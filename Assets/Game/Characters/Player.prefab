@@ -66,17 +66,17 @@ PrefabInstance:
     - target: {fileID: 8339340054995701919, guid: b78da40e1e8265344bc64d80efddd24b,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 69.3847
+      value: 0.01
       objectReference: {fileID: 0}
     - target: {fileID: 8339340054995701919, guid: b78da40e1e8265344bc64d80efddd24b,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 14.68
+      value: 0.44
       objectReference: {fileID: 0}
     - target: {fileID: 8339340054995701919, guid: b78da40e1e8265344bc64d80efddd24b,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 3.152116
+      value: -0.52
       objectReference: {fileID: 0}
     - target: {fileID: 8339340054995701919, guid: b78da40e1e8265344bc64d80efddd24b,
         type: 3}
@@ -142,6 +142,26 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 4872102280017537086}
+    - targetCorrespondingSourceObject: {fileID: 8113930228413350172, guid: b78da40e1e8265344bc64d80efddd24b,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5583396356187098001}
+    - targetCorrespondingSourceObject: {fileID: 8113930228413350172, guid: b78da40e1e8265344bc64d80efddd24b,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3647260587429764393}
+    - targetCorrespondingSourceObject: {fileID: 8113930228413350172, guid: b78da40e1e8265344bc64d80efddd24b,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 680962607057941470}
+    - targetCorrespondingSourceObject: {fileID: 8113930228413350172, guid: b78da40e1e8265344bc64d80efddd24b,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4944970310079228964}
+    - targetCorrespondingSourceObject: {fileID: 8113930228413350172, guid: b78da40e1e8265344bc64d80efddd24b,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3917875700941475815}
   m_SourcePrefab: {fileID: 100100000, guid: b78da40e1e8265344bc64d80efddd24b, type: 3}
 --- !u!1 &5075500785383677502 stripped
 GameObject:
@@ -210,3 +230,67 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 28b05270719298a47b95a560f280b928, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &5583396356187098001
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5075500785383677502}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 715ce82f6d1064bffa021073339056d8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &3647260587429764393
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5075500785383677502}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86f60ab2e2cbc41b9b7ad0c3baaa8cbf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &680962607057941470
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5075500785383677502}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2215178ba12ea4123af2aaa05f25873a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &4944970310079228964
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5075500785383677502}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c824e3a01fb446f48c898e63a146b741, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &3917875700941475815
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5075500785383677502}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 05f7bd7bb63c47af9d4856d68c4de6a6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _radius: 3.03
+  _interactKey: 101
+  _mouseTip: {fileID: 0}
+  _keyboardTip: {fileID: 0}
