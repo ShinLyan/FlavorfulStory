@@ -40,7 +40,6 @@ namespace FlavorfulStory.TimeManagement
             {
                 _currentTimeBetweenTicks = 0;
                 AdvanceTime();
-                print(_dateTime.ToString());
             }
         }
 

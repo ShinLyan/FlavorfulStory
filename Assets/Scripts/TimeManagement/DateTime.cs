@@ -23,11 +23,14 @@ namespace FlavorfulStory.TimeManagement
         public int TotalNumWeeks { get; private set; }
 
         public int CurrentWeek => TotalNumWeeks % 16 == 0 ? 16 : TotalNumWeeks % 16;
+
+        private int _daysInSeason;
+        
         #endregion
         
         #region Constructors
 
-        public DateTime(int date, int season, int year, int hour, int minuteses)
+        public DateTime(int date, int season, int year, int hour, int minutes)
         {
             Day = (Days)(date % 7);
             if (Day == 0) Day = (Days)7;
@@ -36,9 +39,11 @@ namespace FlavorfulStory.TimeManagement
             Season = (Seasons)season;
             Year = year;
             Hour = hour;
-            Minutes = minuteses;
+            Minutes = minutes;
 
-            TotalNumDays = date + (28 * ((int)Season - 1)) + (112 * (Year - 1));
+            _daysInSeason = 28;
+
+            TotalNumDays = date + (_daysInSeason * ((int)Season - 1)) + (_daysInSeason * 4 * (Year - 1));
             
             TotalNumWeeks = 1 + (TotalNumDays / 7);
         }
@@ -79,7 +84,7 @@ namespace FlavorfulStory.TimeManagement
 
             Date++;
 
-            if (Date % 29 == 0)
+            if (Date % (_daysInSeason + 1) == 0)
             {
                 AdvanceSeason();
                 Date = 1;
