@@ -9,15 +9,15 @@ namespace FlavorfulStory.InventorySystem.UI
         private ToolbarSlotUI[] _slots;
 
         /// <summary> Индекс выбранного предмета.</summary>
-        private int _selectedItemIndex = 0;
+        public int SelectedItemIndex { get; private set; }
 
-        private ToolbarSlotUI SelectedItem => _slots[_selectedItemIndex];
+        public InventoryItem SelectedItem => _slots[SelectedItemIndex].GetItem();
 
         /// <summary> Инициализация полей.</summary>
         private void Awake()
         {
             _slots = GetComponentsInChildren<ToolbarSlotUI>();
-            _slots[_selectedItemIndex].Select();
+            _slots[SelectedItemIndex].Select();
 
             Inventory.PlayerInventory.InventoryUpdated += RedrawToolbar;
         }
@@ -31,38 +31,17 @@ namespace FlavorfulStory.InventorySystem.UI
         /// <summary> Перерисовать панель инструментов.</summary>
         private void RedrawToolbar()
         {
-            foreach (var slot in _slots)
-            {
-                slot.Redraw();
-            }
+            foreach (var slot in _slots) slot.Redraw();
         }
 
         /// <summary> Выбрать предмет на панели.</summary>
         /// <param name="index"> Индекс предмета, который нужно выбрать.</param>
         public void SelectItem(int index)
         {
-            _slots[_selectedItemIndex].ResetSelection();
+            _slots[SelectedItemIndex].ResetSelection();
 
-            _selectedItemIndex = index;
-            _slots[_selectedItemIndex].Select();
-        }
-
-        /// <summary> Попробовать использовать предмет в выбранном слоте.</summary>
-        /// <remarks> Если предмет расходуемый, то один экземпляр будет уничтожен.</remarks>
-        /// <returns> Возвращает False, если действие не удалось выполнить.</returns>
-        public bool TryUseSelectedItem()
-        {
-            if (SelectedItem.GetItem() is ActionItem actionItem)
-            {
-                actionItem.Use();
-                if (actionItem.IsConsumable)
-                {
-                    Inventory.PlayerInventory.RemoveFromSlot(_selectedItemIndex, 1);
-                    print($"{this} потратитлся");
-                }
-                return true;
-            }
-            return false;
+            SelectedItemIndex = index;
+            _slots[SelectedItemIndex].Select();
         }
     }
 }

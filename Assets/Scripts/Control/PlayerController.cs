@@ -1,4 +1,6 @@
-﻿using FlavorfulStory.InventorySystem;
+﻿using FlavorfulStory.Actions.ActionItems;
+using FlavorfulStory.InventorySystem;
+using FlavorfulStory.InventorySystem.DropSystem;
 using FlavorfulStory.InventorySystem.UI;
 using FlavorfulStory.Movement;
 using UnityEngine;
@@ -9,6 +11,9 @@ namespace FlavorfulStory.Control
     [RequireComponent(typeof(PlayerMover))]
     public class PlayerController : MonoBehaviour
     {
+        /// <summary>
+        /// 
+        /// </summary>
         [SerializeField] private Toolbar _toolbar;
 
         /// <summary> Передвижение игрока.</summary>
@@ -23,8 +28,13 @@ namespace FlavorfulStory.Control
         /// <summary> Выполнение различных действий в зависимости от состояния.</summary>
         private void Update()
         {
-            InteractWithMovement();
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                GetComponent<ItemDropper>().DropItem(InventoryItem.GetItemFromID("f5d03d4d-c544-4e51-8921-d219a76ce08f"), 1);
+            }
+
             InteractSpecialAbilityKeys();
+            InteractWithMovement();
         }
 
         private void InteractWithMovement()
@@ -43,7 +53,8 @@ namespace FlavorfulStory.Control
 
         private void SelectToolbarItem()
         {
-            for (int i = 0; i < 9; i++)
+            const int ToolbarItemsCount = 9;
+            for (int i = 0; i < ToolbarItemsCount; i++)
             {
                 if (Input.GetKeyDown(KeyCode.Alpha1 + i))
                 {
@@ -52,12 +63,25 @@ namespace FlavorfulStory.Control
             }
         }
 
+        /// <summary> Использовать предмет в панели быстрого доступа.</summary>
+        /// <remarks> Если предмет расходуемый, то один экземпляр будет уничтожен.</remarks>
         private void UseToolbarItem()
         {
-            if (Input.GetMouseButtonDown(1))
+            if (_toolbar && _toolbar.SelectedItem is ActionItem actionItem &&
+                (Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1)))
             {
-                print("Input.GetMouseButtonDown(1)");
-                _toolbar.TryUseSelectedItem();
+                var actionType = Input.GetMouseButtonDown(0) ? 
+                    UseActionType.LeftClick : UseActionType.RightClick;
+                if (actionItem.UseActionType == actionType)
+                {
+                    actionItem.Use(this);
+                }
+
+                if (actionItem.IsConsumable)
+                {
+                    Inventory.PlayerInventory.RemoveFromSlot(_toolbar.SelectedItemIndex, 1);
+                    print($"{_toolbar.SelectedItem} потратился");
+                }
             }
         }
 
