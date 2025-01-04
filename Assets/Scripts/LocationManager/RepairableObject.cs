@@ -3,7 +3,7 @@ using UnityEngine;
 namespace FlavorfulStory.LocationManager
 {
     /// <summary> Восстанавливающийся объект.</summary>
-    public class RepairableObject : InteractableObject
+    public class RepairableObject : InteractableObject2
     {
         /// <summary> Взаимодействие.</summary>
         public override void Interact()

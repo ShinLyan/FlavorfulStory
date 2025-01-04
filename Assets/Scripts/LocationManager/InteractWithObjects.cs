@@ -20,7 +20,7 @@ namespace FlavorfulStory.LocationManager
         [SerializeField] private GameObject _keyboardTip;
         
         /// <summary> Текущая цель.</summary>
-        private InteractableObject _currentTarget;
+        private InteractableObject2 _currentTarget;
         
         /// <summary> Цель принадлежит курсору.</summary>
         private bool _isCursorTarget;
@@ -51,9 +51,9 @@ namespace FlavorfulStory.LocationManager
         }
         
         /// <summary> Поиск цели.</summary>
-        private InteractableObject FindTarget()
+        private InteractableObject2 FindTarget()
         {
-            InteractableObject target = GetCursorTarget();
+            InteractableObject2 target = GetCursorTarget();
             _isCursorTarget = true;
             if (!target)
             {
@@ -66,16 +66,16 @@ namespace FlavorfulStory.LocationManager
         }
         
         /// <summary> Получение цели через курсор.</summary>
-        private InteractableObject GetCursorTarget()
+        private InteractableObject2 GetCursorTarget()
         {
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             bool isHit = Physics.Raycast(ray, out RaycastHit hitInfo, Mathf.Infinity,
                 LayerMask.GetMask("Interactable"));
-            return isHit ? hitInfo.collider.GetComponent<InteractableObject>() : null;
+            return isHit ? hitInfo.collider.GetComponent<InteractableObject2>() : null;
         }
         
         /// <summary> Получение объектов в радуисе взаимодействия.</summary>
-        private IEnumerable<InteractableObject> GetNearbyObjects()
+        private IEnumerable<InteractableObject2> GetNearbyObjects()
         {
             RaycastHit[] hits = Physics.SphereCastAll(
                 transform.position, 
@@ -84,13 +84,13 @@ namespace FlavorfulStory.LocationManager
                 0,
                 LayerMask.GetMask("Interactable")
             );
-            return hits.Select(hit => hit.collider.GetComponent<InteractableObject>());
+            return hits.Select(hit => hit.collider.GetComponent<InteractableObject2>());
         }
         
         /// <summary> Получение ближайшего объекта.</summary>
-        private InteractableObject GetClosestInteractable(IEnumerable<InteractableObject> interactables)
+        private InteractableObject2 GetClosestInteractable(IEnumerable<InteractableObject2> interactables)
         {
-            InteractableObject closest = null;
+            InteractableObject2 closest = null;
             float minDistance = float.MaxValue;
             foreach (var interactable in interactables)
             {

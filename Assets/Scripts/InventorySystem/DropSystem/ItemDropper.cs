@@ -14,12 +14,12 @@ namespace FlavorfulStory.InventorySystem.DropSystem
         /// <summary> Выброшенные предметы.</summary>
         private List<Pickup> _droppedItems = new();
 
-        private List<DropRecord> _otherSceneDroppedItems = new();
+        private readonly List<DropRecord> _otherSceneDroppedItems = new();
 
         /// <summary> Создание pickup в определенной позиции.</summary>
         /// <param name="item"> Предмет, который необходимо заспавнить.</param>
         /// <param name="number"> Количество предметов.</param>
-        public void DropItem(InventoryItem item , int number)
+        public void DropItem(InventoryItem item, int number)
         {
             SpawnPickup(item, number, GetDropPosition());
         }
@@ -29,8 +29,10 @@ namespace FlavorfulStory.InventorySystem.DropSystem
         /// <returns> Возвращает позицию, где должен быть заспавнен предмет.</returns>
         protected virtual Vector3 GetDropPosition()
         {
-            // По умолчанию спавнится в самом объекте.
-            return transform.position;
+            float dropOffsetRange = 5f; // Диапазон случайного смещения по осям X и Z
+            float randomOffsetX = Random.Range(-dropOffsetRange, dropOffsetRange);
+            float randomOffsetZ = Random.Range(-dropOffsetRange, dropOffsetRange);
+            return transform.position + new Vector3(randomOffsetX, 0, randomOffsetZ);
         }
 
         /// <summary> Заспавнить предмет Pickup на сцене.</summary>

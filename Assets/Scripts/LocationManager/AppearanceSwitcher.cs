@@ -10,7 +10,7 @@ namespace FlavorfulStory.LocationManager
         [SerializeField] private bool _isCycled;
         
         /// <summary> Игровые объекты.</summary>
-        private InteractableObject[] _gameObjects;
+        private InteractableObject2[] _gameObjects;
         
         /// <summary> Номер текущего состояния.</summary>
         private int _currentStateIndex;
@@ -18,7 +18,7 @@ namespace FlavorfulStory.LocationManager
         /// <summary> Получение объектов.</summary>
         private void Awake()
         {
-            _gameObjects = GetComponentsInChildren<InteractableObject>(true);
+            _gameObjects = GetComponentsInChildren<InteractableObject2>(true);
             _currentStateIndex = 0;
         }
 
