@@ -1,5 +1,4 @@
 using FlavorfulStory.Control;
-using System;
 using UnityEngine;
 
 namespace FlavorfulStory.SceneManagement
@@ -22,8 +21,8 @@ namespace FlavorfulStory.SceneManagement
             StartCoroutine(TeleportPlayer());
         }
 
-        /// <summary> Телепортировать игрока к другому порталу в точку спавна.</summary>
-        /// <returns> Возвращает корутину, которая телепортирует.</returns>
+        /// <summary> пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ.</summary>
+        /// <returns> пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.</returns>
         private System.Collections.IEnumerator TeleportPlayer()
         {
             transform.parent = null;
