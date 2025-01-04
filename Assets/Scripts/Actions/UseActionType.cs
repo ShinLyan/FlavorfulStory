@@ -1,4 +1,4 @@
-namespace FlavorfulStory.Actions.ActionItems
+namespace FlavorfulStory.Actions
 {
     /// <summary> Тип действия для использования предмета (ЛКМ или ПКМ).</summary>
     public enum UseActionType

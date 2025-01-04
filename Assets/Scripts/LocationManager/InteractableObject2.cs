@@ -4,7 +4,7 @@ namespace FlavorfulStory.LocationManager
 {
     /// <summary> Объект для взаимодействия.</summary>
     [RequireComponent(typeof(Outline))]
-    public class InteractableObject : MonoBehaviour
+    public class InteractableObject2 : MonoBehaviour
     {
         /// <summary> Компонент обводки.</summary>
         private Outline _outline;
