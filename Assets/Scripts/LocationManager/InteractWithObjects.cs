@@ -25,6 +25,8 @@ namespace FlavorfulStory.LocationManager
         /// <summary> Цель принадлежит курсору.</summary>
         private bool _isCursorTarget;
 
+        private RaycastHit[] _hits = new RaycastHit[20];
+        
         private void Update()
         {
             if (_currentTarget)
@@ -59,7 +61,7 @@ namespace FlavorfulStory.LocationManager
             {
                 _isCursorTarget = false;
                 var nearbyInteractables = GetNearbyObjects();
-                if (nearbyInteractables.Count() > 0)
+                if (nearbyInteractables.Any())
                     target = GetClosestInteractable(nearbyInteractables);
             }
             return target;
@@ -77,14 +79,15 @@ namespace FlavorfulStory.LocationManager
         /// <summary> Получение объектов в радуисе взаимодействия.</summary>
         private IEnumerable<InteractableObject2> GetNearbyObjects()
         {
-            RaycastHit[] hits = Physics.SphereCastAll(
+            Physics.SphereCastNonAlloc(
                 transform.position, 
                 _radius,
                 Vector3.one,
+                _hits,
                 0,
                 LayerMask.GetMask("Interactable")
             );
-            return hits.Select(hit => hit.collider.GetComponent<InteractableObject2>());
+            foreach (var hit in _hits) yield return hit.collider.GetComponent<InteractableObject2>();
         }
         
         /// <summary> Получение ближайшего объекта.</summary>

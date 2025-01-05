@@ -34,7 +34,9 @@ namespace NPC
             }
             if (route != null)
             {
-                Debug.Log("Send to route " + route.name);
+                //TODO: Delete DEBUG.LOG()
+                //Debug.Log("Send to route " + route.name);
+                
                 _targetNpcController.SendNpcOnRoute(route);
                 _targetRouteTimeList.RemoveAt(_targetRoutesList.IndexOf(route));
                 _targetRoutesList.Remove(route);  
