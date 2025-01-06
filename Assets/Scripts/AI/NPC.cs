@@ -12,6 +12,8 @@ namespace FlavorfulStory.AI
 
         [SerializeField] private Dictionary<int, Transform> _shedule;
         
+        private Animator _animator;
+        
         private NavMeshAgent _navMeshAgent;
         
         private InteractionState _interactionState;
@@ -24,6 +26,7 @@ namespace FlavorfulStory.AI
         private void Awake()
         {
             _navMeshAgent = GetComponent<NavMeshAgent>();
+            _animator = GetComponent<Animator>();
         }
 
         private void Start()
@@ -31,7 +34,7 @@ namespace FlavorfulStory.AI
             _fsm = new Fsm();
 
             _interactionState = new InteractionState(_fsm, this);
-            _movementState = new MovementState(_fsm, this, _navMeshAgent, _goals);
+            _movementState = new MovementState(_fsm, this, _navMeshAgent, _goals, _animator);
             _routineState = new RoutineState(_fsm, this);
             _waitingState = new WaitingState(_fsm, this);
             

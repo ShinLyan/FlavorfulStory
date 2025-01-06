@@ -1,165 +1,144 @@
+
 using System;
 
 namespace FlavorfulStory.TimeManagement
 {
     [Serializable]
-    public struct DateTime
+    public class DateTime
     {
-        #region Properties
-        public Days Day { get; private set; }
+        // Единственное поле, которое хранит общее количество минут с начала игры
+        private int _totalMinutes;
+        private int _dayMinutes;
+        private int _seasonMinutes;
 
-        public int Date { get; private set;}
-
-        public int Year { get; private set; }
-
-        public int Hour { get; private set; }
-
-        public int Minutes { get; private set; }
-
-        public Seasons Season { get; private set; }
-
-        public int TotalNumDays { get; private set; }
-
-        public int TotalNumWeeks { get; private set; }
-
-        public int CurrentWeek => TotalNumWeeks % 16 == 0 ? 16 : TotalNumWeeks % 16;
-
-        private int _daysInSeason;
-        
-        #endregion
-        
-        #region Constructors
-
-        public DateTime(int date, int season, int year, int hour, int minutes)
+        // Конструктор, который принимает общее количество минут
+        public DateTime(int year, int season, int day, int hour, int minute)
         {
-            Day = (Days)(date % 7);
-            if (Day == 0) Day = (Days)7;
-
-            Date = date;
-            Season = (Seasons)season;
-            Year = year;
-            Hour = hour;
-            Minutes = minutes;
-
-            _daysInSeason = 28;
-
-            TotalNumDays = date + (_daysInSeason * ((int)Season - 1)) + (_daysInSeason * 4 * (Year - 1));
-            
-            TotalNumWeeks = 1 + (TotalNumDays / 7);
+            _dayMinutes = 1440;
+            _seasonMinutes = _dayMinutes * 28;
+            _totalMinutes = ((year - 1) * _seasonMinutes * 4) // Годы в минутах
+                           + ((season - 1) * _seasonMinutes)     // Сезоны в минутах
+                           + ((day - 1) * _dayMinutes)   // Дни в минутах
+                           + (hour * 60)          // Часы в минутах
+                           + minute;              
         }
-        
-        #endregion
-        
+
         #region Methods
 
-        public void AdvanceMinutes(int minutesToAdvanceBy)
+        public void AddMinutes(int minutes)
         {
-            if (Minutes + minutesToAdvanceBy >= 60)
-            {
-                Minutes = (Minutes + minutesToAdvanceBy) % 60;
-                AdvanceHour();
-            }
-            else Minutes += minutesToAdvanceBy;
+            _totalMinutes += minutes;
+        }
+        
+        public int GetYear()
+        {
+            return _totalMinutes / (_seasonMinutes * 4) + 1;
         }
 
-        public void AdvanceHour()
+        public string GetSeason()
         {
-            if (Hour + 1 == 24)
+            int seasonIndex = (_totalMinutes % (_seasonMinutes * 4)) / _seasonMinutes;
+            return seasonIndex switch
             {
-                Hour = 0;
-                AdvanceDay();
-            }
-            else Hour++;
+                0 => "Winter",
+                1 => "Spring",
+                2 => "Summer",
+                3 => "Autumn",
+                _ => "Unknown"
+            };
         }
 
-        public void AdvanceDay()
+        public int GetDayInSeason()
         {
-            Day++;
-
-            if (Day > (Days)7)
-            {
-                Day = (Days)1;
-                TotalNumWeeks++;
-            }
-
-            Date++;
-
-            if (Date % (_daysInSeason + 1) == 0)
-            {
-                AdvanceSeason();
-                Date = 1;
-            }
-
-            TotalNumDays++;
+            return (_totalMinutes % _seasonMinutes) / _dayMinutes + 1;
         }
 
-        public void AdvanceSeason()
+        public Days GetDayOfWeek()
         {
-            if (Season == Seasons.Winter)
-            {
-                Season = Seasons.Spring;
-                AdvanceYear();
-            }
-            else Season++;
+            var dayIndex = (_totalMinutes / _dayMinutes) % 7;
+            return (Days)dayIndex;
         }
 
-        public void AdvanceYear()
+        public int GetHour()
         {
-            Date = 1;
-            Year++;
+            return (_totalMinutes % _dayMinutes) / 60;
+        }
+
+        public int GetMinute()
+        {
+            return _totalMinutes % 60;
+        }
+
+        public int GetTotalWeeks()
+        {
+            return _totalMinutes / (_dayMinutes * 7);
+        }
+
+        public int GetTotalDays()
+        {
+            return _totalMinutes / _dayMinutes;
         }
         
         #endregion
-
-        #region Checks
-
-        public bool IsNight() => Hour > 18 || Hour < 6;
-
-        public bool IsWeekend() => Day > Days.Fri;
         
-        public bool IsParticularDay(Days day) => day == Day;
+        #region Overrides
+        
+        public static bool operator ==(DateTime dt1, DateTime dt2)
+        {
+            if (dt1 is null || dt2 is null)
+                return false;
+            return dt1._totalMinutes == dt2._totalMinutes;
+        }
 
+        public static bool operator !=(DateTime dt1, DateTime dt2)
+        {
+            return !(dt1 == dt2);
+        }
+
+        public static bool operator >(DateTime dt1, DateTime dt2)
+        {
+            return dt1._totalMinutes > dt2._totalMinutes;
+        }
+
+        public static bool operator <(DateTime dt1, DateTime dt2)
+        {
+            return dt1._totalMinutes < dt2._totalMinutes;
+        }
+        
+        public override bool Equals(object obj)
+        {
+            if (obj is DateTime other)
+                return _totalMinutes == other._totalMinutes;
+            return false;
+        }
+
+        // Переопределение метода GetHashCode
+        public override int GetHashCode()
+        {
+            return _totalMinutes.GetHashCode();
+        }
+        
         #endregion
-
+        
         #region ToString
 
         public override string ToString()
         {
-            return $"Date: {Date}, Season: {Season}, Year: {Year}, Hour: {Hour}, Minutes: {Minutes}, TotalNumDays: {TotalNumDays}, TotalNumWeeks: {TotalNumWeeks}";
+            return $"Date: {GetDayInSeason()}, Season: {GetSeason()}, Year: {GetYear()}, " +
+                   $"Hour: {GetHour()}, Minutes: {GetMinute()}, TotalNumDays: {GetTotalDays()}, " +
+                   $"TotalNumWeeks: {GetTotalWeeks()}";
         }
 
         public string DateToString()
         {
-            return $"{Day} {Date} {Year.ToString("D2")}";
+            return $"{GetDayOfWeek()} {GetDayInSeason()} {GetYear()}";
         }
 
         public string TimeToString()
         {
-            return $"{Hour.ToString("D2")}:{Minutes.ToString("D2")}";
+            return $"{GetHour()}:{GetMinute()}";
         }
 
         #endregion
-    }
-    
-    [Serializable]
-    public enum Days
-    {
-        Null = 0,
-        Mon = 1,
-        Tue = 2,
-        Wed = 3,
-        Thu = 4, 
-        Fri = 5, 
-        Sat = 6,
-        Sun = 7
-    }
-
-    [Serializable]
-    public enum Seasons
-    {
-        Winter = 0,
-        Spring = 1,
-        Summer = 2,
-        Autumn = 3
     }
 }

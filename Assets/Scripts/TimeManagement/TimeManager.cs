@@ -1,17 +1,16 @@
 using System;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace FlavorfulStory.TimeManagement
 {
     public class TimeManager : MonoBehaviour
     {
         [Header("Settings")] 
-        [Range(1, 28)] public int dateInMonths;
-        [Range(1, 4)] public int season;
-        [Range(1, 99)] public int year;
-        [Range(0, 24)] public int hour;
-        [Range(0, 6)] public int minutes;
+        [SerializeField, Range(1, 28)] private int _date;
+        [SerializeField, Range(1, 4)] private int _season;
+        [SerializeField, Range(1, 99)] private int _year;
+        [SerializeField, Range(0, 24)] private int _hour;
+        [SerializeField, Range(0, 60)] private int _minutes;
 
         private DateTime _dateTime;
         
@@ -24,7 +23,7 @@ namespace FlavorfulStory.TimeManagement
 
         private void Awake()
         {
-            _dateTime = new DateTime(dateInMonths, season, year, hour, minutes);
+            _dateTime = new DateTime(_year, _season, _date, _hour, _minutes);
         }
 
         private void Start()
@@ -45,8 +44,9 @@ namespace FlavorfulStory.TimeManagement
 
         private void AdvanceTime()
         {
-            _dateTime.AdvanceMinutes(TickMinutesIncrease);
-            
+            _dateTime.AddMinutes(TickMinutesIncrease);
+
+            print(_dateTime.ToString());
             OnDateTimeChanged?.Invoke(_dateTime);
         }
     }
