@@ -1,30 +1,52 @@
-﻿using FlavorfulStory.InventorySystem;
+﻿using FlavorfulStory.Actions;
+using FlavorfulStory.InventorySystem;
 using FlavorfulStory.InventorySystem.UI;
 using FlavorfulStory.Movement;
 using UnityEngine;
 
 namespace FlavorfulStory.Control
 {
-    /// <summary> Контроллер игрока.</summary>
+    /// <summary> Контроллер игрока, отвечающий за управление, 
+    /// использование предметов и взаимодействие с окружением.</summary>
     [RequireComponent(typeof(PlayerMover))]
+    [RequireComponent(typeof(Animator))]
     public class PlayerController : MonoBehaviour
     {
+        /// <summary> Панель быстрого доступа.</summary>
         [SerializeField] private Toolbar _toolbar;
 
         /// <summary> Передвижение игрока.</summary>
         private PlayerMover _playerMover;
 
-        /// <summary> Инициализация полей.</summary>
+        /// <summary> Аниматор игрока.</summary>
+        private Animator _animator;
+
+        /// <summary> Время перезарядки использования инструмента.</summary>
+        [SerializeField] private float _toolCooldown = 1f;
+
+        /// <summary> Таймер для отслеживания перезарядки инструмента.</summary>
+        private float _toolCooldownTimer = 0f;
+
+        /// <summary> Текущий выбранный предмет из панели быстрого доступа.</summary>
+        public InventoryItem CurrentItem => _toolbar.SelectedItem;
+
+        /// <summary> Можно ли использовать инструмент. </summary>
+        public bool CanUseTool => _toolCooldownTimer <= 0f;
+
+        /// <summary> Инициализация необходимых компонентов.</summary>
         private void Awake()
         {
             _playerMover = GetComponent<PlayerMover>();
+            _animator = GetComponent<Animator>();
         }
 
         /// <summary> Выполнение различных действий в зависимости от состояния.</summary>
         private void Update()
         {
-            InteractWithMovement();
             InteractSpecialAbilityKeys();
+            InteractWithMovement();
+
+            UpdateTimers();
         }
 
         private void InteractWithMovement()
@@ -34,6 +56,11 @@ namespace FlavorfulStory.Control
             _playerMover.MoveAndRotate(direction);
         }
 
+        private void UpdateTimers()
+        {
+            if (_toolCooldownTimer > 0f) _toolCooldownTimer -= Time.deltaTime;
+        }
+
         /// <summary> Взаимодействовать со специальными клавишами.</summary>
         private void InteractSpecialAbilityKeys()
         {
@@ -41,9 +68,11 @@ namespace FlavorfulStory.Control
             UseToolbarItem();
         }
 
+        /// <summary> Выбор предмета на панели быстрого доступа.</summary>
         private void SelectToolbarItem()
         {
-            for (int i = 0; i < 9; i++)
+            const int ToolbarItemsCount = 9;
+            for (int i = 0; i < ToolbarItemsCount; i++)
             {
                 if (Input.GetKeyDown(KeyCode.Alpha1 + i))
                 {
@@ -52,12 +81,26 @@ namespace FlavorfulStory.Control
             }
         }
 
+        /// <summary> Использовать предмет из панели быстрого доступа.</summary>
+        /// <remarks> Если предмет расходуемый, то один экземпляр будет уничтожен.</remarks>
         private void UseToolbarItem()
         {
-            if (Input.GetMouseButtonDown(1))
+            if (_toolbar && CurrentItem is ActionItem actionItem &&
+                (Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1)) && CanUseTool)
             {
-                print("Input.GetMouseButtonDown(1)");
-                _toolbar.TryUseSelectedItem();
+                var actionType = Input.GetMouseButtonDown(0) ?
+                    UseActionType.LeftClick : UseActionType.RightClick;
+                if (actionItem.UseActionType == actionType)
+                {
+                    actionItem.Use(this);
+                    _toolCooldownTimer = _toolCooldown;
+                }
+
+                if (actionItem.IsConsumable)
+                {
+                    Inventory.PlayerInventory.RemoveFromSlot(_toolbar.SelectedItemIndex, 1);
+                    print($"{CurrentItem} потратился");
+                }
             }
         }
 
@@ -68,6 +111,28 @@ namespace FlavorfulStory.Control
         {
             var playerController = GameObject.FindWithTag("Player")?.GetComponent<PlayerController>();
             if (playerController) playerController.enabled = enabled;
+        }
+
+        /// <summary> Запуск анимации.</summary>
+        /// <param name="animationName"> Имя анимации.</param>
+        public void TriggerAnimation(string animationName) => _animator?.SetTrigger(animationName);
+
+
+        /// <summary> Получить позицию курсора.</summary>
+        /// <returns> Возвращает позицию курсора.</returns>
+        public static Vector3 GetCursorPosition()
+        {
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            return Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity) ? hit.point : Vector3.zero;
+        }
+
+        /// <summary> Повернуть игрока в направлении указанной позиции.</summary>
+        /// <param name="position"> Позиция для поворота.</param>
+        public void RotateTowards(Vector3 position)
+        {
+            Vector3 direction = (position - transform.position).normalized;
+            direction.y = 0; // Игнорируем вертикальную составляющую
+            transform.rotation = Quaternion.LookRotation(direction);
         }
     }
 }

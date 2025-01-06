@@ -13,7 +13,8 @@ namespace FlavorfulStory.InventorySystem
         #region Fields and Properties
         /// <summary> Автоматически сгенерированный ID для сохранения/загрузки.</summary>
         /// <remarks> Очистите это поле, если вы хотите создать новое.</remarks>
-        [field: Tooltip("Автоматически сгенерированный ID для сохранения/загрузки. Очистите это поле, если вы хотите создать новое.")]
+        [field: Tooltip("Автоматически сгенерированный ID для сохранения/загрузки. " +
+            "Очистите это поле, если вы хотите создать новое.")]
         [field: SerializeField] public string ItemID { get; private set; }
 
         /// <summary> Название предмета, которое будет отображаться в UI.</summary>

@@ -2,6 +2,7 @@
 using FlavorfulStory.Saving;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace FlavorfulStory.InventorySystem.DropSystem
 {
@@ -13,10 +14,12 @@ namespace FlavorfulStory.InventorySystem.DropSystem
         /// <summary> Выброшенные предметы.</summary>
         private List<Pickup> _droppedItems = new();
 
+        private readonly List<DropRecord> _otherSceneDroppedItems = new();
+
         /// <summary> Создание pickup в определенной позиции.</summary>
         /// <param name="item"> Предмет, который необходимо заспавнить.</param>
         /// <param name="number"> Количество предметов.</param>
-        public void DropItem(InventoryItem item , int number)
+        public void DropItem(InventoryItem item, int number)
         {
             SpawnPickup(item, number, GetDropPosition());
         }
@@ -26,8 +29,10 @@ namespace FlavorfulStory.InventorySystem.DropSystem
         /// <returns> Возвращает позицию, где должен быть заспавнен предмет.</returns>
         protected virtual Vector3 GetDropPosition()
         {
-            // По умолчанию спавнится в самом объекте.
-            return transform.position;
+            float dropOffsetRange = 5f; // Диапазон случайного смещения по осям X и Z
+            float randomOffsetX = Random.Range(-dropOffsetRange, dropOffsetRange);
+            float randomOffsetZ = Random.Range(-dropOffsetRange, dropOffsetRange);
+            return transform.position + new Vector3(randomOffsetX, 0, randomOffsetZ);
         }
 
         /// <summary> Заспавнить предмет Pickup на сцене.</summary>
@@ -53,6 +58,8 @@ namespace FlavorfulStory.InventorySystem.DropSystem
 
             /// <summary> Количество выпавших предметов.</summary>
             public int Number;
+
+            public int SceneBuildIndex;
         }
 
         /// <summary> Фиксация состояния объекта при сохранении.</summary>
@@ -60,13 +67,21 @@ namespace FlavorfulStory.InventorySystem.DropSystem
         public object CaptureState()
         {
             RemovePickedUpItems();
-            var droppedItemsList = new DropRecord[_droppedItems.Count];
-            for (int i = 0; i < droppedItemsList.Length; i++)
+
+            var droppedItemsList = new List<DropRecord>();
+            int buildIndex = SceneManager.GetActiveScene().buildIndex;
+            foreach (Pickup pickup in _droppedItems)
             {
-                droppedItemsList[i].ItemID = _droppedItems[i].Item.ItemID;
-                droppedItemsList[i].Position = new SerializableVector3(_droppedItems[i].transform.position);
-                droppedItemsList[i].Number = _droppedItems[i].Number;
+                var droppedItem = new DropRecord
+                {
+                    ItemID = pickup.Item.ItemID,
+                    Position = new SerializableVector3(pickup.transform.position),
+                    Number = pickup.Number,
+                    SceneBuildIndex = buildIndex
+                };
+                droppedItemsList.Add(droppedItem);
             }
+            droppedItemsList.AddRange(_otherSceneDroppedItems);
             return droppedItemsList;
         }
 
@@ -85,9 +100,17 @@ namespace FlavorfulStory.InventorySystem.DropSystem
         /// <param name="state"> Объект состояния, который необходимо восстановить.</param>
         public void RestoreState(object state)
         {
-            var droppedItemsList = state as DropRecord[];
+            var droppedItemsList = state as List<DropRecord>;
+            int buildIndex = SceneManager.GetActiveScene().buildIndex;
+            _otherSceneDroppedItems.Clear();
             foreach (var item in droppedItemsList)
             {
+                if (item.SceneBuildIndex != buildIndex)
+                {
+                    _otherSceneDroppedItems.Add(item);
+                    continue;
+                }
+
                 var pickupItem = InventoryItem.GetItemFromID(item.ItemID);
                 Vector3 position = item.Position.ToVector();
                 int number = item.Number;
