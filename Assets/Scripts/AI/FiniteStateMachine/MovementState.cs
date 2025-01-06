@@ -34,7 +34,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine
             if (_navMeshAgent.remainingDistance < _distanceToChangeGoal)
             {
                 _currentGoal++;
-                if (_currentGoal == _goals.Length - 1) 
+                if (_currentGoal == _goals.Length) 
                     _currentGoal = 0;
             }
             _navMeshAgent.destination = _goals[_currentGoal].position;

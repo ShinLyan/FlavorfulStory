@@ -35,17 +35,10 @@ namespace FlavorfulStory.TimeManagement
             return _totalMinutes / (_seasonMinutes * 4) + 1;
         }
 
-        public string GetSeason()
+        public Seasons GetSeason()
         {
             int seasonIndex = (_totalMinutes % (_seasonMinutes * 4)) / _seasonMinutes;
-            return seasonIndex switch
-            {
-                0 => "Winter",
-                1 => "Spring",
-                2 => "Summer",
-                3 => "Autumn",
-                _ => "Unknown"
-            };
+            return (Seasons)seasonIndex;
         }
 
         public int GetDayInSeason()
@@ -124,9 +117,7 @@ namespace FlavorfulStory.TimeManagement
 
         public override string ToString()
         {
-            return $"Date: {GetDayInSeason()}, Season: {GetSeason()}, Year: {GetYear()}, " +
-                   $"Hour: {GetHour()}, Minutes: {GetMinute()}, TotalNumDays: {GetTotalDays()}, " +
-                   $"TotalNumWeeks: {GetTotalWeeks()}";
+            return $"{GetDayInSeason()}.{(int)GetSeason() + 1}.{GetYear()} {GetHour()}:{GetMinute()}";
         }
 
         public string DateToString()
