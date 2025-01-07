@@ -20,11 +20,10 @@ namespace FlavorfulStory.InventorySystem.UI
         /// <summary> ������������� �����.</summary>
         private void Awake()
         {
-            var toolbarSlotsUI = GetComponentsInChildren<ToolbarSlotUI>(); 
-            _slots = toolbarSlotsUI;
-            _toolbarSize = toolbarSlotsUI.Length;
+            _slots = GetComponentsInChildren<ToolbarSlotUI>();
+            _toolbarSize = _slots.Length;
             _slots[SelectedItemIndex].Select();
-
+            
             Inventory.PlayerInventory.InventoryUpdated += RedrawToolbar;
         }
 
