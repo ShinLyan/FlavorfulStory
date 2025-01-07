@@ -117,7 +117,6 @@ namespace FlavorfulStory.Control
         /// <param name="animationName"> Имя анимации.</param>
         public void TriggerAnimation(string animationName) => _animator?.SetTrigger(animationName);
 
-
         /// <summary> Получить позицию курсора.</summary>
         /// <returns> Возвращает позицию курсора.</returns>
         public static Vector3 GetCursorPosition()
