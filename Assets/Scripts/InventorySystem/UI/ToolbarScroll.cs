@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace FlavorfulStory.InventorySystem.UI
 {
-    /// <summary> Коллбек из UnityAPI. </summary>
+    /// <summary> Класс скроллинга тулбара. </summary>
     [RequireComponent(typeof(Toolbar))]
     public class ToolbarScroll : MonoBehaviour
     {
