@@ -1867,7 +1867,11 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 8165363879355658588, guid: a9114609ac4097e459c8c7e1f3d67d2b,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2137331346}
   m_SourcePrefab: {fileID: 100100000, guid: a9114609ac4097e459c8c7e1f3d67d2b, type: 3}
 --- !u!4 &1019812549 stripped
 Transform:
@@ -2416,6 +2420,25 @@ Light:
   m_UseViewFrustumForShadowCasterCull: 1
   m_ShadowRadius: 0
   m_ShadowAngle: 0
+--- !u!1 &2137331339 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8165363879355658588, guid: a9114609ac4097e459c8c7e1f3d67d2b,
+    type: 3}
+  m_PrefabInstance: {fileID: 895288242}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &2137331346
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2137331339}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7107bef8243b16e4689df2023192e375, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _toolbarSize: 9
 --- !u!1001 &2120185801343123178
 PrefabInstance:
   m_ObjectHideFlags: 0
