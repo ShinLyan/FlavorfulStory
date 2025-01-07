@@ -8,9 +8,6 @@ namespace FlavorfulStory.InventorySystem.UI
     {
         /// <summary> ������ ������ ������ ������������.</summary>
         private ToolbarSlotUI[] _slots;
-
-        /// <summary> Количество тулбар слотов. </summary>
-        private int _toolbarSize;
         
         /// <summary> ������ ���������� ��������.</summary>
         public int SelectedItemIndex { get; private set; }
@@ -21,7 +18,6 @@ namespace FlavorfulStory.InventorySystem.UI
         private void Awake()
         {
             _slots = GetComponentsInChildren<ToolbarSlotUI>();
-            _toolbarSize = _slots.Length;
             _slots[SelectedItemIndex].Select();
             
             Inventory.PlayerInventory.InventoryUpdated += RedrawToolbar;
@@ -58,8 +54,8 @@ namespace FlavorfulStory.InventorySystem.UI
         /// <summary> Метод обработки ввода колесика мыши. </summary>
         private void HandleMouseScrollInput()
         {
-            var scrollInput = (int) Input.mouseScrollDelta.y;
-            var newSelectedItemIndex = Math.Clamp(SelectedItemIndex - scrollInput, 0, _toolbarSize - 1);
+            var scrollInput = (int)Input.mouseScrollDelta.y;
+            var newSelectedItemIndex = Math.Clamp(SelectedItemIndex - scrollInput, 0, _slots.Length - 1);
             SelectItem(newSelectedItemIndex);
         }
     }
