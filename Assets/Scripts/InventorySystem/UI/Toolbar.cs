@@ -1,47 +1,62 @@
+using System;
 using UnityEngine;
 
 namespace FlavorfulStory.InventorySystem.UI
 {
-    /// <summary> Панель инструментов.</summary>
+    /// <summary> пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.</summary>
     public class Toolbar : MonoBehaviour
     {
-        /// <summary> Массив слотов панели инструментов.</summary>
+        /// <summary> пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.</summary>
         private ToolbarSlotUI[] _slots;
-
-        /// <summary> Индекс выбранного предмета.</summary>
+        
+        /// <summary> пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.</summary>
         public int SelectedItemIndex { get; private set; }
 
         public InventoryItem SelectedItem => _slots[SelectedItemIndex].GetItem();
 
-        /// <summary> Инициализация полей.</summary>
+        /// <summary> пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ.</summary>
         private void Awake()
         {
             _slots = GetComponentsInChildren<ToolbarSlotUI>();
             _slots[SelectedItemIndex].Select();
-
+            
             Inventory.PlayerInventory.InventoryUpdated += RedrawToolbar;
         }
 
-        /// <summary> При старте перерисовываем инвентарь.</summary>
+        /// <summary> пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.</summary>
         private void Start()
         {
             RedrawToolbar();
         }
 
-        /// <summary> Перерисовать панель инструментов.</summary>
+        /// <summary> РљРѕР»Р»Р±РµРє РёР· UnityAPI. </summary>
+        private void Update()
+        {
+            HandleMouseScrollInput();
+        }
+        
+        /// <summary> пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.</summary>
         private void RedrawToolbar()
         {
             foreach (var slot in _slots) slot.Redraw();
         }
 
-        /// <summary> Выбрать предмет на панели.</summary>
-        /// <param name="index"> Индекс предмета, который нужно выбрать.</param>
+        /// <summary> пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ.</summary>
+        /// <param name="index"> пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ.</param>
         public void SelectItem(int index)
         {
             _slots[SelectedItemIndex].ResetSelection();
 
             SelectedItemIndex = index;
             _slots[SelectedItemIndex].Select();
+        }
+        
+        /// <summary> РњРµС‚РѕРґ РѕР±СЂР°Р±РѕС‚РєРё РІРІРѕРґР° РєРѕР»РµСЃРёРєР° РјС‹С€Рё. </summary>
+        private void HandleMouseScrollInput()
+        {
+            var scrollInput = (int)Input.mouseScrollDelta.y;
+            var newSelectedItemIndex = Math.Clamp(SelectedItemIndex - scrollInput, 0, _slots.Length - 1);
+            SelectItem(newSelectedItemIndex);
         }
     }
 }
