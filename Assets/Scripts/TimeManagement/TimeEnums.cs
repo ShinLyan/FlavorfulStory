@@ -2,8 +2,9 @@ using System;
 
 namespace FlavorfulStory.TimeManagement
 {
+    /// <summary> Дни недели.</summary>
     [Serializable]
-    public enum Days
+    public enum WeekDays
     {
         Mon = 0,
         Tue = 1,
@@ -14,6 +15,7 @@ namespace FlavorfulStory.TimeManagement
         Sun = 6
     }
 
+    /// <summary> Сезоны.</summary>
     [Serializable]
     public enum Seasons
     {
