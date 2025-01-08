@@ -20,6 +20,7 @@ namespace FlavorfulStory.TimeManagement
         private float _currentTimeBetweenTicks = 0;
         
         public static Action<DateTime> OnDateTimeChanged;
+        public static DateTime Instance {get; private set;}
 
         private void Awake()
         {
@@ -28,6 +29,15 @@ namespace FlavorfulStory.TimeManagement
 
         private void Start()
         {
+            if (Instance != null)
+            {
+                Destroy(gameObject);
+                return;
+            }
+
+            Instance = _dateTime;
+            DontDestroyOnLoad(gameObject);
+            
             OnDateTimeChanged?.Invoke(_dateTime);
         }
 
