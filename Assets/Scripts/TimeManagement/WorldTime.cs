@@ -1,43 +1,31 @@
 using System;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace FlavorfulStory.TimeManagement
 {
-    public class TimeManager : MonoBehaviour
+    public class WorldTime : MonoBehaviour
     {
         [Header("Settings")] 
         [SerializeField, Range(1, 28)] private int _date;
-        [SerializeField, Range(1, 4)] private int _season;
+        [SerializeField] private Seasons _season;
         [SerializeField, Range(1, 99)] private int _year;
         [SerializeField, Range(0, 24)] private int _hour;
         [SerializeField, Range(0, 60)] private int _minutes;
-
-        private DateTime _dateTime;
         
         [Header("Tick settings")] 
-        public int TickMinutesIncrease = 10;
-        public int TimeBetweenTicks = 1;
-        private float _currentTimeBetweenTicks = 0;
+        [SerializeField] private int _tickMinutesIncrease = 10;
+        [SerializeField] private int _timeBetweenTicks = 1;
+        
+        private float _currentTimeBetweenTicks;
+        private DateTime _dateTime;
         
         public static Action<DateTime> OnDateTimeChanged;
-        public static DateTime Instance {get; private set;}
-
+        public static Action OnGlobalDayReset;
+        
         private void Awake()
         {
-            _dateTime = new DateTime(_year, _season, _date, _hour, _minutes);
-        }
-
-        private void Start()
-        {
-            if (Instance != null)
-            {
-                Destroy(gameObject);
-                return;
-            }
-
-            Instance = _dateTime;
-            DontDestroyOnLoad(gameObject);
-            
+            _dateTime = new DateTime(_year, (int)_season, _date, _hour, _minutes);
             OnDateTimeChanged?.Invoke(_dateTime);
         }
 
@@ -45,7 +33,7 @@ namespace FlavorfulStory.TimeManagement
         {
             _currentTimeBetweenTicks += Time.deltaTime;
 
-            if (_currentTimeBetweenTicks >= TimeBetweenTicks)
+            if (_currentTimeBetweenTicks >= _timeBetweenTicks)
             {
                 _currentTimeBetweenTicks = 0;
                 AdvanceTime();
@@ -54,9 +42,12 @@ namespace FlavorfulStory.TimeManagement
 
         private void AdvanceTime()
         {
-            _dateTime.AddMinutes(TickMinutesIncrease);
-
-            print(_dateTime.ToString());
+            _dateTime.AddMinutes(_tickMinutesIncrease);
+            if (_dateTime.GetHour() == 2)
+            {
+                OnGlobalDayReset?.Invoke();
+                _dateTime.AddMinutes(60 * 4 - _dateTime.GetMinute());
+            }
             OnDateTimeChanged?.Invoke(_dateTime);
         }
     }

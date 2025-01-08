@@ -6,21 +6,20 @@ namespace FlavorfulStory.TimeManagement
     [Serializable]
     public class DateTime
     {
-        // Единственное поле, которое хранит общее количество минут с начала игры
         private int _totalMinutes;
         private int _dayMinutes;
         private int _seasonMinutes;
 
-        // Конструктор, который принимает общее количество минут
         public DateTime(int year, int season, int day, int hour, int minute)
         {
             _dayMinutes = 1440;
+            
             _seasonMinutes = _dayMinutes * 28;
             _totalMinutes = ((year - 1) * _seasonMinutes * 4) // Годы в минутах
                            + ((season - 1) * _seasonMinutes)     // Сезоны в минутах
                            + ((day - 1) * _dayMinutes)   // Дни в минутах
                            + (hour * 60)          // Часы в минутах
-                           + minute;              
+                           + minute;
         }
 
         #region Methods
@@ -70,6 +69,14 @@ namespace FlavorfulStory.TimeManagement
         public int GetTotalDays()
         {
             return _totalMinutes / _dayMinutes;
+        }
+
+        public bool IsDay()
+        {
+            int currentHour = GetHour();
+            if (currentHour > 6 && currentHour < 22)
+                return true;
+            return false;
         }
         
         #endregion
@@ -127,7 +134,17 @@ namespace FlavorfulStory.TimeManagement
 
         public string TimeToString()
         {
-            return $"{GetHour()}:{GetMinute()}";
+            var currentHour = GetHour();
+            var currentMinute = GetMinute();
+            var hourString = currentHour.ToString();
+            var minuteString = currentMinute.ToString();
+            
+            if (currentHour < 10)
+                hourString = "0" + currentHour;
+            if (currentMinute < 10)
+                minuteString = "0" + currentMinute;
+            
+            return $"{hourString}:{minuteString}";
         }
 
         #endregion
