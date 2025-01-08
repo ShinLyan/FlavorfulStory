@@ -24,6 +24,8 @@ namespace FlavorfulStory.UI
         private Image _image;
 
         private bool _isSelected;
+        
+        /// <summary> Флаг нахождения курсора на кнопке. Типо как OnHover(). </summary>
         private bool _isMouseOver;
 
         private void Awake()
