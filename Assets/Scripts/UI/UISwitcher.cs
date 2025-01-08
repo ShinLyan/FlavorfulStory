@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using UnityEngine;
 
@@ -26,6 +27,8 @@ namespace FlavorfulStory.UI
             if (_entryPoint != null) SwitchTo(_entryPoint);
 
             if (ValidateSetup()) _tabButtons[_currentTabIndex].Select();
+            
+            InitializeTabButtons();
         }
 
         private void Update()
@@ -54,6 +57,17 @@ namespace FlavorfulStory.UI
             return _tabButtons != null && _tabButtons.Length == transform.childCount;
         }
 
+        /// <summary> Метод инициализации кнопок открытия вкладки.
+        /// Добавляет хэндлер события, что вызывается при нажатии кнопки. </summary>
+        private void InitializeTabButtons()
+        {
+            for (int i = 0; i < _tabButtons.Length; i++)
+            {
+                int tabIndex = i;
+                _tabButtons[i].AddOnClickHandler(() => SelectTab(tabIndex));
+            }
+        }
+        
         /// <summary> ����������� �� ������ �������.</summary>
         /// <param name="toDisplay"> �������, ������� ����� �������.</param>
         public void SwitchTo(GameObject toDisplay)
@@ -73,6 +87,6 @@ namespace FlavorfulStory.UI
         
         /// <summary> Метод получения имен вкладок меню, используемых в InputManager. </summary>
         /// <returns> Имена вкладок меню в виде массива </returns>
-        public string[] GetTabNames() => _tabButtons.Select(button => button.TabButtonName).ToArray();
+        public string[] GetTabNames() => _tabButtons.Select(button => button.ButtonType.ToString()).ToArray();
     }
 }

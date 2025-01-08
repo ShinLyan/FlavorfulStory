@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
@@ -13,21 +14,21 @@ namespace FlavorfulStory.UI
         [SerializeField] private Sprite _selectedSprite;
 
         [SerializeField] private UnityEvent _onSelected;
-        [SerializeField] private UISwitcher _switcher;
 
-        /// <summary> Свойство, используемое для нахождения соответсвующей клавишы в InputManager. </summary>
-        [field: SerializeField] public string TabButtonName { get; private set; }
+        /// <summary> Событие открытия вкладки. </summary>
+        private Action _onClick;
 
-        private int _index;
+        /// <summary> Свойство, используемое для нахождения соответсвующей клавиши в InputManager. </summary>
+        [field: SerializeField] public ButtonType ButtonType { get; private set; }
 
         private Image _image;
 
         private bool _isSelected;
+        private bool _isMouseOver;
 
         private void Awake()
         {
             _image = GetComponent<Image>();
-            _index = transform.GetSiblingIndex();
         }
 
         public void Select()
@@ -40,22 +41,31 @@ namespace FlavorfulStory.UI
         public void ResetSelection()
         {
             _isSelected = false;
-            _image.sprite = _defaultSprite;
+            if (!_isMouseOver) _image.sprite = _defaultSprite;
         }
 
         public void OnPointerClick(PointerEventData eventData)
         {
-            _switcher.SelectTab(_index);
+            _onClick?.Invoke();
         }
 
         public void OnPointerEnter(PointerEventData eventData)
         {
+            _isMouseOver = true;
             _image.sprite = _selectedSprite;
         }
 
         public void OnPointerExit(PointerEventData eventData)
         {
+            _isMouseOver = false;
             if (!_isSelected) _image.sprite = _defaultSprite;
+        }
+
+        /// <summary> Метод добавления обработчика события _onClick. </summary>
+        /// <param name="action"></param>
+        public void AddOnClickHandler(Action action)
+        {
+            _onClick += action;
         }
     }
 }
