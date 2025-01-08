@@ -20,7 +20,6 @@ namespace FlavorfulStory.UI
         /// <summary> Инициализация компонента UISwitcher. Получение имен кнопок для переключения вкладок. </summary>
         private void Awake()
         {
-            //Ок, потому что в детях всего один объект типа UISwitcher
             _uiSwitcher = GetComponentInChildren<UISwitcher>();
             _tabButtonNames = new string[_uiSwitcher.GetTabCount()];
             _tabButtonNames = _uiSwitcher.GetTabNames();
