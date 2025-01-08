@@ -1,25 +1,26 @@
+using System.Linq;
 using UnityEngine;
 
 namespace FlavorfulStory.UI
 {
-    /// <summary> Переключатель UI.</summary>
+    /// <summary> пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ UI.</summary>
     public class UISwitcher : MonoBehaviour
     {
-        /// <summary> Объект, который по умолчанию включается при старте сцены.</summary>
+        /// <summary> пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ.</summary>
         [SerializeField] private GameObject _entryPoint;
 
-        /// <summary> Массив кнопок, открывающих соответствующие вкладки.</summary>
-        [SerializeField] private TabSwitherButton[] _tabButtons;
+        /// <summary> пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ.</summary>
+        [SerializeField] private TabSwitcherButton[] _tabButtons;
 
-        /// <summary> Клавиша, которая переключает на предыдущую вкладку.</summary>
+        /// <summary> пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ.</summary>
         private const KeyCode _previousTabKey = KeyCode.Q;
 
-        /// <summary> Клавиша, которая переключается на следующую вкладку.</summary>
+        /// <summary> пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ.</summary>
         private const KeyCode _nextTabKey = KeyCode.R;
 
         private int _currentTabIndex = 0;
 
-        /// <summary> При старте включаем нужный объект.</summary>
+        /// <summary> пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ.</summary>
         private void Start()
         {
             if (_entryPoint != null) SwitchTo(_entryPoint);
@@ -47,14 +48,14 @@ namespace FlavorfulStory.UI
             _currentTabIndex = index;
         }
 
-        //  Убеждаемся, что количество кнопок и вкладок совпадает
+        //  пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
         private bool ValidateSetup()
         {
             return _tabButtons != null && _tabButtons.Length == transform.childCount;
         }
 
-        /// <summary> Переключить на нужную вкладку.</summary>
-        /// <param name="toDisplay"> Вкладка, которую нужно открыть.</param>
+        /// <summary> пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ.</summary>
+        /// <param name="toDisplay"> пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ.</param>
         public void SwitchTo(GameObject toDisplay)
         {
             if (toDisplay.transform.parent != transform) return;
@@ -65,5 +66,13 @@ namespace FlavorfulStory.UI
             }
             toDisplay.SetActive(true);
         }
+        
+        /// <summary> РњРµС‚РѕРґ РЅР°С…РѕР¶РґРµРЅРёСЏ РєРѕР»РёС‡РµСЃС‚РІР° РІРєР»Р°РґРѕРє РјРµРЅСЋ. </summary>
+        /// <returns> РљРѕР»РёС‡РµСЃС‚РІРѕ РІРєР»Р°РґРѕРє. </returns>
+        public int GetTabCount() => _tabButtons.Length;
+        
+        /// <summary> РњРµС‚РѕРґ РїРѕР»СѓС‡РµРЅРёСЏ РёРјРµРЅ РІРєР»Р°РґРѕРє РјРµРЅСЋ, РёСЃРїРѕР»СЊР·СѓРµРјС‹С… РІ InputManager. </summary>
+        /// <returns> РРјРµРЅР° РІРєР»Р°РґРѕРє РјРµРЅСЋ РІ РІРёРґРµ РјР°СЃСЃРёРІР° </returns>
+        public string[] GetTabNames() => _tabButtons.Select(button => button.TabButtonName).ToArray();
     }
 }

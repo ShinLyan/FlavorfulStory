@@ -6,7 +6,7 @@ using UnityEngine.UI;
 namespace FlavorfulStory.UI
 {
     [RequireComponent(typeof(Image))]
-    public class TabSwitherButton : MonoBehaviour,
+    public class TabSwitcherButton : MonoBehaviour,
         IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
     {
         [SerializeField] private Sprite _defaultSprite;
@@ -14,6 +14,9 @@ namespace FlavorfulStory.UI
 
         [SerializeField] private UnityEvent _onSelected;
         [SerializeField] private UISwitcher _switcher;
+
+        /// <summary> Свойство, используемое для нахождения соответсвующей клавишы в InputManager. </summary>
+        [field: SerializeField] public string TabButtonName { get; private set; }
 
         private int _index;
 
