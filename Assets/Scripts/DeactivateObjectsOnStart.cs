@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+
 /// <summary> Класс отвечающий за отключение рендера объектов на старте (если их не нужно рендерить) .</summary>
 ///<remarks> Служебный класс. Вешается на 1 объект сцены, отвечающий за данную логику .</remarks>
 public class DeactivateObjectsOnStart : MonoBehaviour

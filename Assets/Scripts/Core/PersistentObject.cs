@@ -11,7 +11,7 @@ namespace FlavorfulStory
 
         private void Awake()
         {
-            if (Instance != null)
+            if (Instance)
             {
                 Destroy(gameObject);
                 return;
