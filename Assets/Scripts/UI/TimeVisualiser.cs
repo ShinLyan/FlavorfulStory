@@ -16,12 +16,12 @@ namespace FlavorfulStory.UI
         /// <summary> Время.</summary>
         [SerializeField] private TMP_Text _timeText;
 
-        private void Awake()
+        private void OnEnable()
         {
             TimeManagement.WorldTime.OnDateTimeChanged += SetDateTimeText;
         }
 
-        private void OnDestroy()
+        private void OnDisable()
         {
             TimeManagement.WorldTime.OnDateTimeChanged -= SetDateTimeText;
         }
@@ -30,9 +30,9 @@ namespace FlavorfulStory.UI
         /// <param name="dateTime"> Объект времени.</param>
         private void SetDateTimeText(DateTime dateTime)
         {
-            _weekDayText.text = dateTime.GetDayOfWeek().ToString();
-            _dateText.text = dateTime.GetDayInSeason().ToString();
-            _timeText.text = dateTime.TimeToString();
+            _weekDayText.text = dateTime.DayOfWeek.ToString();
+            _dateText.text = dateTime.DayInSeason.ToString();
+            _timeText.text = dateTime.TimeToString(false);
         }
     }
 }

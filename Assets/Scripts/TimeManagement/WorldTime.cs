@@ -1,27 +1,12 @@
 using System;
+using FlavorfulStory.Saving;
 using UnityEngine;
 
 namespace FlavorfulStory.TimeManagement
 {
     /// <summary> Глобальное игровое время.</summary>
-    public class WorldTime : MonoBehaviour
+    public class WorldTime : MonoBehaviour, ISaveable
     {
-        [Header("Settings")]
-        /// <summary> Дата.</summary>
-        [SerializeField, Range(1, 28)] private int _date;
-        
-        /// <summary> Сезон.</summary>
-        [SerializeField] private Seasons _season;
-        
-        /// <summary> Год.</summary>
-        [SerializeField, Range(1, 99)] private int _year;
-        
-        /// <summary> Час.</summary>
-        [SerializeField, Range(0, 24)] private int _hour;
-
-        /// <summary> Минуты.</summary>
-        [SerializeField, Range(0, 60)] private int _minutes;
-
         /// <summary> Изменение игрового времени за один тик.</summary>
         [Header("Tick settings")]
         [Tooltip("Сколько минут проходит за один тик.")]
@@ -29,12 +14,14 @@ namespace FlavorfulStory.TimeManagement
 
         /// <summary> Время между тиками.</summary>
         [Tooltip("Сколько реального времени длится один тик.")]
-        [SerializeField] private int _timeBetweenTicks = 1;
+        [SerializeField] private float _timeBetweenTicks = 1;
         
-        [Header("Day/night settings.")]
+        /// <summary> Во сколько начинается новый день. </summary>
+        [Header("Day/night settings")]
         [Tooltip("Во сколько начинается новый день.")]
         [SerializeField] private int _dayStartHour;
         
+        /// <summary> Во сколько заканчивается день. </summary>
         [Tooltip("Во сколько заканчивается день.")]
         [SerializeField] private int _dayEndHour;
         
@@ -43,17 +30,23 @@ namespace FlavorfulStory.TimeManagement
         
         /// <summary> Объект DateTime.</summary>
         private DateTime _dateTime;
-        
+
+        private ISaveable _saveableImplementation;
+
+        /// <summary> Событие изменения времени. </summary>
         public static Action<DateTime> OnDateTimeChanged;
-        public static Action OnGlobalDayReset;
+        
+        /// <summary> Событие окончания дня. </summary>
+        public static Action OnDayEnded;
         
         /// <summary> Создание объекта DateTime.</summary>
         private void Awake()
         {
-            _dateTime = new DateTime(_year, (int)_season, _date, _hour, _minutes);
+            // TODO: Если новая игра - инициализировать, иначе - нет.
+            _dateTime = new DateTime(1, Seasons.Spring, 1, _dayStartHour, 0);
             OnDateTimeChanged?.Invoke(_dateTime);
         }
-
+        
         /// <summary> Вычисление игрового времени.</summary>
         private void Update()
         {
@@ -61,7 +54,7 @@ namespace FlavorfulStory.TimeManagement
 
             if (_currentTimeBetweenTicks >= _timeBetweenTicks)
             {
-                _currentTimeBetweenTicks = 0;
+                _currentTimeBetweenTicks = 0f;
                 IncreaseTime();
             }
         }
@@ -70,24 +63,43 @@ namespace FlavorfulStory.TimeManagement
         private void IncreaseTime()
         {
             _dateTime.AddMinutes(_tickMinutesIncrease);
-            if (_dateTime.GetHour() == _dayEndHour)
+            if (_dateTime.Hour == _dayEndHour)
             {
-                OnGlobalDayReset?.Invoke();
+                OnDayEnded?.Invoke();
                 StartNewDay();
             }
 
             OnDateTimeChanged?.Invoke(_dateTime);
         }
-
-        /// <summary> Обновление времени до 06:00.</summary>
+        
+        /// <summary> Обновляет время до начала нового дня в зависимости от текущего времени. </summary>
         public void StartNewDay()
         {
-            if (_dateTime.GetHour() < _dayStartHour)
-                _dateTime.AddMinutes((_dayStartHour - _dateTime.GetHour()) * 60 - _dateTime.GetMinute());
-            else
-                _dateTime.AddMinutes((24 - _dateTime.GetHour() + _dayStartHour) * 60 - _dateTime.GetMinute());
-            
+            bool isSameDay = _dateTime.Hour < _dayStartHour;
+            int dayAdjustment = isSameDay ? 0 : 1;
+
+            _dateTime = new DateTime(
+                _dateTime.Year,
+                _dateTime.Season,
+                _dateTime.DayInSeason + dayAdjustment,
+                _dayStartHour,
+                minute: 0
+            );
+
             OnDateTimeChanged?.Invoke(_dateTime);
         }
+
+        #region Saving
+        public object CaptureState()
+        {
+            return _dateTime;
+        }
+
+        public void RestoreState(object state)
+        {
+            _dateTime = (DateTime) state;
+        }
+        #endregion
     }
+    
 }

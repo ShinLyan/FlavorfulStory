@@ -5,33 +5,68 @@ namespace FlavorfulStory.TimeManagement
 {
     /// <summary> Класс для взаимодействия с игровым временем.</summary>
     [Serializable]
-    public class DateTime
+    public struct DateTime
     {
-        /// <summary> Общее кол-во минут.</summary>
+        /// <summary> Общее количество минут. </summary>
         private int _totalMinutes;
-        /// <summary> Кол-во минут в одном дне.</summary>
-        private int _dayMinutes;
-        /// <summary> Кол-во минут в одном сезоне.</summary>
-        private int _seasonMinutes;
+        
+        /// <summary> Количество дней. </summary>
+        private const int DaysCount = 28;
+        
+        /// <summary> Количество минут в одном дне. </summary>
+        private const int DayMinutes = 60 * 24;
+        
+        /// <summary> Количество минут в одном сезоне. </summary>
+        private const int SeasonMinutes = DayMinutes * DaysCount;
 
-        /// <summary> Конструктор.</summary>
-        /// <param name="year">Год.</param>
-        /// <param name="season">Сезон.</param>
-        /// <param name="day">День в сезоне.</param>
-        /// <param name="hour">Часы.</param>
-        /// <param name="minute">Минуты.</param>
-        public DateTime(int year, int season, int day, int hour, int minute)
+        /// <summary> Конструктор. </summary>
+        /// <param name="year"> Год. </param>
+        /// <param name="season"> Сезон. </param>
+        /// <param name="day"> День в сезоне. </param>
+        /// <param name="hour"> Часы. </param>
+        /// <param name="minute"> Минуты. </param>
+        public DateTime(int year, Seasons season, int day, int hour, int minute)
         {
-            _dayMinutes = 1440;
-            _seasonMinutes = _dayMinutes * 28;
-            
-            _totalMinutes = ((year - 1) * _seasonMinutes * 4) // Годы в минутах
-                           + ((season - 1) * _seasonMinutes)     // Сезоны в минутах
-                           + ((day - 1) * _dayMinutes)   // Дни в минутах
-                           + (hour * 60)          // Часы в минутах
+            _totalMinutes = (year - 1) * SeasonMinutes * 4 // Годы в минутах
+                           + ((int)season) * SeasonMinutes    // Сезоны в минутах
+                           + (day - 1) * DayMinutes  // Дни в минутах
+                           + hour * 60          // Часы в минутах
                            + minute;
         }
 
+        public DateTime(int totalMinutes)
+        {
+            _totalMinutes = totalMinutes;
+        }
+
+        #region Properties
+        
+        /// <summary> Получить год. </summary>
+        public int Year => _totalMinutes / (SeasonMinutes * 4) + 1;
+
+        /// <summary> Получить текущий сезон. </summary>
+        public Seasons Season => (Seasons)(_totalMinutes % (SeasonMinutes * 4) / SeasonMinutes);
+
+        /// <summary> Получить день в сезоне. </summary>
+        public int DayInSeason => _totalMinutes % SeasonMinutes / DayMinutes + 1;
+
+        /// <summary> Получить день недели. </summary>
+        public WeekDays DayOfWeek => (WeekDays)(_totalMinutes / DayMinutes % 7);
+
+        /// <summary> Получить часы. </summary>
+        public int Hour => _totalMinutes % DayMinutes / 60;
+
+        /// <summary> Получить минуты.</summary>
+        public int Minute => _totalMinutes % 60;
+
+        /// <summary> Получить число прошедших недель.</summary>
+        public int TotalWeeks => _totalMinutes / (DayMinutes * 7);
+
+        /// <summary> Получить число прошедших дней.</summary>
+        public int TotalDays => _totalMinutes / DayMinutes;
+
+        #endregion
+        
         #region Methods
 
         /// <summary> Добавление минут. </summary>
@@ -41,122 +76,64 @@ namespace FlavorfulStory.TimeManagement
             _totalMinutes += minutes;
         }
         
-        /// <summary> Получить год.</summary>
-        /// <returns> Номер года.</returns>
-        public int GetYear()
-        {
-            return _totalMinutes / (_seasonMinutes * 4) + 1;
-        }
-
-        /// <summary> Получить текущий сезон.</summary>
-        /// <returns> Текущий сезон.</returns>
-        public Seasons GetSeason()
-        {
-            int seasonIndex = (_totalMinutes % (_seasonMinutes * 4)) / _seasonMinutes;
-            return (Seasons)seasonIndex;
-        }
-
-        /// <summary> Получить день в сезоне.</summary>
-        /// <returns> Номер дня в сезоне.</returns>
-        public int GetDayInSeason()
-        {
-            return (_totalMinutes % _seasonMinutes) / _dayMinutes + 1;
-        }
-
-        /// <summary> Получить день недели.</summary>
-        /// <returns> Номер текущего года.</returns>
-        public WeekDays GetDayOfWeek()
-        {
-            var dayIndex = (_totalMinutes / _dayMinutes) % 7;
-            return (WeekDays)dayIndex;
-        }
-
-        /// <summary> Получить часы.</summary>
-        /// <returns> Кол-во часов.</returns>
-        public int GetHour()
-        {
-            return (_totalMinutes % _dayMinutes) / 60;
-        }
-
-        /// <summary> Получить минуты.</summary>
-        /// <returns> Кол-во минут.</returns>
-        public int GetMinute()
-        {
-            return _totalMinutes % 60;
-        }
-
-        /// <summary> Получить число прошедших недель.</summary>
-        /// <returns> Кол-во прошедших недель.</returns>
-        public int GetTotalWeeks()
-        {
-            return _totalMinutes / (_dayMinutes * 7);
-        }
-
-        /// <summary> Получить число прошедших дней.</summary>
-        /// <returns> Кол-во прошедших дней.</returns>
-        public int GetTotalDays()
-        {
-            return _totalMinutes / _dayMinutes;
-        }
-        
         #endregion
         
         #region Overrides
-        
-        /// <summary> Оператор равенства.</summary>
-        /// <param name="dt1"> Первое время.</param>
-        /// <param name="dt2"> Второе время.</param>
-        /// <returns> Булево равенство времен.</returns>
-        public static bool operator ==(DateTime dt1, DateTime dt2)
-        {
-            if (dt1 is null || dt2 is null)
-                return false;
-            return dt1._totalMinutes == dt2._totalMinutes;
-        }
-        
-        /// <summary> Оператор неравенства.</summary>
-        /// <param name="dt1"> Первое время.</param>
-        /// <param name="dt2"> Второе время.</param>
-        /// <returns> Булево неравенство времен.</returns>
-        public static bool operator !=(DateTime dt1, DateTime dt2)
-        {
-            return !(dt1 == dt2);
-        }
-
-        /// <summary> Оператор больше.</summary>
-        /// <param name="dt1"> Первое время.</param>
-        /// <param name="dt2"> Второе время.</param>
-        /// <returns> Булево сравнение времен.</returns>
-        public static bool operator >(DateTime dt1, DateTime dt2)
-        {
-            return dt1._totalMinutes > dt2._totalMinutes;
-        }
-
-        /// <summary> Оператор меньше.</summary>
-        /// <param name="dt1"> Первое время.</param>
-        /// <param name="dt2"> Второе время.</param>
-        /// <returns> Булево сравнение времен.</returns>
-        public static bool operator <(DateTime dt1, DateTime dt2)
-        {
-            return dt1._totalMinutes < dt2._totalMinutes;
-        }
-        
-        /// <summary> Равенство.</summary>
-        /// <param name="obj"> Объект.</param>
-        /// <returns> Булево равенство.</returns>
-        public override bool Equals(object obj)
-        {
-            if (obj is DateTime other)
-                return _totalMinutes == other._totalMinutes;
-            return false;
-        }
-
-        /// <summary> Получение хэш-кода.</summary>
-        /// <returns> Хэш-код.</returns>
-        public override int GetHashCode()
-        {
-            return _totalMinutes.GetHashCode();
-        }
+        //
+        // /// <summary> Оператор равенства.</summary>
+        // /// <param name="dt1"> Первое время.</param>
+        // /// <param name="dt2"> Второе время.</param>
+        // /// <returns> Булево равенство времен.</returns>
+        // public static bool operator ==(DateTime dt1, DateTime dt2)
+        // {
+        //     if (dt1 is null || dt2 is null)
+        //         return false;
+        //     return dt1._totalMinutes == dt2._totalMinutes;
+        // }
+        //
+        // /// <summary> Оператор неравенства.</summary>
+        // /// <param name="dt1"> Первое время.</param>
+        // /// <param name="dt2"> Второе время.</param>
+        // /// <returns> Булево неравенство времен.</returns>
+        // public static bool operator !=(DateTime dt1, DateTime dt2)
+        // {
+        //     return !(dt1 == dt2);
+        // }
+        //
+        // /// <summary> Оператор больше.</summary>
+        // /// <param name="dt1"> Первое время.</param>
+        // /// <param name="dt2"> Второе время.</param>
+        // /// <returns> Булево сравнение времен.</returns>
+        // public static bool operator >(DateTime dt1, DateTime dt2)
+        // {
+        //     return dt1._totalMinutes > dt2._totalMinutes;
+        // }
+        //
+        // /// <summary> Оператор меньше.</summary>
+        // /// <param name="dt1"> Первое время.</param>
+        // /// <param name="dt2"> Второе время.</param>
+        // /// <returns> Булево сравнение времен.</returns>
+        // public static bool operator <(DateTime dt1, DateTime dt2)
+        // {
+        //     return dt1._totalMinutes < dt2._totalMinutes;
+        // }
+        //
+        // /// <summary> Равенство.</summary>
+        // /// <param name="obj"> Объект.</param>
+        // /// <returns> Булево равенство.</returns>
+        // public override bool Equals(object obj)
+        // {
+        //     if (obj is DateTime other)
+        //         return _totalMinutes == other._totalMinutes;
+        //     return false;
+        // }
+        //
+        // /// <summary> Получение хэш-кода.</summary>
+        // /// <returns> Хэш-код.</returns>
+        // public override int GetHashCode()
+        // {
+        //     return _totalMinutes.GetHashCode();
+        // }
         
         #endregion
         
@@ -166,31 +143,39 @@ namespace FlavorfulStory.TimeManagement
         /// <returns> Строка с текущей датой и временем.</returns>
         public override string ToString()
         {
-            return $"{GetDayInSeason()}.{(int)GetSeason() + 1}.{GetYear()} {GetHour()}:{GetMinute()}";
+            return $"{Year} year {Season} {DayInSeason} day {TimeToString()}" ;
         }
 
         /// <summary> Перевод даты в строковый тип.</summary>
         /// <returns> Строка с датой.</returns>
         public string DateToString()
         {
-            return $"{GetDayOfWeek()} {GetDayInSeason()} {GetYear()}";
+            return $"{DayOfWeek} {DayInSeason} {Year}";
         }
-
-        /// <summary> Перевод временем в строковый тип.</summary>
-        /// <returns> Строка с временем.</returns>
-        public string TimeToString()
+        
+        /// <summary> Преобразует время в строковый формат в зависимости от заданного формата отображения. </summary>
+        /// <param name="is24HourFormat"> Если true, время будет возвращено в 24-часовом формате (например, "14:05").
+        /// Если false, время будет возвращено в 12-часовом формате с указанием AM/PM (например, "02:05 PM"). </param>
+        /// <returns> Строковое представление времени в указанном формате. </returns> 
+        public string TimeToString(bool is24HourFormat = true)
         {
-            var currentHour = GetHour();
-            var currentMinute = GetMinute();
-            var hourString = currentHour.ToString();
-            var minuteString = currentMinute.ToString();
-            
-            if (currentHour < 10)
-                hourString = "0" + currentHour;
-            if (currentMinute < 10)
-                minuteString = "0" + currentMinute;
-            
-            return $"{hourString}:{minuteString}";
+            if (is24HourFormat)
+            {
+                // 24-часовой формат
+                var hourString = Hour.ToString("D2");
+                var minuteString = Minute.ToString("D2");
+                return $"{hourString}:{minuteString}";
+            }
+            else
+            {
+                // AM/PM формат
+                string period = Hour >= 12 ? "PM" : "AM";
+                int hour12 = Hour % 12;
+                if (hour12 == 0) hour12 = 12; // Если час = 0 или 12, то в 12-часовом формате это будет 12
+                var hourString = hour12.ToString("D2");
+                var minuteString = Minute.ToString("D2");
+                return $"{hourString}:{minuteString} {period}";
+            }
         }
 
         #endregion

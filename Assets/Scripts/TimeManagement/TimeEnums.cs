@@ -6,22 +6,22 @@ namespace FlavorfulStory.TimeManagement
     [Serializable]
     public enum WeekDays
     {
-        Mon = 0,
-        Tue = 1,
-        Wed = 2,
-        Thu = 3,
-        Fri = 4,
-        Sat = 5,
-        Sun = 6
+        Monday,
+        Tuesday,
+        Wednesday,
+        Thursday,
+        Friday,
+        Saturday,
+        Sunday
     }
 
     /// <summary> Сезоны.</summary>
     [Serializable]
     public enum Seasons
     {
-        Winter = 0,
-        Spring = 1,
-        Summer = 2,
-        Autumn = 3
+        Spring,
+        Summer,
+        Autumn,
+        Winter
     }
 }
