@@ -47,6 +47,18 @@ namespace FlavorfulStory.Control
             InteractWithMovement();
 
             UpdateTimers();
+
+            var sad = Test.asdgh;
+            print(nameof(sad));
+            print(nameof(Test.qwerty));
+            print(nameof(Test));
+        }
+
+        enum Test
+        {
+            qwerty,
+            test2,
+            asdgh
         }
 
         private void InteractWithMovement()

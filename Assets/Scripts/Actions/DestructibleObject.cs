@@ -24,7 +24,15 @@ namespace FlavorfulStory.Actions
         /// <summary> Текущее количество ударов по объекту.</summary>
         private int _currentHits;
 
+        /// <summary>
+        /// 
+        /// </summary>
         private const float DestroyDelay = 4f;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private bool IsDestroyed { get; set; }
 
         /// <summary> Событие, вызываемое при разрушении объекта.</summary>
         public event Action<DestructibleObject> OnObjectDestroyed;
@@ -33,27 +41,36 @@ namespace FlavorfulStory.Actions
         /// <param name="player"> Контроллер игрока.</param>
         public override void Interact(PlayerController player)
         {
-            if (player.CurrentItem is not Tool tool || tool.ToolType != _requiredTool) return;
+            if (player.CurrentItem is not Tool tool || 
+                tool.ToolType != _requiredTool ||
+                IsDestroyed) return;
 
             _currentHits++;
-            Debug.Log($"Object hit! Remaining hits: {_hitsToDestroy - _currentHits}");
-
-            if (_currentHits >= _hitsToDestroy) DestroyObject();
+            if (_currentHits == _hitsToDestroy) DestroyObject();
         }
 
         /// <summary> Уничтожить объект и сгенерировать выпадающие предметы.</summary>
         private void DestroyObject()
         {
+            IsDestroyed = true;
             Debug.Log($"Object destroyed: {gameObject.name}");
 
             OnObjectDestroyed?.Invoke(this);
             OnDestroyed();
-            DropItems();
-            Destroy(gameObject, DestroyDelay);
+            StartCoroutine(DestroyCoroutine());
         }
 
         /// <summary> Действие, вызываемое при разрушении (например, прокачка навыков).</summary>
         protected abstract void OnDestroyed();
+
+        /// <summary> Корутина уничтожения объекта.</summary>
+        /// <returns> Возвращает корутину уничтожения объекта.</returns>
+        private System.Collections.IEnumerator DestroyCoroutine()
+        {
+            yield return new WaitForSeconds(DestroyDelay);
+            DropItems();
+            Destroy(gameObject);
+        }
 
         /// <summary> Выбросить предметы, настроенные в конкретных подклассах.</summary>
         protected virtual void DropItems()
@@ -61,7 +78,7 @@ namespace FlavorfulStory.Actions
             var itemDropper = GetComponent<ItemDropper>();
             foreach (var dropItem in _dropItems)
             {
-                itemDropper.DropItem(dropItem.ItemPrefab, dropItem.Quantity);
+                itemDropper.DropItem(dropItem.Item, dropItem.Quantity);
             }
         }
     }

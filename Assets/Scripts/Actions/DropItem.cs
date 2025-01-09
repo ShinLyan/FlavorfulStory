@@ -7,9 +7,9 @@ namespace FlavorfulStory.Actions
     [System.Serializable]
     public class DropItem
     {
-        /// <summary> Префаб предмета, который будет падать.</summary>
-        [Tooltip("Префаб предмета, который будет падать.")]
-        public InventoryItem ItemPrefab;
+        /// <summary> Предмет, который должен будет выпасть.</summary>
+        [Tooltip("Предмет, который должен будет выпасть.")]
+        public InventoryItem Item;
 
         /// <summary> Количество выпадающих предметов.</summary>
         [Tooltip("Количество выпадающих предметов.")]
