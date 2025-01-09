@@ -31,6 +31,13 @@ namespace FlavorfulStory.TimeManagement
         [Tooltip("Сколько реального времени длится один тик.")]
         [SerializeField] private int _timeBetweenTicks = 1;
         
+        [Header("Day/night settings.")]
+        [Tooltip("Во сколько начинается новый день.")]
+        [SerializeField] private int _dayStartHour;
+        
+        [Tooltip("Во сколько заканчивается день.")]
+        [SerializeField] private int _dayEndHour;
+        
         /// <summary> Время между тиками.</summary>
         private float _currentTimeBetweenTicks;
         
@@ -63,12 +70,23 @@ namespace FlavorfulStory.TimeManagement
         private void IncreaseTime()
         {
             _dateTime.AddMinutes(_tickMinutesIncrease);
-            if (_dateTime.GetHour() == 2)
+            if (_dateTime.GetHour() == _dayEndHour)
             {
                 OnGlobalDayReset?.Invoke();
-                _dateTime.AddMinutes(60 * 4 - _dateTime.GetMinute());
+                StartNewDay();
             }
 
+            OnDateTimeChanged?.Invoke(_dateTime);
+        }
+
+        /// <summary> Обновление времени до 06:00.</summary>
+        public void StartNewDay()
+        {
+            if (_dateTime.GetHour() < _dayStartHour)
+                _dateTime.AddMinutes((_dayStartHour - _dateTime.GetHour()) * 60 - _dateTime.GetMinute());
+            else
+                _dateTime.AddMinutes((24 - _dateTime.GetHour() + _dayStartHour) * 60 - _dateTime.GetMinute());
+            
             OnDateTimeChanged?.Invoke(_dateTime);
         }
     }
