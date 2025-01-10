@@ -18,8 +18,8 @@ namespace FlavorfulStory.Settings
 
         /// <summary> Список режимов окна.</summary>
         private readonly List<string> _screenModeOptions = new() {
-            "Окно",
-            "Полный экран",
+            "Windowed", // "Окно",
+            "Full screen" // "Полный экран",
         };
 
         /// <summary> Вызывается при включении объекта.</summary>

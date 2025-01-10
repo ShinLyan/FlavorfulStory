@@ -17,16 +17,20 @@ namespace FlavorfulStory.UI
         private const int MaxLength = 20;
 
         /// <summary> Сообщение об ошибке: пустое поле.</summary>
-        private static readonly string EmptyInputError = "Поле не может быть пустым!";
+        private static readonly string EmptyInputError = "The field cannot be empty!";
+        //private static readonly string EmptyInputError = "Поле не может быть пустым!";
 
         /// <summary> Сообщение об ошибке: минимальная длина.</summary>
-        private static readonly string TooShortError = $"Текст должен быть не менее {MinLength} символов.";
+        private static readonly string TooShortError = $"The text must be at least {MinLength} characters long.";
+        //private static readonly string TooShortError = $"Текст должен быть не менее {MinLength} символов.";
 
         /// <summary> Сообщение об ошибке: максимальная длина.</summary>
-        private static readonly string TooLongError = $"Текст должен быть не более {MaxLength} символов.";
+        private static readonly string TooLongError = $"The text must be no more than {MaxLength} characters long.";
+        //private static readonly string TooLongError = $"Текст должен быть не более {MaxLength} символов.";
 
         /// <summary> Сообщение об ошибке: запрещённые символы.</summary>
-        private static readonly string ForbiddenCharactersError = "Текст содержит запрещённые символы!";
+        private static readonly string ForbiddenCharactersError = "The text contains forbidden characters!";
+        //private static readonly string ForbiddenCharactersError = "Текст содержит запрещённые символы!";
 
         /// <summary> Проверяет, валиден ли текст ввода.</summary>
         /// <param name="input"> Текст для проверки.</param>
