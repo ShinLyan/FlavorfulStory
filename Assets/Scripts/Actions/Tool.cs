@@ -5,26 +5,26 @@ using UnityEngine.EventSystems;
 
 namespace FlavorfulStory.Actions
 {
-    /// <summary> Инструмент.</summary>
-    /// <remarks> Может быть использован игроком для взаимодействия с объектами.</remarks>
+    /// <summary> РРЅСЃС‚СЂСѓРјРµРЅС‚.</summary>
+    /// <remarks> РњРѕР¶РµС‚ Р±С‹С‚СЊ РёСЃРїРѕР»СЊР·РѕРІР°РЅ РёРіСЂРѕРєРѕРј РґР»СЏ РІР·Р°РёРјРѕРґРµР№СЃС‚РІРёСЏ СЃ РѕР±СЉРµРєС‚Р°РјРё.</remarks>
     [CreateAssetMenu(menuName = ("FlavorfulStory/Inventory/Tool"))]
     public class Tool : ActionItem
     {
-        /// <summary> Тип инструмента.</summary>
-        [field: Tooltip("Тип инструмента.")]
+        /// <summary> РўРёРї РёРЅСЃС‚СЂСѓРјРµРЅС‚Р°.</summary>
+        [field: Tooltip("РўРёРї РёРЅСЃС‚СЂСѓРјРµРЅС‚Р°.")]
         [field: SerializeField] public ToolType ToolType { get; private set; }
 
-        /// <summary> Максимальная дистанция взаимодействия.</summary>
+        /// <summary> РњР°РєСЃРёРјР°Р»СЊРЅР°СЏ РґРёСЃС‚Р°РЅС†РёСЏ РІР·Р°РёРјРѕРґРµР№СЃС‚РІРёСЏ.</summary>
         private const float MaxInteractionDistance = 2f;
 
-        /// <summary> Радиус использования инструмента.</summary>
+        /// <summary> Р Р°РґРёСѓСЃ РёСЃРїРѕР»СЊР·РѕРІР°РЅРёСЏ РёРЅСЃС‚СЂСѓРјРµРЅС‚Р°.</summary>
         private const float UseRadius = 1.5f;
 
-        /// <summary> Использовать.</summary>
-        /// <param name="player"> Контроллер игрока.</param>
+        /// <summary> РСЃРїРѕР»СЊР·РѕРІР°С‚СЊ.</summary>
+        /// <param name="player"> РљРѕРЅС‚СЂРѕР»Р»РµСЂ РёРіСЂРѕРєР°.</param>
         public override void Use(PlayerController player)
         {
-            // Проверка на клик по UI
+            // РџСЂРѕРІРµСЂРєР° РЅР° РєР»РёРє РїРѕ UI
             if (EventSystem.current && EventSystem.current.IsPointerOverGameObject()) return;
 
             var targetPosition = PlayerController.GetCursorPosition();
@@ -32,13 +32,13 @@ namespace FlavorfulStory.Actions
             player.TriggerAnimation($"Use{ToolType}");
             UseToolInDirection(player.transform.position, targetPosition, player);
 
-            // TODO: Тратить энергию игрока при использовании инструмента
+            // TODO: РўСЂР°С‚РёС‚СЊ СЌРЅРµСЂРіРёСЋ РёРіСЂРѕРєР° РїСЂРё РёСЃРїРѕР»СЊР·РѕРІР°РЅРёРё РёРЅСЃС‚СЂСѓРјРµРЅС‚Р°
         }
 
-        /// <summary> Использовать инструмент в заданном направлении.</summary>
-        /// <param name="origin"> Точка начала взаимодействия.</param>
-        /// <param name="targetPosition"> Целевая позиция, в направлении которой используется инструмент.</param>
-        /// <param name="player"> Контроллер игрока.</param>
+        /// <summary> РСЃРїРѕР»СЊР·РѕРІР°С‚СЊ РёРЅСЃС‚СЂСѓРјРµРЅС‚ РІ Р·Р°РґР°РЅРЅРѕРј РЅР°РїСЂР°РІР»РµРЅРёРё.</summary>
+        /// <param name="origin"> РўРѕС‡РєР° РЅР°С‡Р°Р»Р° РІР·Р°РёРјРѕРґРµР№СЃС‚РІРёСЏ.</param>
+        /// <param name="targetPosition"> Р¦РµР»РµРІР°СЏ РїРѕР·РёС†РёСЏ, РІ РЅР°РїСЂР°РІР»РµРЅРёРё РєРѕС‚РѕСЂРѕР№ РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ РёРЅСЃС‚СЂСѓРјРµРЅС‚.</param>
+        /// <param name="player"> РљРѕРЅС‚СЂРѕР»Р»РµСЂ РёРіСЂРѕРєР°.</param>
         private void UseToolInDirection(Vector3 origin, Vector3 targetPosition, PlayerController player)
         {
             Vector3 direction = (targetPosition - origin).normalized;

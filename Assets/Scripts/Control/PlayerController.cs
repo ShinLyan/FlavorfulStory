@@ -49,11 +49,17 @@ namespace FlavorfulStory.Control
             UpdateTimers();
         }
 
+        /// <summary> Обработка ввода. Передача ввода в PlayerMover. </summary>
         private void InteractWithMovement()
         {
-            float x = Input.GetAxis("Horizontal"), z = Input.GetAxis("Vertical");
+            float x = Input.GetAxisRaw("Horizontal"), z = Input.GetAxisRaw("Vertical");
             var direction = new Vector3(x, 0, z).normalized;
-            _playerMover.MoveAndRotate(direction);
+            _playerMover.SetMoveDirection(direction);
+
+            if (direction != Vector3.zero)
+            {
+                _playerMover.SetLookRotation(direction);
+            }
         }
 
         private void UpdateTimers()
@@ -131,7 +137,8 @@ namespace FlavorfulStory.Control
         {
             Vector3 direction = (position - transform.position).normalized;
             direction.y = 0; // Игнорируем вертикальную составляющую
-            transform.rotation = Quaternion.LookRotation(direction);
+            //transform.rotation = Quaternion.LookRotation(direction);
+            _playerMover.SetLookRotation(direction);
         }
     }
 }
