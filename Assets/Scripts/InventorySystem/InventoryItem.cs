@@ -5,31 +5,31 @@ using UnityEngine;
 namespace FlavorfulStory.InventorySystem
 {
     /// <summary> ScriptableObject, представляющий предмет, 
-    /// который может быть помещен в инвентарь.</summary>
+    /// который может быть помещен в инвентарь. </summary>
     // TODO: сделать абстрактным, когда все типы предметов будут реализованы
     [CreateAssetMenu(menuName = ("FlavorfulStory/Inventory/Item"))]
     public class InventoryItem : ScriptableObject, ISerializationCallbackReceiver
     {
         #region Fields and Properties
-        /// <summary> Автоматически сгенерированный ID для сохранения/загрузки.</summary>
-        /// <remarks> Очистите это поле, если вы хотите создать новое.</remarks>
+        /// <summary> Автоматически сгенерированный ID для сохранения/загрузки. </summary>
+        /// <remarks> Очистите это поле, если вы хотите создать новое. </remarks>
         [field: Tooltip("Автоматически сгенерированный ID для сохранения/загрузки. " +
             "Очистите это поле, если вы хотите создать новое.")]
         [field: SerializeField] public string ItemID { get; private set; }
 
-        /// <summary> Название предмета, которое будет отображаться в UI.</summary>
+        /// <summary> Название предмета, которое будет отображаться в UI. </summary>
         [field: Tooltip("Название предмета, которое будет отображаться в UI.")]
         [field: SerializeField] public string ItemName { get; private set; }
 
-        /// <summary> Описание предмета, которое будет отображаться в UI.</summary>
+        /// <summary> Описание предмета, которое будет отображаться в UI. </summary>
         [field: Tooltip("Описание предмета, которое будет отображаться в UI.")]
         [field: SerializeField][field: TextArea] public string Description { get; private set; }
 
-        /// <summary> Иконка предмета, которая будет отображаться в UI.</summary>
+        /// <summary> Иконка предмета, которая будет отображаться в UI. </summary>
         [field: Tooltip("Иконка предмета, которая будет отображаться в UI.")]
         [field: SerializeField] public Sprite Icon { get; private set; }
 
-        /// <summary> Префаб, который должен появиться при выпадении этого предмета.</summary>
+        /// <summary> Префаб, который должен появиться при выпадении этого предмета. </summary>
         [Tooltip("Префаб, который должен появиться при выпадении этого предмета.")]
         [SerializeField] private Pickup _pickup;
 
@@ -37,14 +37,14 @@ namespace FlavorfulStory.InventorySystem
         [Tooltip("Можно ли поместить несколько предметов одного типа в один слот инвентаря?")]
         [field: SerializeField] public bool IsStackable { get; private set; }
 
-        /// <summary> База данных всех предметов игры.</summary>
+        /// <summary> База данных всех предметов игры. </summary>
         private static Dictionary<string, InventoryItem> _itemDatabase;
         #endregion
 
-        /// <summary> Заспавнить предмет Pickup на сцене.</summary>
-        /// <param name="spawnPosition"> Позиция спавна предмета.</param>
-        /// <param name="number"> Количество предметов.</param>
-        /// <returns> Возвращает ссылку на заспавненный предмет Pickup.</returns>
+        /// <summary> Заспавнить предмет Pickup на сцене. </summary>
+        /// <param name="spawnPosition"> Позиция спавна предмета. </param>
+        /// <param name="number"> Количество предметов. </param>
+        /// <returns> Возвращает ссылку на заспавненный предмет Pickup. </returns>
         public Pickup SpawnPickup(Vector3 spawnPosition, int number)
         {
             var pickup = Instantiate(_pickup);
@@ -53,9 +53,9 @@ namespace FlavorfulStory.InventorySystem
             return pickup;
         }
 
-        /// <summary> Получить экземпляр предмета инвентаря по его ID.</summary>
-        /// <param name="itemID"> ID предмета инвентаря.</param>
-        /// <returns> Экземпляр Inventoryitem, соответствующий ID.</returns>
+        /// <summary> Получить экземпляр предмета инвентаря по его ID. </summary>
+        /// <param name="itemID"> ID предмета инвентаря. </param>
+        /// <returns> Экземпляр Inventoryitem, соответствующий ID. </returns>
         public static InventoryItem GetItemFromID(string itemID)
         {
             if (_itemDatabase == null) CreateItemDatabase();
@@ -64,7 +64,7 @@ namespace FlavorfulStory.InventorySystem
             return _itemDatabase[itemID];
         }
 
-        /// <summary> Создать базу данных предметов.</summary>
+        /// <summary> Создать базу данных предметов. </summary>
         private static void CreateItemDatabase()
         {
             _itemDatabase = new();
@@ -84,7 +84,7 @@ namespace FlavorfulStory.InventorySystem
         }
 
         #region ISerializationCallbackReceiver
-        /// <summary> Генерация и сохранение нового GUID, если он пустой.</summary>
+        /// <summary> Генерация и сохранение нового GUID, если он пустой. </summary>
         public void OnBeforeSerialize()
         {
             if (string.IsNullOrWhiteSpace(ItemID))
@@ -94,7 +94,7 @@ namespace FlavorfulStory.InventorySystem
         }
 
         /// <summary> Требуется для ISerializationCallbackReceiver, 
-        /// но нам не нужно ничего с ним делать.</summary>
+        /// но нам не нужно ничего с ним делать. </summary>
         public void OnAfterDeserialize() { }
         #endregion
     }

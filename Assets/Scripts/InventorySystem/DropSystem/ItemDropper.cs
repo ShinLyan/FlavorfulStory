@@ -6,27 +6,27 @@ using UnityEngine.SceneManagement;
 
 namespace FlavorfulStory.InventorySystem.DropSystem
 {
-    /// <summary> Выбрасыватель предметов.</summary>
+    /// <summary> Выбрасыватель предметов. </summary>
     /// <remarks> Может быть размещен на объекте сцены, которому необходимо выбрасывать pickup в мир.
-    /// Также отслеживается системой сохранения.</remarks>
+    /// Также отслеживается системой сохранения. </remarks>
     public class ItemDropper : MonoBehaviour, ISaveable
     {
-        /// <summary> Выброшенные предметы.</summary>
+        /// <summary> Выброшенные предметы. </summary>
         private List<Pickup> _droppedItems = new();
 
         private readonly List<DropRecord> _otherSceneDroppedItems = new();
 
-        /// <summary> Создание pickup в определенной позиции.</summary>
-        /// <param name="item"> Предмет, который необходимо заспавнить.</param>
-        /// <param name="number"> Количество предметов.</param>
+        /// <summary> Создание pickup в определенной позиции. </summary>
+        /// <param name="item"> Предмет, который необходимо заспавнить. </param>
+        /// <param name="number"> Количество предметов. </param>
         public void DropItem(InventoryItem item, int number)
         {
             SpawnPickup(item, number, GetDropPosition());
         }
 
-        /// <summary> Получить позицию для спавна предмета.</summary>
-        /// <remarks> Можете переопределить для задания кастомной позиции спавна предмета.</remarks>
-        /// <returns> Возвращает позицию, где должен быть заспавнен предмет.</returns>
+        /// <summary> Получить позицию для спавна предмета. </summary>
+        /// <remarks> Можете переопределить для задания кастомной позиции спавна предмета. </remarks>
+        /// <returns> Возвращает позицию, где должен быть заспавнен предмет. </returns>
         protected virtual Vector3 GetDropPosition()
         {
             float dropOffsetRange = 5f; // Диапазон случайного смещения по осям X и Z
@@ -35,10 +35,10 @@ namespace FlavorfulStory.InventorySystem.DropSystem
             return transform.position + new Vector3(randomOffsetX, 0, randomOffsetZ);
         }
 
-        /// <summary> Заспавнить предмет Pickup на сцене.</summary>
-        /// <param name="item"> Предмет, который необходимо заспавнить.</param>
-        /// <param name="number"> Количество предметов.</param>
-        /// <param name="spawnPosition"> Позиция спавна предмета.</param>
+        /// <summary> Заспавнить предмет Pickup на сцене. </summary>
+        /// <param name="item"> Предмет, который необходимо заспавнить. </param>
+        /// <param name="number"> Количество предметов. </param>
+        /// <param name="spawnPosition"> Позиция спавна предмета. </param>
         public void SpawnPickup(InventoryItem item, int number, Vector3 spawnPosition)
         {
             var pickup = item.SpawnPickup(spawnPosition, number);
@@ -46,24 +46,24 @@ namespace FlavorfulStory.InventorySystem.DropSystem
         }
 
         #region Saving
-        /// <summary> Запись о выпавших предметах.</summary>
+        /// <summary> Запись о выпавших предметах. </summary>
         [System.Serializable]
         private struct DropRecord
         {
-            /// <summary> ID выпавшего предмета.</summary>
+            /// <summary> ID выпавшего предмета. </summary>
             public string ItemID;
 
-            /// <summary> Позиция выпадшего предмета.</summary>
+            /// <summary> Позиция выпадшего предмета. </summary>
             public SerializableVector3 Position;
 
-            /// <summary> Количество выпавших предметов.</summary>
+            /// <summary> Количество выпавших предметов. </summary>
             public int Number;
 
             public int SceneBuildIndex;
         }
 
-        /// <summary> Фиксация состояния объекта при сохранении.</summary>
-        /// <returns> Возвращает объект, в котором фиксируется состояние.</returns>
+        /// <summary> Фиксация состояния объекта при сохранении. </summary>
+        /// <returns> Возвращает объект, в котором фиксируется состояние. </returns>
         public object CaptureState()
         {
             RemovePickedUpItems();
@@ -85,7 +85,7 @@ namespace FlavorfulStory.InventorySystem.DropSystem
             return droppedItemsList;
         }
 
-        /// <summary> Удалить из списка все предметы, которые были подобраны в мире.</summary>
+        /// <summary> Удалить из списка все предметы, которые были подобраны в мире. </summary>
         private void RemovePickedUpItems()
         {
             var newList = new List<Pickup>();
@@ -96,8 +96,8 @@ namespace FlavorfulStory.InventorySystem.DropSystem
             _droppedItems = newList;
         }
 
-        /// <summary> Восстановление состояния объекта при загрузке.</summary>
-        /// <param name="state"> Объект состояния, который необходимо восстановить.</param>
+        /// <summary> Восстановление состояния объекта при загрузке. </summary>
+        /// <param name="state"> Объект состояния, который необходимо восстановить. </param>
         public void RestoreState(object state)
         {
             var droppedItemsList = state as List<DropRecord>;

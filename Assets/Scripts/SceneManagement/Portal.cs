@@ -21,8 +21,8 @@ namespace FlavorfulStory.SceneManagement
             StartCoroutine(TeleportPlayer());
         }
 
-        /// <summary> ��������������� ������ � ������� ������� � ����� ������.</summary>
-        /// <returns> ���������� ��������, ������� �������������.</returns>
+        /// <summary> ��������������� ������ � ������� ������� � ����� ������. </summary>
+        /// <returns> ���������� ��������, ������� �������������. </returns>
         private System.Collections.IEnumerator TeleportPlayer()
         {
             transform.parent = null;

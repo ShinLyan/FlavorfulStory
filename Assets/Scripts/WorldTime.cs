@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-/// <summary> Глобальное игровое время.</summary>
+/// <summary> Глобальное игровое время. </summary>
 public class WorldTime : MonoBehaviour, ISaveable
 {
     /// <summary>

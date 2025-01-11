@@ -4,19 +4,19 @@ using UnityEngine;
 
 namespace FlavorfulStory.InventorySystem.EquipmentSystem
 {
-    /// <summary> Слот для снаряжения игрока.</summary>
+    /// <summary> Слот для снаряжения игрока. </summary>
     public class EquipmentSlotUI : MonoBehaviour, IDragContainer<InventoryItem>, IItemHolder
     {
-        /// <summary> Инонка слота инвентаря.</summary>
+        /// <summary> Инонка слота инвентаря. </summary>
         [SerializeField] private InventoryItemIcon _icon;
 
-        /// <summary> Тип снаряжения.</summary>
+        /// <summary> Тип снаряжения. </summary>
         [SerializeField] private EquipmentType _equipmentType;
 
         private EquipableItem _item;
         private Equipment _equipment;
 
-        /// <summary> Инициализация полей.</summary>
+        /// <summary> Инициализация полей. </summary>
         private void Awake()
         {
             var player = GameObject.FindGameObjectWithTag("Player");

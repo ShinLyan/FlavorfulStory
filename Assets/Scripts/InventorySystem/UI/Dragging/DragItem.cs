@@ -3,7 +3,7 @@ using UnityEngine.EventSystems;
 
 namespace FlavorfulStory.InventorySystem.UI.Dragging
 {
-    /// <summary> Позволяет перетаскивать элемент UI из контейнера в контейнер.</summary>
+    /// <summary> Позволяет перетаскивать элемент UI из контейнера в контейнер. </summary>
     /// <remarks> Создайте подкласс для типа, который вы хотите использовать для перетаскивания.
     /// Затем поместите в элемент UI, который вы хотите сделать доступным для перетаскивания.
     /// 
@@ -13,32 +13,32 @@ namespace FlavorfulStory.InventorySystem.UI.Dragging
     /// Задача компонентов, реализующих "IDragContainer", "IDragDestination" и "IDragSource", 
     /// заключается в обновлении интерфейса после того, как произошло перетаскивание.
     /// </remarks>
-    /// <typeparam name="T">Тип, представляющий перетаскиваемый элемент.</typeparam>
+    /// <typeparam name="T">Тип, представляющий перетаскиваемый элемент. </typeparam>
     public abstract class DragItem<T> : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
         where T : class
     {
-        /// <summary> Начальная позиция элемента перед началом перетаскивания.</summary>
+        /// <summary> Начальная позиция элемента перед началом перетаскивания. </summary>
         private Vector3 _startPosition;
 
-        /// <summary> Изначальный родительский контейнер элемента.</summary>
+        /// <summary> Изначальный родительский контейнер элемента. </summary>
         private Transform _originalParent;
 
-        /// <summary> Источник, из которого был взят элемент для перетаскивания.</summary>
+        /// <summary> Источник, из которого был взят элемент для перетаскивания. </summary>
         private IDragSource<T> _source;
 
-        /// <summary> Родительский канвас, используемый для отображения элемента во время перетаскивания.</summary>
+        /// <summary> Родительский канвас, используемый для отображения элемента во время перетаскивания. </summary>
         private Canvas _parentCanvas;
 
-        /// <summary>Инициализирует источники данных и родительский канвас.</summary>
+        /// <summary>Инициализирует источники данных и родительский канвас. </summary>
         private void Awake()
         {
             _source = GetComponentInParent<IDragSource<T>>();
             _parentCanvas = GetComponentInParent<Canvas>();
         }
 
-        /// <summary> Вызывается при начале перетаскивания элемента.</summary>
-        /// <remarks> Перемещает элемент на канвас и отключает блокировку лучей для CanvasGroup.</remarks>
-        /// <param name="eventData"> Данные события курсора.</param>
+        /// <summary> Вызывается при начале перетаскивания элемента. </summary>
+        /// <remarks> Перемещает элемент на канвас и отключает блокировку лучей для CanvasGroup. </remarks>
+        /// <param name="eventData"> Данные события курсора. </param>
         public void OnBeginDrag(PointerEventData eventData)
         {
             _startPosition = transform.position;
@@ -50,8 +50,8 @@ namespace FlavorfulStory.InventorySystem.UI.Dragging
         }
 
         /// <summary> Обновляет позицию элемента в соответствии с положением
-        /// курсора мыши во время перетаскивания.</summary>
-        /// <param name="eventData"> Данные события курсора.</param>
+        /// курсора мыши во время перетаскивания. </summary>
+        /// <param name="eventData"> Данные события курсора. </param>
         public void OnDrag(PointerEventData eventData)
         {
             transform.position = eventData.position;
@@ -59,9 +59,9 @@ namespace FlavorfulStory.InventorySystem.UI.Dragging
             // TODO BUG: когда перетягиваешь из инветаря предмет, а потом закрываешь инвентарь
         }
 
-        /// <summary> Вызывается при завершении перетаскивания элемента.</summary>
-        /// <remarks> Возвращает элемент в исходное положение или перемещает его в целевой контейнер.</remarks>
-        /// <param name="eventData"> Данные события курсора.</param>
+        /// <summary> Вызывается при завершении перетаскивания элемента. </summary>
+        /// <remarks> Возвращает элемент в исходное положение или перемещает его в целевой контейнер. </remarks>
+        /// <param name="eventData"> Данные события курсора. </param>
         public void OnEndDrag(PointerEventData eventData)
         {
             transform.position = _startPosition;
@@ -88,9 +88,9 @@ namespace FlavorfulStory.InventorySystem.UI.Dragging
         }
 
         /// <summary> Находит целевой контейнер для элемента, 
-        /// если указатель мыши находится над объектом UI.</summary>
-        /// <param name="eventData"> Данные события курсора.</param>
-        /// <returns> Возращается целевой контейнер или null.</returns>
+        /// если указатель мыши находится над объектом UI. </summary>
+        /// <param name="eventData"> Данные события курсора. </param>
+        /// <returns> Возращается целевой контейнер или null. </returns>
         private IDragDestination<T> GetContainer(PointerEventData eventData)
         {
             if (eventData.pointerEnter)
@@ -101,8 +101,8 @@ namespace FlavorfulStory.InventorySystem.UI.Dragging
             return null;
         }
 
-        /// <summary> Перемещает элемент в целевой контейнер, обновляя его состояние.</summary>
-        /// <param name="destination"> Целевой контейнер для элемента.</param>
+        /// <summary> Перемещает элемент в целевой контейнер, обновляя его состояние. </summary>
+        /// <param name="destination"> Целевой контейнер для элемента. </param>
         private void DropItemIntoContainer(IDragDestination<T> destination)
         {
             if (ReferenceEquals(destination, _source)) return;
@@ -122,7 +122,7 @@ namespace FlavorfulStory.InventorySystem.UI.Dragging
             AttemptSwap(destinationContainer, sourceContainer);
         }
 
-        /// <summary> Пытается выполнить простую передачу элемента между контейнерами.</summary>
+        /// <summary> Пытается выполнить простую передачу элемента между контейнерами. </summary>
         private bool AttemptSimpleTransfer(IDragDestination<T> destination)
         {
             var draggingItem = _source.GetItem();
@@ -140,7 +140,7 @@ namespace FlavorfulStory.InventorySystem.UI.Dragging
             return true;
         }
 
-        /// <summary> Пытается выполнить обмен элементами между контейнерами.</summary>
+        /// <summary> Пытается выполнить обмен элементами между контейнерами. </summary>
         private void AttemptSwap(IDragContainer<T> destination, IDragContainer<T> source)
         {
             // Предварительно снимаем элемент с обеих сторон.
@@ -186,7 +186,7 @@ namespace FlavorfulStory.InventorySystem.UI.Dragging
             }
         }
 
-        /// <summary> Вычисляет количество предметов, которые следует вернуть обратно в источник.</summary>
+        /// <summary> Вычисляет количество предметов, которые следует вернуть обратно в источник. </summary>
         private int CalculateTakeBack(T removedItem, int removedNumber, IDragContainer<T> removeSource, IDragContainer<T> destination)
         {
             int takeBackNumber = 0;

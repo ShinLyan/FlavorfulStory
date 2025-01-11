@@ -1,21 +1,21 @@
 ﻿using System;
 using UnityEngine;
 
-/// <summary> Класс отвечающий за смену освещения в зависимости от времени.</summary>
+/// <summary> Класс отвечающий за смену освещения в зависимости от времени. </summary>
 public class WorldLight : MonoBehaviour
 {
-    /// <summary> Объект для света , который меняем.</summary>
+    /// <summary> Объект для света , который меняем. </summary>
     [SerializeField] Light mainLight;
-    /// <summary> Нижний порог освещенности.</summary>
+    /// <summary> Нижний порог освещенности. </summary>
     [SerializeField] float minIntensity; //86 400 sec in day
-    /// <summary> Верхний порог освещенности.</summary>
+    /// <summary> Верхний порог освещенности. </summary>
     [SerializeField] float maxIntensity; //86 400 sec in day
-    /// <summary> Длительность дня.</summary>
+    /// <summary> Длительность дня. </summary>
     float dayInterval;
-    /// <summary> Длительность ночи.</summary>
+    /// <summary> Длительность ночи. </summary>
     float nightInterval;
 
-    /// <summary> .</summary>
+    /// <summary> . </summary>
     public void Update()
     {
         dayInterval = WorldTime.Instance.nightTime - WorldTime.Instance.dayTime;

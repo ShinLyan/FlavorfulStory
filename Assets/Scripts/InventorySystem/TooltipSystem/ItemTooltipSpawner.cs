@@ -3,13 +3,13 @@ using UnityEngine;
 
 namespace FlavorfulStory.InventorySystem.TooltipSystem
 {
-    /// <summary> Помещается в слот UI инвентаря для отображения тултипа предмета.</summary>
+    /// <summary> Помещается в слот UI инвентаря для отображения тултипа предмета. </summary>
     [RequireComponent(typeof(IItemHolder))]
     public class ItemTooltipSpawner : TooltipSpawner
     {
         #region Override Methods
         /// <summary> Можно ли создать тултип?</summary>
-        /// <remarks> Возвращает True, если спавнеру можно создать тултип.</remarks>
+        /// <remarks> Возвращает True, если спавнеру можно создать тултип. </remarks>
         public override bool CanCreateTooltip()
         {
             var item = GetComponent<IItemHolder>().GetItem();
@@ -18,8 +18,8 @@ namespace FlavorfulStory.InventorySystem.TooltipSystem
             return true;
         }
 
-        /// <summary> Вызывается, когда приходит время обновить информацию в префабе тултипа.</summary>
-        /// <param name="tooltip"> Заспавненный префаб тултипа для обновления.</param>
+        /// <summary> Вызывается, когда приходит время обновить информацию в префабе тултипа. </summary>
+        /// <param name="tooltip"> Заспавненный префаб тултипа для обновления. </param>
         public override void UpdateTooltip(GameObject tooltip)
         {
             var itemTooltip = tooltip.GetComponent<ItemTooltip>();

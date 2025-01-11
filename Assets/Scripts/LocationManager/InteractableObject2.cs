@@ -2,17 +2,17 @@ using UnityEngine;
 
 namespace FlavorfulStory.LocationManager
 {
-    /// <summary> Объект для взаимодействия.</summary>
+    /// <summary> Объект для взаимодействия. </summary>
     [RequireComponent(typeof(Outline))]
     public class InteractableObject2 : MonoBehaviour
     {
-        /// <summary> Компонент обводки.</summary>
+        /// <summary> Компонент обводки. </summary>
         private Outline _outline;
         
-        /// <summary> Компонент смены внешнего вида.</summary>
+        /// <summary> Компонент смены внешнего вида. </summary>
         protected AppearanceSwitcher _appearanceSwitcher;
 
-        /// <summary> Получение компонентов.</summary>
+        /// <summary> Получение компонентов. </summary>
         private void Awake()
         {
             _outline = GetComponent<Outline>();
@@ -20,14 +20,14 @@ namespace FlavorfulStory.LocationManager
             _appearanceSwitcher = GetComponentInParent<AppearanceSwitcher>();
         }
 
-        /// <summary> Взаимодействие.</summary>
+        /// <summary> Взаимодействие. </summary>
         public virtual void Interact()
         {
             _appearanceSwitcher.ChangeAppearance();
             print("Interacted");
         }
 
-        /// <summary> Включение/выключение обводки.</summary>
+        /// <summary> Включение/выключение обводки. </summary>
         public void SwitchOutline(bool enabled) => _outline.enabled = enabled;
     }
 }

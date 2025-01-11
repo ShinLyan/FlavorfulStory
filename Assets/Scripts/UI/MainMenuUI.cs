@@ -19,7 +19,7 @@ namespace FlavorfulStory.UI
         [SerializeField] private TMP_Text _errorText;
 
         /// <summary> Название сохраненного файла для новой игры, формируемое на основе ввода игрока. </summary>
-        /// <remarks> Название формируется путем соединения строк имени игрока и названия магазина.</remarks>
+        /// <remarks> Название формируется путем соединения строк имени игрока и названия магазина. </remarks>
         private string NewGameSaveFileName => string.Concat(_newGameInputFields.Select(field => field.text));
 
         /// <summary> Вызывается при включении объекта. Отключает управление игроком. </summary>
@@ -81,7 +81,7 @@ namespace FlavorfulStory.UI
         public void OnClickContinue() =>
             PersistentObject.Instance.GetSavingWrapper().ContinueGame();
 
-        /// <summary> Вернуться в главное меню.</summary>
+        /// <summary> Вернуться в главное меню. </summary>
         /// <remarks> Загружает сцену главного меню через систему сохранений. </remarks>
         public void OnClickReturnToMainMenu()
         {

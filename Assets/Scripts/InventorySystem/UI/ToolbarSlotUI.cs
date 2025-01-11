@@ -9,13 +9,13 @@ namespace FlavorfulStory.InventorySystem.UI
     public class ToolbarSlotUI : MonoBehaviour, IItemHolder,
         IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
     {
-        /// <summary> Инонка слота инвентаря.</summary>
+        /// <summary> Инонка слота инвентаря. </summary>
         [SerializeField] private InventoryItemIcon _icon;
 
-        /// <summary> Текст клавиши.</summary>
+        /// <summary> Текст клавиши. </summary>
         [SerializeField] private TMP_Text _keyText;
 
-        /// <summary> Индекс слота в HUD.</summary>
+        /// <summary> Индекс слота в HUD. </summary>
         private int _index;
 
         /// <summary>
@@ -41,8 +41,8 @@ namespace FlavorfulStory.InventorySystem.UI
                 Inventory.PlayerInventory.GetNumberInSlot(_index));
         }
 
-        /// <summary> Получить предмет, который в данный момент находится в этом источнике.</summary>
-        /// <returns> Возвращает предмет, который в данный момент находится в этом источнике.</returns>
+        /// <summary> Получить предмет, который в данный момент находится в этом источнике. </summary>
+        /// <returns> Возвращает предмет, который в данный момент находится в этом источнике. </returns>
         public InventoryItem GetItem() => Inventory.PlayerInventory.GetItemInSlot(_index);
 
         public void Select()

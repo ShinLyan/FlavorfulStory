@@ -4,15 +4,15 @@ using UnityEngine;
 
 namespace FlavorfulStory.TimeManagement
 {
-    /// <summary> Глобальное игровое время.</summary>
+    /// <summary> Глобальное игровое время. </summary>
     public class WorldTime : MonoBehaviour, ISaveable
     {
-        /// <summary> Изменение игрового времени за один тик.</summary>
+        /// <summary> Изменение игрового времени за один тик. </summary>
         [Header("Tick settings")]
         [Tooltip("Сколько минут проходит за один тик.")]
         [SerializeField] private int _tickMinutesIncrease = 10;
 
-        /// <summary> Время между тиками.</summary>
+        /// <summary> Время между тиками. </summary>
         [Tooltip("Сколько реального времени длится один тик.")]
         [SerializeField] private float _timeBetweenTicks = 1;
         
@@ -25,10 +25,10 @@ namespace FlavorfulStory.TimeManagement
         [Tooltip("Во сколько заканчивается день.")]
         [SerializeField] private int _dayEndHour;
         
-        /// <summary> Время между тиками.</summary>
+        /// <summary> Время между тиками. </summary>
         private float _currentTimeBetweenTicks;
         
-        /// <summary> Объект DateTime.</summary>
+        /// <summary> Объект DateTime. </summary>
         private DateTime _dateTime;
 
         private ISaveable _saveableImplementation;
@@ -39,7 +39,7 @@ namespace FlavorfulStory.TimeManagement
         /// <summary> Событие окончания дня. </summary>
         public static Action OnDayEnded;
         
-        /// <summary> Создание объекта DateTime.</summary>
+        /// <summary> Создание объекта DateTime. </summary>
         private void Awake()
         {
             // TODO: Если новая игра - инициализировать, иначе - нет.
@@ -47,7 +47,7 @@ namespace FlavorfulStory.TimeManagement
             OnDateTimeChanged?.Invoke(_dateTime);
         }
         
-        /// <summary> Вычисление игрового времени.</summary>
+        /// <summary> Вычисление игрового времени. </summary>
         private void Update()
         {
             _currentTimeBetweenTicks += Time.deltaTime;
@@ -59,7 +59,7 @@ namespace FlavorfulStory.TimeManagement
             }
         }
 
-        /// <summary> Увеличить время.</summary>
+        /// <summary> Увеличить время. </summary>
         private void IncreaseTime()
         {
             _dateTime.AddMinutes(_tickMinutesIncrease);

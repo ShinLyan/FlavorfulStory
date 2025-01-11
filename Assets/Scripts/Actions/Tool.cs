@@ -5,23 +5,23 @@ using UnityEngine.EventSystems;
 
 namespace FlavorfulStory.Actions
 {
-    /// <summary> Инструмент.</summary>
-    /// <remarks> Может быть использован игроком для взаимодействия с объектами.</remarks>
+    /// <summary> Инструмент. </summary>
+    /// <remarks> Может быть использован игроком для взаимодействия с объектами. </remarks>
     [CreateAssetMenu(menuName = ("FlavorfulStory/Inventory/Tool"))]
     public class Tool : ActionItem
     {
-        /// <summary> Тип инструмента.</summary>
+        /// <summary> Тип инструмента. </summary>
         [field: Tooltip("Тип инструмента.")]
         [field: SerializeField] public ToolType ToolType { get; private set; }
 
-        /// <summary> Максимальная дистанция взаимодействия.</summary>
+        /// <summary> Максимальная дистанция взаимодействия. </summary>
         private const float MaxInteractionDistance = 2f;
 
-        /// <summary> Радиус использования инструмента.</summary>
+        /// <summary> Радиус использования инструмента. </summary>
         private const float UseRadius = 1.5f;
 
-        /// <summary> Использовать.</summary>
-        /// <param name="player"> Контроллер игрока.</param>
+        /// <summary> Использовать. </summary>
+        /// <param name="player"> Контроллер игрока. </param>
         public override void Use(PlayerController player)
         {
             // Проверка на клик по UI
@@ -35,10 +35,10 @@ namespace FlavorfulStory.Actions
             // TODO: Тратить энергию игрока при использовании инструмента
         }
 
-        /// <summary> Использовать инструмент в заданном направлении.</summary>
-        /// <param name="origin"> Точка начала взаимодействия.</param>
-        /// <param name="targetPosition"> Целевая позиция, в направлении которой используется инструмент.</param>
-        /// <param name="player"> Контроллер игрока.</param>
+        /// <summary> Использовать инструмент в заданном направлении. </summary>
+        /// <param name="origin"> Точка начала взаимодействия. </param>
+        /// <param name="targetPosition"> Целевая позиция, в направлении которой используется инструмент. </param>
+        /// <param name="player"> Контроллер игрока. </param>
         private void UseToolInDirection(Vector3 origin, Vector3 targetPosition, PlayerController player)
         {
             Vector3 direction = (targetPosition - origin).normalized;
