@@ -1,4 +1,3 @@
-using System;
 using FlavorfulStory.Saving;
 using UnityEngine;
 
@@ -26,9 +25,16 @@ namespace FlavorfulStory.Movement
 
         /// <summary> Вектор движения игрока. </summary>
         private Vector3 _moveDirection;
+        
+        /// <summary> Вектор поворота(взгляда) игрока. </summary>
+        private Vector3 _lookDirection;
 
         /// <summary> �������� ������.</summary>
         private Animator _animator;
+
+        /// <summary> Хэшированное значение параметра аниматора (скорость). </summary>
+        private static readonly int Speed = Animator.StringToHash("Speed");
+
         #endregion
 
         /// <summary> ������������� ����� ������.</summary>
@@ -42,44 +48,38 @@ namespace FlavorfulStory.Movement
         private void Start()
         {
             _moveDirection = Vector3.zero;
+            _lookDirection = Vector3.zero;
         }
 
-        /// <summary> ������������ ������ � �������� �����������.</summary>
-        /// <param name="direction"> �����������, � ������� �������� �����.</param>
-        private void MoveAndRotate()
-        {
-            // Rotate(_moveDirection);
-            // AnimateMovement(_moveDirection.magnitude);
-            // Move(_moveDirection);
-        }
-
+        /// <summary> Коллбэк UnityAPI. Поворот и передвижение игрока. </summary>
         private void FixedUpdate()
         {
-            Rotate(_moveDirection);
-            Move(_moveDirection);
+            Rotate();
+            Move();
         }
 
+        /// <summary> Коллбэк UnityAPI. Анимаиця передвижения игрока. </summary>
         private void Update()
         {
             AnimateMovement(_moveDirection.magnitude);
         }
-
-        public void SetDirection(Vector3 direction) => _moveDirection = direction;
         
-        /// <summary> ������������ ������ � �������� �����������.</summary>
-        /// <param name="direction"> �����������, � ������� �������� �����.</param>
-        private void Move(Vector3 direction)
+        /// <summary> Передвижение игрока в соответствии с Input'ом. </summary>
+        private void Move()
         {
-            Vector3 offset = _moveSpeed * CountSpeedMultiplier() * Time.fixedDeltaTime * direction;
-            //_rigidbody.MovePosition(_rigidbody.position + offset);
-            Vector3 moveForce = _moveSpeed * CountSpeedMultiplier() * direction;
+            Vector3 moveForce = _moveSpeed * CountSpeedMultiplier() * _moveDirection;
             moveForce.y = _rigidbody.velocity.y;
-            // _rigidbody.AddForce(moveForce, ForceMode.Impulse);
-            // if (_rigidbody.velocity.magnitude > _moveSpeed)
-            // {
-            //     _rigidbody.velocity = direction * _moveSpeed;
-            // }
             _rigidbody.velocity = moveForce;
+        }
+        
+        /// <summary> Плавный поворот игрока в соответствии с Input'ом. </summary>
+        private void Rotate()
+        {
+            _rigidbody.MoveRotation(
+                Quaternion.Slerp(transform.rotation, 
+                    Quaternion.LookRotation(_lookDirection),
+                    Time.fixedDeltaTime * _rotateSpeed)
+            );
         }
 
         /// <summary> ��������� ��������� ��������.</summary>
@@ -98,21 +98,17 @@ namespace FlavorfulStory.Movement
         {
             float speed = Mathf.Clamp01(directionMagnitude) * CountSpeedMultiplier();
             const float DampTime = 0.2f; // �������� �������� �����������
-            _animator.SetFloat("Speed", speed, DampTime, Time.deltaTime);
+            _animator.SetFloat(Speed, speed, DampTime, Time.deltaTime);
         }
+        
+        /// <summary> Задать направление движения игрока. </summary>
+        /// <param name="direction"> Вектор направления. </param>
+        public void SetMoveDirection(Vector3 direction) => _moveDirection = direction;
 
-        /// <summary> ������� ������ � �������� �����������.</summary>
-        /// <param name="direction"> �����������, � ������� �������� �����.</param>
-        public void Rotate(Vector3 direction)
-        {
-            float singleStep = _rotateSpeed * Time.fixedDeltaTime;
-            var newDirection = Vector3.RotateTowards(transform.forward, direction, singleStep, 0f);
-            _rigidbody.MoveRotation(Quaternion.LookRotation(newDirection));
-            //_rigidbody.MoveRotation(Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(newDirection), _rotateSpeed));
-            //_rigidbody.MoveRotation(Quaternion.Lerp(transform.rotation, Quaternion.LookRotation(_moveDirection), Time.fixedDeltaTime * _rotateSpeed));
-            
-        }
-
+        /// <summary> Задать направление взгляда игрока. </summary>
+        /// <param name="direction"> Вектор взгляда. </param>
+        public void SetLookRotation(Vector3 direction) => _lookDirection = direction;
+        
         #region Saving
         [System.Serializable]
         private struct MoverSaveData
