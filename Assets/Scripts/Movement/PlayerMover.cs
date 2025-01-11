@@ -1,82 +1,116 @@
+using System;
 using FlavorfulStory.Saving;
 using UnityEngine;
 
 namespace FlavorfulStory.Movement
 {
-    /// <summary> Передвижение игрока.</summary>
+    /// <summary> пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ.</summary>
     [RequireComponent(typeof(Rigidbody))]
     [RequireComponent(typeof(Animator))]
     public class PlayerMover : MonoBehaviour, ISaveable
     {
         #region Private Fields
-        [Header("Параметры передвижения")]
-        /// <summary> Скорость движения в метрах в секунду.</summary>
-        [SerializeField, Tooltip("Скорость движения")] private float _moveSpeed;
+        [Header("пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")]
+        /// <summary> пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ.</summary>
+        [SerializeField, Tooltip("пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")] private float _moveSpeed;
 
-        /// <summary> Скорость поворота в радианах в секунду.</summary>
-        [SerializeField, Tooltip("Скорость поворота")] private float _rotateSpeed;
+        /// <summary> пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ.</summary>
+        [SerializeField, Tooltip("пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")] private float _rotateSpeed;
 
-        /// <summary> Клавиша, при зажатии которой происходит переключение на ходьбу вместо бега.</summary>
-        [SerializeField, Tooltip("Клавиша, при зажатии которой происходит переключение на ходьбу вместо бега.")]
+        /// <summary> пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ.</summary>
+        [SerializeField, Tooltip("пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ.")]
         private KeyCode _keyForWalking = KeyCode.LeftShift;
 
-        /// <summary> Твердое тело.</summary>
+        /// <summary> пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ.</summary>
         private Rigidbody _rigidbody;
 
-        /// <summary> Аниматор игрока.</summary>
+        /// <summary> Р’РµРєС‚РѕСЂ РґРІРёР¶РµРЅРёСЏ РёРіСЂРѕРєР°. </summary>
+        private Vector3 _moveDirection;
+
+        /// <summary> пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ.</summary>
         private Animator _animator;
         #endregion
 
-        /// <summary> Инициализация полей класса.</summary>
+        /// <summary> пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ.</summary>
         private void Awake()
         {
             _rigidbody = GetComponent<Rigidbody>();
             _animator = GetComponent<Animator>();
         }
 
-        /// <summary> Передвижение игрока в заданном направлении.</summary>
-        /// <param name="direction"> Направление, в котором движется игрок.</param>
-        public void MoveAndRotate(Vector3 direction)
+        /// <summary> РљРѕР»Р»Р±СЌРє UnityAPI. РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РІРµРєС‚РѕСЂР° РґРІРёР¶РµРЅРёСЏ. </summary>
+        private void Start()
         {
-            Move(direction);
-            AnimateMovement(direction.magnitude);
-            Rotate(direction);
+            _moveDirection = Vector3.zero;
         }
 
-        /// <summary> Передвижение игрока в заданном направлении.</summary>
-        /// <param name="direction"> Направление, в котором движется игрок.</param>
+        /// <summary> пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.</summary>
+        /// <param name="direction"> пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ.</param>
+        private void MoveAndRotate()
+        {
+            // Rotate(_moveDirection);
+            // AnimateMovement(_moveDirection.magnitude);
+            // Move(_moveDirection);
+        }
+
+        private void FixedUpdate()
+        {
+            Rotate(_moveDirection);
+            Move(_moveDirection);
+        }
+
+        private void Update()
+        {
+            AnimateMovement(_moveDirection.magnitude);
+        }
+
+        public void SetDirection(Vector3 direction) => _moveDirection = direction;
+        
+        /// <summary> пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.</summary>
+        /// <param name="direction"> пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ.</param>
         private void Move(Vector3 direction)
         {
-            Vector3 offset = _moveSpeed * CountSpeedMultiplier() * Time.deltaTime * direction;
-            _rigidbody.MovePosition(_rigidbody.position + offset);
+            Vector3 offset = _moveSpeed * CountSpeedMultiplier() * Time.fixedDeltaTime * direction;
+            //_rigidbody.MovePosition(_rigidbody.position + offset);
+            Vector3 moveForce = _moveSpeed * CountSpeedMultiplier() * direction;
+            moveForce.y = _rigidbody.velocity.y;
+            // _rigidbody.AddForce(moveForce, ForceMode.Impulse);
+            // if (_rigidbody.velocity.magnitude > _moveSpeed)
+            // {
+            //     _rigidbody.velocity = direction * _moveSpeed;
+            // }
+            _rigidbody.velocity = moveForce;
         }
 
-        /// <summary> Расчитать множитель скорости.</summary>
-        /// <returns> Возвращает значение множителя скорости.</returns>
+        /// <summary> пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.</summary>
+        /// <returns> пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.</returns>
         private float CountSpeedMultiplier()
         {
-            // Значения множителей варьируются от 0 до 1.
+            // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ 0 пїЅпїЅ 1.
             const float WalkingMultiplier = 0.5f;
             const float RunningMultiplier = 1f;
             return Input.GetKey(_keyForWalking) ? WalkingMultiplier : RunningMultiplier;
         }
 
-        /// <summary> Анимировать передвижение.</summary>
-        /// <param name="directionMagnitude"> Величина вектора направления.</param>
+        /// <summary> пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.</summary>
+        /// <param name="directionMagnitude"> пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.</param>
         private void AnimateMovement(float directionMagnitude)
         {
             float speed = Mathf.Clamp01(directionMagnitude) * CountSpeedMultiplier();
-            const float DampTime = 0.2f; // Значение получено эмпирически
+            const float DampTime = 0.2f; // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
             _animator.SetFloat("Speed", speed, DampTime, Time.deltaTime);
         }
 
-        /// <summary> Поворот игрока в заданном направлении.</summary>
-        /// <param name="direction"> Направление, в котором движется игрок.</param>
+        /// <summary> пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.</summary>
+        /// <param name="direction"> пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ.</param>
         public void Rotate(Vector3 direction)
         {
-            float singleStep = _rotateSpeed * Time.deltaTime;
+            float singleStep = _rotateSpeed * Time.fixedDeltaTime;
             var newDirection = Vector3.RotateTowards(transform.forward, direction, singleStep, 0f);
-            transform.rotation = Quaternion.LookRotation(newDirection);
+            _rigidbody.MoveRotation(Quaternion.LookRotation(newDirection));
+            //_rigidbody.MoveRotation(Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(newDirection), _rotateSpeed));
+            //_rigidbody.MoveRotation(Quaternion.Lerp(transform.rotation, Quaternion.LookRotation(_moveDirection), Time.fixedDeltaTime * _rotateSpeed));
+            
         }
 
         #region Saving

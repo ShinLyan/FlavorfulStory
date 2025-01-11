@@ -51,9 +51,9 @@ namespace FlavorfulStory.Control
 
         private void InteractWithMovement()
         {
-            float x = Input.GetAxis("Horizontal"), z = Input.GetAxis("Vertical");
+            float x = Input.GetAxisRaw("Horizontal"), z = Input.GetAxisRaw("Vertical");
             var direction = new Vector3(x, 0, z).normalized;
-            _playerMover.MoveAndRotate(direction);
+            _playerMover.SetDirection(direction);
         }
 
         private void UpdateTimers()
