@@ -3,82 +3,112 @@ using UnityEngine;
 
 namespace FlavorfulStory.Movement
 {
-    /// <summary> Передвижение игрока.</summary>
+    /// <summary> пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ.</summary>
     [RequireComponent(typeof(Rigidbody))]
     [RequireComponent(typeof(Animator))]
     public class PlayerMover : MonoBehaviour, ISaveable
     {
         #region Private Fields
-        [Header("Параметры передвижения")]
-        /// <summary> Скорость движения в метрах в секунду.</summary>
-        [SerializeField, Tooltip("Скорость движения")] private float _moveSpeed;
+        [Header("пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")]
+        /// <summary> пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ.</summary>
+        [SerializeField, Tooltip("пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")] private float _moveSpeed;
 
-        /// <summary> Скорость поворота в радианах в секунду.</summary>
-        [SerializeField, Tooltip("Скорость поворота")] private float _rotateSpeed;
+        /// <summary> пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ.</summary>
+        [SerializeField, Tooltip("пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")] private float _rotateSpeed;
 
-        /// <summary> Клавиша, при зажатии которой происходит переключение на ходьбу вместо бега.</summary>
-        [SerializeField, Tooltip("Клавиша, при зажатии которой происходит переключение на ходьбу вместо бега.")]
+        /// <summary> пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ.</summary>
+        [SerializeField, Tooltip("пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ.")]
         private KeyCode _keyForWalking = KeyCode.LeftShift;
 
-        /// <summary> Твердое тело.</summary>
+        /// <summary> пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ.</summary>
         private Rigidbody _rigidbody;
 
-        /// <summary> Аниматор игрока.</summary>
+        /// <summary> Р’РµРєС‚РѕСЂ РґРІРёР¶РµРЅРёСЏ РёРіСЂРѕРєР°. </summary>
+        private Vector3 _moveDirection;
+        
+        /// <summary> Р’РµРєС‚РѕСЂ РїРѕРІРѕСЂРѕС‚Р°(РІР·РіР»СЏРґР°) РёРіСЂРѕРєР°. </summary>
+        private Vector3 _lookDirection;
+
+        /// <summary> пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ.</summary>
         private Animator _animator;
+
+        /// <summary> РҐСЌС€РёСЂРѕРІР°РЅРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ РїР°СЂР°РјРµС‚СЂР° Р°РЅРёРјР°С‚РѕСЂР° (СЃРєРѕСЂРѕСЃС‚СЊ). </summary>
+        private static readonly int Speed = Animator.StringToHash("Speed");
+
         #endregion
 
-        /// <summary> Инициализация полей класса.</summary>
+        /// <summary> пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ.</summary>
         private void Awake()
         {
             _rigidbody = GetComponent<Rigidbody>();
             _animator = GetComponent<Animator>();
         }
 
-        /// <summary> Передвижение игрока в заданном направлении.</summary>
-        /// <param name="direction"> Направление, в котором движется игрок.</param>
-        public void MoveAndRotate(Vector3 direction)
+        /// <summary> РљРѕР»Р»Р±СЌРє UnityAPI. РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РІРµРєС‚РѕСЂР° РґРІРёР¶РµРЅРёСЏ. </summary>
+        private void Start()
         {
-            Move(direction);
-            AnimateMovement(direction.magnitude);
-            Rotate(direction);
+            _moveDirection = Vector3.zero;
+            _lookDirection = Vector3.zero;
         }
 
-        /// <summary> Передвижение игрока в заданном направлении.</summary>
-        /// <param name="direction"> Направление, в котором движется игрок.</param>
-        private void Move(Vector3 direction)
+        /// <summary> РљРѕР»Р»Р±СЌРє UnityAPI. РџРѕРІРѕСЂРѕС‚ Рё РїРµСЂРµРґРІРёР¶РµРЅРёРµ РёРіСЂРѕРєР°. </summary>
+        private void FixedUpdate()
         {
-            Vector3 offset = _moveSpeed * CountSpeedMultiplier() * Time.deltaTime * direction;
-            _rigidbody.MovePosition(_rigidbody.position + offset);
+            Rotate();
+            Move();
         }
 
-        /// <summary> Расчитать множитель скорости.</summary>
-        /// <returns> Возвращает значение множителя скорости.</returns>
+        /// <summary> РљРѕР»Р»Р±СЌРє UnityAPI. РђРЅРёРјР°РёС†СЏ РїРµСЂРµРґРІРёР¶РµРЅРёСЏ РёРіСЂРѕРєР°. </summary>
+        private void Update()
+        {
+            AnimateMovement(_moveDirection.magnitude);
+        }
+        
+        /// <summary> РџРµСЂРµРґРІРёР¶РµРЅРёРµ РёРіСЂРѕРєР° РІ СЃРѕРѕС‚РІРµС‚СЃС‚РІРёРё СЃ Input'РѕРј. </summary>
+        private void Move()
+        {
+            Vector3 moveForce = _moveSpeed * CountSpeedMultiplier() * _moveDirection;
+            moveForce.y = _rigidbody.velocity.y;
+            _rigidbody.velocity = moveForce;
+        }
+        
+        /// <summary> РџР»Р°РІРЅС‹Р№ РїРѕРІРѕСЂРѕС‚ РёРіСЂРѕРєР° РІ СЃРѕРѕС‚РІРµС‚СЃС‚РІРёРё СЃ Input'РѕРј. </summary>
+        private void Rotate()
+        {
+            _rigidbody.MoveRotation(
+                Quaternion.Slerp(transform.rotation, 
+                    Quaternion.LookRotation(_lookDirection),
+                    Time.fixedDeltaTime * _rotateSpeed)
+            );
+        }
+
+        /// <summary> пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.</summary>
+        /// <returns> пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.</returns>
         private float CountSpeedMultiplier()
         {
-            // Значения множителей варьируются от 0 до 1.
+            // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ 0 пїЅпїЅ 1.
             const float WalkingMultiplier = 0.5f;
             const float RunningMultiplier = 1f;
             return Input.GetKey(_keyForWalking) ? WalkingMultiplier : RunningMultiplier;
         }
 
-        /// <summary> Анимировать передвижение.</summary>
-        /// <param name="directionMagnitude"> Величина вектора направления.</param>
+        /// <summary> пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.</summary>
+        /// <param name="directionMagnitude"> пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.</param>
         private void AnimateMovement(float directionMagnitude)
         {
             float speed = Mathf.Clamp01(directionMagnitude) * CountSpeedMultiplier();
-            const float DampTime = 0.2f; // Значение получено эмпирически
-            _animator.SetFloat("Speed", speed, DampTime, Time.deltaTime);
+            const float DampTime = 0.2f; // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+            _animator.SetFloat(Speed, speed, DampTime, Time.deltaTime);
         }
+        
+        /// <summary> Р—Р°РґР°С‚СЊ РЅР°РїСЂР°РІР»РµРЅРёРµ РґРІРёР¶РµРЅРёСЏ РёРіСЂРѕРєР°. </summary>
+        /// <param name="direction"> Р’РµРєС‚РѕСЂ РЅР°РїСЂР°РІР»РµРЅРёСЏ. </param>
+        public void SetMoveDirection(Vector3 direction) => _moveDirection = direction;
 
-        /// <summary> Поворот игрока в заданном направлении.</summary>
-        /// <param name="direction"> Направление, в котором движется игрок.</param>
-        public void Rotate(Vector3 direction)
-        {
-            float singleStep = _rotateSpeed * Time.deltaTime;
-            var newDirection = Vector3.RotateTowards(transform.forward, direction, singleStep, 0f);
-            transform.rotation = Quaternion.LookRotation(newDirection);
-        }
-
+        /// <summary> Р—Р°РґР°С‚СЊ РЅР°РїСЂР°РІР»РµРЅРёРµ РІР·РіР»СЏРґР° РёРіСЂРѕРєР°. </summary>
+        /// <param name="direction"> Р’РµРєС‚РѕСЂ РІР·РіР»СЏРґР°. </param>
+        public void SetLookRotation(Vector3 direction) => _lookDirection = direction;
+        
         #region Saving
         [System.Serializable]
         private struct MoverSaveData
