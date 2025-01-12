@@ -1,11 +1,15 @@
+using System;
 using System.Linq;
 using UnityEngine;
 
 namespace FlavorfulStory.UI
 {
+    //TODO: Refactor
     /// <summary> Управление переключением UI. </summary>
     public class UISwitcher : MonoBehaviour
     {
+        public event Action<int> OnTabSelected; 
+        
         /// <summary> Объект, на который переключится UI при запуске. </summary>
         [SerializeField] private GameObject _entryPoint;
 
@@ -78,6 +82,8 @@ namespace FlavorfulStory.UI
             _tabButtons[_currentTabIndex].ResetSelection();
             _tabButtons[index].Select();
             _currentTabIndex = index;
+            
+            OnTabSelected?.Invoke(index);
         }
 
         /// <summary> Переключение отображения на указанный объект. </summary>
@@ -95,6 +101,6 @@ namespace FlavorfulStory.UI
 
         /// <summary> Получение имен вкладок меню, используемых в InputManager. </summary>
         /// <returns> Массив строк с именами вкладок. </returns>
-        public string[] GetTabNames() => _tabButtons.Select(button => button.ButtonType.ToString()).ToArray();
+        public string[] GetTabNames() => _tabButtons.Select(button => button.TabType.ToString()).ToArray();
     }
 }

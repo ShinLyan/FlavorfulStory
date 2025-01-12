@@ -7,6 +7,7 @@ using UnityEngine.UI;
 
 namespace FlavorfulStory.UI
 {
+    //TODO: Refactor
     /// <summary> Кнопка переключения вкладки. </summary>
     [RequireComponent(typeof(Image))]
     public class TabSwitcherButton : MonoBehaviour,
@@ -19,7 +20,7 @@ namespace FlavorfulStory.UI
         [SerializeField] private UnityEvent _onSelected;
 
         /// <summary> Тип кнопки, используемый для идентификации в InputManager. </summary>
-        [field: SerializeField] public ButtonType ButtonType { get; private set; }
+        [field: SerializeField] public TabType TabType { get; private set; }
 
         /// <summary> Цвет текста выбранной вкладки. </summary>
         private Color _selectedColor = new(1, 0.8566375f, 0.6745283f);

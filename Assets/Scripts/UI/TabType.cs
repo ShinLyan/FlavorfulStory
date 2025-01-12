@@ -2,18 +2,15 @@
 {
     /// <summary> Перичесление для обозначения типов кнопок </summary>
     /// <remarks> Используется для возможного переназначения кнопок в настройках управления. </remarks>>
-    public enum ButtonType
+    public enum TabType
     {
         /// <summary> Открытие главной вкладки в меню. </summary>
-        OpenMainTab, 
+        MainTab, 
 
         /// <summary> Открытие вкладки инвентаря в меню. </summary>
-        OpenInventoryTab,
-
-        /// <summary> Открытие вкладки карты в меню. </summary>
-        OpenMapTab,
+        InventoryTab,
         
         /// <summary> Открытие вкладки настроек в меню. </summary>
-        OpenSettingsTab,
+        SettingsTab,
     }
 }
