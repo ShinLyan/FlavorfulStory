@@ -12,7 +12,7 @@ namespace FlavorfulStory.UI
         [SerializeField] private GameObject _tab;
 
         /// <summary> Поле дочернего UISwitcher. </summary>
-        private UISwitcher _uiSwitcher;
+        [SerializeField] private UISwitcher _uiSwitcher;
 
         /// <summary> Массив имен кнопок для включения определенных вкладок. </summary>
         private string[] _tabButtonNames;
@@ -20,7 +20,6 @@ namespace FlavorfulStory.UI
         /// <summary> Инициализация компонента UISwitcher. Получение имен кнопок для переключения вкладок. </summary>
         private void Awake()
         {
-            _uiSwitcher = GetComponentInChildren<UISwitcher>();
             _tabButtonNames = _uiSwitcher.GetTabNames();
         }
 

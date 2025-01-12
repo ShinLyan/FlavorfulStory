@@ -19,28 +19,7 @@ namespace FlavorfulStory.TimeManagement
         /// <summary> Количество минут в одном сезоне. </summary>
         private const int SeasonMinutes = DayMinutes * DaysCount;
 
-        /// <summary> Конструктор. </summary>
-        /// <param name="year"> Год. </param>
-        /// <param name="season"> Сезон. </param>
-        /// <param name="day"> День в сезоне. </param>
-        /// <param name="hour"> Часы. </param>
-        /// <param name="minute"> Минуты. </param>
-        public DateTime(int year, Seasons season, int day, int hour, int minute)
-        {
-            _totalMinutes = (year - 1) * SeasonMinutes * 4 // Годы в минутах
-                           + ((int)season) * SeasonMinutes    // Сезоны в минутах
-                           + (day - 1) * DayMinutes  // Дни в минутах
-                           + hour * 60          // Часы в минутах
-                           + minute;
-        }
-
-        public DateTime(int totalMinutes)
-        {
-            _totalMinutes = totalMinutes;
-        }
-
         #region Properties
-        
         /// <summary> Получить год. </summary>
         public int Year => _totalMinutes / (SeasonMinutes * 4) + 1;
 
@@ -66,8 +45,26 @@ namespace FlavorfulStory.TimeManagement
         public int TotalDays => _totalMinutes / DayMinutes;
 
         #endregion
-        
-        #region Methods
+
+        /// <summary> Конструктор. </summary>
+        /// <param name="year"> Год. </param>
+        /// <param name="season"> Сезон. </param>
+        /// <param name="day"> День в сезоне. </param>
+        /// <param name="hour"> Часы. </param>
+        /// <param name="minute"> Минуты. </param>
+        public DateTime(int year, Seasons season, int day, int hour, int minute)
+        {
+            _totalMinutes = (year - 1) * SeasonMinutes * 4 // Годы в минутах
+                           + ((int)season) * SeasonMinutes    // Сезоны в минутах
+                           + (day - 1) * DayMinutes  // Дни в минутах
+                           + hour * 60          // Часы в минутах
+                           + minute;
+        }
+
+        public DateTime(int totalMinutes)
+        {
+            _totalMinutes = totalMinutes;
+        }
 
         /// <summary> Добавление минут. </summary>
         /// <param name="minutes"> Добавляемые минуты. </param>
@@ -75,72 +72,10 @@ namespace FlavorfulStory.TimeManagement
         {
             _totalMinutes += minutes;
         }
-        
-        #endregion
-        
-        #region Overrides
-        //
-        // /// <summary> Оператор равенства. </summary>
-        // /// <param name="dt1"> Первое время. </param>
-        // /// <param name="dt2"> Второе время. </param>
-        // /// <returns> Булево равенство времен. </returns>
-        // public static bool operator ==(DateTime dt1, DateTime dt2)
-        // {
-        //     if (dt1 is null || dt2 is null)
-        //         return false;
-        //     return dt1._totalMinutes == dt2._totalMinutes;
-        // }
-        //
-        // /// <summary> Оператор неравенства. </summary>
-        // /// <param name="dt1"> Первое время. </param>
-        // /// <param name="dt2"> Второе время. </param>
-        // /// <returns> Булево неравенство времен. </returns>
-        // public static bool operator !=(DateTime dt1, DateTime dt2)
-        // {
-        //     return !(dt1 == dt2);
-        // }
-        //
-        // /// <summary> Оператор больше. </summary>
-        // /// <param name="dt1"> Первое время. </param>
-        // /// <param name="dt2"> Второе время. </param>
-        // /// <returns> Булево сравнение времен. </returns>
-        // public static bool operator >(DateTime dt1, DateTime dt2)
-        // {
-        //     return dt1._totalMinutes > dt2._totalMinutes;
-        // }
-        //
-        // /// <summary> Оператор меньше. </summary>
-        // /// <param name="dt1"> Первое время. </param>
-        // /// <param name="dt2"> Второе время. </param>
-        // /// <returns> Булево сравнение времен. </returns>
-        // public static bool operator <(DateTime dt1, DateTime dt2)
-        // {
-        //     return dt1._totalMinutes < dt2._totalMinutes;
-        // }
-        //
-        // /// <summary> Равенство. </summary>
-        // /// <param name="obj"> Объект. </param>
-        // /// <returns> Булево равенство. </returns>
-        // public override bool Equals(object obj)
-        // {
-        //     if (obj is DateTime other)
-        //         return _totalMinutes == other._totalMinutes;
-        //     return false;
-        // }
-        //
-        // /// <summary> Получение хэш-кода. </summary>
-        // /// <returns> Хэш-код. </returns>
-        // public override int GetHashCode()
-        // {
-        //     return _totalMinutes.GetHashCode();
-        // }
-        
-        #endregion
-        
-        #region ToString
 
-        /// <summary> Переопределение ToString(). </summary>
-        /// <returns> Строка с текущей датой и временем. </returns>
+        #region ToString
+        /// <summary> Переопределение ToString().</summary>
+        /// <returns> Строка с текущей датой и временем.</returns>
         public override string ToString()
         {
             return $"{Year} year {Season} {DayInSeason} day {TimeToString()}" ;
@@ -177,7 +112,6 @@ namespace FlavorfulStory.TimeManagement
                 return $"{hourString}:{minuteString} {period}";
             }
         }
-
         #endregion
     }
 }
