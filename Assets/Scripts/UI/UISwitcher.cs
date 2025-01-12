@@ -9,8 +9,13 @@ namespace FlavorfulStory.UI
         /// <summary> Объект, на который переключится UI при запуске. </summary>
         [SerializeField] private GameObject _entryPoint;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        [SerializeField] private GameObject _tabButtonsGameObject;
+
         /// <summary> Массив кнопок, управляющих переключением вкладок. </summary>
-        [SerializeField] private TabSwitcherButton[] _tabButtons;
+        private TabSwitcherButton[] _tabButtons;
 
         /// <summary> Клавиша для переключения на предыдущую вкладку. </summary>
         private const KeyCode _previousTabKey = KeyCode.Q;
@@ -20,6 +25,11 @@ namespace FlavorfulStory.UI
 
         /// <summary> Индекс текущей активной вкладки. </summary>
         private int _currentTabIndex = 0;
+
+        private void Awake()
+        {
+            _tabButtons = _tabButtonsGameObject.GetComponentsInChildren<TabSwitcherButton>();
+        }
 
         /// <summary> Инициализация UI при старте. Устанавливает начальную вкладку и подготавливает кнопки. </summary>
         private void Start()

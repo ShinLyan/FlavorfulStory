@@ -9,9 +9,6 @@ namespace FlavorfulStory.InventorySystem.UI
     [RequireComponent(typeof(Image))]
     public class InventoryItemIcon : MonoBehaviour
     {
-        /// <summary> Контейнер для текста количества предметов.</summary>
-        [SerializeField] private GameObject _textContainer;
-
         /// <summary> Текст количества предметов.</summary>
         [SerializeField] private TMP_Text _itemNumberText;
 
@@ -26,7 +23,7 @@ namespace FlavorfulStory.InventorySystem.UI
 
             if (!_itemNumberText) return;
 
-            _textContainer.SetActive(number > 1);
+            _itemNumberText.gameObject.SetActive(number > 1);
             _itemNumberText.text = number.ToString();
         }
     }
