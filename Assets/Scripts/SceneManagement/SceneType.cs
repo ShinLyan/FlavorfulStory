@@ -1,17 +1,17 @@
 namespace FlavorfulStory.SceneManagement
 {
-    /// <summary> Список всех сцен игры.</summary>
+    /// <summary> Список всех сцен игры. </summary>
     /// <remarks> Необходимо указывать точное название сцены. 
-    /// В дальнейшем от этих названий будут загружаться сцены.</remarks>
+    /// В дальнейшем от этих названий будут загружаться сцены. </remarks>
     public enum SceneType
     {
-        /// <summary> Главное меню.</summary>
+        /// <summary> Главное меню. </summary>
         MainMenu,
 
-        /// <summary> Каменный остров.</summary>
+        /// <summary> Каменный остров. </summary>
         RockyIsland,
 
-        /// <summary> Ресторан.</summary>
+        /// <summary> Ресторан. </summary>
         Restaurant
     }
 }

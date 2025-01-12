@@ -3,7 +3,7 @@ using System;
 
 namespace FlavorfulStory.TimeManagement
 {
-    /// <summary> Класс для взаимодействия с игровым временем.</summary>
+    /// <summary> Класс для взаимодействия с игровым временем. </summary>
     [Serializable]
     public struct DateTime
     {
@@ -35,13 +35,13 @@ namespace FlavorfulStory.TimeManagement
         /// <summary> Получить часы. </summary>
         public int Hour => _totalMinutes % DayMinutes / 60;
 
-        /// <summary> Получить минуты.</summary>
+        /// <summary> Получить минуты. </summary>
         public int Minute => _totalMinutes % 60;
 
-        /// <summary> Получить число прошедших недель.</summary>
+        /// <summary> Получить число прошедших недель. </summary>
         public int TotalWeeks => _totalMinutes / (DayMinutes * 7);
 
-        /// <summary> Получить число прошедших дней.</summary>
+        /// <summary> Получить число прошедших дней. </summary>
         public int TotalDays => _totalMinutes / DayMinutes;
 
         #endregion
@@ -67,7 +67,7 @@ namespace FlavorfulStory.TimeManagement
         }
 
         /// <summary> Добавление минут. </summary>
-        /// <param name="minutes"> Добавляемые минуты.</param>
+        /// <param name="minutes"> Добавляемые минуты. </param>
         public void AddMinutes(int minutes)
         {
             _totalMinutes += minutes;
@@ -81,8 +81,8 @@ namespace FlavorfulStory.TimeManagement
             return $"{Year} year {Season} {DayInSeason} day {TimeToString()}" ;
         }
 
-        /// <summary> Перевод даты в строковый тип.</summary>
-        /// <returns> Строка с датой.</returns>
+        /// <summary> Перевод даты в строковый тип. </summary>
+        /// <returns> Строка с датой. </returns>
         public string DateToString()
         {
             return $"{DayOfWeek} {DayInSeason} {Year}";

@@ -12,26 +12,20 @@ namespace FlavorfulStory.UI
     public class TabSwitcherButton : MonoBehaviour,
         IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
     {
-        /// <summary>
-        /// 
-        /// </summary>
+        /// <summary> Текстовое поле названия вкладки. </summary>
         [SerializeField] private TMP_Text _tabNameText;
-
-        /// <summary>
-        /// 
-        /// </summary>
-        private Color _selectedColor = new(231, 194, 147);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        private Color _defaultColor = Color.white;
 
         /// <summary> Unity-событие, вызываемое при выборе кнопки. </summary>
         [SerializeField] private UnityEvent _onSelected;
 
         /// <summary> Тип кнопки, используемый для идентификации в InputManager. </summary>
         [field: SerializeField] public ButtonType ButtonType { get; private set; }
+
+        /// <summary> Цвет текста выбранной вкладки. </summary>
+        private Color _selectedColor = new(1, 0.8566375f, 0.6745283f);
+
+        /// <summary> Цвет текста вкладки по умолчанию. </summary>
+        private Color _defaultColor = Color.white;
 
         /// <summary> Флаг, указывающий, выбрана ли кнопка. </summary>
         private bool _isSelected;

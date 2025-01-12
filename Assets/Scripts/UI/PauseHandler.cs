@@ -6,13 +6,13 @@ using UnityEngine;
 public class PauseHandler : MonoBehaviour
 {
     [Header("Objects")]
-    /// <summary>Список объектов UI объектов, которые открываются при паузе.</summary>
+    /// <summary>Список объектов UI объектов, которые открываются при паузе. </summary>
     [SerializeField] private List<GameObject> _enableObjects;
-    /// <summary>Список объектов UI объектов, которые скрываются при паузе.</summary>
+    /// <summary>Список объектов UI объектов, которые скрываются при паузе. </summary>
     [SerializeField] private List<GameObject> _disableObjects;
-    ///<summary>Переменная состояния паузы.</summary>
+    ///<summary>Переменная состояния паузы. </summary>
     private bool _isPaused;
-    ///<summary>По умолчанию игра не на паузе.</summary>
+    ///<summary>По умолчанию игра не на паузе. </summary>
     private void Start()
     {
         _isPaused = false;
@@ -25,7 +25,7 @@ public class PauseHandler : MonoBehaviour
             SetPause();
         }
     }
-    ///<summary>Метод для включения/выключения объектов UI при паузе.</summary>
+    ///<summary>Метод для включения/выключения объектов UI при паузе. </summary>
     private void SetPause()
     {
         if (!_isPaused)

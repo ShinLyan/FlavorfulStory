@@ -4,19 +4,19 @@ using UnityEngine.EventSystems;
 
 namespace FlavorfulStory.UI.Bars
 {
-    /// <summary>  Класс, отвечающий за отрисовку количества энергии.</summary>
+    /// <summary>  Класс, отвечающий за отрисовку количества энергии. </summary>
     public class EnergyBar : BaseBar, IPointerEnterHandler, IPointerExitHandler
     {
-        /// <summary> Компонент энергии.</summary>
+        /// <summary> Компонент энергии. </summary>
         private Stamina _stamina;
 
-        /// <summary> Подписка на события.</summary>
+        /// <summary> Подписка на события. </summary>
         private void OnEnable()
         {
             _stamina.OnStaminaChanged += SetBarText;
         }
 
-        /// <summary> Отписка от событий.</summary>
+        /// <summary> Отписка от событий. </summary>
         private void OnDisable()
         {
             _stamina.OnStaminaChanged -= SetBarText;
@@ -34,16 +34,16 @@ namespace FlavorfulStory.UI.Bars
             _textObject.gameObject.SetActive(false);
         }
 
-        /// <summary> Включение объекта при наведении на него курсора.</summary>
-        /// <param name="eventData"> Информация ивента.</param>
+        /// <summary> Включение объекта при наведении на него курсора. </summary>
+        /// <param name="eventData"> Информация ивента. </param>
         public void OnPointerEnter(PointerEventData eventData)
         {
             SetBarText(_stamina.CurrentValue);
             _textObject.gameObject.SetActive(true);
         }
 
-        /// <summary> Выключение объекта при наведении на него курсора.</summary>
-        /// <param name="eventData"> Информация ивента.</param>
+        /// <summary> Выключение объекта при наведении на него курсора. </summary>
+        /// <param name="eventData"> Информация ивента. </param>
         public void OnPointerExit(PointerEventData eventData)
         {
             _textObject.gameObject.SetActive(false);

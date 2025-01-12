@@ -2,7 +2,7 @@ using System;
 
 namespace FlavorfulStory.TimeManagement
 {
-    /// <summary> Дни недели.</summary>
+    /// <summary> Дни недели. </summary>
     [Serializable]
     public enum WeekDays
     {
@@ -15,7 +15,7 @@ namespace FlavorfulStory.TimeManagement
         Sunday
     }
 
-    /// <summary> Сезоны.</summary>
+    /// <summary> Сезоны. </summary>
     [Serializable]
     public enum Seasons
     {

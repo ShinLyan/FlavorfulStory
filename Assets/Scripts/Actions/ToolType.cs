@@ -1,12 +1,12 @@
 namespace FlavorfulStory.Actions
 {
-    /// <summary> Тип инструмента, необходимого для взаимодействия с объектом.</summary>
+    /// <summary> Тип инструмента, необходимого для взаимодействия с объектом. </summary>
     public enum ToolType
     {
-        /// <summary> Топор.</summary>
+        /// <summary> Топор. </summary>
         Axe,
 
-        /// <summary> Кирка.</summary>
+        /// <summary> Кирка. </summary>
         Pickaxe
     }
 }

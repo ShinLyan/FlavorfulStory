@@ -3,96 +3,127 @@ using UnityEngine;
 
 namespace FlavorfulStory.Movement
 {
-    /// <summary> Передвижение игрока.</summary>
+    /// <summary> РџРµСЂРµРґРІРёР¶РµРЅРёРµ РёРіСЂРѕРєР°. </summary>
     [RequireComponent(typeof(Rigidbody))]
     [RequireComponent(typeof(Animator))]
     public class PlayerMover : MonoBehaviour, ISaveable
     {
         #region Private Fields
-        [Header("Параметры передвижения")]
-        /// <summary> Скорость движения в метрах в секунду.</summary>
-        [SerializeField, Tooltip("Скорость движения")] private float _moveSpeed;
+        [Header("РџР°СЂР°РјРµС‚СЂС‹ РґРІРёР¶РµРЅРёСЏ")]
+        /// <summary> РЎРєРѕСЂРѕСЃС‚СЊ РїРµСЂРµРґРІРёР¶РµРЅРёСЏ РёРіСЂРѕРєР°. </summary>
+        [SerializeField, Tooltip("РЎРєРѕСЂРѕСЃС‚СЊ РїРµСЂРµРґРІРёР¶РµРЅРёСЏ РёРіСЂРѕРєР°.")] private float _moveSpeed;
 
-        /// <summary> Скорость поворота в радианах в секунду.</summary>
-        [SerializeField, Tooltip("Скорость поворота")] private float _rotateSpeed;
+        /// <summary> РЎРєРѕСЂРѕСЃС‚СЊ РїРѕРІРѕСЂРѕС‚Р° РёРіСЂРѕРєР°. </summary>
+        [SerializeField, Tooltip("РЎРєРѕСЂРѕСЃС‚СЊ РїРѕРІРѕСЂРѕС‚Р° РёРіСЂРѕРєР°.")] private float _rotateSpeed;
 
-        /// <summary> Клавиша, при зажатии которой происходит переключение на ходьбу вместо бега.</summary>
-        [SerializeField, Tooltip("Клавиша, при зажатии которой происходит переключение на ходьбу вместо бега.")]
+        /// <summary> РљР»Р°РІРёС€Р° РґР»СЏ РїРµСЂРµРєР»СЋС‡РµРЅРёСЏ РјРµР¶РґСѓ Р±РµРіРѕРј Рё С…РѕРґСЊР±РѕР№. </summary>
+        [SerializeField, Tooltip("РљР»Р°РІРёС€Р° РґР»СЏ РїРµСЂРµРєР»СЋС‡РµРЅРёСЏ РјРµР¶РґСѓ Р±РµРіРѕРј Рё С…РѕРґСЊР±РѕР№.")]
         private KeyCode _keyForWalking = KeyCode.LeftShift;
 
-        /// <summary> Твердое тело.</summary>
+        /// <summary> РљРѕРјРїРѕРЅРµРЅС‚ Rigidbody, РѕС‚РІРµС‡Р°СЋС‰РёР№ Р·Р° С„РёР·РёРєСѓ РґРІРёР¶РµРЅРёСЏ РёРіСЂРѕРєР°. </summary>
         private Rigidbody _rigidbody;
 
-        /// <summary> Аниматор игрока.</summary>
+        /// <summary> РўРµРєСѓС‰РёР№ РІРµРєС‚РѕСЂ РЅР°РїСЂР°РІР»РµРЅРёСЏ РґРІРёР¶РµРЅРёСЏ РёРіСЂРѕРєР°. </summary>
+        private Vector3 _moveDirection;
+
+        /// <summary> РўРµРєСѓС‰РёР№ РІРµРєС‚РѕСЂ РїРѕРІРѕСЂРѕС‚Р° (РЅР°РїСЂР°РІР»РµРЅРёСЏ РІР·РіР»СЏРґР°) РёРіСЂРѕРєР°. </summary>
+        private Vector3 _lookDirection;
+
+        /// <summary> РљРѕРјРїРѕРЅРµРЅС‚ Animator РґР»СЏ СѓРїСЂР°РІР»РµРЅРёСЏ Р°РЅРёРјР°С†РёСЏРјРё РёРіСЂРѕРєР°. </summary>
         private Animator _animator;
+
+        /// <summary> РҐСЌС€РёСЂРѕРІР°РЅРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ РїР°СЂР°РјРµС‚СЂР° "СЃРєРѕСЂРѕСЃС‚СЊ" РґР»СЏ Р°РЅРёРјР°С†РёРё. </summary>
+        private static readonly int _speedParameterHash = Animator.StringToHash("Speed");
         #endregion
 
-        /// <summary> Инициализация полей класса.</summary>
+        /// <summary> РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РєРѕРјРїРѕРЅРµРЅС‚РѕРІ (Rigidbody Рё Animator). </summary>
         private void Awake()
         {
             _rigidbody = GetComponent<Rigidbody>();
             _animator = GetComponent<Animator>();
         }
 
-        /// <summary> Передвижение игрока в заданном направлении.</summary>
-        /// <param name="direction"> Направление, в котором движется игрок.</param>
-        public void MoveAndRotate(Vector3 direction)
+        /// <summary> РћР±РЅРѕРІР»РµРЅРёРµ РґРІРёР¶РµРЅРёСЏ Рё РїРѕРІРѕСЂРѕС‚Р° РёРіСЂРѕРєР° С‡РµСЂРµР· FixedUpdate. </summary>
+        private void FixedUpdate()
         {
-            Move(direction);
-            AnimateMovement(direction.magnitude);
-            Rotate(direction);
+            Rotate();
+            Move();
         }
 
-        /// <summary> Передвижение игрока в заданном направлении.</summary>
-        /// <param name="direction"> Направление, в котором движется игрок.</param>
-        private void Move(Vector3 direction)
+        /// <summary> РћР±РЅРѕРІР»СЏРµС‚ Р°РЅРёРјР°С†РёСЋ РІ Р·Р°РІРёСЃРёРјРѕСЃС‚Рё РѕС‚ РЅР°РїСЂР°РІР»РµРЅРёСЏ РґРІРёР¶РµРЅРёСЏ. </summary>
+        private void Update()
         {
-            Vector3 offset = _moveSpeed * CountSpeedMultiplier() * Time.deltaTime * direction;
-            _rigidbody.MovePosition(_rigidbody.position + offset);
+            AnimateMovement(_moveDirection.magnitude);
         }
 
-        /// <summary> Расчитать множитель скорости.</summary>
-        /// <returns> Возвращает значение множителя скорости.</returns>
+        /// <summary> Р’С‹РїРѕР»РЅСЏРµС‚ РїРµСЂРµРґРІРёР¶РµРЅРёРµ РёРіСЂРѕРєР° РІ СЃРѕРѕС‚РІРµС‚СЃС‚РІРёРё СЃ РЅР°РїСЂР°РІР»РµРЅРёРµРј РґРІРёР¶РµРЅРёСЏ. </summary>
+        private void Move()
+        {
+            Vector3 moveForce = _moveSpeed * CountSpeedMultiplier() * _moveDirection;
+            moveForce.y = _rigidbody.velocity.y;
+            _rigidbody.velocity = moveForce;
+        }
+
+        /// <summary> РџР»Р°РІРЅРѕ РїРѕРІРѕСЂР°С‡РёРІР°РµС‚ РёРіСЂРѕРєР° РІ СѓРєР°Р·Р°РЅРЅРѕРј РЅР°РїСЂР°РІР»РµРЅРёРё. </summary>
+        private void Rotate()
+        {
+            if (_lookDirection == Vector3.zero) return;
+
+            _rigidbody.MoveRotation(
+                Quaternion.Slerp(transform.rotation, 
+                    Quaternion.LookRotation(_lookDirection),
+                    Time.fixedDeltaTime * _rotateSpeed)
+            );
+        }
+
+        /// <summary> Р’С‹С‡РёСЃР»СЏРµС‚ РјРЅРѕР¶РёС‚РµР»СЊ СЃРєРѕСЂРѕСЃС‚Рё РІ Р·Р°РІРёСЃРёРјРѕСЃС‚Рё РѕС‚ СЂРµР¶РёРјР° (С…РѕРґСЊР±Р° РёР»Рё Р±РµРі). </summary>
+        /// <returns> РњРЅРѕР¶РёС‚РµР»СЊ СЃРєРѕСЂРѕСЃС‚Рё (0.5 РґР»СЏ С…РѕРґСЊР±С‹, 1 РґР»СЏ Р±РµРіР°). </returns>
         private float CountSpeedMultiplier()
         {
-            // Значения множителей варьируются от 0 до 1.
             const float WalkingMultiplier = 0.5f;
             const float RunningMultiplier = 1f;
             return Input.GetKey(_keyForWalking) ? WalkingMultiplier : RunningMultiplier;
         }
 
-        /// <summary> Анимировать передвижение.</summary>
-        /// <param name="directionMagnitude"> Величина вектора направления.</param>
+        /// <summary> РћР±РЅРѕРІР»СЏРµС‚ Р°РЅРёРјР°С†РёСЋ РґРІРёР¶РµРЅРёСЏ РёРіСЂРѕРєР° РІ Р·Р°РІРёСЃРёРјРѕСЃС‚Рё РѕС‚ СЃРєРѕСЂРѕСЃС‚Рё. </summary>
+        /// <param name="directionMagnitude"> Р’РµР»РёС‡РёРЅР° РЅР°РїСЂР°РІР»РµРЅРёСЏ РґРІРёР¶РµРЅРёСЏ. </param>
         private void AnimateMovement(float directionMagnitude)
         {
             float speed = Mathf.Clamp01(directionMagnitude) * CountSpeedMultiplier();
-            const float DampTime = 0.2f; // Значение получено эмпирически
-            _animator.SetFloat("Speed", speed, DampTime, Time.deltaTime);
+            const float DampTime = 0.2f; // Р’СЂРµРјСЏ СЃРіР»Р°Р¶РёРІР°РЅРёСЏ РїРµСЂРµС…РѕРґР° Р°РЅРёРјР°С†РёРё
+            _animator.SetFloat(_speedParameterHash, speed, DampTime, Time.deltaTime);
         }
 
-        /// <summary> Поворот игрока в заданном направлении.</summary>
-        /// <param name="direction"> Направление, в котором движется игрок.</param>
-        public void Rotate(Vector3 direction)
-        {
-            float singleStep = _rotateSpeed * Time.deltaTime;
-            var newDirection = Vector3.RotateTowards(transform.forward, direction, singleStep, 0f);
-            transform.rotation = Quaternion.LookRotation(newDirection);
-        }
+        /// <summary> РЈСЃС‚Р°РЅР°РІР»РёРІР°РµС‚ РЅР°РїСЂР°РІР»РµРЅРёРµ РґРІРёР¶РµРЅРёСЏ РёРіСЂРѕРєР°. </summary>
+        /// <param name="direction"> Р’РµРєС‚РѕСЂ РЅР°РїСЂР°РІР»РµРЅРёСЏ РґРІРёР¶РµРЅРёСЏ. </param>
+        public void SetMoveDirection(Vector3 direction) => _moveDirection = direction;
+
+        /// <summary> РЈСЃС‚Р°РЅР°РІР»РёРІР°РµС‚ РЅР°РїСЂР°РІР»РµРЅРёРµ РїРѕРІРѕСЂРѕС‚Р° РёРіСЂРѕРєР°. </summary>
+        /// <param name="direction"> Р’РµРєС‚РѕСЂ РЅР°РїСЂР°РІР»РµРЅРёСЏ РІР·РіР»СЏРґР°. </param>
+        public void SetLookRotation(Vector3 direction) => _lookDirection = direction;
 
         #region Saving
+        /// <summary> РЎС‚СЂСѓРєС‚СѓСЂР° РґР»СЏ СЃРѕС…СЂР°РЅРµРЅРёСЏ РїРѕР·РёС†РёРё Рё РїРѕРІРѕСЂРѕС‚Р° РёРіСЂРѕРєР°. </summary>
         [System.Serializable]
         private struct MoverSaveData
         {
+            /// <summary> РџРѕР·РёС†РёСЏ РёРіСЂРѕРєР°. </summary>
             public SerializableVector3 Position;
+
+            /// <summary> РџРѕРІРѕСЂРѕС‚ РёРіСЂРѕРєР°. </summary>
             public SerializableVector3 Rotation;
         }
 
+        /// <summary> РЎРѕС…СЂР°РЅСЏРµС‚ С‚РµРєСѓС‰РµРµ СЃРѕСЃС‚РѕСЏРЅРёРµ РёРіСЂРѕРєР° (РїРѕР·РёС†РёСЏ Рё РїРѕРІРѕСЂРѕС‚). </summary>
+        /// <returns> РћР±СЉРµРєС‚ СЃ РґР°РЅРЅС‹РјРё РїРѕР·РёС†РёРё Рё РїРѕРІРѕСЂРѕС‚Р°. </returns>
         public object CaptureState() => new MoverSaveData()
         {
             Position = new SerializableVector3(transform.position),
             Rotation = new SerializableVector3(transform.eulerAngles)
         };
 
+        /// <summary> Р’РѕСЃСЃС‚Р°РЅР°РІР»РёРІР°РµС‚ СЃРѕСЃС‚РѕСЏРЅРёРµ РёРіСЂРѕРєР° РёР· СЃРѕС…СЂР°РЅРµРЅРёСЏ. </summary>
+        /// <param name="state"> РћР±СЉРµРєС‚ СЃРѕС…СЂР°РЅРµРЅРЅРѕРіРѕ СЃРѕСЃС‚РѕСЏРЅРёСЏ. </param>
         public void RestoreState(object state)
         {
             var data = (MoverSaveData)state;
