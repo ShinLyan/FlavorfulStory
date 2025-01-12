@@ -15,6 +15,9 @@ namespace FlavorfulStory.InventorySystem.UI
         /// <summary> ����� �������. </summary>
         [SerializeField] private TMP_Text _keyText;
 
+        /// <summary> Изображение обводки тулбар слота. </summary>
+        [SerializeField] private Image _hoverImage;
+
         /// <summary> ������ ����� � HUD. </summary>
         private int _index;
 
@@ -27,6 +30,9 @@ namespace FlavorfulStory.InventorySystem.UI
         /// 
         /// </summary>
         private bool _isSelected;
+
+        /// <summary> Флаг нахождение курсора на тулбар слоте. Типо как Hover. </summary>
+        private bool _isMouseOver;
 
         private void Awake()
         {
@@ -49,12 +55,14 @@ namespace FlavorfulStory.InventorySystem.UI
         {
             _isSelected = true;
             FadeToColor(Color.white);
+            HoverStart();
         }
 
         public void ResetSelection()
         {
             _isSelected = false;
             FadeToColor(Color.gray);
+            if (!_isMouseOver) HoverEnd();
         }
         private void FadeToColor(Color color)
         {
@@ -65,13 +73,17 @@ namespace FlavorfulStory.InventorySystem.UI
         /// <summary> Наведение курсора на тулбар слот. Плавно проявляет рамку тулбар слота. </summary>
         private void HoverStart()
         {
-            FadeToColor(Color.white);
+            //FadeToColor(Color.white);
+            const float FadeDuration = 0.2f;
+            _hoverImage.CrossFadeAlpha(1.0f, FadeDuration, true);
         }
 
         /// <summary> Уведение курсора с тулбар слота. Плавно убирает рамку с тулбар слота. </summary>
         private void HoverEnd()
         {
-            FadeToColor(Color.gray);
+            //FadeToColor(Color.gray);
+            const float FadeDuration = 0.2f;
+            _hoverImage.CrossFadeAlpha(0.0f, FadeDuration, true);
         }
         
         public void OnPointerClick(PointerEventData eventData)
@@ -81,11 +93,13 @@ namespace FlavorfulStory.InventorySystem.UI
 
         public void OnPointerEnter(PointerEventData eventData)
         {
+            _isMouseOver = true;
             HoverStart();
         }
 
         public void OnPointerExit(PointerEventData eventData)
         {
+            _isMouseOver = false;
             if (!_isSelected) HoverEnd();
         }
     }
