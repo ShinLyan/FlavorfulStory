@@ -62,6 +62,18 @@ namespace FlavorfulStory.InventorySystem.UI
             GetComponent<Image>().CrossFadeColor(color, FadeDuration, true, true);
         }
 
+        /// <summary> Наведение курсора на тулбар слот. Плавно проявляет рамку тулбар слота. </summary>
+        private void HoverStart()
+        {
+            FadeToColor(Color.white);
+        }
+
+        /// <summary> Уведение курсора с тулбар слота. Плавно убирает рамку с тулбар слота. </summary>
+        private void HoverEnd()
+        {
+            FadeToColor(Color.gray);
+        }
+        
         public void OnPointerClick(PointerEventData eventData)
         {
             _toolbar.SelectItem(_index);
@@ -69,13 +81,12 @@ namespace FlavorfulStory.InventorySystem.UI
 
         public void OnPointerEnter(PointerEventData eventData)
         {
-            FadeToColor(Color.white);
+            HoverStart();
         }
 
         public void OnPointerExit(PointerEventData eventData)
         {
-            //if (!_isSelected) FadeToColor(Color.white);
-            if (!_isSelected) FadeToColor(Color.gray);
+            if (!_isSelected) HoverEnd();
         }
     }
 }
