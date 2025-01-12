@@ -9,13 +9,13 @@ namespace FlavorfulStory.InventorySystem.UI
     public class ToolbarSlotUI : MonoBehaviour, IItemHolder,
         IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
     {
-        /// <summary> Инонка слота инвентаря. </summary>
+        /// <summary> пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ. </summary>
         [SerializeField] private InventoryItemIcon _icon;
 
-        /// <summary> Текст клавиши. </summary>
+        /// <summary> пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ. </summary>
         [SerializeField] private TMP_Text _keyText;
 
-        /// <summary> Индекс слота в HUD. </summary>
+        /// <summary> пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ HUD. </summary>
         private int _index;
 
         /// <summary>
@@ -41,20 +41,20 @@ namespace FlavorfulStory.InventorySystem.UI
                 Inventory.PlayerInventory.GetNumberInSlot(_index));
         }
 
-        /// <summary> Получить предмет, который в данный момент находится в этом источнике. </summary>
-        /// <returns> Возвращает предмет, который в данный момент находится в этом источнике. </returns>
+        /// <summary> пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ. </summary>
+        /// <returns> пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ. </returns>
         public InventoryItem GetItem() => Inventory.PlayerInventory.GetItemInSlot(_index);
 
         public void Select()
         {
             _isSelected = true;
-            FadeToColor(Color.gray);
+            FadeToColor(Color.white);
         }
 
         public void ResetSelection()
         {
             _isSelected = false;
-            FadeToColor(Color.white);
+            FadeToColor(Color.gray);
         }
         private void FadeToColor(Color color)
         {
@@ -69,12 +69,13 @@ namespace FlavorfulStory.InventorySystem.UI
 
         public void OnPointerEnter(PointerEventData eventData)
         {
-            FadeToColor(Color.gray);
+            FadeToColor(Color.white);
         }
 
         public void OnPointerExit(PointerEventData eventData)
         {
-            if (!_isSelected) FadeToColor(Color.white);
+            //if (!_isSelected) FadeToColor(Color.white);
+            if (!_isSelected) FadeToColor(Color.gray);
         }
     }
 }
