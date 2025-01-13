@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 namespace FlavorfulStory.InventorySystem.UI
@@ -19,15 +18,15 @@ namespace FlavorfulStory.InventorySystem.UI
         private void Awake()
         {
             _slots = GetComponentsInChildren<ToolbarSlotUI>();
-            _slots[SelectedItemIndex].Select();
-            
             Inventory.PlayerInventory.InventoryUpdated += RedrawToolbar;
         }
 
         /// <summary> При старте перерисовываем инвентарь. </summary>
         private void Start()
         {
+            ResetToolbar();
             RedrawToolbar();
+            _slots[SelectedItemIndex].Select();
         }
 
         /// <summary> Обрабатываем ввод колесика мыши. </summary>
@@ -36,6 +35,15 @@ namespace FlavorfulStory.InventorySystem.UI
             HandleMouseScrollInput();
         }
 
+        /// <summary> Снять выделение со всех слотов тулбара. </summary>
+        private void ResetToolbar()
+        {
+            foreach (var toolbarSlot in _slots)
+            {
+                toolbarSlot.ResetSelection();
+            }
+        }
+        
         /// <summary> Перерисовать панель инструментов. </summary>
         private void RedrawToolbar()
         {
@@ -56,7 +64,10 @@ namespace FlavorfulStory.InventorySystem.UI
         private void HandleMouseScrollInput()
         {
             var scrollInput = (int)Input.mouseScrollDelta.y;
-            var newSelectedItemIndex = Math.Clamp(SelectedItemIndex - scrollInput, 0, _slots.Length - 1);
+
+            if (scrollInput == 0) return;
+            
+            var newSelectedItemIndex = Mathf.Clamp(SelectedItemIndex - scrollInput, 0, _slots.Length - 1);
             SelectItem(newSelectedItemIndex);
         }
     }

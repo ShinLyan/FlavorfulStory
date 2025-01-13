@@ -13,7 +13,7 @@ namespace FlavorfulStory.UI
         [SerializeField] private GameObject _tabButtonsGameObject;
 
         /// <summary> Массив кнопок, управляющих переключением вкладок. </summary>
-        private TabSwitcherButton[] _tabButtons;
+        [SerializeField] private TabSwitcherButton[] _tabButtons;
 
         /// <summary> Клавиша для переключения на предыдущую вкладку. </summary>
         private const KeyCode _previousTabKey = KeyCode.Q;
