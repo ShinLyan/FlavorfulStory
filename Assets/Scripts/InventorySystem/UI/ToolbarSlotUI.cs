@@ -5,27 +5,35 @@ using UnityEngine.UI;
 
 namespace FlavorfulStory.InventorySystem.UI
 {
-    /// <summary> Слот панели инструментов для отображения предметов инвентаря. </summary>
     [RequireComponent(typeof(Image))]
     public class ToolbarSlotUI : MonoBehaviour, IItemHolder,
         IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
     {
-        /// <summary> Отображение иконки предмета в слоте. </summary>
+        /// <summary> ������ ����� ���������. </summary>
         [SerializeField] private InventoryItemIcon _icon;
 
-        /// <summary> Текст с номером слота. </summary>
+        /// <summary> ����� �������. </summary>
         [SerializeField] private TMP_Text _keyText;
 
-        /// <summary> Индекс текущего слота на панели. </summary>
+        /// <summary> Изображение обводки тулбар слота. </summary>
+        [SerializeField] private Image _hoverImage;
+
+        /// <summary> ������ ����� � HUD. </summary>
         private int _index;
 
-        /// <summary> Панель инструментов, которой принадлежит слот. </summary>
+        /// <summary>
+        /// 
+        /// </summary>
         private Toolbar _toolbar;
 
-        /// <summary> Выбран ли слот? </summary>
+        /// <summary>
+        /// 
+        /// </summary>
         private bool _isSelected;
 
-        /// <summary> Инициализация индекса слота, текста номера и панели инструментов. </summary>
+        /// <summary> Флаг нахождение курсора на тулбар слоте. Типо как Hover. </summary>
+        private bool _isMouseOver;
+
         private void Awake()
         {
             _index = transform.GetSiblingIndex();
@@ -33,58 +41,66 @@ namespace FlavorfulStory.InventorySystem.UI
             _toolbar = transform.parent.GetComponent<Toolbar>();
         }
 
-        /// <summary> Обновление содержимого слота на основе текущего состояния инвентаря. </summary>
         public void Redraw()
         {
             _icon.SetItem(Inventory.PlayerInventory.GetItemInSlot(_index), 
                 Inventory.PlayerInventory.GetNumberInSlot(_index));
         }
 
-        /// <summary> Получение предмета, находящегося в текущем слоте. </summary>
-        /// <returns> Предмет, находящийся в текущем слоте. </returns>
+        /// <summary> �������� �������, ������� � ������ ������ ��������� � ���� ���������. </summary>
+        /// <returns> ���������� �������, ������� � ������ ������ ��������� � ���� ���������. </returns>
         public InventoryItem GetItem() => Inventory.PlayerInventory.GetItemInSlot(_index);
 
-        /// <summary> Установка состояния слота как выбранного. </summary>
         public void Select()
         {
             _isSelected = true;
             FadeToColor(Color.white);
+            HoverStart();
         }
 
-        /// <summary> Сброс состояния слота как выбранного. </summary>
         public void ResetSelection()
         {
             _isSelected = false;
             FadeToColor(Color.gray);
+            if (!_isMouseOver) HoverEnd();
         }
-        
-        /// <summary> Изменение цвета слота с анимацией. </summary>
-        /// <param name="color"> Новый цвет слота. </param>
         private void FadeToColor(Color color)
         {
             const float FadeDuration = 0.2f;
             GetComponent<Image>().CrossFadeColor(color, FadeDuration, true, true);
         }
 
-        /// <summary> Обработка клика по слоту. </summary>
-        /// <param name="eventData"> Данные события клика. </param>
+        /// <summary> Наведение курсора на тулбар слот. Плавно проявляет рамку тулбар слота. </summary>
+        private void HoverStart()
+        {
+            //FadeToColor(Color.white);
+            const float FadeDuration = 0.2f;
+            _hoverImage.CrossFadeAlpha(1.0f, FadeDuration, true);
+        }
+
+        /// <summary> Уведение курсора с тулбар слота. Плавно убирает рамку с тулбар слота. </summary>
+        private void HoverEnd()
+        {
+            //FadeToColor(Color.gray);
+            const float FadeDuration = 0.2f;
+            _hoverImage.CrossFadeAlpha(0.0f, FadeDuration, true);
+        }
+        
         public void OnPointerClick(PointerEventData eventData)
         {
             _toolbar.SelectItem(_index);
         }
 
-        /// <summary> Обработка наведения курсора на слот. </summary>
-        /// <param name="eventData"> Данные события наведения. </param>
         public void OnPointerEnter(PointerEventData eventData)
         {
-            FadeToColor(Color.white);
+            _isMouseOver = true;
+            HoverStart();
         }
 
-        /// <summary> Обработка выхода курсора из слота. </summary>
-        /// <param name="eventData"> Данные события выхода. </param>
         public void OnPointerExit(PointerEventData eventData)
         {
-            if (!_isSelected) FadeToColor(Color.gray);
+            _isMouseOver = false;
+            if (!_isSelected) HoverEnd();
         }
     }
 }
