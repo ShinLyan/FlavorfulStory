@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 namespace FlavorfulStory.InventorySystem.UI
@@ -36,7 +35,7 @@ namespace FlavorfulStory.InventorySystem.UI
             HandleMouseScrollInput();
         }
 
-        /// <summary> Снять выделение со всех слотов Тулбара. </summary>
+        /// <summary> Снять выделение со всех слотов тулбара. </summary>
         private void ResetToolbar()
         {
             foreach (var toolbarSlot in _slots)
@@ -64,11 +63,11 @@ namespace FlavorfulStory.InventorySystem.UI
         /// <summary> Обработка ввода колесика мыши. </summary>
         private void HandleMouseScrollInput()
         {
-            var scrollInput = (int) Input.mouseScrollDelta.y;
+            var scrollInput = (int)Input.mouseScrollDelta.y;
 
             if (scrollInput == 0) return;
             
-            var newSelectedItemIndex = Math.Clamp(SelectedItemIndex - scrollInput, 0, _slots.Length - 1);
+            var newSelectedItemIndex = Mathf.Clamp(SelectedItemIndex - scrollInput, 0, _slots.Length - 1);
             SelectItem(newSelectedItemIndex);
         }
     }
