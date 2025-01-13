@@ -57,7 +57,6 @@ namespace FlavorfulStory.UI
             {
                 if (Input.GetButtonDown(_tabButtonNames[i]))
                 {
-                    print("OpenTab");
                     SwitchTab(true);
                     _uiSwitcher.SelectTab(i);
                     break; 
