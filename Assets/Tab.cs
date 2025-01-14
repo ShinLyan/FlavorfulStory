@@ -11,12 +11,6 @@ public class Tab : MonoBehaviour
     [SerializeField] private TabType _tabType;
 
     public event Action<TabType> OnTabSelected;
-    
-    private void Awake()
-    {
-        _tabButton = GetComponentInChildren<TabButton>();
-        _tabButton.OnClick += SwitchTo;
-    }
 
     private void SwitchTo()
     {
@@ -26,13 +20,21 @@ public class Tab : MonoBehaviour
 
     public void Select()
     {
+        _tabButton.IsActive = true;
         _tabButton.SetNameState(true);
         _tabContent.SetActive(true);
     }
 
     public void ResetSelection()
     {
+        _tabButton.IsActive = false;
         _tabButton.SetNameState(false);
         _tabContent.SetActive(false);
+    }
+
+    public void Initialize()
+    {
+        _tabButton = GetComponentInChildren<TabButton>(true);
+        _tabButton.OnClick += SwitchTo;
     }
 }

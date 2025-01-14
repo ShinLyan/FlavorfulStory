@@ -1,3 +1,4 @@
+using System;
 using FlavorfulStory.UI;
 using UnityEngine;
 
@@ -17,10 +18,11 @@ public class GameMenu : MonoBehaviour
     
     private void Awake()
     {
-        _tabs = GetComponentsInChildren<Tab>();
+        _tabs = GetComponentsInChildren<Tab>(true);
         foreach (var tab in _tabs)
         {
             tab.OnTabSelected += SelectTab;
+            tab.Initialize();
         }
     }
 
@@ -34,6 +36,7 @@ public class GameMenu : MonoBehaviour
     {
         HandleSwitchInput();
         HandleAdjacentTabsInput();
+        HandleTabButtonsInput();
     }
 
     private void SelectTab(TabType tabType)
@@ -53,17 +56,10 @@ public class GameMenu : MonoBehaviour
         _tabs[(int) _currentTabType].ResetSelection();
     }
 
-    private void Show()
+    private void Switch(bool state)
     {
-        _content.SetActive(true);
+        _content.SetActive(state);
     }
-
-    private void Hide()
-    {
-        _content.SetActive(false);
-    }
-    
-    private void Switch(bool state) => _content.SetActive(state);
 
     private void HandleSwitchInput()
     {
@@ -75,6 +71,8 @@ public class GameMenu : MonoBehaviour
     
     private void HandleAdjacentTabsInput()
     {
+        if (!_content.activeInHierarchy) return;
+        
         if (Input.GetKeyDown(PreviousTabKey) || Input.GetKeyDown(NextTabKey))
         {
             bool isPreviousTab = Input.GetKeyDown(PreviousTabKey);
@@ -83,6 +81,24 @@ public class GameMenu : MonoBehaviour
             
             int newTabIndex = (currentTabIndex + _tabs.Length + direction) % _tabs.Length;
             SelectTab((TabType) newTabIndex);
+        }
+    }
+
+    private void HandleTabButtonsInput()
+    {
+        if (_content.activeInHierarchy && Input.GetButtonDown(_currentTabType.ToString()))
+        {
+            Switch(false);
+            return;
+        }
+        
+        foreach (var tabType in (TabType[]) Enum.GetValues(typeof(TabType)))
+        {
+            if (!Input.GetButtonDown(tabType.ToString())) continue;
+            
+            Switch(true);
+            SelectTab(tabType);
+            break;
         }
     }
 }
