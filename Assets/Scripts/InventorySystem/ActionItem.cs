@@ -4,22 +4,22 @@ using UnityEngine;
 
 namespace FlavorfulStory.InventorySystem
 {
-    /// <summary> Предмет инвентаря, который можно использовать.</summary>
-    /// <remarks> Этот класс следует использовать в качестве базового. Подклассы должны реализовывать метод `Use`.</remarks>
+    /// <summary> РџСЂРµРґРјРµС‚ РёРЅРІРµРЅС‚Р°СЂСЏ, РєРѕС‚РѕСЂС‹Р№ РјРѕР¶РЅРѕ РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ. </summary>
+    /// <remarks> Р­С‚РѕС‚ РєР»Р°СЃСЃ СЃР»РµРґСѓРµС‚ РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ РІ РєР°С‡РµСЃС‚РІРµ Р±Р°Р·РѕРІРѕРіРѕ. РџРѕРґРєР»Р°СЃСЃС‹ РґРѕР»Р¶РЅС‹ СЂРµР°Р»РёР·РѕРІС‹РІР°С‚СЊ РјРµС‚РѕРґ `Use`. </remarks>
     [CreateAssetMenu(menuName = ("FlavorfulStory/Inventory/Action Item"))]
     public class ActionItem : InventoryItem, IUsable
     {
-        /// <summary> Расходуется ли предмет при использовании?</summary>
-        [field: Tooltip("Расходуется ли предмет при использовании?")]
+        /// <summary> Р Р°СЃС…РѕРґСѓРµС‚СЃСЏ Р»Рё РїСЂРµРґРјРµС‚ РїСЂРё РёСЃРїРѕР»СЊР·РѕРІР°РЅРёРё?</summary>
+        [field: Tooltip("Р Р°СЃС…РѕРґСѓРµС‚СЃСЏ Р»Рё РїСЂРµРґРјРµС‚ РїСЂРё РёСЃРїРѕР»СЊР·РѕРІР°РЅРёРё?")]
         [field: SerializeField] public bool IsConsumable { get; private set; }
 
-        /// <summary> Расходуется ли предмет при использовании?</summary>
-        [field: Tooltip("Тип действия для использования предмета (ЛКМ или ПКМ).")]
+        /// <summary> Р Р°СЃС…РѕРґСѓРµС‚СЃСЏ Р»Рё РїСЂРµРґРјРµС‚ РїСЂРё РёСЃРїРѕР»СЊР·РѕРІР°РЅРёРё?</summary>
+        [field: Tooltip("РўРёРї РґРµР№СЃС‚РІРёСЏ РґР»СЏ РёСЃРїРѕР»СЊР·РѕРІР°РЅРёСЏ РїСЂРµРґРјРµС‚Р° (Р›РљРњ РёР»Рё РџРљРњ).")]
         [field: SerializeField] public UseActionType UseActionType { get; private set; }
 
-        /// <summary> Использование предмета.</summary>
-        /// <remarks> Переопределите для обеспечения функциональности.</remarks>
-        /// <param name="player"> Контроллер игрока.</param>
+        /// <summary> РСЃРїРѕР»СЊР·РѕРІР°РЅРёРµ РїСЂРµРґРјРµС‚Р°. </summary>
+        /// <remarks> РџРµСЂРµРѕРїСЂРµРґРµР»РёС‚Рµ РґР»СЏ РѕР±РµСЃРїРµС‡РµРЅРёСЏ С„СѓРЅРєС†РёРѕРЅР°Р»СЊРЅРѕСЃС‚Рё. </remarks>
+        /// <param name="player"> РљРѕРЅС‚СЂРѕР»Р»РµСЂ РёРіСЂРѕРєР°. </param>
         public virtual void Use(PlayerController player)
         {
             Debug.Log($"Using action: {this}");

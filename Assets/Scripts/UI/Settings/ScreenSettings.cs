@@ -4,25 +4,25 @@ using UnityEngine;
 
 namespace FlavorfulStory.Settings
 {
-    /// <summary> Настройки разрешения и режима окна.</summary>
+    /// <summary> Настройки разрешения и режима окна. </summary>
     public class ScreenSettings : MonoBehaviour
     {
-        /// <summary> Выпадающий список с типами окна.</summary>
+        /// <summary> Выпадающий список с типами окна. </summary>
         [SerializeField] private TMP_Dropdown _resolutionDropdown;
 
-        /// <summary> Выпадающий список с разрешениями.</summary>
+        /// <summary> Выпадающий список с разрешениями. </summary>
         [SerializeField] private TMP_Dropdown _screenModeDropdown;
 
-        /// <summary> Список разрешений.</summary>
+        /// <summary> Список разрешений. </summary>
         private readonly List<Resolution> _resolutions = new();
 
-        /// <summary> Список режимов окна.</summary>
+        /// <summary> Список режимов окна. </summary>
         private readonly List<string> _screenModeOptions = new() {
-            "Окно",
-            "Полный экран",
+            "Windowed", // "Окно",
+            "Full screen" // "Полный экран",
         };
 
-        /// <summary> Вызывается при включении объекта.</summary>
+        /// <summary> Вызывается при включении объекта. </summary>
         private void OnEnable()
         {
             _resolutionDropdown.onValueChanged.AddListener(delegate
@@ -36,14 +36,14 @@ namespace FlavorfulStory.Settings
             });
         }
 
-        /// <summary> Срабатывает при выборе пользователя в выпадающем списке разрещений.</summary>
+        /// <summary> Срабатывает при выборе пользователя в выпадающем списке разрещений. </summary>
         private void ResolutionOptionChanged()
         {
             Resolution resolution = _resolutions[_resolutionDropdown.value];
             Screen.SetResolution(resolution.width, resolution.height, Screen.fullScreenMode);
         }
 
-        /// <summary> Срабатывает при выборе пользователя в выпадающем списке режимов окна.</summary>
+        /// <summary> Срабатывает при выборе пользователя в выпадающем списке режимов окна. </summary>
         private void ScreenModeChanged()
         {
             switch (_screenModeDropdown.value)
@@ -57,14 +57,14 @@ namespace FlavorfulStory.Settings
             }
         }
 
-        /// <summary> Вызывается при отключении объекта.</summary>
+        /// <summary> Вызывается при отключении объекта. </summary>
         private void OnDisable()
         {
             _resolutionDropdown.onValueChanged.RemoveAllListeners();
             _screenModeDropdown.onValueChanged.RemoveAllListeners();
         }
 
-        /// <summary> Инициализация разрешений и рижемов окна и обновление значений в выпадаюзих списках.</summary>
+        /// <summary> Инициализация разрешений и рижемов окна и обновление значений в выпадаюзих списках. </summary>
         private void Start()
         {
             InitializeResolutions();
@@ -72,7 +72,7 @@ namespace FlavorfulStory.Settings
             UpdateDropdownValues();
         }
 
-        /// <summary> Получения всех поддерживаемых разрешений экрана и добавления их в соответствующий выпадающий список.</summary>
+        /// <summary> Получения всех поддерживаемых разрешений экрана и добавления их в соответствующий выпадающий список. </summary>
         private void InitializeResolutions()
         {
             Resolution[] allResolutions = Screen.resolutions;
@@ -94,7 +94,7 @@ namespace FlavorfulStory.Settings
             _resolutionDropdown.RefreshShownValue();
         }
 
-        /// <summary> Получение всех поддерживаемых режимов экрана и добавления их в соответствующий выпадающий список.</summary>
+        /// <summary> Получение всех поддерживаемых режимов экрана и добавления их в соответствующий выпадающий список. </summary>
         private void InitializeScreenModes()
         {
             _screenModeDropdown.ClearOptions();
@@ -108,7 +108,7 @@ namespace FlavorfulStory.Settings
             _screenModeDropdown.RefreshShownValue();
         }
 
-        /// <summary> Обновление значений выпадающих списков.</summary>
+        /// <summary> Обновление значений выпадающих списков. </summary>
         private void UpdateDropdownValues()
         {
             _resolutionDropdown.RefreshShownValue();

@@ -2,36 +2,40 @@ using System;
 
 namespace FlavorfulStory.UI
 {
-    /// <summary> Проверка полей ввода.</summary>
+    /// <summary> Проверка полей ввода. </summary>
     public static class InputFieldValidator
     {
-        /// <summary> Запрещенные символы.</summary>
+        /// <summary> Запрещенные символы. </summary>
         private static readonly char[] ForbiddenCharacters =
             { '"', '\'', '@', '#', '$', '%', '^', '&', '*', '(', ')', '=', '+',
             '[', ']', '{', '}', '\\', '|', '/', '<', '>', '?', '`', '~' };
 
-        /// <summary> Минимальная длина текста.</summary>
+        /// <summary> Минимальная длина текста. </summary>
         private const int MinLength = 3;
 
-        /// <summary> Максимальная длина текста.</summary>
+        /// <summary> Максимальная длина текста. </summary>
         private const int MaxLength = 20;
 
-        /// <summary> Сообщение об ошибке: пустое поле.</summary>
-        private static readonly string EmptyInputError = "Поле не может быть пустым!";
+        /// <summary> Сообщение об ошибке: пустое поле. </summary>
+        private static readonly string EmptyInputError = "The field cannot be empty!";
+        //private static readonly string EmptyInputError = "Поле не может быть пустым!";
 
-        /// <summary> Сообщение об ошибке: минимальная длина.</summary>
-        private static readonly string TooShortError = $"Текст должен быть не менее {MinLength} символов.";
+        /// <summary> Сообщение об ошибке: минимальная длина. </summary>
+        private static readonly string TooShortError = $"The text must be at least {MinLength} characters long.";
+        //private static readonly string TooShortError = $"Текст должен быть не менее {MinLength} символов.";
 
-        /// <summary> Сообщение об ошибке: максимальная длина.</summary>
-        private static readonly string TooLongError = $"Текст должен быть не более {MaxLength} символов.";
+        /// <summary> Сообщение об ошибке: максимальная длина. </summary>
+        private static readonly string TooLongError = $"The text must be no more than {MaxLength} characters long.";
+        //private static readonly string TooLongError = $"Текст должен быть не более {MaxLength} символов.";
 
-        /// <summary> Сообщение об ошибке: запрещённые символы.</summary>
-        private static readonly string ForbiddenCharactersError = "Текст содержит запрещённые символы!";
+        /// <summary> Сообщение об ошибке: запрещённые символы. </summary>
+        private static readonly string ForbiddenCharactersError = "The text contains forbidden characters!";
+        //private static readonly string ForbiddenCharactersError = "Текст содержит запрещённые символы!";
 
-        /// <summary> Проверяет, валиден ли текст ввода.</summary>
-        /// <param name="input"> Текст для проверки.</param>
-        /// <param name="warningMessage"> Сообщение об ошибке, если ввод невалиден.</param>
-        /// <returns> True, если ввод валиден; иначе False.</returns>
+        /// <summary> Проверяет, валиден ли текст ввода. </summary>
+        /// <param name="input"> Текст для проверки. </param>
+        /// <param name="warningMessage"> Сообщение об ошибке, если ввод невалиден. </param>
+        /// <returns> True, если ввод валиден; иначе False. </returns>
         public static bool IsValid(string input, out string warningMessage)
         {
             input = input.Trim();
@@ -60,9 +64,9 @@ namespace FlavorfulStory.UI
             return true;
         }
 
-        /// <summary> Проверяет, содержит ли текст запрещённые символы.</summary>
-        /// <param name="input"> Текст для проверки.</param>
-        /// <returns> True, если есть запрещённые символы; иначе False.</returns>
+        /// <summary> Проверяет, содержит ли текст запрещённые символы. </summary>
+        /// <param name="input"> Текст для проверки. </param>
+        /// <returns> True, если есть запрещённые символы; иначе False. </returns>
         private static bool ContainsForbiddenCharacters(string input)
         {
             foreach (char c in ForbiddenCharacters)

@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-/// <summary> Класс отвечающий за отключение рендера объектов на старте (если их не нужно рендерить) .</summary>
-///<remarks> Служебный класс. Вешается на 1 объект сцены, отвечающий за данную логику .</remarks>
+/// <summary> Класс отвечающий за отключение рендера объектов на старте (если их не нужно рендерить) . </summary>
+///<remarks> Служебный класс. Вешается на 1 объект сцены, отвечающий за данную логику . </remarks>
 public class DeactivateObjectsOnStart : MonoBehaviour
 {
     [SerializeField] List<GameObject> ObjectsToDeactivate;
@@ -11,7 +11,7 @@ public class DeactivateObjectsOnStart : MonoBehaviour
         if (AllActivated()) { DeactivateAll(); this.gameObject.SetActive(false); }
     }
 
-    /// <summary>Метод для деактивации объектов .</summary>
+    /// <summary>Метод для деактивации объектов . </summary>
     public void DeactivateAll()
     {
         foreach (var item in ObjectsToDeactivate)
@@ -20,7 +20,7 @@ public class DeactivateObjectsOnStart : MonoBehaviour
         }
     }
 
-    /// <summary>Bool , отражающий значения: активированы ли все объекты/активированы не все .</summary>
+    /// <summary>Bool , отражающий значения: активированы ли все объекты/активированы не все . </summary>
     bool AllActivated()
     {
         foreach (var item in ObjectsToDeactivate)

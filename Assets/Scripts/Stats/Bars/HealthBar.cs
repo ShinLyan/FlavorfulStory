@@ -5,19 +5,19 @@ using UnityEngine.EventSystems;
 
 namespace FlavorfulStory.UI.Bars
 {
-    /// <summary>  Класс, отвечающий за отрисовку количества здоровья.</summary>
+    /// <summary>  Класс, отвечающий за отрисовку количества здоровья. </summary>
     public class HealthBar : BaseBar, IPointerEnterHandler, IPointerExitHandler
     {
-        /// <summary> Компонент здоровья.</summary>
+        /// <summary> Компонент здоровья. </summary>
         private Health _health;
 
-        /// <summary> Подписка на события.</summary>
+        /// <summary> Подписка на события. </summary>
         private void OnEnable()
         {
             _health.OnHealthChanged += SetBarText;
         }
 
-        /// <summary> Отписка от события.</summary>
+        /// <summary> Отписка от события. </summary>
         private void OnDisable()
         {
             _health.OnHealthChanged -= SetBarText;
@@ -35,16 +35,16 @@ namespace FlavorfulStory.UI.Bars
             _textObject.gameObject.SetActive(false);
         }
         
-        /// <summary> Включение объекта при наведении на него курсора.</summary>
-        /// <param name="eventData"> Информация ивента.</param>
+        /// <summary> Включение объекта при наведении на него курсора. </summary>
+        /// <param name="eventData"> Информация ивента. </param>
         public void OnPointerEnter(PointerEventData eventData)
         {
             SetBarText(_health.CurrentValue);
             _textObject.gameObject.SetActive(true);
         }
         
-        /// <summary> Выключение объекта при наведении на него курсора.</summary>
-        /// <param name="eventData"> Информация ивента.</param>
+        /// <summary> Выключение объекта при наведении на него курсора. </summary>
+        /// <param name="eventData"> Информация ивента. </param>
         public void OnPointerExit(PointerEventData eventData)
         {
             _textObject.gameObject.SetActive(false);

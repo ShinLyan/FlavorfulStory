@@ -2,17 +2,17 @@
 
 namespace FlavorfulStory.UI
 {
-    /// <summary> Переключатель вкладки при нажатии на клавишу.</summary>
+    /// <summary> Переключатель вкладки при нажатии на клавишу. </summary>
     public class KeySwitcher : MonoBehaviour
     {
-        /// <summary> Клавиша переключения.</summary>
+        /// <summary> Клавиша переключения. </summary>
         [SerializeField] private KeyCode _switchKey;
 
-        /// <summary> Вкладка, которую необходимо переключать.</summary>
+        /// <summary> Вкладка, которую необходимо переключать. </summary>
         [SerializeField] private GameObject _tab;
 
         /// <summary> Поле дочернего UISwitcher. </summary>
-        private UISwitcher _uiSwitcher;
+        [SerializeField] private UISwitcher _uiSwitcher;
 
         /// <summary> Массив имен кнопок для включения определенных вкладок. </summary>
         private string[] _tabButtonNames;
@@ -20,17 +20,16 @@ namespace FlavorfulStory.UI
         /// <summary> Инициализация компонента UISwitcher. Получение имен кнопок для переключения вкладок. </summary>
         private void Awake()
         {
-            _uiSwitcher = GetComponentInChildren<UISwitcher>();
             _tabButtonNames = _uiSwitcher.GetTabNames();
         }
 
-        /// <summary> При старте выключаем вкладку.</summary>
+        /// <summary> При старте выключаем вкладку. </summary>
         private void Start()
         {
             SwitchTab(false);
         }
 
-        /// <summary> При нажатии на клавишу переключать вкладку или открыть выбранную.</summary>
+        /// <summary> При нажатии на клавишу переключать вкладку или открыть выбранную. </summary>
         private void Update()
         {
             if (Input.GetKeyDown(_switchKey))
@@ -54,8 +53,8 @@ namespace FlavorfulStory.UI
             }
         }
 
-        /// <summary> Переключить вкладку.</summary>
-        /// <param name="enabled"> Состояние вкладки - Вкл / Выкл.</param>
+        /// <summary> Переключить вкладку. </summary>
+        /// <param name="enabled"> Состояние вкладки - Вкл / Выкл. </param>
         private void SwitchTab(bool enabled) => _tab.SetActive(enabled);
     }
 }

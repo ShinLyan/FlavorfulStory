@@ -4,25 +4,25 @@ using UnityEngine;
 
 namespace FlavorfulStory.LocationManager
 {
-    /// <summary> Взаимодействие с объектами.</summary>
+    /// <summary> Взаимодействие с объектами. </summary>
     public class InteractWithObjects : MonoBehaviour
     {
         /// <summary> Радиус взаимодействия</summary>
         [SerializeField, Range(1f, 10f)] private float _radius;
         
-        /// <summary> Кнопка взаимодействия.</summary>
+        /// <summary> Кнопка взаимодействия. </summary>
         [SerializeField] private KeyCode _interactKey = KeyCode.E;
         
-        /// <summary> Подсказка для взаимодействия мышью.</summary>
+        /// <summary> Подсказка для взаимодействия мышью. </summary>
         [SerializeField] private GameObject _mouseTip;
         
-        /// <summary> Подсказка взаимодействия через клавиатуру.</summary>
+        /// <summary> Подсказка взаимодействия через клавиатуру. </summary>
         [SerializeField] private GameObject _keyboardTip;
         
-        /// <summary> Текущая цель.</summary>
+        /// <summary> Текущая цель. </summary>
         private InteractableObject2 _currentTarget;
         
-        /// <summary> Цель принадлежит курсору.</summary>
+        /// <summary> Цель принадлежит курсору. </summary>
         private bool _isCursorTarget;
 
         private RaycastHit[] _hits = new RaycastHit[20];
@@ -52,7 +52,7 @@ namespace FlavorfulStory.LocationManager
             }
         }
         
-        /// <summary> Поиск цели.</summary>
+        /// <summary> Поиск цели. </summary>
         private InteractableObject2 FindTarget()
         {
             InteractableObject2 target = GetCursorTarget();
@@ -67,7 +67,7 @@ namespace FlavorfulStory.LocationManager
             return target;
         }
         
-        /// <summary> Получение цели через курсор.</summary>
+        /// <summary> Получение цели через курсор. </summary>
         private InteractableObject2 GetCursorTarget()
         {
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -76,7 +76,7 @@ namespace FlavorfulStory.LocationManager
             return isHit ? hitInfo.collider.GetComponent<InteractableObject2>() : null;
         }
         
-        /// <summary> Получение объектов в радуисе взаимодействия.</summary>
+        /// <summary> Получение объектов в радуисе взаимодействия. </summary>
         private IEnumerable<InteractableObject2> GetNearbyObjects()
         {
             Physics.SphereCastNonAlloc(
@@ -90,7 +90,7 @@ namespace FlavorfulStory.LocationManager
             foreach (var hit in _hits) yield return hit.collider.GetComponent<InteractableObject2>();
         }
         
-        /// <summary> Получение ближайшего объекта.</summary>
+        /// <summary> Получение ближайшего объекта. </summary>
         private InteractableObject2 GetClosestInteractable(IEnumerable<InteractableObject2> interactables)
         {
             InteractableObject2 closest = null;
@@ -106,12 +106,12 @@ namespace FlavorfulStory.LocationManager
             return closest;
         }
         
-        /// <summary> Можно взаимодействовать.</summary>
+        /// <summary> Можно взаимодействовать. </summary>
         private bool CanInteract() => 
             _currentTarget && Vector3.Distance(transform.position, _currentTarget.transform.position) <= _radius;
         
 
-        /// <summary> Рисование в окне сцены.</summary>
+        /// <summary> Рисование в окне сцены. </summary>
         private void OnDrawGizmos()
         {
             var player = GameObject.FindGameObjectWithTag("Player");

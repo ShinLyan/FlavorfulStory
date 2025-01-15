@@ -4,42 +4,42 @@ using UnityEngine.EventSystems;
 namespace FlavorfulStory.InventorySystem.UI.Tooltips
 {
     /// <summary> Абстрактный базовый класс, который обрабатывает создание
-    /// префаба тултипа в правильном положении на экране относительно курсора.</summary>
-    /// <remarks> Переопределите абстрактные методы для своего спавнера тултипа.</remarks>
+    /// префаба тултипа в правильном положении на экране относительно курсора. </summary>
+    /// <remarks> Переопределите абстрактные методы для своего спавнера тултипа. </remarks>
     public abstract class TooltipSpawner : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {
-        /// <summary> Префаб тултипа, который нужно заспавнить.</summary>
+        /// <summary> Префаб тултипа, который нужно заспавнить. </summary>
         [Tooltip("Префаб тултипа, который нужно заспавнить.")]
         [SerializeField] private GameObject _tooltipPrefab;
 
-        /// <summary> Заспавненный тултип.</summary>
+        /// <summary> Заспавненный тултип. </summary>
         private GameObject _tooltip;
 
         #region Abstract Methods
         /// <summary> Можно ли создать тултип?</summary>
-        /// <remarks> Возвращает True, если спавнеру можно создать тултип.</remarks>
+        /// <remarks> Возвращает True, если спавнеру можно создать тултип. </remarks>
         public abstract bool CanCreateTooltip();
 
-        /// <summary> Вызывается, когда приходит время обновить информацию в префабе тултипа.</summary>
-        /// <param name="tooltip"> Заспавненный префаб тултипа для обновления.</param>
+        /// <summary> Вызывается, когда приходит время обновить информацию в префабе тултипа. </summary>
+        /// <param name="tooltip"> Заспавненный префаб тултипа для обновления. </param>
         public abstract void UpdateTooltip(GameObject tooltip);
         #endregion
 
-        /// <summary> Вызывается при уничтожении объекта.</summary>
+        /// <summary> Вызывается при уничтожении объекта. </summary>
         private void OnDestroy() => ClearTooltip();
 
-        /// <summary> Вызывается при отключении объекта.</summary>
+        /// <summary> Вызывается при отключении объекта. </summary>
         private void OnDisable() => ClearTooltip();
 
-        /// <summary> Очистить тултип.</summary>
+        /// <summary> Очистить тултип. </summary>
         private void ClearTooltip()
         {
             if (_tooltip != null) Destroy(_tooltip);
         }
 
-        /// <summary> Вызывается при наведении курсора на объект UI.</summary>
-        /// <remarks> Создает или обновляет тултип при необходимости.</remarks>
-        /// <param name="eventData"> Данные события взаимодействия с UI.</param>
+        /// <summary> Вызывается при наведении курсора на объект UI. </summary>
+        /// <remarks> Создает или обновляет тултип при необходимости. </remarks>
+        /// <param name="eventData"> Данные события взаимодействия с UI. </param>
         public void OnPointerEnter(PointerEventData eventData)
         {
             if (_tooltip != null && !CanCreateTooltip()) ClearTooltip();
@@ -57,9 +57,9 @@ namespace FlavorfulStory.InventorySystem.UI.Tooltips
             }
         }
 
-        /// <summary> Позиционировать тултип относительно объекта, на который наведен курсор.</summary>
+        /// <summary> Позиционировать тултип относительно объекта, на который наведен курсор. </summary>
         /// <remarks> В зависимости от расположения объекта относительно центра экрана
-        /// тултип корректируется, чтобы не выходить за границы экрана.</remarks>
+        /// тултип корректируется, чтобы не выходить за границы экрана. </remarks>
         private void PositionTooltip()
         {
             // Обновляем положение всех Canvas-элементов для учета изменений в UI.
@@ -85,10 +85,10 @@ namespace FlavorfulStory.InventorySystem.UI.Tooltips
             _tooltip.transform.position = slotCorners[slotCornerIndex] - tooltipCorners[tooltipCornerIndex] + _tooltip.transform.position;
         }
 
-        /// <summary> Возвращает индекс угла для позиционирования.</summary>
+        /// <summary> Возвращает индекс угла для позиционирования. </summary>
         /// <param name="below"> Находится ли объект ниже середины экрана?</param>
         /// <param name="right"> Находится ли объект правее середины экрана?</param>
-        /// <returns> Индекс угла: 0 - левый нижний, 1 - левый верхний, 2 - правый верхний, 3 - правый нижний.</returns>
+        /// <returns> Индекс угла: 0 - левый нижний, 1 - левый верхний, 2 - правый верхний, 3 - правый нижний. </returns>
         private int GetCornerIndex(bool below, bool right) => (below, right) switch
         {
             (true, false) => 0, // Левый нижний угол
@@ -97,8 +97,8 @@ namespace FlavorfulStory.InventorySystem.UI.Tooltips
             (true, true) => 3, // Правый нижний угол
         };
 
-        /// <summary> Вызывается при уводе курсора с объекта UI.</summary>
-        /// <param name="eventData"> Данные события взаимодействия с UI.</param>
+        /// <summary> Вызывается при уводе курсора с объекта UI. </summary>
+        /// <param name="eventData"> Данные события взаимодействия с UI. </param>
         public void OnPointerExit(PointerEventData eventData) => ClearTooltip();
     }
 }
