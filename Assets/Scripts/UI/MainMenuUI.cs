@@ -1,5 +1,4 @@
 using FlavorfulStory.Control;
-using FlavorfulStory.SceneManagement;
 using System.Linq;
 using TMPro;
 using UnityEngine;
@@ -76,17 +75,10 @@ namespace FlavorfulStory.UI
                 inputField.text = string.Empty;
             }
         }
-
+        
         /// <summary> Продолжить ранее сохраненную игру. </summary>
         public void OnClickContinue() =>
             PersistentObject.Instance.GetSavingWrapper().ContinueGame();
-
-        /// <summary> Вернуться в главное меню. </summary>
-        /// <remarks> Загружает сцену главного меню через систему сохранений. </remarks>
-        public void OnClickReturnToMainMenu()
-        {
-            SavingWrapper.LoadSceneByName(SceneType.MainMenu.ToString());
-        }
 
         /// <summary> Завершить работу приложения. </summary>
         public void OnClickQuit() => Application.Quit();
