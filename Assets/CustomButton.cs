@@ -38,14 +38,4 @@ public abstract class CustomButton : MonoBehaviour, IPointerClickHandler, IPoint
         IsMouseOver = false;
         HoverEnd();
     }
-    
-    // private void OnDisable()
-    // {
-    //     IsMouseOver = false;
-    // }
-    //
-    // private void OnEnable()
-    // {
-    //     IsMouseOver = false;
-    // }
 }

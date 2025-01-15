@@ -12,8 +12,9 @@ public class TabButton : CustomButton
     /// <summary> Цвет текста вкладки по умолчанию. </summary>
     [SerializeField] private Color _defaultLabelColor;// = Color.white
 
-    public bool IsActive;
-    
+
+    public bool IsActive { get; set; }
+
     public event Action OnClick;
     
     protected override void Initialize()
