@@ -1,4 +1,5 @@
 using System;
+using FlavorfulStory.SceneManagement;
 using FlavorfulStory.UI;
 using UnityEngine;
 
@@ -100,5 +101,15 @@ public class GameMenu : MonoBehaviour
             SelectTab(tabType);
             break;
         }
+    }
+
+    public void Hide()
+    {
+        _content.SetActive(false);
+    }
+    
+    public void OnClickReturnToMainMenu()
+    {
+        SavingWrapper.LoadSceneByName(SceneType.MainMenu.ToString());
     }
 }
