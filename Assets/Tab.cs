@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Tab : MonoBehaviour
 {
-    private TabButton _tabButton;
+    [SerializeField] private TabButton _tabButton;
     
     [SerializeField] private GameObject _tabContent;
 
@@ -34,7 +34,6 @@ public class Tab : MonoBehaviour
 
     public void Initialize()
     {
-        _tabButton = GetComponentInChildren<TabButton>(true);
         _tabButton.OnClick += SwitchTo;
     }
 }
