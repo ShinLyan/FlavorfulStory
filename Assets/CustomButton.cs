@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -6,7 +7,7 @@ using UnityEngine.UI;
 public abstract class CustomButton : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
 {
     protected Image ButtonImage { get; private set; }
-    protected bool IsMouseOver { get; private set; }
+    protected bool IsMouseOver { get; set; }
 
     protected virtual void Awake()
     {
@@ -37,5 +38,10 @@ public abstract class CustomButton : MonoBehaviour, IPointerClickHandler, IPoint
     {
         IsMouseOver = false;
         HoverEnd();
+    }
+
+    private void OnDisable()
+    {
+        IsMouseOver = false;
     }
 }

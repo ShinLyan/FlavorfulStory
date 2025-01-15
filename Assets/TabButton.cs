@@ -29,7 +29,7 @@ public class TabButton : CustomButton
 
     protected override void HoverEnd()
     {
-        SetNameState(false);
+        if (!IsActive) SetNameState(false);
     }
 
     protected override void Click()
@@ -40,14 +40,7 @@ public class TabButton : CustomButton
 
     public void SetNameState(bool state)
     {
-        if (state == false && IsActive == false && !IsMouseOver)
-        {
-            _nameText.color = _defaultLabelColor;
-        }
-        else
-        {
-            _nameText.color = _activeLabelColor;
-        }
+        _nameText.color = state || IsMouseOver ? _activeLabelColor : _defaultLabelColor;
     }
 
     private void OnEnable()
