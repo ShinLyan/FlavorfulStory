@@ -1,13 +1,11 @@
+using FlavorfulStory.UI;
 using TMPro;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace FlavorfulStory.InventorySystem.UI
 {
-    [RequireComponent(typeof(Image))]
-    public class ToolbarSlotUI : MonoBehaviour, IItemHolder,
-        IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
+    public class ToolbarSlotUI : CustomButton, IItemHolder
     {
         /// <summary> ������ ����� ���������. </summary>
         [SerializeField] private InventoryItemIcon _icon;
@@ -17,35 +15,44 @@ namespace FlavorfulStory.InventorySystem.UI
 
         /// <summary> Изображение обводки тулбар слота. </summary>
         [SerializeField] private Image _hoverImage;
-
-        /// <summary> ������ ����� � HUD. </summary>
+        
+        const float FadeDuration = 0.2f;
+        
         private int _index;
-
-        /// <summary>
-        /// 
-        /// </summary>
+        
         private Toolbar _toolbar;
-
-        /// <summary>
-        /// 
-        /// </summary>
+        
         private bool _isSelected;
 
-        /// <summary> Флаг нахождение курсора на тулбар слоте. Типо как Hover. </summary>
-        private bool _isMouseOver;
-
-        private void Awake()
+        protected override void Initialize()
         {
             _index = transform.GetSiblingIndex();
             _keyText.text = $"{_index + 1}";
             _toolbar = transform.parent.GetComponent<Toolbar>();
         }
 
-        public void Redraw()
+        protected override void HoverStart()
         {
-            _icon.SetItem(Inventory.PlayerInventory.GetItemInSlot(_index), 
-                Inventory.PlayerInventory.GetNumberInSlot(_index));
+            _hoverImage.CrossFadeAlpha(1.0f, FadeDuration, true);
         }
+
+        protected override void HoverEnd()
+        {
+            if (!_isSelected)
+            {
+                _hoverImage.CrossFadeAlpha(0.0f, FadeDuration, true);
+            }
+        }
+
+        protected override void Click()
+        {
+            _toolbar.SelectItem(_index);
+        }
+        
+        public void Redraw() => _icon.SetItem(
+            Inventory.PlayerInventory.GetItemInSlot(_index), 
+            Inventory.PlayerInventory.GetNumberInSlot(_index)
+            );
 
         /// <summary> �������� �������, ������� � ������ ������ ��������� � ���� ���������. </summary>
         /// <returns> ���������� �������, ������� � ������ ������ ��������� � ���� ���������. </returns>
@@ -62,45 +69,11 @@ namespace FlavorfulStory.InventorySystem.UI
         {
             _isSelected = false;
             FadeToColor(Color.gray);
-            if (!_isMouseOver) HoverEnd();
+            if (!IsMouseOver) HoverEnd();
         }
         private void FadeToColor(Color color)
         {
-            const float FadeDuration = 0.2f;
-            GetComponent<Image>().CrossFadeColor(color, FadeDuration, true, true);
-        }
-
-        /// <summary> Наведение курсора на тулбар слот. Плавно проявляет рамку тулбар слота. </summary>
-        private void HoverStart()
-        {
-            //FadeToColor(Color.white);
-            const float FadeDuration = 0.2f;
-            _hoverImage.CrossFadeAlpha(1.0f, FadeDuration, true);
-        }
-
-        /// <summary> Уведение курсора с тулбар слота. Плавно убирает рамку с тулбар слота. </summary>
-        private void HoverEnd()
-        {
-            //FadeToColor(Color.gray);
-            const float FadeDuration = 0.2f;
-            _hoverImage.CrossFadeAlpha(0.0f, FadeDuration, true);
-        }
-        
-        public void OnPointerClick(PointerEventData eventData)
-        {
-            _toolbar.SelectItem(_index);
-        }
-
-        public void OnPointerEnter(PointerEventData eventData)
-        {
-            _isMouseOver = true;
-            HoverStart();
-        }
-
-        public void OnPointerExit(PointerEventData eventData)
-        {
-            _isMouseOver = false;
-            if (!_isSelected) HoverEnd();
+            ButtonImage.CrossFadeColor(color, FadeDuration, true, true);
         }
     }
 }
