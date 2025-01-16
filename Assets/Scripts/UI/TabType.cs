@@ -1,6 +1,6 @@
 ﻿namespace FlavorfulStory.UI
 {
-    /// <summary> Перичесление для обозначения типов вкладок. </summary>
+    /// <summary> Тип вкладок. </summary>
     /// <remarks> Используется для возможного переназначения кнопок управления в настройках. </remarks>>
     public enum TabType
     {

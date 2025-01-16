@@ -1,5 +1,6 @@
 using System;
 using FlavorfulStory.SceneManagement;
+using TMPro;
 using UnityEngine;
 
 namespace FlavorfulStory.UI
@@ -14,6 +15,12 @@ namespace FlavorfulStory.UI
         /// <summary> Контейнер с контентом меню. </summary>
         [SerializeField] private GameObject _content;
 
+        /// <summary> Текст обозначения кнопки для переключения на предыдущую вкладку. </summary>
+        [SerializeField] private TMP_Text _previousTabLabel;
+        
+        /// <summary> Текст обозначения кнопки для переключения на следующую вкладку. </summary>
+        [SerializeField] private TMP_Text _nextTabLabel;
+        
         /// <summary> Массив вкладок в меню. </summary>
         private Tab[] _tabs;
 
@@ -41,7 +48,10 @@ namespace FlavorfulStory.UI
         private void Start()
         {
             _currentTabType = TabType.MainTab;
-            _tabs[(int)_currentTabType].Select();
+            ShowCurrentTab();
+
+            _previousTabLabel.text = PreviousTabKey.ToString();
+            _nextTabLabel.text = NextTabKey.ToString();
         }
 
         /// <summary> Обрабатывает ввод пользователя для переключения состояния меню,
@@ -53,40 +63,12 @@ namespace FlavorfulStory.UI
             HandleTabButtonsInput();
         }
 
-        /// <summary> Выбирает вкладку и скрывает текущую. </summary>
-        /// <param name="tabType"> Тип вкладки для выбора. </param>
-        private void SelectTab(TabType tabType)
-        {
-            HideCurrentTab();
-            _currentTabType = tabType;
-            ShowCurrentTab();
-        }
-
-        /// <summary> Показывает текущую вкладку. </summary>
-        private void ShowCurrentTab()
-        {
-            _tabs[(int)_currentTabType].Select();
-        }
-
-        /// <summary> Скрывает текущую вкладку. </summary>
-        private void HideCurrentTab()
-        {
-            _tabs[(int)_currentTabType].ResetSelection();
-        }
-
-        /// <summary> Переключает состояние видимости меню. </summary>
-        /// <param name="state"> Новое состояние видимости меню. </param>
-        private void Switch(bool state)
-        {
-            _content.SetActive(state);
-        }
-
         /// <summary> Обрабатывает ввод для переключения состояния меню (нажатие клавиши для скрытия/показа меню). </summary>
         private void HandleSwitchInput()
         {
             if (Input.GetKeyDown(_switchKey))
             {
-                Switch(!_content.activeSelf);
+                SwitchContent(!_content.activeSelf);
             }
         }
 
@@ -111,18 +93,47 @@ namespace FlavorfulStory.UI
         {
             if (_content.activeInHierarchy && Input.GetButtonDown(_currentTabType.ToString()))
             {
-                Switch(false);
+                SwitchContent(false);
                 return;
             }
 
-            foreach (var tabType in (TabType[])Enum.GetValues(typeof(TabType)))
+            foreach (TabType tabType in Enum.GetValues(typeof(TabType)))
             {
-                if (!Input.GetButtonDown(tabType.ToString())) continue;
-
-                Switch(true);
-                SelectTab(tabType);
-                break;
+                if (Input.GetButtonDown(tabType.ToString()))
+                {
+                    SwitchContent(true);
+                    SelectTab(tabType);
+                    return;
+                }
             }
+        }
+        
+        /// <summary> Выбирает вкладку и скрывает текущую. </summary>
+        /// <param name="tabType"> Тип вкладки для выбора. </param>
+        private void SelectTab(TabType tabType)
+        {
+            HideCurrentTab();
+            _currentTabType = tabType;
+            ShowCurrentTab();
+        }
+
+        /// <summary> Показывает текущую вкладку. </summary>
+        private void ShowCurrentTab()
+        {
+            _tabs[(int)_currentTabType].Select();
+        }
+
+        /// <summary> Скрывает текущую вкладку. </summary>
+        private void HideCurrentTab()
+        {
+            _tabs[(int)_currentTabType].ResetSelection();
+        }
+
+        /// <summary> Переключает состояние видимости меню. </summary>
+        /// <param name="isEnabled"> Новое состояние видимости меню. </param>
+        private void SwitchContent(bool isEnabled)
+        {
+            _content.SetActive(isEnabled);
         }
 
         /// <summary> Скрывает меню. </summary>

@@ -12,7 +12,7 @@ namespace FlavorfulStory.UI
         [SerializeField] private TMP_Text _label;
 
         /// <summary> Цвет текста, когда вкладка активна. </summary>
-        [SerializeField] private Color _activeLabelColor; // = new(1, 0.8566375f, 0.6745283f)
+        [SerializeField] private Color _activeLabelColor;
 
         /// <summary> Цвет текста, когда вкладка неактивна. </summary>
         [SerializeField] private Color _defaultLabelColor;
@@ -23,6 +23,12 @@ namespace FlavorfulStory.UI
         /// <summary> Событие клика по кнопке вкладки. </summary>
         public event Action OnClick;
 
+        /// <summary> При активации компонента устанавливает цвет текста в зависимости от состояния вкладки. </summary>
+        private void OnEnable()
+        {
+            _label.color = IsActive ? _activeLabelColor : _defaultLabelColor;
+        }
+        
         /// <summary> Инициализация кнопки вкладки. Устанавливает начальное состояние цвета текста. </summary>
         protected override void Initialize()
         {
@@ -52,12 +58,6 @@ namespace FlavorfulStory.UI
         public void SetNameState(bool state)
         {
             _label.color = state || IsMouseOver ? _activeLabelColor : _defaultLabelColor;
-        }
-
-        /// <summary> При активации компонента устанавливает цвет текста в зависимости от состояния вкладки. </summary>
-        private void OnEnable()
-        {
-            _label.color = IsActive ? _activeLabelColor : _defaultLabelColor;
         }
     }
 }
