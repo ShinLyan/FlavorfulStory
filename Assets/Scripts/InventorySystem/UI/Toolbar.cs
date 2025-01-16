@@ -1,9 +1,10 @@
+using FlavorfulStory.Saving;
 using UnityEngine;
 
 namespace FlavorfulStory.InventorySystem.UI
 {
     /// <summary> Панель инструментов. </summary>
-    public class Toolbar : MonoBehaviour
+    public class Toolbar : MonoBehaviour, ISaveable
     {
         /// <summary> Массив слотов панели инструментов. </summary>
         private ToolbarSlotUI[] _slots;
@@ -73,5 +74,11 @@ namespace FlavorfulStory.InventorySystem.UI
             var newSelectedItemIndex = Mathf.Clamp(SelectedItemIndex - scrollInput, 0, _slots.Length - 1);
             SelectItem(newSelectedItemIndex);
         }
+
+        #region Saving
+        public object CaptureState() => SelectedItemIndex;
+
+        public void RestoreState(object state) => SelectedItemIndex = (int) state;
+        #endregion
     }
 }
