@@ -1,7 +1,7 @@
 ﻿namespace FlavorfulStory.UI
 {
     /// <summary> Тип вкладок. </summary>
-    /// <remarks> Используется для возможного переназначения кнопок управления в настройках. </remarks>>
+    /// <remarks> Используется для возможного переназначения кнопок управления в настройках. </remarks>
     public enum TabType
     {
         /// <summary> Главная вкладка в игровом меню. </summary>

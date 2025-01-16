@@ -42,6 +42,9 @@ namespace FlavorfulStory.UI
             {
                 tab.OnTabSelected += SelectTab;
             }
+            
+            _previousTabLabel.text = PreviousTabKey.ToString();
+            _nextTabLabel.text = NextTabKey.ToString();
         }
 
         /// <summary> Устанавливает начальную вкладку (главную). </summary>
@@ -49,9 +52,6 @@ namespace FlavorfulStory.UI
         {
             _currentTabType = TabType.MainTab;
             ShowCurrentTab();
-
-            _previousTabLabel.text = PreviousTabKey.ToString();
-            _nextTabLabel.text = NextTabKey.ToString();
         }
 
         /// <summary> Обрабатывает ввод пользователя для переключения состояния меню,
@@ -139,7 +139,7 @@ namespace FlavorfulStory.UI
         /// <summary> Скрывает меню. </summary>
         public void Hide()
         {
-            _content.SetActive(false);
+            SwitchContent(false);
         }
 
         /// <summary> Обработчик нажатия кнопки возврата в главное меню. Загружает сцену главного меню. </summary>
