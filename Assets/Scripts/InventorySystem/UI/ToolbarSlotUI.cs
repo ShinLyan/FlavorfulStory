@@ -1,3 +1,4 @@
+using System;
 using FlavorfulStory.UI;
 using TMPro;
 using UnityEngine;
@@ -7,10 +8,8 @@ namespace FlavorfulStory.InventorySystem.UI
 {
     public class ToolbarSlotUI : CustomButton, IItemHolder
     {
-        /// <summary> ������ ����� ���������. </summary>
         [SerializeField] private InventoryItemIcon _icon;
-
-        /// <summary> ����� �������. </summary>
+        
         [SerializeField] private TMP_Text _keyText;
 
         /// <summary> Изображение обводки тулбар слота. </summary>
@@ -20,15 +19,14 @@ namespace FlavorfulStory.InventorySystem.UI
         
         private int _index;
         
-        private Toolbar _toolbar;
-        
         private bool _isSelected;
 
+        public event Action<int> OnSlotClicked; 
+        
         protected override void Initialize()
         {
             _index = transform.GetSiblingIndex();
             _keyText.text = $"{_index + 1}";
-            _toolbar = transform.parent.GetComponent<Toolbar>();
         }
 
         protected override void HoverStart()
@@ -46,18 +44,9 @@ namespace FlavorfulStory.InventorySystem.UI
 
         protected override void Click()
         {
-            _toolbar.SelectItem(_index);
+            OnSlotClicked?.Invoke(_index);
         }
         
-        public void Redraw() => _icon.SetItem(
-            Inventory.PlayerInventory.GetItemInSlot(_index), 
-            Inventory.PlayerInventory.GetNumberInSlot(_index)
-            );
-
-        /// <summary> �������� �������, ������� � ������ ������ ��������� � ���� ���������. </summary>
-        /// <returns> ���������� �������, ������� � ������ ������ ��������� � ���� ���������. </returns>
-        public InventoryItem GetItem() => Inventory.PlayerInventory.GetItemInSlot(_index);
-
         public void Select()
         {
             _isSelected = true;
@@ -71,6 +60,14 @@ namespace FlavorfulStory.InventorySystem.UI
             FadeToColor(Color.gray);
             if (!IsMouseOver) HoverEnd();
         }
+        
+        public void Redraw() => _icon.SetItem(
+            Inventory.PlayerInventory.GetItemInSlot(_index), 
+            Inventory.PlayerInventory.GetNumberInSlot(_index)
+            );
+        
+        public InventoryItem GetItem() => Inventory.PlayerInventory.GetItemInSlot(_index);
+        
         private void FadeToColor(Color color)
         {
             ButtonImage.CrossFadeColor(color, FadeDuration, true, true);

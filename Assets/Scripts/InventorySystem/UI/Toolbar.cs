@@ -19,6 +19,10 @@ namespace FlavorfulStory.InventorySystem.UI
         {
             _slots = GetComponentsInChildren<ToolbarSlotUI>();
             Inventory.PlayerInventory.InventoryUpdated += RedrawToolbar;
+            foreach (var slot in _slots)
+            {
+                slot.OnSlotClicked += SelectItem;
+            }
         }
 
         /// <summary> При старте перерисовываем инвентарь. </summary>
@@ -38,9 +42,9 @@ namespace FlavorfulStory.InventorySystem.UI
         /// <summary> Снять выделение со всех слотов тулбара. </summary>
         private void ResetToolbar()
         {
-            foreach (var toolbarSlot in _slots)
+            foreach (var slot in _slots)
             {
-                toolbarSlot.ResetSelection();
+                slot.ResetSelection();
             }
         }
         
@@ -55,7 +59,6 @@ namespace FlavorfulStory.InventorySystem.UI
         public void SelectItem(int index)
         {
             _slots[SelectedItemIndex].ResetSelection();
-
             SelectedItemIndex = index;
             _slots[SelectedItemIndex].Select();
         }
