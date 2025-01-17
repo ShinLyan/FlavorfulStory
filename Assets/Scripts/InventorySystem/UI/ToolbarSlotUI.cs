@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using FlavorfulStory.UI;
 using TMPro;
 using UnityEngine;
@@ -12,10 +13,13 @@ namespace FlavorfulStory.InventorySystem.UI
         
         [SerializeField] private TMP_Text _keyText;
 
+        private Color _defaultColor; 
+        private Color _selectedColor = new Color(1.0f, 1.0f, 1.0f, 0.35f); 
+        
         /// <summary> Изображение обводки тулбар слота. </summary>
         [SerializeField] private Image _hoverImage;
         
-        const float FadeDuration = 0.2f;
+        const float FadeDuration = 0.1f;
         
         private int _index;
         
@@ -27,6 +31,7 @@ namespace FlavorfulStory.InventorySystem.UI
         {
             _index = transform.GetSiblingIndex();
             _keyText.text = $"{_index + 1}";
+            _defaultColor = ButtonImage.color;
         }
 
         protected override void HoverStart()
@@ -36,10 +41,7 @@ namespace FlavorfulStory.InventorySystem.UI
 
         protected override void HoverEnd()
         {
-            if (!_isSelected)
-            {
-                _hoverImage.CrossFadeAlpha(0.0f, FadeDuration, true);
-            }
+            _hoverImage.CrossFadeAlpha(0.0f, FadeDuration, true);
         }
 
         protected override void Click()
@@ -50,14 +52,14 @@ namespace FlavorfulStory.InventorySystem.UI
         public void Select()
         {
             _isSelected = true;
-            FadeToColor(Color.white);
-            HoverStart();
+            FadeToColor(_selectedColor);
+            //HoverStart();
         }
 
         public void ResetSelection()
         {
             _isSelected = false;
-            FadeToColor(Color.gray);
+            FadeToColor(_defaultColor);
             if (!IsMouseOver) HoverEnd();
         }
         
@@ -70,7 +72,21 @@ namespace FlavorfulStory.InventorySystem.UI
         
         private void FadeToColor(Color color)
         {
-            ButtonImage.CrossFadeColor(color, FadeDuration, true, true);
+            //ButtonImage.CrossFadeColor(color, FadeDuration, true, true);
+            StartCoroutine(FadeToColorCoroutine(color));
+        }
+
+        private IEnumerator FadeToColorCoroutine(Color color)
+        {
+            var startColor = ButtonImage.color;
+            float timeElapsed = 0;
+            while (timeElapsed <= FadeDuration)
+            {
+                ButtonImage.color = Color.Lerp(startColor, color, timeElapsed / FadeDuration);
+                timeElapsed += Time.deltaTime;
+                yield return null;
+            }
+            ButtonImage.color = color;
         }
     }
 }
