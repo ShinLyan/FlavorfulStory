@@ -9,8 +9,10 @@ namespace FlavorfulStory.InventorySystem.UI
     [RequireComponent(typeof(Image))]
     public class InventoryItemIcon : MonoBehaviour
     {
-        /// <summary> Текст количества предметов.</summary>
+        /// <summary> Gameobject-контейнер количества предметов. </summary>
         [SerializeField] private GameObject _itemNumberContainer;
+        
+        /// <summary> Текст количества предметов.</summary>
         [SerializeField] private TMP_Text _itemNumberText;
 
         /// <summary> Установить предмет инвентаря. </summary>
