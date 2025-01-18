@@ -1,7 +1,7 @@
 namespace FlavorfulStory.InventorySystem
 {
-    /// <summary> Классы, реализующие этот интерфейс, позволяют 
-    /// "ItemTooltipSpawner" отображать нужную информацию. </summary>
+    /// <summary> РљР»Р°СЃСЃС‹, СЂРµР°Р»РёР·СѓСЋС‰РёРµ СЌС‚РѕС‚ РёРЅС‚РµСЂС„РµР№СЃ, РїРѕР·РІРѕР»СЏСЋС‚ 
+    /// "ItemTooltipSpawner" РѕС‚РѕР±СЂР°Р¶Р°С‚СЊ РЅСѓР¶РЅСѓСЋ РёРЅС„РѕСЂРјР°С†РёСЋ. </summary>
     public interface IItemHolder
     {
         public InventoryItem GetItem();

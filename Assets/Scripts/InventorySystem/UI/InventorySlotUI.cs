@@ -7,7 +7,7 @@ namespace FlavorfulStory.InventorySystem.UI
     public class InventorySlotUI : MonoBehaviour, IDragContainer<InventoryItem>, IItemHolder
     {
         /// <summary> Инонка слота инвентаря. </summary>
-        [SerializeField] private InventoryItemIcon _icon;
+        [SerializeField] private InventoryItemIcon _inventoryItemIcon;
 
         /// <summary> Индекс слота в инвентаре. </summary>
         private int _index;
@@ -28,7 +28,7 @@ namespace FlavorfulStory.InventorySystem.UI
         {
             _inventory = inventory;
             _index = index;
-            _icon.SetItem(inventory.GetItemInSlot(index), inventory.GetNumberInSlot(index));
+            _inventoryItemIcon.SetItem(inventory.GetItemInSlot(index), inventory.GetNumberInSlot(index));
         }
 
         /// <summary> Получить максимально допустимое количество элементов. </summary>

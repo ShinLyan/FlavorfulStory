@@ -1,5 +1,5 @@
-using FlavorfulStory.Saving;
 using System;
+using FlavorfulStory.Saving;
 using UnityEngine;
 
 namespace FlavorfulStory.TimeManagement
@@ -7,23 +7,27 @@ namespace FlavorfulStory.TimeManagement
     /// <summary> Глобальное игровое время. </summary>
     public class WorldTime : MonoBehaviour, ISaveable
     {
+        /// <summary> Событие изменения времени. </summary>
+        public static Action<DateTime> OnDateTimeChanged;
+
+        /// <summary> Событие окончания дня. </summary>
+        public static Action OnDayEnded;
+
         /// <summary> Изменение игрового времени за один тик. </summary>
-        [Header("Tick settings")]
-        [Tooltip("Сколько минут проходит за один тик.")]
-        [SerializeField] private int _tickMinutesIncrease = 10;
+        [Header("Tick settings")] [Tooltip("Сколько минут проходит за один тик.")] [SerializeField]
+        private int _tickMinutesIncrease = 10;
 
         /// <summary> Время между тиками. </summary>
-        [Tooltip("Сколько реального времени длится один тик.")]
-        [SerializeField] private float _timeBetweenTicks = 1;
+        [Tooltip("Сколько реального времени длится один тик.")] [SerializeField]
+        private float _timeBetweenTicks = 1;
 
         /// <summary> Во сколько начинается новый день. </summary>
-        [Header("Day/night settings")]
-        [Tooltip("Во сколько начинается новый день.")]
-        [SerializeField] private int _dayStartHour;
+        [Header("Day/night settings")] [Tooltip("Во сколько начинается новый день.")] [SerializeField]
+        private int _dayStartHour;
 
         /// <summary> Во сколько заканчивается день. </summary>
-        [Tooltip("Во сколько заканчивается день.")]
-        [SerializeField] private int _dayEndHour;
+        [Tooltip("Во сколько заканчивается день.")] [SerializeField]
+        private int _dayEndHour;
 
         /// <summary> Время между тиками. </summary>
         private float _currentTimeBetweenTicks;
@@ -32,12 +36,6 @@ namespace FlavorfulStory.TimeManagement
         private DateTime _dateTime;
 
         private ISaveable _saveableImplementation;
-
-        /// <summary> Событие изменения времени. </summary>
-        public static Action<DateTime> OnDateTimeChanged;
-
-        /// <summary> Событие окончания дня. </summary>
-        public static Action OnDayEnded;
 
         /// <summary> Создание объекта DateTime. </summary>
         private void Awake()
@@ -80,21 +78,22 @@ namespace FlavorfulStory.TimeManagement
         /// <summary> Обновляет время до начала нового дня в зависимости от текущего времени. </summary>
         public void StartNewDay()
         {
-            bool isSameDay = _dateTime.Hour < _dayStartHour;
-            int dayAdjustment = isSameDay ? 0 : 1;
+            var isSameDay = _dateTime.Hour < _dayStartHour;
+            var dayAdjustment = isSameDay ? 0 : 1;
 
             _dateTime = new DateTime(
                 _dateTime.Year,
                 _dateTime.Season,
                 _dateTime.DayInSeason + dayAdjustment,
                 _dayStartHour,
-                minute: 0
+                0
             );
 
             OnDateTimeChanged?.Invoke(_dateTime);
         }
 
         #region Saving
+
         public object CaptureState()
         {
             return _dateTime;
@@ -104,7 +103,7 @@ namespace FlavorfulStory.TimeManagement
         {
             _dateTime = (DateTime)state;
         }
+
         #endregion
     }
-
 }

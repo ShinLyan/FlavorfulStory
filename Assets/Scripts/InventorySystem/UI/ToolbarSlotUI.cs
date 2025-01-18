@@ -1,106 +1,111 @@
+using System;
+using System.Collections;
+using FlavorfulStory.UI;
 using TMPro;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace FlavorfulStory.InventorySystem.UI
 {
-    [RequireComponent(typeof(Image))]
-    public class ToolbarSlotUI : MonoBehaviour, IItemHolder,
-        IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
+    /// <summary> Представляет отдельный слот на панели инструментов. </summary>
+    /// <remarks> Управляет отображением предмета, обработкой нажатий и визуальной обратной связью. </remarks>
+    public class ToolbarSlotUI : CustomButton, IItemHolder
     {
-        /// <summary> ������ ����� ���������. </summary>
+        /// <summary> Иконка предмета в инвентаре. </summary>
         [SerializeField] private InventoryItemIcon _icon;
 
-        /// <summary> ����� �������. </summary>
+        /// <summary> Текстовое поле для отображения клавиши быстрого доступа. </summary>
         [SerializeField] private TMP_Text _keyText;
 
         /// <summary> Изображение обводки тулбар слота. </summary>
         [SerializeField] private Image _hoverImage;
 
-        /// <summary> ������ ����� � HUD. </summary>
+        /// <summary> Цвет слота по умолчанию. </summary>
+        private Color _defaultColor;
+
+        /// <summary> Цвет выбранного слота. </summary>
+        private readonly Color _selectedColor = new(1.0f, 1.0f, 1.0f, 0.35f);
+
+        /// <summary> Длительность анимации затухания в секундах. </summary>
+        private const float FadeDuration = 0.05f;
+
+        /// <summary> Индекс слота в панели инструментов. </summary>
         private int _index;
 
-        /// <summary>
-        /// 
-        /// </summary>
-        private Toolbar _toolbar;
+        /// <summary> Событие, возникающее при клике на слот. </summary>
+        public event Action<int> OnSlotClicked;
 
-        /// <summary>
-        /// 
-        /// </summary>
-        private bool _isSelected;
-
-        /// <summary> Флаг нахождение курсора на тулбар слоте. Типо как Hover. </summary>
-        private bool _isMouseOver;
-
-        private void Awake()
+        /// <summary> Инициализирует слот панели инструментов. </summary>
+        protected override void Initialize()
         {
             _index = transform.GetSiblingIndex();
             _keyText.text = $"{_index + 1}";
-            _toolbar = transform.parent.GetComponent<Toolbar>();
+            _defaultColor = ButtonImage.color;
         }
 
-        public void Redraw()
+        /// <summary> Обрабатывает начало наведения курсора на слот. </summary>
+        protected override void HoverStart()
         {
-            _icon.SetItem(Inventory.PlayerInventory.GetItemInSlot(_index), 
-                Inventory.PlayerInventory.GetNumberInSlot(_index));
-        }
-
-        /// <summary> �������� �������, ������� � ������ ������ ��������� � ���� ���������. </summary>
-        /// <returns> ���������� �������, ������� � ������ ������ ��������� � ���� ���������. </returns>
-        public InventoryItem GetItem() => Inventory.PlayerInventory.GetItemInSlot(_index);
-
-        public void Select()
-        {
-            _isSelected = true;
-            FadeToColor(Color.white);
-            HoverStart();
-        }
-
-        public void ResetSelection()
-        {
-            _isSelected = false;
-            FadeToColor(Color.gray);
-            if (!_isMouseOver) HoverEnd();
-        }
-        private void FadeToColor(Color color)
-        {
-            const float FadeDuration = 0.2f;
-            GetComponent<Image>().CrossFadeColor(color, FadeDuration, true, true);
-        }
-
-        /// <summary> Наведение курсора на тулбар слот. Плавно проявляет рамку тулбар слота. </summary>
-        private void HoverStart()
-        {
-            //FadeToColor(Color.white);
-            const float FadeDuration = 0.2f;
             _hoverImage.CrossFadeAlpha(1.0f, FadeDuration, true);
         }
 
-        /// <summary> Уведение курсора с тулбар слота. Плавно убирает рамку с тулбар слота. </summary>
-        private void HoverEnd()
+        /// <summary> Обрабатывает окончание наведения курсора на слот. </summary>
+        protected override void HoverEnd()
         {
-            //FadeToColor(Color.gray);
-            const float FadeDuration = 0.2f;
             _hoverImage.CrossFadeAlpha(0.0f, FadeDuration, true);
         }
-        
-        public void OnPointerClick(PointerEventData eventData)
+
+        /// <summary> Обрабатывает клик по слоту. </summary>
+        protected override void Click()
         {
-            _toolbar.SelectItem(_index);
+            OnSlotClicked?.Invoke(_index);
         }
 
-        public void OnPointerEnter(PointerEventData eventData)
+        /// <summary> Выделяет данный слот. </summary>
+        public void Select()
         {
-            _isMouseOver = true;
-            HoverStart();
+            FadeToColor(_selectedColor);
         }
 
-        public void OnPointerExit(PointerEventData eventData)
+        /// <summary> Сбрасывает выделение слота. </summary>
+        public void ResetSelection()
         {
-            _isMouseOver = false;
-            if (!_isSelected) HoverEnd();
+            FadeToColor(_defaultColor);
+            if (!IsMouseOver) HoverEnd();
+        }
+
+        /// <summary> Обновляет отображение предмета в слоте. </summary>
+        public void Redraw() => _icon.SetItem(
+            Inventory.PlayerInventory.GetItemInSlot(_index),
+            Inventory.PlayerInventory.GetNumberInSlot(_index)
+        );
+
+        /// <summary> Получает предмет, находящийся в данном слоте. </summary>
+        /// <returns> Предмет инвентаря в текущем слоте. </returns>
+        public InventoryItem GetItem() => Inventory.PlayerInventory.GetItemInSlot(_index);
+
+        /// <summary> Запускает плавное изменение цвета слота. </summary>
+        /// <param name="color"> Целевой цвет. </param>
+        private void FadeToColor(Color color)
+        {
+            StartCoroutine(FadeToColorCoroutine(color));
+        }
+
+        /// <summary> Корутина для плавного изменения цвета слота. </summary>
+        /// <param name="color"> Целевой цвет. </param>
+        /// <returns> Перечислитель для корутины. </returns>
+        private IEnumerator FadeToColorCoroutine(Color color)
+        {
+            var startColor = ButtonImage.color;
+            float timeElapsed = 0;
+            while (timeElapsed <= FadeDuration)
+            {
+                ButtonImage.color = Color.Lerp(startColor, color, timeElapsed / FadeDuration);
+                timeElapsed += Time.deltaTime;
+                yield return null;
+            }
+
+            ButtonImage.color = color;
         }
     }
 }
