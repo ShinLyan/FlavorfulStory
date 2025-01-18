@@ -74,7 +74,7 @@ namespace FlavorfulStory.Control
         private void UseToolbarItem()
         {
             if (_toolbar && CurrentItem is ActionItem actionItem &&
-                (Input.GetMouseButtonUp(0) || Input.GetMouseButtonUp(1)) && CanUseTool)
+                (Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1)) && CanUseTool)
             {
                 var actionType = Input.GetMouseButtonDown(0) ?
                     UseActionType.LeftClick : UseActionType.RightClick;
