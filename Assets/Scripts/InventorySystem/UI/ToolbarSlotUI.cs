@@ -13,28 +13,28 @@ namespace FlavorfulStory.InventorySystem.UI
     {
         /// <summary> Иконка предмета в инвентаре. </summary>
         [SerializeField] private InventoryItemIcon _icon;
-        
+
         /// <summary> Текстовое поле для отображения клавиши быстрого доступа. </summary>
         [SerializeField] private TMP_Text _keyText;
 
         /// <summary> Изображение обводки тулбар слота. </summary>
         [SerializeField] private Image _hoverImage;
-        
+
         /// <summary> Цвет слота по умолчанию. </summary>
-        private Color _defaultColor; 
-        
+        private Color _defaultColor;
+
         /// <summary> Цвет выбранного слота. </summary>
-        private readonly Color _selectedColor = new(1.0f, 1.0f, 1.0f, 0.35f); 
-        
+        private readonly Color _selectedColor = new(1.0f, 1.0f, 1.0f, 0.35f);
+
         /// <summary> Длительность анимации затухания в секундах. </summary>
         private const float FadeDuration = 0.05f;
-        
+
         /// <summary> Индекс слота в панели инструментов. </summary>
         private int _index;
 
         /// <summary> Событие, возникающее при клике на слот. </summary>
-        public event Action<int> OnSlotClicked; 
-        
+        public event Action<int> OnSlotClicked;
+
         /// <summary> Инициализирует слот панели инструментов. </summary>
         protected override void Initialize()
         {
@@ -60,7 +60,7 @@ namespace FlavorfulStory.InventorySystem.UI
         {
             OnSlotClicked?.Invoke(_index);
         }
-        
+
         /// <summary> Выделяет данный слот. </summary>
         public void Select()
         {
@@ -73,17 +73,17 @@ namespace FlavorfulStory.InventorySystem.UI
             FadeToColor(_defaultColor);
             if (!IsMouseOver) HoverEnd();
         }
-        
+
         /// <summary> Обновляет отображение предмета в слоте. </summary>
         public void Redraw() => _icon.SetItem(
-            Inventory.PlayerInventory.GetItemInSlot(_index), 
+            Inventory.PlayerInventory.GetItemInSlot(_index),
             Inventory.PlayerInventory.GetNumberInSlot(_index)
-            );
-        
+        );
+
         /// <summary> Получает предмет, находящийся в данном слоте. </summary>
         /// <returns> Предмет инвентаря в текущем слоте. </returns>
         public InventoryItem GetItem() => Inventory.PlayerInventory.GetItemInSlot(_index);
-        
+
         /// <summary> Запускает плавное изменение цвета слота. </summary>
         /// <param name="color"> Целевой цвет. </param>
         private void FadeToColor(Color color)
@@ -104,6 +104,7 @@ namespace FlavorfulStory.InventorySystem.UI
                 timeElapsed += Time.deltaTime;
                 yield return null;
             }
+
             ButtonImage.color = color;
         }
     }

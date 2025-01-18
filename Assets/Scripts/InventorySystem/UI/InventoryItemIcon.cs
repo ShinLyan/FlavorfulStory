@@ -14,20 +14,17 @@ namespace FlavorfulStory.InventorySystem.UI
         
         /// <summary> Текст количества предметов.</summary>
         [SerializeField] private TMP_Text _itemNumberText;
-
+        
         /// <summary> Установить предмет инвентаря. </summary>
         /// <param name="item"> Предмет инвентаря. </param>
         /// <param name="number"> Количество предметов. </param>
         public void SetItem(InventoryItem item, int number)
         {
             var iconImage = GetComponent<Image>();
-            iconImage.enabled = item != null;
+            iconImage.enabled = item;
             if (item) iconImage.sprite = item.Icon;
-
-            if (!_itemNumberText) return;
-
-            _itemNumberText.gameObject.SetActive(number > 1);
-            if (_itemNumberContainer != null) _itemNumberContainer.SetActive(number > 1);
+            
+            _itemNumberContainer.SetActive(number > 1);
             _itemNumberText.text = number.ToString();
         }
     }

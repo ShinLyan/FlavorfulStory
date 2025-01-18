@@ -49,7 +49,7 @@ namespace FlavorfulStory.InventorySystem.UI
                 slot.ResetSelection();
             }
         }
-        
+
         /// <summary> Обновляет визуальное представление всех слотов панели инструментов. </summary>
         private void RedrawToolbar()
         {
@@ -64,26 +64,28 @@ namespace FlavorfulStory.InventorySystem.UI
             SelectedItemIndex = index;
             _slots[SelectedItemIndex].Select();
         }
-        
+
         /// <summary> Обрабатывает ввод колесика мыши для смены выбранного предмета. </summary>
         private void HandleMouseScrollInput()
         {
             var scrollInput = (int)Input.mouseScrollDelta.y;
 
             if (scrollInput == 0) return;
-            
+
             var newSelectedItemIndex = Mathf.Clamp(SelectedItemIndex - scrollInput, 0, _slots.Length - 1);
             SelectItem(newSelectedItemIndex);
         }
 
         #region Saving
+
         /// <summary> Сохраняет текущее состояние выбранного индекса. </summary>
         /// <returns> Индекс текущего выбранного предмета. </returns>
         public object CaptureState() => SelectedItemIndex;
 
         /// <summary> Восстанавливает сохраненное состояние выбранного индекса. </summary>
         /// <param name="state"> Сохраненный индекс предмета. </param>
-        public void RestoreState(object state) => SelectedItemIndex = (int) state;
+        public void RestoreState(object state) => SelectedItemIndex = (int)state;
+
         #endregion
     }
 }
