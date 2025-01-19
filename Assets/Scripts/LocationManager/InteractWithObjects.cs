@@ -45,9 +45,9 @@ namespace FlavorfulStory.LocationManager
                 _keyboardTip.SetActive(true);
                 if (_isCursorTarget) _mouseTip.SetActive(true);
                 
-                if (Input.GetMouseButtonDown(0) && _isCursorTarget)
+                if (UnityEngine.Input.GetMouseButtonDown(0) && _isCursorTarget)
                     _currentTarget.Interact();
-                else if (Input.GetKeyDown(_interactKey))
+                else if (UnityEngine.Input.GetKeyDown(_interactKey))
                     _currentTarget.Interact();
             }
         }
@@ -70,7 +70,7 @@ namespace FlavorfulStory.LocationManager
         /// <summary> Получение цели через курсор. </summary>
         private InteractableObject2 GetCursorTarget()
         {
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            Ray ray = Camera.main.ScreenPointToRay(UnityEngine.Input.mousePosition);
             bool isHit = Physics.Raycast(ray, out RaycastHit hitInfo, Mathf.Infinity,
                 LayerMask.GetMask("Interactable"));
             return isHit ? hitInfo.collider.GetComponent<InteractableObject2>() : null;
