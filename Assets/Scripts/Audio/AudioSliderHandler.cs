@@ -19,7 +19,7 @@ namespace FlavorfulStory.Audio
         /// <summary> Получение компонента слайдера. </summary>
         private void Awake()
         {
-            _audioSettings = FindObjectOfType<Settings.AudioSettings>();
+            _audioSettings = FindAnyObjectByType<Settings.AudioSettings>();
             _slider = GetComponent<Slider>();
             _slider.onValueChanged.AddListener(delegate { ValueChanged(); });
         }

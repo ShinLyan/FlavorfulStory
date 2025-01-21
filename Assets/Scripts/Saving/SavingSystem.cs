@@ -92,7 +92,7 @@ namespace FlavorfulStory.Saving
         /// <param name="state"> Словарь, содержащий состояния всех объектов, которые необходимо зафиксировать. </param>
         private static void CaptureState(Dictionary<string, object> state)
         {
-            foreach (SaveableEntity saveable in FindObjectsOfType<SaveableEntity>())
+            foreach (SaveableEntity saveable in FindObjectsByType<SaveableEntity>(FindObjectsSortMode.None))
             {
                 state[saveable.UniqueIdentifier] = saveable.CaptureState();
             }
@@ -105,7 +105,7 @@ namespace FlavorfulStory.Saving
         {
             if (state == null) return;
 
-            foreach (SaveableEntity saveable in FindObjectsOfType<SaveableEntity>())
+            foreach (SaveableEntity saveable in FindObjectsByType<SaveableEntity>(FindObjectsSortMode.None))
             {
                 string id = saveable.UniqueIdentifier;
                 if (state.ContainsKey(id)) saveable.RestoreState(state[id]);
