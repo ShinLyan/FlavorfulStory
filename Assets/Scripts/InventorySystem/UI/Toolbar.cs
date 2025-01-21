@@ -1,4 +1,4 @@
-using FlavorfulStory.Input;
+using FlavorfulStory.InputSystem;
 using FlavorfulStory.Saving;
 using UnityEngine;
 

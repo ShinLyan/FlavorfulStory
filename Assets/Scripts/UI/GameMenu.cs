@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using FlavorfulStory.Input;
+using FlavorfulStory.InputSystem;
 using FlavorfulStory.SceneManagement;
 using TMPro;
 using UnityEngine;
@@ -25,7 +25,7 @@ namespace FlavorfulStory.UI
         /// <summary> Массив вкладок в меню. </summary>
         private Tab[] _tabs;
         
-        ///<summary> Индекс текущей активной вкладки. </summary>
+        /// <summary> Индекс текущей активной вкладки. </summary>
         private int _currentTabindex;
 
         /// <summary> Инициализация компонента.
