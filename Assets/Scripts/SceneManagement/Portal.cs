@@ -55,7 +55,7 @@ namespace FlavorfulStory.SceneManagement
 
         private Portal GetOtherPortal()
         {
-            foreach (var portal in FindObjectsOfType<Portal>())
+            foreach (var portal in FindObjectsByType<Portal>(FindObjectsSortMode.None))
             {
                 if (portal == this || portal._destination != _destination) continue;
                 return portal;
