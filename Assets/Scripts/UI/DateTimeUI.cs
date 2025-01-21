@@ -34,7 +34,7 @@ namespace FlavorfulStory.UI
         {
             _seasonText.text = dateTime.Season.ToString();
             _dayText.text = $"{dateTime.DayOfWeek.ToString()} {dateTime.DayInSeason.ToString()}";
-            _timeText.text = dateTime.TimeToString(false);
+            _timeText.text = dateTime.TimeToString(true);
         }
     }
 }

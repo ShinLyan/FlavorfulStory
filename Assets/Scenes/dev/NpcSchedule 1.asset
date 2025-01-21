@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6ad9c5c3fa3a4e58b6ed5c02280740b1, type: 3}
-  m_Name: NpcSchedule
+  m_Name: NpcSchedule 1
   m_EditorClassIdentifier: 
   Schedules:
   - Season: 
@@ -22,19 +22,12 @@ MonoBehaviour:
     - Hour: 7
       Minutes: 0
       SceneName: 0
-      Position: {x: -25, y: 1, z: 3}
-      Rotation: {x: 0, y: 0, z: 0}
-      AnimationClip: {fileID: 0}
-      DialoguePool: []
-    - Hour: 10
-      Minutes: 0
-      SceneName: 0
       Position: {x: -29, y: 1, z: 3}
       Rotation: {x: 0, y: 0, z: 0}
       AnimationClip: {fileID: 4403344103166383221, guid: 10fa50c59af8fd440a0348904414802a,
         type: 3}
       DialoguePool: []
-    - Hour: 13
+    - Hour: 10
       Minutes: 0
       SceneName: 0
       Position: {x: -29, y: 1, z: -3}
@@ -42,10 +35,18 @@ MonoBehaviour:
       AnimationClip: {fileID: 4403344103166383221, guid: 10fa50c59af8fd440a0348904414802a,
         type: 3}
       DialoguePool: []
-    - Hour: 16
+    - Hour: 13
       Minutes: 0
       SceneName: 0
       Position: {x: -24, y: 1, z: -3}
+      Rotation: {x: 0, y: 0, z: 0}
+      AnimationClip: {fileID: 4403344103166383221, guid: 10fa50c59af8fd440a0348904414802a,
+        type: 3}
+      DialoguePool: []
+    - Hour: 16
+      Minutes: 0
+      SceneName: 0
+      Position: {x: -25, y: 1, z: 3}
       Rotation: {x: 0, y: 0, z: 0}
       AnimationClip: {fileID: 4403344103166383221, guid: 10fa50c59af8fd440a0348904414802a,
         type: 3}

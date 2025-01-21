@@ -22,7 +22,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine
 
         public override void Update(float deltaTime)
         {
-            Debug.Log($"[{GetType().Name}] Update.");
+            
         }
     }
 }

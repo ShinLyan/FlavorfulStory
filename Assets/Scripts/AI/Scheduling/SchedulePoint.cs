@@ -1,6 +1,6 @@
 using System;
+using FlavorfulStory.SceneManagement;
 using UnityEngine;
-using DateTime = FlavorfulStory.TimeManagement.DateTime;
 
 namespace FlavorfulStory.AI.Scheduling
 {
@@ -12,13 +12,12 @@ namespace FlavorfulStory.AI.Scheduling
         [Range(0, 60)] public int Minutes;
 
         [Header("Scene Settings")]
-        public string SceneName;
-        public Transform Position;
-        public float X_Rotation;
-        public float Y_Rotation;
+        public SceneType SceneName;
+        public Vector3 Position;
+        public Vector3 Rotation;
 
         [Header("Other Settings")] 
-        public Animation Animation;
-        public string[] DialoguePool;
+        public string AnimationClipName;
+        public string[] DialoguePool; // TODO: в будущем заменить на спец. класс для диалогов
     }
 }

@@ -1,6 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
 using FlavorfulStory.AI.FiniteStateMachine;
+using FlavorfulStory.AI.Scheduling;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -8,11 +7,10 @@ namespace FlavorfulStory.AI
 {
     public class NPC : MonoBehaviour
     {
-        [SerializeField] private Transform[] _goals;
-
-        [SerializeField] private Dictionary<int, Transform> _shedule;
+        [SerializeField] private NpcSchedule _npcSchedule;
         
         private Animator _animator;
+        private Animation _animation;
         
         private NavMeshAgent _navMeshAgent;
         
@@ -27,6 +25,7 @@ namespace FlavorfulStory.AI
         {
             _navMeshAgent = GetComponent<NavMeshAgent>();
             _animator = GetComponent<Animator>();
+            _animation = GetComponent<Animation>();
         }
 
         private void Start()
@@ -34,8 +33,8 @@ namespace FlavorfulStory.AI
             _fsm = new Fsm();
 
             _interactionState = new InteractionState(_fsm, this);
-            _movementState = new MovementState(_fsm, this, _navMeshAgent, _goals, _animator);
-            _routineState = new RoutineState(_fsm, this);
+            _movementState = new MovementState(_fsm, _navMeshAgent, _npcSchedule, _animator);
+            _routineState = new RoutineState(_fsm, _npcSchedule, _animator);
             _waitingState = new WaitingState(_fsm, this);
             
             _fsm.AddState(_interactionState);
@@ -43,30 +42,29 @@ namespace FlavorfulStory.AI
             _fsm.AddState(_routineState);
             _fsm.AddState(_waitingState);
             
-            _fsm.SetState<MovementState>();
+            _fsm.SetState<RoutineState>();
         }
 
         private void Update()
         {
             _fsm.Update(Time.deltaTime);
         }
-
+        
         private void OnTriggerEnter(Collider other) {
             if (other.CompareTag("Player"))
+            {
+                _navMeshAgent.isStopped = true;
                 _fsm.SetState<WaitingState>();
+            }
         }
 
         private void OnTriggerExit(Collider other)
         {
             if (other.CompareTag("Player"))
-                StartCoroutine(SetStateAfterTime(3));
-        }
-
-        IEnumerator SetStateAfterTime(int sleepTime)
-        {
-            yield return new WaitForSeconds(sleepTime);
-            _fsm.SetState<MovementState>();
+            {
+                _navMeshAgent.isStopped = false;
+                _fsm.SetState<MovementState>();
+            }
         }
     }
-    
 }
