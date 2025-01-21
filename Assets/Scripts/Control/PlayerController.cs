@@ -1,5 +1,5 @@
 ﻿using FlavorfulStory.Actions;
-using FlavorfulStory.Input;
+using FlavorfulStory.InputSystem;
 using FlavorfulStory.InventorySystem;
 using FlavorfulStory.InventorySystem.UI;
 using FlavorfulStory.Movement;
@@ -63,7 +63,7 @@ namespace FlavorfulStory.Control
             const int ToolbarItemsCount = 9;
             for (int i = 0; i < ToolbarItemsCount; i++)
             {
-                if (UnityEngine.Input.GetKeyDown(KeyCode.Alpha1 + i))
+                if (Input.GetKeyDown(KeyCode.Alpha1 + i))
                 {
                     _toolbar.SelectItem(i);
                 }
@@ -75,9 +75,9 @@ namespace FlavorfulStory.Control
         private void UseToolbarItem()
         {
             if (_toolbar && CurrentItem is ActionItem actionItem &&
-                (UnityEngine.Input.GetMouseButtonDown(0) || UnityEngine.Input.GetMouseButtonDown(1)) && CanUseTool)
+                (Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1)) && CanUseTool)
             {
-                var actionType = UnityEngine.Input.GetMouseButtonDown(0) ?
+                var actionType = Input.GetMouseButtonDown(0) ?
                     UseActionType.LeftClick : UseActionType.RightClick;
                 if (actionItem.UseActionType == actionType)
                 {

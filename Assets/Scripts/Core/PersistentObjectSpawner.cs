@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using FlavorfulStory.InputSystem;
+using UnityEngine;
 
 namespace FlavorfulStory.Core
 {
@@ -21,6 +22,8 @@ namespace FlavorfulStory.Core
 
             SpawnPersistentObject();
             _hasSpawned = true;
+            
+            InputWrapper.Initialize();
         }
 
         /// <summary> Создание постоянного объекта. </summary>

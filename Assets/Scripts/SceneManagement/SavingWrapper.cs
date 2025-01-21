@@ -95,9 +95,9 @@ namespace FlavorfulStory.SceneManagement
 
         private void Update()
         {
-            if (UnityEngine.Input.GetKeyDown(_saveKey)) Save();
-            if (UnityEngine.Input.GetKeyDown(_loadKey)) Load();
-            if (UnityEngine.Input.GetKeyDown(_deleteKey)) Delete();
+            if (Input.GetKeyDown(_saveKey)) Save();
+            if (Input.GetKeyDown(_loadKey)) Load();
+            if (Input.GetKeyDown(_deleteKey)) Delete();
         }
 #endif
         #endregion

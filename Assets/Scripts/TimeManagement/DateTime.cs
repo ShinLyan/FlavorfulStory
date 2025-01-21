@@ -74,7 +74,7 @@ namespace FlavorfulStory.TimeManagement
         }
 
         #region ToString
-        /// <summary> Переопределение ToString().</summary>
+        /// <summary> Переопределение ToString(). </summary>
         /// <returns> Строка с текущей датой и временем.</returns>
         public override string ToString()
         {

@@ -1,5 +1,5 @@
 using System;
-using FlavorfulStory.Input;
+using FlavorfulStory.InputSystem;
 using FlavorfulStory.Saving;
 using UnityEngine;
 
@@ -58,8 +58,8 @@ namespace FlavorfulStory.Movement
         private void Move()
         {
             Vector3 moveForce = _moveSpeed * CountSpeedMultiplier() * _moveDirection;
-            moveForce.y = _rigidbody.velocity.y;
-            _rigidbody.velocity = moveForce;
+            moveForce.y = _rigidbody.linearVelocity.y;
+            _rigidbody.linearVelocity = moveForce;
         }
 
         /// <summary> Плавно поворачивает игрока в указанном направлении. </summary>
