@@ -1,4 +1,5 @@
 ﻿using FlavorfulStory.Actions;
+using FlavorfulStory.Input;
 using FlavorfulStory.InventorySystem;
 using FlavorfulStory.InventorySystem.UI;
 using FlavorfulStory.Movement;
@@ -62,7 +63,7 @@ namespace FlavorfulStory.Control
             const int ToolbarItemsCount = 9;
             for (int i = 0; i < ToolbarItemsCount; i++)
             {
-                if (Input.GetKeyDown(KeyCode.Alpha1 + i))
+                if (UnityEngine.Input.GetKeyDown(KeyCode.Alpha1 + i))
                 {
                     _toolbar.SelectItem(i);
                 }
@@ -74,9 +75,9 @@ namespace FlavorfulStory.Control
         private void UseToolbarItem()
         {
             if (_toolbar && CurrentItem is ActionItem actionItem &&
-                (Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1)) && CanUseTool)
+                (UnityEngine.Input.GetMouseButtonDown(0) || UnityEngine.Input.GetMouseButtonDown(1)) && CanUseTool)
             {
-                var actionType = Input.GetMouseButtonDown(0) ?
+                var actionType = UnityEngine.Input.GetMouseButtonDown(0) ?
                     UseActionType.LeftClick : UseActionType.RightClick;
                 if (actionItem.UseActionType == actionType)
                 {
@@ -95,7 +96,7 @@ namespace FlavorfulStory.Control
         /// <summary> Обработка ввода. Передача ввода в PlayerMover. </summary>
         private void InteractWithMovement()
         {
-            float x = Input.GetAxisRaw("Horizontal"), z = Input.GetAxisRaw("Vertical");
+            float x = InputWrapper.GetAxisRaw(InputButton.Horizontal), z = InputWrapper.GetAxisRaw(InputButton.Vertical);
             var direction = new Vector3(x, 0, z).normalized;
             _playerMover.SetMoveDirection(direction);
 
@@ -129,7 +130,7 @@ namespace FlavorfulStory.Control
         /// <returns> Возвращает позицию курсора. </returns>
         public static Vector3 GetCursorPosition()
         {
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            Ray ray = Camera.main.ScreenPointToRay(InputWrapper.GetMousePosition());
             return Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity) ? hit.point : Vector3.zero;
         }
 

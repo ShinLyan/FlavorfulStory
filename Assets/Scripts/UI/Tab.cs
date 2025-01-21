@@ -1,4 +1,5 @@
 using System;
+using FlavorfulStory.Input;
 using UnityEngine;
 
 namespace FlavorfulStory.UI
@@ -9,29 +10,34 @@ namespace FlavorfulStory.UI
         /// <summary> Кнопка вкладки. </summary>
         [SerializeField] private TabButton _tabButton;
 
-        /// <summary> Контент, который отображается при активной вкладке. </summary>
+        ///<summary> Контент, который отображается при активной вкладке. </summary>
         [SerializeField] private GameObject _tabContent;
+        
+        ///<summary> Индекс вкладки в наборе вкладок. </summary>
+        private int _index;
 
-        /// <summary> Тип вкладки. </summary>
-        [SerializeField] private TabType _tabType;
+        ///<summary> Кнопка ввода, связанная с данной вкладкой. </summary>
+        [field: SerializeField] public InputButton InputButton { get; private set; }
 
-        /// <summary> Событие выбора вкладки. </summary>
-        public event Action<TabType> OnTabSelected;
-
-        /// <summary> При инициализации подписываемся на событие клика по кнопке вкладки. </summary>
+        ///<summary> Событие, вызываемое при выборе вкладки. </summary>
+        ///<remarks> Передает индекс выбранной вкладки. </remarks>
+        public event Action<int> OnTabSelected;
+        
+        ///<summary> Инициализирует обработчик события клика по кнопке вкладки. </summary>
         private void Awake()
         {
             _tabButton.OnClick += SwitchTo;
         }
 
-        /// <summary> Переключает на эту вкладку, вызывая событие выбора и активируя контент. </summary>
+        ///<summary> Переключает интерфейс на данную вкладку. </summary>
+        ///<remarks> Вызывает событие выбора вкладки и активирует её контент. </remarks>
         private void SwitchTo()
         {
-            OnTabSelected?.Invoke(_tabType);
+            OnTabSelected?.Invoke(_index);
             Select();
         }
 
-        /// <summary> Активирует вкладку и ее контент. </summary>
+        ///<summary> Активирует вкладку и отображает её контент. </summary>
         public void Select()
         {
             _tabButton.IsActive = true;
@@ -39,12 +45,16 @@ namespace FlavorfulStory.UI
             _tabContent.SetActive(true);
         }
 
-        /// <summary> Сбрасывает выбор вкладки, скрывает контент. </summary>
+        ///<summary> Деактивирует вкладку и скрывает её контент. </summary>
         public void ResetSelection()
         {
             _tabButton.IsActive = false;
             _tabButton.SetNameState(false);
             _tabContent.SetActive(false);
         }
+
+        ///<summary> Устанавливает индекс вкладки. </summary>
+        ///<param name="index"> Числовой индекс вкладки. </param>
+        public void SetIndex(int index) => _index = index;
     }
 }

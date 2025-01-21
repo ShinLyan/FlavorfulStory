@@ -1,3 +1,4 @@
+using FlavorfulStory.Input;
 using FlavorfulStory.Saving;
 using UnityEngine;
 
@@ -68,7 +69,7 @@ namespace FlavorfulStory.InventorySystem.UI
         /// <summary> Обрабатывает ввод колесика мыши для смены выбранного предмета. </summary>
         private void HandleMouseScrollInput()
         {
-            var scrollInput = (int)Input.mouseScrollDelta.y;
+            var scrollInput = InputWrapper.GetMouseScrollDelta();
 
             if (scrollInput == 0) return;
 

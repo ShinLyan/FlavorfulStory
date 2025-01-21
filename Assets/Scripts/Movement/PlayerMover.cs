@@ -1,3 +1,5 @@
+using System;
+using FlavorfulStory.Input;
 using FlavorfulStory.Saving;
 using UnityEngine;
 
@@ -15,11 +17,7 @@ namespace FlavorfulStory.Movement
 
         /// <summary> Скорость поворота игрока. </summary>
         [SerializeField, Tooltip("Скорость поворота игрока.")] private float _rotateSpeed;
-
-        /// <summary> Клавиша для переключения между бегом и ходьбой. </summary>
-        [SerializeField, Tooltip("Клавиша для переключения между бегом и ходьбой.")]
-        private KeyCode _keyForWalking = KeyCode.LeftShift;
-
+        
         /// <summary> Компонент Rigidbody, отвечающий за физику движения игрока. </summary>
         private Rigidbody _rigidbody;
 
@@ -82,7 +80,7 @@ namespace FlavorfulStory.Movement
         {
             const float WalkingMultiplier = 0.5f;
             const float RunningMultiplier = 1f;
-            return Input.GetKey(_keyForWalking) ? WalkingMultiplier : RunningMultiplier;
+            return InputWrapper.GetButton(InputButton.Walking) ? WalkingMultiplier : RunningMultiplier; 
         }
 
         /// <summary> Обновляет анимацию движения игрока в зависимости от скорости. </summary>
