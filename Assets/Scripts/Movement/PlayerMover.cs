@@ -60,8 +60,8 @@ namespace FlavorfulStory.Movement
         private void Move()
         {
             Vector3 moveForce = _moveSpeed * CountSpeedMultiplier() * _moveDirection;
-            moveForce.y = _rigidbody.linearVelocity.y;
-            _rigidbody.linearVelocity = moveForce;
+            moveForce.y = _rigidbody.velocity.y;
+            _rigidbody.velocity = moveForce;
         }
 
         /// <summary> Плавно поворачивает игрока в указанном направлении. </summary>
