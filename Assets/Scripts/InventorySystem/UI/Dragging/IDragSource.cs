@@ -1,21 +1,22 @@
 ﻿namespace FlavorfulStory.InventorySystem.UI.Dragging
 {
-    /// <summary> Классы, реализующие этот интерфейс, могут выступать 
+    /// <summary> Интерфейс для классов, которые могут выступать
     /// в качестве источника для перетаскивания "DragItem". </summary>
-    /// <typeparam name="T"> Тип, представляющий перетаскиваемый элемент. </typeparam>
+    /// <typeparam name="T"> Тип объекта, который может быть перетаскиваемым. </typeparam>
     public interface IDragSource<T> where T : class
     {
-        /// <summary> Получить предмет, который в данный момент находится в этом источнике. </summary>
-        /// <returns> Возвращает предмет, который в данный момент находится в этом источнике. </returns>
+        /// <summary> Получить элемент, который находится в этом источнике. </summary>
+        /// <returns> Элемент, находящийся в данном источнике. </returns>
         public T GetItem();
-
-        /// <summary> Получить количество предметов. </summary>
-        /// <returns> Возвращает количество предметов. </returns>
+        
+        /// <summary> Получить количество элементов в источнике. </summary>
+        /// <returns> Количество элементов в источнике. </returns>
         public int GetNumber();
 
-        /// <summary> Удалить заданное количество предметов из источника. </summary>
-        /// <param name="number"> Количество предметов, которое необходимо удалить. </param>
-        /// <remarks> Значение number не должно превышать число, возвращаемое с помощью "GetNumber". </remarks>
+        /// <summary> Удалить указанное количество элементов из источника. </summary>
+        /// <param name="number"> Количество удаляемых элементов. </param>
+        /// <remarks> Параметр <paramref name="number"/> не должен превышать количество,
+        /// возвращаемое методом <c>GetNumber</c>. </remarks>
         public void RemoveItems(int number);
     }
 }

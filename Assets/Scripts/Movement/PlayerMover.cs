@@ -9,12 +9,15 @@ namespace FlavorfulStory.Movement
     public class PlayerMover : MonoBehaviour, ISaveable
     {
         #region Private Fields
+
         [Header("Параметры движения")]
         /// <summary> Скорость передвижения игрока. </summary>
-        [SerializeField, Tooltip("Скорость передвижения игрока.")] private float _moveSpeed;
+        [SerializeField, Tooltip("Скорость передвижения игрока.")]
+        private float _moveSpeed;
 
         /// <summary> Скорость поворота игрока. </summary>
-        [SerializeField, Tooltip("Скорость поворота игрока.")] private float _rotateSpeed;
+        [SerializeField, Tooltip("Скорость поворота игрока.")]
+        private float _rotateSpeed;
 
         /// <summary> Клавиша для переключения между бегом и ходьбой. </summary>
         [SerializeField, Tooltip("Клавиша для переключения между бегом и ходьбой.")]
@@ -34,6 +37,7 @@ namespace FlavorfulStory.Movement
 
         /// <summary> Хэшированное значение параметра "скорость" для анимации. </summary>
         private static readonly int _speedParameterHash = Animator.StringToHash("Speed");
+
         #endregion
 
         /// <summary> Инициализация компонентов (Rigidbody и Animator). </summary>
@@ -60,8 +64,8 @@ namespace FlavorfulStory.Movement
         private void Move()
         {
             Vector3 moveForce = _moveSpeed * CountSpeedMultiplier() * _moveDirection;
-            moveForce.y = _rigidbody.velocity.y;
-            _rigidbody.velocity = moveForce;
+            moveForce.y = _rigidbody.linearVelocity.y;
+            _rigidbody.linearVelocity = moveForce;
         }
 
         /// <summary> Плавно поворачивает игрока в указанном направлении. </summary>
@@ -70,7 +74,7 @@ namespace FlavorfulStory.Movement
             if (_lookDirection == Vector3.zero) return;
 
             _rigidbody.MoveRotation(
-                Quaternion.Slerp(transform.rotation, 
+                Quaternion.Slerp(transform.rotation,
                     Quaternion.LookRotation(_lookDirection),
                     Time.fixedDeltaTime * _rotateSpeed)
             );
@@ -103,6 +107,7 @@ namespace FlavorfulStory.Movement
         public void SetLookRotation(Vector3 direction) => _lookDirection = direction;
 
         #region Saving
+
         /// <summary> Структура для сохранения позиции и поворота игрока. </summary>
         [System.Serializable]
         private struct MoverSaveData
@@ -130,6 +135,7 @@ namespace FlavorfulStory.Movement
             transform.position = data.Position.ToVector();
             transform.eulerAngles = data.Rotation.ToVector();
         }
+
         #endregion
     }
 }

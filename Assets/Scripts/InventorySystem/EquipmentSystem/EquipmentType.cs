@@ -1,27 +1,24 @@
 namespace FlavorfulStory.InventorySystem.EquipmentSystem
 {
-    /// <summary> Тип снаряжения. </summary>
+    /// <summary> РўРёРїС‹ СЌРєРёРїРёСЂРѕРІРєРё, РєРѕС‚РѕСЂС‹Рµ РёРіСЂРѕРє РјРѕР¶РµС‚ РЅРѕСЃРёС‚СЊ. </summary>
     public enum EquipmentType
     {
-        /// <summary> Шлем. </summary>
+        /// <summary> РЁР»РµРј. </summary>
         Helmet,
 
-        /// <summary> Ожерелье. </summary>
+        /// <summary> РћР¶РµСЂРµР»СЊРµ. </summary>
         Necklace,
 
-        /// <summary> Грудь. </summary>
+        /// <summary> Р‘СЂРѕРЅСЏ. </summary>
         Chest,
 
-        /// <summary> Перчатки. </summary>
+        /// <summary> РџРµСЂС‡Р°С‚РєРё. </summary>
         Gloves,
 
-        /// <summary> Брюки. </summary>
+        /// <summary> РЁС‚Р°РЅС‹. </summary>
         Trousers,
 
-        /// <summary> Ботинки. </summary>
+        /// <summary> Р‘РѕС‚РёРЅРєРё. </summary>
         Boots,
-
-        /// <summary> Щит. </summary>
-        Shield,
     }
 }

@@ -4,36 +4,39 @@ using UnityEngine;
 
 namespace FlavorfulStory.Audio
 {
-    /// <summary> Проигрыватель треков. </summary>
+    /// <summary> Проигрыватель треков, обеспечивающий воспроизведение музыки из списка. </summary>
     [RequireComponent(typeof(AudioSource))]
     public class TrackPlayer : MonoBehaviour
     {
-        /// <summary> Список аудиоклипов для песен. </summary>
+        /// <summary> Список треков для воспроизведения. </summary>
         [SerializeField] private List<AudioClip> _tracks;
 
-        /// <summary> Аудиоисточник. </summary>
+        /// <summary> Источник звука для воспроизведения треков. </summary>
         private AudioSource _source;
 
-        /// <summary> Инициализация полей. </summary>
+        /// <summary> Инициализация аудиоисточника. </summary>
         private void Awake()
         {
             _source = GetComponent<AudioSource>();
         }
 
-        /// <summary> Метод для старта воспроизведения музыки. </summary>
+        /// <summary> Запуск воспроизведения треков. </summary>
         private void Start()
         {
             StartCoroutine(PlayTracks(_tracks));
         }
 
-        /// <summary> Метод для воспроизведения трека. </summary>
+        /// <summary> Воспроизведение указанного трека. </summary>
+        /// <param name="audioClip"> Трек, который нужно воспроизвести. </param>
         private void PlayTrack(AudioClip audioClip)
         {
             _source.clip = audioClip;
             _source.Play();
         }
 
-        /// <summary> Метод для воспроизведения всех треков. </summary>
+        /// <summary> Воспроизведение треков из списка в случайном порядке. </summary>
+        /// <param name="tracks"> Список треков для воспроизведения. </param>
+        /// <returns> Объект корутины. </returns>
         private IEnumerator PlayTracks(List<AudioClip> tracks)
         {
             while (true)

@@ -1,15 +1,15 @@
 namespace FlavorfulStory.Audio
 {
-    /// <summary> Тип громкости. </summary>
+    /// <summary> РўРёРї РіСЂРѕРјРєРѕСЃС‚Рё РґР»СЏ СѓРїСЂР°РІР»РµРЅРёСЏ СѓСЂРѕРІРЅСЏРјРё Р·РІСѓРєР°. </summary>
     public enum VolumeType
     {
-        /// <summary> Общая громкость. </summary>
+        /// <summary> РћР±С‰Р°СЏ РіСЂРѕРјРєРѕСЃС‚СЊ. </summary>
         Master,
 
-        /// <summary> Громкость звуков. </summary>
+        /// <summary> Р“СЂРѕРјРєРѕСЃС‚СЊ Р·РІСѓРєРѕРІС‹С… СЌС„С„РµРєС‚РѕРІ. </summary>
         SFX,
 
-        /// <summary> Громкость музыки. </summary>
+        /// <summary> Р“СЂРѕРјРєРѕСЃС‚СЊ РјСѓР·С‹РєРё. </summary>
         Music,
     }
 }

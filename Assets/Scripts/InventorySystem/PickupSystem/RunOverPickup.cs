@@ -2,18 +2,18 @@ using UnityEngine;
 
 namespace FlavorfulStory.InventorySystem.PickupSystem
 {
+    /// <summary> РђРІС‚РѕРјР°С‚РёС‡РµСЃРєРёР№ РїРѕРґР±РѕСЂ РїСЂРµРґРјРµС‚РѕРІ РїСЂРё РїРµСЂРµСЃРµС‡РµРЅРёРё С‚СЂРёРіРіРµСЂР°. </summary>
     [RequireComponent(typeof(Pickup))]
     public class RunOverPickup : MonoBehaviour
     {
-        /// <summary> Метод, вызывающийся при пересечении с коллайдером другого объекта. </summary>
-        /// <param name="other"> Коллайдер входящего объекта. </param>
+        /// <summary> РћР±СЂР°Р±Р°С‚С‹РІР°РµС‚ СЃРѕР±С‹С‚РёРµ РїРµСЂРµСЃРµС‡РµРЅРёСЏ С‚СЂРёРіРіРµСЂР°. </summary>
+        /// <param name="other"> РљРѕР»Р»Р°Р№РґРµСЂ РѕР±СЉРµРєС‚Р°, РїРµСЂРµСЃРµРєС€РµРіРѕ С‚СЂРёРіРіРµСЂ. </param>
         private void OnTriggerEnter(Collider other)
         {
-            if (other.CompareTag("Player"))
-            {
-                var pickup = GetComponent<Pickup>();
-                if (pickup.CanBePickedUp) pickup.PickupItem();
-            }
+            if (!other.CompareTag("Player")) return;
+            
+            var pickup = GetComponent<Pickup>();
+            if (pickup.CanBePickedUp) pickup.PickupItem();
         }
     }
 }

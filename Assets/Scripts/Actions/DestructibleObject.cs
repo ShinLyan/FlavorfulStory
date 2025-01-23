@@ -5,57 +5,55 @@ using UnityEngine;
 
 namespace FlavorfulStory.Actions
 {
-    /// <summary> Разрушаемый объект. </summary>
+    /// <summary> Р Р°Р·СЂСѓС€Р°РµРјС‹Р№ РѕР±СЉРµРєС‚, РІР·Р°РёРјРѕРґРµР№СЃС‚РІСѓСЋС‰РёР№ СЃ РёРіСЂРѕРєРѕРј. </summary>
     [RequireComponent(typeof(ItemDropper))]
     public abstract class DestructibleObject : InteractableObject
     {
-        /// <summary> Количество ударов для разрушения объекта. </summary>
-        [Tooltip("Количество ударов для разрушения объекта."), Range(1, 5)]
+        /// <summary> РљРѕР»РёС‡РµСЃС‚РІРѕ СѓРґР°СЂРѕРІ, РЅРµРѕР±С…РѕРґРёРјРѕРµ РґР»СЏ СЂР°Р·СЂСѓС€РµРЅРёСЏ РѕР±СЉРµРєС‚Р°. </summary>
+        [Tooltip("РљРѕР»РёС‡РµСЃС‚РІРѕ СѓРґР°СЂРѕРІ, РЅРµРѕР±С…РѕРґРёРјРѕРµ РґР»СЏ СЂР°Р·СЂСѓС€РµРЅРёСЏ РѕР±СЉРµРєС‚Р°."), Range(1, 5)]
         [SerializeField] private int _hitsToDestroy;
 
-        /// <summary> Тип инструмента, необходимого для разрушения. </summary>
-        [Tooltip("Тип инструмента, необходимого для разрушения.")]
+        /// <summary> РўРёРї РёРЅСЃС‚СЂСѓРјРµРЅС‚Р°, С‚СЂРµР±СѓРµРјРѕРіРѕ РґР»СЏ СЂР°Р·СЂСѓС€РµРЅРёСЏ РѕР±СЉРµРєС‚Р°. </summary>
+        [Tooltip("РўРёРї РёРЅСЃС‚СЂСѓРјРµРЅС‚Р°, С‚СЂРµР±СѓРµРјРѕРіРѕ РґР»СЏ СЂР°Р·СЂСѓС€РµРЅРёСЏ РѕР±СЉРµРєС‚Р°.")]
         [SerializeField] private ToolType _requiredTool;
 
-        /// <summary> Список предметов, которые выпадут при разрушении. </summary>
-        [Tooltip("Список предметов, которые выпадут при разрушении.")]
+        /// <summary> РЎРїРёСЃРѕРє РїСЂРµРґРјРµС‚РѕРІ, РІС‹РїР°РґР°СЋС‰РёС… РїСЂРё СЂР°Р·СЂСѓС€РµРЅРёРё РѕР±СЉРµРєС‚Р°. </summary>
+        [Tooltip("РЎРїРёСЃРѕРє РїСЂРµРґРјРµС‚РѕРІ, РІС‹РїР°РґР°СЋС‰РёС… РїСЂРё СЂР°Р·СЂСѓС€РµРЅРёРё РѕР±СЉРµРєС‚Р°.")]
         [SerializeField] private DropItem[] _dropItems;
 
-        /// <summary> Текущее количество ударов по объекту. </summary>
+        /// <summary> РўРµРєСѓС‰РµРµ РєРѕР»РёС‡РµСЃС‚РІРѕ СѓРґР°СЂРѕРІ, РЅР°РЅРµСЃРµРЅРЅС‹С… РѕР±СЉРµРєС‚Сѓ. </summary>
         private int _currentHits;
 
+        /// <summary> Р—Р°РґРµСЂР¶РєР° РїРµСЂРµРґ СѓРґР°Р»РµРЅРёРµРј РѕР±СЉРµРєС‚Р° РїРѕСЃР»Рµ СЂР°Р·СЂСѓС€РµРЅРёСЏ. </summary>
         private const float DestroyDelay = 4f;
 
-        /// <summary> Событие, вызываемое при разрушении объекта. </summary>
+        /// <summary> РЎРѕР±С‹С‚РёРµ, СѓРІРµРґРѕРјР»СЏСЋС‰РµРµ Рѕ СЂР°Р·СЂСѓС€РµРЅРёРё РѕР±СЉРµРєС‚Р°. </summary>
         public event Action<DestructibleObject> OnObjectDestroyed;
 
-        /// <summary> Взаимодействовать. </summary>
-        /// <param name="player"> Контроллер игрока. </param>
+        /// <summary> Р’Р·Р°РёРјРѕРґРµР№СЃС‚РІРёРµ СЃ РѕР±СЉРµРєС‚РѕРј. </summary>
+        /// <param name="player"> РљРѕРЅС‚СЂРѕР»Р»РµСЂ РёРіСЂРѕРєР°. </param>
         public override void Interact(PlayerController player)
         {
             if (player.CurrentItem is not Tool tool || tool.ToolType != _requiredTool) return;
 
             _currentHits++;
-            Debug.Log($"Object hit! Remaining hits: {_hitsToDestroy - _currentHits}");
 
             if (_currentHits >= _hitsToDestroy) DestroyObject();
         }
 
-        /// <summary> Уничтожить объект и сгенерировать выпадающие предметы. </summary>
+        /// <summary> Р Р°Р·СЂСѓС€РµРЅРёРµ РѕР±СЉРµРєС‚Р° СЃ РІС‹Р·РѕРІРѕРј СЃРІСЏР·Р°РЅРЅС‹С… РґРµР№СЃС‚РІРёР№. </summary>
         private void DestroyObject()
         {
-            Debug.Log($"Object destroyed: {gameObject.name}");
-
             OnObjectDestroyed?.Invoke(this);
             OnDestroyed();
             DropItems();
             Destroy(gameObject, DestroyDelay);
         }
 
-        /// <summary> Действие, вызываемое при разрушении (например, прокачка навыков). </summary>
+        /// <summary> Р”РµР№СЃС‚РІРёСЏ, РІС‹РїРѕР»РЅСЏРµРјС‹Рµ РїСЂРё СЂР°Р·СЂСѓС€РµРЅРёРё РѕР±СЉРµРєС‚Р°. </summary>
         protected abstract void OnDestroyed();
 
-        /// <summary> Выбросить предметы, настроенные в конкретных подклассах. </summary>
+        /// <summary> Р’С‹РїР°РґРµРЅРёРµ РїСЂРµРґРјРµС‚РѕРІ, СЃРІСЏР·Р°РЅРЅС‹С… СЃ РѕР±СЉРµРєС‚РѕРј. </summary>
         protected virtual void DropItems()
         {
             var itemDropper = GetComponent<ItemDropper>();
