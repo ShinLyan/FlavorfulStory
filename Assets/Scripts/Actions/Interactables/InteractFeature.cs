@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using FlavorfulStory.Control;
 using FlavorfulStory.InputSystem;
 using FlavorfulStory.TooltipSystem;
 using JetBrains.Annotations;
@@ -13,22 +14,25 @@ namespace FlavorfulStory.Actions.Interactables
     {
         /// <summary> UI-объект для отображения тултипа взаимодействия. </summary>
         [SerializeField] private InteractableObjectToolTip _interactableObjectTooltip;
-
+        
+        /// <summary> Аниматор для управления анимациями в процессе взаимодействия. </summary>
+        [SerializeField] private Animator _animator;
+        
+        /// <summary> Ближайший объект, с которым можно взаимодействовать. </summary>
+        [CanBeNull] private IInteractable _nearestAllowedInteractable;
+        
         /// <summary> Список объектов, доступных для взаимодействия. </summary>
         private readonly List<IInteractable> _reachableInteractables = new();
 
-        /// <summary> Ближайший объект, с которым можно взаимодействовать. </summary>
-        [CanBeNull] private IInteractable _nearestAllowedInteractable;
-
+        /// <summary> PlayerController родительского объекта. </summary>
+        private PlayerController _playerController;
+        
         /// <summary> Флаг, указывающий, происходит ли в данный момент взаимодействие. </summary>
         private bool _isInteracting = false;
         
-        /// <summary> Аниматор для управления анимациями в процессе взаимодействия. </summary>
-        private Animator _animator;
-        
         /// <summary> Хэш для анимации сбора. </summary>
-        private static readonly int gather = Animator.StringToHash("Gather");
-
+        private readonly int _gather = Animator.StringToHash("Gather");
+        
         /// <summary> Событие, вызываемое при начале взаимодействия. Используется для звуковых эффектов и других действий. </summary>
         public event Action OnInteractionStarted; // На будущее - для звуков и тд
         
@@ -36,10 +40,29 @@ namespace FlavorfulStory.Actions.Interactables
         public event Action OnInteractionEnded; // На будущее - для звуков и тд
         
         /// <summary> Инициализация компонента. </summary>
-        /// <remarks> Захват ссылки на аниматор. </remarks>
+        /// <remarks> Подписка на событие OnInteractionEnded (PlayerController.cs). </remarks>
         private void Awake()
         {
-            _animator = GetComponent<Animator>();
+            _playerController = GetComponentInParent<PlayerController>();
+            _playerController.OnInteractionEnded += EndInteraction;
+        }
+        
+        /// <summary> Отписка от события OnInteractionEnded (PlayerController.cs). </summary>
+        private void OnDestroy()
+        {
+            _playerController.OnInteractionEnded -= EndInteraction;
+        }
+        
+        /// <summary> Проверяет нажатие кнопки взаимодействия и вызывает метод Interact() для ближайшего объекта. </summary>
+        private void Update()
+        {
+            if (InputWrapper.GetButtonDown(InputButton.Interact) 
+                && _nearestAllowedInteractable != null
+                && !_isInteracting)
+            {
+                BeginInteraction();
+                _nearestAllowedInteractable?.Interact();
+            }
         }
 
         /// <summary> Добавляет объект в список доступных для взаимодействия при входе в триггер. </summary>
@@ -76,18 +99,6 @@ namespace FlavorfulStory.Actions.Interactables
             }
         }
 
-        /// <summary> Проверяет нажатие кнопки взаимодействия и вызывает метод Interact() для ближайшего объекта. </summary>
-        private void Update()
-        {
-            if (InputWrapper.GetButtonDown(InputButton.Interact) 
-                && _nearestAllowedInteractable != null
-                && !_isInteracting)
-            {
-                BeginInteraction();
-                _nearestAllowedInteractable?.Interact();
-            }
-        }
-
         /// <summary> Определяет ближайший объект для взаимодействия из доступных. </summary>
         /// <returns> Ближайший объект, с которым можно взаимодействовать, или null. </returns>
         [CanBeNull]
@@ -104,7 +115,7 @@ namespace FlavorfulStory.Actions.Interactables
         {
             OnInteractionStarted?.Invoke();
             _isInteracting = true;
-            _animator.SetTrigger(gather);
+            _animator.SetTrigger(_gather);
             InputWrapper.BlockInput(new[] { InputButton.Horizontal, InputButton.Vertical });
         }
 
@@ -114,7 +125,7 @@ namespace FlavorfulStory.Actions.Interactables
         {
             OnInteractionEnded?.Invoke();
             _isInteracting = false;
-            _animator.ResetTrigger(gather);
+            _animator.ResetTrigger(_gather);
             InputWrapper.UnblockInput(new[] { InputButton.Horizontal, InputButton.Vertical });
         }
     }

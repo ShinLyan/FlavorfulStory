@@ -4,6 +4,7 @@ using UnityEngine;
 
 namespace FlavorfulStory.LocationManager
 {
+    //TODO: DElete?
     /// <summary> Взаимодействие с объектами. </summary>
     public class InteractWithObjects : MonoBehaviour
     {

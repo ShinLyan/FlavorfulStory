@@ -1,4 +1,5 @@
-﻿using FlavorfulStory.Actions;
+﻿using System;
+using FlavorfulStory.Actions;
 using FlavorfulStory.InputSystem;
 using FlavorfulStory.InventorySystem;
 using FlavorfulStory.InventorySystem.UI;
@@ -34,6 +35,10 @@ namespace FlavorfulStory.Control
         /// <summary> Можно ли использовать инструмент? </summary>
         public bool CanUseTool => _toolCooldownTimer <= 0f;
 
+        /// <summary> Событие, вызываемое при окончании взаимодейтсвия. </summary>
+        /// <remarks> Событие срабатывает внутри метода EndInteraction(). </remarks>
+        public event Action OnInteractionEnded;
+        
         /// <summary> Инициализация необходимых компонентов. </summary>
         private void Awake()
         {
@@ -111,6 +116,10 @@ namespace FlavorfulStory.Control
         {
             if (_toolCooldownTimer > 0f) _toolCooldownTimer -= Time.deltaTime;
         }
+
+        /// <summary> Закончить взаимодействие. </summary>
+        /// <remarks> Метод подписан на событие в анимации игрока (Gather_interaction). </remarks>
+        private void EndInteraction() => OnInteractionEnded?.Invoke();
 
         /// <summary> Переключение контроллера игрока. </summary>
         /// <remarks> Используется чтобы игрок не двигался до загрузки другой сцены. </remarks> 
