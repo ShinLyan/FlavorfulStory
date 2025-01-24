@@ -65,12 +65,12 @@ namespace FlavorfulStory.UI
                 if (_content.activeSelf)
                 {
                     InputWrapper.UnblockInput(movementButtons);
-                    InputWrapper.UnblockInput(new[] { InputButton.MouseScroll });
+                    InputWrapper.UnblockInput(InputButton.MouseScroll);
                 }
                 else
                 {
                     InputWrapper.BlockInput(movementButtons);
-                    InputWrapper.BlockInput(new[] { InputButton.MouseScroll });
+                    InputWrapper.BlockInput(InputButton.MouseScroll);
                 }
                 
                 SwitchContent(!_content.activeSelf);

@@ -26,6 +26,10 @@ namespace FlavorfulStory.InputSystem
             _isInitialized = true;
         }
 
+        /// <summary> Блокирует указанную кнопку ввода. </summary>
+        /// <param name="inputToBlock"> Кнопка для блокировки. </param>
+        public static void BlockInput(InputButton inputToBlock) => _allowedButtons[inputToBlock] = false;
+        
         /// <summary> Блокирует указанные кнопки ввода. </summary>
         ///<param name="inputToBlock"> Коллекция кнопок для блокировки. </param>
         public static void BlockInput(IEnumerable<InputButton> inputToBlock)
@@ -45,11 +49,15 @@ namespace FlavorfulStory.InputSystem
             }
         }
 
+        /// <summary> Разблокирует указанную кнопку ввода. </summary>
+        /// <param name="inputToUnlock"> Кнопка для разблокировки. </param>
+        public static void UnblockInput(InputButton inputToUnlock) => _allowedButtons[inputToUnlock] = true;
+        
         /// <summary> Разблокирует указанные кнопки ввода. </summary>
-        ///<param name="inputToBlock"> Коллекция кнопок для разблокировки. </param>
-        public static void UnblockInput(IEnumerable<InputButton> inputToBlock)
+        ///<param name="inputToUnlock"> Коллекция кнопок для разблокировки. </param>
+        public static void UnblockInput(IEnumerable<InputButton> inputToUnlock)
         {
-            foreach (var inputButton in inputToBlock)
+            foreach (var inputButton in inputToUnlock)
             {
                 _allowedButtons[inputButton] = true;
             }

@@ -5,32 +5,32 @@ using UnityEngine;
 
 namespace FlavorfulStory.Actions
 {
-    /// <summary> Разрушаемый объект. </summary>
+    /// <summary> Р Р°Р·СЂСѓС€Р°РµРјС‹Р№ РѕР±СЉРµРєС‚. </summary>
     [RequireComponent(typeof(ItemDropper))]
     public abstract class DestructibleObject : InteractableObject
     {
-        /// <summary> Количество ударов для разрушения объекта. </summary>
-        [Tooltip("Количество ударов для разрушения объекта."), Range(1, 5)]
+        /// <summary> РљРѕР»РёС‡РµСЃС‚РІРѕ СѓРґР°СЂРѕРІ РґР»СЏ СЂР°Р·СЂСѓС€РµРЅРёСЏ РѕР±СЉРµРєС‚Р°. </summary>
+        [Tooltip("РљРѕР»РёС‡РµСЃС‚РІРѕ СѓРґР°СЂРѕРІ РґР»СЏ СЂР°Р·СЂСѓС€РµРЅРёСЏ РѕР±СЉРµРєС‚Р°."), Range(1, 5)]
         [SerializeField] private int _hitsToDestroy;
 
-        /// <summary> Тип инструмента, необходимого для разрушения. </summary>
-        [Tooltip("Тип инструмента, необходимого для разрушения.")]
+        /// <summary> РўРёРї РёРЅСЃС‚СЂСѓРјРµРЅС‚Р°, РЅРµРѕР±С…РѕРґРёРјРѕРіРѕ РґР»СЏ СЂР°Р·СЂСѓС€РµРЅРёСЏ. </summary>
+        [Tooltip("РўРёРї РёРЅСЃС‚СЂСѓРјРµРЅС‚Р°, РЅРµРѕР±С…РѕРґРёРјРѕРіРѕ РґР»СЏ СЂР°Р·СЂСѓС€РµРЅРёСЏ.")]
         [SerializeField] private ToolType _requiredTool;
 
-        /// <summary> Список предметов, которые выпадут при разрушении. </summary>
-        [Tooltip("Список предметов, которые выпадут при разрушении.")]
+        /// <summary> РЎРїРёСЃРѕРє РїСЂРµРґРјРµС‚РѕРІ, РєРѕС‚РѕСЂС‹Рµ РІС‹РїР°РґСѓС‚ РїСЂРё СЂР°Р·СЂСѓС€РµРЅРёРё. </summary>
+        [Tooltip("РЎРїРёСЃРѕРє РїСЂРµРґРјРµС‚РѕРІ, РєРѕС‚РѕСЂС‹Рµ РІС‹РїР°РґСѓС‚ РїСЂРё СЂР°Р·СЂСѓС€РµРЅРёРё.")]
         [SerializeField] private DropItem[] _dropItems;
 
-        /// <summary> Текущее количество ударов по объекту. </summary>
+        /// <summary> РўРµРєСѓС‰РµРµ РєРѕР»РёС‡РµСЃС‚РІРѕ СѓРґР°СЂРѕРІ РїРѕ РѕР±СЉРµРєС‚Сѓ. </summary>
         private int _currentHits;
 
         private const float DestroyDelay = 4f;
 
-        /// <summary> Событие, вызываемое при разрушении объекта. </summary>
+        /// <summary> РЎРѕР±С‹С‚РёРµ, РІС‹Р·С‹РІР°РµРјРѕРµ РїСЂРё СЂР°Р·СЂСѓС€РµРЅРёРё РѕР±СЉРµРєС‚Р°. </summary>
         public event Action<DestructibleObject> OnObjectDestroyed;
 
-        /// <summary> Взаимодействовать. </summary>
-        /// <param name="player"> Контроллер игрока. </param>
+        /// <summary> Р’Р·Р°РёРјРѕРґРµР№СЃС‚РІРѕРІР°С‚СЊ. </summary>
+        /// <param name="player"> РљРѕРЅС‚СЂРѕР»Р»РµСЂ РёРіСЂРѕРєР°. </param>
         public override void Interact(PlayerController player)
         {
             if (player.CurrentItem is not Tool tool || tool.ToolType != _requiredTool) return;
@@ -41,7 +41,7 @@ namespace FlavorfulStory.Actions
             if (_currentHits >= _hitsToDestroy) DestroyObject();
         }
 
-        /// <summary> Уничтожить объект и сгенерировать выпадающие предметы. </summary>
+        /// <summary> РЈРЅРёС‡С‚РѕР¶РёС‚СЊ РѕР±СЉРµРєС‚ Рё СЃРіРµРЅРµСЂРёСЂРѕРІР°С‚СЊ РІС‹РїР°РґР°СЋС‰РёРµ РїСЂРµРґРјРµС‚С‹. </summary>
         private void DestroyObject()
         {
             Debug.Log($"Object destroyed: {gameObject.name}");
@@ -52,10 +52,10 @@ namespace FlavorfulStory.Actions
             Destroy(gameObject, DestroyDelay);
         }
 
-        /// <summary> Действие, вызываемое при разрушении (например, прокачка навыков). </summary>
+        /// <summary> Р”РµР№СЃС‚РІРёРµ, РІС‹Р·С‹РІР°РµРјРѕРµ РїСЂРё СЂР°Р·СЂСѓС€РµРЅРёРё (РЅР°РїСЂРёРјРµСЂ, РїСЂРѕРєР°С‡РєР° РЅР°РІС‹РєРѕРІ). </summary>
         protected abstract void OnDestroyed();
 
-        /// <summary> Выбросить предметы, настроенные в конкретных подклассах. </summary>
+        /// <summary> Р’С‹Р±СЂРѕСЃРёС‚СЊ РїСЂРµРґРјРµС‚С‹, РЅР°СЃС‚СЂРѕРµРЅРЅС‹Рµ РІ РєРѕРЅРєСЂРµС‚РЅС‹С… РїРѕРґРєР»Р°СЃСЃР°С…. </summary>
         protected virtual void DropItems()
         {
             var itemDropper = GetComponent<ItemDropper>();
