@@ -1475,6 +1475,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2126461002}
   - component: {fileID: 2126461003}
+  - component: {fileID: 2126461004}
   m_Layer: 0
   m_Name: Spawner
   m_TagString: Untagged
@@ -1513,9 +1514,23 @@ MonoBehaviour:
   _obstaclesLayerMask:
     serializedVersion: 2
     m_Bits: 63
-  _visualizeConfigArea: 0
-  MaxIterations: 300
-  _scaleVariation: {x: 0.8, y: 1.2}
+  _visualizeConfigArea: 1
+  _gizmosColor: {r: 0.06607056, g: 0, b: 1, a: 1}
+  _maxIterations: 300
+  _scaleVariation: {x: 0.8, y: 1.25}
+--- !u!114 &2126461004
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2126461001}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3deb9cfb883439a4d9da32368c0a55b4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _uniqueIdentifier: f2e87569-195c-4b10-83a2-19367fee6a6d
 --- !u!1001 &6740527990976289389
 PrefabInstance:
   m_ObjectHideFlags: 0

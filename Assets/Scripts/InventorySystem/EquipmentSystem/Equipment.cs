@@ -4,43 +4,43 @@ using UnityEngine;
 
 namespace FlavorfulStory.InventorySystem.EquipmentSystem
 {
-    /// <summary> Хранилище предметов, которыми оснащен игрок. 
-    /// Предметы хранятся в специальных местах снаряжения. </summary>
-    /// <remarks>  Этот компонент должен быть размещен на объекте "Player". </remarks>
+    /// <summary> РҐСЂР°РЅРёР»РёС‰Рµ РїСЂРµРґРјРµС‚РѕРІ, РєРѕС‚РѕСЂС‹РјРё РѕСЃРЅР°С‰РµРЅ РёРіСЂРѕРє. 
+    /// РџСЂРµРґРјРµС‚С‹ С…СЂР°РЅСЏС‚СЃСЏ РІ СЃРїРµС†РёР°Р»СЊРЅС‹С… РјРµСЃС‚Р°С… СЃРЅР°СЂСЏР¶РµРЅРёСЏ. </summary>
+    /// <remarks>  Р­С‚РѕС‚ РєРѕРјРїРѕРЅРµРЅС‚ РґРѕР»Р¶РµРЅ Р±С‹С‚СЊ СЂР°Р·РјРµС‰РµРЅ РЅР° РѕР±СЉРµРєС‚Рµ "Player". </remarks>
     public class Equipment : MonoBehaviour, ISaveable
     {
-        /// <summary> Экипированные предметы. </summary>
+        /// <summary> Р­РєРёРїРёСЂРѕРІР°РЅРЅС‹Рµ РїСЂРµРґРјРµС‚С‹. </summary>
         private Dictionary<EquipmentType, EquipableItem> _equippedItems = new();
 
-        /// <summary> Срабатывает, когда предметы в слотах добавляются / удаляются. </summary>
+        /// <summary> РЎСЂР°Р±Р°С‚С‹РІР°РµС‚, РєРѕРіРґР° РїСЂРµРґРјРµС‚С‹ РІ СЃР»РѕС‚Р°С… РґРѕР±Р°РІР»СЏСЋС‚СЃСЏ / СѓРґР°Р»СЏСЋС‚СЃСЏ. </summary>
         public event System.Action EquipmentUpdated;
 
-        /// <summary> Получить предмет снаряжения по типу. </summary>
-        /// <param name="equipLocation"> Тип снаряжения. </param>
-        /// <returns> Возвращает предмет снаряжения по типу. </returns>
+        /// <summary> РџРѕР»СѓС‡РёС‚СЊ РїСЂРµРґРјРµС‚ СЃРЅР°СЂСЏР¶РµРЅРёСЏ РїРѕ С‚РёРїСѓ. </summary>
+        /// <param name="equipLocation"> РўРёРї СЃРЅР°СЂСЏР¶РµРЅРёСЏ. </param>
+        /// <returns> Р’РѕР·РІСЂР°С‰Р°РµС‚ РїСЂРµРґРјРµС‚ СЃРЅР°СЂСЏР¶РµРЅРёСЏ РїРѕ С‚РёРїСѓ. </returns>
         public EquipableItem GetEquipmentFromType(EquipmentType equipLocation) =>
             _equippedItems.TryGetValue(equipLocation, out var item) ? item : null;
 
-        /// <summary> Добавить предмет в указанное место снаряжения. </summary>
+        /// <summary> Р”РѕР±Р°РІРёС‚СЊ РїСЂРµРґРјРµС‚ РІ СѓРєР°Р·Р°РЅРЅРѕРµ РјРµСЃС‚Рѕ СЃРЅР°СЂСЏР¶РµРЅРёСЏ. </summary>
         public void AddItem(EquipmentType slot, EquipableItem item)
         {
             _equippedItems[slot] = item;
             EquipmentUpdated?.Invoke();
         }
 
-        /// <summary> Удалить предмет снаряжения по типу. </summary>
+        /// <summary> РЈРґР°Р»РёС‚СЊ РїСЂРµРґРјРµС‚ СЃРЅР°СЂСЏР¶РµРЅРёСЏ РїРѕ С‚РёРїСѓ. </summary>
         public void RemoveItem(EquipmentType slot)
         {
             _equippedItems.Remove(slot);
             EquipmentUpdated?.Invoke();
         }
 
-        /// <summary> Получить список всех экипированных предметов. </summary>
+        /// <summary> РџРѕР»СѓС‡РёС‚СЊ СЃРїРёСЃРѕРє РІСЃРµС… СЌРєРёРїРёСЂРѕРІР°РЅРЅС‹С… РїСЂРµРґРјРµС‚РѕРІ. </summary>
         public IEnumerable<EquipmentType> GetEquippedItems() => _equippedItems.Keys;
 
         #region Saving
-        /// <summary> Фиксация состояния объекта при сохранении. </summary>
-        /// <returns> Возвращает объект, в котором фиксируется состояние. </returns>
+        /// <summary> Р¤РёРєСЃР°С†РёСЏ СЃРѕСЃС‚РѕСЏРЅРёСЏ РѕР±СЉРµРєС‚Р° РїСЂРё СЃРѕС…СЂР°РЅРµРЅРёРё. </summary>
+        /// <returns> Р’РѕР·РІСЂР°С‰Р°РµС‚ РѕР±СЉРµРєС‚, РІ РєРѕС‚РѕСЂРѕРј С„РёРєСЃРёСЂСѓРµС‚СЃСЏ СЃРѕСЃС‚РѕСЏРЅРёРµ. </returns>
         public object CaptureState()
         {
             var equippedItemsForSerialization = new Dictionary<EquipmentType, string>();
@@ -51,8 +51,8 @@ namespace FlavorfulStory.InventorySystem.EquipmentSystem
             return equippedItemsForSerialization;
         }
 
-        /// <summary> Восстановление состояния объекта при загрузке. </summary>
-        /// <param name="state"> Объект состояния, который необходимо восстановить. </param>
+        /// <summary> Р’РѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёРµ СЃРѕСЃС‚РѕСЏРЅРёСЏ РѕР±СЉРµРєС‚Р° РїСЂРё Р·Р°РіСЂСѓР·РєРµ. </summary>
+        /// <param name="state"> РћР±СЉРµРєС‚ СЃРѕСЃС‚РѕСЏРЅРёСЏ, РєРѕС‚РѕСЂС‹Р№ РЅРµРѕР±С…РѕРґРёРјРѕ РІРѕСЃСЃС‚Р°РЅРѕРІРёС‚СЊ. </param>
         public void RestoreState(object state)
         {
             _equippedItems = new Dictionary<EquipmentType, EquipableItem>();
