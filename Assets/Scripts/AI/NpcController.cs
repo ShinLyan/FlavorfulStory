@@ -65,24 +65,6 @@ namespace FlavorfulStory.AI.States
             _stateController.Update(Time.deltaTime);
         }
 
-        // Закомментированные методы для обработки триггеров.
-        // private void OnTriggerEnter(Collider other) {
-        //     if (other.CompareTag("Player"))
-        //     {
-        //         _navMeshAgent.isStopped = true;
-        //         _stateController.SetState<WaitingState>();
-        //     }
-        // }
-        //
-        // private void OnTriggerExit(Collider other)
-        // {
-        //     if (other.CompareTag("Player"))
-        //     {
-        //         _navMeshAgent.isStopped = false;
-        //         _stateController.SetState<MovementState>();
-        //     }
-        // }
-
         /// <summary> Воспроизведение анимации движения. </summary>
         /// <param name="speed"> Скорость движения. </param>
         /// <param name="dampTime"> Время сглаживания перехода анимации. </param>
@@ -93,9 +75,9 @@ namespace FlavorfulStory.AI.States
 
         /// <summary> Воспроизведение анимации состояния. </summary>
         /// <param name="animationStateName"> Название состояния анимации. </param>
-        public void PlayStateAnimation(string animationStateName)
+        public void PlayStateAnimation(NpcAnimationClipName animationStateName)
         {
-            _animator.Play(animationStateName);
+            _animator.Play(animationStateName.ToString());
         }
     }
 }

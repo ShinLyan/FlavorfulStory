@@ -1,6 +1,7 @@
 using FlavorfulStory.AI.Scheduling;
 using FlavorfulStory.AI.States;
 using FlavorfulStory.TimeManagement;
+using UnityEngine;
 
 namespace FlavorfulStory.AI.FiniteStateMachine
 {
@@ -53,7 +54,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         {
             if (_currentPoint != null)
             {
-                var animationClipName = _currentPoint.AnimationClipName.ToString();
+                var animationClipName = _currentPoint.NpcAnimationClipName;
 
                 if (_currentPoint != null)
                     _npcController.PlayStateAnimation(animationClipName);
@@ -65,19 +66,19 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         /// <param name="currentTime"> Текущее время в игре. </param>
         private void CheckNewTime(DateTime currentTime)
         {
-            SchedulePoint closestPoint = _npcSchedule.Schedules[0].GetClosestSchedulePointInPath(currentTime);
-            if (closestPoint == null || closestPoint == _currentPoint) return;
+            SchedulePoint closestPoint = _npcSchedule.Params[0].GetClosestSchedulePointInPath(currentTime);
+            if (closestPoint == null)
+            {
+                Debug.LogError("Ближайшая точка отсутствует!");
+                return;
+            }
+
+            if (closestPoint == _currentPoint)
+                return;
 
             _currentPoint = closestPoint;
             if (closestPoint.Hour == currentTime.Hour && closestPoint.Minutes == currentTime.Minute)
                 _stateController.SetState<MovementState>();
         }
-
-        // TODO: можно реализовать через аниматор => можно убрать
-        // private bool IsPlayingAnimation(string stateName)
-        // {
-        //     return _animator.GetCurrentAnimatorStateInfo(0).IsName(stateName) &&
-        //            _animator.GetCurrentAnimatorStateInfo(0).normalizedTime < 1.0f;
-        // }
     }
 }

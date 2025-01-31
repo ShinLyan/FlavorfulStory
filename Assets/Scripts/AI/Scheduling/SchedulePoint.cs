@@ -2,6 +2,7 @@ using System;
 using FlavorfulStory.AI.States;
 using FlavorfulStory.SceneManagement;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace FlavorfulStory.AI.Scheduling
 {
@@ -27,8 +28,10 @@ namespace FlavorfulStory.AI.Scheduling
         [Tooltip("Стандартный угол поворота NPC, при достижении указанных координат.")] public Vector3 Rotation;
 
         /// <summary> Название анимационного стейта в аниматоре. </summary>
+        [FormerlySerializedAs("_npcAnimationClipName")]
+        [FormerlySerializedAs("AnimationClipName")]
         [Header("Other Settings")]
-        [Tooltip("Название анимационного стейта в аниматоре.")] public AnimationClipName AnimationClipName;
+        [Tooltip("Название анимационного стейта в аниматоре.")] public NpcAnimationClipName NpcAnimationClipName;
 
         /// <summary> Набор диалогов в указанных координатах. </summary>
         [Tooltip("Набор диалогов в указанных координатах.")] public string[] DialoguePool; // TODO: в будущем заменить на спец. класс для диалогов

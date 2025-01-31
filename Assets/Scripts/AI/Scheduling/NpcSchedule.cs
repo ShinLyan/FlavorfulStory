@@ -7,6 +7,6 @@ namespace FlavorfulStory.AI.Scheduling
     public class NpcSchedule : ScriptableObject
     {
         /// <summary> Массив параметров расписаний для NPC. </summary>
-        public ScheduleParams[] Schedules;
+        public ScheduleParams[] Params;
     }
 }

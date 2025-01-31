@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using JetBrains.Annotations;
 
 namespace FlavorfulStory.AI.FiniteStateMachine
 {
@@ -7,7 +8,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine
     public class StateController
     {
         /// <summary> Текущее состояние персонажа. </summary>
-        private CharacterState CurrentState { get; set; }
+        private CharacterState _currentState;
 
         /// <summary> Словарь, хранящий все возможные состояния персонажа, где ключ — тип состояния,
         /// а значение — экземпляр состояния. </summary>
@@ -26,14 +27,14 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         {
             var type = typeof(T);
 
-            if (CurrentState?.GetType() == type)
+            if (_currentState?.GetType() == type)
                 return;
 
             if (_states.TryGetValue(type, out var newState))
             {
-                CurrentState?.Exit();
-                CurrentState = newState;
-                CurrentState.Enter();
+                _currentState?.Exit();
+                _currentState = newState;
+                _currentState?.Enter();
             }
         }
 
@@ -41,14 +42,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         /// <param name="deltaTime"> Время в секундах, прошедшее с последнего кадра. </param>
         public void Update(float deltaTime)
         {
-            CurrentState?.Update(deltaTime);
-        }
-
-        /// <summary> Обновляет логику текущего состояния, связанную с физикой. </summary>
-        /// <param name="fixedDeltaTime"> Время в секундах, прошедшее с последнего фиксированного кадра. </param>
-        public void FixedUpdate(float fixedDeltaTime)
-        {
-            CurrentState?.FixedUpdate(fixedDeltaTime);
+            _currentState?.Update(deltaTime);
         }
     }
 }

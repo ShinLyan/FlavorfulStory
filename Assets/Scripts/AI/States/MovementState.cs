@@ -83,13 +83,16 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         /// <param name="currentTime"> Текущее время в игре. </param>
         private void FindDestinationPoint(DateTime currentTime)
         {
-            SchedulePoint closestPoint = _npcSchedule.Schedules[0].GetClosestSchedulePointInPath(currentTime);
+            SchedulePoint closestPoint = _npcSchedule.Params[0].GetClosestSchedulePointInPath(currentTime);
 
             if (closestPoint != null && _currentPoint != closestPoint)
             {
                 _navMeshAgent.SetDestination(closestPoint.Position);
                 _currentPoint = closestPoint;
             }
+            
+            if (closestPoint == null)
+                Debug.LogError("Ближайшая точка отсутствует!");
         }
     }
 }
