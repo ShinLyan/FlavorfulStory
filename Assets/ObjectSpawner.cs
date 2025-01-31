@@ -35,12 +35,12 @@ public class ObjectSpawner : MonoBehaviour, ISaveable
     private List<SpawnedObjectRecord> _spawnedObjectRecords = new(0);
 
     /// <summary> Флаг, указывающий, были ли объекты загружены из файла. </summary>
-    private bool _loadFromFile;
+    private bool _wasLoadedFromSavefile;
     
     /// <summary> Запускает процесс спавна при старте сцены. </summary>
     private void Start()
     {
-        if (!_loadFromFile) SpawnFromConfig();
+        if (!_wasLoadedFromSavefile) SpawnFromConfig();
     }
     
     /// <summary> Спавнит объекты на основе конфигурации. </summary>
@@ -195,7 +195,7 @@ public class ObjectSpawner : MonoBehaviour, ISaveable
     public void RestoreState(object state)
     {
         _spawnedObjectRecords = state as List<SpawnedObjectRecord>;
-        _loadFromFile = _spawnedObjectRecords?.Capacity > 0;
+        _wasLoadedFromSavefile = _spawnedObjectRecords?.Capacity > 0;
         SpawnFromSave(_spawnedObjectRecords);
     }
     #endregion
