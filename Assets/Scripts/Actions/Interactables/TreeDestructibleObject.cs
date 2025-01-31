@@ -4,9 +4,9 @@ using UnityEngine;
 
 namespace FlavorfulStory.Actions.Interactables
 {
-    public class TreeDestructibleObject : DestructibleObject, ISpawnable
+    public class TreeDestructibleObject : DestructibleObject, IDestroyable
     {
-        public event Action<ISpawnable> OnObjectDestroyed;
+        public event Action<IDestroyable> OnObjectDestroyed;
         protected override void OnDestroyed()
         {
             OnObjectDestroyed?.Invoke(this);
