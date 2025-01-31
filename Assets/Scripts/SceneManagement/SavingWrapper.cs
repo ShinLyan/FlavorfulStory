@@ -40,10 +40,6 @@ namespace FlavorfulStory.SceneManagement
             PlayerPrefs.SetString(CurrentSaveKey, saveFile);
         }
 
-        /// <summary> Получить текущее сохранение. </summary>
-        /// <returns> Возвращает название текущего сохранения. </returns>
-        private static string GetCurrentSave() => PlayerPrefs.GetString(CurrentSaveKey);
-
         /// <summary> Загрузить первую сцену. </summary>
         /// <returns> Возвращает корутину, которая запускает первую сцену. </returns>
         private IEnumerator LoadFirstScene()
@@ -62,6 +58,10 @@ namespace FlavorfulStory.SceneManagement
             yield return PersistentObject.Instance.GetFader().FadeIn(Fader.FadeInTime);
         }
 
+        /// <summary> Получить текущее сохранение. </summary>
+        /// <returns> Возвращает название текущего сохранения. </returns>
+        public static string GetCurrentSave() => PlayerPrefs.GetString(CurrentSaveKey);
+        
         /// <summary> Загрузить сцену по названию. </summary>
         /// <param name="sceneName"> Название сцены. </param>
         /// <returns> Возвращает корутину, которая загружает сцену по названию. </returns>

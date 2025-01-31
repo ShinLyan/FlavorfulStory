@@ -3,15 +3,15 @@ using UnityEngine;
 
 namespace FlavorfulStory.Actions
 {
-    /// <summary> Интерактивный объект - абстрактный класс. </summary>
+    /// <summary> РРЅС‚РµСЂР°РєС‚РёРІРЅС‹Р№ РѕР±СЉРµРєС‚ - Р°Р±СЃС‚СЂР°РєС‚РЅС‹Р№ РєР»Р°СЃСЃ. </summary>
     public abstract class InteractableObject : MonoBehaviour
     {
-        /// <summary> Отображаемое сообщение при взаимодействии. </summary>
-        [Tooltip("Сообщение, которое отображается при наведении на объект.")]
+        /// <summary> РћС‚РѕР±СЂР°Р¶Р°РµРјРѕРµ СЃРѕРѕР±С‰РµРЅРёРµ РїСЂРё РІР·Р°РёРјРѕРґРµР№СЃС‚РІРёРё. </summary>
+        [Tooltip("РЎРѕРѕР±С‰РµРЅРёРµ, РєРѕС‚РѕСЂРѕРµ РѕС‚РѕР±СЂР°Р¶Р°РµС‚СЃСЏ РїСЂРё РЅР°РІРµРґРµРЅРёРё РЅР° РѕР±СЉРµРєС‚.")]
         [field: SerializeField] public string InteractionMessage { get; protected set; }
 
-        /// <summary> Метод, вызываемый при взаимодействии. </summary>
-        /// <param name="player"> Игрок, инициировавший взаимодействие. </param>
+        /// <summary> РњРµС‚РѕРґ, РІС‹Р·С‹РІР°РµРјС‹Р№ РїСЂРё РІР·Р°РёРјРѕРґРµР№СЃС‚РІРёРё. </summary>
+        /// <param name="player"> РРіСЂРѕРє, РёРЅРёС†РёРёСЂРѕРІР°РІС€РёР№ РІР·Р°РёРјРѕРґРµР№СЃС‚РІРёРµ. </param>
         public abstract void Interact(PlayerController player);
     }
 }

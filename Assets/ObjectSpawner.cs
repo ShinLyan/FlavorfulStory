@@ -133,10 +133,10 @@ public class ObjectSpawner : MonoBehaviour, ISaveable
     }
 
     /// <summary> Удаляет объект из списка заспавненных объектов. </summary>
-    /// <param name="destroyable"> Объект, который необходимо удалить из списка. </param>
-    private void RemoveObjectFromList(IDestroyable destroyable)
+    /// <param name="ispawnable"> Объект, который необходимо удалить из списка. </param>
+    private void RemoveObjectFromList(ISpawnable ispawnable)
     {
-        var monoBehaviour = destroyable as MonoBehaviour;
+        var monoBehaviour = ispawnable as MonoBehaviour;
         _spawnedObjects.Remove(monoBehaviour?.gameObject);
     }
     
@@ -145,7 +145,7 @@ public class ObjectSpawner : MonoBehaviour, ISaveable
     private void AddObjectToList(GameObject go)
     {
         _spawnedObjects.Add(go);
-        go.GetComponent<IDestroyable>().OnObjectDestroyed += RemoveObjectFromList;
+        go.GetComponent<ISpawnable>().OnObjectDestroyed += RemoveObjectFromList;
     }
 
     /// <summary> Спавнит объект в заданной позиции с заданными параметрами масштаба и вращения. </summary>
@@ -195,7 +195,7 @@ public class ObjectSpawner : MonoBehaviour, ISaveable
     public void RestoreState(object state)
     {
         _spawnedObjectRecords = state as List<SpawnedObjectRecord>;
-        _wasLoadedFromSavefile = _spawnedObjectRecords?.Capacity > 0;
+        _wasLoadedFromSavefile = _spawnedObjectRecords?.Count >= 0;
         SpawnFromSave(_spawnedObjectRecords);
     }
     #endregion
