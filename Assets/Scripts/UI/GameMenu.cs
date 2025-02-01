@@ -17,10 +17,10 @@ namespace FlavorfulStory.UI
 
         /// <summary> Текст обозначения кнопки для переключения на предыдущую вкладку. </summary>
         [SerializeField] private TMP_Text _previousTabLabel;
-        
+
         /// <summary> Текст обозначения кнопки для переключения на следующую вкладку. </summary>
         [SerializeField] private TMP_Text _nextTabLabel;
-        
+
         /// <summary> Массив вкладок в меню. </summary>
         private Tab[] _tabs;
 
@@ -42,7 +42,7 @@ namespace FlavorfulStory.UI
             {
                 tab.OnTabSelected += SelectTab;
             }
-            
+
             _previousTabLabel.text = PreviousTabKey.ToString();
             _nextTabLabel.text = NextTabKey.ToString();
         }
@@ -107,7 +107,7 @@ namespace FlavorfulStory.UI
                 }
             }
         }
-        
+
         /// <summary> Выбирает вкладку и скрывает текущую. </summary>
         /// <param name="tabType"> Тип вкладки для выбора. </param>
         private void SelectTab(TabType tabType)

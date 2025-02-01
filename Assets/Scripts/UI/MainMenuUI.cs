@@ -5,69 +5,69 @@ using UnityEngine;
 
 namespace FlavorfulStory.UI
 {
-    /// <summary> UI главного меню. </summary>
+    /// <summary> Интерфейс главного меню. </summary>
     public class MainMenuUI : MonoBehaviour
     {
-        /// <summary> Поля ввода, которые игрок заполняет при запуске новой игры. </summary>
+        /// <summary> Поля ввода, заполняемые игроком при старте новой игры. </summary>
         [SerializeField] private TMP_InputField[] _newGameInputFields;
 
-        /// <summary> Объект для отображения сообщения об ошибке. </summary>
+        /// <summary> Объект отображения ошибки. </summary>
         [SerializeField] private GameObject _messageError;
 
         /// <summary> Поле текста для вывода сообщений об ошибках. </summary>
         [SerializeField] private TMP_Text _errorText;
 
-        /// <summary> Название сохраненного файла для новой игры, формируемое на основе ввода игрока. </summary>
-        /// <remarks> Название формируется путем соединения строк имени игрока и названия магазина. </remarks>
+        /// <summary> Название сохраненного файла для новой игры. </summary>
+        /// <remarks> Формируется путем объединения значений полей ввода. </remarks>
         private string NewGameSaveFileName => string.Concat(_newGameInputFields.Select(field => field.text));
 
-        /// <summary> Вызывается при включении объекта. Отключает управление игроком. </summary>
+        /// <summary> Подписка на событие включения. Отключает управление игроком. </summary>
         private void OnEnable()
         {
             PlayerController.SwitchController(false);
         }
 
-        /// <summary> Вызывается при выключении объекта. Включает управление игроком. </summary>
+        /// <summary> Подписка на событие выключения. Включает управление игроком. </summary>
         private void OnDisable()
         {
             PlayerController.SwitchController(true);
         }
 
-        /// <summary> Обрабатывает запуск новой игры. </summary>
-        /// <remarks> Проверяет корректность заполнения полей ввода и, при успехе, 
-        /// инициирует запуск новой игры через систему сохранений. </remarks>
+        /// <summary> Запуск новой игры. </summary>
+        /// <remarks> Проверяет корректность введенных данных, затем запускает новую игру. </remarks>
         public void OnClickNewGame()
         {
             if (!AreInputFieldsValid()) return;
             PersistentObject.Instance.GetSavingWrapper().StartNewGame(NewGameSaveFileName);
         }
 
-        /// <summary> Проверяет поля ввода на корректность. </summary>
-        /// <returns> Возвращает True, если все поля ввода заполнены корректно, иначе False. </returns>
+        /// <summary> Проверка корректности введенных данных. </summary>
+        /// <returns> Возвращает True, если данные корректны, иначе False. </returns>
         private bool AreInputFieldsValid()
         {
-            for (int i = 0; i < _newGameInputFields.Length; i++)
+            foreach (var inputField in _newGameInputFields)
             {
-                if (!InputFieldValidator.IsValid(_newGameInputFields[i].text, out string warningMessage))
+                if (!InputFieldValidator.IsValid(inputField.text, out string warningMessage))
                 {
                     _messageError.SetActive(true);
                     _errorText.text = warningMessage;
                     return false;
                 }
             }
+
             _messageError.SetActive(false);
             return true;
         }
 
-        /// <summary> Обрабатывает закрытие окна. </summary>
-        /// <remarks> Очищает поля ввода и скрывает сообщение об ошибке. </remarks>
+        /// <summary> Отмена ввода данных. </summary>
+        /// <remarks> Очищает поля ввода и скрывает сообщения об ошибках. </remarks>
         public void OnClickCancel()
         {
             ClearInputFields();
             _messageError.SetActive(false);
         }
 
-        /// <summary> Очистить текст во всех полях ввода. </summary>
+        /// <summary> Очистка полей ввода. </summary>
         private void ClearInputFields()
         {
             foreach (var inputField in _newGameInputFields)
@@ -75,12 +75,12 @@ namespace FlavorfulStory.UI
                 inputField.text = string.Empty;
             }
         }
-        
-        /// <summary> Продолжить ранее сохраненную игру. </summary>
+
+        /// <summary> Продолжение сохраненной игры. </summary>
         public void OnClickContinue() =>
             PersistentObject.Instance.GetSavingWrapper().ContinueGame();
 
-        /// <summary> Завершить работу приложения. </summary>
+        /// <summary> Выход из приложения. </summary>
         public void OnClickQuit() => Application.Quit();
     }
 }

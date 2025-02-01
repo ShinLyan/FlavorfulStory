@@ -3,13 +3,13 @@ using UnityEngine;
 
 namespace FlavorfulStory.UI
 {
-    /// <summary> Реализует вкладку в интерфейсе. Включает кнопку вкладки и отображаемый контент. </summary>
+    /// <summary> Вкладка в интерфейсе, содержащая кнопку и отображаемый контент. </summary>
     public class Tab : MonoBehaviour
     {
         /// <summary> Кнопка вкладки. </summary>
         [SerializeField] private TabButton _tabButton;
 
-        /// <summary> Контент, который отображается при активной вкладке. </summary>
+        /// <summary> Контент, отображаемый при активной вкладке. </summary>
         [SerializeField] private GameObject _tabContent;
 
         /// <summary> Тип вкладки. </summary>
@@ -18,20 +18,20 @@ namespace FlavorfulStory.UI
         /// <summary> Событие выбора вкладки. </summary>
         public event Action<TabType> OnTabSelected;
 
-        /// <summary> При инициализации подписываемся на событие клика по кнопке вкладки. </summary>
+        /// <summary> Подписка на событие клика по кнопке вкладки при инициализации. </summary>
         private void Awake()
         {
             _tabButton.OnClick += SwitchTo;
         }
 
-        /// <summary> Переключает на эту вкладку, вызывая событие выбора и активируя контент. </summary>
+        /// <summary> Выбор этой вкладки, вызов события выбора и активация контента. </summary>
         private void SwitchTo()
         {
             OnTabSelected?.Invoke(_tabType);
             Select();
         }
 
-        /// <summary> Активирует вкладку и ее контент. </summary>
+        /// <summary> Активация вкладки и ее контента. </summary>
         public void Select()
         {
             _tabButton.IsActive = true;
@@ -39,7 +39,7 @@ namespace FlavorfulStory.UI
             _tabContent.SetActive(true);
         }
 
-        /// <summary> Сбрасывает выбор вкладки, скрывает контент. </summary>
+        /// <summary> Сброс состояния вкладки и скрытие контента. </summary>
         public void ResetSelection()
         {
             _tabButton.IsActive = false;
