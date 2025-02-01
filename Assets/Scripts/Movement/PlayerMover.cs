@@ -1,4 +1,5 @@
 using FlavorfulStory.Saving;
+using FlavorfulStory.InputSystem;
 using UnityEngine;
 
 namespace FlavorfulStory.Movement
@@ -80,8 +81,7 @@ namespace FlavorfulStory.Movement
         {
             const float WalkingMultiplier = 0.5f;
             const float RunningMultiplier = 1f;
-            return Input.GetKey(_keyForWalking) ? WalkingMultiplier : RunningMultiplier;
-        }
+            return InputWrapper.GetButton(InputButton.Walking) ? WalkingMultiplier : RunningMultiplier;         }
 
         /// <summary> Обновляет анимацию движения игрока в зависимости от скорости. </summary>
         /// <param name="directionMagnitude"> Величина направления движения. </param>

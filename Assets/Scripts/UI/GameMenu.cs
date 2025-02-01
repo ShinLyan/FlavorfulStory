@@ -1,4 +1,5 @@
-using System;
+using System.Collections.Generic;
+using FlavorfulStory.InputSystem;
 using FlavorfulStory.SceneManagement;
 using TMPro;
 using UnityEngine;
@@ -37,9 +38,6 @@ namespace FlavorfulStory.UI
                 _tabs[i].OnTabSelected += SelectTab;
                 _tabs[i].SetIndex(i);
             }
-            
-            _previousTabLabel.text = PreviousTabKey.ToString();
-            _nextTabLabel.text = NextTabKey.ToString();
         }
 
         /// <summary> Устанавливает начальную вкладку (главную). </summary>
