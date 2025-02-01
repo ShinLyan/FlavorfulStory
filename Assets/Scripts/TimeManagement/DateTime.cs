@@ -1,3 +1,4 @@
+
 using System;
 
 namespace FlavorfulStory.TimeManagement
@@ -79,10 +80,7 @@ namespace FlavorfulStory.TimeManagement
 
         /// <summary> Преобразует текущую дату и время в строку. </summary>
         /// <returns> Строковое представление текущей даты и времени. </returns>
-        public override string ToString()
-        {
-            return $"{Year} year {Season} {DayInSeason} day {TimeToString()}";
-        }
+        public override string ToString() => $"{Year} year {Season} {DayInSeason} day {TimeToString()}";
 
         /// <summary> Преобразует текущую дату в строку. </summary>
         /// <returns> Строковое представление текущей даты. </returns>

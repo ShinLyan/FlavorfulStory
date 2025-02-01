@@ -12,17 +12,11 @@ namespace FlavorfulStory.Movement
 
         [Header("Параметры движения")]
         /// <summary> Скорость передвижения игрока. </summary>
-        [SerializeField, Tooltip("Скорость передвижения игрока.")]
-        private float _moveSpeed;
+        [SerializeField, Tooltip("Скорость передвижения игрока.")] private float _moveSpeed;
 
         /// <summary> Скорость поворота игрока. </summary>
-        [SerializeField, Tooltip("Скорость поворота игрока.")]
-        private float _rotateSpeed;
-
-        /// <summary> Клавиша для переключения между бегом и ходьбой. </summary>
-        [SerializeField, Tooltip("Клавиша для переключения между бегом и ходьбой.")]
-        private KeyCode _keyForWalking = KeyCode.LeftShift;
-
+        [SerializeField, Tooltip("Скорость поворота игрока.")] private float _rotateSpeed;
+        
         /// <summary> Компонент Rigidbody, отвечающий за физику движения игрока. </summary>
         private Rigidbody _rigidbody;
 
@@ -107,7 +101,6 @@ namespace FlavorfulStory.Movement
         public void SetLookRotation(Vector3 direction) => _lookDirection = direction;
 
         #region Saving
-
         /// <summary> Структура для сохранения позиции и поворота игрока. </summary>
         [System.Serializable]
         private struct MoverSaveData
@@ -135,7 +128,6 @@ namespace FlavorfulStory.Movement
             transform.position = data.Position.ToVector();
             transform.eulerAngles = data.Rotation.ToVector();
         }
-
         #endregion
     }
 }

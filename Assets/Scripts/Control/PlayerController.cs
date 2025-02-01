@@ -1,4 +1,5 @@
 ﻿using FlavorfulStory.Actions;
+using FlavorfulStory.InputSystem;
 using FlavorfulStory.InventorySystem;
 using FlavorfulStory.InventorySystem.UI;
 using FlavorfulStory.Movement;
@@ -94,7 +95,7 @@ namespace FlavorfulStory.Control
         /// <summary> Обработка ввода. Передача ввода в PlayerMover. </summary>
         private void InteractWithMovement()
         {
-            float x = Input.GetAxisRaw("Horizontal"), z = Input.GetAxisRaw("Vertical");
+            float x = InputWrapper.GetAxisRaw(InputButton.Horizontal), z = InputWrapper.GetAxisRaw(InputButton.Vertical);
             var direction = new Vector3(x, 0, z).normalized;
             _playerMover.SetMoveDirection(direction);
 
@@ -128,7 +129,7 @@ namespace FlavorfulStory.Control
         /// <returns> Возвращает позицию курсора. </returns>
         public static Vector3 GetCursorPosition()
         {
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            Ray ray = Camera.main.ScreenPointToRay(InputWrapper.GetMousePosition());
             return Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity) ? hit.point : Vector3.zero;
         }
 

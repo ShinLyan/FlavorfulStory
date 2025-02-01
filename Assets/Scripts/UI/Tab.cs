@@ -1,4 +1,5 @@
 using System;
+using FlavorfulStory.InputSystem;
 using UnityEngine;
 
 namespace FlavorfulStory.UI
@@ -11,14 +12,19 @@ namespace FlavorfulStory.UI
 
         /// <summary> Контент, отображаемый при активной вкладке. </summary>
         [SerializeField] private GameObject _tabContent;
+        
+        /// <summary> Индекс вкладки в наборе вкладок. </summary>
+        private int _index;
 
-        /// <summary> Тип вкладки. </summary>
-        [SerializeField] private TabType _tabType;
-
-        /// <summary> Событие выбора вкладки. </summary>
-        public event Action<TabType> OnTabSelected;
+        /// <summary> Кнопка ввода, связанная с данной вкладкой. </summary>
+        [field: SerializeField] public InputButton InputButton { get; private set; }
 
         /// <summary> Подписка на событие клика по кнопке вкладки при инициализации. </summary>
+        /// <summary> Событие, вызываемое при выборе вкладки. </summary>
+        ///<remarks> Передает индекс выбранной вкладки. </remarks>
+        public event Action<int> OnTabSelected;
+        
+        /// <summary> Инициализирует обработчик события клика по кнопке вкладки. </summary>
         private void Awake()
         {
             _tabButton.OnClick += SwitchTo;
@@ -27,7 +33,7 @@ namespace FlavorfulStory.UI
         /// <summary> Выбор этой вкладки, вызов события выбора и активация контента. </summary>
         private void SwitchTo()
         {
-            OnTabSelected?.Invoke(_tabType);
+            OnTabSelected?.Invoke(_index);
             Select();
         }
 
@@ -46,5 +52,9 @@ namespace FlavorfulStory.UI
             _tabButton.SetNameState(false);
             _tabContent.SetActive(false);
         }
+
+        /// <summary> Устанавливает индекс вкладки. </summary>
+        ///<param name="index"> Числовой индекс вкладки. </param>
+        public void SetIndex(int index) => _index = index;
     }
 }

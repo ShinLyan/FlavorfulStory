@@ -23,26 +23,21 @@ namespace FlavorfulStory.UI
 
         /// <summary> Массив вкладок в меню. </summary>
         private Tab[] _tabs;
-
-        /// <summary> Текущая выбранная вкладка. </summary>
-        private TabType _currentTabType;
-
-        /// <summary> Клавиша для перехода к предыдущей вкладке. </summary>
-        private const KeyCode PreviousTabKey = KeyCode.Q;
-
-        /// <summary> Клавиша для перехода к следующей вкладке. </summary>
-        private const KeyCode NextTabKey = KeyCode.R;
+        
+        /// <summary> Индекс текущей активной вкладки. </summary>
+        private int _currentTabindex;
 
         /// <summary> Инициализация компонента.
         /// Находит все вкладки и назначает обработчики для их выбора. </summary>
         private void Awake()
         {
             _tabs = GetComponentsInChildren<Tab>(true);
-            foreach (var tab in _tabs)
+            for (int i = 0; i < _tabs.Length; i++)
             {
-                tab.OnTabSelected += SelectTab;
+                _tabs[i].OnTabSelected += SelectTab;
+                _tabs[i].SetIndex(i);
             }
-
+            
             _previousTabLabel.text = PreviousTabKey.ToString();
             _nextTabLabel.text = NextTabKey.ToString();
         }
@@ -50,7 +45,7 @@ namespace FlavorfulStory.UI
         /// <summary> Устанавливает начальную вкладку (главную). </summary>
         private void Start()
         {
-            _currentTabType = TabType.MainTab;
+            _currentTabindex = 0; // MainTab по умолчанию
             ShowCurrentTab();
         }
 
@@ -66,8 +61,20 @@ namespace FlavorfulStory.UI
         /// <summary> Обрабатывает ввод для переключения состояния меню (нажатие клавиши для скрытия/показа меню). </summary>
         private void HandleSwitchInput()
         {
-            if (Input.GetKeyDown(_switchKey))
+            if (InputWrapper.GetButtonDown(InputButton.SwitchGameMenu))
             {
+                var movementButtons = new List<InputButton> { InputButton.Horizontal, InputButton.Vertical};
+                if (_content.activeSelf)
+                {
+                    InputWrapper.UnblockInput(movementButtons);
+                    InputWrapper.UnblockInput(new[] { InputButton.MouseScroll });
+                }
+                else
+                {
+                    InputWrapper.BlockInput(movementButtons);
+                    InputWrapper.BlockInput(new[] { InputButton.MouseScroll });
+                }
+                
                 SwitchContent(!_content.activeSelf);
             }
         }
@@ -77,56 +84,56 @@ namespace FlavorfulStory.UI
         {
             if (!_content.activeInHierarchy) return;
 
-            if (Input.GetKeyDown(PreviousTabKey) || Input.GetKeyDown(NextTabKey))
+            if (InputWrapper.GetButtonDown(InputButton.SwitchToPreviousTab) ||
+                InputWrapper.GetButtonDown(InputButton.SwitchToNextTab))
             {
-                bool isPreviousTab = Input.GetKeyDown(PreviousTabKey);
+                bool isPreviousTab = InputWrapper.GetButtonDown(InputButton.SwitchToPreviousTab);
                 int direction = isPreviousTab ? -1 : 1;
-                var currentTabIndex = (int)_currentTabType;
-
-                int newTabIndex = (currentTabIndex + _tabs.Length + direction) % _tabs.Length;
-                SelectTab((TabType)newTabIndex);
+                int newTabIndex = (_currentTabindex + _tabs.Length + direction) % _tabs.Length;
+                SelectTab(newTabIndex);
             }
         }
 
         /// <summary> Обрабатывает ввод для нажатия на кнопки вкладок. </summary>
         private void HandleTabButtonsInput()
         {
-            if (_content.activeInHierarchy && Input.GetButtonDown(_currentTabType.ToString()))
+            if (_content.activeInHierarchy && 
+                InputWrapper.GetButtonDown(_tabs[_currentTabindex].InputButton))
             {
                 SwitchContent(false);
                 return;
             }
 
-            foreach (TabType tabType in Enum.GetValues(typeof(TabType)))
+            for (int i = 0; i < _tabs.Length; i++)
             {
-                if (Input.GetButtonDown(tabType.ToString()))
+                if (InputWrapper.GetButtonDown(_tabs[i].InputButton))
                 {
                     SwitchContent(true);
-                    SelectTab(tabType);
+                    SelectTab(i);
                     return;
                 }
             }
         }
-
+        
         /// <summary> Выбирает вкладку и скрывает текущую. </summary>
-        /// <param name="tabType"> Тип вкладки для выбора. </param>
-        private void SelectTab(TabType tabType)
+        /// <param name="index"> Индекс вкладки для выбора. </param>
+        private void SelectTab(int index)
         {
             HideCurrentTab();
-            _currentTabType = tabType;
+            _currentTabindex = index;
             ShowCurrentTab();
         }
 
         /// <summary> Показывает текущую вкладку. </summary>
         private void ShowCurrentTab()
         {
-            _tabs[(int)_currentTabType].Select();
+            _tabs[_currentTabindex].Select();
         }
 
         /// <summary> Скрывает текущую вкладку. </summary>
         private void HideCurrentTab()
         {
-            _tabs[(int)_currentTabType].ResetSelection();
+            _tabs[_currentTabindex].ResetSelection();
         }
 
         /// <summary> Переключает состояние видимости меню. </summary>
