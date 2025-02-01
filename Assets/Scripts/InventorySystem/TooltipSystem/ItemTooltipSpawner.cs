@@ -8,14 +8,13 @@ namespace FlavorfulStory.InventorySystem.TooltipSystem
     public class ItemTooltipSpawner : TooltipSpawner
     {
         #region Override Methods
+
         /// <summary> Можно ли создать тултип?</summary>
         /// <remarks> Возвращает True, если спавнеру можно создать тултип. </remarks>
         public override bool CanCreateTooltip()
         {
             var item = GetComponent<IItemHolder>().GetItem();
-            if (!item) return false;
-
-            return true;
+            return item;
         }
 
         /// <summary> Вызывается, когда приходит время обновить информацию в префабе тултипа. </summary>
@@ -28,6 +27,7 @@ namespace FlavorfulStory.InventorySystem.TooltipSystem
             var item = GetComponent<IItemHolder>().GetItem();
             itemTooltip.Setup(item);
         }
+
         #endregion
     }
 }

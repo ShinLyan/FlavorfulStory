@@ -10,6 +10,7 @@ namespace FlavorfulStory.Saving
     public class SavingSystem : MonoBehaviour
     {
         #region Public Methods
+
         /// <summary> Загрузка последней сцены. </summary>
         /// <param name="saveFile"> Название файла с сохранением. </param>
         /// <returns> Корутина, которая запускает асинхронную подгрузку сцены. </returns>
@@ -23,6 +24,7 @@ namespace FlavorfulStory.Saving
             {
                 buildIndex = (int)state["lastSceneBuildIndex"];
             }
+
             yield return SceneManager.LoadSceneAsync(buildIndex);
             RestoreState(state);
         }
@@ -56,9 +58,11 @@ namespace FlavorfulStory.Saving
         /// <param name="saveFile"> Название файла сохранения. </param>
         /// <returns> Возвращает True - если файл сохранения существует, False - в противном случае. </returns>
         public static bool SaveFileExists(string saveFile) => File.Exists(GetPathFromSaveFile(saveFile));
+
         #endregion
 
         #region Private Methods
+
         /// <summary> Загрузка данных из файла. </summary>
         /// <param name="saveFile"> Название файла сохранения. </param>
         /// <returns> Возвращает словарь названия и объекта. </returns>
@@ -92,10 +96,11 @@ namespace FlavorfulStory.Saving
         /// <param name="state"> Словарь, содержащий состояния всех объектов, которые необходимо зафиксировать. </param>
         private static void CaptureState(Dictionary<string, object> state)
         {
-            foreach (SaveableEntity saveable in FindObjectsOfType<SaveableEntity>())
+            foreach (SaveableEntity saveable in FindObjectsByType<SaveableEntity>(FindObjectsSortMode.None))
             {
                 state[saveable.UniqueIdentifier] = saveable.CaptureState();
             }
+
             state["lastSceneBuildIndex"] = SceneManager.GetActiveScene().buildIndex;
         }
 
@@ -105,12 +110,13 @@ namespace FlavorfulStory.Saving
         {
             if (state == null) return;
 
-            foreach (SaveableEntity saveable in FindObjectsOfType<SaveableEntity>())
+            foreach (SaveableEntity saveable in FindObjectsByType<SaveableEntity>(FindObjectsSortMode.None))
             {
                 string id = saveable.UniqueIdentifier;
                 if (state.ContainsKey(id)) saveable.RestoreState(state[id]);
             }
         }
+
         #endregion
     }
 }

@@ -46,6 +46,7 @@ namespace FlavorfulStory.InventorySystem.DropSystem
         }
 
         #region Saving
+
         /// <summary> Запись о выпавших предметах. </summary>
         [System.Serializable]
         private struct DropRecord
@@ -81,6 +82,7 @@ namespace FlavorfulStory.InventorySystem.DropSystem
                 };
                 droppedItemsList.Add(droppedItem);
             }
+
             droppedItemsList.AddRange(_otherSceneDroppedItems);
             return droppedItemsList;
         }
@@ -93,6 +95,7 @@ namespace FlavorfulStory.InventorySystem.DropSystem
             {
                 if (item != null) newList.Add(item);
             }
+
             _droppedItems = newList;
         }
 
@@ -117,6 +120,7 @@ namespace FlavorfulStory.InventorySystem.DropSystem
                 SpawnPickup(pickupItem, number, position);
             }
         }
+
         #endregion
     }
 }

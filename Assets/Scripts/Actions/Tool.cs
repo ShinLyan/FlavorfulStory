@@ -5,8 +5,8 @@ using UnityEngine.EventSystems;
 
 namespace FlavorfulStory.Actions
 {
-    /// <summary> Инструмент. </summary>
-    /// <remarks> Может быть использован игроком для взаимодействия с объектами. </remarks>
+    /// <summary> Инструмент, используемый игроком для взаимодействия с объектами. </summary>
+    /// <remarks> Может выполнять действия, специфичные для типа инструмента. </remarks>
     [CreateAssetMenu(menuName = ("FlavorfulStory/Inventory/Tool"))]
     public class Tool : ActionItem
     {
@@ -20,11 +20,10 @@ namespace FlavorfulStory.Actions
         /// <summary> Радиус использования инструмента. </summary>
         private const float UseRadius = 1.5f;
 
-        /// <summary> Использовать. </summary>
+        /// <summary> Использовать инструмент. </summary>
         /// <param name="player"> Контроллер игрока. </param>
         public override void Use(PlayerController player)
         {
-            // Проверка на клик по UI
             if (EventSystem.current && EventSystem.current.IsPointerOverGameObject()) return;
 
             var targetPosition = PlayerController.GetCursorPosition();
@@ -32,12 +31,12 @@ namespace FlavorfulStory.Actions
             player.TriggerAnimation($"Use{ToolType}");
             UseToolInDirection(player.transform.position, targetPosition, player);
 
-            // TODO: Тратить энергию игрока при использовании инструмента
+            // TODO: Реализовать трату энергии игрока при использовании инструмента
         }
 
         /// <summary> Использовать инструмент в заданном направлении. </summary>
-        /// <param name="origin"> Точка начала взаимодействия. </param>
-        /// <param name="targetPosition"> Целевая позиция, в направлении которой используется инструмент. </param>
+        /// <param name="origin"> Начальная точка взаимодействия. </param>
+        /// <param name="targetPosition"> Целевая позиция, куда направлено взаимодействие. </param>
         /// <param name="player"> Контроллер игрока. </param>
         private void UseToolInDirection(Vector3 origin, Vector3 targetPosition, PlayerController player)
         {

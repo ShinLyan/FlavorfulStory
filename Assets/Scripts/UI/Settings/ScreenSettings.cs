@@ -4,46 +4,40 @@ using UnityEngine;
 
 namespace FlavorfulStory.Settings
 {
-    /// <summary> Настройки разрешения и режима окна. </summary>
+    /// <summary> Управляет настройками разрешения экрана и режимами отображения окна. </summary>
     public class ScreenSettings : MonoBehaviour
     {
-        /// <summary> Выпадающий список с типами окна. </summary>
+        /// <summary> Выпадающий список выбора разрешения экрана. </summary>
         [SerializeField] private TMP_Dropdown _resolutionDropdown;
 
-        /// <summary> Выпадающий список с разрешениями. </summary>
+        /// <summary> Выпадающий список выбора режима окна. </summary>
         [SerializeField] private TMP_Dropdown _screenModeDropdown;
 
-        /// <summary> Список разрешений. </summary>
+        /// <summary> Список доступных разрешений экрана. </summary>
         private readonly List<Resolution> _resolutions = new();
 
-        /// <summary> Список режимов окна. </summary>
-        private readonly List<string> _screenModeOptions = new() {
-            "Windowed", // "Окно",
-            "Full screen" // "Полный экран",
+        /// <summary> Список доступных режимов окна. </summary>
+        private readonly List<string> _screenModeOptions = new()
+        {
+            "Windowed", // Оконный режим
+            "Full screen" // Полноэкранный режим
         };
 
-        /// <summary> Вызывается при включении объекта. </summary>
+        /// <summary> Подписывается на события изменения настроек экрана при активации объекта. </summary>
         private void OnEnable()
         {
-            _resolutionDropdown.onValueChanged.AddListener(delegate
-            {
-                ResolutionOptionChanged();
-            });
-
-            _screenModeDropdown.onValueChanged.AddListener(delegate
-            {
-                ScreenModeChanged();
-            });
+            _resolutionDropdown.onValueChanged.AddListener(delegate { ResolutionOptionChanged(); });
+            _screenModeDropdown.onValueChanged.AddListener(delegate { ScreenModeChanged(); });
         }
 
-        /// <summary> Срабатывает при выборе пользователя в выпадающем списке разрещений. </summary>
+        /// <summary> Устанавливает выбранное пользователем разрешение экрана. </summary>
         private void ResolutionOptionChanged()
         {
-            Resolution resolution = _resolutions[_resolutionDropdown.value];
+            var resolution = _resolutions[_resolutionDropdown.value];
             Screen.SetResolution(resolution.width, resolution.height, Screen.fullScreenMode);
         }
 
-        /// <summary> Срабатывает при выборе пользователя в выпадающем списке режимов окна. </summary>
+        /// <summary> Устанавливает выбранный пользователем режим окна. </summary>
         private void ScreenModeChanged()
         {
             switch (_screenModeDropdown.value)
@@ -57,14 +51,14 @@ namespace FlavorfulStory.Settings
             }
         }
 
-        /// <summary> Вызывается при отключении объекта. </summary>
+        /// <summary> Отписывается от событий при отключении объекта. </summary>
         private void OnDisable()
         {
             _resolutionDropdown.onValueChanged.RemoveAllListeners();
             _screenModeDropdown.onValueChanged.RemoveAllListeners();
         }
 
-        /// <summary> Инициализация разрешений и рижемов окна и обновление значений в выпадаюзих списках. </summary>
+        /// <summary> Инициализирует настройки экрана при запуске. </summary>
         private void Start()
         {
             InitializeResolutions();
@@ -72,7 +66,7 @@ namespace FlavorfulStory.Settings
             UpdateDropdownValues();
         }
 
-        /// <summary> Получения всех поддерживаемых разрешений экрана и добавления их в соответствующий выпадающий список. </summary>
+        /// <summary> Получает все доступные разрешения экрана и заполняет выпадающий список. </summary>
         private void InitializeResolutions()
         {
             Resolution[] allResolutions = Screen.resolutions;
@@ -94,13 +88,11 @@ namespace FlavorfulStory.Settings
             _resolutionDropdown.RefreshShownValue();
         }
 
-        /// <summary> Получение всех поддерживаемых режимов экрана и добавления их в соответствующий выпадающий список. </summary>
+        /// <summary> Заполняет выпадающий список режимов экрана. </summary>
         private void InitializeScreenModes()
         {
             _screenModeDropdown.ClearOptions();
-
-            List<string> _screenModeDropdownOptions = _screenModeOptions;
-            _screenModeDropdown.AddOptions(_screenModeDropdownOptions);
+            _screenModeDropdown.AddOptions(_screenModeOptions);
 
             _screenModeDropdown.value = 1;
             Screen.fullScreenMode = FullScreenMode.FullScreenWindow;
@@ -108,7 +100,7 @@ namespace FlavorfulStory.Settings
             _screenModeDropdown.RefreshShownValue();
         }
 
-        /// <summary> Обновление значений выпадающих списков. </summary>
+        /// <summary> Обновляет отображаемые значения в выпадающих списках. </summary>
         private void UpdateDropdownValues()
         {
             _resolutionDropdown.RefreshShownValue();

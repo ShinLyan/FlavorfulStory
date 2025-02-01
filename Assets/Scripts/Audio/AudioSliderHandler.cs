@@ -3,34 +3,34 @@ using UnityEngine.UI;
 
 namespace FlavorfulStory.Audio
 {
-    /// <summary> Класс, считывающий значение слайдера. </summary>
+    /// <summary> Считывание значения слайдера для управления громкостью. </summary>
     [RequireComponent(typeof(Slider))]
     public class AudioSliderHandler : MonoBehaviour
     {
-        /// <summary> Тип громкости. </summary>
+        /// <summary> Тип громкости, связанный с этим слайдером. </summary>
         [SerializeField] private VolumeType _volumeType;
 
-        /// <summary> Настройки звука. </summary>
+        /// <summary> Ссылка на настройки звука. </summary>
         private Settings.AudioSettings _audioSettings;
 
-        /// <summary> Ссылка на слайдер. </summary>
+        /// <summary> Компонент слайдера. </summary>
         private Slider _slider;
 
-        /// <summary> Получение компонента слайдера. </summary>
+        /// <summary> Инициализация ссылки на слайдер и подписка на событие изменения значения. </summary>
         private void Awake()
         {
-            _audioSettings = FindObjectOfType<Settings.AudioSettings>();
+            _audioSettings = FindAnyObjectByType<Settings.AudioSettings>();
             _slider = GetComponent<Slider>();
             _slider.onValueChanged.AddListener(delegate { ValueChanged(); });
         }
 
-        /// <summary> При старте инициализируем значения слайдеров. </summary>
+        /// <summary> Установка начального значения слайдера на основе текущих настроек звука. </summary>
         private void Start()
         {
             _slider.value = _audioSettings.GetVolumeValueFromType(_volumeType);
         }
 
-        /// <summary> Вызывается при изменении значения слайдера. </summary>
+        /// <summary> Изменение значения в настройках звука при взаимодействии со слайдером. </summary>
         private void ValueChanged()
         {
             _audioSettings.SetMixerValue(_volumeType, _slider.value);

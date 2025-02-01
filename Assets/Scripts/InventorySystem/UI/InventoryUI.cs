@@ -2,19 +2,19 @@ using UnityEngine;
 
 namespace FlavorfulStory.InventorySystem.UI
 {
-    /// <summary> Инвентарь в UI - управляет созданием всех предметов инвентаря в UI. </summary>
+    /// <summary> РЈРїСЂР°РІР»РµРЅРёРµ РѕС‚РѕР±СЂР°Р¶РµРЅРёРµРј РёРЅРІРµРЅС‚Р°СЂСЏ РІ РїРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРѕРј РёРЅС‚РµСЂС„РµР№СЃРµ. </summary>
     public class InventoryUI : MonoBehaviour
     {
-        /// <summary> Префаб слота инвентаря. </summary>
+        /// <summary> РџСЂРµС„Р°Р± СЃР»РѕС‚Р° РґР»СЏ РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ РїСЂРµРґРјРµС‚Р°. </summary>
         [SerializeField] private InventorySlotUI _inventorySlotPrefab;
 
-        /// <summary> Место для спавна слотов инвентаря. </summary>
+        /// <summary> РњРµСЃС‚Рѕ, РіРґРµ СЃРѕР·РґР°СЋС‚СЃСЏ СЃР»РѕС‚С‹ РёРЅРІРµРЅС‚Р°СЂСЏ. </summary>
         private Transform _placeToSpawnSlots;
 
-        /// <summary> Инвентарь игрока. </summary>
+        /// <summary> РЎСЃС‹Р»РєР° РЅР° РёРЅРІРµРЅС‚Р°СЂСЊ РёРіСЂРѕРєР°. </summary>
         private Inventory _playerInventory;
 
-        /// <summary> Инициализация объекта. </summary>
+        /// <summary> РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РёРЅРІРµРЅС‚Р°СЂСЏ Рё РїРѕРґРїРёСЃРєР° РЅР° РѕР±РЅРѕРІР»РµРЅРёРµ РёРЅРІРµРЅС‚Р°СЂСЏ. </summary>
         private void Awake()
         {
             _playerInventory = Inventory.PlayerInventory;
@@ -23,20 +23,20 @@ namespace FlavorfulStory.InventorySystem.UI
             _placeToSpawnSlots = transform;
         }
 
-        /// <summary> При старте перерисовываем инвентарь. </summary>
+        /// <summary> РџРµСЂРІРёС‡РЅРѕРµ РѕР±РЅРѕРІР»РµРЅРёРµ РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ РёРЅРІРµРЅС‚Р°СЂСЏ. </summary>
         private void Start()
         {
             RedrawInventory();
         }
 
-        /// <summary> Перерисовать инвентарь. </summary>
+        /// <summary> РћР±РЅРѕРІР»РµРЅРёРµ РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ РёРЅРІРµРЅС‚Р°СЂСЏ. </summary>
         private void RedrawInventory()
         {
             DestroyAllSlots();
             SpawnInventorySlots();
         }
 
-        /// <summary> Уничтожить все слоты инвентаря. </summary>
+        /// <summary> РЈРґР°Р»РµРЅРёРµ РІСЃРµС… СЃСѓС‰РµСЃС‚РІСѓСЋС‰РёС… СЃР»РѕС‚РѕРІ РёРЅРІРµРЅС‚Р°СЂСЏ. </summary>
         private void DestroyAllSlots()
         {
             foreach (Transform child in _placeToSpawnSlots)
@@ -45,7 +45,7 @@ namespace FlavorfulStory.InventorySystem.UI
             }
         }
 
-        /// <summary> Создание слотов инвентаря. </summary>
+        /// <summary> РЎРѕР·РґР°РЅРёРµ РЅРѕРІС‹С… СЃР»РѕС‚РѕРІ РґР»СЏ РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ РїСЂРµРґРјРµС‚РѕРІ РёРЅРІРµРЅС‚Р°СЂСЏ. </summary>
         private void SpawnInventorySlots()
         {
             for (int index = 0; index < _playerInventory.InventorySize; index++)

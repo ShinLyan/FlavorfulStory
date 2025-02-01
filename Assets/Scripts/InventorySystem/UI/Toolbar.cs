@@ -1,9 +1,12 @@
+using FlavorfulStory.InputSystem;
+using FlavorfulStory.Saving;
 using UnityEngine;
 
 namespace FlavorfulStory.InventorySystem.UI
 {
-    /// <summary> Панель инструментов. </summary>
-    public class Toolbar : MonoBehaviour
+    /// <summary> Панель инструментов, отображающая и управляющая экипированными предметами. </summary>
+    /// <remarks> Данный класс обрабатывает выбор предметов, ввод мыши и поддерживает визуальное состояние слотов панели инструментов. </remarks>
+    public class Toolbar : MonoBehaviour, ISaveable
     {
         /// <summary> Массив слотов панели инструментов. </summary>
         private ToolbarSlotUI[] _slots;
@@ -14,14 +17,18 @@ namespace FlavorfulStory.InventorySystem.UI
         /// <summary> Выбранный предмет. </summary>
         public InventoryItem SelectedItem => _slots[SelectedItemIndex].GetItem();
 
-        /// <summary> Инициализация полей. </summary>
+        /// <summary> Инициализация полей и подписка на события тулбар слотов. </summary>
         private void Awake()
         {
             _slots = GetComponentsInChildren<ToolbarSlotUI>();
             Inventory.PlayerInventory.InventoryUpdated += RedrawToolbar;
+            foreach (var slot in _slots)
+            {
+                slot.OnSlotClicked += SelectItem;
+            }
         }
 
-        /// <summary> При старте перерисовываем инвентарь. </summary>
+        /// <summary> Первоначальная настройка панели инструментов. </summary>
         private void Start()
         {
             ResetToolbar();
@@ -29,46 +36,57 @@ namespace FlavorfulStory.InventorySystem.UI
             _slots[SelectedItemIndex].Select();
         }
 
-        /// <summary> Обрабатываем ввод колесика мыши. </summary>
+        /// <summary> Обрабатывает ввод колесика мыши в каждом кадре. </summary>
         private void Update()
         {
             HandleMouseScrollInput();
         }
 
-        /// <summary> Снять выделение со всех слотов тулбара. </summary>
+        /// <summary> Сбрасывает состояние выделения всех слотов панели инструментов. </summary>
         private void ResetToolbar()
         {
-            foreach (var toolbarSlot in _slots)
+            foreach (var slot in _slots)
             {
-                toolbarSlot.ResetSelection();
+                slot.ResetSelection();
             }
         }
-        
-        /// <summary> Перерисовать панель инструментов. </summary>
+
+        /// <summary> Обновляет визуальное представление всех слотов панели инструментов. </summary>
         private void RedrawToolbar()
         {
             foreach (var slot in _slots) slot.Redraw();
         }
 
-        /// <summary> Выбрать предмет на панели. </summary>
+        /// <summary> Выбирает предмет в панели инструментов по указанному индексу. </summary>
         /// <param name="index"> Индекс предмета, который нужно выбрать. </param>
         public void SelectItem(int index)
         {
             _slots[SelectedItemIndex].ResetSelection();
-
             SelectedItemIndex = index;
             _slots[SelectedItemIndex].Select();
         }
-        
-        /// <summary> Обработка ввода колесика мыши. </summary>
+
+        /// <summary> Обрабатывает ввод колесика мыши для смены выбранного предмета. </summary>
         private void HandleMouseScrollInput()
         {
-            var scrollInput = (int)Input.mouseScrollDelta.y;
+            var scrollInput = InputWrapper.GetMouseScrollDelta();
 
             if (scrollInput == 0) return;
-            
+
             var newSelectedItemIndex = Mathf.Clamp(SelectedItemIndex - scrollInput, 0, _slots.Length - 1);
             SelectItem(newSelectedItemIndex);
         }
+
+        #region Saving
+
+        /// <summary> Сохраняет текущее состояние выбранного индекса. </summary>
+        /// <returns> Индекс текущего выбранного предмета. </returns>
+        public object CaptureState() => SelectedItemIndex;
+
+        /// <summary> Восстанавливает сохраненное состояние выбранного индекса. </summary>
+        /// <param name="state"> Сохраненный индекс предмета. </param>
+        public void RestoreState(object state) => SelectedItemIndex = (int)state;
+
+        #endregion
     }
 }
