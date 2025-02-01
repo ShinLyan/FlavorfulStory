@@ -3,17 +3,17 @@ using UnityEngine;
 
 namespace FlavorfulStory.InventorySystem.TooltipSystem
 {
-    /// <summary> Тултип (всплывающая подсказка) предмета. </summary>
+    /// <summary> Отображает всплывающую подсказку для предмета. </summary>
     public class ItemTooltip : MonoBehaviour
     {
-        /// <summary> Текст заголовка. </summary>
+        /// <summary> Текст заголовка подсказки. </summary>
         [SerializeField] private TMP_Text _titleText;
 
-        /// <summary> Текст описания. </summary>
+        /// <summary> Текст описания подсказки. </summary>
         [SerializeField] private TMP_Text _descriptionText;
 
-        /// <summary> Установка значений тултип. </summary>
-        /// <param name="item"></param>
+        /// <summary> Устанавливает значения для отображения тултипа. </summary>
+        /// <param name="item"> Предмет, данные которого будут отображены. </param>
         public void Setup(InventoryItem item)
         {
             _titleText.text = item.ItemName;

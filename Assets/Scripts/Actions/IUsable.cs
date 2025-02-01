@@ -1,9 +1,9 @@
 using FlavorfulStory.Control;
 
-/// <summary> Интерфейс использования. </summary>
+/// <summary> РРЅС‚РµСЂС„РµР№СЃ РґР»СЏ РѕР±СЉРµРєС‚РѕРІ, РєРѕС‚РѕСЂС‹Рµ РјРѕР¶РЅРѕ РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ. </summary>
 public interface IUsable
 {
-    /// <summary> Использовать. </summary>
-    /// <param name="player"> Контроллер игрока. </param>
+    /// <summary> РСЃРїРѕР»СЊР·РѕРІР°РЅРёРµ РѕР±СЉРµРєС‚Р°. </summary>
+    /// <param name="player"> РРіСЂРѕРє, РёСЃРїРѕР»СЊР·СѓСЋС‰РёР№ РѕР±СЉРµРєС‚. </param>
     public void Use(PlayerController player);
 }

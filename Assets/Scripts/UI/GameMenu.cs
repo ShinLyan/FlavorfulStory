@@ -1,5 +1,4 @@
-using System.Collections.Generic;
-using FlavorfulStory.InputSystem;
+using System;
 using FlavorfulStory.SceneManagement;
 using TMPro;
 using UnityEngine;
@@ -18,10 +17,10 @@ namespace FlavorfulStory.UI
 
         /// <summary> Текст обозначения кнопки для переключения на предыдущую вкладку. </summary>
         [SerializeField] private TMP_Text _previousTabLabel;
-        
+
         /// <summary> Текст обозначения кнопки для переключения на следующую вкладку. </summary>
         [SerializeField] private TMP_Text _nextTabLabel;
-        
+
         /// <summary> Массив вкладок в меню. </summary>
         private Tab[] _tabs;
         
@@ -38,12 +37,15 @@ namespace FlavorfulStory.UI
                 _tabs[i].OnTabSelected += SelectTab;
                 _tabs[i].SetIndex(i);
             }
+            
+            _previousTabLabel.text = PreviousTabKey.ToString();
+            _nextTabLabel.text = NextTabKey.ToString();
         }
 
         /// <summary> Устанавливает начальную вкладку (главную). </summary>
         private void Start()
         {
-            _currentTabindex = 0; //MainTab по умолчанию
+            _currentTabindex = 0; // MainTab по умолчанию
             ShowCurrentTab();
         }
 

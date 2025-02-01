@@ -1,46 +1,45 @@
 using System;
+using System.Linq;
 
 namespace FlavorfulStory.UI
 {
-    /// <summary> Проверка полей ввода. </summary>
+    /// <summary> Р’Р°Р»РёРґР°С†РёСЏ РІРІРѕРґР° РІ С‚РµРєСЃС‚РѕРІС‹Рµ РїРѕР»СЏ. </summary>
     public static class InputFieldValidator
     {
-        /// <summary> Запрещенные символы. </summary>
+        /// <summary> Р—Р°РїСЂРµС‰С‘РЅРЅС‹Рµ СЃРёРјРІРѕР»С‹. </summary>
         private static readonly char[] ForbiddenCharacters =
-            { '"', '\'', '@', '#', '$', '%', '^', '&', '*', '(', ')', '=', '+',
-            '[', ']', '{', '}', '\\', '|', '/', '<', '>', '?', '`', '~' };
+        {
+            '"', '\'', '@', '#', '$', '%', '^', '&', '*', '(', ')', '=', '+',
+            '[', ']', '{', '}', '\\', '|', '/', '<', '>', '?', '`', '~'
+        };
 
-        /// <summary> Минимальная длина текста. </summary>
+        /// <summary> РњРёРЅРёРјР°Р»СЊРЅР°СЏ РґР»РёРЅР° СЃС‚СЂРѕРєРё. </summary>
         private const int MinLength = 3;
 
-        /// <summary> Максимальная длина текста. </summary>
+        /// <summary> РњР°РєСЃРёРјР°Р»СЊРЅР°СЏ РґР»РёРЅР° СЃС‚СЂРѕРєРё. </summary>
         private const int MaxLength = 20;
 
-        /// <summary> Сообщение об ошибке: пустое поле. </summary>
-        private static readonly string EmptyInputError = "The field cannot be empty!";
-        //private static readonly string EmptyInputError = "Поле не может быть пустым!";
+        /// <summary> РћС€РёР±РєР°: РїСѓСЃС‚РѕРµ РїРѕР»Рµ. </summary>
+        private const string EmptyInputError = "The field cannot be empty!";
 
-        /// <summary> Сообщение об ошибке: минимальная длина. </summary>
+        /// <summary> РћС€РёР±РєР°: С‚РµРєСЃС‚ СЃР»РёС€РєРѕРј РєРѕСЂРѕС‚РєРёР№. </summary>
         private static readonly string TooShortError = $"The text must be at least {MinLength} characters long.";
-        //private static readonly string TooShortError = $"Текст должен быть не менее {MinLength} символов.";
 
-        /// <summary> Сообщение об ошибке: максимальная длина. </summary>
+        /// <summary> РћС€РёР±РєР°: С‚РµРєСЃС‚ СЃР»РёС€РєРѕРј РґР»РёРЅРЅС‹Р№. </summary>
         private static readonly string TooLongError = $"The text must be no more than {MaxLength} characters long.";
-        //private static readonly string TooLongError = $"Текст должен быть не более {MaxLength} символов.";
 
-        /// <summary> Сообщение об ошибке: запрещённые символы. </summary>
-        private static readonly string ForbiddenCharactersError = "The text contains forbidden characters!";
-        //private static readonly string ForbiddenCharactersError = "Текст содержит запрещённые символы!";
+        /// <summary> РћС€РёР±РєР°: Р·Р°РїСЂРµС‰С‘РЅРЅС‹Рµ СЃРёРјРІРѕР»С‹. </summary>
+        private const string ForbiddenCharactersError = "The text contains forbidden characters!";
 
-        /// <summary> Проверяет, валиден ли текст ввода. </summary>
-        /// <param name="input"> Текст для проверки. </param>
-        /// <param name="warningMessage"> Сообщение об ошибке, если ввод невалиден. </param>
-        /// <returns> True, если ввод валиден; иначе False. </returns>
+        /// <summary> РџСЂРѕРІРµСЂРєР° РІР°Р»РёРґРЅРѕСЃС‚Рё СЃС‚СЂРѕРєРё. </summary>
+        /// <param name="input"> РЎС‚СЂРѕРєР° РґР»СЏ РїСЂРѕРІРµСЂРєРё. </param>
+        /// <param name="warningMessage"> РЎРѕРѕР±С‰РµРЅРёРµ РѕР± РѕС€РёР±РєРµ, РµСЃР»Рё СЃС‚СЂРѕРєР° РЅРµРІР°Р»РёРґРЅР°. </param>
+        /// <returns> True, РµСЃР»Рё СЃС‚СЂРѕРєР° РІР°Р»РёРґРЅР°; РёРЅР°С‡Рµ False. </returns>
         public static bool IsValid(string input, out string warningMessage)
         {
             input = input.Trim();
 
-            // Список проверок с соответствующими сообщениями об ошибках
+            // РЈСЃР»РѕРІРёСЏ РїСЂРѕРІРµСЂРєРё Рё СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓСЋС‰РёРµ РѕС€РёР±РєРё
             var checks = new (Func<bool> Condition, string ErrorMessage)[]
             {
                 (() => string.IsNullOrEmpty(input), EmptyInputError),
@@ -49,34 +48,23 @@ namespace FlavorfulStory.UI
                 (() => ContainsForbiddenCharacters(input), ForbiddenCharactersError)
             };
 
-            // Проверка условий
+            // РџСЂРѕРІРµСЂСЏРµРј РєР°Р¶РґРѕРµ СѓСЃР»РѕРІРёРµ
             foreach (var (condition, errorMessage) in checks)
             {
-                if (condition())
-                {
-                    warningMessage = errorMessage;
-                    return false;
-                }
+                if (!condition()) continue;
+                warningMessage = errorMessage;
+                return false;
             }
 
-            // Все проверки пройдены
+            // Р•СЃР»Рё РѕС€РёР±РѕРє РЅРµС‚
             warningMessage = string.Empty;
             return true;
         }
 
-        /// <summary> Проверяет, содержит ли текст запрещённые символы. </summary>
-        /// <param name="input"> Текст для проверки. </param>
-        /// <returns> True, если есть запрещённые символы; иначе False. </returns>
+        /// <summary> РџСЂРѕРІРµСЂРєР°, СЃРѕРґРµСЂР¶РёС‚ Р»Рё СЃС‚СЂРѕРєР° Р·Р°РїСЂРµС‰С‘РЅРЅС‹Рµ СЃРёРјРІРѕР»С‹. </summary>
+        /// <param name="input"> РЎС‚СЂРѕРєР° РґР»СЏ РїСЂРѕРІРµСЂРєРё. </param>
+        /// <returns> True, РµСЃР»Рё СЃС‚СЂРѕРєР° СЃРѕРґРµСЂР¶РёС‚ Р·Р°РїСЂРµС‰С‘РЅРЅС‹Рµ СЃРёРјРІРѕР»С‹; РёРЅР°С‡Рµ False. </returns>
         private static bool ContainsForbiddenCharacters(string input)
-        {
-            foreach (char c in ForbiddenCharacters)
-            {
-                if (input.Contains(c.ToString()))
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
+            => ForbiddenCharacters.Any(character => input.IndexOf(character) >= 0);
     }
 }

@@ -4,58 +4,59 @@ using UnityEngine.UI;
 
 namespace FlavorfulStory.UI
 {
-    /// <summary>
-    /// Абстрактный класс, реализующий поведение пользовательской кнопки с обработкой наведения и кликов мыши.
-    /// Класс требует наличия компонента Image.
-    /// </summary>
+    /// <summary> Базовый класс пользовательской кнопки с обработкой событий наведения и кликов. </summary>
+    /// <remarks> Требует наличия компонента <see cref="Image"/>. </remarks>
     [RequireComponent(typeof(Image))]
     public abstract class CustomButton : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
     {
-        /// <summary> Свойство для доступа к компоненту Image кнопки. </summary>
+        /// <summary> Компонент <see cref="Image"/> кнопки. </summary>
         protected Image ButtonImage { get; private set; }
-        
-        /// <summary> Флаг, указывающий, что мышь находится над кнопкой. </summary>
+
+        /// <summary> Находится ли курсор над кнопкой? </summary>
         protected bool IsMouseOver { get; private set; }
 
-        /// <summary> Вызывается при деактивации компонента. Сбрасывает состояние IsMouseOver. </summary>
+        /// <summary> Сброс состояния наведения при деактивации компонента. </summary>
         private void OnDisable()
         {
             IsMouseOver = false;
         }
 
-        /// <summary> Инициализация кнопки. Получает компонент Image и вызывает метод Initialize(). </summary>
+        /// <summary> Инициализация кнопки, получение компонента <see cref="Image"/>. </summary>
         protected virtual void Awake()
         {
             ButtonImage = GetComponent<Image>();
             Initialize();
         }
 
-        /// <summary> Абстрактный метод инициализации, который должен быть реализован в дочернем классе. </summary>
+        /// <summary> Метод инициализации, который должен быть реализован в дочерних классах. </summary>
         protected abstract void Initialize();
 
-        /// <summary> Абстрактный метод, вызываемый при начале наведения мыши на кнопку. </summary>
+        /// <summary> Действие при наведении курсора на кнопку. </summary>
         protected abstract void HoverStart();
 
-        /// <summary> Абстрактный метод, вызываемый при завершении наведения мыши на кнопку. </summary>
+        /// <summary> Действие при уходе курсора с кнопки. </summary>
         protected abstract void HoverEnd();
 
-        /// <summary> Абстрактный метод, вызываемый при клике на кнопку. </summary>
+        /// <summary> Действие при клике на кнопку. </summary>
         protected abstract void Click();
 
-        /// <summary> Обрабатывает событие клика по кнопке. </summary>
+        /// <summary> Вызывается при клике на кнопку. </summary>
+        /// <param name="eventData"> Данные события клика. </param>
         public void OnPointerClick(PointerEventData eventData)
         {
             Click();
         }
 
-        /// <summary> Обрабатывает событие наведения мыши на кнопку. </summary>
+        /// <summary> Вызывается при наведении курсора на кнопку. </summary>
+        /// <param name="eventData"> Данные события наведения. </param>
         public void OnPointerEnter(PointerEventData eventData)
         {
             IsMouseOver = true;
             HoverStart();
         }
 
-        /// <summary> Обрабатывает событие ухода мыши с кнопки. </summary>
+        /// <summary> Вызывается при уходе курсора с кнопки. </summary>
+        /// <param name="eventData"> Данные события ухода курсора. </param>
         public void OnPointerExit(PointerEventData eventData)
         {
             IsMouseOver = false;
