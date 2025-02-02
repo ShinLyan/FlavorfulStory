@@ -11,42 +11,28 @@ namespace FlavorfulStory.Actions.Interactables
         [SerializeField] private DropItem _dropItem;
 
         /// <summary> Название объекта, отображаемое в тултипе. </summary>
+        // TODO: Возможно надо будет выпилить и сделать нормально, более универсально
         private const string Name = "Wending stump";
-        
+
         /// <summary> Описание объекта, отображаемое в тултипе. </summary>
+        // TODO: Возможно надо будет выпилить и сделать нормально, более универсально
         private const string Description = "Press E, if hungry";
 
-        /// <summary> Флаг, определяющий возможность взаимодействия с объектом. </summary>
-        private bool _canInteract;
-
-        /// <summary> Инициализация объекта. </summary>
-        private void Awake()
-        {
-            _canInteract = true;
-        }
+        /// <summary> Проверяет, доступно ли взаимодействие с объектом. </summary>
+        public bool IsInteractionAllowed { get; set; } = true;
 
         /// <summary> Возвращает расстояние до другого трансформа. </summary>
         /// <param name="otherTransform"> Трансформ объекта, до которого вычисляется расстояние. </param>
         /// <returns> Расстояние между объектами. </returns>
-        public float GetDistanceTo(Transform otherTransform)
-        {
-            return Vector3.Distance(transform.position, otherTransform.position);
-        }
-
-        /// <summary> Проверяет, доступно ли взаимодействие с объектом. </summary>
-        /// <returns> Возвращает true, если взаимодействие разрешено. </returns>
-        public bool IsInteractionAllowed()
-        {
-            return _canInteract;
-        }
+        public float GetDistanceTo(Transform otherTransform) =>
+            Vector3.Distance(transform.position, otherTransform.position);
 
         /// <summary> Выполняет взаимодействие с объектом. </summary>
         public void Interact()
         {
-            if (_canInteract)
-            {
-                Inventory.PlayerInventory.TryAddToFirstEmptySlot(_dropItem.ItemPrefab, _dropItem.Quantity);
-            }
+            if (!IsInteractionAllowed) return;
+
+            Inventory.PlayerInventory.TryAddToFirstEmptySlot(_dropItem.ItemPrefab, _dropItem.Quantity);
         }
 
         /// <summary> Возвращает название для тултипа. </summary>

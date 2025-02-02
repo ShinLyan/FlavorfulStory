@@ -38,7 +38,7 @@ namespace FlavorfulStory.Control
         /// <summary> Событие, вызываемое при окончании взаимодейтсвия. </summary>
         /// <remarks> Событие срабатывает внутри метода EndInteraction(). </remarks>
         public event Action OnInteractionEnded;
-        
+
         /// <summary> Инициализация необходимых компонентов. </summary>
         private void Awake()
         {
@@ -82,8 +82,7 @@ namespace FlavorfulStory.Control
             if (_toolbar && CurrentItem is ActionItem actionItem &&
                 (Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1)) && CanUseTool)
             {
-                var actionType = Input.GetMouseButtonDown(0) ?
-                    UseActionType.LeftClick : UseActionType.RightClick;
+                var actionType = Input.GetMouseButtonDown(0) ? UseActionType.LeftClick : UseActionType.RightClick;
                 if (actionItem.UseActionType == actionType)
                 {
                     actionItem.Use(this);
@@ -101,7 +100,8 @@ namespace FlavorfulStory.Control
         /// <summary> Обработка ввода. Передача ввода в PlayerMover. </summary>
         private void InteractWithMovement()
         {
-            float x = InputWrapper.GetAxisRaw(InputButton.Horizontal), z = InputWrapper.GetAxisRaw(InputButton.Vertical);
+            float x = InputWrapper.GetAxisRaw(InputButton.Horizontal),
+                z = InputWrapper.GetAxisRaw(InputButton.Vertical);
             var direction = new Vector3(x, 0, z).normalized;
             _playerMover.SetMoveDirection(direction);
 
@@ -120,16 +120,6 @@ namespace FlavorfulStory.Control
         /// <summary> Закончить взаимодействие. </summary>
         /// <remarks> Метод подписан на событие в анимации игрока (Gather_interaction). </remarks>
         private void EndInteraction() => OnInteractionEnded?.Invoke();
-
-        /// <summary> Переключение контроллера игрока. </summary>
-        /// <remarks> Используется чтобы игрок не двигался до загрузки другой сцены. </remarks> 
-        /// <param name="enabled"> Включить / Выключить контроллер. </param>
-        public static void SwitchController(bool enabled)
-        {
-            // TODO: УДАЛИТЬ ЭТОТ КОСТЫЛЬ
-            var playerController = GameObject.FindWithTag("Player")?.GetComponent<PlayerController>();
-            if (playerController) playerController.enabled = enabled;
-        }
 
         /// <summary> Запуск анимации. </summary>
         /// <param name="animationName"> Имя анимации. </param>

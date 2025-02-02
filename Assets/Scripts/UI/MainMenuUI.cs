@@ -1,4 +1,3 @@
-using FlavorfulStory.Control;
 using System.Linq;
 using TMPro;
 using UnityEngine;
@@ -21,18 +20,6 @@ namespace FlavorfulStory.UI
         /// <remarks> Название формируется путем соединения строк имени игрока и названия магазина. </remarks>
         private string NewGameSaveFileName => string.Concat(_newGameInputFields.Select(field => field.text));
 
-        /// <summary> Вызывается при включении объекта. Отключает управление игроком. </summary>
-        private void OnEnable()
-        {
-            PlayerController.SwitchController(false);
-        }
-
-        /// <summary> Вызывается при выключении объекта. Включает управление игроком. </summary>
-        private void OnDisable()
-        {
-            PlayerController.SwitchController(true);
-        }
-
         /// <summary> Обрабатывает запуск новой игры. </summary>
         /// <remarks> Проверяет корректность заполнения полей ввода и, при успехе, 
         /// инициирует запуск новой игры через систему сохранений. </remarks>
@@ -46,15 +33,16 @@ namespace FlavorfulStory.UI
         /// <returns> Возвращает True, если все поля ввода заполнены корректно, иначе False. </returns>
         private bool AreInputFieldsValid()
         {
-            for (int i = 0; i < _newGameInputFields.Length; i++)
+            foreach (var inputField in _newGameInputFields)
             {
-                if (!InputFieldValidator.IsValid(_newGameInputFields[i].text, out string warningMessage))
+                if (!InputFieldValidator.IsValid(inputField.text, out var warningMessage))
                 {
                     _messageError.SetActive(true);
                     _errorText.text = warningMessage;
                     return false;
                 }
             }
+            
             _messageError.SetActive(false);
             return true;
         }
@@ -68,13 +56,8 @@ namespace FlavorfulStory.UI
         }
 
         /// <summary> Очистить текст во всех полях ввода. </summary>
-        private void ClearInputFields()
-        {
-            foreach (var inputField in _newGameInputFields)
-            {
-                inputField.text = string.Empty;
-            }
-        }
+        private void ClearInputFields() =>
+            System.Array.ForEach(_newGameInputFields, inputField => inputField.text = string.Empty);
         
         /// <summary> Продолжить ранее сохраненную игру. </summary>
         public void OnClickContinue() =>

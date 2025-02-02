@@ -4,7 +4,6 @@ using System.Linq;
 using FlavorfulStory.Control;
 using FlavorfulStory.InputSystem;
 using FlavorfulStory.TooltipSystem;
-using JetBrains.Annotations;
 using UnityEngine;
 
 namespace FlavorfulStory.Actions.Interactables
@@ -13,32 +12,34 @@ namespace FlavorfulStory.Actions.Interactables
     public class InteractFeature : MonoBehaviour
     {
         /// <summary> UI-объект для отображения тултипа взаимодействия. </summary>
-        [SerializeField] private InteractableObjectToolTip _interactableObjectTooltip;
-        
+        [SerializeField] private InteractableObjectTooltip _interactableObjectTooltip;
+
         /// <summary> Аниматор для управления анимациями в процессе взаимодействия. </summary>
         [SerializeField] private Animator _animator;
-        
+
         /// <summary> Ближайший объект, с которым можно взаимодействовать. </summary>
-        [CanBeNull] private IInteractable _nearestAllowedInteractable;
-        
+        private IInteractable _nearestAllowedInteractable;
+
         /// <summary> Список объектов, доступных для взаимодействия. </summary>
         private readonly List<IInteractable> _reachableInteractables = new();
 
         /// <summary> PlayerController родительского объекта. </summary>
         private PlayerController _playerController;
-        
+
         /// <summary> Флаг, указывающий, происходит ли в данный момент взаимодействие. </summary>
-        private bool _isInteracting = false;
-        
+        private bool _isInteracting;
+
         /// <summary> Хэш для анимации сбора. </summary>
         private readonly int _gather = Animator.StringToHash("Gather");
-        
-        /// <summary> Событие, вызываемое при начале взаимодействия. Используется для звуковых эффектов и других действий. </summary>
+
+        /// <summary> Событие, вызываемое при начале взаимодействия.
+        /// Используется для звуковых эффектов и других действий. </summary>
         public event Action OnInteractionStarted; // На будущее - для звуков и тд
-        
-        /// <summary> Событие, вызываемое при завершении взаимодействия. Используется для звуковых эффектов и других действий. </summary>
+
+        /// <summary> Событие, вызываемое при завершении взаимодействия.
+        /// Используется для звуковых эффектов и других действий. </summary>
         public event Action OnInteractionEnded; // На будущее - для звуков и тд
-        
+
         /// <summary> Инициализация компонента. </summary>
         /// <remarks> Подписка на событие OnInteractionEnded (PlayerController.cs). </remarks>
         private void Awake()
@@ -46,19 +47,15 @@ namespace FlavorfulStory.Actions.Interactables
             _playerController = GetComponentInParent<PlayerController>();
             _playerController.OnInteractionEnded += EndInteraction;
         }
-        
+
         /// <summary> Отписка от события OnInteractionEnded (PlayerController.cs). </summary>
-        private void OnDestroy()
-        {
-            _playerController.OnInteractionEnded -= EndInteraction;
-        }
-        
+        private void OnDestroy() => _playerController.OnInteractionEnded -= EndInteraction;
+
         /// <summary> Проверяет нажатие кнопки взаимодействия и вызывает метод Interact() для ближайшего объекта. </summary>
         private void Update()
         {
-            if (InputWrapper.GetButtonDown(InputButton.Interact) 
-                && _nearestAllowedInteractable != null
-                && !_isInteracting)
+            if (InputWrapper.GetButtonDown(InputButton.Interact) &&
+                _nearestAllowedInteractable != null && !_isInteracting)
             {
                 BeginInteraction();
                 _nearestAllowedInteractable?.Interact();
@@ -82,7 +79,7 @@ namespace FlavorfulStory.Actions.Interactables
             _nearestAllowedInteractable = GetNearestAllowedInteractable();
 
             _interactableObjectTooltip.gameObject.SetActive(_nearestAllowedInteractable != null);
-
+            
             if (_nearestAllowedInteractable == null) return;
 
             _interactableObjectTooltip.SetTitleAndDescription(_nearestAllowedInteractable);
@@ -101,14 +98,10 @@ namespace FlavorfulStory.Actions.Interactables
 
         /// <summary> Определяет ближайший объект для взаимодействия из доступных. </summary>
         /// <returns> Ближайший объект, с которым можно взаимодействовать, или null. </returns>
-        [CanBeNull]
-        private IInteractable GetNearestAllowedInteractable()
-        {
-            return _reachableInteractables
-                .Where(interactable => interactable.IsInteractionAllowed())
+        private IInteractable GetNearestAllowedInteractable() =>
+            _reachableInteractables.Where(interactable => interactable.IsInteractionAllowed)
                 .OrderBy(interactable => interactable.GetDistanceTo(transform))
                 .FirstOrDefault();
-        }
 
         /// <summary> Начать взаимодействие. </summary>
         private void BeginInteraction()

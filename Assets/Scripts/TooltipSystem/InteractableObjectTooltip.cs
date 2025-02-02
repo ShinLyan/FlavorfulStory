@@ -4,7 +4,7 @@ using UnityEngine;
 namespace FlavorfulStory.TooltipSystem
 {
     /// <summary> Отвечает за отображение тултипа для взаимодействуемых объектов. </summary>
-    public class InteractableObjectToolTip : MonoBehaviour
+    public class InteractableObjectTooltip : MonoBehaviour
     {
         /// <summary> Поле для отображения заголовка тултипа. </summary>
         [SerializeField] private TMP_Text _title;
