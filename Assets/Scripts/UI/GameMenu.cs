@@ -43,7 +43,7 @@ namespace FlavorfulStory.UI
         /// <summary> Устанавливает начальную вкладку (главную). </summary>
         private void Start()
         {
-            _currentTabindex = 0; //MainTab по умолчанию
+            _currentTabindex = 0; // MainTab по умолчанию
             ShowCurrentTab();
         }
 

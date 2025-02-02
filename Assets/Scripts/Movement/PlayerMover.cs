@@ -1,6 +1,5 @@
-using System;
-using FlavorfulStory.InputSystem;
 using FlavorfulStory.Saving;
+using FlavorfulStory.InputSystem;
 using UnityEngine;
 
 namespace FlavorfulStory.Movement
@@ -11,6 +10,7 @@ namespace FlavorfulStory.Movement
     public class PlayerMover : MonoBehaviour, ISaveable
     {
         #region Private Fields
+
         [Header("Параметры движения")]
         /// <summary> Скорость передвижения игрока. </summary>
         [SerializeField, Tooltip("Скорость передвижения игрока.")] private float _moveSpeed;
@@ -32,6 +32,7 @@ namespace FlavorfulStory.Movement
 
         /// <summary> Хэшированное значение параметра "скорость" для анимации. </summary>
         private static readonly int _speedParameterHash = Animator.StringToHash("Speed");
+
         #endregion
 
         /// <summary> Инициализация компонентов (Rigidbody и Animator). </summary>
@@ -68,7 +69,7 @@ namespace FlavorfulStory.Movement
             if (_lookDirection == Vector3.zero) return;
 
             _rigidbody.MoveRotation(
-                Quaternion.Slerp(transform.rotation, 
+                Quaternion.Slerp(transform.rotation,
                     Quaternion.LookRotation(_lookDirection),
                     Time.fixedDeltaTime * _rotateSpeed)
             );
@@ -80,8 +81,7 @@ namespace FlavorfulStory.Movement
         {
             const float WalkingMultiplier = 0.5f;
             const float RunningMultiplier = 1f;
-            return InputWrapper.GetButton(InputButton.Walking) ? WalkingMultiplier : RunningMultiplier; 
-        }
+            return InputWrapper.GetButton(InputButton.Walking) ? WalkingMultiplier : RunningMultiplier;         }
 
         /// <summary> Обновляет анимацию движения игрока в зависимости от скорости. </summary>
         /// <param name="directionMagnitude"> Величина направления движения. </param>

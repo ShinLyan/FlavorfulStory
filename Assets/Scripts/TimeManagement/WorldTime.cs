@@ -4,53 +4,55 @@ using UnityEngine;
 
 namespace FlavorfulStory.TimeManagement
 {
-    /// <summary> Глобальное игровое время. </summary>
+    /// <summary> Управляет глобальным игровым временем, изменяя его по тикам и вызывая события. </summary>
     public class WorldTime : MonoBehaviour, ISaveable
     {
-        /// <summary> Событие изменения времени. </summary>
+        /// <summary> Вызывается при изменении игрового времени. </summary>
         public static Action<DateTime> OnDateTimeChanged;
 
-        /// <summary> Событие окончания дня. </summary>
+        /// <summary> Вызывается при завершении игрового дня. </summary>
         public static Action OnDayEnded;
 
-        /// <summary> Изменение игрового времени за один тик. </summary>
-        [Header("Tick settings")] [Tooltip("Сколько минут проходит за один тик.")] [SerializeField]
+        [Header("Tick settings")]
+        /// <summary> Количество игровых минут, добавляемых за один тик. </summary>
+        [Tooltip("Сколько минут проходит за один тик.")]
+        [SerializeField]
         private int _tickMinutesIncrease = 10;
 
-        /// <summary> Время между тиками. </summary>
+        /// <summary> Время в секундах между тиками. </summary>
         [Tooltip("Сколько реального времени длится один тик.")] [SerializeField]
         private float _timeBetweenTicks = 1;
 
-        /// <summary> Во сколько начинается новый день. </summary>
-        [Header("Day/night settings")] [Tooltip("Во сколько начинается новый день.")] [SerializeField]
+        [Header("Day/night settings")]
+        /// <summary> Час начала нового дня. </summary>
+        [Tooltip("Во сколько начинается новый день.")]
+        [SerializeField]
         private int _dayStartHour;
 
-        /// <summary> Во сколько заканчивается день. </summary>
+        /// <summary> Час окончания дня. </summary>
         [Tooltip("Во сколько заканчивается день.")] [SerializeField]
         private int _dayEndHour;
 
-        /// <summary> Время между тиками. </summary>
+        /// <summary> Текущее время, прошедшее с момента последнего тика. </summary>
         private float _currentTimeBetweenTicks;
 
-        /// <summary> Объект DateTime. </summary>
+        /// <summary> Текущее игровое время. </summary>
         private DateTime _dateTime;
 
-        private ISaveable _saveableImplementation;
-
-        /// <summary> Создание объекта DateTime. </summary>
+        /// <summary> Создаёт объект `DateTime` и инициализирует его значением начала первого дня. </summary>
         private void Awake()
         {
-            // TODO: Если новая игра - инициализировать, иначе - нет.
+            // TODO: Если новая игра - инициализировать, иначе загрузить сохранённое время.
             _dateTime = new DateTime(1, Seasons.Spring, 1, _dayStartHour, 0);
         }
 
-        /// <summary> При старте обновляем UI. </summary>
+        /// <summary> Вызывает обновление UI при старте. </summary>
         private void Start()
         {
             OnDateTimeChanged?.Invoke(_dateTime);
         }
 
-        /// <summary> Вычисление игрового времени. </summary>
+        /// <summary> Обновляет игровое время, проверяя, прошёл ли очередной тик. </summary>
         private void Update()
         {
             _currentTimeBetweenTicks += Time.deltaTime;
@@ -62,10 +64,11 @@ namespace FlavorfulStory.TimeManagement
             }
         }
 
-        /// <summary> Увеличить время. </summary>
+        /// <summary> Увеличивает игровое время и проверяет завершение дня. </summary>
         private void IncreaseTime()
         {
             _dateTime.AddMinutes(_tickMinutesIncrease);
+
             if (_dateTime.Hour == _dayEndHour)
             {
                 OnDayEnded?.Invoke();
@@ -78,8 +81,8 @@ namespace FlavorfulStory.TimeManagement
         /// <summary> Обновляет время до начала нового дня в зависимости от текущего времени. </summary>
         public void StartNewDay()
         {
-            var isSameDay = _dateTime.Hour < _dayStartHour;
-            var dayAdjustment = isSameDay ? 0 : 1;
+            bool isSameDay = _dateTime.Hour < _dayStartHour;
+            int dayAdjustment = isSameDay ? 0 : 1;
 
             _dateTime = new DateTime(
                 _dateTime.Year,
@@ -94,11 +97,14 @@ namespace FlavorfulStory.TimeManagement
 
         #region Saving
 
+        /// <summary> Сохраняет текущее игровое время. </summary>
         public object CaptureState()
         {
             return _dateTime;
         }
 
+        /// <summary> Восстанавливает игровое время из сохранённого состояния. </summary>
+        /// <param name="state"> Сохранённое значение игрового времени. </param>
         public void RestoreState(object state)
         {
             _dateTime = (DateTime)state;

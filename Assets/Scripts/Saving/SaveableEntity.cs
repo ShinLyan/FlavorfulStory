@@ -18,7 +18,7 @@ namespace FlavorfulStory.Saving
         public object CaptureState()
         {
             var state = new Dictionary<string, object>();
-            foreach (ISaveable saveable in GetComponents<ISaveable>())
+            foreach (var saveable in GetComponents<ISaveable>())
             {
                 state[saveable.GetType().ToString()] = saveable.CaptureState();
             }
@@ -32,7 +32,7 @@ namespace FlavorfulStory.Saving
             var stateDict = state as Dictionary<string, object>;
             if (stateDict == null) return;
 
-            foreach (ISaveable saveable in GetComponents<ISaveable>())
+            foreach (var saveable in GetComponents<ISaveable>())
             {
                 string typeString = saveable.GetType().ToString();
                 if (stateDict.ContainsKey(typeString))

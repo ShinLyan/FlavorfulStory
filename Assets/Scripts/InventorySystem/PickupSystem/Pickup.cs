@@ -2,35 +2,37 @@
 
 namespace FlavorfulStory.InventorySystem.PickupSystem
 {
-    /// <summary> Подбор предмета. </summary>
-    /// <remarks> Размещается в специальном префабе. Содержит данные о подобранном предмете. </remarks>
+    /// <summary> Отвечает за механику подбора предметов игроком. </summary>
+    /// <remarks> Скрипт должен быть размещен на специальном префабе, содержащем данные о предмете. </remarks>
     [RequireComponent(typeof(SphereCollider))]
     public class Pickup : MonoBehaviour
     {
+        /// <summary> Радиус подбора предмета. </summary>
         [SerializeField, Range(0f, 5f), Tooltip("Радиус подбора предмета.")]
         private float _pickupRadius;
 
         /// <summary> Инвентарь игрока. </summary>
         private Inventory _inventory;
 
-        /// <summary> Предмет инвентаря. </summary>
-        [field: SerializeField] public InventoryItem Item { get; private set; }
+        /// <summary> Предмет, который можно подобрать. </summary>
+        [field: SerializeField]
+        public InventoryItem Item { get; private set; }
 
-        /// <summary> Количество предметов. </summary>
+        /// <summary> Количество предметов, доступных для подбора. </summary>
         public int Number { get; private set; } = 1;
 
-        /// <summary> Может быть подобран?</summary>
+        /// <summary> Указывает, может ли предмет быть подобран в текущий момент. </summary>
         public bool CanBePickedUp => _inventory.HasSpaceFor(Item);
 
-        /// <summary> Инициализация компонента. </summary>
+        /// <summary> Инициализация ссылки на инвентарь игрока. </summary>
         private void Awake()
         {
             var player = GameObject.FindGameObjectWithTag("Player");
             _inventory = player.GetComponent<Inventory>();
         }
 
-        /// <summary> Установить необходимые данные после создания префаба. </summary>
-        /// <param name="item"> Предмет, который нужно установить. </param>
+        /// <summary> Устанавливает данные для подбираемого предмета. </summary>
+        /// <param name="item"> Тип предмета. </param>
         /// <param name="number"> Количество предметов. </param>
         public void Setup(InventoryItem item, int number)
         {
@@ -38,7 +40,7 @@ namespace FlavorfulStory.InventorySystem.PickupSystem
             Number = number;
         }
 
-        /// <summary> Подобрать предмет. </summary>
+        /// <summary> Добавить предмет в инвентарь и удалить его из мира. </summary>
         public void PickupItem()
         {
             bool foundSlot = _inventory.TryAddToFirstEmptySlot(Item, Number);
@@ -46,11 +48,14 @@ namespace FlavorfulStory.InventorySystem.PickupSystem
         }
 
         #region Debug
+
+        /// <summary> Обновляет радиус коллайдера при изменении радиуса подбора в инспекторе. </summary>
         private void OnValidate()
         {
             var sphereCollider = GetComponent<SphereCollider>();
             sphereCollider.radius = _pickupRadius;
         }
+
         #endregion
     }
 }

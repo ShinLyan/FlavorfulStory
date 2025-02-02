@@ -3,12 +3,12 @@ using UnityEngine;
 
 namespace FlavorfulStory.Actions
 {
-    /// <summary> Выпадающий предмет и его количество. </summary>
+    /// <summary> Данные о предмете, выпадающем при взаимодействии. </summary>
     [System.Serializable]
     public class DropItem
     {
-        /// <summary> Префаб предмета, который будет падать. </summary>
-        [Tooltip("Префаб предмета, который будет падать.")]
+        /// <summary> Префаб предмета, который будет создан. </summary>
+        [Tooltip("Префаб предмета, который будет создан.")]
         public InventoryItem ItemPrefab;
 
         /// <summary> Количество выпадающих предметов. </summary>

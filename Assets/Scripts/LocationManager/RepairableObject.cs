@@ -2,10 +2,10 @@ using UnityEngine;
 
 namespace FlavorfulStory.LocationManager
 {
-    /// <summary> Восстанавливающийся объект. </summary>
+    /// <summary> Объект, который можно восстановить через взаимодействие. </summary>
     public class RepairableObject : InteractableObject2
     {
-        /// <summary> Взаимодействие. </summary>
+        /// <summary> Выполняет действие взаимодействия с восстанавливаемым объектом. </summary>
         public override void Interact()
         {
             base.Interact();

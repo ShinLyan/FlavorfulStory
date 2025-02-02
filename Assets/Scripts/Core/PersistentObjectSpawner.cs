@@ -3,19 +3,19 @@ using UnityEngine;
 
 namespace FlavorfulStory.Core
 {
-    /// <summary> Класс создает префаб только один раз для всех сцен. </summary>
-    /// <remarks> Поместите в инспекторе префаб, который будет присутствовать в каждой сцене и содержать все игровые объекты, являющиеся Singleton.
-    /// Класс создаст префаб только один раз и настроит его на сохранение между сценами. </remarks>
+    /// <summary> Создает объект-префаб только один раз и сохраняет его между сценами. </summary>
+    /// <remarks> Поместите в инспекторе префаб, содержащий объекты Singleton,
+    /// который будет сохраняться между сценами. </remarks>
     public class PersistentObjectSpawner : MonoBehaviour
     {
-        /// <summary> Префаб, который создается только один раз и сохраняется между сценами. </summary>
+        /// <summary> Префаб, создаваемый один раз и сохраняемый между сценами. </summary>
         [Tooltip("Префаб, который создается только один раз и сохраняется между сценами.")]
         [SerializeField] private GameObject _persistentObjectsPrefab;
 
-        /// <summary> Был ли заспавнен?</summary>
+        /// <summary> Был ли префаб уже создан? </summary>
         private bool _hasSpawned;
 
-        /// <summary> Создание постоянного объекта. </summary>
+        /// <summary> Проверка и создание объекта при загрузке сцены. </summary>
         private void Awake()
         {
             if (_hasSpawned) return;
@@ -26,7 +26,7 @@ namespace FlavorfulStory.Core
             InputWrapper.Initialize();
         }
 
-        /// <summary> Создание постоянного объекта. </summary>
+        /// <summary> Создает постоянный объект и устанавливает его сохранение между сценами. </summary>
         private void SpawnPersistentObject()
         {
             var persistentObject = Instantiate(_persistentObjectsPrefab);

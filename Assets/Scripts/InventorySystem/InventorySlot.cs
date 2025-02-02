@@ -1,11 +1,12 @@
 namespace FlavorfulStory.InventorySystem
 {
+    /// <summary> РЎР»РѕС‚ РёРЅРІРµРЅС‚Р°СЂСЏ, СЃРѕРґРµСЂР¶Р°С‰РёР№ РїСЂРµРґРјРµС‚ Рё РµРіРѕ РєРѕР»РёС‡РµСЃС‚РІРѕ. </summary>
     public struct InventorySlot
     {
-        /// <summary> Предмет, который может быть помещен в инвентарь. </summary>
+        /// <summary> РџСЂРµРґРјРµС‚, РЅР°С…РѕРґСЏС‰РёР№СЃСЏ РІ СЌС‚РѕРј СЃР»РѕС‚Рµ. </summary>
         public InventoryItem Item { get; set; }
 
-        /// <summary> Количество предметов в инвентаре. </summary>
+        /// <summary> РљРѕР»РёС‡РµСЃС‚РІРѕ РїСЂРµРґРјРµС‚РѕРІ РІ СЌС‚РѕРј СЃР»РѕС‚Рµ. </summary>
         public int Number { get; set; }
     }
 }
