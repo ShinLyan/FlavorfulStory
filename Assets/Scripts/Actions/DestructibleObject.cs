@@ -5,55 +5,57 @@ using UnityEngine;
 
 namespace FlavorfulStory.Actions
 {
-    /// <summary> Разрушаемый объект, взаимодействующий с игроком. </summary>
+    /// <summary> Разрушаемый объект. </summary>
     [RequireComponent(typeof(ItemDropper))]
     public abstract class DestructibleObject : InteractableObject
     {
-        /// <summary> Количество ударов, необходимое для разрушения объекта. </summary>
-        [Tooltip("Количество ударов, необходимое для разрушения объекта."), Range(1, 5)]
+        /// <summary> Количество ударов для разрушения объекта. </summary>
+        [Tooltip("Количество ударов для разрушения объекта."), Range(1, 5)]
         [SerializeField] private int _hitsToDestroy;
 
-        /// <summary> Тип инструмента, требуемого для разрушения объекта. </summary>
-        [Tooltip("Тип инструмента, требуемого для разрушения объекта.")]
+        /// <summary> Тип инструмента, необходимого для разрушения. </summary>
+        [Tooltip("Тип инструмента, необходимого для разрушения.")]
         [SerializeField] private ToolType _requiredTool;
 
-        /// <summary> Список предметов, выпадающих при разрушении объекта. </summary>
-        [Tooltip("Список предметов, выпадающих при разрушении объекта.")]
+        /// <summary> Список предметов, которые выпадут при разрушении. </summary>
+        [Tooltip("Список предметов, которые выпадут при разрушении.")]
         [SerializeField] private DropItem[] _dropItems;
 
-        /// <summary> Текущее количество ударов, нанесенных объекту. </summary>
+        /// <summary> Текущее количество ударов по объекту. </summary>
         private int _currentHits;
 
-        /// <summary> Задержка перед удалением объекта после разрушения. </summary>
         private const float DestroyDelay = 4f;
 
-        /// <summary> Событие, уведомляющее о разрушении объекта. </summary>
+        /// <summary> Событие, вызываемое при разрушении объекта. </summary>
         public event Action<DestructibleObject> OnObjectDestroyed;
 
-        /// <summary> Взаимодействие с объектом. </summary>
+        /// <summary> Взаимодействовать. </summary>
         /// <param name="player"> Контроллер игрока. </param>
         public override void Interact(PlayerController player)
         {
             if (player.CurrentItem is not Tool tool || tool.ToolType != _requiredTool) return;
 
             _currentHits++;
+            Debug.Log($"Object hit! Remaining hits: {_hitsToDestroy - _currentHits}");
 
             if (_currentHits >= _hitsToDestroy) DestroyObject();
         }
 
-        /// <summary> Разрушение объекта с вызовом связанных действий. </summary>
+        /// <summary> Уничтожить объект и сгенерировать выпадающие предметы. </summary>
         private void DestroyObject()
         {
+            Debug.Log($"Object destroyed: {gameObject.name}");
+
             OnObjectDestroyed?.Invoke(this);
             OnDestroyed();
             DropItems();
             Destroy(gameObject, DestroyDelay);
         }
 
-        /// <summary> Действия, выполняемые при разрушении объекта. </summary>
+        /// <summary> Действие, вызываемое при разрушении (например, прокачка навыков). </summary>
         protected abstract void OnDestroyed();
 
-        /// <summary> Выпадение предметов, связанных с объектом. </summary>
+        /// <summary> Выбросить предметы, настроенные в конкретных подклассах. </summary>
         protected virtual void DropItems()
         {
             var itemDropper = GetComponent<ItemDropper>();

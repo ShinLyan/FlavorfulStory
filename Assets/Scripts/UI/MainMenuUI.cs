@@ -1,86 +1,69 @@
-using FlavorfulStory.Control;
 using System.Linq;
 using TMPro;
 using UnityEngine;
 
 namespace FlavorfulStory.UI
 {
-    /// <summary> Интерфейс главного меню. </summary>
+    /// <summary> UI главного меню. </summary>
     public class MainMenuUI : MonoBehaviour
     {
-        /// <summary> Поля ввода, заполняемые игроком при старте новой игры. </summary>
+        /// <summary> Поля ввода, которые игрок заполняет при запуске новой игры. </summary>
         [SerializeField] private TMP_InputField[] _newGameInputFields;
 
-        /// <summary> Объект отображения ошибки. </summary>
+        /// <summary> Объект для отображения сообщения об ошибке. </summary>
         [SerializeField] private GameObject _messageError;
 
         /// <summary> Поле текста для вывода сообщений об ошибках. </summary>
         [SerializeField] private TMP_Text _errorText;
 
-        /// <summary> Название сохраненного файла для новой игры. </summary>
-        /// <remarks> Формируется путем объединения значений полей ввода. </remarks>
+        /// <summary> Название сохраненного файла для новой игры, формируемое на основе ввода игрока. </summary>
+        /// <remarks> Название формируется путем соединения строк имени игрока и названия магазина. </remarks>
         private string NewGameSaveFileName => string.Concat(_newGameInputFields.Select(field => field.text));
 
-        /// <summary> Подписка на событие включения. Отключает управление игроком. </summary>
-        private void OnEnable()
-        {
-            PlayerController.SwitchController(false);
-        }
-
-        /// <summary> Подписка на событие выключения. Включает управление игроком. </summary>
-        private void OnDisable()
-        {
-            PlayerController.SwitchController(true);
-        }
-
-        /// <summary> Запуск новой игры. </summary>
-        /// <remarks> Проверяет корректность введенных данных, затем запускает новую игру. </remarks>
+        /// <summary> Обрабатывает запуск новой игры. </summary>
+        /// <remarks> Проверяет корректность заполнения полей ввода и, при успехе, 
+        /// инициирует запуск новой игры через систему сохранений. </remarks>
         public void OnClickNewGame()
         {
             if (!AreInputFieldsValid()) return;
             PersistentObject.Instance.GetSavingWrapper().StartNewGame(NewGameSaveFileName);
         }
 
-        /// <summary> Проверка корректности введенных данных. </summary>
-        /// <returns> Возвращает True, если данные корректны, иначе False. </returns>
+        /// <summary> Проверяет поля ввода на корректность. </summary>
+        /// <returns> Возвращает True, если все поля ввода заполнены корректно, иначе False. </returns>
         private bool AreInputFieldsValid()
         {
             foreach (var inputField in _newGameInputFields)
             {
-                if (!InputFieldValidator.IsValid(inputField.text, out string warningMessage))
+                if (!InputFieldValidator.IsValid(inputField.text, out var warningMessage))
                 {
                     _messageError.SetActive(true);
                     _errorText.text = warningMessage;
                     return false;
                 }
             }
-
+            
             _messageError.SetActive(false);
             return true;
         }
 
-        /// <summary> Отмена ввода данных. </summary>
-        /// <remarks> Очищает поля ввода и скрывает сообщения об ошибках. </remarks>
+        /// <summary> Обрабатывает закрытие окна. </summary>
+        /// <remarks> Очищает поля ввода и скрывает сообщение об ошибке. </remarks>
         public void OnClickCancel()
         {
             ClearInputFields();
             _messageError.SetActive(false);
         }
 
-        /// <summary> Очистка полей ввода. </summary>
-        private void ClearInputFields()
-        {
-            foreach (var inputField in _newGameInputFields)
-            {
-                inputField.text = string.Empty;
-            }
-        }
-
-        /// <summary> Продолжение сохраненной игры. </summary>
+        /// <summary> Очистить текст во всех полях ввода. </summary>
+        private void ClearInputFields() =>
+            System.Array.ForEach(_newGameInputFields, inputField => inputField.text = string.Empty);
+        
+        /// <summary> Продолжить ранее сохраненную игру. </summary>
         public void OnClickContinue() =>
             PersistentObject.Instance.GetSavingWrapper().ContinueGame();
 
-        /// <summary> Выход из приложения. </summary>
+        /// <summary> Завершить работу приложения. </summary>
         public void OnClickQuit() => Application.Quit();
     }
 }

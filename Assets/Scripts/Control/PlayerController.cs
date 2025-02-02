@@ -1,4 +1,5 @@
-﻿using FlavorfulStory.Actions;
+﻿using System;
+using FlavorfulStory.Actions;
 using FlavorfulStory.InputSystem;
 using FlavorfulStory.InventorySystem;
 using FlavorfulStory.InventorySystem.UI;
@@ -33,6 +34,10 @@ namespace FlavorfulStory.Control
 
         /// <summary> Можно ли использовать инструмент? </summary>
         public bool CanUseTool => _toolCooldownTimer <= 0f;
+
+        /// <summary> Событие, вызываемое при окончании взаимодейтсвия. </summary>
+        /// <remarks> Событие срабатывает внутри метода EndInteraction(). </remarks>
+        public event Action OnInteractionEnded;
 
         /// <summary> Инициализация необходимых компонентов. </summary>
         private void Awake()
@@ -95,7 +100,8 @@ namespace FlavorfulStory.Control
         /// <summary> Обработка ввода. Передача ввода в PlayerMover. </summary>
         private void InteractWithMovement()
         {
-            float x = InputWrapper.GetAxisRaw(InputButton.Horizontal), z = InputWrapper.GetAxisRaw(InputButton.Vertical);
+            float x = InputWrapper.GetAxisRaw(InputButton.Horizontal),
+                z = InputWrapper.GetAxisRaw(InputButton.Vertical);
             var direction = new Vector3(x, 0, z).normalized;
             _playerMover.SetMoveDirection(direction);
 
@@ -111,15 +117,9 @@ namespace FlavorfulStory.Control
             if (_toolCooldownTimer > 0f) _toolCooldownTimer -= Time.deltaTime;
         }
 
-        /// <summary> Переключение контроллера игрока. </summary>
-        /// <remarks> Используется чтобы игрок не двигался до загрузки другой сцены. </remarks> 
-        /// <param name="enabled"> Включить / Выключить контроллер. </param>
-        public static void SwitchController(bool enabled)
-        {
-            // TODO: УДАЛИТЬ ЭТОТ КОСТЫЛЬ
-            var playerController = GameObject.FindWithTag("Player")?.GetComponent<PlayerController>();
-            if (playerController) playerController.enabled = enabled;
-        }
+        /// <summary> Закончить взаимодействие. </summary>
+        /// <remarks> Метод подписан на событие в анимации игрока (Gather_interaction). </remarks>
+        private void EndInteraction() => OnInteractionEnded?.Invoke();
 
         /// <summary> Запуск анимации. </summary>
         /// <param name="animationName"> Имя анимации. </param>
