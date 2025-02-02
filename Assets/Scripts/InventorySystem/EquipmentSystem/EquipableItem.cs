@@ -2,12 +2,12 @@ using UnityEngine;
 
 namespace FlavorfulStory.InventorySystem.EquipmentSystem
 {
-    /// <summary> Предмет инвентаря, которым игрок может экипироваться. Оружие может быть его подклассом. </summary>
+    /// <summary> Р­РєРёРїРёСЂСѓРµРјС‹Р№ РїСЂРµРґРјРµС‚, РїСЂРµРґРЅР°Р·РЅР°С‡РµРЅРЅС‹Р№ РґР»СЏ РёСЃРїРѕР»СЊР·РѕРІР°РЅРёСЏ РІ РѕРїСЂРµРґРµР»РµРЅРЅРѕРј СЃР»РѕС‚Рµ СЌРєРёРїРёСЂРѕРІРєРё. </summary>
     [CreateAssetMenu(menuName = ("FlavorfulStory/Inventory/Equipable Item"))]
     public class EquipableItem : InventoryItem
     {
-        /// <summary> Куда разрешается класть этот предмет. </summary>
-        [field: Tooltip("Куда нам разрешается класть этот предмет.")]
+        /// <summary> РЎР»РѕС‚ СЌРєРёРїРёСЂРѕРІРєРё, РІ РєРѕС‚РѕСЂС‹Р№ РјРѕР¶РµС‚ Р±С‹С‚СЊ РїРѕРјРµС‰РµРЅ РїСЂРµРґРјРµС‚. </summary>
+        [field: Tooltip("РЎР»РѕС‚ СЌРєРёРїРёСЂРѕРІРєРё, РІ РєРѕС‚РѕСЂС‹Р№ РјРѕР¶РµС‚ Р±С‹С‚СЊ РїРѕРјРµС‰РµРЅ РїСЂРµРґРјРµС‚.")]
         [field: SerializeField] public EquipmentType AllowedEquipmentLocation { get; private set; }
     }
 }

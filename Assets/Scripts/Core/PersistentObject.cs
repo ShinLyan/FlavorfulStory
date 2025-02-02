@@ -3,12 +3,13 @@ using UnityEngine;
 
 namespace FlavorfulStory
 {
-    /// <summary> Альтернатива использованию паттерна Singleton. </summary>
+    /// <summary> Р“Р»РѕР±Р°Р»СЊРЅС‹Р№ РѕР±СЉРµРєС‚, СЃРѕС…СЂР°РЅСЏСЋС‰РёР№СЃСЏ РјРµР¶РґСѓ СЃС†РµРЅР°РјРё (Singleton). </summary>
     public class PersistentObject : MonoBehaviour
     {
-        /// <summary> Синглтон. </summary>
+        /// <summary> Р­РєР·РµРјРїР»СЏСЂ Singleton. </summary>
         public static PersistentObject Instance { get; private set; }
 
+        /// <summary> РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ Singleton. </summary>
         private void Awake()
         {
             if (Instance)
@@ -16,15 +17,16 @@ namespace FlavorfulStory
                 Destroy(gameObject);
                 return;
             }
+
             Instance = this;
         }
 
-        /// <summary> Получить ссылку на SavingWrapper. </summary>
-        /// <returns> Возвращает ссылку на SavingWrapper. </returns>
+        /// <summary> РџРѕР»СѓС‡РµРЅРёРµ СЃСЃС‹Р»РєРё РЅР° РєРѕРјРїРѕРЅРµРЅС‚ SavingWrapper. </summary>
+        /// <returns> Р­РєР·РµРјРїР»СЏСЂ SavingWrapper. </returns>
         public SavingWrapper GetSavingWrapper() => GetComponentInChildren<SavingWrapper>();
 
-        /// <summary> Получить ссылку на Fader. </summary>
-        /// <returns> Возвращает ссылку на Fader. </returns>
+        /// <summary> РџРѕР»СѓС‡РµРЅРёРµ СЃСЃС‹Р»РєРё РЅР° РєРѕРјРїРѕРЅРµРЅС‚ Fader. </summary>
+        /// <returns> Р­РєР·РµРјРїР»СЏСЂ Fader. </returns>
         public Fader GetFader() => GetComponentInChildren<Fader>();
     }
 }

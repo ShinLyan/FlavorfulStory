@@ -4,43 +4,47 @@ using UnityEngine;
 
 namespace FlavorfulStory.InventorySystem.EquipmentSystem
 {
-    /// <summary> Хранилище предметов, которыми оснащен игрок. 
-    /// Предметы хранятся в специальных местах снаряжения. </summary>
-    /// <remarks>  Этот компонент должен быть размещен на объекте "Player". </remarks>
+    /// <summary> Управляет экипировкой игрока, позволяет добавлять, удалять и сохранять предметы экипировки. </summary>
+    /// <remarks> Скрипт предполагается размещать на объекте "Player". </remarks>
     public class Equipment : MonoBehaviour, ISaveable
     {
-        /// <summary> Экипированные предметы. </summary>
+        /// <summary> Текущее состояние экипировки, связанное со слотами. </summary>
         private Dictionary<EquipmentType, EquipableItem> _equippedItems = new();
 
-        /// <summary> Срабатывает, когда предметы в слотах добавляются / удаляются. </summary>
+        /// <summary> Событие, вызываемое при изменении состояния экипировки. </summary>
         public event System.Action EquipmentUpdated;
 
-        /// <summary> Получить предмет снаряжения по типу. </summary>
-        /// <param name="equipLocation"> Тип снаряжения. </param>
-        /// <returns> Возвращает предмет снаряжения по типу. </returns>
+        /// <summary> Получить предмет из указанного слота экипировки. </summary>
+        /// <param name="equipLocation"> Слот экипировки. </param>
+        /// <returns> Предмет, находящийся в слоте, или null, если слот пуст. </returns>
         public EquipableItem GetEquipmentFromType(EquipmentType equipLocation) =>
-            _equippedItems.TryGetValue(equipLocation, out var item) ? item : null;
+            _equippedItems.GetValueOrDefault(equipLocation);
 
-        /// <summary> Добавить предмет в указанное место снаряжения. </summary>
+        /// <summary> Добавить предмет в указанный слот экипировки. </summary>
+        /// <param name="slot"> Слот, куда добавляется предмет. </param>
+        /// <param name="item"> Экипируемый предмет. </param>
         public void AddItem(EquipmentType slot, EquipableItem item)
         {
             _equippedItems[slot] = item;
             EquipmentUpdated?.Invoke();
         }
 
-        /// <summary> Удалить предмет снаряжения по типу. </summary>
+        /// <summary> Удалить предмет из указанного слота экипировки. </summary>
+        /// <param name="slot"> Слот, из которого удаляется предмет. </param>
         public void RemoveItem(EquipmentType slot)
         {
             _equippedItems.Remove(slot);
             EquipmentUpdated?.Invoke();
         }
 
-        /// <summary> Получить список всех экипированных предметов. </summary>
+        /// <summary> Получить список всех слотов, где есть экипированные предметы. </summary>
+        /// <returns> Перечисление слотов с экипированными предметами. </returns>
         public IEnumerable<EquipmentType> GetEquippedItems() => _equippedItems.Keys;
 
         #region Saving
-        /// <summary> Фиксация состояния объекта при сохранении. </summary>
-        /// <returns> Возвращает объект, в котором фиксируется состояние. </returns>
+
+        /// <summary> Сохранить текущее состояние экипировки. </summary>
+        /// <returns> Сериализованные данные об экипировке. </returns>
         public object CaptureState()
         {
             var equippedItemsForSerialization = new Dictionary<EquipmentType, string>();
@@ -51,8 +55,8 @@ namespace FlavorfulStory.InventorySystem.EquipmentSystem
             return equippedItemsForSerialization;
         }
 
-        /// <summary> Восстановление состояния объекта при загрузке. </summary>
-        /// <param name="state"> Объект состояния, который необходимо восстановить. </param>
+        /// <summary> Восстановить состояние экипировки из сохраненных данных. </summary>
+        /// <param name="state"> Сохраненные данные экипировки. </param>
         public void RestoreState(object state)
         {
             _equippedItems = new Dictionary<EquipmentType, EquipableItem>();
@@ -64,6 +68,7 @@ namespace FlavorfulStory.InventorySystem.EquipmentSystem
                 if (item) _equippedItems[pair.Key] = item;
             }
         }
+
         #endregion
     }
 }

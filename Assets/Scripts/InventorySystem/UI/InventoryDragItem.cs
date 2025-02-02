@@ -2,7 +2,7 @@
 
 namespace FlavorfulStory.InventorySystem.UI
 {
-    /// <summary> Класс, позволяющий перетаскивать предметы в другие ячейки. </summary>
+    /// <summary> Позволяет перетаскивать предметы инвентаря между ячейками. </summary>
     public class InventoryDragItem : DragItem<InventoryItem>
     {
     }

@@ -18,13 +18,13 @@ namespace FlavorfulStory.UI
 
         /// <summary> Текст обозначения кнопки для переключения на предыдущую вкладку. </summary>
         [SerializeField] private TMP_Text _previousTabLabel;
-        
+
         /// <summary> Текст обозначения кнопки для переключения на следующую вкладку. </summary>
         [SerializeField] private TMP_Text _nextTabLabel;
-        
+
         /// <summary> Массив вкладок в меню. </summary>
         private Tab[] _tabs;
-        
+
         /// <summary> Индекс текущей активной вкладки. </summary>
         private int _currentTabindex;
 
@@ -43,7 +43,7 @@ namespace FlavorfulStory.UI
         /// <summary> Устанавливает начальную вкладку (главную). </summary>
         private void Start()
         {
-            _currentTabindex = 0; //MainTab по умолчанию
+            _currentTabindex = 0; // MainTab по умолчанию
             ShowCurrentTab();
         }
 
@@ -61,22 +61,23 @@ namespace FlavorfulStory.UI
         {
             if (InputWrapper.GetButtonDown(InputButton.SwitchGameMenu))
             {
-                var movementButtons = new List<InputButton> { InputButton.Horizontal, InputButton.Vertical};
-                if (_content.activeSelf)
-                {
-                    InputWrapper.UnblockInput(movementButtons);
-                    InputWrapper.UnblockInput(new[] { InputButton.MouseScroll });
-                }
-                else
-                {
-                    InputWrapper.BlockInput(movementButtons);
-                    InputWrapper.BlockInput(new[] { InputButton.MouseScroll });
-                }
-                
                 SwitchContent(!_content.activeSelf);
             }
         }
 
+        /// <summary> Переключает состояние видимости меню. </summary>
+        /// <param name="isEnabled"> Новое состояние видимости меню. </param>
+        private void SwitchContent(bool isEnabled)
+        {
+            var actions = new[] { InputButton.Horizontal, InputButton.Vertical, InputButton.MouseScroll };
+            if (!isEnabled)
+                InputWrapper.UnblockInput(actions);
+            else
+                InputWrapper.BlockInput(actions);
+
+            _content.SetActive(isEnabled);
+        }
+        
         /// <summary> Обрабатывает ввод для переключения между соседними вкладками. </summary>
         private void HandleAdjacentTabsInput()
         {
@@ -95,7 +96,7 @@ namespace FlavorfulStory.UI
         /// <summary> Обрабатывает ввод для нажатия на кнопки вкладок. </summary>
         private void HandleTabButtonsInput()
         {
-            if (_content.activeInHierarchy && 
+            if (_content.activeInHierarchy &&
                 InputWrapper.GetButtonDown(_tabs[_currentTabindex].InputButton))
             {
                 SwitchContent(false);
@@ -112,7 +113,7 @@ namespace FlavorfulStory.UI
                 }
             }
         }
-        
+
         /// <summary> Выбирает вкладку и скрывает текущую. </summary>
         /// <param name="index"> Индекс вкладки для выбора. </param>
         private void SelectTab(int index)
@@ -123,34 +124,15 @@ namespace FlavorfulStory.UI
         }
 
         /// <summary> Показывает текущую вкладку. </summary>
-        private void ShowCurrentTab()
-        {
-            _tabs[_currentTabindex].Select();
-        }
+        private void ShowCurrentTab() => _tabs[_currentTabindex].Select();
 
         /// <summary> Скрывает текущую вкладку. </summary>
-        private void HideCurrentTab()
-        {
-            _tabs[_currentTabindex].ResetSelection();
-        }
-
-        /// <summary> Переключает состояние видимости меню. </summary>
-        /// <param name="isEnabled"> Новое состояние видимости меню. </param>
-        private void SwitchContent(bool isEnabled)
-        {
-            _content.SetActive(isEnabled);
-        }
+        private void HideCurrentTab() => _tabs[_currentTabindex].ResetSelection();
 
         /// <summary> Скрывает меню. </summary>
-        public void Hide()
-        {
-            SwitchContent(false);
-        }
+        public void OnClickContinue() => SwitchContent(false);
 
         /// <summary> Обработчик нажатия кнопки возврата в главное меню. Загружает сцену главного меню. </summary>
-        public void OnClickReturnToMainMenu()
-        {
-            SavingWrapper.LoadSceneByName(SceneType.MainMenu.ToString());
-        }
+        public void OnClickReturnToMainMenu() => SavingWrapper.LoadSceneByName(SceneType.MainMenu.ToString());
     }
 }

@@ -11,13 +11,14 @@ namespace FlavorfulStory.Stats.CharacterStats
         /// <summary> Максимальное значение параметра. </summary>
         public float MaxValue { get; set; }
 
+        /// <summary> Инициализация параметров значением по умолчанию. </summary>
         private void Start()
         {
             CurrentValue = 100;
             MaxValue = 100;
         }
 
-        /// <summary> Сброс др максимального значения. </summary>
+        /// <summary> Восстанавливает параметр до максимального значения. </summary>
         public void ResetToMaxValue()
         {
             CurrentValue = MaxValue;

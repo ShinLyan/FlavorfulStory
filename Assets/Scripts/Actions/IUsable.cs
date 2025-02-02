@@ -1,9 +1,9 @@
 using FlavorfulStory.Control;
 
-/// <summary> Интерфейс использования. </summary>
+/// <summary> Интерфейс для объектов, которые можно использовать. </summary>
 public interface IUsable
 {
-    /// <summary> Использовать. </summary>
-    /// <param name="player"> Контроллер игрока. </param>
+    /// <summary> Использование объекта. </summary>
+    /// <param name="player"> Игрок, использующий объект. </param>
     public void Use(PlayerController player);
 }

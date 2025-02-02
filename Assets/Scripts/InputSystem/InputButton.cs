@@ -33,6 +33,9 @@
         /// <summary> Открыть вкладку настроек в игровом меню. </summary>
         OpenSettingsTab,
 
+        /// <summary> Взаимодействие с объектами. </summary>
+        Interact,
+
         /// <summary> Позиция курсора мыши. </summary>
         MousePosition
     }

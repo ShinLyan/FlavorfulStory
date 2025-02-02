@@ -3,14 +3,14 @@ using UnityEngine;
 
 namespace FlavorfulStory.Actions
 {
-    /// <summary> Интерактивный объект - абстрактный класс. </summary>
+    /// <summary> Базовый класс для объектов, с которыми можно взаимодействовать. </summary>
     public abstract class InteractableObject : MonoBehaviour
     {
-        /// <summary> Отображаемое сообщение при взаимодействии. </summary>
+        /// <summary> Сообщение для отображения при взаимодействии. </summary>
         [Tooltip("Сообщение, которое отображается при наведении на объект.")]
         [field: SerializeField] public string InteractionMessage { get; protected set; }
 
-        /// <summary> Метод, вызываемый при взаимодействии. </summary>
+        /// <summary> Взаимодействие с объектом. </summary>
         /// <param name="player"> Игрок, инициировавший взаимодействие. </param>
         public abstract void Interact(PlayerController player);
     }

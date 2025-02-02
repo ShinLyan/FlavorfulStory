@@ -1,12 +1,12 @@
 namespace FlavorfulStory.Actions
 {
-    /// <summary> Тип действия для использования предмета (ЛКМ или ПКМ). </summary>
+    /// <summary> РўРёРї РґРµР№СЃС‚РІРёСЏ, РІС‹РїРѕР»РЅСЏРµРјРѕРіРѕ РїСЂРё РёСЃРїРѕР»СЊР·РѕРІР°РЅРёРё РѕР±СЉРµРєС‚Р° (РЅР°РїСЂРёРјРµСЂ, РєР»РёРє РјС‹С€Рё). </summary>
     public enum UseActionType
     {
-        /// <summary> Левая кнопка мыши. </summary>
+        /// <summary> Р›РµРІС‹Р№ РєР»РёРє РјС‹С€Рё. </summary>
         LeftClick,
 
-        /// <summary> Правая кнопка мыши. </summary>
+        /// <summary> РџСЂР°РІС‹Р№ РєР»РёРє РјС‹С€Рё. </summary>
         RightClick
     }
 }
