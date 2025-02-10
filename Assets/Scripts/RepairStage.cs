@@ -1,0 +1,25 @@
+using System;
+using System.Collections.Generic;
+using FlavorfulStory.InventorySystem;
+using UnityEngine;
+
+[Serializable]
+public struct ResourceRequirement
+{
+    [Tooltip("Требуемый ресурс.")]
+    public InventoryItem Item;
+    
+    [Tooltip("Количество требуемого ресурса .")]
+    public int Quantity;
+}
+
+
+[Serializable]
+public struct RepairStage
+{
+    [Tooltip("Ресурсные требования для выполнения стадии ремонта.")]
+    public string objectName;
+    
+    [Tooltip("Ресурсные требования для выполнения стадии ремонта.")]
+    public List<ResourceRequirement> Requirements;
+}
