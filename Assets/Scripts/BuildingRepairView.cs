@@ -6,18 +6,22 @@ public class BuildingRepairView : MonoBehaviour
 {
     [SerializeField] private Image _background;
     [SerializeField] private RectTransform _mainWindowContent;
+
+    public bool IsOpen { get; private set; }
     
     public void Open()
     {
-        _background.gameObject.SetActive(true);
-        _mainWindowContent.gameObject.SetActive(true);
+        IsOpen = true;
+        _background.gameObject.SetActive(IsOpen);
+        _mainWindowContent.gameObject.SetActive(IsOpen);
         InputWrapper.BlockAllInput();
     }
 
     public void Close()
     {
-        _background.gameObject.SetActive(false);
-        _mainWindowContent.gameObject.SetActive(false);
+        IsOpen = false;
+        _background.gameObject.SetActive(IsOpen);
+        _mainWindowContent.gameObject.SetActive(IsOpen);
         InputWrapper.UnblockAllInput();
     }
 }

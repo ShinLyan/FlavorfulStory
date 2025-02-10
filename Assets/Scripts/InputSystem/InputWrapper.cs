@@ -67,15 +67,16 @@ namespace FlavorfulStory.InputSystem
 
         /// <summary> Проверяет нажатие кнопки в текущем кадре. </summary>
         ///<param name="button"> Проверяемая кнопка. </param>
+        /// ///<param name="masterAccess"> Флаг мастера. </param>
         ///<returns> True, если кнопка была нажата в текущем кадре. </returns>
-        public static bool GetButtonDown(InputButton button) =>
-            _allowedButtons[button] && Input.GetButtonDown(button.ToString());
+        public static bool GetButtonDown(InputButton button, bool masterAccess = false) =>
+            (_allowedButtons[button] || masterAccess) && Input.GetButtonDown(button.ToString());
 
         /// <summary> Проверяет удержание кнопки. </summary>
         ///<param name="button"> Проверяемая кнопка. </param>
         /// <param name="masterAccess"> Мастер флаг. </param>
         ///<returns> True, если кнопка удерживается. </returns>
-        public static bool GetButton(InputButton button, bool masterAccess = false) =>
+        public static bool GetButton(InputButton button) =>
             _allowedButtons[button] && Input.GetButton(button.ToString());
 
         /// <summary> Получает значение оси ввода. </summary>

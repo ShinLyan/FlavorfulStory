@@ -22,7 +22,7 @@ public class RepairableBuilding : MonoBehaviour, IInteractable
 
     private void Update()
     {
-        if (InputWrapper.GetButton(InputButton.SwitchGameMenu, true))
+        if (_repairView.IsOpen && InputWrapper.GetButtonDown(InputButton.SwitchGameMenu, true))
         {
             _repairView.Close();
         }
