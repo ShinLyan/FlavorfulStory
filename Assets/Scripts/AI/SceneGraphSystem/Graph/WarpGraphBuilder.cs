@@ -1,6 +1,6 @@
 namespace FlavorfulStory.AI.SceneGraphSystem
 {
-    public class WarpGraphBuilder
+    public static class WarpGraphBuilder
     {
         public static WarpGraph BuildGraph(AllWarpsSetup allWarpsSetup)
         {

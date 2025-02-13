@@ -51,7 +51,6 @@ namespace FlavorfulStory.Control
         {
             InteractSpecialAbilityKeys();
             InteractWithMovement();
-
             UpdateTimers();
         }
 

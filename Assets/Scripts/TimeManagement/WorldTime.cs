@@ -11,7 +11,7 @@ namespace FlavorfulStory.TimeManagement
         public static Action<DateTime> OnDateTimeChanged;
 
         /// <summary> Вызывается при завершении игрового дня. </summary>
-        public static Action OnDayEnded;
+        public static Action<DateTime> OnDayEnded;
 
         [Header("Tick settings")]
         /// <summary> Количество игровых минут, добавляемых за один тик. </summary>
@@ -71,7 +71,7 @@ namespace FlavorfulStory.TimeManagement
 
             if (_dateTime.Hour == _dayEndHour)
             {
-                OnDayEnded?.Invoke();
+                OnDayEnded?.Invoke(_dateTime);
                 StartNewDay();
             }
 

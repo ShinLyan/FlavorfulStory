@@ -1,5 +1,4 @@
 using FlavorfulStory.AI.Scheduling;
-using FlavorfulStory.AI.States;
 using FlavorfulStory.TimeManagement;
 using UnityEngine;
 
@@ -15,7 +14,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         private NpcSchedule _npcSchedule;
 
         /// <summary> Контроллер NPC, управляющий его поведением и анимациями. </summary>
-        private NpcController _npcController;
+        private NPC _npc;
 
         /// <summary> Текущая точка расписания, в которой находится NPC. </summary>
         private SchedulePoint _currentPoint;
@@ -23,13 +22,13 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         /// <summary> Инициализирует новое состояние рутины. </summary>
         /// <param name="stateController"> Контроллер состояний. </param>
         /// <param name="npcSchedule"> Расписание NPC. </param>
-        /// <param name="npcController"> Контроллер NPC. </param>
+        /// <param name="npc"> Контроллер NPC. </param>
         public RoutineState(StateController stateController, NpcSchedule npcSchedule,
-            NpcController npcController) : base(stateController)
+            NPC npc) : base(stateController)
         {
             _stateController = stateController;
             _npcSchedule = npcSchedule;
-            _npcController = npcController;
+            _npc = npc;
             _currentPoint = null;
         }
 
@@ -57,7 +56,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine
                 var animationClipName = _currentPoint.NpcAnimationClipName;
 
                 if (_currentPoint != null)
-                    _npcController.PlayStateAnimation(animationClipName);
+                    _npc.PlayStateAnimation(animationClipName);
             }
         }
 

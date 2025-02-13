@@ -1,5 +1,4 @@
 using FlavorfulStory.AI.Scheduling;
-using FlavorfulStory.AI.States;
 using FlavorfulStory.TimeManagement;
 using UnityEngine;
 using UnityEngine.AI;
@@ -20,12 +19,13 @@ namespace FlavorfulStory.AI.FiniteStateMachine
 
         /// <summary> Расписание NPC, определяющее его маршруты и точки перемещения. </summary>
         private NpcSchedule _npcSchedule;
+        private ScheduleParams _scheduleParams;
 
         /// <summary> Контроллер состояний, управляющий переключением между состояниями NPC. </summary>
         private StateController _stateController;
 
         /// <summary> Контроллер NPC, управляющий его поведением и анимациями. </summary>
-        private NpcController _npcController;
+        private NPC _npc;
 
         /// <summary> Текущая точка маршрута, к которой движется NPC. </summary>
         private SchedulePoint _currentPoint;
@@ -37,14 +37,14 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         /// <param name="stateController"> Контроллер состояний. </param>
         /// <param name="npcSchedule"> Расписание NPC. </param>
         /// <param name="navMeshAgent"> Компонент для навигации по NavMesh. </param>
-        /// <param name="npcController"> Контроллер NPC. </param>
+        /// <param name="npc"> Контроллер NPC. </param>
         public MovementState(StateController stateController, NpcSchedule npcSchedule,
-            NavMeshAgent navMeshAgent, NpcController npcController) : base(stateController)
+            NavMeshAgent navMeshAgent, NPC npc) : base(stateController)
         {
             _stateController = stateController;
             _npcSchedule = npcSchedule;
             _navMeshAgent = navMeshAgent;
-            _npcController = npcController;
+            _npc = npc;
             _currentPoint = null;
         }
 
@@ -58,7 +58,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         public override void Exit()
         {
             WorldTime.OnDateTimeChanged -= FindDestinationPoint;
-            _npcController.PlayMoveAnimation(0f, 0f);
+            _npc.PlayMoveAnimation(0f, 0f);
             _currentPoint = null;
         }
 
@@ -67,7 +67,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         public override void Update(float deltaTime)
         {
             _speed = Mathf.Clamp01(_navMeshAgent.velocity.magnitude);
-            _npcController.PlayMoveAnimation(_speed);
+            _npc.PlayMoveAnimation(_speed);
             SwitchStateIfPointReached();
         }
 
@@ -83,8 +83,19 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         /// <param name="currentTime"> Текущее время в игре. </param>
         private void FindDestinationPoint(DateTime currentTime)
         {
-            SchedulePoint closestPoint = _npcSchedule.Params[0].GetClosestSchedulePointInPath(currentTime);
-
+            // SchedulePoint closestPoint = _npcSchedule.Params[0].GetClosestSchedulePointInPath(currentTime);
+            //
+            // if (closestPoint != null && _currentPoint != closestPoint)
+            // {
+            //     _navMeshAgent.SetDestination(closestPoint.Position);
+            //     _currentPoint = closestPoint;
+            // }
+            //
+            // if (closestPoint == null)
+            //     Debug.LogError("Ближайшая точка отсутствует!");
+            
+            SchedulePoint closestPoint = _scheduleParams.GetClosestSchedulePointInPath(currentTime);
+            
             if (closestPoint != null && _currentPoint != closestPoint)
             {
                 _navMeshAgent.SetDestination(closestPoint.Position);
@@ -93,6 +104,11 @@ namespace FlavorfulStory.AI.FiniteStateMachine
             
             if (closestPoint == null)
                 Debug.LogError("Ближайшая точка отсутствует!");
+        }
+
+        public void SetNewSchedule(ScheduleParams newScheduleParams)
+        {
+            _scheduleParams = newScheduleParams;
         }
     }
 }

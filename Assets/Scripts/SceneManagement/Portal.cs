@@ -1,3 +1,4 @@
+using System;
 using FlavorfulStory.InputSystem;
 using UnityEngine;
 
@@ -9,8 +10,10 @@ namespace FlavorfulStory.SceneManagement
         /// <summary> Точка появления игрока после телепортации. </summary>
         [SerializeField] private Transform _spawnPoint;
 
+        [SerializeField] private LocationType _parentScene;
+        
         /// <summary> Тип сцены, в которую нужно перейти. </summary>
-        [SerializeField] private SceneType _sceneToLoad;
+        [SerializeField] private LocationType _sceneToLoad;
 
         /// <summary> Идентификатор назначения портала. </summary>
         [SerializeField] private DestinationIdentifier _destination;
@@ -38,25 +41,19 @@ namespace FlavorfulStory.SceneManagement
         /// <returns> Корутина для выполнения последовательных действий. </returns>
         private System.Collections.IEnumerator TeleportPlayer()
         {
-            transform.parent = null;
-            DontDestroyOnLoad(gameObject);
-
             InputWrapper.BlockAllInput();
+            
             yield return PersistentObject.Instance.GetFader().FadeOut(Fader.FadeOutTime);
-
-            SavingWrapper.Save();
-            yield return SavingWrapper.LoadSceneAsyncByName(_sceneToLoad.ToString());
-
-            SavingWrapper.Load();
+            
+            LocationChanger.EnableLocation(_sceneToLoad);
+            
             UpdatePlayerPosition(GetOtherPortal());
-
-            SavingWrapper.Save();
-
+            
             yield return new WaitForSeconds(Fader.FadeWaitTime);
             PersistentObject.Instance.GetFader().FadeIn(Fader.FadeInTime);
-
+            
             InputWrapper.UnblockAllInput();
-            Destroy(gameObject);
+            LocationChanger.DisableLocation(_parentScene);
         }
 
         /// <summary> Обновляет позицию и поворот игрока после телепортации. </summary>
@@ -64,7 +61,8 @@ namespace FlavorfulStory.SceneManagement
         private void UpdatePlayerPosition(Portal portal)
         {
             var player = GameObject.FindWithTag("Player");
-            player.transform.SetPositionAndRotation(portal._spawnPoint.position, portal._spawnPoint.rotation);
+            var playerRigidbody = player.GetComponent<Rigidbody>();
+            playerRigidbody.Move(portal._spawnPoint.transform.position, portal._spawnPoint.transform.rotation);
         }
 
         /// <summary> Находит другой портал с тем же идентификатором назначения. </summary>
