@@ -1,21 +1,18 @@
 using FlavorfulStory.AI.FiniteStateMachine;
+using FlavorfulStory.AI.SceneGraphSystem;
 using FlavorfulStory.AI.Scheduling;
 using FlavorfulStory.SceneManagement;
 using UnityEngine;
 using UnityEngine.AI;
-using UnityEngine.Serialization;
 
 namespace FlavorfulStory.AI
 {
     /// <summary> Контроллер NPC, управляющий состояниями и поведением персонажа. </summary>
     public class NPC : MonoBehaviour
     {
-        #region Properties
         public NpcName Name => _npcName;
-        [FormerlySerializedAs("CurrentSceneName")] public LocationType _currentLocationName;
-        #endregion
-        
-        #region Fields
+        public LocationType _currentLocationName;
+
         [SerializeField] private NpcName _npcName;
         
         /// <summary> Расписание NPC, определяющее его поведение и маршруты. </summary>
@@ -46,7 +43,10 @@ namespace FlavorfulStory.AI
         private StateController _stateController;
         
         private ScheduleParams _currentScheduleParams;
-        #endregion
+        
+        private WarpGraph _warpGraph;
+        [SerializeField] private AllWarpsSetup _allWarpsSetup;
+
 
         /// <summary> Инициализация компонентов и состояний. </summary>
         private void Awake()
@@ -56,9 +56,11 @@ namespace FlavorfulStory.AI
 
             _stateController = new StateController();
 
+            _warpGraph = WarpGraphBuilder.BuildGraph(_allWarpsSetup);
+
             // Инициализация состояний.
             _interactionState = new InteractionState(_stateController);
-            _movementState = new MovementState(_stateController, _npcSchedule, _navMeshAgent, this);
+            _movementState = new MovementState(_stateController, _npcSchedule, _navMeshAgent, this, _warpGraph);
             _routineState = new RoutineState(_stateController, _npcSchedule, this);
             _waitingState = new WaitingState(_stateController);
 

@@ -17,9 +17,10 @@ namespace FlavorfulStory.AI.Scheduling
         [Range(0, 59), Tooltip("Минута, в которую NPC отправится на указанную точку.")] public int Minutes;
 
         /// <summary> Название сцены, на которой действительны указанные координаты. </summary>
+        [FormerlySerializedAs("_locationName")]
         [FormerlySerializedAs("SceneName")]
         [Header("Scene Settings")]
-        [Tooltip("Название сцены, на которой действительны указанные координаты.")] public LocationType _locationName;
+        [Tooltip("Название сцены, на которой действительны указанные координаты.")] public LocationType LocationName;
 
         /// <summary> Координаты, в которые должен прийти NPC. </summary>
         [Tooltip("Координаты, в которые должен прийти NPC.")] public Vector3 Position;

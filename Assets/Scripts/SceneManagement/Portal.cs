@@ -1,5 +1,6 @@
 using System;
 using FlavorfulStory.InputSystem;
+using FlavorfulStory.Movement;
 using UnityEngine;
 
 namespace FlavorfulStory.SceneManagement
@@ -62,7 +63,15 @@ namespace FlavorfulStory.SceneManagement
         {
             var player = GameObject.FindWithTag("Player");
             var playerRigidbody = player.GetComponent<Rigidbody>();
-            playerRigidbody.Move(portal._spawnPoint.transform.position, portal._spawnPoint.transform.rotation);
+            var playerMover = player.GetComponent<PlayerMover>();
+            // playerRigidbody.Move(portal._spawnPoint.transform.position, portal._spawnPoint.transform.localRotation);
+            playerRigidbody.Move(portal._spawnPoint.transform.position, Quaternion.Euler(0, 90, 0));
+            // playerMover.SetLookRotation(Quaternion.Euler(0, 90, 0));
+            // player.transform.position = portal._spawnPoint.position;
+            // Debug.Log(portal._spawnPoint.transform.rotation.eulerAngles + " " +  portal._spawnPoint.transform.localRotation.eulerAngles);
+            playerMover.SetLookRotation(new Vector3(0, 90, 0));
+            // playerMover.SetLookRotation(portal._spawnPoint.rotation.eulerAngles);
+            // Debug.Log(portal._spawnPoint.rotation.eulerAngles);
         }
 
         /// <summary> Находит другой портал с тем же идентификатором назначения. </summary>

@@ -1,13 +1,13 @@
 using System;
+using FlavorfulStory.SceneManagement;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 namespace FlavorfulStory.AI.SceneGraphSystem
 {
     [Serializable]
     public class Warp
     {
-        public TestSceneType sceneType;
+        public LocationType sceneType;
         public Vector3 position;
         public ConnectedWarp[] connectedWarps;
     }
@@ -15,7 +15,7 @@ namespace FlavorfulStory.AI.SceneGraphSystem
     [Serializable]
     public class ConnectedWarp
     {
-        public TestSceneType _sceneType;
+        public LocationType _sceneType;
         public int _pathTimeDuration;
     }
 }
