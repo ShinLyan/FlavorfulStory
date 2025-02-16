@@ -12,7 +12,7 @@ namespace FlavorfulStory.SceneManagement
         [SerializeField] private Transform _spawnPoint;
 
         [SerializeField] private LocationType _parentScene;
-        
+
         /// <summary> Тип сцены, в которую нужно перейти. </summary>
         [SerializeField] private LocationType _sceneToLoad;
 
@@ -34,44 +34,35 @@ namespace FlavorfulStory.SceneManagement
         private void OnTriggerEnter(Collider other)
         {
             if (!other.CompareTag("Player")) return;
-
-            StartCoroutine(TeleportPlayer());
+            
+            StartCoroutine(TeleportPlayer(other.GetComponent<Rigidbody>(), other.GetComponent<PlayerMover>()));
         }
 
         /// <summary> Телепортирует игрока через портал, загружая новую сцену. </summary>
         /// <returns> Корутина для выполнения последовательных действий. </returns>
-        private System.Collections.IEnumerator TeleportPlayer()
+        private System.Collections.IEnumerator TeleportPlayer(Rigidbody playerRigidbody, PlayerMover playerMover)
         {
             InputWrapper.BlockAllInput();
-            
+
             yield return PersistentObject.Instance.GetFader().FadeOut(Fader.FadeOutTime);
-            
+
             LocationChanger.EnableLocation(_sceneToLoad);
-            
-            UpdatePlayerPosition(GetOtherPortal());
-            
+
+            UpdatePlayerPosition(GetOtherPortal(), playerRigidbody, playerMover);
+
             yield return new WaitForSeconds(Fader.FadeWaitTime);
             PersistentObject.Instance.GetFader().FadeIn(Fader.FadeInTime);
-            
+
             InputWrapper.UnblockAllInput();
             LocationChanger.DisableLocation(_parentScene);
         }
 
         /// <summary> Обновляет позицию и поворот игрока после телепортации. </summary>
         /// <param name="portal"> Портал, в который переместился игрок. </param>
-        private void UpdatePlayerPosition(Portal portal)
+        private void UpdatePlayerPosition(Portal portal, Rigidbody playerRigidbody, PlayerMover playerMover)
         {
-            var player = GameObject.FindWithTag("Player");
-            var playerRigidbody = player.GetComponent<Rigidbody>();
-            var playerMover = player.GetComponent<PlayerMover>();
-            // playerRigidbody.Move(portal._spawnPoint.transform.position, portal._spawnPoint.transform.localRotation);
-            playerRigidbody.Move(portal._spawnPoint.transform.position, Quaternion.Euler(0, 90, 0));
-            // playerMover.SetLookRotation(Quaternion.Euler(0, 90, 0));
-            // player.transform.position = portal._spawnPoint.position;
-            // Debug.Log(portal._spawnPoint.transform.rotation.eulerAngles + " " +  portal._spawnPoint.transform.localRotation.eulerAngles);
-            playerMover.SetLookRotation(new Vector3(0, 90, 0));
-            // playerMover.SetLookRotation(portal._spawnPoint.rotation.eulerAngles);
-            // Debug.Log(portal._spawnPoint.rotation.eulerAngles);
+            playerRigidbody.MovePosition(portal._spawnPoint.transform.position);
+            playerMover.SetLookRotation(portal._spawnPoint.transform.rotation);
         }
 
         /// <summary> Находит другой портал с тем же идентификатором назначения. </summary>
@@ -83,6 +74,7 @@ namespace FlavorfulStory.SceneManagement
                 if (portal == this || portal._destination != _destination) continue;
                 return portal;
             }
+
             return null;
         }
     }

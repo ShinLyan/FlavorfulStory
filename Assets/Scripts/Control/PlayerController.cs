@@ -106,7 +106,7 @@ namespace FlavorfulStory.Control
 
             if (direction != Vector3.zero)
             {
-                _playerMover.SetLookRotation(direction);
+                _playerMover.SetLookRotation(Quaternion.LookRotation(direction));
             }
         }
 
@@ -138,7 +138,7 @@ namespace FlavorfulStory.Control
         {
             Vector3 direction = (position - transform.position).normalized;
             direction.y = 0; // Игнорируем вертикальную составляющую
-            _playerMover.SetLookRotation(direction);
+            _playerMover.SetLookRotation(Quaternion.LookRotation(direction));
         }
     }
 }

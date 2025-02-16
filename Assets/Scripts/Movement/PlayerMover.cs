@@ -13,19 +13,21 @@ namespace FlavorfulStory.Movement
 
         [Header("Параметры движения")]
         /// <summary> Скорость передвижения игрока. </summary>
-        [SerializeField, Tooltip("Скорость передвижения игрока.")] private float _moveSpeed;
+        [SerializeField, Tooltip("Скорость передвижения игрока.")]
+        private float _moveSpeed;
 
         /// <summary> Скорость поворота игрока. </summary>
-        [SerializeField, Tooltip("Скорость поворота игрока.")] private float _rotateSpeed;
-        
+        [SerializeField, Tooltip("Скорость поворота игрока.")]
+        private float _rotateSpeed;
+
         /// <summary> Компонент Rigidbody, отвечающий за физику движения игрока. </summary>
         private Rigidbody _rigidbody;
 
         /// <summary> Текущий вектор направления движения игрока. </summary>
         private Vector3 _moveDirection;
 
-        /// <summary> Текущий вектор поворота (направления взгляда) игрока. </summary>
-        private Vector3 _lookDirection;
+        /// <summary> Текущее направление взгляда игрока. </summary>
+        private Quaternion _lookRotation = Quaternion.identity;
 
         /// <summary> Компонент Animator для управления анимациями игрока. </summary>
         private Animator _animator;
@@ -66,11 +68,9 @@ namespace FlavorfulStory.Movement
         /// <summary> Плавно поворачивает игрока в указанном направлении. </summary>
         private void Rotate()
         {
-            if (_lookDirection == Vector3.zero) return;
-
             _rigidbody.MoveRotation(
                 Quaternion.Slerp(transform.rotation,
-                    Quaternion.LookRotation(_lookDirection),
+                    _lookRotation,
                     Time.fixedDeltaTime * _rotateSpeed)
             );
         }
@@ -81,7 +81,8 @@ namespace FlavorfulStory.Movement
         {
             const float WalkingMultiplier = 0.5f;
             const float RunningMultiplier = 1f;
-            return InputWrapper.GetButton(InputButton.Walking) ? WalkingMultiplier : RunningMultiplier;         }
+            return InputWrapper.GetButton(InputButton.Walking) ? WalkingMultiplier : RunningMultiplier;
+        }
 
         /// <summary> Обновляет анимацию движения игрока в зависимости от скорости. </summary>
         /// <param name="directionMagnitude"> Величина направления движения. </param>
@@ -96,11 +97,12 @@ namespace FlavorfulStory.Movement
         /// <param name="direction"> Вектор направления движения. </param>
         public void SetMoveDirection(Vector3 direction) => _moveDirection = direction;
 
-        /// <summary> Устанавливает направление поворота игрока. </summary>
-        /// <param name="direction"> Вектор направления взгляда. </param>
-        public void SetLookRotation(Vector3 direction) => _lookDirection = direction;
+        /// <summary> Устанавливает направление взгяда игрока. </summary>
+        /// <param name="rotation"> Кватернион направления взгляда. </param>
+        public void SetLookRotation(Quaternion rotation) => _lookRotation = rotation;
 
         #region Saving
+
         /// <summary> Структура для сохранения позиции и поворота игрока. </summary>
         [System.Serializable]
         private struct MoverSaveData
@@ -128,6 +130,7 @@ namespace FlavorfulStory.Movement
             transform.position = data.Position.ToVector();
             transform.eulerAngles = data.Rotation.ToVector();
         }
+
         #endregion
     }
 }
