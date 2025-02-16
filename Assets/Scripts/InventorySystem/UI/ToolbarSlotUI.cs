@@ -61,6 +61,10 @@ namespace FlavorfulStory.InventorySystem.UI
             OnSlotClicked?.Invoke(_index);
         }
 
+        protected override void OnInteractionEnabled() {}
+
+        protected override void OnInteractionDisabled() {}
+
         /// <summary> Выделяет данный слот. </summary>
         public void Select()
         {

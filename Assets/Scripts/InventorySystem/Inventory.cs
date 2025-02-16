@@ -1,4 +1,6 @@
-﻿using FlavorfulStory.Saving;
+﻿using System;
+using System.Linq;
+using FlavorfulStory.Saving;
 using UnityEngine;
 
 namespace FlavorfulStory.InventorySystem
@@ -8,8 +10,8 @@ namespace FlavorfulStory.InventorySystem
     public class Inventory : MonoBehaviour, ISaveable
     {
         /// <summary> Количество слотов в инвентаре. </summary>
-        [Tooltip("Количество слотов в инвентаре.")]
-        [SerializeField] private int _inventorySize = 16;
+        [Tooltip("Количество слотов в инвентаре.")] [SerializeField]
+        private int _inventorySize = 16;
 
         /// <summary> Предметы инвентаря. </summary>
         private InventorySlot[] _slots;
@@ -38,6 +40,7 @@ namespace FlavorfulStory.InventorySystem
                 {
                     return GameObject.FindWithTag("Player").GetComponent<Inventory>();
                 }
+
                 return _playerInventory;
             }
             private set => _playerInventory = value;
@@ -50,7 +53,9 @@ namespace FlavorfulStory.InventorySystem
         /// <param name="item"> Предмет, который нужно поместить в слот. </param>
         /// <returns> Возвращает индекс слота предмета. Если предмет не найден, возвращает -1. </returns>
         private int FindSlot(InventoryItem item) => FindStackIndex(item) is var slotIndex
-            && slotIndex < 0 ? FindEmptySlot() : slotIndex;
+                                                    && slotIndex < 0
+            ? FindEmptySlot()
+            : slotIndex;
 
         /// <summary> Найти индекс существующего стака предметов этого типа. </summary>
         /// <param name="item"> Предмет, для которого нужно найти стак. </param>
@@ -63,6 +68,7 @@ namespace FlavorfulStory.InventorySystem
             {
                 if (ReferenceEquals(_slots[i].Item, item)) return i;
             }
+
             return -1;
         }
 
@@ -75,26 +81,54 @@ namespace FlavorfulStory.InventorySystem
             {
                 if (_slots[i].Item == null) return i;
             }
+
             return -1;
         }
 
         /// <summary> Есть ли экземпляр этого предмета в инвентаре?</summary>
         /// <param name="item"> Предмет. </param>
         /// <returns> Возвращает True - если предмет есть в инвентаре, False - в противном случае. </returns>
-        public bool HasItem(InventoryItem item)
-        {
-            foreach (var slot in _slots)
-            {
-                if (ReferenceEquals(slot, item)) return true;
-            }
-            return false;
-        }
+        public bool HasItem(InventoryItem item) => _slots.Count((slot) => slot.Item == item) > 0;
 
         /// <summary> Получить предмет инвентаря в заданном слоте. </summary>
         /// <param name="slotIndex"> Индекс слота, из которого нужно получить предмет. </param>
         /// <returns> Возвращает предмет инвентаря в заданном слоте. </returns>
         public InventoryItem GetItemInSlot(int slotIndex) => _slots[slotIndex].Item;
 
+        /// <summary> Получить общее количество заданного предмета в инвентаре. </summary>
+        /// <param name="item"> Предмет инвентаря. </param>
+        /// <returns> Возвращает общее количество заданного предмета в инвентаре. </returns>
+        public int GetItemNumber(InventoryItem item)
+        {
+            return _slots.Where(slot => slot.Item == item).Sum(slot => slot.Number);
+        }
+
+        //TODO: Добавить коммы
+        public void RemoveItem(InventoryItem item, int number)
+        {
+            if (!HasItem(item))
+            {
+                Debug.LogError($"No item[{item.ItemName}] present in inventory!");
+                return;
+            } 
+            if (GetItemNumber(item) < number)
+            {
+                Debug.LogError($"You are trying to remove {number} item[{item.ItemName}], but only {GetItemNumber(item)} present in inventory!");
+                return;
+            }
+
+            int remainingToRemove = number;
+            for (int i = 0; i < _slots.Length && remainingToRemove > 0; i++)
+            {
+                if (_slots[i].Item == item)
+                {
+                    int numberToRemove = Math.Min(_slots[i].Number, remainingToRemove);
+                    RemoveFromSlot(i, numberToRemove);
+                    remainingToRemove -= numberToRemove;
+                }
+            }
+        }
+        
         /// <summary> Получить количество предметов инвентаря в заданном слоте. </summary>
         /// <param name="slotIndex"> Индекс слота, из которого нужно получить количество. </param>
         /// <returns> Возвращает количество предметов инвентаря в заданном слоте. </returns>
@@ -149,10 +183,12 @@ namespace FlavorfulStory.InventorySystem
                 _slots[slotIndex].Item = null;
                 _slots[slotIndex].Number = 0;
             }
+
             InventoryUpdated?.Invoke();
         }
 
         #region Saving
+
         /// <summary> Запись о предмете в слоте. </summary>
         [System.Serializable]
         private struct InventorySlotRecord
@@ -177,6 +213,7 @@ namespace FlavorfulStory.InventorySystem
                     slotRecords[i].Number = _slots[i].Number;
                 }
             }
+
             return slotRecords;
         }
 
@@ -190,8 +227,10 @@ namespace FlavorfulStory.InventorySystem
                 _slots[i].Item = InventoryItem.GetItemFromID(slotRecords[i].ItemID);
                 _slots[i].Number = slotRecords[i].Number;
             }
+
             InventoryUpdated?.Invoke();
         }
+
         #endregion
     }
 }

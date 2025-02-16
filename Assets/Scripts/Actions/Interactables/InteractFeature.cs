@@ -123,7 +123,7 @@ namespace FlavorfulStory.Actions.Interactables
             OnInteractionEnded?.Invoke();
             _isInteracting = false;
             _animator.ResetTrigger(_gather);
-            if (!_nearestAllowedInteractable.IsBlockingMovement)
+            if (_nearestAllowedInteractable is { IsBlockingMovement: false })
             {
                 InputWrapper.UnblockInput(new[] { InputButton.Horizontal, InputButton.Vertical });
             }

@@ -11,11 +11,12 @@ public class ResourceTransferButton : CustomButton
 
     [CanBeNull] private InventoryItem _resource;
 
-    private Action _clickAction;
+    public event Action<InventoryItem, ResourceTransferButtonType> OnClick;
 
-    public void SetAction(Action clickAction) => _clickAction = clickAction;
-    
-    public void SetResource(InventoryItem resource) => _resource = resource;
+    public void SetResource(InventoryItem resource)
+    {
+        _resource = resource;
+    }
     
     protected override void Initialize()
     {
@@ -33,7 +34,16 @@ public class ResourceTransferButton : CustomButton
     protected override void Click()
     {
         if (_resource == null) Debug.LogError("Не назначен ресурс (Ремонт зданий/Требование)!");
+        
+        OnClick?.Invoke(_resource, _buttonType);
+    }
 
-        _clickAction?.Invoke();
+    protected override void OnInteractionEnabled() {}
+
+    protected override void OnInteractionDisabled() {}
+
+    public void TriggerClick()
+    {
+        Click();
     }
 }

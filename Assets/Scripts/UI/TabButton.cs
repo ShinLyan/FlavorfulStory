@@ -54,6 +54,10 @@ namespace FlavorfulStory.UI
             OnClick?.Invoke();
         }
 
+        protected override void OnInteractionEnabled() {}
+
+        protected override void OnInteractionDisabled() {}
+
         /// <summary> Установка состояния текста (активное или стандартное). </summary>
         /// <param name="state"> Состояние текста (true - активное, false - стандартное). </param>
         public void SetNameState(bool state)
