@@ -1,7 +1,6 @@
 using FlavorfulStory.Control;
 using FlavorfulStory.InventorySystem;
 using UnityEngine;
-using UnityEngine.EventSystems;
 
 namespace FlavorfulStory.Actions
 {
@@ -24,11 +23,13 @@ namespace FlavorfulStory.Actions
         /// <param name="player"> Контроллер игрока. </param>
         public override void Use(PlayerController player)
         {
-            if (EventSystem.current && EventSystem.current.IsPointerOverGameObject()) return;
-
+            Debug.Log("Use Tool");
+            
             var targetPosition = PlayerController.GetCursorPosition();
             player.RotateTowards(targetPosition);
             player.TriggerAnimation($"Use{ToolType}");
+            player.EquipTool(this);
+            player.ScheduleUnequipTool();
             UseToolInDirection(player.transform.position, targetPosition, player);
 
             // TODO: Реализовать трату энергии игрока при использовании инструмента

@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using FlavorfulStory.Actions;
 using FlavorfulStory.InputSystem;
 using FlavorfulStory.InventorySystem;
 using FlavorfulStory.InventorySystem.UI;
 using FlavorfulStory.Movement;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace FlavorfulStory.Control
 {
@@ -26,14 +28,27 @@ namespace FlavorfulStory.Control
         /// <summary> Аниматор игрока. </summary>
         private Animator _animator;
 
+        #region Tools
+
+        /// <summary> Массив привязок типов инструментов к их префабам. </summary>
+        [SerializeField] private List<ToolPrefabMapping> _toolMappings;
+
+        /// <summary> Точка, где появляется инструмент в руке. </summary>
+        [SerializeField] private Transform _toolHolder;
+
+        /// <summary> Текущий экипированный инструмент. </summary>
+        private GameObject _currentTool;
+
         /// <summary> Таймер для отслеживания перезарядки инструмента. </summary>
         private float _toolCooldownTimer;
 
-        /// <summary> Текущий выбранный предмет из панели быстрого доступа. </summary>
-        public InventoryItem CurrentItem => _toolbar.SelectedItem;
-
         /// <summary> Можно ли использовать инструмент? </summary>
         public bool CanUseTool => _toolCooldownTimer <= 0f;
+
+        #endregion
+
+        /// <summary> Текущий выбранный предмет из панели быстрого доступа. </summary>
+        public InventoryItem CurrentItem => _toolbar.SelectedItem;
 
         /// <summary> Событие, вызываемое при окончании взаимодейтсвия. </summary>
         /// <remarks> Событие срабатывает внутри метода EndInteraction(). </remarks>
@@ -80,13 +95,15 @@ namespace FlavorfulStory.Control
         private void UseToolbarItem()
         {
             if (_toolbar && CurrentItem is ActionItem actionItem &&
-                (Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1)) && CanUseTool)
+                (Input.GetMouseButton(0) || Input.GetMouseButton(1)) &&
+                CanUseTool && !EventSystem.current.IsPointerOverGameObject())
             {
-                var actionType = Input.GetMouseButtonDown(0) ? UseActionType.LeftClick : UseActionType.RightClick;
+                var actionType = Input.GetMouseButton(0) ? UseActionType.LeftClick : UseActionType.RightClick;
                 if (actionItem.UseActionType == actionType)
                 {
                     actionItem.Use(this);
                     _toolCooldownTimer = _toolCooldown;
+                    InputWrapper.BlockInput(new[] { InputButton.Horizontal, InputButton.Vertical });
                 }
 
                 if (actionItem.IsConsumable)
@@ -95,6 +112,8 @@ namespace FlavorfulStory.Control
                     print($"{CurrentItem} потратился");
                 }
             }
+
+            if (CanUseTool) InputWrapper.UnblockInput(new[] { InputButton.Horizontal, InputButton.Vertical });
         }
 
         /// <summary> Обработка ввода. Передача ввода в PlayerMover. </summary>
@@ -140,6 +159,45 @@ namespace FlavorfulStory.Control
             Vector3 direction = (position - transform.position).normalized;
             direction.y = 0; // Игнорируем вертикальную составляющую
             _playerMover.SetLookRotation(direction);
+        }
+
+        /// <summary> Экипировать инструмент в руку игрока. </summary>
+        /// <param name="tool"> Инструмент, который должен быть экипирован. </param>
+        public void EquipTool(Tool tool)
+        {
+            foreach (var mapping in _toolMappings)
+            {
+                if (mapping.ToolType == tool.ToolType && !_currentTool)
+                {
+                    _currentTool = Instantiate(mapping.ToolPrefab, _toolHolder);
+                    Debug.Log("EquipTool");
+                    return;
+                }
+            }
+        }
+
+        /// <summary> Убрать инструмент из руки игрока. </summary>
+        public void UnequipTool()
+        {
+            if (!_currentTool) return;
+
+            Destroy(_currentTool);
+            _currentTool = null;
+            
+            Debug.Log("UnequipTool");
+        }
+        
+        /// <summary> Запланировать удаление инструмента после завершения анимации. </summary>
+        public void ScheduleUnequipTool()
+        {
+            StartCoroutine(WaitForAnimationAndUnequip());
+        }
+
+        /// <summary> Корутина для ожидания завершения анимации и удаления инструмента. </summary>
+        private System.Collections.IEnumerator WaitForAnimationAndUnequip()
+        {
+            yield return new WaitForSeconds(_animator.GetCurrentAnimatorStateInfo(0).length);
+            UnequipTool();
         }
     }
 }
