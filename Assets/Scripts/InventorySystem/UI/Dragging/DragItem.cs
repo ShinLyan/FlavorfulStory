@@ -133,6 +133,8 @@ namespace FlavorfulStory.InventorySystem.UI.Dragging
             else
             {
                 // Если обмен невозможен, возвращаем предметы в исходные контейнеры
+                source.RemoveItems(sourceNumber);
+                destination.RemoveItems(destinationNumber);
                 destination.AddItems(destinationItem, destinationNumber);
                 source.AddItems(sourceItem, sourceNumber);
             }
