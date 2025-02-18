@@ -40,7 +40,7 @@ namespace FlavorfulStory.InventorySystem
 
         /// <summary> Вместимость одного стака. </summary>
         [field: Tooltip("Вместимость одного стака. "), SerializeField]
-        public int StackSize { get; private set; }
+        public int StackSize { get; private set; } = 99;
 
         /// <summary> База данных всех предметов игры. </summary>
         private static Dictionary<string, InventoryItem> _itemDatabase;
