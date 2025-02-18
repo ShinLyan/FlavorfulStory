@@ -1,8 +1,13 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 [CreateAssetMenu(menuName = "FlavorfulStory/Building/RepairConfig", fileName = "RepairConfig")]
 public class BuildingRepairConfig : ScriptableObject
 {
-    public List<RepairStage> _stages;
+    [Tooltip("Префаб ремонтируемого объекта по умолчанию")]
+    public GameObject DefaultGameObject; 
+ 
+    [Tooltip("Стадии строительства")]
+    public List<RepairStage> Stages;
 }

@@ -19,6 +19,9 @@ public struct RepairStage
 {
     [Tooltip("Ресурсные требования для выполнения стадии ремонта.")]
     public string objectName;
+
+    [Tooltip("Префаб объекта выполненной стадии ремонта.")]
+    public GameObject Gameobject;
     
     [Tooltip("Ресурсные требования для выполнения стадии ремонта.")]
     public List<ResourceRequirement> Requirements;

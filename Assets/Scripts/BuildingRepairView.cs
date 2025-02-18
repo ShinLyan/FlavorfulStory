@@ -6,6 +6,7 @@ using UnityEngine.UI;
 using TMPro;
 using FlavorfulStory.InputSystem;
 using FlavorfulStory.InventorySystem;
+using FlavorfulStory.TimeManagement;
 
 public class BuildingRepairView : MonoBehaviour
 {
@@ -19,7 +20,7 @@ public class BuildingRepairView : MonoBehaviour
 
     private Action<InventoryItem, ResourceTransferButtonType> _resourceTransferHandler;
 
-    public bool IsOpen { get; private set; }
+    private bool _isOpen;
 
     private void Awake()
     {
@@ -27,6 +28,14 @@ public class BuildingRepairView : MonoBehaviour
         BuildButton = GetComponentInChildren<UIButton>(true);
     }
 
+    private void Update()
+    {
+        if (_isOpen && InputWrapper.GetButtonDown(InputButton.SwitchGameMenu, true))
+        {
+            Close();
+        }
+    }
+    
     public void Initialize(Action<InventoryItem, ResourceTransferButtonType> resourceTransferHandler)
     {
         _resourceTransferHandler = resourceTransferHandler;
@@ -34,9 +43,10 @@ public class BuildingRepairView : MonoBehaviour
 
     public void Open()
     {
-        IsOpen = true;
-        _background.gameObject.SetActive(IsOpen);
-        _mainWindowContent.gameObject.SetActive(IsOpen);
+        _isOpen = true;
+        _background.gameObject.SetActive(_isOpen);
+        _mainWindowContent.gameObject.SetActive(_isOpen);
+        WorldTime.Pause();
         InputWrapper.BlockAllInput();
         foreach (var view in _requirementViews)
         {
@@ -46,15 +56,15 @@ public class BuildingRepairView : MonoBehaviour
 
     public void Close()
     {
-        IsOpen = false;
-        _background.gameObject.SetActive(IsOpen);
-        _mainWindowContent.gameObject.SetActive(IsOpen);
+        _isOpen = false;
+        _background.gameObject.SetActive(_isOpen);
+        _mainWindowContent.gameObject.SetActive(_isOpen);
+        WorldTime.Unpause();
         InputWrapper.UnblockAllInput();
         foreach (var view in _requirementViews)
         {
             view.OnResourceTransferButtonClick -= _resourceTransferHandler;
         }
-
         BuildButton.RemoveAllListeners();
     }
 

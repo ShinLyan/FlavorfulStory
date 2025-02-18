@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using FlavorfulStory.Actions.Interactables;
-using FlavorfulStory.InputSystem;
 using FlavorfulStory.InventorySystem;
 
 public class RepairableBuilding : MonoBehaviour, IInteractable
@@ -18,11 +17,14 @@ public class RepairableBuilding : MonoBehaviour, IInteractable
     private int _currentRepairStageIndex;
 
     private bool _repairCompleted;
+
+    private List<Transform> _stagesGameobjects;
     
     private void Awake()
     {
         _repairView = FindFirstObjectByType<BuildingRepairView>(FindObjectsInactive.Include);
-        _investedResources = new(_repairConfig._stages.Count);
+        _investedResources = new(_repairConfig.Stages.Count);
+        _stagesGameobjects = new(_repairConfig.Stages.Count + 1);
     }
 
     private void Start()
@@ -30,41 +32,47 @@ public class RepairableBuilding : MonoBehaviour, IInteractable
         IsInteractionAllowed = true;
         IsBlockingMovement = true;
         _currentRepairStageIndex = 0;
-        for (int i = 0; i < _repairConfig._stages[_currentRepairStageIndex].Requirements.Count; i++)
+        for (int i = 0; i < _repairConfig.Stages[_currentRepairStageIndex].Requirements.Count; i++)
         {
             _investedResources.Add(0);
         }
-        _repairView.Initialize(TransferResource);
-    }
 
-    private void Update()
-    {
-        if (_repairView.IsOpen && InputWrapper.GetButtonDown(InputButton.SwitchGameMenu, true))
+        var go = Instantiate(_repairConfig.DefaultGameObject, transform, false);
+        go.gameObject.SetActive(true);
+        _stagesGameobjects.Add(go.transform);
+        foreach (var stage in _repairConfig.Stages)
         {
-            _repairView.Close();
+            var stageGo = Instantiate(stage.Gameobject, transform, false);
+            stageGo.gameObject.SetActive(false);
+            _stagesGameobjects.Add(stageGo.transform);
         }
     }
 
     //TODO: Можно вызывать только, если требования удовлетворены. Иначе - блокать
     private void Build()
     {
-        _repairCompleted = _currentRepairStageIndex >= _repairConfig._stages.Count - 1;
+        // TODO: private List<Transform> _stagesGameobjects => Лучше иметь GameObject в Generic'е
+        _stagesGameobjects[_currentRepairStageIndex].gameObject.SetActive(false);
+        _stagesGameobjects[_currentRepairStageIndex+1].gameObject.SetActive(true);
+        
+        _repairCompleted = _currentRepairStageIndex >= _repairConfig.Stages.Count - 1;
         if (!_repairCompleted)
         {
             _currentRepairStageIndex++;
             _investedResources.Clear();
-            foreach (var requirement in _repairConfig._stages[_currentRepairStageIndex].Requirements)
+            foreach (var requirement in _repairConfig.Stages[_currentRepairStageIndex].Requirements)
             {
                 _investedResources.Add(0);
             }
         }
-        _repairView.SetData(_repairConfig._stages[_currentRepairStageIndex], _investedResources, _repairCompleted);
+        _repairView.SetData(_repairConfig.Stages[_currentRepairStageIndex], _investedResources, _repairCompleted);
         _repairView.BuildButton.IsInteractable = CanBeRepaired();
+        IsInteractionAllowed = !_repairCompleted;
     }
     
     private void TransferResource(InventoryItem resource, ResourceTransferButtonType transferButtonType)
     {
-        var requriments = _repairConfig._stages[_currentRepairStageIndex].Requirements;
+        var requriments = _repairConfig.Stages[_currentRepairStageIndex].Requirements;
 
         switch (transferButtonType)
         {
@@ -83,10 +91,10 @@ public class RepairableBuilding : MonoBehaviour, IInteractable
 
     private void TryAddResource(InventoryItem resource)
     {
-        int resourceRequirementNumber = _repairConfig._stages[_currentRepairStageIndex].Requirements
+        int resourceRequirementNumber = _repairConfig.Stages[_currentRepairStageIndex].Requirements
             .Find(requirement => requirement.Item.ItemID == resource.ItemID).Quantity;
         
-        var investedResourceIndex = _repairConfig._stages[_currentRepairStageIndex].Requirements.FindIndex(x => x.Item.ItemID == resource.ItemID);
+        var investedResourceIndex = _repairConfig.Stages[_currentRepairStageIndex].Requirements.FindIndex(x => x.Item.ItemID == resource.ItemID);
         if (_investedResources[investedResourceIndex] < resourceRequirementNumber)
         {
             if (Inventory.PlayerInventory.HasItem(resource) && Inventory.PlayerInventory.GetItemNumber(resource) > 0)
@@ -95,40 +103,32 @@ public class RepairableBuilding : MonoBehaviour, IInteractable
                 int investedNumber = Math.Min(numberToInvest, Inventory.PlayerInventory.GetItemNumber(resource));
                 _investedResources[investedResourceIndex] += investedNumber;
                 Inventory.PlayerInventory.RemoveItem(resource, investedNumber);
-                _repairView.SetData(_repairConfig._stages[_currentRepairStageIndex], _investedResources, _repairCompleted);
+                _repairView.SetData(_repairConfig.Stages[_currentRepairStageIndex], _investedResources, _repairCompleted);
             }
         }
     }
 
     private void TryReturnResource(InventoryItem resource)
     {
-        var investedResourceIndex = _repairConfig._stages[_currentRepairStageIndex].Requirements.
+        var investedResourceIndex = _repairConfig.Stages[_currentRepairStageIndex].Requirements.
             FindIndex(requirement => requirement.Item.ItemID == resource.ItemID);
         int investedResourceNumber = _investedResources[investedResourceIndex];
         
+        //Убедиться в работоспособности HasSpaceFor(): учесть случай, когда инаентарь полон(не можем вернуть ресы).
         if (investedResourceNumber > 0 && Inventory.PlayerInventory.HasSpaceFor(resource))
         {
             Inventory.PlayerInventory.TryAddToFirstEmptySlot(resource, investedResourceNumber);
             _investedResources[investedResourceIndex] = 0;
-            _repairView.SetData(_repairConfig._stages[_currentRepairStageIndex], _investedResources, _repairCompleted);
+            _repairView.SetData(_repairConfig.Stages[_currentRepairStageIndex], _investedResources, _repairCompleted);
         }
-        //TODO: учесть случай, когда инаентарь полон(не можем вернуть ресы).
     }
 
     private bool CanBeRepaired()
     {
-        return _repairConfig._stages[_currentRepairStageIndex].Requirements
+        return _repairConfig.Stages[_currentRepairStageIndex].Requirements
             .Select((requirement, i) => _investedResources[i] >= requirement.Quantity)
             .All(valid => valid) && 
             !_repairCompleted;
-        // for (int i = 0; i < _repairConfig._stages[_currentRepairStageIndex].Requirements.Count; i++)
-        // {
-        //     if (_investedResources[i] < _repairConfig._stages[_currentRepairStageIndex].Requirements[i].Quantity)
-        //     {
-        //         return false;
-        //     }
-        // }
-        // return true;
     }
     
     #region Iteractable
@@ -144,9 +144,10 @@ public class RepairableBuilding : MonoBehaviour, IInteractable
 
     public void Interact()
     {
+        _repairView.Initialize(TransferResource);
         _repairView.BuildButton.OnClick += Build;
         _repairView.Open();
-        _repairView.SetData(_repairConfig._stages[_currentRepairStageIndex], _investedResources, _repairCompleted);
+        _repairView.SetData(_repairConfig.Stages[_currentRepairStageIndex], _investedResources, _repairCompleted);
         _repairView.BuildButton.IsInteractable = CanBeRepaired();
     }
 
