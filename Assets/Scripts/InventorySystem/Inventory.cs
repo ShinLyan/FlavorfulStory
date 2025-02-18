@@ -32,7 +32,7 @@ namespace FlavorfulStory.InventorySystem
         private void Awake()
         {
             _slots = new InventorySlot[InventorySize];
-            _playerInventory = GameObject.FindWithTag("Player").GetComponent<Inventory>();
+            _playerInventory = PlayerInventory;
         }
 
         /// <summary> Может ли этот предмет поместиться где-нибудь в инвентаре? </summary>
@@ -92,8 +92,8 @@ namespace FlavorfulStory.InventorySystem
                 if (index < 0) index = FindEmptySlot();
                 if (index < 0) return false;
 
-                int addAmount = System.Math.Min(number, item.StackSize - _slots[slotIndex].Number);
-                if (!_slots[slotIndex].Item) _slots[slotIndex].Item = item;
+                int addAmount = Math.Min(number, item.StackSize - _slots[slotIndex].Number);
+                _slots[slotIndex].Item ??= item;
                 _slots[slotIndex].Number += addAmount;
                 number -= addAmount;
             }
@@ -110,12 +110,12 @@ namespace FlavorfulStory.InventorySystem
         {
             while (number > 0)
             {
-                int slotIndex = FindSlot(item);
-                if (slotIndex < 0) return false;
+                int index = FindSlot(item);
+                if (index < 0) return false;
 
-                int addAmount = Mathf.Min(number, item.StackSize - _slots[slotIndex].Number);
-                if (!_slots[slotIndex].Item) _slots[slotIndex].Item = item;
-                _slots[slotIndex].Number += addAmount;
+                int addAmount = Mathf.Min(number, item.StackSize - _slots[index].Number);
+                _slots[index].Item ??= item;
+                _slots[index].Number += addAmount;
                 number -= addAmount;
             }
 
@@ -128,8 +128,7 @@ namespace FlavorfulStory.InventorySystem
         /// <param name="number"> Количество предметов. </param>
         public void RemoveFromSlot(int slotIndex, int number)
         {
-            _slots[slotIndex].Number -= number;
-            if (_slots[slotIndex].Number <= 0)
+            if ((_slots[slotIndex].Number -= number) <= 0)
             {
                 _slots[slotIndex].Item = null;
                 _slots[slotIndex].Number = 0;
@@ -141,7 +140,7 @@ namespace FlavorfulStory.InventorySystem
         #region Saving
 
         /// <summary> Запись о предмете в слоте. </summary>
-        [System.Serializable]
+        [Serializable]
         private struct InventorySlotRecord
         {
             /// <summary> ID предмета в слоте. </summary>
