@@ -9,20 +9,30 @@ namespace FlavorfulStory.InventorySystem.UI.Tooltips
     public abstract class TooltipSpawner : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {
         /// <summary> Префаб тултипа, который нужно заспавнить. </summary>
-        [Tooltip("Префаб тултипа, который нужно заспавнить.")]
-        [SerializeField] private GameObject _tooltipPrefab;
+        [Tooltip("Префаб тултипа, который нужно заспавнить.")] [SerializeField]
+        private GameObject _tooltipPrefab;
 
         /// <summary> Заспавненный тултип. </summary>
         private GameObject _tooltip;
 
+        /// <summary> Задержка перед появлением тултипа (стандартное значение в играх). </summary>
+        private const float TooltipDelay = 0.5f;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private Coroutine _tooltipCoroutine;
+
         #region Abstract Methods
+
         /// <summary> Можно ли создать тултип?</summary>
         /// <remarks> Возвращает True, если спавнеру можно создать тултип. </remarks>
-        public abstract bool CanCreateTooltip();
+        protected abstract bool CanCreateTooltip();
 
         /// <summary> Вызывается, когда приходит время обновить информацию в префабе тултипа. </summary>
         /// <param name="tooltip"> Заспавненный префаб тултипа для обновления. </param>
-        public abstract void UpdateTooltip(GameObject tooltip);
+        protected abstract void UpdateTooltip(GameObject tooltip);
+
         #endregion
 
         /// <summary> Вызывается при уничтожении объекта. </summary>
@@ -35,6 +45,7 @@ namespace FlavorfulStory.InventorySystem.UI.Tooltips
         private void ClearTooltip()
         {
             if (_tooltip != null) Destroy(_tooltip);
+            if (_tooltipCoroutine != null) StopCoroutine(_tooltipCoroutine);
         }
 
         /// <summary> Вызывается при наведении курсора на объект UI. </summary>
@@ -42,6 +53,15 @@ namespace FlavorfulStory.InventorySystem.UI.Tooltips
         /// <param name="eventData"> Данные события взаимодействия с UI. </param>
         public void OnPointerEnter(PointerEventData eventData)
         {
+            if (_tooltipCoroutine != null) StopCoroutine(_tooltipCoroutine);
+
+            _tooltipCoroutine = StartCoroutine(ShowTooltipWithDelay());
+        }
+
+        private System.Collections.IEnumerator ShowTooltipWithDelay()
+        {
+            yield return new WaitForSeconds(TooltipDelay);
+
             if (_tooltip != null && !CanCreateTooltip()) ClearTooltip();
 
             if (_tooltip == null && CanCreateTooltip())
@@ -82,7 +102,8 @@ namespace FlavorfulStory.InventorySystem.UI.Tooltips
             int tooltipCornerIndex = GetCornerIndex(!below, !right);
 
             // Устанавливаем новое положение тултипа, чтобы он был выровнен с нужным углом.
-            _tooltip.transform.position = slotCorners[slotCornerIndex] - tooltipCorners[tooltipCornerIndex] + _tooltip.transform.position;
+            _tooltip.transform.position = slotCorners[slotCornerIndex] - tooltipCorners[tooltipCornerIndex] +
+                                          _tooltip.transform.position;
         }
 
         /// <summary> Возвращает индекс угла для позиционирования. </summary>
