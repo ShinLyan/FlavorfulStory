@@ -2,8 +2,8 @@ using System;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using FlavorfulStory.InventorySystem;
 using JetBrains.Annotations;
+using FlavorfulStory.InventorySystem;
 
 public class ResourceRequirementView : MonoBehaviour
 {

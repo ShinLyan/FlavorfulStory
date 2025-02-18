@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
-using FlavorfulStory.InventorySystem;
 using UnityEngine;
+using FlavorfulStory.InventorySystem;
 
 [Serializable]
 public struct ResourceRequirement

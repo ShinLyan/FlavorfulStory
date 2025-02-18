@@ -1,8 +1,8 @@
 using System;
 using UnityEngine;
+using JetBrains.Annotations;
 using FlavorfulStory.InventorySystem;
 using FlavorfulStory.UI;
-using JetBrains.Annotations;
 
 public class ResourceTransferButton : CustomButton
 {
