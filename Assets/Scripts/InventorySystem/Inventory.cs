@@ -110,10 +110,12 @@ namespace FlavorfulStory.InventorySystem
             {
                 Debug.LogError($"No item[{item.ItemName}] present in inventory!");
                 return;
-            } 
+            }
+
             if (GetItemNumber(item) < number)
             {
-                Debug.LogError($"You are trying to remove {number} item[{item.ItemName}], but only {GetItemNumber(item)} present in inventory!");
+                Debug.LogError(
+                    $"You are trying to remove {number} item[{item.ItemName}], but only {GetItemNumber(item)} present in inventory!");
                 return;
             }
 
@@ -128,7 +130,7 @@ namespace FlavorfulStory.InventorySystem
                 }
             }
         }
-        
+
         /// <summary> Получить количество предметов инвентаря в заданном слоте. </summary>
         /// <param name="slotIndex"> Индекс слота, из которого нужно получить количество. </param>
         /// <returns> Возвращает количество предметов инвентаря в заданном слоте. </returns>
