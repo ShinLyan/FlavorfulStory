@@ -32,7 +32,6 @@ namespace FlavorfulStory.Actions.Interactables
         /// <summary> Выполняет взаимодействие с объектом. </summary>
         public void Interact()
         {
-            print("Fish");
             if (!IsInteractionAllowed) return;
 
             Inventory.PlayerInventory.TryAddToFirstEmptySlot(_dropItem.ItemPrefab, _dropItem.Quantity);

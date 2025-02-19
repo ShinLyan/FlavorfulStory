@@ -9,14 +9,15 @@ namespace FlavorfulStory.UI
     [RequireComponent(typeof(Image))]
     public abstract class CustomButton : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
     {
-        private readonly Color _interactionDisabledColor = Color.gray;
-        private readonly Color _interactionEnabledColor = Color.white;
-        
         /// <summary> Компонент <see cref="Image"/> кнопки. </summary>
         protected Image ButtonImage { get; private set; }
 
         /// <summary> Находится ли курсор над кнопкой? </summary>
         protected bool IsMouseOver { get; private set; }
+        
+        private readonly Color _interactionDisabledColor = Color.gray;
+        
+        private readonly Color _interactionEnabledColor = Color.white;
 
         private bool _isInteractable = true;
         public bool IsInteractable
