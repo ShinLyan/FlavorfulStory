@@ -13,8 +13,8 @@ namespace FlavorfulStory.InputSystem
 
         /// <summary> Флаг инициализации класса. </summary>
         private static bool _isInitialized;
-        
-        
+
+
         /// <summary> Инициализирует словарь разрешенных кнопок ввода. </summary>
         public static void Initialize()
         {
@@ -30,8 +30,9 @@ namespace FlavorfulStory.InputSystem
 
         /// <summary> Блокирует указанную кнопку ввода. </summary>
         /// <param name="inputToBlock"> Кнопка для блокировки. </param>
-        public static void BlockInput(InputButton inputToBlock){
-            _allowedButtons[inputToBlock] = false;  
+        public static void BlockInput(InputButton inputToBlock)
+        {
+            _allowedButtons[inputToBlock] = false;
         }
 
         /// <summary> Блокирует указанные кнопки ввода. </summary>
@@ -47,8 +48,8 @@ namespace FlavorfulStory.InputSystem
         /// <param name="inputToUnlock"> Кнопка для разблокировки. </param>
         public static void UnblockInput(InputButton inputToUnlock)
         {
-            _allowedButtons[inputToUnlock] = true;  
-        } 
+            _allowedButtons[inputToUnlock] = true;
+        }
 
         /// <summary> Разблокирует указанные кнопки ввода. </summary>
         ///<param name="inputToUnlock"> Коллекция кнопок для разблокировки. </param>
