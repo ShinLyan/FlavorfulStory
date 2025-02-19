@@ -5,8 +5,8 @@ using UnityEngine;
 
 namespace FlavorfulStory.InventorySystem
 {
-    /// <summary> Класс обеспечивает хранение инвентаря игрока. Доступно настраиваемое количество слотов.
-    /// Этот компонент должен быть размещен на игровом объекте с тегом "Игрок". </summary>
+    /// <summary> Хранение инвентаря игрока с настраиваемым количеством слотов.
+    /// Компонент должен находиться на объекте с тегом "Player". </summary>
     public class Inventory : MonoBehaviour, ISaveable
     {
         /// <summary> Количество слотов в инвентаре. </summary>
@@ -16,26 +16,24 @@ namespace FlavorfulStory.InventorySystem
         /// <summary> Предметы инвентаря. </summary>
         private InventorySlot[] _slots;
 
-        /// <summary>
-        /// 
-        /// </summary>
+        /// <summary> Синглтон инвентаря игрока. </summary>
         private static Inventory _playerInventory;
 
-        /// <summary> Получить инвентарь игрока. </summary>
+        /// <summary> Синглтон инвентаря игрока. </summary>
         public static Inventory PlayerInventory =>
-            _playerInventory ??= GameObject.FindWithTag("Player").GetComponent<Inventory>();
+            _playerInventory ? _playerInventory : GameObject.FindWithTag("Player").GetComponent<Inventory>();
 
-        /// <summary> Событие, которое срабатывает, когда предметы в инвентаре добавляются / удаляются. </summary>
+        /// <summary> Событие, вызываемое при изменении инвентаря (добавление, удаление предметов). </summary>
         public event Action InventoryUpdated;
 
-        /// <summary> Инициализация полей. </summary>
+        /// <summary> Инициализация слотов и ссылки на инвентарь игрока. </summary>
         private void Awake()
         {
             _slots = new InventorySlot[InventorySize];
             _playerInventory = PlayerInventory;
         }
 
-        /// <summary> Может ли этот предмет поместиться где-нибудь в инвентаре? </summary>
+        /// <summary> Есть ли место для предмета в инвентаре? </summary>
         public bool HasSpaceFor(InventoryItem item) => FindSlot(item) >= 0;
 
         /// <summary> Найти слот, в который можно поместить данный предмет. </summary>

@@ -23,8 +23,6 @@ namespace FlavorfulStory.Actions
         /// <param name="player"> Контроллер игрока. </param>
         public override void Use(PlayerController player)
         {
-            Debug.Log("Use Tool");
-            
             var targetPosition = PlayerController.GetCursorPosition();
             player.RotateTowards(targetPosition);
             player.TriggerAnimation($"Use{ToolType}");

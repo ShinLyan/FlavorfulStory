@@ -15,22 +15,20 @@ namespace FlavorfulStory.InventorySystem.UI.Tooltips
         /// <summary> Заспавненный тултип. </summary>
         private GameObject _tooltip;
 
-        /// <summary> Задержка перед появлением тултипа (стандартное значение в играх). </summary>
+        /// <summary> Задержка перед появлением тултипа. </summary>
         private const float TooltipDelay = 0.5f;
 
-        /// <summary>
-        /// 
-        /// </summary>
+        /// <summary> Запущенная корутина для спавна тултипа. </summary>
         private Coroutine _tooltipCoroutine;
 
         #region Abstract Methods
 
-        /// <summary> Можно ли создать тултип?</summary>
-        /// <remarks> Возвращает True, если спавнеру можно создать тултип. </remarks>
+        /// <summary> Можно ли создать тултип? </summary>
+        /// <returns> True, если тултип можно создать, иначе False. </returns>
         protected abstract bool CanCreateTooltip();
 
-        /// <summary> Вызывается, когда приходит время обновить информацию в префабе тултипа. </summary>
-        /// <param name="tooltip"> Заспавненный префаб тултипа для обновления. </param>
+        /// <summary> Обновляет данные в тултипе. </summary>
+        /// <param name="tooltip"> Объект тултипа. </param>
         protected abstract void UpdateTooltip(GameObject tooltip);
 
         #endregion
@@ -44,7 +42,7 @@ namespace FlavorfulStory.InventorySystem.UI.Tooltips
         /// <summary> Очистить тултип. </summary>
         private void ClearTooltip()
         {
-            if (_tooltip != null) Destroy(_tooltip);
+            if (_tooltip) Destroy(_tooltip);
             if (_tooltipCoroutine != null) StopCoroutine(_tooltipCoroutine);
         }
 
@@ -62,15 +60,15 @@ namespace FlavorfulStory.InventorySystem.UI.Tooltips
         {
             yield return new WaitForSeconds(TooltipDelay);
 
-            if (_tooltip != null && !CanCreateTooltip()) ClearTooltip();
+            if (_tooltip && !CanCreateTooltip()) ClearTooltip();
 
-            if (_tooltip == null && CanCreateTooltip())
+            if (!_tooltip && CanCreateTooltip())
             {
                 var parentCanvas = GetComponentInParent<Canvas>();
                 _tooltip = Instantiate(_tooltipPrefab, parentCanvas.transform);
             }
 
-            if (_tooltip != null)
+            if (_tooltip)
             {
                 UpdateTooltip(_tooltip);
                 PositionTooltip();
@@ -110,7 +108,7 @@ namespace FlavorfulStory.InventorySystem.UI.Tooltips
         /// <param name="below"> Находится ли объект ниже середины экрана?</param>
         /// <param name="right"> Находится ли объект правее середины экрана?</param>
         /// <returns> Индекс угла: 0 - левый нижний, 1 - левый верхний, 2 - правый верхний, 3 - правый нижний. </returns>
-        private int GetCornerIndex(bool below, bool right) => (below, right) switch
+        private static int GetCornerIndex(bool below, bool right) => (below, right) switch
         {
             (true, false) => 0, // Левый нижний угол
             (false, false) => 1, // Левый верхний угол

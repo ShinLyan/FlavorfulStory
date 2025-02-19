@@ -30,8 +30,8 @@ namespace FlavorfulStory.Control
 
         #region Tools
 
-        /// <summary> Массив привязок типов инструментов к их префабам. </summary>
-        [SerializeField] private List<ToolPrefabMapping> _toolMappings;
+        /// <summary> Привязки типов инструментов к их префабам. </summary>
+        [SerializeField] private ToolPrefabMapping[] _toolMappings;
 
         /// <summary> Точка, где появляется инструмент в руке. </summary>
         [SerializeField] private Transform _toolHolder;
@@ -170,7 +170,6 @@ namespace FlavorfulStory.Control
                 if (mapping.ToolType == tool.ToolType && !_currentTool)
                 {
                     _currentTool = Instantiate(mapping.ToolPrefab, _toolHolder);
-                    Debug.Log("EquipTool");
                     return;
                 }
             }
@@ -183,10 +182,8 @@ namespace FlavorfulStory.Control
 
             Destroy(_currentTool);
             _currentTool = null;
-            
-            Debug.Log("UnequipTool");
         }
-        
+
         /// <summary> Запланировать удаление инструмента после завершения анимации. </summary>
         public void ScheduleUnequipTool()
         {

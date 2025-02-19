@@ -215,7 +215,17 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 4944970310079228964}
+    - targetCorrespondingSourceObject: {fileID: 8113930228413350172, guid: b78da40e1e8265344bc64d80efddd24b,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5266106266160787627}
   m_SourcePrefab: {fileID: 100100000, guid: b78da40e1e8265344bc64d80efddd24b, type: 3}
+--- !u!4 &1723252589634449998 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2386780836856704364, guid: b78da40e1e8265344bc64d80efddd24b,
+    type: 3}
+  m_PrefabInstance: {fileID: 3960271142364864290}
+  m_PrefabAsset: {fileID: 0}
 --- !u!95 &3655937164596301170 stripped
 Animator:
   m_CorrespondingSourceObject: {fileID: 309001130825355856, guid: b78da40e1e8265344bc64d80efddd24b,
@@ -256,6 +266,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _toolbar: {fileID: 0}
   _toolCooldown: 1
+  _toolMappings:
+  - ToolType: 0
+    ToolPrefab: {fileID: 6607908229998962764, guid: 8f662c7c217f34c4ca4aa8b95d9efda1,
+      type: 3}
+  _toolHolder: {fileID: 1723252589634449998}
 --- !u!114 &8120314572516739807
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -282,7 +297,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 19fc28a888c18ce4a82d521912c49df1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _inventorySize: 27
+  <InventorySize>k__BackingField: 0
 --- !u!114 &4872102280017537086
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -341,5 +356,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c824e3a01fb446f48c898e63a146b741, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &5266106266160787627
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5075500785383677502}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0c3a970a862f6824fbdca652389c28ac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
