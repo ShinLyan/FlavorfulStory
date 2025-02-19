@@ -14,12 +14,14 @@ namespace FlavorfulStory.SceneManagement
         /// <summary> Ключ для хранения имени текущего сохранения в PlayerPrefs. </summary>
         private const string CurrentSaveKey = "currentSaveName";
 
+        public static bool SaveFileExists => PlayerPrefs.HasKey(CurrentSaveKey) &&
+                                             SavingSystem.SaveFileExists(GetCurrentSave());
+        
         /// <summary> Продолжает последнюю сохранённую игру. </summary>
         /// <remarks> Вызывается из главного меню. </remarks>
         public void ContinueGame()
         {
-            if (!PlayerPrefs.HasKey(CurrentSaveKey) ||
-                !SavingSystem.SaveFileExists(GetCurrentSave()))
+            if (!SaveFileExists)
                 return;
 
             StartCoroutine(LoadLastScene());

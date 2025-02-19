@@ -69,7 +69,7 @@ namespace FlavorfulStory.UI
         /// <param name="isEnabled"> Новое состояние видимости меню. </param>
         private void SwitchContent(bool isEnabled)
         {
-            var actions = new[] { InputButton.Horizontal, InputButton.Vertical, InputButton.MouseScroll };
+            var actions = new[] { InputButton.Horizontal, InputButton.Vertical, InputButton.Interact, InputButton.MouseScroll };
             if (!isEnabled)
                 InputWrapper.UnblockInput(actions);
             else
