@@ -10,22 +10,25 @@ namespace FlavorfulStory.Actions
     public abstract class DestructibleObject : InteractableObject
     {
         /// <summary> Количество ударов для разрушения объекта. </summary>
-        [Tooltip("Количество ударов для разрушения объекта."), Range(1, 5)]
-        [SerializeField] private int _hitsToDestroy;
+        [Tooltip("Количество ударов для разрушения объекта."), Range(1, 5), SerializeField]
+        private int _hitsToDestroy;
 
         /// <summary> Тип инструмента, необходимого для разрушения. </summary>
-        [Tooltip("Тип инструмента, необходимого для разрушения.")]
-        [SerializeField] private ToolType _requiredTool;
+        [Tooltip("Тип инструмента, необходимого для разрушения."), SerializeField]
+        private ToolType _requiredTool;
 
         /// <summary> Список предметов, которые выпадут при разрушении. </summary>
-        [Tooltip("Список предметов, которые выпадут при разрушении.")]
-        [SerializeField] private DropItem[] _dropItems;
+        [Tooltip("Список предметов, которые выпадут при разрушении."), SerializeField]
+        private DropItem[] _dropItems;
+
+        /// <summary> Выбрасыватель предметов. </summary>
+        private ItemDropper _itemDropper;
 
         /// <summary> Текущее количество ударов по объекту. </summary>
         private int _currentHits;
-        
+
         /// <summary> Разрушен ли объект? </summary>
-        private bool IsDestroyed { get; set; }
+        private bool _isDestroyed;
 
         /// <summary> Задержка перед окончательным уничтожением объекта. </summary>
         private const float DestroyDelay = 4f;
@@ -33,13 +36,17 @@ namespace FlavorfulStory.Actions
         /// <summary> Событие, вызываемое при разрушении объекта. </summary>
         public event Action<DestructibleObject> OnObjectDestroyed;
 
+        private void Awake()
+        {
+            _itemDropper = GetComponent<ItemDropper>();
+        }
+
         /// <summary> Взаимодействовать. </summary>
         /// <param name="player"> Контроллер игрока. </param>
         public override void Interact(PlayerController player)
         {
-            if (player.CurrentItem is not Tool tool || 
-                tool.ToolType != _requiredTool ||
-                IsDestroyed) return;
+            if (player.CurrentItem is not Tool tool ||
+                tool.ToolType != _requiredTool || _isDestroyed) return;
 
             _currentHits++;
 
@@ -49,9 +56,7 @@ namespace FlavorfulStory.Actions
         /// <summary> Уничтожить объект и сгенерировать выпадающие предметы. </summary>
         private void DestroyObject()
         {
-            IsDestroyed = true;
-            Debug.Log($"Object destroyed: {gameObject.name}");
-
+            _isDestroyed = true;
             OnObjectDestroyed?.Invoke(this);
             OnDestroyed();
             StartCoroutine(DestroyCoroutine());
@@ -67,14 +72,13 @@ namespace FlavorfulStory.Actions
             DropItems();
             Destroy(gameObject);
         }
-        
+
         /// <summary> Выбросить предметы, настроенные в конкретных подклассах. </summary>
         protected virtual void DropItems()
         {
-            var itemDropper = GetComponent<ItemDropper>();
             foreach (var dropItem in _dropItems)
             {
-                itemDropper.DropItem(dropItem.ItemPrefab, dropItem.Quantity);
+                _itemDropper.DropItem(dropItem.ItemPrefab, dropItem.Quantity);
             }
         }
     }

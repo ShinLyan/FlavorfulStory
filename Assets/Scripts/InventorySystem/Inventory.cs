@@ -40,7 +40,7 @@ namespace FlavorfulStory.InventorySystem
         /// <param name="item"> Предмет, который нужно поместить в слот. </param>
         /// <returns> Возвращает индекс слота предмета. Если предмет не найден, возвращает -1. </returns>
         private int FindSlot(InventoryItem item) =>
-            FindStackIndex(item) is var slotIndex && slotIndex < 0 ? FindEmptySlot() : slotIndex;
+            FindStackIndex(item) is var slotIndex && slotIndex >= 0 ? slotIndex : FindEmptySlot();
 
         /// <summary> Найти индекс существующего стака предметов этого типа. </summary>
         /// <param name="item"> Предмет, для которого нужно найти стак. </param>

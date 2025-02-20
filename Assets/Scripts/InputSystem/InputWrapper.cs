@@ -86,5 +86,11 @@ namespace FlavorfulStory.InputSystem
         ///<returns> Вектор позиции курсора мыши. </returns>
         public static Vector3 GetMousePosition() =>
             !_allowedButtons[InputButton.MousePosition] ? Vector3.zero : Input.mousePosition;
+
+        public static void BlockPlayerMovement() =>
+            BlockInput(new[] { InputButton.Horizontal, InputButton.Vertical });
+
+        public static void UnblockPlayerMovement() =>
+            UnblockInput(new[] { InputButton.Horizontal, InputButton.Vertical });
     }
 }

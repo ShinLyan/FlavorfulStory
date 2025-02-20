@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Linq;
 using FlavorfulStory.Actions;
 using FlavorfulStory.InputSystem;
 using FlavorfulStory.InventorySystem;
@@ -12,10 +12,11 @@ namespace FlavorfulStory.Control
 {
     /// <summary> Контроллер игрока, отвечающий за управление, 
     /// использование предметов и взаимодействие с окружением. </summary>
-    [RequireComponent(typeof(PlayerMover))]
-    [RequireComponent(typeof(Animator))]
+    [RequireComponent(typeof(PlayerMover)), RequireComponent(typeof(Animator))]
     public class PlayerController : MonoBehaviour
     {
+        #region Fields
+
         /// <summary> Панель быстрого доступа. </summary>
         [SerializeField] private Toolbar _toolbar;
 
@@ -30,16 +31,13 @@ namespace FlavorfulStory.Control
 
         #region Tools
 
-        /// <summary> Привязки типов инструментов к их префабам. </summary>
+        /// <summary> Соответствия типов инструментов и их префабов. </summary>
         [SerializeField] private ToolPrefabMapping[] _toolMappings;
-
-        /// <summary> Точка, где появляется инструмент в руке. </summary>
-        [SerializeField] private Transform _toolHolder;
 
         /// <summary> Текущий экипированный инструмент. </summary>
         private GameObject _currentTool;
 
-        /// <summary> Таймер для отслеживания перезарядки инструмента. </summary>
+        /// <summary> Таймер перезарядки использования инструмента. </summary>
         private float _toolCooldownTimer;
 
         /// <summary> Можно ли использовать инструмент? </summary>
@@ -48,37 +46,38 @@ namespace FlavorfulStory.Control
         #endregion
 
         /// <summary> Текущий выбранный предмет из панели быстрого доступа. </summary>
-        public InventoryItem CurrentItem => _toolbar.SelectedItem;
+        public InventoryItem CurrentItem => _toolbar?.SelectedItem;
 
         /// <summary> Событие, вызываемое при окончании взаимодейтсвия. </summary>
         /// <remarks> Событие срабатывает внутри метода EndInteraction(). </remarks>
         public event Action OnInteractionEnded;
 
-        /// <summary> Инициализация необходимых компонентов. </summary>
+        #endregion
+
+        /// <summary> Инициализация компонентов. </summary>
         private void Awake()
         {
             _playerMover = GetComponent<PlayerMover>();
             _animator = GetComponent<Animator>();
         }
 
-        /// <summary> Выполнение различных действий в зависимости от состояния. </summary>
+        /// <summary> Обновление состояния игрока. </summary>
         private void Update()
         {
-            InteractSpecialAbilityKeys();
-            InteractWithMovement();
-
-            UpdateTimers();
+            HandleInput();
+            ReduceCooldownTimer();
         }
 
-        /// <summary> Взаимодействовать со специальными клавишами. </summary>
-        private void InteractSpecialAbilityKeys()
+        /// <summary> Обработка ввода. </summary>
+        private void HandleInput()
         {
-            SelectToolbarItem();
-            UseToolbarItem();
+            HandleToolbarSelection();
+            HandleToolbarUsage();
+            HandleMovement();
         }
 
-        /// <summary> Выбор предмета на панели быстрого доступа. </summary>
-        private void SelectToolbarItem()
+        /// <summary> Обработка выбора предмета на панели быстрого доступа. </summary>
+        private void HandleToolbarSelection()
         {
             const int ToolbarItemsCount = 9;
             for (int i = 0; i < ToolbarItemsCount; i++)
@@ -90,73 +89,71 @@ namespace FlavorfulStory.Control
             }
         }
 
-        /// <summary> Использовать предмет из панели быстрого доступа. </summary>
-        /// <remarks> Если предмет расходуемый, то один экземпляр будет уничтожен. </remarks>
-        private void UseToolbarItem()
+        /// <summary> Обработка использования предмета из панели быстрого доступа. </summary>
+        private void HandleToolbarUsage()
         {
-            if (_toolbar && CurrentItem is ActionItem actionItem &&
-                (Input.GetMouseButton(0) || Input.GetMouseButton(1)) &&
-                CanUseTool && !EventSystem.current.IsPointerOverGameObject())
+            if (!CanUseTool || CurrentItem is not ActionItem actionItem ||
+                EventSystem.current.IsPointerOverGameObject())
+                return;
+
+            if (Input.GetMouseButton(0) && actionItem.UseActionType == UseActionType.LeftClick ||
+                Input.GetMouseButton(1) && actionItem.UseActionType == UseActionType.RightClick)
             {
-                var actionType = Input.GetMouseButton(0) ? UseActionType.LeftClick : UseActionType.RightClick;
-                if (actionItem.UseActionType == actionType)
-                {
-                    actionItem.Use(this);
-                    _toolCooldownTimer = _toolCooldown;
-                    InputWrapper.BlockInput(new[] { InputButton.Horizontal, InputButton.Vertical });
-                }
+                actionItem.Use(this);
+                _toolCooldownTimer = _toolCooldown;
+                InputWrapper.BlockPlayerMovement();
 
                 if (actionItem.IsConsumable)
-                {
                     Inventory.PlayerInventory.RemoveFromSlot(_toolbar.SelectedItemIndex, 1);
-                    print($"{CurrentItem} потратился");
-                }
             }
 
-            if (CanUseTool) InputWrapper.UnblockInput(new[] { InputButton.Horizontal, InputButton.Vertical });
+            if (!CanUseTool) return;
+
+            UnequipTool();
+            InputWrapper.UnblockPlayerMovement();
         }
 
-        /// <summary> Обработка ввода. Передача ввода в PlayerMover. </summary>
-        private void InteractWithMovement()
+        /// <summary> Обработка передвижения. </summary>
+        private void HandleMovement()
         {
-            float x = InputWrapper.GetAxisRaw(InputButton.Horizontal),
-                z = InputWrapper.GetAxisRaw(InputButton.Vertical);
-            var direction = new Vector3(x, 0, z).normalized;
-            _playerMover.SetMoveDirection(direction);
+            var direction = new Vector3(
+                InputWrapper.GetAxisRaw(InputButton.Horizontal),
+                0,
+                InputWrapper.GetAxisRaw(InputButton.Vertical)
+            ).normalized;
 
+            _playerMover.SetMoveDirection(direction);
             if (direction != Vector3.zero)
-            {
                 _playerMover.SetLookRotation(direction);
-            }
         }
 
-        /// <summary> Обновить таймеры. </summary>
-        private void UpdateTimers()
+        /// <summary> Уменьшение таймера перезарядки. </summary>
+        private void ReduceCooldownTimer()
         {
             if (_toolCooldownTimer > 0f) _toolCooldownTimer -= Time.deltaTime;
         }
 
-        /// <summary> Закончить взаимодействие. </summary>
+        /// <summary> Завершение взаимодействия. </summary>
         /// <remarks> Метод подписан на событие в анимации игрока (Gather_interaction). </remarks>
         private void EndInteraction() => OnInteractionEnded?.Invoke();
 
         /// <summary> Запуск анимации. </summary>
-        /// <param name="animationName"> Имя анимации. </param>
+        /// <param name="animationName"> Название анимации. </param>
         public void TriggerAnimation(string animationName) => _animator.SetTrigger(animationName);
 
-        /// <summary> Получить позицию курсора. </summary>
-        /// <returns> Возвращает позицию курсора. </returns>
+        /// <summary> Получение позиции курсора. </summary>
+        /// <returns> Позиция точки, в которую направлен курсор. </returns>
         public static Vector3 GetCursorPosition()
         {
-            Ray ray = Camera.main.ScreenPointToRay(InputWrapper.GetMousePosition());
-            return Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity) ? hit.point : Vector3.zero;
+            var ray = Camera.main.ScreenPointToRay(InputWrapper.GetMousePosition());
+            return Physics.Raycast(ray, out var hit, Mathf.Infinity) ? hit.point : Vector3.zero;
         }
 
         /// <summary> Повернуть игрока в направлении указанной позиции. </summary>
         /// <param name="position"> Позиция для поворота. </param>
         public void RotateTowards(Vector3 position)
         {
-            Vector3 direction = (position - transform.position).normalized;
+            var direction = (position - transform.position).normalized;
             direction.y = 0; // Игнорируем вертикальную составляющую
             _playerMover.SetLookRotation(direction);
         }
@@ -165,36 +162,22 @@ namespace FlavorfulStory.Control
         /// <param name="tool"> Инструмент, который должен быть экипирован. </param>
         public void EquipTool(Tool tool)
         {
-            foreach (var mapping in _toolMappings)
-            {
-                if (mapping.ToolType == tool.ToolType && !_currentTool)
-                {
-                    _currentTool = Instantiate(mapping.ToolPrefab, _toolHolder);
-                    return;
-                }
-            }
+            if (_currentTool) return;
+
+            var mapping = _toolMappings.FirstOrDefault(m => m.ToolType == tool.ToolType);
+            if (mapping == null) return;
+
+            _currentTool = mapping.ToolPrefab;
+            _currentTool.SetActive(true);
         }
 
         /// <summary> Убрать инструмент из руки игрока. </summary>
-        public void UnequipTool()
+        private void UnequipTool()
         {
             if (!_currentTool) return;
 
-            Destroy(_currentTool);
+            _currentTool.SetActive(false);
             _currentTool = null;
-        }
-
-        /// <summary> Запланировать удаление инструмента после завершения анимации. </summary>
-        public void ScheduleUnequipTool()
-        {
-            StartCoroutine(WaitForAnimationAndUnequip());
-        }
-
-        /// <summary> Корутина для ожидания завершения анимации и удаления инструмента. </summary>
-        private System.Collections.IEnumerator WaitForAnimationAndUnequip()
-        {
-            yield return new WaitForSeconds(_animator.GetCurrentAnimatorStateInfo(0).length);
-            UnequipTool();
         }
     }
 }

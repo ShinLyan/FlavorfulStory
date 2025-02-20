@@ -109,7 +109,7 @@ namespace FlavorfulStory.Actions.Interactables
             OnInteractionStarted?.Invoke();
             _isInteracting = true;
             _animator.SetTrigger(_gather);
-            InputWrapper.BlockInput(new[] { InputButton.Horizontal, InputButton.Vertical });
+            InputWrapper.BlockPlayerMovement();
         }
 
         /// <summary> Закончить взаимодействие. </summary>
@@ -119,7 +119,7 @@ namespace FlavorfulStory.Actions.Interactables
             OnInteractionEnded?.Invoke();
             _isInteracting = false;
             _animator.ResetTrigger(_gather);
-            InputWrapper.UnblockInput(new[] { InputButton.Horizontal, InputButton.Vertical });
+            InputWrapper.UnblockPlayerMovement();
         }
     }
 }

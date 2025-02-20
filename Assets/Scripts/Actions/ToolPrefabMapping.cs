@@ -4,7 +4,7 @@ namespace FlavorfulStory.Actions
 {
     /// <summary> Сопоставление типа инструмента с его префабом. </summary>
     [System.Serializable]
-    public struct ToolPrefabMapping
+    public class ToolPrefabMapping
     {
         /// <summary> Тип инструмента. </summary>
         [Tooltip("Тип инструмента.")]

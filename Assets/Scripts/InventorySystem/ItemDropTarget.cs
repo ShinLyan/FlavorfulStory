@@ -5,7 +5,7 @@ using UnityEngine;
 namespace FlavorfulStory.InventorySystem
 {
     /// <summary> Целевой контейнер для предметов, выбрасываемых из инвентаря. </summary>
-    public class InventoryDropTarget : MonoBehaviour, IDragDestination<InventoryItem>
+    public class ItemDropTarget : MonoBehaviour, IDragDestination<InventoryItem>
     {
         /// <summary> Получить максимально допустимое количество элементов,
         /// которые можно добавить в это место назначения. </summary>
