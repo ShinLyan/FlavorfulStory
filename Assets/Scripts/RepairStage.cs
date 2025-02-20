@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using FlavorfulStory.InventorySystem;
-using UnityEngine.Serialization;
 
 /// <summary> Структура, определяющая требование ресурса для ремонта. </summary>
 [Serializable]
