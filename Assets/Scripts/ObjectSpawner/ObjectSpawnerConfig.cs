@@ -11,16 +11,16 @@ namespace FlavorfulStory.ObjectSpawner
         public GameObject ObjectPrefab;
 
         /// <summary> Количество объектов для спавна. </summary>
-        [Tooltip("Количество объектов для спавна.")] [Range(1f, 50f)]
+        [Tooltip("Количество объектов для спавна.")] [Range(1f, 100f)]
         public int Quantity;
 
         [Header("Область спавна")]
         /// <summary> Ширина, в пределах которой будут заспавнены объекты. </summary>
-        [Tooltip("Ширина, в пределах которой будут заспавнены объекты."), Range(0, 50f)]
+        [Tooltip("Ширина, в пределах которой будут заспавнены объекты."), Range(0, 1000f)]
         public int Width;
 
         /// <summary> Длина, в пределах которой будут заспавнены объекты. </summary>
-        [Tooltip("Длина, в пределах которой будут заспавнены объекты."), Range(0, 50f)]
+        [Tooltip("Длина, в пределах которой будут заспавнены объекты."), Range(0, 1000f)]
         public int Length;
 
         // <summary> Минимальное расстояние между объектами. </summary>

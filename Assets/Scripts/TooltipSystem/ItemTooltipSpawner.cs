@@ -11,7 +11,7 @@ namespace FlavorfulStory.InventorySystem.TooltipSystem
 
         /// <summary> Можно ли создать тултип?</summary>
         /// <remarks> Возвращает True, если спавнеру можно создать тултип. </remarks>
-        public override bool CanCreateTooltip()
+        protected override bool CanCreateTooltip()
         {
             var item = GetComponent<IItemHolder>().GetItem();
             return item;
@@ -19,7 +19,7 @@ namespace FlavorfulStory.InventorySystem.TooltipSystem
 
         /// <summary> Вызывается, когда приходит время обновить информацию в префабе тултипа. </summary>
         /// <param name="tooltip"> Заспавненный префаб тултипа для обновления. </param>
-        public override void UpdateTooltip(GameObject tooltip)
+        protected override void UpdateTooltip(GameObject tooltip)
         {
             var itemTooltip = tooltip.GetComponent<ItemTooltip>();
             if (itemTooltip == null) return;

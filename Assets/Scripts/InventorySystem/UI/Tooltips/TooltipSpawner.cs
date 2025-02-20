@@ -9,20 +9,28 @@ namespace FlavorfulStory.InventorySystem.UI.Tooltips
     public abstract class TooltipSpawner : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {
         /// <summary> Префаб тултипа, который нужно заспавнить. </summary>
-        [Tooltip("Префаб тултипа, который нужно заспавнить.")]
-        [SerializeField] private GameObject _tooltipPrefab;
+        [Tooltip("Префаб тултипа, который нужно заспавнить.")] [SerializeField]
+        private GameObject _tooltipPrefab;
 
         /// <summary> Заспавненный тултип. </summary>
         private GameObject _tooltip;
 
-        #region Abstract Methods
-        /// <summary> Можно ли создать тултип?</summary>
-        /// <remarks> Возвращает True, если спавнеру можно создать тултип. </remarks>
-        public abstract bool CanCreateTooltip();
+        /// <summary> Задержка перед появлением тултипа. </summary>
+        private const float TooltipDelay = 0.5f;
 
-        /// <summary> Вызывается, когда приходит время обновить информацию в префабе тултипа. </summary>
-        /// <param name="tooltip"> Заспавненный префаб тултипа для обновления. </param>
-        public abstract void UpdateTooltip(GameObject tooltip);
+        /// <summary> Запущенная корутина для спавна тултипа. </summary>
+        private Coroutine _tooltipCoroutine;
+
+        #region Abstract Methods
+
+        /// <summary> Можно ли создать тултип? </summary>
+        /// <returns> True, если тултип можно создать, иначе False. </returns>
+        protected abstract bool CanCreateTooltip();
+
+        /// <summary> Обновляет данные в тултипе. </summary>
+        /// <param name="tooltip"> Объект тултипа. </param>
+        protected abstract void UpdateTooltip(GameObject tooltip);
+
         #endregion
 
         /// <summary> Вызывается при уничтожении объекта. </summary>
@@ -34,7 +42,8 @@ namespace FlavorfulStory.InventorySystem.UI.Tooltips
         /// <summary> Очистить тултип. </summary>
         private void ClearTooltip()
         {
-            if (_tooltip != null) Destroy(_tooltip);
+            if (_tooltip) Destroy(_tooltip);
+            if (_tooltipCoroutine != null) StopCoroutine(_tooltipCoroutine);
         }
 
         /// <summary> Вызывается при наведении курсора на объект UI. </summary>
@@ -42,15 +51,24 @@ namespace FlavorfulStory.InventorySystem.UI.Tooltips
         /// <param name="eventData"> Данные события взаимодействия с UI. </param>
         public void OnPointerEnter(PointerEventData eventData)
         {
-            if (_tooltip != null && !CanCreateTooltip()) ClearTooltip();
+            if (_tooltipCoroutine != null) StopCoroutine(_tooltipCoroutine);
 
-            if (_tooltip == null && CanCreateTooltip())
+            _tooltipCoroutine = StartCoroutine(ShowTooltipWithDelay());
+        }
+
+        private System.Collections.IEnumerator ShowTooltipWithDelay()
+        {
+            yield return new WaitForSeconds(TooltipDelay);
+
+            if (_tooltip && !CanCreateTooltip()) ClearTooltip();
+
+            if (!_tooltip && CanCreateTooltip())
             {
                 var parentCanvas = GetComponentInParent<Canvas>();
                 _tooltip = Instantiate(_tooltipPrefab, parentCanvas.transform);
             }
 
-            if (_tooltip != null)
+            if (_tooltip)
             {
                 UpdateTooltip(_tooltip);
                 PositionTooltip();
@@ -82,14 +100,15 @@ namespace FlavorfulStory.InventorySystem.UI.Tooltips
             int tooltipCornerIndex = GetCornerIndex(!below, !right);
 
             // Устанавливаем новое положение тултипа, чтобы он был выровнен с нужным углом.
-            _tooltip.transform.position = slotCorners[slotCornerIndex] - tooltipCorners[tooltipCornerIndex] + _tooltip.transform.position;
+            _tooltip.transform.position = slotCorners[slotCornerIndex] - tooltipCorners[tooltipCornerIndex] +
+                                          _tooltip.transform.position;
         }
 
         /// <summary> Возвращает индекс угла для позиционирования. </summary>
         /// <param name="below"> Находится ли объект ниже середины экрана?</param>
         /// <param name="right"> Находится ли объект правее середины экрана?</param>
         /// <returns> Индекс угла: 0 - левый нижний, 1 - левый верхний, 2 - правый верхний, 3 - правый нижний. </returns>
-        private int GetCornerIndex(bool below, bool right) => (below, right) switch
+        private static int GetCornerIndex(bool below, bool right) => (below, right) switch
         {
             (true, false) => 0, // Левый нижний угол
             (false, false) => 1, // Левый верхний угол
