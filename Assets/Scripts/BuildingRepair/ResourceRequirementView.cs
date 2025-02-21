@@ -43,27 +43,22 @@ namespace FlavorfulStory.BuildingRepair
         }
 
         /// <summary> Установить ресурс для текущего элемента. </summary>
-        /// <param name="resource"> Ресурс, который будет установлен для текущего элемента. </param>
-        public void Setup(InventoryItem resource)
+        /// <param name="requirement"> Ресурсное требование. </param>
+        /// <param name="investedNumber"> Количество вложенного ресурса в процесс ремонта. </param>
+        public void Setup(ResourceRequirement requirement, int investedNumber)
         {
-            _resource = resource;
+            _resource = requirement.Item;
             _addResourceButton.SetResource(_resource);
             _returnResourceButton.SetResource(_resource);
             _resourceIcon.sprite = _resource.Icon;
-        }
-
-        /// <summary> Установить текстовое отображение количества ресурса. </summary>
-        /// <param name="currentQuantity"> Текущее количество ресурса. </param>
-        /// <param name="requiredQuantity"> Необходимое количество ресурса для завершения стадии ремонта. </param>
-        public void SetQuantityText(int currentQuantity, int requiredQuantity)
-        {
-            _quantityText.text = $"{currentQuantity}/{requiredQuantity}";
+            _quantityText.text = $"{investedNumber}/{requirement.Quantity}";
+            UpdateTransferButtonsInteractableState(requirement.Quantity, investedNumber);
         }
 
         /// <summary> Обновить состояние кнопок добавления и возврата ресурса. </summary>
         /// <param name="requirementNumber"> Требуемое количество ресурса. </param>
         /// <param name="investedNumber"> Количество вложенного ресурса в процесс ремонта. </param>
-        public void UpdateTransferButtonsInteractableState(int requirementNumber, int investedNumber)
+        private void UpdateTransferButtonsInteractableState(int requirementNumber, int investedNumber)
         {
             _addResourceButton.IsInteractable = (investedNumber != requirementNumber &&
                                                  Inventory.PlayerInventory.GetItemNumber(_resource) > 0);

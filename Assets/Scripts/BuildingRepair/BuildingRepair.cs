@@ -13,10 +13,8 @@ namespace FlavorfulStory.BuildingRepair
     /// <remarks> Управляет стадиями ремонта, состоянием объектов, взаимодействием с ресурсами и сохранением прогресса. </remarks>
     public class BuildingRepair : MonoBehaviour, IInteractable, ISaveable
     {
-        /// <summary> Стадии ремонта. </summary>
-        /// <remarks> Содержит настройки и данные для каждой стадии ремонта здания. </remarks>
-        [Tooltip("Стадии ремонта."), SerializeField]
-        private BuildingRepairConfig _repairConfig;
+        /// <summary> Список стадий ремонта здания. </summary>
+        [Tooltip("Стадии строительства"), SerializeField] private List<RepairStage> _stages;
 
         /// <summary> Вьюшка представления интерфейса ремонта для текущего здания. </summary>
         private BuildingRepairView _repairView;
@@ -38,7 +36,7 @@ namespace FlavorfulStory.BuildingRepair
         private void Awake()
         {
             _repairView = FindFirstObjectByType<BuildingRepairView>(FindObjectsInactive.Include);
-            _stagesVisuals = new(_repairConfig.Stages.Count + 1);
+            _stagesVisuals = new(_stages.Count + 1);
         }
 
         /// <summary> Коллбэк из UnityAPI. </summary>
@@ -56,7 +54,7 @@ namespace FlavorfulStory.BuildingRepair
         {
             _currentRepairStageIndex = 0;
             _repairCompleted = false;
-            _investedResources = new(_repairConfig.Stages[_currentRepairStageIndex].Requirements.Count);
+            _investedResources = new(_stages[_currentRepairStageIndex].Requirements.Count);
             InitializeInvestedResourcesList();
             UpdateInteractableState();
             SpawnStagesVisuals();
@@ -67,7 +65,7 @@ namespace FlavorfulStory.BuildingRepair
         /// <remarks> Список инвестированных ресурсов на текущей стадии будет инициализирован нулями. </remarks>
         private void InitializeInvestedResourcesList()
         {
-            foreach (var requirement in _repairConfig.Stages[_currentRepairStageIndex].Requirements)
+            foreach (var requirement in _stages[_currentRepairStageIndex].Requirements)
             {
                 _investedResources.Add(0);
             }
@@ -81,9 +79,9 @@ namespace FlavorfulStory.BuildingRepair
         /// <remarks> Создает и добавляет все визуальные элементы для стадий ремонта в сцену. </remarks>
         private void SpawnStagesVisuals()
         {
-            var defaultState = Instantiate(_repairConfig.DefaultGameObject, transform, false);
-            _stagesVisuals.Add(defaultState);
-            foreach (var stage in _repairConfig.Stages)
+            var defaultState = transform.GetChild(0);
+            _stagesVisuals.Add(defaultState.gameObject);
+            foreach (var stage in _stages)
             {
                 var stageGo = Instantiate(stage.Gameobject, transform, false);
                 _stagesVisuals.Add(stageGo);
@@ -103,7 +101,7 @@ namespace FlavorfulStory.BuildingRepair
         /// <remarks> Переходит к следующей стадии ремонта, если все ресурсы добавлены. </remarks>
         private void Build()
         {
-            _repairCompleted = _currentRepairStageIndex >= _repairConfig.Stages.Count - 1;
+            _repairCompleted = _currentRepairStageIndex >= _stages.Count - 1;
             if (!_repairCompleted)
             {
                 _currentRepairStageIndex++;
@@ -111,7 +109,7 @@ namespace FlavorfulStory.BuildingRepair
                 InitializeInvestedResourcesList();
             }
 
-            _repairView.SetData(_repairConfig.Stages[_currentRepairStageIndex], _investedResources, _repairCompleted);
+            _repairView.SetData(_stages[_currentRepairStageIndex], _investedResources, _repairCompleted);
             _repairView.BuildButton.IsInteractable = CanBeRepaired();
             UpdateInteractableState();
             SetVisualStage(_currentRepairStageIndex, _repairCompleted);
@@ -139,12 +137,13 @@ namespace FlavorfulStory.BuildingRepair
 
         /// <summary> Попробовать добавить ресурс в процесс ремонта. </summary>
         /// <param name="resource"> Ресурс, который будет добавлен в ремонт. </param>
-        private void TryAddResource(InventoryItem resource)
+        /// <returns> Флаг успешной операции. </returns>
+        private bool TryAddResource(InventoryItem resource)
         {
-            int resourceRequirementNumber = _repairConfig.Stages[_currentRepairStageIndex].Requirements
+            int resourceRequirementNumber = _stages[_currentRepairStageIndex].Requirements
                 .Find(requirement => requirement.Item.ItemID == resource.ItemID).Quantity;
 
-            var investedResourceIndex = _repairConfig.Stages[_currentRepairStageIndex].Requirements
+            var investedResourceIndex = _stages[_currentRepairStageIndex].Requirements
                 .FindIndex(x => x.Item.ItemID == resource.ItemID);
             if (_investedResources[investedResourceIndex] < resourceRequirementNumber)
             {
@@ -155,17 +154,19 @@ namespace FlavorfulStory.BuildingRepair
                     int investedNumber = Math.Min(numberToInvest, Inventory.PlayerInventory.GetItemNumber(resource));
                     _investedResources[investedResourceIndex] += investedNumber;
                     Inventory.PlayerInventory.RemoveItem(resource, investedNumber);
-                    _repairView.SetData(_repairConfig.Stages[_currentRepairStageIndex], _investedResources,
+                    _repairView.SetData(_stages[_currentRepairStageIndex], _investedResources,
                         _repairCompleted);
+                    return true;
                 }
             }
+            return false;
         }
 
         /// <summary> Попробовать вернуть ресурс в инвентарь. </summary>
         /// <param name="resource"> Ресурс, который возвращается в инвентарь. </param>
-        private void TryReturnResource(InventoryItem resource)
+        private bool TryReturnResource(InventoryItem resource)
         {
-            var investedResourceIndex = _repairConfig.Stages[_currentRepairStageIndex].Requirements
+            var investedResourceIndex = _stages[_currentRepairStageIndex].Requirements
                 .FindIndex(requirement => requirement.Item.ItemID == resource.ItemID);
             int investedResourceNumber = _investedResources[investedResourceIndex];
 
@@ -174,16 +175,18 @@ namespace FlavorfulStory.BuildingRepair
             {
                 Inventory.PlayerInventory.TryAddToFirstEmptySlot(resource, investedResourceNumber);
                 _investedResources[investedResourceIndex] = 0;
-                _repairView.SetData(_repairConfig.Stages[_currentRepairStageIndex], _investedResources,
+                _repairView.SetData(_stages[_currentRepairStageIndex], _investedResources,
                     _repairCompleted);
+                return true;
             }
+            return false;
         }
 
         /// <summary> Проверить, можно ли совершить ремонт. </summary>
         /// <returns> Возвращает <c>true</c>, если все ресурсы для текущей стадии вложены, иначе <c>false</c>. </returns>
         private bool CanBeRepaired()
         {
-            return _repairConfig.Stages[_currentRepairStageIndex].Requirements
+            return _stages[_currentRepairStageIndex].Requirements
                        .Select((requirement, i) => _investedResources[i] >= requirement.Quantity)
                        .All(requirementCompleted => requirementCompleted) &&
                    !_repairCompleted;
@@ -216,8 +219,8 @@ namespace FlavorfulStory.BuildingRepair
         {
             _repairView.Initialize(TransferResource);
             _repairView.BuildButton.OnClick += Build;
-            _repairView.Open(_repairConfig.Stages[_currentRepairStageIndex].Requirements.Count);
-            _repairView.SetData(_repairConfig.Stages[_currentRepairStageIndex], _investedResources, _repairCompleted);
+            _repairView.Open(_stages[_currentRepairStageIndex].Requirements.Count);
+            _repairView.SetData(_stages[_currentRepairStageIndex], _investedResources, _repairCompleted);
             _repairView.BuildButton.IsInteractable = CanBeRepaired();
         }
 

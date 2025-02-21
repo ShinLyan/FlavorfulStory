@@ -18,9 +18,12 @@ namespace FlavorfulStory.BuildingRepair
         /// <summary> Текст, отображаемый при завершении ремонта. </summary>
         [SerializeField] private TMP_Text _repairCompletedText;
 
-        
+        /// <summary> Префаб вьюшки ресурсного требования. </summary>
+        /// <remarks> Спавнится в родителя, что имеет VerticalLayoutGroup. </remarks>
         [SerializeField] private GameObject _requirementViewPrefab;
 
+        /// <summary> Родитель вьюшек ресурсных требований. </summary>
+        /// <remarks> Содержит компонент VerticalLayoutGroup. </remarks>
         [SerializeField] private Transform _requirementViewsContainer;
 
         /// <summary> Кнопка для подтверждения ремонта. </summary>
@@ -125,18 +128,15 @@ namespace FlavorfulStory.BuildingRepair
             {
                 view.gameObject.SetActive(true);
             }
-
+            
             for (int i = 0; i < stage.Requirements.Count; i++)
             {
-                _requirementViews[i].Setup(stage.Requirements[i].Item);
-                // TODO: Объединить в один метод
-                _requirementViews[i].SetQuantityText(investedResources[i], stage.Requirements[i].Quantity);
-                _requirementViews[i].UpdateTransferButtonsInteractableState(
-                    stage.Requirements[i].Quantity, investedResources[i]
-                );
+                _requirementViews[i].Setup(stage.Requirements[i], investedResources[i]);
             }
         }
-
+        
+        /// <summary> Заспавнить вьюшки ресурсных требований. </summary>
+        /// <param name="count"> Количество вьющек. </param>
         private void SpawnRequirementViews(int count)
         {
             for (int i = 0; i < count; i++)
@@ -151,6 +151,7 @@ namespace FlavorfulStory.BuildingRepair
             }
         }
 
+        /// <summary> Удалить вьюшки ресурсных требований. </summary>
         private void DestroyRequirementViews()
         {
             foreach (var view in _requirementViews)
