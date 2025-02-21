@@ -216,7 +216,7 @@ namespace FlavorfulStory.BuildingRepair
         {
             _repairView.Initialize(TransferResource);
             _repairView.BuildButton.OnClick += Build;
-            _repairView.Open();
+            _repairView.Open(_repairConfig.Stages[_currentRepairStageIndex].Requirements.Count);
             _repairView.SetData(_repairConfig.Stages[_currentRepairStageIndex], _investedResources, _repairCompleted);
             _repairView.BuildButton.IsInteractable = CanBeRepaired();
         }

@@ -1305,6 +1305,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _uniqueIdentifier: 8e668440-383e-43ab-a2be-a0350065bdc1
+--- !u!224 &2074521350 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 8800185379289686496, guid: affcbebf48e6f0f43979348487a41615,
+    type: 3}
+  m_PrefabInstance: {fileID: 4030150602889849440}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &2077273752 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7383500482912895184, guid: a9114609ac4097e459c8c7e1f3d67d2b,
@@ -1424,6 +1430,17 @@ PrefabInstance:
       propertyPath: m_Name
       value: BuildingRepairCanvas
       objectReference: {fileID: 0}
+    - target: {fileID: 2980101029542535840, guid: affcbebf48e6f0f43979348487a41615,
+        type: 3}
+      propertyPath: _requirementViewPrefab
+      value: 
+      objectReference: {fileID: 3336740871693969319, guid: 5749c982e2521b24b9546ef7bf59b5d9,
+        type: 3}
+    - target: {fileID: 2980101029542535840, guid: affcbebf48e6f0f43979348487a41615,
+        type: 3}
+      propertyPath: _requirementViewsContainer
+      value: 
+      objectReference: {fileID: 2074521350}
     - target: {fileID: 3698780425964633341, guid: affcbebf48e6f0f43979348487a41615,
         type: 3}
       propertyPath: m_AnchorMax.y
@@ -1515,7 +1532,11 @@ PrefabInstance:
       value: -40
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 1280494110217757825, guid: affcbebf48e6f0f43979348487a41615, type: 3}
+    - {fileID: 2109109453362196883, guid: affcbebf48e6f0f43979348487a41615, type: 3}
+    - {fileID: 9053229032421365350, guid: affcbebf48e6f0f43979348487a41615, type: 3}
+    - {fileID: 4284585659887556219, guid: affcbebf48e6f0f43979348487a41615, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: affcbebf48e6f0f43979348487a41615, type: 3}
