@@ -38,17 +38,28 @@ namespace FlavorfulStory.BuildingRepair
         private void Awake()
         {
             _requirementViews = GetComponentsInChildren<ResourceRequirementView>(true).ToList();
-            BuildButton = GetComponentInChildren<UIButton>(true);
             _content = transform.GetChild(0).gameObject;
+            BuildButton = GetComponentInChildren<UIButton>(true);
         }
 
         /// <summary> Обновление состояния окна. Коллбэк из UnityAPI. </summary>
         private void Update()
         {
-            if (_isOpen && InputWrapper.GetButtonDown(InputButton.SwitchGameMenu, true))
+            if (_isOpen && InputWrapper.GetButtonDown(InputButton.SwitchGameMenu))
             {
                 Close();
+                StartCoroutine(BlockGameMenuForOneFrame());
             }
+        }
+
+        /// <summary> Заблокировать кнопку переключения игрового меню на один кадр. </summary>
+        private System.Collections.IEnumerator BlockGameMenuForOneFrame()
+        {
+            // Блокируем на следующий кадр
+            InputWrapper.BlockInput(InputButton.SwitchGameMenu);
+            yield return null;
+            // Разблокируем ввод
+            InputWrapper.UnblockInput(InputButton.SwitchGameMenu);
         }
 
         /// <summary> Инициализировать обработчик передачи ресурсов. </summary>
@@ -65,6 +76,7 @@ namespace FlavorfulStory.BuildingRepair
             _content.SetActive(_isOpen);
             WorldTime.Pause();
             InputWrapper.BlockAllInput();
+            InputWrapper.UnblockInput(InputButton.SwitchGameMenu);
             foreach (var view in _requirementViews)
             {
                 view.OnResourceTransferButtonClick += _resourceTransferHandler;
@@ -78,6 +90,7 @@ namespace FlavorfulStory.BuildingRepair
             _content.SetActive(_isOpen);
             WorldTime.Unpause();
             InputWrapper.UnblockAllInput();
+            InputWrapper.UnblockInput(InputButton.SwitchGameMenu);
             foreach (var view in _requirementViews)
             {
                 view.OnResourceTransferButtonClick -= _resourceTransferHandler;

@@ -10,9 +10,6 @@ namespace FlavorfulStory.UI
     /// Обрабатывает ввод для переключения вкладок и скрытия/показа меню. </summary>
     public class GameMenu : MonoBehaviour
     {
-        /// <summary> Клавиша для переключения состояния меню. </summary>
-        [SerializeField] private KeyCode _switchKey;
-
         /// <summary> Контейнер с контентом меню. </summary>
         [SerializeField] private GameObject _content;
 
