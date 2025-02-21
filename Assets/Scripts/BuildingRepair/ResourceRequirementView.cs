@@ -10,6 +10,7 @@ namespace FlavorfulStory.BuildingRepair
     /// <remarks> Управляет визуализацией и взаимодействием с кнопками добавления и возврата ресурса. </remarks>
     public class ResourceRequirementView : MonoBehaviour
     {
+        [Header("UI компоненты")]
         /// <summary> Иконка ресурса, отображаемая на панели. </summary>
         [SerializeField] private Image _resourceIcon;
 
@@ -25,45 +26,81 @@ namespace FlavorfulStory.BuildingRepair
         /// <summary> Текущий ресурс, с которым работает этот элемент. Может быть null, если ресурс не задан. </summary>
         private InventoryItem _resource;
 
+        /// <summary> Требуемое количество ресурса. </summary>
+        private int _requiredQuantity;
+
+        /// <summary> Вложенное количество ресурса. </summary>
+        private int _investedQuantity;
+
         /// <summary> Событие, которое вызывается при клике на одну из кнопок добавления или возврата ресурса. </summary>
         public event Action<InventoryItem, ResourceTransferButtonType> OnResourceTransferButtonClick;
 
-        /// <summary> Подписка на события добавления и возврата ресурсов при активации объекта. </summary>
-        private void OnEnable()
-        {
-            _addResourceButton.OnClick += OnResourceTransferButtonClick;
-            _returnResourceButton.OnClick += OnResourceTransferButtonClick;
-        }
+        /// <summary> Коллбэк UnityAPI при включении объекта. </summary>
+        /// <remarks> Вызывает <see cref="SubscribeToEvents"/>. </remarks>
+        private void OnEnable() => SubscribeToEvents();
 
-        /// <summary> Отписка от событий добавления и возврата ресурсов при деактивации объекта. </summary>
-        private void OnDisable()
-        {
-            _addResourceButton.OnClick -= OnResourceTransferButtonClick;
-            _returnResourceButton.OnClick -= OnResourceTransferButtonClick;
-        }
+        /// <summary> Коллбэк UnityAPI при выключении объекта. </summary>
+        /// <remarks> Вызывает <see cref="UnsubscribeFromEvents"/>. </remarks>
+        private void OnDisable() => UnsubscribeFromEvents();
 
         /// <summary> Установить ресурс для текущего элемента. </summary>
         /// <param name="requirement"> Ресурсное требование. </param>
         /// <param name="investedNumber"> Количество вложенного ресурса в процесс ремонта. </param>
         public void Setup(ResourceRequirement requirement, int investedNumber)
         {
-            _resource = requirement.Item;
+            InitializeResourceData(requirement.Item, requirement.Quantity, investedNumber);
+            UpdateVisuals();
+            UpdateButtonStates();
+        }
+
+        /// <summary> Инициализировать данные о ресурсе. </summary>
+        /// <param name="resource"> Ресурс. </param>
+        /// <param name="requiredQuantity"> Требуемое количество ресурса. </param>
+        /// <param name="investedQuantity"> Вложенное количество ресурса. </param>
+        private void InitializeResourceData(InventoryItem resource, int requiredQuantity, int investedQuantity)
+        {
+            _resource = resource ?? throw new ArgumentNullException(nameof(resource));
+            _requiredQuantity = requiredQuantity;
+            _investedQuantity = investedQuantity;
+
+            ConfigureTransferButtons();
+        }
+
+        /// <summary> Настроить кнопки добавления и возврата ресурса. </summary>
+        private void ConfigureTransferButtons()
+        {
             _addResourceButton.SetResource(_resource);
             _returnResourceButton.SetResource(_resource);
+        }
+
+        /// <summary> Обновить визуальное отображение информации о ресурсе. </summary>
+        private void UpdateVisuals()
+        {
             _resourceIcon.sprite = _resource.Icon;
-            _quantityText.text = $"{investedNumber}/{requirement.Quantity}";
-            UpdateTransferButtonsInteractableState(requirement.Quantity, investedNumber);
+            _quantityText.text = $"{_investedQuantity}/{_requiredQuantity}";
         }
 
         /// <summary> Обновить состояние кнопок добавления и возврата ресурса. </summary>
-        /// <param name="requirementNumber"> Требуемое количество ресурса. </param>
-        /// <param name="investedNumber"> Количество вложенного ресурса в процесс ремонта. </param>
-        private void UpdateTransferButtonsInteractableState(int requirementNumber, int investedNumber)
+        private void UpdateButtonStates()
         {
-            _addResourceButton.IsInteractable = (investedNumber != requirementNumber &&
-                                                 Inventory.PlayerInventory.GetItemNumber(_resource) > 0);
-            _returnResourceButton.IsInteractable =
-                !(investedNumber == 0 || !Inventory.PlayerInventory.HasSpaceFor(_resource));
+            _addResourceButton.IsInteractable = _investedQuantity < _requiredQuantity &&
+                                                Inventory.PlayerInventory.GetItemNumber(_resource) > 0;
+            _returnResourceButton.IsInteractable = _investedQuantity > 0 &&
+                                                   Inventory.PlayerInventory.HasSpaceFor(_resource);
+        }
+
+        /// <summary> Подписаться на события добавления и возврата ресурсов при активации объекта. </summary>
+        private void SubscribeToEvents()
+        {
+            _addResourceButton.OnClick += OnResourceTransferButtonClick;
+            _returnResourceButton.OnClick += OnResourceTransferButtonClick;
+        }
+
+        /// <summary> Отписаться от событий добавления и возврата ресурсов при деактивации объекта. </summary>
+        private void UnsubscribeFromEvents()
+        {
+            _addResourceButton.OnClick -= OnResourceTransferButtonClick;
+            _returnResourceButton.OnClick -= OnResourceTransferButtonClick;
         }
     }
 }

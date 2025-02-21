@@ -319,7 +319,7 @@ PrefabInstance:
     - target: {fileID: 1508726255514112787, guid: 8ba1917497413bc4eb88f6b28139bb96,
         type: 3}
       propertyPath: m_Name
-      value: JustStump
+      value: DefaultStage
       objectReference: {fileID: 0}
     - target: {fileID: 1508726255514472243, guid: 8ba1917497413bc4eb88f6b28139bb96,
         type: 3}
@@ -1097,7 +1097,7 @@ PrefabInstance:
     - target: {fileID: 1508726255514112787, guid: 8ba1917497413bc4eb88f6b28139bb96,
         type: 3}
       propertyPath: m_Name
-      value: JustStump
+      value: DefaultStage
       objectReference: {fileID: 0}
     - target: {fileID: 1508726255514472243, guid: 8ba1917497413bc4eb88f6b28139bb96,
         type: 3}
@@ -1334,15 +1334,15 @@ MonoBehaviour:
       type: 3}
     Requirements:
     - Item: {fileID: 11400000, guid: c105c0283ae6d95488d48924be055535, type: 2}
-      Quantity: 5
-  - ObjectName: Fishy Stump
+      Quantity: 10
+  - ObjectName: Fishy stump
     Gameobject: {fileID: 5147111134944401275, guid: d611b75241f8879458bb7b95b8e1838a,
       type: 3}
     Requirements:
     - Item: {fileID: 11400000, guid: c105c0283ae6d95488d48924be055535, type: 2}
-      Quantity: 10
+      Quantity: 20
     - Item: {fileID: 11400000, guid: 615d2c1474bbd6b40a381e8f02f49dc3, type: 2}
-      Quantity: 1
+      Quantity: 10
   <IsBlockingMovement>k__BackingField: 1
 --- !u!65 &1831753307
 BoxCollider:
@@ -1721,6 +1721,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_IsActive
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5397709990059322854, guid: affcbebf48e6f0f43979348487a41615,
+        type: 3}
+      propertyPath: m_Pivot.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5397709990059322854, guid: affcbebf48e6f0f43979348487a41615,
+        type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 600
       objectReference: {fileID: 0}
     - target: {fileID: 6030950170796153608, guid: affcbebf48e6f0f43979348487a41615,
         type: 3}

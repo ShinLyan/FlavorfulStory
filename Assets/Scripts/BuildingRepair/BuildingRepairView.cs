@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using TMPro;
 using FlavorfulStory.InputSystem;
@@ -87,10 +86,6 @@ namespace FlavorfulStory.BuildingRepair
             InputWrapper.BlockAllInput();
             InputWrapper.UnblockInput(InputButton.SwitchGameMenu);
             SpawnRequirementViews(requirementsCount);
-            // foreach (var view in _requirementViews)
-            // {
-            //     view.OnResourceTransferButtonClick += _resourceTransferHandler;
-            // }
         }
 
         /// <summary> Закрыть окно ремонта. </summary>
@@ -118,16 +113,10 @@ namespace FlavorfulStory.BuildingRepair
             _objectNameText.text = stage.ObjectName;
             _repairCompletedText.text = $"{stage.ObjectName}'s repair completed";
             _repairCompletedText.gameObject.SetActive(repairCompleted);
-
-            _requirementViews.ForEach(view => view.gameObject.SetActive(false));
-
+            
             if (repairCompleted) return;
 
-            var activeRequirementViews = _requirementViews.Take(stage.Requirements.Count);
-            foreach (var view in activeRequirementViews)
-            {
-                view.gameObject.SetActive(true);
-            }
+            _requirementViews.ForEach(view => view.gameObject.SetActive(true));
             
             for (int i = 0; i < stage.Requirements.Count; i++)
             {
@@ -141,8 +130,9 @@ namespace FlavorfulStory.BuildingRepair
         {
             for (int i = 0; i < count; i++)
             {
-                var requirementView = Instantiate(_requirementViewPrefab, _requirementViewsContainer).GetComponent<ResourceRequirementView>();
-                _requirementViews.Add(requirementView);
+                var requirementView = Instantiate(_requirementViewPrefab, _requirementViewsContainer);
+                requirementView.SetActive(false);
+                _requirementViews.Add(requirementView.GetComponent<ResourceRequirementView>());
             }
             
             foreach (var view in _requirementViews)
