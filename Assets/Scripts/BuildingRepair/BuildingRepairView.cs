@@ -25,14 +25,8 @@ namespace FlavorfulStory.BuildingRepair
         /// <remarks> Содержит компонент VerticalLayoutGroup. </remarks>
         [SerializeField] private Transform _requirementViewsContainer;
 
-        /// <summary> Кнопка для подтверждения ремонта. </summary>
-        public UIButton BuildButton { get; private set; }
-
         /// <summary> Список вьюшек требований ресурсов. </summary>
         private List<ResourceRequirementView> _requirementViews;
-
-        /// <summary> Обработчик передачи ресурсов. </summary>
-        private Action<InventoryItem, ResourceTransferButtonType> _resourceTransferHandler;
 
         /// <summary> Флаг, указывающий открыто ли окно ремонта. </summary>
         private bool _isOpen;
@@ -40,11 +34,16 @@ namespace FlavorfulStory.BuildingRepair
         /// <summary> Контейнер для основного содержимого окна. </summary>
         private GameObject _content;
 
+        /// <summary> Кнопка для подтверждения ремонта. </summary>
+        public UIButton BuildButton { get; private set; }
+
+        /// <summary> Обработчик передачи ресурсов. </summary>
+        private Action<InventoryItem, ResourceTransferButtonType> _resourceTransferHandler;
+
         /// <summary> Инициализация. Коллбэк из UnityAPI. </summary>
         /// <remarks> Собирает вьюшки ресурсных требований. Собирает кнопку строительства. </remarks>
         private void Awake()
         {
-            //_requirementViews = GetComponentsInChildren<ResourceRequirementView>(true).ToList();
             _requirementViews = new();
             _content = transform.GetChild(0).gameObject;
             BuildButton = GetComponentInChildren<UIButton>(true);
@@ -53,21 +52,28 @@ namespace FlavorfulStory.BuildingRepair
         /// <summary> Обновление состояния окна. Коллбэк из UnityAPI. </summary>
         private void Update()
         {
-            if (_isOpen && InputWrapper.GetButtonDown(InputButton.SwitchGameMenu))
-            {
-                Close();
-                StartCoroutine(BlockGameMenuForOneFrame());
-            }
+            if (!_isOpen || !InputWrapper.GetButtonDown(InputButton.SwitchGameMenu)) return;
+
+            Close();
+            StartCoroutine(BlockGameMenuForOneFrame());
+        }
+
+        /// <summary> Закрыть окно ремонта. </summary>
+        public void Close()
+        {
+            _isOpen = false;
+            _content.SetActive(_isOpen);
+            WorldTime.Unpause();
+            InputWrapper.UnblockAllInput();
+            BuildButton.RemoveAllListeners();
         }
 
         /// <summary> Заблокировать кнопку переключения игрового меню на один кадр. </summary>
-        private System.Collections.IEnumerator BlockGameMenuForOneFrame()
+        private static System.Collections.IEnumerator BlockGameMenuForOneFrame()
         {
-            // Блокируем на следующий кадр
             InputWrapper.BlockInput(InputButton.SwitchGameMenu);
             yield return null;
-            // Разблокируем ввод
-            InputWrapper.UnblockInput(InputButton.SwitchGameMenu);
+            InputWrapper.UnblockAllInput();
         }
 
         /// <summary> Инициализировать обработчик передачи ресурсов. </summary>
@@ -78,27 +84,13 @@ namespace FlavorfulStory.BuildingRepair
         }
 
         /// <summary> Открыть окно ремонта. </summary>
-        public void Open(int requirementsCount)
+        public void Open()
         {
             _isOpen = true;
             _content.SetActive(_isOpen);
             WorldTime.Pause();
             InputWrapper.BlockAllInput();
             InputWrapper.UnblockInput(InputButton.SwitchGameMenu);
-            SpawnRequirementViews(requirementsCount);
-        }
-
-        /// <summary> Закрыть окно ремонта. </summary>
-        public void Close()
-        {
-            _isOpen = false;
-            _content.SetActive(_isOpen);
-            WorldTime.Unpause();
-            InputWrapper.UnblockAllInput();
-            InputWrapper.UnblockInput(InputButton.SwitchGameMenu);
-            DestroyRequirementViews();
-
-            BuildButton.RemoveAllListeners();
         }
 
         /// <summary> Установить данные для отображения в окне ремонта. </summary>
@@ -109,21 +101,33 @@ namespace FlavorfulStory.BuildingRepair
         {
             DestroyRequirementViews();
             SpawnRequirementViews(stage.Requirements.Count);
-            
-            _objectNameText.text = stage.ObjectName;
-            _repairCompletedText.text = $"{stage.ObjectName}'s repair completed";
+
+            _objectNameText.text = stage.BuildingName;
+            _repairCompletedText.text = $"{stage.BuildingName}'s repair completed";
             _repairCompletedText.gameObject.SetActive(repairCompleted);
-            
+
             if (repairCompleted) return;
 
             _requirementViews.ForEach(view => view.gameObject.SetActive(true));
-            
+
             for (int i = 0; i < stage.Requirements.Count; i++)
             {
                 _requirementViews[i].Setup(stage.Requirements[i], investedResources[i]);
             }
         }
-        
+
+        /// <summary> Удалить вьюшки ресурсных требований. </summary>
+        private void DestroyRequirementViews()
+        {
+            foreach (var view in _requirementViews)
+                view.OnResourceTransferButtonClick -= _resourceTransferHandler;
+
+            foreach (Transform child in _requirementViewsContainer.transform)
+                Destroy(child.gameObject);
+
+            _requirementViews.Clear();
+        }
+
         /// <summary> Заспавнить вьюшки ресурсных требований. </summary>
         /// <param name="count"> Количество вьющек. </param>
         private void SpawnRequirementViews(int count)
@@ -134,25 +138,11 @@ namespace FlavorfulStory.BuildingRepair
                 requirementView.SetActive(false);
                 _requirementViews.Add(requirementView.GetComponent<ResourceRequirementView>());
             }
-            
+
             foreach (var view in _requirementViews)
             {
                 view.OnResourceTransferButtonClick += _resourceTransferHandler;
             }
-        }
-
-        /// <summary> Удалить вьюшки ресурсных требований. </summary>
-        private void DestroyRequirementViews()
-        {
-            foreach (var view in _requirementViews)
-            {
-                view.OnResourceTransferButtonClick -= _resourceTransferHandler;
-            }
-            foreach (Transform child in _requirementViewsContainer.transform)
-            {
-                Destroy(child.gameObject);
-            }
-            _requirementViews.Clear();
         }
     }
 }

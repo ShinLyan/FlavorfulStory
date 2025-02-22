@@ -54,7 +54,7 @@ namespace FlavorfulStory.InventorySystem.PickupSystem
             if (shouldBeCollected && !IsItemCollected) DestroyPickup();
             if (!shouldBeCollected && IsItemCollected) SpawnPickup();
         }
-
+    
         #endregion
     }
 }

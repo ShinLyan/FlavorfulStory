@@ -10,7 +10,6 @@ namespace FlavorfulStory.BuildingRepair
     /// <remarks> Управляет визуализацией и взаимодействием с кнопками добавления и возврата ресурса. </remarks>
     public class ResourceRequirementView : MonoBehaviour
     {
-        [Header("UI компоненты")]
         /// <summary> Иконка ресурса, отображаемая на панели. </summary>
         [SerializeField] private Image _resourceIcon;
 
@@ -49,8 +48,8 @@ namespace FlavorfulStory.BuildingRepair
         public void Setup(ResourceRequirement requirement, int investedNumber)
         {
             InitializeResourceData(requirement.Item, requirement.Quantity, investedNumber);
-            UpdateVisuals();
-            UpdateButtonStates();
+            UpdateView();
+            UpdateButtonsStates();
         }
 
         /// <summary> Инициализировать данные о ресурсе. </summary>
@@ -59,29 +58,23 @@ namespace FlavorfulStory.BuildingRepair
         /// <param name="investedQuantity"> Вложенное количество ресурса. </param>
         private void InitializeResourceData(InventoryItem resource, int requiredQuantity, int investedQuantity)
         {
-            _resource = resource ?? throw new ArgumentNullException(nameof(resource));
+            _resource = resource;
             _requiredQuantity = requiredQuantity;
             _investedQuantity = investedQuantity;
 
-            ConfigureTransferButtons();
-        }
-
-        /// <summary> Настроить кнопки добавления и возврата ресурса. </summary>
-        private void ConfigureTransferButtons()
-        {
             _addResourceButton.SetResource(_resource);
             _returnResourceButton.SetResource(_resource);
         }
 
         /// <summary> Обновить визуальное отображение информации о ресурсе. </summary>
-        private void UpdateVisuals()
+        private void UpdateView()
         {
             _resourceIcon.sprite = _resource.Icon;
             _quantityText.text = $"{_investedQuantity}/{_requiredQuantity}";
         }
 
         /// <summary> Обновить состояние кнопок добавления и возврата ресурса. </summary>
-        private void UpdateButtonStates()
+        private void UpdateButtonsStates()
         {
             _addResourceButton.IsInteractable = _investedQuantity < _requiredQuantity &&
                                                 Inventory.PlayerInventory.GetItemNumber(_resource) > 0;

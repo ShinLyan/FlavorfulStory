@@ -1,22 +1,21 @@
-using System;
 using UnityEngine;
 using FlavorfulStory.InventorySystem;
 using FlavorfulStory.UI;
 
 namespace FlavorfulStory.BuildingRepair
 {
-    /// <summary> Класс для кнопки, отвечающей за передачу ресурсов (добавление или возвращение). Наследуется от CustomButton. </summary>
+    /// <summary> Класс для кнопки, отвечающей за передачу ресурсов (добавление или возвращение).
+    /// Наследуется от CustomButton. </summary>
     public class ResourceTransferButton : CustomButton
     {
-        //Назначается один раз в инспекторе
-        /// <summary> Тип кнопки для передачи ресурсов (добавление или возвращение). Назначается один раз в инспекторе. </summary>
+        /// <summary> Тип кнопки для передачи ресурсов (добавление или возвращение). </summary>
         [SerializeField] private ResourceTransferButtonType _buttonType;
 
         /// <summary> Ресурс, связанный с кнопкой. Может быть null, если ресурс не назначен. </summary>
         private InventoryItem _resource;
 
         /// <summary> Событие, которое вызывается при нажатии на кнопку. </summary>
-        public event Action<InventoryItem, ResourceTransferButtonType> OnClick;
+        public event System.Action<InventoryItem, ResourceTransferButtonType> OnClick;
 
         /// <summary> Инициализация кнопки (в данной реализации ничего не делает). </summary>
         protected override void Initialize()

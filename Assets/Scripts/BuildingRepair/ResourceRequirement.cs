@@ -11,7 +11,7 @@ namespace FlavorfulStory.BuildingRepair
         [Tooltip("Требуемый ресурс.")] public InventoryItem Item;
 
         /// <summary> Необходимое количество предмета. </summary>
-        [Tooltip("Количество требуемого ресурса .")]
+        [Tooltip("Количество требуемого ресурса.")]
         public int Quantity;
     }
 }
