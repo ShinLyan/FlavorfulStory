@@ -60,11 +60,14 @@ namespace FlavorfulStory.SceneManagement
         /// <param name="time"> Время анимации. </param>
         private System.Collections.IEnumerator FadeRoutine(float target, float time)
         {
+            _canvasGroup.blocksRaycasts = true;
             while (!Mathf.Approximately(_canvasGroup.alpha, target))
             {
                 _canvasGroup.alpha = Mathf.MoveTowards(_canvasGroup.alpha, target, Time.deltaTime / time);
                 yield return null;
             }
+
+            _canvasGroup.blocksRaycasts = !Mathf.Approximately(_canvasGroup.alpha, 0.0f);
         }
     }
 }
