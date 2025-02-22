@@ -97,16 +97,16 @@ namespace FlavorfulStory.BuildingRepair
         /// <param name="stage"> Текущая стадия ремонта. </param>
         /// <param name="investedResources"> Список инвестированных в ремонт ресурсов. </param>
         /// <param name="repairCompleted"> Флаг завершения ремонта. </param>
-        public void SetData(RepairStage stage, List<int> investedResources, bool repairCompleted)
+        public void SetData(RepairStage stage, List<int> investedResources)
         {
+            // TODO: ПЕРЕДЕЛАТЬ
             DestroyRequirementViews();
             SpawnRequirementViews(stage.Requirements.Count);
 
             _objectNameText.text = stage.BuildingName;
-            _repairCompletedText.text = $"{stage.BuildingName}'s repair completed";
-            _repairCompletedText.gameObject.SetActive(repairCompleted);
 
-            if (repairCompleted) return;
+            _repairCompletedText.gameObject.SetActive(false);
+            _repairCompletedText.text = $"{stage.BuildingName}'s repair completed";
 
             _requirementViews.ForEach(view => view.gameObject.SetActive(true));
 
@@ -114,6 +114,13 @@ namespace FlavorfulStory.BuildingRepair
             {
                 _requirementViews[i].Setup(stage.Requirements[i], investedResources[i]);
             }
+        }
+
+        public void D()
+        {
+            // TODO: ПЕРЕДЕЛАТЬ
+            _requirementViews.ForEach(view => view.gameObject.SetActive(false));
+            _repairCompletedText.gameObject.SetActive(true);
         }
 
         /// <summary> Удалить вьюшки ресурсных требований. </summary>

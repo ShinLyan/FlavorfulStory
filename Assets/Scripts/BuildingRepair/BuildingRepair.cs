@@ -27,7 +27,7 @@ namespace FlavorfulStory.BuildingRepair
         private int _currentRepairStageIndex;
 
         /// <summary> Флаг, указывающий, завершен ли ремонт здания. </summary>
-        private bool _repairCompleted;
+        private bool RepairCompleted => _currentRepairStageIndex > _stages.Count - 1;
 
         /// <summary> Список визуальных объектов для каждой стадии ремонта, включая начальную стадию. </summary>
         private List<GameObject> _stagesVisuals;
@@ -64,6 +64,8 @@ namespace FlavorfulStory.BuildingRepair
         /// <remarks> Список инвестированных ресурсов на текущей стадии будет инициализирован нулями. </remarks>
         private void InitializeInvestedResourcesList()
         {
+            if (RepairCompleted) return;
+
             _investedResources.Clear();
             for (int i = 0; i < _stages[_currentRepairStageIndex].Requirements.Count; i++)
                 _investedResources.Add(0);
@@ -71,7 +73,7 @@ namespace FlavorfulStory.BuildingRepair
 
         /// <summary> Обновить состояние возможности взаимодействия с ремонтируемым объектом. </summary>
         /// <remarks> После завершения ремонта взаимодействие становится невозможным. </remarks>
-        private void UpdateInteractableState() => IsInteractionAllowed = !_repairCompleted;
+        private void UpdateInteractableState() => IsInteractionAllowed = !RepairCompleted;
 
         /// <summary> Заспавнить визуальные объекты для стадий ремонта. </summary>
         /// <remarks> Создает и добавляет все визуальные элементы для стадий ремонта в сцену. </remarks>
@@ -92,25 +94,29 @@ namespace FlavorfulStory.BuildingRepair
         private void UpdateVisualStage()
         {
             _stagesVisuals.ForEach(go => go.SetActive(false));
-            _stagesVisuals[_currentRepairStageIndex + (_repairCompleted ? 1 : 0)].gameObject.SetActive(true);
+            _stagesVisuals[_currentRepairStageIndex].gameObject.SetActive(true);
         }
 
         /// <summary> Построить (продолжить ремонт) на основе вложенных ресурсов. </summary>
         /// <remarks> Переходит к следующей стадии ремонта, если все ресурсы добавлены. </remarks>
         private void Build()
         {
-            _repairCompleted = _currentRepairStageIndex >= _stages.Count - 1;
-            if (!_repairCompleted)
+            _currentRepairStageIndex++;
+            InitializeInvestedResourcesList();
+            // TODO: ПЕРЕДЕЛАТЬ НОРМАЛЬНО
+            if (!RepairCompleted)
             {
-                _currentRepairStageIndex++;
-                InitializeInvestedResourcesList();
+                _repairView.SetData(_stages[_currentRepairStageIndex], _investedResources);
+            }
+            else
+            {
+                _repairView.D();
             }
 
-            _repairView.SetData(_stages[_currentRepairStageIndex], _investedResources, _repairCompleted);
             _repairView.BuildButton.IsInteractable = CanBeRepaired();
             UpdateInteractableState();
             UpdateVisualStage();
-            if (!_repairCompleted) _repairView.Close();
+            if (!RepairCompleted) _repairView.Close();
         }
 
         /// <summary> Передать ресурс в процесс ремонта. </summary>
@@ -130,7 +136,7 @@ namespace FlavorfulStory.BuildingRepair
                     throw new ArgumentOutOfRangeException(nameof(transferButtonType), transferButtonType, null);
             }
 
-            _repairView.SetData(_stages[_currentRepairStageIndex], _investedResources, _repairCompleted);
+            _repairView.SetData(_stages[_currentRepairStageIndex], _investedResources);
             _repairView.BuildButton.IsInteractable = CanBeRepaired();
         }
 
@@ -173,7 +179,7 @@ namespace FlavorfulStory.BuildingRepair
 
         /// <summary> Проверить, можно ли совершить ремонт. </summary>
         /// <returns> Возвращает <c>true</c>, если все ресурсы для текущей стадии вложены, иначе <c>false</c>. </returns>
-        private bool CanBeRepaired() => !_repairCompleted && _stages[_currentRepairStageIndex].Requirements
+        private bool CanBeRepaired() => !RepairCompleted && _stages[_currentRepairStageIndex].Requirements
             .Select((requirement, i) => _investedResources[i] >= requirement.Quantity)
             .All(requirementCompleted => requirementCompleted);
 
@@ -205,7 +211,7 @@ namespace FlavorfulStory.BuildingRepair
             _repairView.Initialize(TransferResource);
             _repairView.BuildButton.OnClick += Build;
             _repairView.Open();
-            _repairView.SetData(_stages[_currentRepairStageIndex], _investedResources, _repairCompleted);
+            _repairView.SetData(_stages[_currentRepairStageIndex], _investedResources);
             _repairView.BuildButton.IsInteractable = CanBeRepaired();
         }
 
@@ -225,7 +231,6 @@ namespace FlavorfulStory.BuildingRepair
         {
             public List<int> InvestedResources;
             public int RepairStageIndex;
-            public bool RepairCompleted;
         }
 
         /// <summary> Сохранить состояние объекта для дальнейшего восстановления. </summary>
@@ -233,8 +238,7 @@ namespace FlavorfulStory.BuildingRepair
         public object CaptureState() => new RepairableBuildingRecord
         {
             RepairStageIndex = _currentRepairStageIndex,
-            InvestedResources = _investedResources,
-            RepairCompleted = _repairCompleted
+            InvestedResources = _investedResources
         };
 
         /// <summary> Восстановить состояние объекта из сохранённого состояния. </summary>
@@ -245,7 +249,6 @@ namespace FlavorfulStory.BuildingRepair
 
             _investedResources = record.InvestedResources;
             _currentRepairStageIndex = record.RepairStageIndex;
-            _repairCompleted = record.RepairCompleted;
             UpdateInteractableState();
             SpawnStagesVisuals();
             UpdateVisualStage();
