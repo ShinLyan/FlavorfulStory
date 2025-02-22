@@ -1,21 +1,46 @@
-using System;
 using FlavorfulStory.SceneManagement;
 using UnityEngine;
 
 namespace FlavorfulStory.AI.SceneGraphSystem
 {
-    [Serializable]
-    public class Warp
+    // Warp.cs
+    public class Warp : MonoBehaviour
     {
-        public LocationType sceneType;
-        public Vector3 position;
-        public ConnectedWarp[] connectedWarps;
-    }
+        public LocationType ParentLocation;
+        public Warp[] ConnectedWarps;
+        public int TransitionDuration = 1;
 
-    [Serializable]
-    public class ConnectedWarp
-    {
-        public LocationType _sceneType;
-        public int _pathTimeDuration;
+        [Header("Debug")]
+        public bool DrawIntraLocationConnections = true;
+
+        void OnDrawGizmos()
+        {
+            Gizmos.color = Color.cyan;
+            Gizmos.DrawSphere(transform.position, 0.3f);
+
+            // связи с другими локациями
+            foreach (var connected in ConnectedWarps)
+            {
+                if (connected != null)
+                {
+                    Gizmos.color = Color.yellow;
+                    Gizmos.DrawLine(transform.position, connected.transform.position);
+                }
+            }
+
+            // связи внутри локаций
+            if (DrawIntraLocationConnections)
+            {
+                var allWarps = FindObjectsOfType<Warp>();
+                foreach (var otherWarp in allWarps)
+                {
+                    if (otherWarp.ParentLocation == ParentLocation && otherWarp != this)
+                    {
+                        Gizmos.color = Color.blue;
+                        Gizmos.DrawLine(transform.position, otherWarp.transform.position);
+                    }
+                }
+            }
+        }
     }
 }

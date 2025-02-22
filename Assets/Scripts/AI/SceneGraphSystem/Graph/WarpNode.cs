@@ -1,28 +1,15 @@
 using System.Collections.Generic;
-using FlavorfulStory.SceneManagement;
-using UnityEngine;
 
 namespace FlavorfulStory.AI.SceneGraphSystem
 {
     public class WarpNode
     {
-        public int Id { get; private set; }
-        public LocationType SceneType { get; private set; }
-        public Vector3 Position { get; private set; }
-        public List<WarpEdge> Edges { get; private set; }
+        public Warp SourceWarp { get; }
+        public List<WarpEdge> Edges { get; } = new List<WarpEdge>();
 
-        public WarpNode(int id,LocationType sceneType, Vector3 position)
+        public WarpNode(Warp warp)
         {
-            Id = id;
-            SceneType = sceneType;
-            Position = position;
-            Edges = new List<WarpEdge>();
-        }
-
-        public void AddEdge(WarpNode targetNode, int duration)
-        {
-            Edges.Add(new WarpEdge(targetNode, duration));
+            SourceWarp = warp;
         }
     }
-
 }

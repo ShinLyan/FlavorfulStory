@@ -6,126 +6,108 @@ namespace FlavorfulStory.AI.SceneGraphSystem
 {
     public class WarpGraph
     {
-        public Dictionary<LocationType, List<WarpNode>> Nodes { get; private set; }
-
-        public WarpGraph()
-        {
-            Nodes = new Dictionary<LocationType, List<WarpNode>>();
-        }
+        private Dictionary<LocationType, List<WarpNode>> _nodesByLocation = new Dictionary<LocationType, List<WarpNode>>();
+        private List<WarpNode> _allNodes = new List<WarpNode>();
 
         public void AddNode(WarpNode node)
         {
-            if (!Nodes.ContainsKey(node.SceneType))
+            if (!_nodesByLocation.ContainsKey(node.SourceWarp.ParentLocation))
             {
-                Nodes[node.SceneType] = new List<WarpNode>();
+                _nodesByLocation[node.SourceWarp.ParentLocation] = new List<WarpNode>();
             }
-            Nodes[node.SceneType].Add(node);
+            _nodesByLocation[node.SourceWarp.ParentLocation].Add(node);
+            _allNodes.Add(node);
         }
 
-        public void AddEdge(int fromId, int toId, int duration)
+        public List<Warp> FindShortestPath(Warp start, Warp end)
         {
-            var fromNode = FindNode(fromId);
-            var toNode = FindNode(toId);
+            var queue = new Queue<WarpNode>();
+            var visited = new HashSet<WarpNode>();
+            var path = new Dictionary<WarpNode, WarpNode>();
+            
+            var startNode = _allNodes.Find(n => n.SourceWarp == start);
+            var endNode = _allNodes.Find(n => n.SourceWarp == end);
 
-            if (fromNode != null && toNode != null)
-            {
-                fromNode.AddEdge(toNode, duration);
-            }
-        }
+            if (startNode == null || endNode == null) return null;
 
-        private WarpNode FindNode(int id)
-        {
-            foreach (var sceneType in Nodes.Keys)
+            queue.Enqueue(startNode);
+            visited.Add(startNode);
+            path[startNode] = null;
+
+            while (queue.Count > 0)
             {
-                foreach (var node in Nodes[sceneType])
+                var current = queue.Dequeue();
+
+                if (current == endNode)
+                    return ReconstructPath(path, endNode);
+
+                foreach (var edge in current.Edges)
                 {
-                    if (node.Id == id)
+                    if (visited.Add(edge.TargetNode))
                     {
-                        return node;
+                        path[edge.TargetNode] = current;
+                        queue.Enqueue(edge.TargetNode);
                     }
                 }
             }
             return null;
         }
 
-        public List<WarpNode> FindShortestPath(WarpNode startNode, WarpNode targetNode)
+        private static List<Warp> ReconstructPath(Dictionary<WarpNode, WarpNode> path, WarpNode endNode)
         {
-            Dictionary<WarpNode, int> distances = new Dictionary<WarpNode, int>();
-            Dictionary<WarpNode, WarpNode> previousNodes = new Dictionary<WarpNode, WarpNode>();
-            HashSet<WarpNode> visited = new HashSet<WarpNode>();
-
-            // Очередь с приоритетом на основе SortedSet
-            SortedSet<KeyValuePair<int, WarpNode>> priorityQueue = 
-                new SortedSet<KeyValuePair<int, WarpNode>>(Comparer<KeyValuePair<int, WarpNode>>.Create((a, b) => 
-                    a.Key == b.Key ? a.Value.Id - b.Value.Id : a.Key - b.Key));
-
-            // Инициализация
-            foreach (var scene in Nodes.Values)
+            var result = new List<Warp>();
+            var current = endNode;
+            
+            while (current != null)
             {
-                foreach (var node in scene)
+                result.Add(current.SourceWarp);
+                current = path[current];
+            }
+            
+            result.Reverse();
+            return result;
+        }
+        
+        // Возвращает все узлы в указанной локации
+        private List<WarpNode> GetNodesByLocation(LocationType location)
+        {
+            return _nodesByLocation.GetValueOrDefault(location);
+        }
+
+        // Находит ближайший узел к позиции в указанной локации
+        public WarpNode FindClosestWarp(Vector3 position, LocationType location)
+        {
+            var nodes = GetNodesByLocation(location);
+            if (nodes == null || nodes.Count == 0) return null;
+
+            WarpNode closestNode = null;
+            float minDistance = float.MaxValue;
+
+            foreach (var node in nodes)
+            {
+                float distance = Vector3.Distance(position, node.SourceWarp.transform.position);
+                if (distance < minDistance)
                 {
-                    distances[node] = int.MaxValue;
-                    previousNodes[node] = null;
+                    minDistance = distance;
+                    closestNode = node;
                 }
             }
 
-            distances[startNode] = 0;
-            priorityQueue.Add(new KeyValuePair<int, WarpNode>(0, startNode));
-
-            // Основной алгоритм Dijkstra
-            while (priorityQueue.Count > 0)
-            {
-                var current = priorityQueue.Min.Value;
-                priorityQueue.Remove(priorityQueue.Min);
-
-                if (current == targetNode)
-                    break;
-
-                if (visited.Contains(current))
-                    continue;
-
-                visited.Add(current);
-
-                foreach (var edge in current.Edges)
-                {
-                    WarpNode neighbor = edge.TargetNode;
-                    int newDist = distances[current] + edge.Duration;
-
-                    if (newDist < distances[neighbor])
-                    {
-                        priorityQueue.Remove(new KeyValuePair<int, WarpNode>(distances[neighbor], neighbor));
-                        distances[neighbor] = newDist;
-                        previousNodes[neighbor] = current;
-                        priorityQueue.Add(new KeyValuePair<int, WarpNode>(newDist, neighbor));
-                    }
-                }
-            }
-
-            // Восстановление пути
-            List<WarpNode> path = new List<WarpNode>();
-            WarpNode step = targetNode;
-
-            while (step != null)
-            {
-                path.Add(step);
-                step = previousNodes[step];
-            }
-
-            path.Reverse();
-            return path;
+            return closestNode;
         }
 
         public void PrintGraph()
         {
-            foreach (var sceneType in Nodes.Keys)
+            foreach (var location in _nodesByLocation.Keys)
             {
-                foreach (var node in Nodes[sceneType])
+                foreach (var node in _nodesByLocation[location])
                 {
-                    Debug.Log($"Node: SceneType = {node.SceneType}, Position = {node.Position}");
+                    string connections = "";
                     foreach (var edge in node.Edges)
                     {
-                        Debug.Log($"    Connected: {edge.TargetNode.SceneType}, Position = {edge.TargetNode}, Duration = {edge.Duration}");
+                        connections += $"{edge.TargetNode.SourceWarp.ParentLocation} -> ";
                     }
+                    Debug.Log($"[{location}] Connected to: {connections.TrimEnd(" -> ".ToCharArray())}");
                 }
             }
         }

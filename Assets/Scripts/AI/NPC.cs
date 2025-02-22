@@ -44,8 +44,8 @@ namespace FlavorfulStory.AI
         
         private ScheduleParams _currentScheduleParams;
         
+        private Warp[] _warps;
         private WarpGraph _warpGraph;
-        [SerializeField] private AllWarpsSetup _allWarpsSetup;
 
 
         /// <summary> Инициализация компонентов и состояний. </summary>
@@ -56,21 +56,19 @@ namespace FlavorfulStory.AI
 
             _stateController = new StateController();
 
-            _warpGraph = WarpGraphBuilder.BuildGraph(_allWarpsSetup);
-
-            // Инициализация состояний.
+            _warps = FindObjectsByType<Warp>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+            _warpGraph = WarpGraphBuilder.BuildGraph(_warps);
+            
             _interactionState = new InteractionState(_stateController);
             _movementState = new MovementState(_stateController, _npcSchedule, _navMeshAgent, this, _warpGraph);
             _routineState = new RoutineState(_stateController, _npcSchedule, this);
             _waitingState = new WaitingState(_stateController);
-
-            // Добавление состояний в контроллер.
+            
             _stateController.AddState(_interactionState);
             _stateController.AddState(_movementState);
             _stateController.AddState(_routineState);
             _stateController.AddState(_waitingState);
-
-            // Установка начального состояния.
+            
             _stateController.SetState<RoutineState>();
         }
 

@@ -2,12 +2,12 @@ namespace FlavorfulStory.AI.SceneGraphSystem
 {
     public class WarpEdge
     {
-        public WarpNode TargetNode { get; private set; }
-        public int Duration { get; private set; }
+        public WarpNode TargetNode { get; }
+        public int Duration { get; }
 
-        public WarpEdge(WarpNode targetNode, int duration)
+        public WarpEdge(WarpNode target, int duration)
         {
-            TargetNode = targetNode;
+            TargetNode = target;
             Duration = duration;
         }
     }

@@ -1,47 +1,61 @@
+using System.Collections.Generic;
+using FlavorfulStory.SceneManagement;
+using UnityEngine;
+
 namespace FlavorfulStory.AI.SceneGraphSystem
 {
     public static class WarpGraphBuilder
     {
-        public static WarpGraph BuildGraph(AllWarpsSetup allWarpsSetup)
+        public static WarpGraph BuildGraph(IEnumerable<Warp> allWarps)
         {
-            WarpGraph graph = new WarpGraph();
+            var graph = new WarpGraph();
+            var nodeMap = new Dictionary<Warp, WarpNode>();
+            var warpsByLocation = new Dictionary<LocationType, List<Warp>>();
 
-            // Сначала создаем все узлы
-            foreach (var sceneWarpsSetup in allWarpsSetup.SceneWarpsSetup)
+            // Группируем варпы по локациям
+            foreach (var warp in allWarps)
             {
-                int warpIndex = 1; // Индекс варпа внутри сцены (начинаем с 1)
+                if (!warpsByLocation.ContainsKey(warp.ParentLocation))
+                    warpsByLocation[warp.ParentLocation] = new List<Warp>();
+                
+                warpsByLocation[warp.ParentLocation].Add(warp);
+            }
 
-                foreach (var warp in sceneWarpsSetup.warps)
+            // Создаем узлы и связи внутри локаций
+            foreach (var location in warpsByLocation.Keys)
+            {
+                var warpsInLocation = warpsByLocation[location];
+        
+                foreach (var warp in warpsInLocation)
                 {
-                    // Генерация уникального id на основе sceneType и индекса
-                    int id = (int)warp.sceneType * 100 + warpIndex;
-                    WarpNode node = new WarpNode(id, warp.sceneType, warp.position);
+                    var node = new WarpNode(warp);
+                    nodeMap[warp] = node;
                     graph.AddNode(node);
+                }
 
-                    warpIndex++; // Увеличиваем индекс для следующего варпа
+                // Связываем все варпы внутри локации между собой
+                foreach (var warpA in warpsInLocation)
+                {
+                    foreach (var warpB in warpsInLocation)
+                    {
+                        if (warpA != warpB)
+                        {
+                            float distance = Vector3.Distance(warpA.transform.position, warpB.transform.position);
+                            nodeMap[warpA].Edges.Add(new WarpEdge(nodeMap[warpB], Mathf.RoundToInt(distance)));
+                        }
+                    }
                 }
             }
 
-            // Затем добавляем ребра между узлами
-            foreach (var sceneWarpsSetup in allWarpsSetup.SceneWarpsSetup)
+            // Добавляем связи между варпами разных локаций
+            foreach (var warp in allWarps)
             {
-                int warpIndex = 1; // Индекс варпа внутри сцены (начинаем с 1)
-
-                foreach (var warp in sceneWarpsSetup.warps)
+                foreach (var connectedWarp in warp.ConnectedWarps)
                 {
-                    // Генерация уникального id для текущего варпа
-                    int fromId = (int)warp.sceneType * 100 + warpIndex;
-
-                    foreach (var connectedWarp in warp.connectedWarps)
+                    if (nodeMap.TryGetValue(connectedWarp, out var targetNode))
                     {
-                        // Генерация уникального id для целевого варпа
-                        int toId = (int)connectedWarp._sceneType * 100 + 1; // Предполагаем, что connectedWarp указывает на первый варп в целевой сцене
-
-                        // Добавляем ребро между узлами
-                        graph.AddEdge(fromId, toId, connectedWarp._pathTimeDuration);
+                        nodeMap[warp].Edges.Add(new WarpEdge(targetNode, warp.TransitionDuration));
                     }
-
-                    warpIndex++; // Увеличиваем индекс для следующего варпа
                 }
             }
 
