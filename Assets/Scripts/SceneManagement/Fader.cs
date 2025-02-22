@@ -22,10 +22,7 @@ namespace FlavorfulStory.SceneManagement
         public const float FadeWaitTime = 0.5f;
 
         /// <summary> Инициализирует компонент CanvasGroup. </summary>
-        private void Awake()
-        {
-            _canvasGroup = GetComponent<CanvasGroup>();
-        }
+        private void Awake() => _canvasGroup = GetComponent<CanvasGroup>();
 
         /// <summary> Немедленно устанавливает CanvasGroup на полностью прозрачное состояние. </summary>
         public void FadeOutImmediate() => _canvasGroup.alpha = 1f;
@@ -35,18 +32,18 @@ namespace FlavorfulStory.SceneManagement
 
         /// <summary> Постепенно затемняет CanvasGroup. </summary>
         /// <param name="time"> Время анимации. </param>
-        /// <returns> Корутин для управления затемнением. </returns>
+        /// <returns> Корутина для управления затемнением. </returns>
         public Coroutine FadeOut(float time) => Fade(1f, time);
 
         /// <summary> Постепенно делает CanvasGroup видимым. </summary>
         /// <param name="time"> Время анимации. </param>
-        /// <returns> Корутин для управления появлением. </returns>
+        /// <returns> Корутина для управления появлением. </returns>
         public Coroutine FadeIn(float time) => Fade(0f, time);
 
         /// <summary> Запускает анимацию затемнения или появления. </summary>
         /// <param name="target"> Целевое значение прозрачности (0 для появления, 1 для затемнения). </param>
         /// <param name="time"> Время анимации. </param>
-        /// <returns> Корутин для управления процессом анимации. </returns>
+        /// <returns> Корутина для управления процессом анимации. </returns>
         private Coroutine Fade(float target, float time)
         {
             if (_currentActiveFade != null) StopCoroutine(_currentActiveFade);

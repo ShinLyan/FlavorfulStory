@@ -1,9 +1,8 @@
-using System;
 using System.Linq;
-using FlavorfulStory.SceneManagement;
-using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
+using FlavorfulStory.SceneManagement;
 
 namespace FlavorfulStory.UI
 {
@@ -28,7 +27,8 @@ namespace FlavorfulStory.UI
         private string NewGameSaveFileName => string.Concat(_newGameInputFields.Select(field => field.text));
 
         /// <summary> Коллбэк из UnityAPI. </summary>
-        /// <remarks> Устанавливает кнопке продолжения игры неактивное состояние, если отсутствует файл сохранения. </remarks>
+        /// <remarks> Устанавливает кнопке продолжения игры неактивное состояние,
+        /// если отсутствует файл сохранения. </remarks>
         private void Start() => _continueGameButton.interactable = SavingWrapper.SaveFileExists;
 
         /// <summary> Обрабатывает запуск новой игры. </summary>
@@ -37,7 +37,7 @@ namespace FlavorfulStory.UI
         public void OnClickNewGame()
         {
             if (!AreInputFieldsValid()) return;
-            PersistentObject.Instance.GetSavingWrapper().StartNewGame(NewGameSaveFileName);
+            PersistentObject.Instance.SavingWrapper.StartNewGame(NewGameSaveFileName);
         }
 
         /// <summary> Проверяет поля ввода на корректность. </summary>
@@ -46,7 +46,7 @@ namespace FlavorfulStory.UI
         {
             foreach (var inputField in _newGameInputFields)
             {
-                if (!InputFieldValidator.IsValid(inputField.text, out var warningMessage))
+                if (!InputFieldValidator.IsValid(inputField.text, out string warningMessage))
                 {
                     _messageError.SetActive(true);
                     _errorText.text = warningMessage;
@@ -71,8 +71,7 @@ namespace FlavorfulStory.UI
             System.Array.ForEach(_newGameInputFields, inputField => inputField.text = string.Empty);
 
         /// <summary> Продолжить ранее сохраненную игру. </summary>
-        public void OnClickContinue() =>
-            PersistentObject.Instance.GetSavingWrapper().ContinueGame();
+        public void OnClickContinue() => PersistentObject.Instance.SavingWrapper.ContinueGame();
 
         /// <summary> Завершить работу приложения. </summary>
         public void OnClickQuit() => Application.Quit();
