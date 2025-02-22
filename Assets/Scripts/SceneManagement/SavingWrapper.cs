@@ -1,7 +1,7 @@
-﻿using FlavorfulStory.Saving;
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using FlavorfulStory.Saving;
 
 namespace FlavorfulStory.SceneManagement
 {
@@ -14,54 +14,53 @@ namespace FlavorfulStory.SceneManagement
         /// <summary> Ключ для хранения имени текущего сохранения в PlayerPrefs. </summary>
         private const string CurrentSaveKey = "currentSaveName";
 
+        /// <summary> Флаг существующего файла сохранения. </summary>
+        public static bool SaveFileExists => PlayerPrefs.HasKey(CurrentSaveKey) &&
+                                             SavingSystem.SaveFileExists(GetCurrentSaveFileName());
+
         /// <summary> Продолжает последнюю сохранённую игру. </summary>
         /// <remarks> Вызывается из главного меню. </remarks>
         public void ContinueGame()
         {
-            if (!PlayerPrefs.HasKey(CurrentSaveKey) ||
-                !SavingSystem.SaveFileExists(GetCurrentSave()))
-                return;
+            if (!SaveFileExists) return;
 
             StartCoroutine(LoadLastScene());
         }
 
         /// <summary> Начинает новую игру с указанным файлом сохранения. </summary>
-        /// <param name="saveFile"> Название файла сохранения. </param>
-        public void StartNewGame(string saveFile)
+        /// <param name="saveFileName"> Название файла сохранения. </param>
+        public void StartNewGame(string saveFileName)
         {
-            if (string.IsNullOrEmpty(saveFile)) return;
+            if (string.IsNullOrEmpty(saveFileName)) return;
 
-            SetCurrentSave(saveFile);
+            SetCurrentSave(saveFileName);
             StartCoroutine(LoadFirstScene());
         }
 
         /// <summary> Устанавливает текущее сохранение. </summary>
-        /// <param name="saveFile"> Название файла сохранения. </param>
-        private static void SetCurrentSave(string saveFile)
-        {
-            PlayerPrefs.SetString(CurrentSaveKey, saveFile);
-        }
+        /// <param name="saveFileName"> Название файла сохранения. </param>
+        private static void SetCurrentSave(string saveFileName) => PlayerPrefs.SetString(CurrentSaveKey, saveFileName);
 
         /// <summary> Получает название текущего сохранения. </summary>
         /// <returns> Название текущего сохранения. </returns>
-        private static string GetCurrentSave() => PlayerPrefs.GetString(CurrentSaveKey);
+        private static string GetCurrentSaveFileName() => PlayerPrefs.GetString(CurrentSaveKey);
 
         /// <summary> Загружает первую сцену игры. </summary>
         /// <returns> Корутина, выполняющая загрузку первой сцены. </returns>
         private IEnumerator LoadFirstScene()
         {
-            yield return PersistentObject.Instance.GetFader().FadeOut(Fader.FadeOutTime);
+            yield return PersistentObject.Instance.Fader.FadeOut(Fader.FadeOutTime);
             yield return SceneManager.LoadSceneAsync(_firstUploadedScene.ToString());
-            yield return PersistentObject.Instance.GetFader().FadeIn(Fader.FadeInTime);
+            yield return PersistentObject.Instance.Fader.FadeIn(Fader.FadeInTime);
         }
 
         /// <summary> Загружает последнюю сохранённую сцену. </summary>
         /// <returns> Корутина, выполняющая загрузку последней сохранённой сцены. </returns>
         private static IEnumerator LoadLastScene()
         {
-            yield return PersistentObject.Instance.GetFader().FadeOut(Fader.FadeOutTime);
-            yield return SavingSystem.LoadLastScene(GetCurrentSave());
-            yield return PersistentObject.Instance.GetFader().FadeIn(Fader.FadeInTime);
+            yield return PersistentObject.Instance.Fader.FadeOut(Fader.FadeOutTime);
+            yield return SavingSystem.LoadLastScene(GetCurrentSaveFileName());
+            yield return PersistentObject.Instance.Fader.FadeIn(Fader.FadeInTime);
         }
 
         /// <summary> Асинхронно загружает сцену по её названию. </summary>
@@ -74,19 +73,16 @@ namespace FlavorfulStory.SceneManagement
 
         /// <summary> Загружает сцену по её названию. </summary>
         /// <param name="sceneName"> Название сцены. </param>
-        public static void LoadSceneByName(string sceneName)
-        {
-            SceneManager.LoadScene(sceneName);
-        }
+        public static void LoadSceneByName(string sceneName) => SceneManager.LoadScene(sceneName);
 
         /// <summary> Загружает данные игры из текущего сохранения. </summary>
-        public static void Load() => SavingSystem.Load(GetCurrentSave());
+        public static void Load() => SavingSystem.Load(GetCurrentSaveFileName());
 
         /// <summary> Сохраняет данные игры в текущий файл сохранения. </summary>
-        public static void Save() => SavingSystem.Save(GetCurrentSave());
+        public static void Save() => SavingSystem.Save(GetCurrentSaveFileName());
 
         /// <summary> Удаляет текущее сохранение. </summary>
-        public static void Delete() => SavingSystem.Delete(GetCurrentSave());
+        public static void Delete() => SavingSystem.Delete(GetCurrentSaveFileName());
 
         #region Debug
 
