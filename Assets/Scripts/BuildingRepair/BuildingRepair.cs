@@ -103,20 +103,18 @@ namespace FlavorfulStory.BuildingRepair
         {
             _currentRepairStageIndex++;
             InitializeInvestedResourcesList();
-            // TODO: ПЕРЕДЕЛАТЬ НОРМАЛЬНО
-            if (!RepairCompleted)
-            {
-                _repairView.SetData(_stages[_currentRepairStageIndex], _investedResources);
-            }
-            else
-            {
-                _repairView.D();
-            }
-
             _repairView.BuildButton.IsInteractable = CanBeRepaired();
             UpdateInteractableState();
             UpdateVisualStage();
-            if (!RepairCompleted) _repairView.Close();
+            // TODO: ПЕРЕДЕЛАТЬ НОРМАЛЬНО
+            if (RepairCompleted)
+            {
+                _repairView.D();
+                return;
+            }
+            
+            _repairView.SetData(_stages[_currentRepairStageIndex], _investedResources);
+            _repairView.Close();
         }
 
         /// <summary> Передать ресурс в процесс ремонта. </summary>
@@ -245,6 +243,7 @@ namespace FlavorfulStory.BuildingRepair
         /// <param name="state"> Сохраненное состояние для восстановления. </param>
         public void RestoreState(object state)
         {
+            print("L");
             var record = state is RepairableBuildingRecord buildingRecord ? buildingRecord : default;
 
             _investedResources = record.InvestedResources;
