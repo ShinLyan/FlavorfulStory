@@ -9,6 +9,12 @@ namespace FlavorfulStory
         /// <summary> Экземпляр Singleton. </summary>
         public static PersistentObject Instance { get; private set; }
 
+        /// <summary> Ссылка на компонент Fader. </summary>
+        public Fader Fader { get; private set; }
+
+        /// <summary> Ссылка на компонент SavingWrapper. </summary>
+        public SavingWrapper SavingWrapper { get; private set; }
+        
         /// <summary> Инициализация Singleton. </summary>
         private void Awake()
         {
@@ -19,14 +25,8 @@ namespace FlavorfulStory
             }
 
             Instance = this;
+            Fader = GetComponentInChildren<Fader>();
+            SavingWrapper = GetComponentInChildren<SavingWrapper>();
         }
-
-        /// <summary> Получение ссылки на компонент SavingWrapper. </summary>
-        /// <returns> Экземпляр SavingWrapper. </returns>
-        public SavingWrapper GetSavingWrapper() => GetComponentInChildren<SavingWrapper>();
-
-        /// <summary> Получение ссылки на компонент Fader. </summary>
-        /// <returns> Экземпляр Fader. </returns>
-        public Fader GetFader() => GetComponentInChildren<Fader>();
     }
 }

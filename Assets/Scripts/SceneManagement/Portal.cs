@@ -42,7 +42,7 @@ namespace FlavorfulStory.SceneManagement
             DontDestroyOnLoad(gameObject);
 
             InputWrapper.BlockAllInput();
-            yield return PersistentObject.Instance.GetFader().FadeOut(Fader.FadeOutTime);
+            yield return PersistentObject.Instance.Fader.FadeOut(Fader.FadeOutTime);
 
             SavingWrapper.Save();
             yield return SavingWrapper.LoadSceneAsyncByName(_sceneToLoad.ToString());
@@ -53,7 +53,7 @@ namespace FlavorfulStory.SceneManagement
             SavingWrapper.Save();
 
             yield return new WaitForSeconds(Fader.FadeWaitTime);
-            PersistentObject.Instance.GetFader().FadeIn(Fader.FadeInTime);
+            PersistentObject.Instance.Fader.FadeIn(Fader.FadeInTime);
 
             InputWrapper.UnblockAllInput();
             Destroy(gameObject);
