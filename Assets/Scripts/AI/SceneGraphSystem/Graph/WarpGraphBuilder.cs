@@ -49,15 +49,9 @@ namespace FlavorfulStory.AI.SceneGraphSystem
 
             // Добавляем связи между варпами разных локаций
             foreach (var warp in allWarps)
-            {
                 foreach (var connectedWarp in warp.ConnectedWarps)
-                {
                     if (nodeMap.TryGetValue(connectedWarp, out var targetNode))
-                    {
                         nodeMap[warp].Edges.Add(new WarpEdge(targetNode, warp.TransitionDuration));
-                    }
-                }
-            }
 
             return graph;
         }

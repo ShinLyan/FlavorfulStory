@@ -144,28 +144,28 @@ namespace FlavorfulStory.AI.FiniteStateMachine
 
         private IEnumerator TraverseWarpPath(List<Warp> path, SchedulePoint destination)
         {
-            if (_navMeshAgent.isActiveAndEnabled)
-                _navMeshAgent.ResetPath();
-            
             foreach (var currentWarp in path)
             {
+                // Debug.Log(currentWarp.ParentLocation + " " + currentWarp.name);
                 if (currentWarp.ParentLocation != _npc._currentLocationName)
                 {
-                    Debug.Log("TELEPORT");
+                    Debug.Log("TELEPORT TO: " + currentWarp.name);
                     _navMeshAgent.Warp(currentWarp.transform.position);
                     _npc._currentLocationName = currentWarp.ParentLocation;
                 }
                 else
                 {
+                    Debug.Log("RUN TO: " + currentWarp.name);
                     _navMeshAgent.SetDestination(currentWarp.transform.position);
 
-                    while (_navMeshAgent.pathPending || 
-                           (_navMeshAgent.remainingDistance > DistanceToReachPoint && _navMeshAgent.hasPath))
+                    while (_navMeshAgent.pathPending || _navMeshAgent.remainingDistance > DistanceToReachPoint)
                         yield return null;
                 }
             }
+            
+            Debug.Log("==FINISHED==");
 
-            // когда прошел через все порталы и оказался на конечной сцене
+            // когда прошел через все варпы и оказался на конечной сцене
             _navMeshAgent.SetDestination(destination.Position); 
     
             while (_navMeshAgent.remainingDistance > DistanceToReachPoint)
