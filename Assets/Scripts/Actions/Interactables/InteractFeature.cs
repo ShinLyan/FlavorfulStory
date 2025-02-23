@@ -103,6 +103,7 @@ namespace FlavorfulStory.Actions.Interactables
                 .OrderBy(interactable => interactable.GetDistanceTo(transform))
                 .FirstOrDefault();
 
+        // TODO: Убрать анимацию для ремонта
         /// <summary> Начать взаимодействие. </summary>
         private void BeginInteraction()
         {

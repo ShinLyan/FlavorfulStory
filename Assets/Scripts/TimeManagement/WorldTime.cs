@@ -39,6 +39,8 @@ namespace FlavorfulStory.TimeManagement
         /// <summary> Текущее игровое время. </summary>
         private DateTime _dateTime;
 
+        private static bool _isPaused;
+        
         /// <summary> Создаёт объект `DateTime` и инициализирует его значением начала первого дня. </summary>
         private void Awake()
         {
@@ -55,6 +57,8 @@ namespace FlavorfulStory.TimeManagement
         /// <summary> Обновляет игровое время, проверяя, прошёл ли очередной тик. </summary>
         private void Update()
         {
+            if (_isPaused) return;
+            
             _currentTimeBetweenTicks += Time.deltaTime;
 
             if (_currentTimeBetweenTicks >= _timeBetweenTicks)
@@ -94,6 +98,10 @@ namespace FlavorfulStory.TimeManagement
 
             OnDateTimeChanged?.Invoke(_dateTime);
         }
+
+        public static void Pause() => _isPaused = true;
+
+        public static void Unpause() => _isPaused = false;
 
         #region Saving
 

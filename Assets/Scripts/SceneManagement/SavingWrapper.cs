@@ -33,13 +33,13 @@ namespace FlavorfulStory.SceneManagement
         {
             if (string.IsNullOrEmpty(saveFileName)) return;
 
-            SetCurrentSave(saveFileName);
+            SetCurrentSaveFileName(saveFileName);
             StartCoroutine(LoadFirstScene());
         }
 
         /// <summary> Устанавливает текущее сохранение. </summary>
         /// <param name="saveFileName"> Название файла сохранения. </param>
-        private static void SetCurrentSave(string saveFileName) => PlayerPrefs.SetString(CurrentSaveKey, saveFileName);
+        private static void SetCurrentSaveFileName(string saveFileName) => PlayerPrefs.SetString(CurrentSaveKey, saveFileName);
 
         /// <summary> Получает название текущего сохранения. </summary>
         /// <returns> Название текущего сохранения. </returns>
