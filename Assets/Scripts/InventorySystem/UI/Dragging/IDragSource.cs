@@ -3,7 +3,7 @@
     /// <summary> Интерфейс для классов, которые могут выступать
     /// в качестве источника для перетаскивания "DragItem". </summary>
     /// <typeparam name="T"> Тип объекта, который может быть перетаскиваемым. </typeparam>
-    public interface IDragSource<T> where T : class
+    public interface IDragSource<out T> where T : class
     {
         /// <summary> Получить элемент, который находится в этом источнике. </summary>
         /// <returns> Элемент, находящийся в данном источнике. </returns>

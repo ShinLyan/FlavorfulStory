@@ -103,17 +103,14 @@ namespace FlavorfulStory.Actions.Interactables
                 .OrderBy(interactable => interactable.GetDistanceTo(transform))
                 .FirstOrDefault();
 
-        //TODO: Убрать анимацию для ремонта
+        // TODO: Убрать анимацию для ремонта
         /// <summary> Начать взаимодействие. </summary>
         private void BeginInteraction()
         {
             OnInteractionStarted?.Invoke();
             _isInteracting = true;
             _animator.SetTrigger(_gather);
-            if (_nearestAllowedInteractable.IsBlockingMovement)
-            {
-                InputWrapper.BlockInput(new[] { InputButton.Horizontal, InputButton.Vertical });
-            }
+            InputWrapper.BlockPlayerMovement();
         }
 
         /// <summary> Закончить взаимодействие. </summary>
@@ -123,10 +120,7 @@ namespace FlavorfulStory.Actions.Interactables
             OnInteractionEnded?.Invoke();
             _isInteracting = false;
             _animator.ResetTrigger(_gather);
-            if (_nearestAllowedInteractable is { IsBlockingMovement: false })
-            {
-                InputWrapper.UnblockInput(new[] { InputButton.Horizontal, InputButton.Vertical });
-            }
+            InputWrapper.UnblockPlayerMovement();
         }
     }
 }

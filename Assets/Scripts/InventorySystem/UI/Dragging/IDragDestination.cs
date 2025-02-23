@@ -3,7 +3,7 @@
     /// <summary> Интерфейс для классов, которые могут выступать
     /// в качестве места назначения для перетаскивания "DragItem". </summary>
     /// <typeparam name="T"> Тип объекта, который может быть перетаскиваемым. </typeparam>
-    public interface IDragDestination<T> where T : class
+    public interface IDragDestination<in T> where T : class
     {
         /// <summary> Получить максимально допустимое количество элементов,
         /// которые можно добавить в это место назначения. </summary>

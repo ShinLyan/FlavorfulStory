@@ -7,7 +7,7 @@ namespace FlavorfulStory.InventorySystem.UI.Dragging
     /// <remarks> Создайте подкласс для типа элемента, который вы хотите перетаскивать. 
     /// Добавьте этот скрипт в элемент UI, который должен быть доступен для перетаскивания.
     /// Элемент перемещается на родительский Canvas во время перетаскивания.
-    /// После завершения он возвращается в исходный контейнер или перемещается в новый. </remarks>
+    /// После завершения он возвращается в исходный контейнер или перемещается в новый.
     /// Задача компонентов, реализующих "IDragContainer", "IDragDestination" и "IDragSource", 
     /// заключается в обновлении интерфейса после того, как произошло перетаскивание. </remarks>
     /// <typeparam name="T"> Тип объекта, который можно перетаскивать. </typeparam>
@@ -26,23 +26,29 @@ namespace FlavorfulStory.InventorySystem.UI.Dragging
         /// <summary> Родительский Canvas, используемый для отображения элемента во время перетаскивания. </summary>
         private Canvas _parentCanvas;
 
+        /// <summary> Группа CanvasGroup, контролирующая взаимодействие с элементом во время перетаскивания. </summary>
+        private CanvasGroup _canvasGroup;
+
         /// <summary> Инициализирует источник данных и родительский Canvas. </summary>
         private void Awake()
         {
             _source = GetComponentInParent<IDragSource<T>>();
             _parentCanvas = GetComponentInParent<Canvas>();
+            _canvasGroup = GetComponent<CanvasGroup>();
         }
 
         /// <summary> Начало перетаскивания элемента. </summary>
-        /// <remarks> Перемещает элемент на канвас и отключает блокировку лучей для CanvasGroup. </remarks>
         /// <param name="eventData"> Данные события курсора. </param>
         public void OnBeginDrag(PointerEventData eventData)
         {
+            // Сохраняем начальные параметры перед началом перетаскивания
             _startPosition = transform.position;
             _originalParent = transform.parent;
 
-            // В противном случае событие удаления не будет получено.
-            GetComponent<CanvasGroup>().blocksRaycasts = false;
+            // Отключаем блокировку лучей для корректного взаимодействия с UI
+            _canvasGroup.blocksRaycasts = false;
+
+            // Перемещаем элемент на родительский Canvas для корректного отображения
             transform.SetParent(_parentCanvas.transform, true);
         }
 
@@ -50,6 +56,7 @@ namespace FlavorfulStory.InventorySystem.UI.Dragging
         /// <param name="eventData"> Данные события курсора. </param>
         public void OnDrag(PointerEventData eventData)
         {
+            // Обновляем позицию элемента в соответствии с движением курсора
             transform.position = eventData.position;
         }
 
@@ -58,144 +65,112 @@ namespace FlavorfulStory.InventorySystem.UI.Dragging
         /// <param name="eventData"> Данные события курсора. </param>
         public void OnEndDrag(PointerEventData eventData)
         {
+            // Возвращаем объект в исходное положение и включаем блокировку лучей
             transform.position = _startPosition;
-            GetComponent<CanvasGroup>().blocksRaycasts = true;
+            _canvasGroup.blocksRaycasts = true;
             transform.SetParent(_originalParent, true);
 
-            IDragDestination<T> container;
+            // Определяем контейнер, в который может быть помещён предмет
+            var container = EventSystem.current.IsPointerOverGameObject()
+                ? GetContainer(eventData)
+                : _parentCanvas.GetComponent<IDragDestination<T>>();
 
-            // Проверяем, был ли нажат курсор мыши на UI элемент
-            if (EventSystem.current.IsPointerOverGameObject())
-            {
-                container = GetContainer(eventData);
-            }
-            else
-            {
-                container = _parentCanvas.GetComponent<IDragDestination<T>>();
-            }
-
+            // Если контейнер найден, выполняем перемещение предмета
             if (container != null) DropItemIntoContainer(container);
         }
 
         /// <summary> Поиск целевого контейнера под указателем мыши. </summary>
         /// <param name="eventData"> Данные события курсора. </param>
         /// <returns> Целевой контейнер или null, если контейнер не найден. </returns>
-        private static IDragDestination<T> GetContainer(PointerEventData eventData)
-        {
-            if (!eventData.pointerEnter) return null;
+        private static IDragDestination<T> GetContainer(PointerEventData eventData) =>
+            eventData.pointerEnter?.GetComponentInParent<IDragDestination<T>>();
 
-            var container = eventData.pointerEnter.GetComponentInParent<IDragDestination<T>>();
-            return container;
-        }
-
-        /// <summary> Перемещение элемента в целевой контейнер, обновляя его состояние. </summary>
+        /// <summary> Перемещение элемента в целевой контейнер. </summary>
         /// <param name="destination"> Целевой контейнер для перемещения элемента. </param>
         private void DropItemIntoContainer(IDragDestination<T> destination)
         {
+            // Проверяем, чтобы предмет не перемещался в тот же контейнер
             if (ReferenceEquals(destination, _source)) return;
 
-            // Обмен невозможен.
-            if (destination is not IDragContainer<T> destinationContainer ||
-                _source is not IDragContainer<T> sourceContainer ||
-                destinationContainer.GetItem() == null ||
-                ReferenceEquals(destinationContainer.GetItem(), sourceContainer.GetItem()))
-            {
-                AttemptSimpleTransfer(destination);
-                return;
-            }
-
-            AttemptSwap(destinationContainer, sourceContainer);
-        }
-
-        /// <summary> Выполняет передачу элемента между контейнерами. </summary>
-        /// <param name="destination"> Целевой контейнер для передачи элемента. </param>
-        /// <returns> true, если передача невозможна, иначе false. </returns>
-        private bool AttemptSimpleTransfer(IDragDestination<T> destination)
-        {
-            var draggingItem = _source.GetItem();
-            var draggingNumber = _source.GetNumber();
-
-            int acceptable = destination.GetMaxAcceptableItemsNumber(draggingItem);
-            int toTransfer = Mathf.Min(acceptable, draggingNumber);
-            if (toTransfer <= 0) return true;
-
-            _source.RemoveItems(toTransfer);
-            destination.AddItems(draggingItem, toTransfer);
-            return false;
+            // Определяем тип перемещения: обмен или перемещение предмета в контейнер
+            if (destination is IDragContainer<T> destinationContainer &&
+                _source is IDragContainer<T> sourceContainer &&
+                destinationContainer.GetItem() != null)
+                SwapItems(destinationContainer, sourceContainer);
+            else
+                TransferItems(destination);
         }
 
         /// <summary> Выполняет обмен элементами между контейнерами. </summary>
         /// <param name="destination"> Целевой контейнер для обмена. </param>
         /// <param name="source"> Исходный контейнер для обмена. </param>
-        private static void AttemptSwap(IDragContainer<T> destination, IDragContainer<T> source)
+        private static void SwapItems(IDragContainer<T> destination, IDragContainer<T> source)
         {
-            // Предварительно снимаем элемент с обеих сторон.
-            int removedSourceNumber = source.GetNumber();
-            var removedSourceItem = source.GetItem();
-            int removedDestinationNumber = destination.GetNumber();
-            var removedDestinationItem = destination.GetItem();
+            // Сохраняем информацию о предметах и их количестве перед обменом
+            var (sourceItem, sourceNumber) = (source.GetItem(), source.GetNumber());
+            var (destinationItem, destinationNumber) = (destination.GetItem(), destination.GetNumber());
 
-            // Удаление элементов из обоих контейнеров.
-            source.RemoveItems(removedSourceNumber);
-            destination.RemoveItems(removedDestinationNumber);
+            // Удаляем предметы из обоих контейнеров перед обменом
+            source.RemoveItems(sourceNumber);
+            destination.RemoveItems(destinationNumber);
 
-            // Рассчитываем количество предметов, которые необходимо вернуть.
-            int sourceTakeBackNumber = CalculateTakeBack(removedSourceItem, removedSourceNumber, source, destination);
-            int destinationTakeBackNumber = CalculateTakeBack(
-                removedDestinationItem, removedDestinationNumber, destination, source);
-            if (sourceTakeBackNumber > 0)
+            // Проверяем возможность возврата части предметов обратно в исходные контейнеры
+            int returnSource = CalculateReturnAmount(sourceItem, sourceNumber, source, destination);
+            int returnDestination = CalculateReturnAmount(destinationItem, destinationNumber, destination, source);
+
+            // Возвращаем излишки предметов обратно в контейнеры
+            if (returnSource > 0) source.AddItems(sourceItem, returnSource);
+            if (returnDestination > 0) destination.AddItems(destinationItem, returnDestination);
+
+            // Проверяем, возможен ли обмен предметами
+            if (source.GetMaxAcceptableItemsNumber(destinationItem) >= destinationNumber &&
+                destination.GetMaxAcceptableItemsNumber(sourceItem) >= sourceNumber)
             {
-                source.AddItems(removedSourceItem, sourceTakeBackNumber);
-                removedSourceNumber -= sourceTakeBackNumber;
+                // Завершаем обмен
+                if (destinationNumber > 0) source.AddItems(destinationItem, destinationNumber);
+                if (sourceNumber > 0) destination.AddItems(sourceItem, sourceNumber);
             }
-
-            if (destinationTakeBackNumber > 0)
+            else
             {
-                destination.AddItems(removedDestinationItem, destinationTakeBackNumber);
-                removedDestinationNumber -= destinationTakeBackNumber;
-            }
-
-            // Проверяем, можно ли выполнить успешный обмен.
-            if (source.GetMaxAcceptableItemsNumber(removedDestinationItem) < removedDestinationNumber ||
-                destination.GetMaxAcceptableItemsNumber(removedSourceItem) < removedSourceNumber)
-            {
-                // Возвращаем предметы в исходные контейнеры, если обмен невозможен.
-                destination.AddItems(removedDestinationItem, removedDestinationNumber);
-                source.AddItems(removedSourceItem, removedSourceNumber);
-                return;
-            }
-
-            // Выполняем обмен.
-            if (removedDestinationNumber > 0)
-            {
-                source.AddItems(removedDestinationItem, removedDestinationNumber);
-            }
-
-            if (removedSourceNumber > 0)
-            {
-                destination.AddItems(removedSourceItem, removedSourceNumber);
+                // Если обмен невозможен, возвращаем предметы в исходные контейнеры
+                source.RemoveItems(sourceNumber);
+                destination.RemoveItems(destinationNumber);
+                destination.AddItems(destinationItem, destinationNumber);
+                source.AddItems(sourceItem, sourceNumber);
             }
         }
-        
+
+        /// <summary> Выполняет передачу элемента между контейнерами. </summary>
+        /// <param name="destination"> Целевой контейнер для передачи элемента. </param>
+        private void TransferItems(IDragDestination<T> destination)
+        {
+            // Получаем перетаскиваемый предмет и его количество
+            var item = _source.GetItem();
+            int number = Mathf.Min(destination.GetMaxAcceptableItemsNumber(item), _source.GetNumber());
+
+            // Проверяем, можно ли переместить предмет
+            if (number > 0)
+            {
+                // Удаляем предмет из исходного контейнера и добавляем в целевой
+                _source.RemoveItems(number);
+                destination.AddItems(item, number);
+            }
+        }
+
         /// <summary> Рассчитывает количество предметов, которые необходимо вернуть в исходный контейнер. </summary>
-        /// <param name="removedItem"> Предмет, который был удален. </param>
-        /// <param name="removedNumber"> Количество удаленных предметов. </param>
-        /// <param name="removeSource"> Исходный контейнер, из которого был удален предмет. </param>
+        /// <param name="item"> Предмет, который был удален. </param>
+        /// <param name="number"> Количество удаленных предметов. </param>
+        /// <param name="removeFrom"> Исходный контейнер, из которого был удален предмет. </param>
         /// <param name="destination"> Целевой контейнер, куда был передан предмет. </param>
         /// <returns> Количество предметов, которые нужно вернуть обратно в исходный контейнер. </returns>
-        private static int CalculateTakeBack(T removedItem, int removedNumber,
-            IDragContainer<T> removeSource, IDragContainer<T> destination)
+        private static int CalculateReturnAmount(T item, int number,
+            IDragContainer<T> removeFrom, IDragContainer<T> destination)
         {
-            int takeBackNumber = 0;
-            int destinationMaxAcceptable = destination.GetMaxAcceptableItemsNumber(removedItem);
-            if (destinationMaxAcceptable < removedNumber)
-            {
-                takeBackNumber = removedNumber - destinationMaxAcceptable;
+            // Рассчитываем излишки предметов, которые не могут быть перенесены в целевой контейнер
+            int excess = number - destination.GetMaxAcceptableItemsNumber(item);
 
-                int sourceTakeBackAcceptable = removeSource.GetMaxAcceptableItemsNumber(removedItem);
-                if (sourceTakeBackAcceptable < takeBackNumber) return 0;
-            }
-            return takeBackNumber;
+            // Проверяем, можно ли вернуть излишки обратно в исходный контейнер
+            return excess > 0 && removeFrom.GetMaxAcceptableItemsNumber(item) >= excess ? excess : 0;
         }
     }
 }
