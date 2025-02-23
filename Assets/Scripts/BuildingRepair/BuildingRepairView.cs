@@ -5,6 +5,7 @@ using TMPro;
 using FlavorfulStory.InputSystem;
 using FlavorfulStory.InventorySystem;
 using FlavorfulStory.TimeManagement;
+using FlavorfulStory.UI;
 
 namespace FlavorfulStory.BuildingRepair
 {
@@ -99,7 +100,6 @@ namespace FlavorfulStory.BuildingRepair
         /// <param name="repairCompleted"> Флаг завершения ремонта. </param>
         public void SetData(RepairStage stage, List<int> investedResources)
         {
-            // TODO: ПЕРЕДЕЛАТЬ
             DestroyRequirementViews();
             SpawnRequirementViews(stage.Requirements.Count);
 
@@ -116,9 +116,8 @@ namespace FlavorfulStory.BuildingRepair
             }
         }
 
-        public void D()
+        public void DisplayCompletionMessage()
         {
-            // TODO: ПЕРЕДЕЛАТЬ
             _requirementViews.ForEach(view => view.gameObject.SetActive(false));
             _repairCompletedText.gameObject.SetActive(true);
         }
