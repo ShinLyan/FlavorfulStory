@@ -120,6 +120,7 @@ namespace FlavorfulStory.BuildingRepair
         {
             _requirementViews.ForEach(view => view.gameObject.SetActive(false));
             _repairCompletedText.gameObject.SetActive(true);
+            BuildButton.IsInteractable = false;
         }
 
         /// <summary> Удалить вьюшки ресурсных требований. </summary>
