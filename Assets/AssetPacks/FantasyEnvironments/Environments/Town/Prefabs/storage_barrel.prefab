@@ -11,13 +11,13 @@ GameObject:
   - component: {fileID: 4569873704234660}
   - component: {fileID: 33322510245055834}
   - component: {fileID: 23700771919634606}
-  - component: {fileID: 64625223336438494}
-  m_Layer: 0
+  - component: {fileID: 2778822995416635852}
+  m_Layer: 6
   m_Name: storage_barrel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 4294967295
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &4569873704234660
 Transform:
@@ -59,6 +59,9 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 4294967295
   m_RendererPriority: 0
   m_Materials:
@@ -84,8 +87,8 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &64625223336438494
-MeshCollider:
+--- !u!65 &2778822995416635852
+BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -102,7 +105,6 @@ MeshCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 4300002, guid: 08ee021cfbb99df4db2b3cf60648887e, type: 3}
+  serializedVersion: 3
+  m_Size: {x: 0.9765479, y: 1.0338151, z: 0.97654206}
+  m_Center: {x: 0, y: 0.5168843, z: -0.00000023841858}

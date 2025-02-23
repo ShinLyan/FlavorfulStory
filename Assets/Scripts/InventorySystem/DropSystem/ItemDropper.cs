@@ -32,7 +32,8 @@ namespace FlavorfulStory.InventorySystem.DropSystem
             float dropOffsetRange = 2f; // Диапазон случайного смещения по осям X и Z
             float randomOffsetX = Random.Range(-dropOffsetRange, dropOffsetRange);
             float randomOffsetZ = Random.Range(-dropOffsetRange, dropOffsetRange);
-            return transform.position + new Vector3(randomOffsetX, 0, randomOffsetZ);
+            //TODO: Убрать хардкод - подумать, как адекватно сделать.
+            return transform.position + new Vector3(randomOffsetX, 1, randomOffsetZ);
         }
 
         /// <summary> Заспавнить предмет Pickup на сцене. </summary>
