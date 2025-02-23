@@ -114,13 +114,14 @@ namespace FlavorfulStory.Actions.Interactables
         }
 
         /// <summary> Закончить взаимодействие. </summary>
-        /// <remarks> Метол подписан на событие в анимации игрока (Gather_interaction). </remarks>
+        /// <remarks> Метод подписан на событие в анимации игрока (Gather_interaction). </remarks>
         private void EndInteraction()
         {
             OnInteractionEnded?.Invoke();
             _isInteracting = false;
             _animator.ResetTrigger(_gather);
-            InputWrapper.UnblockPlayerMovement();
+            if (_nearestAllowedInteractable is { IsBlockingMovement: false })
+                InputWrapper.UnblockPlayerMovement();
         }
     }
 }
