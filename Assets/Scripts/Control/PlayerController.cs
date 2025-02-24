@@ -124,7 +124,9 @@ namespace FlavorfulStory.Control
 
             _playerMover.SetMoveDirection(direction);
             if (direction != Vector3.zero)
-                _playerMover.SetLookRotation(direction);
+            {
+                _playerMover.SetLookRotation(Quaternion.LookRotation(direction));
+            }
         }
 
         /// <summary> Уменьшение таймера перезарядки. </summary>
@@ -155,7 +157,7 @@ namespace FlavorfulStory.Control
         {
             var direction = (position - transform.position).normalized;
             direction.y = 0; // Игнорируем вертикальную составляющую
-            _playerMover.SetLookRotation(direction);
+            _playerMover.SetLookRotation(Quaternion.LookRotation(direction));
         }
 
         /// <summary> Экипировать инструмент в руку игрока. </summary>

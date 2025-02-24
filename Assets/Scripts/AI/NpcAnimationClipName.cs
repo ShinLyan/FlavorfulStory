@@ -1,4 +1,4 @@
-namespace FlavorfulStory.AI.States
+namespace FlavorfulStory.AI
 {
     /// <summary> Перечисление, представляющее названия анимационных клипов для NPC. </summary>
     public enum NpcAnimationClipName

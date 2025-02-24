@@ -12,6 +12,9 @@ namespace FlavorfulStory.SceneManagement
         RockyIsland,
 
         /// <summary> Ресторан. </summary>
-        Restaurant
+        Restaurant,
+        
+        /// <summary> Главная сцена. </summary>
+        MainScene,
     }
 }

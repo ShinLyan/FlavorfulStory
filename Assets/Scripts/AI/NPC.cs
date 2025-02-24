@@ -1,13 +1,23 @@
 using FlavorfulStory.AI.FiniteStateMachine;
+using FlavorfulStory.AI.SceneGraphSystem;
 using FlavorfulStory.AI.Scheduling;
+using FlavorfulStory.SceneManagement;
 using UnityEngine;
 using UnityEngine.AI;
 
-namespace FlavorfulStory.AI.States
+namespace FlavorfulStory.AI
 {
     /// <summary> Контроллер NPC, управляющий состояниями и поведением персонажа. </summary>
-    public class NpcController : MonoBehaviour
+    public class NPC : MonoBehaviour
     {
+        /// <summary> Имя NPC. </summary>
+        public NpcName Name => _npcName;
+
+        /// <summary> Текущая локация, в которой находится NPC. </summary>
+        public LocationType _currentLocationName;
+
+        [SerializeField] private NpcName _npcName;
+        
         /// <summary> Расписание NPC, определяющее его поведение и маршруты. </summary>
         [SerializeField] private NpcSchedule _npcSchedule;
 
@@ -34,6 +44,15 @@ namespace FlavorfulStory.AI.States
 
         /// <summary> Контроллер состояний, управляющий переключением между состояниями NPC. </summary>
         private StateController _stateController;
+        
+        /// <summary> Текущие параметры расписания NPC. </summary>
+        private ScheduleParams _currentScheduleParams;
+        
+        /// <summary> Массив всех варпов на сцене. </summary>
+        private Warp[] _warps;
+
+        /// <summary> Граф варпов, используемый для навигации NPC. </summary>
+        private WarpGraph _warpGraph;
 
         /// <summary> Инициализация компонентов и состояний. </summary>
         private void Awake()
@@ -43,19 +62,19 @@ namespace FlavorfulStory.AI.States
 
             _stateController = new StateController();
 
-            // Инициализация состояний.
+            _warps = FindObjectsByType<Warp>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+            _warpGraph = WarpGraphBuilder.BuildGraph(_warps);
+            
             _interactionState = new InteractionState(_stateController);
-            _movementState = new MovementState(_stateController, _npcSchedule, _navMeshAgent, this);
+            _movementState = new MovementState(_stateController, _npcSchedule, _navMeshAgent, this, _warpGraph);
             _routineState = new RoutineState(_stateController, _npcSchedule, this);
             _waitingState = new WaitingState(_stateController);
-
-            // Добавление состояний в контроллер.
+            
             _stateController.AddState(_interactionState);
             _stateController.AddState(_movementState);
             _stateController.AddState(_routineState);
             _stateController.AddState(_waitingState);
-
-            // Установка начального состояния.
+            
             _stateController.SetState<RoutineState>();
         }
 
@@ -78,6 +97,13 @@ namespace FlavorfulStory.AI.States
         public void PlayStateAnimation(NpcAnimationClipName animationStateName)
         {
             _animator.Play(animationStateName.ToString());
+        }
+
+        /// <summary> Устанавливает новое расписание для NPC. </summary>
+        /// <param name="newScheduleParams"> Новые параметры расписания. </param>
+        public void SetNewSchedule(ScheduleParams newScheduleParams)
+        {
+            _currentScheduleParams = newScheduleParams;
         }
     }
 }
