@@ -1,56 +1,46 @@
-﻿using FlavorfulStory.Saving;
+﻿using System;
+using System.Linq;
+using FlavorfulStory.Saving;
 using UnityEngine;
 
 namespace FlavorfulStory.InventorySystem
 {
-    /// <summary> Класс обеспечивает хранение инвентаря игрока. Доступно настраиваемое количество слотов.
-    /// Этот компонент должен быть размещен на игровом объекте с тегом "Игрок". </summary>
+    /// <summary> Хранение инвентаря игрока с настраиваемым количеством слотов.
+    /// Компонент должен находиться на объекте с тегом "Player". </summary>
     public class Inventory : MonoBehaviour, ISaveable
     {
         /// <summary> Количество слотов в инвентаре. </summary>
-        [Tooltip("Количество слотов в инвентаре.")]
-        [SerializeField] private int _inventorySize = 16;
+        [field: Tooltip("Количество слотов в инвентаре."), SerializeField]
+        public int InventorySize { get; private set; }
 
         /// <summary> Предметы инвентаря. </summary>
         private InventorySlot[] _slots;
 
-        /// <summary> Количество слотов в инвентаре. </summary>
-        public int InventorySize => _inventorySize;
-
-        /// <summary> Событие, которое срабатывает, когда предметы в инвентаре добавляются / удаляются. </summary>
-        public event System.Action InventoryUpdated;
-
-        /// <summary> Инициализация полей. </summary>
-        private void Awake()
-        {
-            _slots = new InventorySlot[_inventorySize];
-            _playerInventory = GameObject.FindWithTag("Player").GetComponent<Inventory>();
-        }
-
+        /// <summary> Синглтон инвентаря игрока. </summary>
         private static Inventory _playerInventory;
 
-        /// <summary> Получить инвентарь игрока. </summary>
-        public static Inventory PlayerInventory
+        /// <summary> Синглтон инвентаря игрока. </summary>
+        public static Inventory PlayerInventory =>
+            _playerInventory ? _playerInventory : GameObject.FindWithTag("Player").GetComponent<Inventory>();
+
+        /// <summary> Событие, вызываемое при изменении инвентаря (добавление, удаление предметов). </summary>
+        public event Action InventoryUpdated;
+
+        /// <summary> Инициализация слотов и ссылки на инвентарь игрока. </summary>
+        private void Awake()
         {
-            get
-            {
-                if (!_playerInventory)
-                {
-                    return GameObject.FindWithTag("Player").GetComponent<Inventory>();
-                }
-                return _playerInventory;
-            }
-            private set => _playerInventory = value;
+            _slots = new InventorySlot[InventorySize];
+            _playerInventory = PlayerInventory;
         }
 
-        /// <summary> Может ли этот предмет поместиться где-нибудь в инвентаре?</summary>
+        /// <summary> Есть ли место для предмета в инвентаре? </summary>
         public bool HasSpaceFor(InventoryItem item) => FindSlot(item) >= 0;
 
         /// <summary> Найти слот, в который можно поместить данный предмет. </summary>
         /// <param name="item"> Предмет, который нужно поместить в слот. </param>
         /// <returns> Возвращает индекс слота предмета. Если предмет не найден, возвращает -1. </returns>
-        private int FindSlot(InventoryItem item) => FindStackIndex(item) is var slotIndex
-            && slotIndex < 0 ? FindEmptySlot() : slotIndex;
+        private int FindSlot(InventoryItem item) =>
+            FindStackIndex(item) is var slotIndex && slotIndex >= 0 ? slotIndex : FindEmptySlot();
 
         /// <summary> Найти индекс существующего стака предметов этого типа. </summary>
         /// <param name="item"> Предмет, для которого нужно найти стак. </param>
@@ -58,42 +48,58 @@ namespace FlavorfulStory.InventorySystem
         private int FindStackIndex(InventoryItem item)
         {
             if (!item.IsStackable) return -1;
-
-            for (int i = 0; i < _slots.Length; i++)
-            {
-                if (ReferenceEquals(_slots[i].Item, item)) return i;
-            }
-            return -1;
+            return Array.FindIndex(
+                _slots,
+                slot => ReferenceEquals(slot.Item, item) && slot.Number < item.StackSize);
         }
 
         /// <summary> Найти индекс свободного слота в инвентаре. </summary>
         /// <returns> Возвращает индекс свободного слота в инвентаре.
         /// Если все слоты заполнены, то возвращает -1. </returns>
-        private int FindEmptySlot()
-        {
-            for (int i = 0; i < _slots.Length; i++)
-            {
-                if (_slots[i].Item == null) return i;
-            }
-            return -1;
-        }
+        private int FindEmptySlot() => Array.FindIndex(_slots, slot => !slot.Item);
 
-        /// <summary> Есть ли экземпляр этого предмета в инвентаре?</summary>
+        /// <summary> Есть ли экземпляр этого предмета в инвентаре? </summary>
         /// <param name="item"> Предмет. </param>
         /// <returns> Возвращает True - если предмет есть в инвентаре, False - в противном случае. </returns>
-        public bool HasItem(InventoryItem item)
-        {
-            foreach (var slot in _slots)
-            {
-                if (ReferenceEquals(slot, item)) return true;
-            }
-            return false;
-        }
+        public bool HasItem(InventoryItem item) => _slots.Any(slot => ReferenceEquals(slot.Item, item));
 
         /// <summary> Получить предмет инвентаря в заданном слоте. </summary>
         /// <param name="slotIndex"> Индекс слота, из которого нужно получить предмет. </param>
         /// <returns> Возвращает предмет инвентаря в заданном слоте. </returns>
         public InventoryItem GetItemInSlot(int slotIndex) => _slots[slotIndex].Item;
+
+        /// <summary> Получить общее количество заданного предмета в инвентаре. </summary>
+        /// <param name="item"> Предмет инвентаря. </param>
+        /// <returns> Возвращает общее количество заданного предмета в инвентаре. </returns>
+        public int GetItemNumber(InventoryItem item) =>
+            _slots.Where(slot => slot.Item == item).Sum(slot => slot.Number);
+        
+        public void RemoveItem(InventoryItem item, int number)
+        {
+            if (!HasItem(item))
+            {
+                Debug.LogError($"No item[{item.ItemName}] present in inventory!");
+                return;
+            }
+
+            if (GetItemNumber(item) < number)
+            {
+                Debug.LogError(
+                    $"You are trying to remove {number} item[{item.ItemName}], but only {GetItemNumber(item)} present in inventory!");
+                return;
+            }
+
+            int remainingToRemove = number;
+            for (int i = 0; i < _slots.Length && remainingToRemove > 0; i++)
+            {
+                if (_slots[i].Item == item)
+                {
+                    int numberToRemove = Math.Min(_slots[i].Number, remainingToRemove);
+                    RemoveFromSlot(i, numberToRemove);
+                    remainingToRemove -= numberToRemove;
+                }
+            }
+        }
 
         /// <summary> Получить количество предметов инвентаря в заданном слоте. </summary>
         /// <param name="slotIndex"> Индекс слота, из которого нужно получить количество. </param>
@@ -109,13 +115,19 @@ namespace FlavorfulStory.InventorySystem
         /// <returns> Возвращает True, если предмет был добавлен в любое место инвентаря. </returns>
         public bool TryAddItemToSlot(int slotIndex, InventoryItem item, int number)
         {
-            if (_slots[slotIndex].Item != null) return TryAddToFirstEmptySlot(item, number);
+            if (_slots[slotIndex].Item) return TryAddToFirstEmptySlot(item, number);
 
-            int index = FindStackIndex(item);
-            if (index >= 0) slotIndex = index;
+            while (number > 0)
+            {
+                int index = FindStackIndex(item);
+                if (index < 0) index = FindEmptySlot();
+                if (index < 0) return false;
 
-            _slots[slotIndex].Item = item;
-            _slots[slotIndex].Number += number;
+                int addAmount = Math.Min(number, item.StackSize - _slots[slotIndex].Number);
+                _slots[slotIndex].Item ??= item;
+                _slots[slotIndex].Number += addAmount;
+                number -= addAmount;
+            }
 
             InventoryUpdated?.Invoke();
             return true;
@@ -127,12 +139,16 @@ namespace FlavorfulStory.InventorySystem
         /// <returns> Возвращает True, если предмет можно добавить, False - в противном случае. </returns>
         public bool TryAddToFirstEmptySlot(InventoryItem item, int number)
         {
-            int slotIndex = FindSlot(item);
+            while (number > 0)
+            {
+                int index = FindSlot(item);
+                if (index < 0) return false;
 
-            if (slotIndex < 0) return false;
-
-            _slots[slotIndex].Item = item;
-            _slots[slotIndex].Number += number;
+                int addAmount = Mathf.Min(number, item.StackSize - _slots[index].Number);
+                _slots[index].Item ??= item;
+                _slots[index].Number += addAmount;
+                number -= addAmount;
+            }
 
             InventoryUpdated?.Invoke();
             return true;
@@ -143,18 +159,19 @@ namespace FlavorfulStory.InventorySystem
         /// <param name="number"> Количество предметов. </param>
         public void RemoveFromSlot(int slotIndex, int number)
         {
-            _slots[slotIndex].Number -= number;
-            if (_slots[slotIndex].Number <= 0)
+            if ((_slots[slotIndex].Number -= number) <= 0)
             {
                 _slots[slotIndex].Item = null;
                 _slots[slotIndex].Number = 0;
             }
+
             InventoryUpdated?.Invoke();
         }
 
         #region Saving
+
         /// <summary> Запись о предмете в слоте. </summary>
-        [System.Serializable]
+        [Serializable]
         private struct InventorySlotRecord
         {
             /// <summary> ID предмета в слоте. </summary>
@@ -168,15 +185,15 @@ namespace FlavorfulStory.InventorySystem
         /// <returns> Возвращает объект, в котором фиксируется состояние. </returns>
         public object CaptureState()
         {
-            var slotRecords = new InventorySlotRecord[_inventorySize];
-            for (int i = 0; i < _inventorySize; i++)
+            var slotRecords = new InventorySlotRecord[InventorySize];
+            for (int i = 0; i < InventorySize; i++)
             {
-                if (_slots[i].Item != null)
-                {
-                    slotRecords[i].ItemID = _slots[i].Item.ItemID;
-                    slotRecords[i].Number = _slots[i].Number;
-                }
+                if (!_slots[i].Item) continue;
+
+                slotRecords[i].ItemID = _slots[i].Item.ItemID;
+                slotRecords[i].Number = _slots[i].Number;
             }
+
             return slotRecords;
         }
 
@@ -185,13 +202,17 @@ namespace FlavorfulStory.InventorySystem
         public void RestoreState(object state)
         {
             var slotRecords = state as InventorySlotRecord[];
-            for (int i = 0; i < _inventorySize; i++)
+            for (int i = 0; i < InventorySize; i++)
             {
+                if (slotRecords == null) continue;
+
                 _slots[i].Item = InventoryItem.GetItemFromID(slotRecords[i].ItemID);
                 _slots[i].Number = slotRecords[i].Number;
             }
+
             InventoryUpdated?.Invoke();
         }
+
         #endregion
     }
 }

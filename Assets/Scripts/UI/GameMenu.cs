@@ -10,9 +10,6 @@ namespace FlavorfulStory.UI
     /// Обрабатывает ввод для переключения вкладок и скрытия/показа меню. </summary>
     public class GameMenu : MonoBehaviour
     {
-        /// <summary> Клавиша для переключения состояния меню. </summary>
-        [SerializeField] private KeyCode _switchKey;
-
         /// <summary> Контейнер с контентом меню. </summary>
         [SerializeField] private GameObject _content;
 
@@ -69,15 +66,20 @@ namespace FlavorfulStory.UI
         /// <param name="isEnabled"> Новое состояние видимости меню. </param>
         private void SwitchContent(bool isEnabled)
         {
-            var actions = new[] { InputButton.Horizontal, InputButton.Vertical, InputButton.MouseScroll };
-            if (!isEnabled)
-                InputWrapper.UnblockInput(actions);
+            if (isEnabled)
+            {
+                InputWrapper.BlockPlayerMovement();
+                InputWrapper.BlockInput(InputButton.MouseScroll);
+            }
             else
-                InputWrapper.BlockInput(actions);
+            {
+                InputWrapper.UnblockPlayerMovement();
+                InputWrapper.UnblockInput(InputButton.MouseScroll);
+            }
 
             _content.SetActive(isEnabled);
         }
-        
+
         /// <summary> Обрабатывает ввод для переключения между соседними вкладками. </summary>
         private void HandleAdjacentTabsInput()
         {

@@ -1,19 +1,22 @@
 ﻿using System;
+using System.Linq;
 using FlavorfulStory.Actions;
 using FlavorfulStory.InputSystem;
 using FlavorfulStory.InventorySystem;
 using FlavorfulStory.InventorySystem.UI;
 using FlavorfulStory.Movement;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace FlavorfulStory.Control
 {
     /// <summary> Контроллер игрока, отвечающий за управление, 
     /// использование предметов и взаимодействие с окружением. </summary>
-    [RequireComponent(typeof(PlayerMover))]
-    [RequireComponent(typeof(Animator))]
+    [RequireComponent(typeof(PlayerMover)), RequireComponent(typeof(Animator))]
     public class PlayerController : MonoBehaviour
     {
+        #region Fields
+
         /// <summary> Панель быстрого доступа. </summary>
         [SerializeField] private Toolbar _toolbar;
 
@@ -26,43 +29,55 @@ namespace FlavorfulStory.Control
         /// <summary> Аниматор игрока. </summary>
         private Animator _animator;
 
-        /// <summary> Таймер для отслеживания перезарядки инструмента. </summary>
-        private float _toolCooldownTimer;
+        #region Tools
 
-        /// <summary> Текущий выбранный предмет из панели быстрого доступа. </summary>
-        public InventoryItem CurrentItem => _toolbar.SelectedItem;
+        /// <summary> Соответствия типов инструментов и их префабов. </summary>
+        [SerializeField] private ToolPrefabMapping[] _toolMappings;
+
+        /// <summary> Текущий экипированный инструмент. </summary>
+        private GameObject _currentTool;
+
+        /// <summary> Таймер перезарядки использования инструмента. </summary>
+        private float _toolCooldownTimer;
 
         /// <summary> Можно ли использовать инструмент? </summary>
         public bool CanUseTool => _toolCooldownTimer <= 0f;
+
+        #endregion
+
+        /// <summary> Текущий выбранный предмет из панели быстрого доступа. </summary>
+        public InventoryItem CurrentItem => _toolbar?.SelectedItem;
 
         /// <summary> Событие, вызываемое при окончании взаимодейтсвия. </summary>
         /// <remarks> Событие срабатывает внутри метода EndInteraction(). </remarks>
         public event Action OnInteractionEnded;
 
-        /// <summary> Инициализация необходимых компонентов. </summary>
+        #endregion
+
+        /// <summary> Инициализация компонентов. </summary>
         private void Awake()
         {
             _playerMover = GetComponent<PlayerMover>();
             _animator = GetComponent<Animator>();
         }
 
-        /// <summary> Выполнение различных действий в зависимости от состояния. </summary>
+        /// <summary> Обновление состояния игрока. </summary>
         private void Update()
         {
-            InteractSpecialAbilityKeys();
-            InteractWithMovement();
-            UpdateTimers();
+            HandleInput();
+            ReduceCooldownTimer();
         }
 
-        /// <summary> Взаимодействовать со специальными клавишами. </summary>
-        private void InteractSpecialAbilityKeys()
+        /// <summary> Обработка ввода. </summary>
+        private void HandleInput()
         {
-            SelectToolbarItem();
-            UseToolbarItem();
+            HandleToolbarSelection();
+            HandleToolbarUsage();
+            HandleMovement();
         }
 
-        /// <summary> Выбор предмета на панели быстрого доступа. </summary>
-        private void SelectToolbarItem()
+        /// <summary> Обработка выбора предмета на панели быстрого доступа. </summary>
+        private void HandleToolbarSelection()
         {
             const int ToolbarItemsCount = 9;
             for (int i = 0; i < ToolbarItemsCount; i++)
@@ -74,71 +89,97 @@ namespace FlavorfulStory.Control
             }
         }
 
-        /// <summary> Использовать предмет из панели быстрого доступа. </summary>
-        /// <remarks> Если предмет расходуемый, то один экземпляр будет уничтожен. </remarks>
-        private void UseToolbarItem()
+        /// <summary> Обработка использования предмета из панели быстрого доступа. </summary>
+        private void HandleToolbarUsage()
         {
-            if (_toolbar && CurrentItem is ActionItem actionItem &&
-                (Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1)) && CanUseTool)
+            if (!CanUseTool || CurrentItem is not ActionItem actionItem ||
+                EventSystem.current.IsPointerOverGameObject())
+                return;
+
+            if (Input.GetMouseButton(0) && actionItem.UseActionType == UseActionType.LeftClick ||
+                Input.GetMouseButton(1) && actionItem.UseActionType == UseActionType.RightClick)
             {
-                var actionType = Input.GetMouseButtonDown(0) ? UseActionType.LeftClick : UseActionType.RightClick;
-                if (actionItem.UseActionType == actionType)
-                {
-                    actionItem.Use(this);
-                    _toolCooldownTimer = _toolCooldown;
-                }
+                actionItem.Use(this);
+                _toolCooldownTimer = _toolCooldown;
+                InputWrapper.BlockPlayerMovement();
 
                 if (actionItem.IsConsumable)
-                {
                     Inventory.PlayerInventory.RemoveFromSlot(_toolbar.SelectedItemIndex, 1);
-                    print($"{CurrentItem} потратился");
-                }
             }
+
+            if (!CanUseTool) return;
+
+            UnequipTool();
+            InputWrapper.UnblockPlayerMovement();
         }
 
-        /// <summary> Обработка ввода. Передача ввода в PlayerMover. </summary>
-        private void InteractWithMovement()
+        /// <summary> Обработка передвижения. </summary>
+        private void HandleMovement()
         {
-            float x = InputWrapper.GetAxisRaw(InputButton.Horizontal),
-                z = InputWrapper.GetAxisRaw(InputButton.Vertical);
-            var direction = new Vector3(x, 0, z).normalized;
-            _playerMover.SetMoveDirection(direction);
+            var direction = new Vector3(
+                InputWrapper.GetAxisRaw(InputButton.Horizontal),
+                0,
+                InputWrapper.GetAxisRaw(InputButton.Vertical)
+            ).normalized;
 
+            _playerMover.SetMoveDirection(direction);
             if (direction != Vector3.zero)
             {
                 _playerMover.SetLookRotation(Quaternion.LookRotation(direction));
             }
         }
 
-        /// <summary> Обновить таймеры. </summary>
-        private void UpdateTimers()
+        /// <summary> Уменьшение таймера перезарядки. </summary>
+        private void ReduceCooldownTimer()
         {
             if (_toolCooldownTimer > 0f) _toolCooldownTimer -= Time.deltaTime;
         }
 
-        /// <summary> Закончить взаимодействие. </summary>
+        /// <summary> Завершение взаимодействия. </summary>
         /// <remarks> Метод подписан на событие в анимации игрока (Gather_interaction). </remarks>
         private void EndInteraction() => OnInteractionEnded?.Invoke();
 
         /// <summary> Запуск анимации. </summary>
-        /// <param name="animationName"> Имя анимации. </param>
+        /// <param name="animationName"> Название анимации. </param>
         public void TriggerAnimation(string animationName) => _animator.SetTrigger(animationName);
 
-        /// <summary> Получить позицию курсора. </summary>
-        /// <returns> Возвращает позицию курсора. </returns>
+        /// <summary> Получение позиции курсора. </summary>
+        /// <returns> Позиция точки, в которую направлен курсор. </returns>
         public static Vector3 GetCursorPosition()
         {
-            Ray ray = Camera.main.ScreenPointToRay(InputWrapper.GetMousePosition());
-            return Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity) ? hit.point : Vector3.zero;
+            var ray = Camera.main.ScreenPointToRay(InputWrapper.GetMousePosition());
+            return Physics.Raycast(ray, out var hit, Mathf.Infinity) ? hit.point : Vector3.zero;
         }
 
         /// <summary> Повернуть игрока в направлении указанной позиции. </summary>
         /// <param name="position"> Позиция для поворота. </param>
         public void RotateTowards(Vector3 position)
         {
-            Vector3 direction = (position - transform.position).normalized;
+            var direction = (position - transform.position).normalized;
             direction.y = 0; // Игнорируем вертикальную составляющую
             _playerMover.SetLookRotation(Quaternion.LookRotation(direction));
+        }
+
+        /// <summary> Экипировать инструмент в руку игрока. </summary>
+        /// <param name="tool"> Инструмент, который должен быть экипирован. </param>
+        public void EquipTool(Tool tool)
+        {
+            if (_currentTool) return;
+
+            var mapping = _toolMappings.FirstOrDefault(m => m.ToolType == tool.ToolType);
+            if (mapping == null) return;
+
+            _currentTool = mapping.ToolPrefab;
+            _currentTool.SetActive(true);
+        }
+
+        /// <summary> Убрать инструмент из руки игрока. </summary>
+        private void UnequipTool()
+        {
+            if (!_currentTool) return;
+
+            _currentTool.SetActive(false);
+            _currentTool = null;
         }
     }
 }

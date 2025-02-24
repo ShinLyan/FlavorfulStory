@@ -21,6 +21,8 @@ namespace FlavorfulStory.Actions.Interactables
         /// <summary> Проверяет, доступно ли взаимодействие с объектом. </summary>
         public bool IsInteractionAllowed { get; set; } = true;
 
+        [field:SerializeField] public bool IsBlockingMovement { get; set; }
+
         /// <summary> Возвращает расстояние до другого трансформа. </summary>
         /// <param name="otherTransform"> Трансформ объекта, до которого вычисляется расстояние. </param>
         /// <returns> Расстояние между объектами. </returns>
