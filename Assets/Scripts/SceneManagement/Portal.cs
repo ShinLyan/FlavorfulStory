@@ -2,6 +2,7 @@ using System;
 using FlavorfulStory.InputSystem;
 using FlavorfulStory.Movement;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace FlavorfulStory.SceneManagement
 {
@@ -11,10 +12,10 @@ namespace FlavorfulStory.SceneManagement
         /// <summary> Точка появления игрока после телепортации. </summary>
         [SerializeField] private Transform _spawnPoint;
 
-        [SerializeField] private LocationType _parentScene;
+        [SerializeField] private LocationType _parentLocation;
 
         /// <summary> Тип сцены, в которую нужно перейти. </summary>
-        [SerializeField] private LocationType _sceneToLoad;
+        [SerializeField] private LocationType _locationToLoad;
 
         /// <summary> Идентификатор назначения портала. </summary>
         [SerializeField] private DestinationIdentifier _destination;
@@ -44,17 +45,17 @@ namespace FlavorfulStory.SceneManagement
         {
             InputWrapper.BlockAllInput();
 
-            yield return PersistentObject.Instance.GetFader().FadeOut(Fader.FadeOutTime);
+            yield return PersistentObject.Instance.Fader.FadeOut(Fader.FadeOutTime);
 
-            LocationChanger.EnableLocation(_sceneToLoad);
+            LocationChanger.EnableLocation(_locationToLoad);
 
             UpdatePlayerPosition(GetOtherPortal(), playerRigidbody, playerMover);
 
             yield return new WaitForSeconds(Fader.FadeWaitTime);
-            PersistentObject.Instance.GetFader().FadeIn(Fader.FadeInTime);
+            PersistentObject.Instance.Fader.FadeIn(Fader.FadeInTime);
 
             InputWrapper.UnblockAllInput();
-            LocationChanger.DisableLocation(_parentScene);
+            LocationChanger.DisableLocation(_parentLocation);
         }
 
         /// <summary> Обновляет позицию и поворот игрока после телепортации. </summary>

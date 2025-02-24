@@ -150,7 +150,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c8797726b244934981371ffe7a3a884, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ParentLocation: 7
+  ParentLocation: 4
   ConnectedWarps:
   - {fileID: 1584180527}
   TransitionDuration: 1
@@ -168,8 +168,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _spawnPoint: {fileID: 172718475}
-  _parentScene: 7
-  _sceneToLoad: 6
+  _parentLocation: 4
+  _locationToLoad: 5
   _destination: 0
 --- !u!65 &4438303
 BoxCollider:
@@ -235,12 +235,22 @@ PrefabInstance:
     - target: {fileID: 3119389482679897859, guid: 6cdd8394e4a804b4bab33bcfb840cdbd,
         type: 3}
       propertyPath: _parentScene
-      value: 5
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 3119389482679897859, guid: 6cdd8394e4a804b4bab33bcfb840cdbd,
         type: 3}
       propertyPath: _sceneToLoad
-      value: 4
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3119389482679897859, guid: 6cdd8394e4a804b4bab33bcfb840cdbd,
+        type: 3}
+      propertyPath: _locationToLoad
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3119389482679897859, guid: 6cdd8394e4a804b4bab33bcfb840cdbd,
+        type: 3}
+      propertyPath: _parentLocation
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 4347107647799730963, guid: 6cdd8394e4a804b4bab33bcfb840cdbd,
         type: 3}
@@ -310,7 +320,7 @@ PrefabInstance:
     - target: {fileID: 7347091911505615900, guid: 6cdd8394e4a804b4bab33bcfb840cdbd,
         type: 3}
       propertyPath: LocationType
-      value: 5
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 7963601950164307453, guid: 6cdd8394e4a804b4bab33bcfb840cdbd,
         type: 3}
@@ -412,7 +422,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c8797726b244934981371ffe7a3a884, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ParentLocation: 7
+  ParentLocation: 4
   ConnectedWarps:
   - {fileID: 368143972}
   TransitionDuration: 1
@@ -435,7 +445,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c8797726b244934981371ffe7a3a884, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ParentLocation: 5
+  ParentLocation: 2
   ConnectedWarps:
   - {fileID: 1625581793}
   TransitionDuration: 1
@@ -489,7 +499,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c8797726b244934981371ffe7a3a884, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ParentLocation: 4
+  ParentLocation: 1
   ConnectedWarps:
   - {fileID: 526681343}
   TransitionDuration: 1
@@ -512,7 +522,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c8797726b244934981371ffe7a3a884, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ParentLocation: 6
+  ParentLocation: 3
   ConnectedWarps:
   - {fileID: 178581928}
   - {fileID: 493453927}
@@ -529,7 +539,7 @@ PrefabInstance:
     - target: {fileID: 253334076731174270, guid: 9f50fdc2288ad4da79ac5c8cea5b8ece,
         type: 3}
       propertyPath: LocationType
-      value: 2
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 873816051851809539, guid: 9f50fdc2288ad4da79ac5c8cea5b8ece,
         type: 3}
@@ -604,12 +614,12 @@ PrefabInstance:
     - target: {fileID: 7605414835084395997, guid: 9f50fdc2288ad4da79ac5c8cea5b8ece,
         type: 3}
       propertyPath: _parentScene
-      value: 7
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 7605414835084395997, guid: 9f50fdc2288ad4da79ac5c8cea5b8ece,
         type: 3}
       propertyPath: _sceneToLoad
-      value: 6
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 7961660201416985034, guid: 9f50fdc2288ad4da79ac5c8cea5b8ece,
         type: 3}
@@ -647,7 +657,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c8797726b244934981371ffe7a3a884, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ParentLocation: 2
+  ParentLocation: 5
   ConnectedWarps:
   - {fileID: 368143972}
   TransitionDuration: 1
@@ -670,7 +680,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c8797726b244934981371ffe7a3a884, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ParentLocation: 6
+  ParentLocation: 3
   ConnectedWarps:
   - {fileID: 314910372}
   TransitionDuration: 1
@@ -717,12 +727,22 @@ PrefabInstance:
     - target: {fileID: 729835974972460185, guid: db760588a687241aeb4966d2098f65c0,
         type: 3}
       propertyPath: _parentScene
-      value: 4
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 729835974972460185, guid: db760588a687241aeb4966d2098f65c0,
         type: 3}
       propertyPath: _sceneToLoad
-      value: 6
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 729835974972460185, guid: db760588a687241aeb4966d2098f65c0,
+        type: 3}
+      propertyPath: _locationToLoad
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 729835974972460185, guid: db760588a687241aeb4966d2098f65c0,
+        type: 3}
+      propertyPath: _parentLocation
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1867186935407248353, guid: db760588a687241aeb4966d2098f65c0,
         type: 3}
@@ -737,7 +757,7 @@ PrefabInstance:
     - target: {fileID: 2185553001047046275, guid: db760588a687241aeb4966d2098f65c0,
         type: 3}
       propertyPath: LocationType
-      value: 4
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2472595458749551475, guid: db760588a687241aeb4966d2098f65c0,
         type: 3}
@@ -827,22 +847,37 @@ PrefabInstance:
     - target: {fileID: 4597541027959546511, guid: db760588a687241aeb4966d2098f65c0,
         type: 3}
       propertyPath: _parentScene
-      value: 4
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4597541027959546511, guid: db760588a687241aeb4966d2098f65c0,
         type: 3}
       propertyPath: _sceneToLoad
-      value: 3
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4597541027959546511, guid: db760588a687241aeb4966d2098f65c0,
+        type: 3}
+      propertyPath: _parentLocation
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5095344924639482000, guid: db760588a687241aeb4966d2098f65c0,
         type: 3}
       propertyPath: _parentScene
-      value: 4
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5095344924639482000, guid: db760588a687241aeb4966d2098f65c0,
         type: 3}
       propertyPath: _sceneToLoad
-      value: 5
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5095344924639482000, guid: db760588a687241aeb4966d2098f65c0,
+        type: 3}
+      propertyPath: _locationToLoad
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5095344924639482000, guid: db760588a687241aeb4966d2098f65c0,
+        type: 3}
+      propertyPath: _parentLocation
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6163326459572307293, guid: db760588a687241aeb4966d2098f65c0,
         type: 3}
@@ -983,7 +1018,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c8797726b244934981371ffe7a3a884, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ParentLocation: 3
+  ParentLocation: 0
   ConnectedWarps:
   - {fileID: 1614568517}
   TransitionDuration: 1
@@ -1261,27 +1296,37 @@ PrefabInstance:
     - target: {fileID: 1067143569324124511, guid: b8bb01aa5c19e4968b4c73ae4dd69b46,
         type: 3}
       propertyPath: _parentScene
-      value: 6
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 1067143569324124511, guid: b8bb01aa5c19e4968b4c73ae4dd69b46,
         type: 3}
       propertyPath: _sceneToLoad
-      value: 4
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1067143569324124511, guid: b8bb01aa5c19e4968b4c73ae4dd69b46,
+        type: 3}
+      propertyPath: _locationToLoad
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1067143569324124511, guid: b8bb01aa5c19e4968b4c73ae4dd69b46,
+        type: 3}
+      propertyPath: _parentLocation
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 1500603568497323990, guid: b8bb01aa5c19e4968b4c73ae4dd69b46,
         type: 3}
       propertyPath: LocationType
-      value: 6
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 1523036893767697549, guid: b8bb01aa5c19e4968b4c73ae4dd69b46,
         type: 3}
       propertyPath: _parentScene
-      value: 6
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 1523036893767697549, guid: b8bb01aa5c19e4968b4c73ae4dd69b46,
         type: 3}
       propertyPath: _sceneToLoad
-      value: 7
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 2511049977433128307, guid: b8bb01aa5c19e4968b4c73ae4dd69b46,
         type: 3}
@@ -1587,7 +1632,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c8797726b244934981371ffe7a3a884, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ParentLocation: 2
+  ParentLocation: 5
   ConnectedWarps:
   - {fileID: 4438301}
   TransitionDuration: 1
@@ -1605,8 +1650,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _spawnPoint: {fileID: 1196040171}
-  _parentScene: 7
-  _sceneToLoad: 6
+  _parentLocation: 5
+  _locationToLoad: 4
   _destination: 0
 --- !u!65 &1584180529
 BoxCollider:
@@ -1708,7 +1753,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c8797726b244934981371ffe7a3a884, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ParentLocation: 4
+  ParentLocation: 1
   ConnectedWarps:
   - {fileID: 912398233}
   TransitionDuration: 1
@@ -1724,7 +1769,7 @@ PrefabInstance:
     - target: {fileID: 253334076731174270, guid: 9f50fdc2288ad4da79ac5c8cea5b8ece,
         type: 3}
       propertyPath: LocationType
-      value: 7
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 873816051851809539, guid: 9f50fdc2288ad4da79ac5c8cea5b8ece,
         type: 3}
@@ -1799,12 +1844,22 @@ PrefabInstance:
     - target: {fileID: 7605414835084395997, guid: 9f50fdc2288ad4da79ac5c8cea5b8ece,
         type: 3}
       propertyPath: _parentScene
-      value: 7
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 7605414835084395997, guid: 9f50fdc2288ad4da79ac5c8cea5b8ece,
         type: 3}
       propertyPath: _sceneToLoad
-      value: 6
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 7605414835084395997, guid: 9f50fdc2288ad4da79ac5c8cea5b8ece,
+        type: 3}
+      propertyPath: _locationToLoad
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 7605414835084395997, guid: 9f50fdc2288ad4da79ac5c8cea5b8ece,
+        type: 3}
+      propertyPath: _parentLocation
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 7961660201416985034, guid: 9f50fdc2288ad4da79ac5c8cea5b8ece,
         type: 3}
@@ -1842,7 +1897,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c8797726b244934981371ffe7a3a884, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ParentLocation: 4
+  ParentLocation: 1
   ConnectedWarps:
   - {fileID: 191620109}
   TransitionDuration: 1
@@ -1981,12 +2036,12 @@ PrefabInstance:
     - target: {fileID: 172655968695962615, guid: a9114609ac4097e459c8c7e1f3d67d2b,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 10.511814
+      value: 8.370002
       objectReference: {fileID: 0}
     - target: {fileID: 172655968695962615, guid: a9114609ac4097e459c8c7e1f3d67d2b,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: -13.350668
+      value: -14.85038
       objectReference: {fileID: 0}
     - target: {fileID: 189103431482551013, guid: a9114609ac4097e459c8c7e1f3d67d2b,
         type: 3}
@@ -3906,12 +3961,12 @@ PrefabInstance:
     - target: {fileID: 6602437388469038716, guid: a9114609ac4097e459c8c7e1f3d67d2b,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 10.511814
+      value: 8.370002
       objectReference: {fileID: 0}
     - target: {fileID: 6602437388469038716, guid: a9114609ac4097e459c8c7e1f3d67d2b,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: -13.350668
+      value: -14.85038
       objectReference: {fileID: 0}
     - target: {fileID: 6646886766987139025, guid: a9114609ac4097e459c8c7e1f3d67d2b,
         type: 3}
@@ -4667,7 +4722,7 @@ PrefabInstance:
     - target: {fileID: 2760265604884861489, guid: ce24d4a198b4c7748b5d9d8f1aaa3a22,
         type: 3}
       propertyPath: _currentLocationName
-      value: 3
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7922225790736311418, guid: ce24d4a198b4c7748b5d9d8f1aaa3a22,
         type: 3}
@@ -4795,12 +4850,17 @@ PrefabInstance:
     - target: {fileID: 3016074100583323116, guid: a17d258a2d710414da60eb12daeeb478,
         type: 3}
       propertyPath: _parentScene
-      value: 3
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3016074100583323116, guid: a17d258a2d710414da60eb12daeeb478,
         type: 3}
       propertyPath: _sceneToLoad
-      value: 4
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3016074100583323116, guid: a17d258a2d710414da60eb12daeeb478,
+        type: 3}
+      propertyPath: _locationToLoad
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3196845177057778830, guid: a17d258a2d710414da60eb12daeeb478,
         type: 3}
@@ -4815,7 +4875,7 @@ PrefabInstance:
     - target: {fileID: 6548604075587431659, guid: a17d258a2d710414da60eb12daeeb478,
         type: 3}
       propertyPath: LocationType
-      value: 3
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7111685836495798050, guid: a17d258a2d710414da60eb12daeeb478,
         type: 3}

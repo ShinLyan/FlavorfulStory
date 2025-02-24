@@ -3,13 +3,18 @@ namespace FlavorfulStory.SceneManagement
     /// <summary> Перечисление, представляющее доступные игровые сцены. </summary>
     /// <remarks> Используется для определения загружаемых сцен. 
     /// В сценах могут быть различные игровые зоны. </remarks>
-    public enum LocationType
+    public enum SceneType
     {
-        Location1,
-        Location2,
-        Location3,
-        Location4,
-        Location5,
-        Location6
+        /// <summary> Главное меню. </summary>
+        MainMenu,
+
+        /// <summary> Каменистый остров. </summary>
+        RockyIsland,
+
+        /// <summary> Ресторан. </summary>
+        Restaurant,
+        
+        /// <summary> Главная сцена. </summary>
+        MainScene,
     }
 }
