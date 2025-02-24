@@ -4,8 +4,12 @@ using UnityEngine;
 
 namespace FlavorfulStory.AI.SceneGraphSystem
 {
+    /// <summary> Класс для построения графа варпов. </summary>
     public static class WarpGraphBuilder
     {
+        /// <summary> Строит граф варпов на основе списка всех варпов. </summary>
+        /// <param name="allWarps"> Список всех варпов для построения графа. </param>
+        /// <returns> Построенный граф варпов. </returns>
         public static WarpGraph BuildGraph(IEnumerable<Warp> allWarps)
         {
             var graph = new WarpGraph();

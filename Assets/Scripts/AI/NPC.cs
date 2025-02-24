@@ -10,7 +10,10 @@ namespace FlavorfulStory.AI
     /// <summary> Контроллер NPC, управляющий состояниями и поведением персонажа. </summary>
     public class NPC : MonoBehaviour
     {
+        /// <summary> Имя NPC. </summary>
         public NpcName Name => _npcName;
+
+        /// <summary> Текущая локация, в которой находится NPC. </summary>
         public LocationType _currentLocationName;
 
         [SerializeField] private NpcName _npcName;
@@ -42,11 +45,14 @@ namespace FlavorfulStory.AI
         /// <summary> Контроллер состояний, управляющий переключением между состояниями NPC. </summary>
         private StateController _stateController;
         
+        /// <summary> Текущие параметры расписания NPC. </summary>
         private ScheduleParams _currentScheduleParams;
         
+        /// <summary> Массив всех варпов на сцене. </summary>
         private Warp[] _warps;
-        private WarpGraph _warpGraph;
 
+        /// <summary> Граф варпов, используемый для навигации NPC. </summary>
+        private WarpGraph _warpGraph;
 
         /// <summary> Инициализация компонентов и состояний. </summary>
         private void Awake()
@@ -93,6 +99,8 @@ namespace FlavorfulStory.AI
             _animator.Play(animationStateName.ToString());
         }
 
+        /// <summary> Устанавливает новое расписание для NPC. </summary>
+        /// <param name="newScheduleParams"> Новые параметры расписания. </param>
         public void SetNewSchedule(ScheduleParams newScheduleParams)
         {
             _currentScheduleParams = newScheduleParams;
