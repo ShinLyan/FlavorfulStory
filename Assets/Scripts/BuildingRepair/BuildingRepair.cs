@@ -145,7 +145,7 @@ namespace FlavorfulStory.BuildingRepair
             int investedResourceNumber = _investedResources[investedResourceIndex];
             if (investedResourceNumber <= 0 || !Inventory.PlayerInventory.HasSpaceFor(resource)) return;
 
-            Inventory.PlayerInventory.TryAddToFirstEmptySlot(resource, investedResourceNumber);
+            Inventory.PlayerInventory.TryAddToFirstAvailableSlot(resource, investedResourceNumber);
             _investedResources[investedResourceIndex] = 0;
         }
 

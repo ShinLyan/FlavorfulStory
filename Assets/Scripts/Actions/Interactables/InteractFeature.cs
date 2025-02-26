@@ -110,7 +110,11 @@ namespace FlavorfulStory.Actions.Interactables
             OnInteractionStarted?.Invoke();
             _isInteracting = true;
             _animator.SetTrigger(_gather);
-            InputWrapper.BlockPlayerMovement();
+            
+            print(_nearestAllowedInteractable.IsBlockingMovement);
+            
+            if (_nearestAllowedInteractable.IsBlockingMovement)
+                InputWrapper.BlockPlayerMovement();
         }
 
         /// <summary> Закончить взаимодействие. </summary>
@@ -121,7 +125,9 @@ namespace FlavorfulStory.Actions.Interactables
             _isInteracting = false;
             _animator.ResetTrigger(_gather);
             if (_nearestAllowedInteractable is { IsBlockingMovement: false })
+            {
                 InputWrapper.UnblockPlayerMovement();
+            }
         }
     }
 }

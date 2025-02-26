@@ -104,13 +104,15 @@ namespace FlavorfulStory.Control
                 InputWrapper.BlockPlayerMovement();
 
                 if (actionItem.IsConsumable)
+                {
                     Inventory.PlayerInventory.RemoveFromSlot(_toolbar.SelectedItemIndex, 1);
+                    InputWrapper.UnblockPlayerMovement();
+                }
             }
 
             if (!CanUseTool) return;
 
             UnequipTool();
-            InputWrapper.UnblockPlayerMovement();
         }
 
         /// <summary> Обработка передвижения. </summary>
@@ -176,6 +178,7 @@ namespace FlavorfulStory.Control
         {
             if (!_currentTool) return;
 
+            InputWrapper.UnblockPlayerMovement();
             _currentTool.SetActive(false);
             _currentTool = null;
         }

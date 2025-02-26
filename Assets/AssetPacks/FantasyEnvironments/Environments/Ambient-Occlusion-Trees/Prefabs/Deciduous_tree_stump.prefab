@@ -10,9 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 4341730311799906}
   - component: {fileID: 205222133322211786}
-  - component: {fileID: 914636549693991903}
-  - component: {fileID: 3832020210611947238}
-  - component: {fileID: 2968233684054872724}
   m_Layer: 3
   m_Name: Deciduous_tree_stump
   m_TagString: Untagged
@@ -65,54 +62,6 @@ LODGroup:
     renderers:
     - renderer: {fileID: 23192281985518496}
   m_Enabled: 1
---- !u!114 &914636549693991903
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1043896297628826}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 595ff70369e3abf4484b1167d645c9d8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _dropItem:
-    ItemPrefab: {fileID: 11400000, guid: eb8c35d6d90a84043af17703c99e22f3, type: 2}
-    Quantity: 1
---- !u!65 &3832020210611947238
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1043896297628826}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 2, y: 2, z: 2}
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &2968233684054872724
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1043896297628826}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0c3a970a862f6824fbdca652389c28ac, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1439663639052520
 GameObject:
   m_ObjectHideFlags: 0
