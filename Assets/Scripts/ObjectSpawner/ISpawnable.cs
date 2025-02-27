@@ -5,7 +5,8 @@ namespace FlavorfulStory.ObjectSpawner
     /// <summary> Интерфейс, определяющий объект, который может быть уничтожен. </summary>
     public interface ISpawnable
     {
+        // TODO: Вынести в IDestroyable
         /// <summary> Событие, возникающее при уничтожении объекта. </summary>
-        public event Action<ISpawnable> OnObjectDestroyed;
+        //public event Action<ISpawnable> OnObjectDestroyed;
     }
 }

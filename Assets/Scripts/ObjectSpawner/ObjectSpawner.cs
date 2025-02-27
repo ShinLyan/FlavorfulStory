@@ -93,16 +93,16 @@ namespace FlavorfulStory.ObjectSpawner
                 Quaternion.Euler(0f, rotationY, 0f),
                 transform);
             go.transform.localScale = scale;
-            go.GetComponent<ISpawnable>().OnObjectDestroyed += RemoveObjectFromList;
+            go.GetComponent<IDestroyable>().OnObjectDestroyed += RemoveObjectFromList;
 
             _spawnedObjects.Add(go);
         }
 
         /// <summary> Удаляет объект из списка заспавненных объектов. </summary>
-        /// <param name="spawnable"> Объект, который необходимо удалить из списка. </param>
-        private void RemoveObjectFromList(ISpawnable spawnable)
+        /// <param name="destroyable"> Объект, который необходимо удалить из списка. </param>
+        private void RemoveObjectFromList(IDestroyable destroyable)
         {
-            if (spawnable is MonoBehaviour monoBehaviour)
+            if (destroyable is MonoBehaviour monoBehaviour)
                 _spawnedObjects.Remove(monoBehaviour.gameObject);
         }
 

@@ -35,16 +35,22 @@ namespace FlavorfulStory.Actions
         /// <summary> Использовать инструмент в заданном направлении. </summary>
         /// <param name="targetPosition"> Целевая позиция, куда направлено взаимодействие. </param>
         /// <param name="player"> Контроллер игрока. </param>
-        private static void UseToolInDirection(Vector3 targetPosition, PlayerController player)
+        private void UseToolInDirection(Vector3 targetPosition, PlayerController player)
         {
             var origin = player.transform.position;
             var direction = (targetPosition - origin).normalized;
             var interactionCenter = origin + direction * (MaxInteractionDistance / 2);
             var hitColliders = Physics.OverlapSphere(interactionCenter, UseRadius);
+            // foreach (var collider in hitColliders)
+            // {
+            //     if (collider.TryGetComponent<InteractableObject>(out var interactableObject))
+            //         interactableObject.Interact(player);
+            // }
+            
             foreach (var collider in hitColliders)
             {
-                if (collider.TryGetComponent<InteractableObject>(out var interactableObject))
-                    interactableObject.Interact(player);
+                if (collider.TryGetComponent<IHitable>(out var hitable))
+                    hitable.TakeHit(ToolType);
             }
 
             Debug.DrawLine(origin, interactionCenter, Color.red, 5f);
