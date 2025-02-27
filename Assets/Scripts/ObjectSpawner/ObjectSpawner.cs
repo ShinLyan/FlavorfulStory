@@ -53,7 +53,11 @@ namespace FlavorfulStory.ObjectSpawner
         /// <summary> Запускает процесс спавна при старте сцены. </summary>
         private void Start()
         {
-            if (!_wasLoadedFromSavefile) SpawnFromConfig();
+            if (!_wasLoadedFromSavefile)
+            {
+                SpawnFromConfig();
+                print("Aboba");
+            }
         }
 
         /// <summary> Спавнит объекты на основе конфигурации. </summary>
@@ -185,9 +189,12 @@ namespace FlavorfulStory.ObjectSpawner
         /// <param name="state"> Объект состояния, который необходимо восстановить. </param>
         public void RestoreState(object state)
         {
+            if (_wasLoadedFromSavefile) return;
+            
             _spawnedObjectRecords = state as List<SpawnedObjectRecord>;
             _wasLoadedFromSavefile = _spawnedObjectRecords?.Count >= 0;
             SpawnFromSave(_spawnedObjectRecords);
+            print("res");
         }
 
         /// <summary> Восстанавливает заспавненные объекты из сохраненного состояния. </summary>
