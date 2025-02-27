@@ -5,10 +5,9 @@ using System.Linq;
 using UnityEngine;
 using FlavorfulStory.Actions;
 using FlavorfulStory.InventorySystem.DropSystem;
-using FlavorfulStory.ObjectSpawner;
 
 [RequireComponent(typeof(ItemDropper))]
-public class DestroyableResourceContainer : MonoBehaviour, IHitable, IDestroyable, ISpawnable
+public class DestroyableResourceContainer : MonoBehaviour, IHitable, IDestroyable
 {
     #region DestroyBehaviour
 

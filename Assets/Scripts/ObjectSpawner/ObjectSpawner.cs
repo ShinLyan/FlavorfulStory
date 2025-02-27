@@ -54,10 +54,7 @@ namespace FlavorfulStory.ObjectSpawner
         private void Start()
         {
             if (!_wasLoadedFromSavefile)
-            {
                 SpawnFromConfig();
-                print("Aboba");
-            }
         }
 
         /// <summary> Спавнит объекты на основе конфигурации. </summary>
@@ -194,7 +191,6 @@ namespace FlavorfulStory.ObjectSpawner
             _spawnedObjectRecords = state as List<SpawnedObjectRecord>;
             _wasLoadedFromSavefile = _spawnedObjectRecords?.Count >= 0;
             SpawnFromSave(_spawnedObjectRecords);
-            print("res");
         }
 
         /// <summary> Восстанавливает заспавненные объекты из сохраненного состояния. </summary>

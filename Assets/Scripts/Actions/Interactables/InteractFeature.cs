@@ -111,8 +111,6 @@ namespace FlavorfulStory.Actions.Interactables
             _isInteracting = true;
             _animator.SetTrigger(_gather);
             
-            print(_nearestAllowedInteractable.IsBlockingMovement);
-            
             if (_nearestAllowedInteractable.IsBlockingMovement)
                 InputWrapper.BlockPlayerMovement();
         }

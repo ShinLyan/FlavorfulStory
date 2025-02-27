@@ -1,8 +1,8 @@
 ﻿using System.Collections;
-using FlavorfulStory.InputSystem;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using FlavorfulStory.Saving;
+using FlavorfulStory.InputSystem;
 
 namespace FlavorfulStory.SceneManagement
 {
