@@ -3,12 +3,16 @@ using UnityEngine;
 
 public class ObjectSwitcher : MonoBehaviour
 {
+    /// <summary> Префабы версий одного объекта. </summary>
+    /// <remarks> Версия по умолчанию(первый ребенок в иерархии) добавляется автоматически. </remarks>
     [SerializeField] private GameObject[] _objectPrefabs;
 
     private List<GameObject> _spawnedObjects;
 
-    private void Awake()
+    public void Initialize()
     {
+        if (_spawnedObjects != null) return;
+        
         _spawnedObjects = new List<GameObject>(_objectPrefabs.Length + 1) { transform.GetChild(0).gameObject };
         foreach (var prefab in _objectPrefabs)
         {
