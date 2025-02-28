@@ -87,6 +87,7 @@ namespace FlavorfulStory.ObjectSpawner
         /// <param name="position"> Позиция спавна объекта. </param>
         /// <param name="rotationY"> Угол вращения объекта по оси Y. </param>
         /// <param name="scale"> Масштаб объекта. </param>
+        /// <param name="hitsTaken"> Количственно сделанных ударов по объекту. </param>
         private void SpawnObject(Vector3 position, float rotationY, Vector3 scale)
         {
             var go = Instantiate(_config.ObjectPrefab,
@@ -171,6 +172,7 @@ namespace FlavorfulStory.ObjectSpawner
             public SerializableVector3 Position;
             public float RotationY;
             public float Scale;
+            public int HitsTaken;
         }
 
         /// <summary> Фиксация состояния объекта при сохранении. </summary>
@@ -179,7 +181,7 @@ namespace FlavorfulStory.ObjectSpawner
         {
             Position = new SerializableVector3(spawnedObject.transform.position),
             RotationY = transform.rotation.y,
-            Scale = transform.localScale.x
+            Scale = transform.localScale.x,
         }).ToList();
 
         /// <summary> Восстановление состояния объекта при загрузке. </summary>
@@ -187,7 +189,7 @@ namespace FlavorfulStory.ObjectSpawner
         public void RestoreState(object state)
         {
             if (_wasLoadedFromSavefile) return;
-            
+
             _spawnedObjectRecords = state as List<SpawnedObjectRecord>;
             _wasLoadedFromSavefile = _spawnedObjectRecords?.Count >= 0;
             SpawnFromSave(_spawnedObjectRecords);

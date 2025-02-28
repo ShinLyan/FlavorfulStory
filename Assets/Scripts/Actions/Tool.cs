@@ -41,11 +41,6 @@ namespace FlavorfulStory.Actions
             var direction = (targetPosition - origin).normalized;
             var interactionCenter = origin + direction * (MaxInteractionDistance / 2);
             var hitColliders = Physics.OverlapSphere(interactionCenter, UseRadius);
-            // foreach (var collider in hitColliders)
-            // {
-            //     if (collider.TryGetComponent<InteractableObject>(out var interactableObject))
-            //         interactableObject.Interact(player);
-            // }
             
             foreach (var collider in hitColliders)
             {

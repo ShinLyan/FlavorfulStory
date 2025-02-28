@@ -6,7 +6,8 @@ using UnityEngine;
 using FlavorfulStory.Actions;
 using FlavorfulStory.InventorySystem.DropSystem;
 
-[RequireComponent(typeof(ItemDropper))]
+//TODO: сделать сохранение (_hitsTaken). Зародителить и сделать 2 наследника ObjectSpawner(default & resourceContainer)?
+[RequireComponent(typeof(ItemDropper), typeof(ObjectSwitcher))]
 public class DestroyableResourceContainer : MonoBehaviour, IHitable, IDestroyable
 {
     #region DestroyBehaviour
@@ -21,7 +22,6 @@ public class DestroyableResourceContainer : MonoBehaviour, IHitable, IDestroyabl
     public void Destroy()
     {
         IsDestroyed = true;
-        gameObject.AddComponent(typeof(Rigidbody));
         OnObjectDestroyed?.Invoke(this);
         StartCoroutine(DestroyGameobjectAfterDelay());
     }
@@ -45,9 +45,10 @@ public class DestroyableResourceContainer : MonoBehaviour, IHitable, IDestroyabl
 
     /// <summary> Количество ударов для разрушения объекта. </summary>
     [Tooltip("Количество ударов для каждой стадии объекта."), Range(1, 5), SerializeField]
-    private int _hitsToDestroy;
+    private List<int> _hitsToGrades;
 
-    /// <summary> Текущее количество ударов по объекту. </summary>
+    private int HitsToDestroy => _hitsToGrades.Sum();
+
     private int _hitsTaken;
 
     public void TakeHit(ToolType toolType)
@@ -55,7 +56,25 @@ public class DestroyableResourceContainer : MonoBehaviour, IHitable, IDestroyabl
         if (IsDestroyed || !_toolsToBeHit.Contains(toolType)) return;
 
         _hitsTaken++;
-        if (_hitsTaken >= _hitsToDestroy) Destroy();
+        if (_hitsTaken >= HitsToDestroy)
+        {
+            Destroy();
+            return;
+        }
+        
+        SwitchToCorrectGameobject(_hitsTaken);
+    }
+
+    private void SwitchToCorrectGameobject(int hitsTaken)
+    {
+        for (int i = _hitsToGrades.Count-1; i >= 0; i--)
+        {
+            if (_hitsToGrades.Take(i + 1).Sum() == hitsTaken)
+            {
+                _objectSwitcher.SwitchToGameobject(i + 1);
+                DropResources();
+            }
+        }
     }
 
     #endregion
@@ -67,8 +86,16 @@ public class DestroyableResourceContainer : MonoBehaviour, IHitable, IDestroyabl
     /// <summary> Выбрасыватель предметов. </summary>
     private ItemDropper _itemDropper;
 
+    private ObjectSwitcher _objectSwitcher;
+
     private void Awake()
     {
         _itemDropper = GetComponent<ItemDropper>();
+        _objectSwitcher = GetComponent<ObjectSwitcher>();
+        
+        if (_objectSwitcher.GetObjectsCount() != _hitsToGrades.Count)
+            Debug.LogError("Несоответствие между количеством грейдов и ударами!");
+        
+        _objectSwitcher.Initialize();
     }
-}
+    }

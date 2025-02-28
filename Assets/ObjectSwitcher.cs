@@ -9,6 +9,8 @@ public class ObjectSwitcher : MonoBehaviour
 
     private List<GameObject> _spawnedObjects;
 
+    public int GetObjectsCount() => _objectPrefabs.Length + 1;
+    
     public void Initialize()
     {
         if (_spawnedObjects != null) return;
