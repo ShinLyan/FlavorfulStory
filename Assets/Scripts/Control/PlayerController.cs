@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using FlavorfulStory.Actions;
+using FlavorfulStory.Actions.Interactables;
 using FlavorfulStory.InputSystem;
 using FlavorfulStory.InventorySystem;
 using FlavorfulStory.InventorySystem.UI;
@@ -28,6 +29,8 @@ namespace FlavorfulStory.Control
 
         /// <summary> Аниматор игрока. </summary>
         private Animator _animator;
+
+        private InteractFeature _interactFeature;
 
         #region Tools
 
@@ -59,6 +62,7 @@ namespace FlavorfulStory.Control
         {
             _playerMover = GetComponent<PlayerMover>();
             _animator = GetComponent<Animator>();
+            _interactFeature = GetComponentInChildren<InteractFeature>();
         }
 
         /// <summary> Обновление состояния игрока. </summary>
@@ -93,7 +97,7 @@ namespace FlavorfulStory.Control
         private void HandleToolbarUsage()
         {
             if (!CanUseTool || CurrentItem is not ActionItem actionItem ||
-                EventSystem.current.IsPointerOverGameObject())
+                EventSystem.current.IsPointerOverGameObject() || _interactFeature.IsInteracting)
                 return;
 
             if (Input.GetMouseButton(0) && actionItem.UseActionType == UseActionType.LeftClick ||

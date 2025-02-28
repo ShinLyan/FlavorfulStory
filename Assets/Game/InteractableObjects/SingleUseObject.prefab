@@ -83,11 +83,7 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 1043896297628826, guid: 5a21074ccac8b1e40a90e2b16e16afa4,
         type: 3}
       insertIndex: -1
-      addedObject: {fileID: 6649227784936899345}
-    - targetCorrespondingSourceObject: {fileID: 1043896297628826, guid: 5a21074ccac8b1e40a90e2b16e16afa4,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 3374298867726109884}
+      addedObject: {fileID: 2020863611369828700}
   m_SourcePrefab: {fileID: 100100000, guid: 5a21074ccac8b1e40a90e2b16e16afa4, type: 3}
 --- !u!4 &302094333448902092 stripped
 Transform:
@@ -122,7 +118,7 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 2, y: 2, z: 2}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &6649227784936899345
+--- !u!114 &2020863611369828700
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -131,28 +127,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 305568157476844852}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 595ff70369e3abf4484b1167d645c9d8, type: 3}
+  m_Script: {fileID: 11500000, guid: 797de47557b9f484d896d8a3b34bf0b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _dropItem:
-    ItemPrefab: {fileID: 11400000, guid: eb8c35d6d90a84043af17703c99e22f3, type: 2}
-    Quantity: 1
-  _fruit: {fileID: 2186140200884035575}
-  _interactionCooldown: 3
-  _singleUse: 1
-  <IsBlockingMovement>k__BackingField: 0
---- !u!114 &3374298867726109884
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 305568157476844852}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0c3a970a862f6824fbdca652389c28ac, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  _dropItems:
+  - ItemPrefab: {fileID: 11400000, guid: eb8c35d6d90a84043af17703c99e22f3, type: 2}
+    Quantity: 5
+  _destroyDelay: 3
 --- !u!1001 &2186140200884066647
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -213,12 +194,6 @@ PrefabInstance:
 --- !u!4 &2186140200883930071 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400000, guid: 255c999c8d23ff64a9d306da66da8c9c,
-    type: 3}
-  m_PrefabInstance: {fileID: 2186140200884066647}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &2186140200884035575 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 100000, guid: 255c999c8d23ff64a9d306da66da8c9c,
     type: 3}
   m_PrefabInstance: {fileID: 2186140200884066647}
   m_PrefabAsset: {fileID: 0}

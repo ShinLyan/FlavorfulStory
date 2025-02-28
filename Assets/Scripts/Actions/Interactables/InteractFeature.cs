@@ -27,7 +27,7 @@ namespace FlavorfulStory.Actions.Interactables
         private PlayerController _playerController;
 
         /// <summary> Флаг, указывающий, происходит ли в данный момент взаимодействие. </summary>
-        private bool _isInteracting;
+        public bool IsInteracting { get; private set; }
 
         /// <summary> Хэш для анимации сбора. </summary>
         private readonly int _gather = Animator.StringToHash("Gather");
@@ -55,7 +55,7 @@ namespace FlavorfulStory.Actions.Interactables
         private void Update()
         {
             if (InputWrapper.GetButtonDown(InputButton.Interact) &&
-                _nearestAllowedInteractable != null && !_isInteracting)
+                _nearestAllowedInteractable != null && !IsInteracting)
             {
                 BeginInteraction();
                 _nearestAllowedInteractable?.Interact();
@@ -98,21 +98,23 @@ namespace FlavorfulStory.Actions.Interactables
 
         /// <summary> Определяет ближайший объект для взаимодействия из доступных. </summary>
         /// <returns> Ближайший объект, с которым можно взаимодействовать, или null. </returns>
-        private IInteractable GetNearestAllowedInteractable() =>
-            _reachableInteractables.Where(interactable => interactable.IsInteractionAllowed)
+        private IInteractable GetNearestAllowedInteractable()
+        {
+            if (IsInteracting) return _nearestAllowedInteractable;
+            
+            return _reachableInteractables.Where(interactable => interactable.IsInteractionAllowed)
                 .OrderBy(interactable => interactable.GetDistanceTo(transform))
                 .FirstOrDefault();
+        }
 
         // TODO: Убрать анимацию для ремонта
         /// <summary> Начать взаимодействие. </summary>
         private void BeginInteraction()
         {
             OnInteractionStarted?.Invoke();
-            _isInteracting = true;
+            IsInteracting = true;
             _animator.SetTrigger(_gather);
-            
-            if (_nearestAllowedInteractable.IsBlockingMovement)
-                InputWrapper.BlockPlayerMovement();
+            InputWrapper.BlockPlayerMovement();
         }
 
         /// <summary> Закончить взаимодействие. </summary>
@@ -120,9 +122,9 @@ namespace FlavorfulStory.Actions.Interactables
         private void EndInteraction()
         {
             OnInteractionEnded?.Invoke();
-            _isInteracting = false;
+            IsInteracting = false;
             _animator.ResetTrigger(_gather);
-            if (_nearestAllowedInteractable is { IsBlockingMovement: false })
+            if (_nearestAllowedInteractable is AbstractInteractableObject)
             {
                 InputWrapper.UnblockPlayerMovement();
             }
