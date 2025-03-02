@@ -15,7 +15,7 @@ namespace FlavorfulStory.ObjectSpawner
 
         /// <summary> Конфигурация для спавнера объектов, содержащая параметры для спавна. </summary>
         [SerializeField, Tooltip("Конфигурация для спавнера объектов, содержащая параметры для спавна.")]
-        private ObjectSpawnerConfig _config;
+        protected ObjectSpawnerConfig _config;
 
         /// <summary> Слой, на котором находятся препятствия, с которыми не должны пересекаться объекты. </summary>
         [SerializeField,
@@ -40,16 +40,23 @@ namespace FlavorfulStory.ObjectSpawner
         private Vector2 _scaleVariation;
 
         /// <summary> Список всех заспавненных объектов. </summary>
-        private readonly List<GameObject> _spawnedObjects = new();
+        protected readonly List<GameObject> _spawnedObjects = new();
 
         /// <summary> Список записей заспавненных объектов, используемый для сохранения состояния. </summary>
         private List<SpawnedObjectRecord> _spawnedObjectRecords = new(0);
 
         /// <summary> Флаг, указывающий, были ли объекты загружены из файла. </summary>
-        private bool _wasLoadedFromSavefile;
+        protected bool _wasLoadedFromSavefile;
 
         #endregion
 
+        private void Awake()
+        {
+            if (_config.ObjectPrefab.GetComponent<IHitable>() != null)
+                Debug.LogError("В конфиге спавнера не должен находится объект, реализующий интерфейс IHitable." +
+                               " Используйте DestroyableContainerSpawner.cs");
+        }
+        
         /// <summary> Запускает процесс спавна при старте сцены. </summary>
         private void Start()
         {
@@ -58,7 +65,7 @@ namespace FlavorfulStory.ObjectSpawner
         }
 
         /// <summary> Спавнит объекты на основе конфигурации. </summary>
-        private void SpawnFromConfig()
+        protected void SpawnFromConfig()
         {
             if (!_config) Debug.LogError("Спавнеру не назначен конфиг.");
 
@@ -102,7 +109,7 @@ namespace FlavorfulStory.ObjectSpawner
 
         /// <summary> Удаляет объект из списка заспавненных объектов. </summary>
         /// <param name="destroyable"> Объект, который необходимо удалить из списка. </param>
-        private void RemoveObjectFromList(IDestroyable destroyable)
+        protected void RemoveObjectFromList(IDestroyable destroyable)
         {
             if (destroyable is MonoBehaviour monoBehaviour)
                 _spawnedObjects.Remove(monoBehaviour.gameObject);
@@ -172,12 +179,11 @@ namespace FlavorfulStory.ObjectSpawner
             public SerializableVector3 Position;
             public float RotationY;
             public float Scale;
-            public int HitsTaken;
         }
 
         /// <summary> Фиксация состояния объекта при сохранении. </summary>
         /// <returns> Возвращает объект, в котором фиксируется состояние. </returns>
-        public object CaptureState() => _spawnedObjects.Select(spawnedObject => new SpawnedObjectRecord
+        public virtual object CaptureState() => _spawnedObjects.Select(spawnedObject => new SpawnedObjectRecord
         {
             Position = new SerializableVector3(spawnedObject.transform.position),
             RotationY = transform.rotation.y,
@@ -186,7 +192,7 @@ namespace FlavorfulStory.ObjectSpawner
 
         /// <summary> Восстановление состояния объекта при загрузке. </summary>
         /// <param name="state"> Объект состояния, который необходимо восстановить. </param>
-        public void RestoreState(object state)
+        public virtual void RestoreState(object state)
         {
             if (_wasLoadedFromSavefile) return;
 

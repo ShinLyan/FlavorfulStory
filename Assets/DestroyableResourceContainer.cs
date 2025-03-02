@@ -5,6 +5,7 @@ using System.Linq;
 using UnityEngine;
 using FlavorfulStory.Actions;
 using FlavorfulStory.InventorySystem.DropSystem;
+using UnityEngine.Serialization;
 
 //TODO: сделать сохранение (_hitsTaken). Зародителить и сделать 2 наследника ObjectSpawner(default & resourceContainer)?
 [RequireComponent(typeof(ItemDropper), typeof(ObjectSwitcher))]
@@ -49,30 +50,31 @@ public class DestroyableResourceContainer : MonoBehaviour, IHitable, IDestroyabl
 
     private int HitsToDestroy => _hitsToGrades.Sum();
 
-    private int _hitsTaken;
+    public int HitsTaken { get; protected set; }
 
     public void TakeHit(ToolType toolType)
     {
         if (IsDestroyed || !_toolsToBeHit.Contains(toolType)) return;
 
-        _hitsTaken++;
-        if (_hitsTaken >= HitsToDestroy)
+        HitsTaken++;
+        if (HitsTaken >= HitsToDestroy)
         {
             Destroy();
             return;
         }
-        
-        SwitchToCorrectGameobject(_hitsTaken);
+
+        SwitchToCorrectGameobject(HitsTaken);
     }
 
-    private void SwitchToCorrectGameobject(int hitsTaken)
+    private void SwitchToCorrectGameobject(int hitsTaken, bool dropResources = true)
     {
-        for (int i = _hitsToGrades.Count-1; i >= 0; i--)
+        for (int i = _hitsToGrades.Count - 1; i >= 0; i--)
         {
             if (_hitsToGrades.Take(i + 1).Sum() == hitsTaken)
             {
                 _objectSwitcher.SwitchToGameobject(i + 1);
-                DropResources();
+                if (dropResources)
+                    DropResources();
             }
         }
     }
@@ -90,12 +92,23 @@ public class DestroyableResourceContainer : MonoBehaviour, IHitable, IDestroyabl
 
     private void Awake()
     {
+        Initialize();
+    }
+
+    public void Initialize()
+    {
         _itemDropper = GetComponent<ItemDropper>();
         _objectSwitcher = GetComponent<ObjectSwitcher>();
-        
+
         if (_objectSwitcher.GetObjectsCount() != _hitsToGrades.Count)
             Debug.LogError("Несоответствие между количеством грейдов и ударами!");
-        
+
         _objectSwitcher.Initialize();
     }
+
+    public void SetHitCount(int hitsTaken)
+    {
+        HitsTaken = hitsTaken;
+        SwitchToCorrectGameobject(HitsTaken, false);
     }
+}
