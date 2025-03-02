@@ -9,8 +9,8 @@ using UnityEngine;
 public class DestroyableContainerSpawner : ObjectSpawner
 {
     /// <summary> Список записей заспавненных объектов, используемый для сохранения состояния. </summary>
-    private List<SpawnedContainerRecord> _spawnedContainerRecords = new(0);
-    
+    private List<SpawnedContainerRecord> _spawnedContainerRecords = new();
+
     private void Awake()
     {
         if (_config.ObjectPrefab.GetComponent<IHitable>() == null)
@@ -22,6 +22,8 @@ public class DestroyableContainerSpawner : ObjectSpawner
         if (!_wasLoadedFromSavefile && !SavingWrapper.SaveFileExists)
             SpawnFromConfig();
     }
+
+    #region Saving
     
     [Serializable]
     private struct SpawnedContainerRecord
@@ -31,14 +33,14 @@ public class DestroyableContainerSpawner : ObjectSpawner
         public float Scale;
         public int HitsTaken;
     }
-    
+
     /// <summary> Фиксация состояния объекта при сохранении. </summary>
     /// <returns> Возвращает объект, в котором фиксируется состояние. </returns>
     public override object CaptureState() => _spawnedObjects.Select(spawnedObject => new SpawnedContainerRecord
     {
         Position = new SerializableVector3(spawnedObject.transform.position),
-        RotationY = transform.rotation.y,
-        Scale = transform.localScale.x,
+        RotationY = spawnedObject.transform.eulerAngles.y,
+        Scale = spawnedObject.transform.localScale.x,
         HitsTaken = spawnedObject.GetComponent<DestroyableResourceContainer>().HitsTaken
     }).ToList();
 
@@ -46,39 +48,33 @@ public class DestroyableContainerSpawner : ObjectSpawner
     /// <param name="state"> Объект состояния, который необходимо восстановить. </param>
     public override void RestoreState(object state)
     {
-        print("Aboba");
-        print(_wasLoadedFromSavefile);
         if (_wasLoadedFromSavefile) return;
 
         _spawnedContainerRecords = state as List<SpawnedContainerRecord>;
-        _wasLoadedFromSavefile = _spawnedContainerRecords?.Count >= 0;
+        _wasLoadedFromSavefile = _spawnedContainerRecords is { Count: >= 0 };
         SpawnFromSave(_spawnedContainerRecords);
     }
 
     /// <summary> Восстанавливает заспавненные объекты из сохраненного состояния. </summary>
-    /// <param name="spawnedObjectRecords"> Заспавненные объекты. </param>
-    private void SpawnFromSave(List<SpawnedContainerRecord> spawnedObjectRecords) =>
-        spawnedObjectRecords.ForEach(record =>
-            SpawnObject(
-                record.Position.ToVector(),
-                record.RotationY,
-                Vector3.one * record.Scale,
-                record.HitsTaken
-            )
-        );
-    
+    /// <param name="records"> Заспавненные объекты. </param>
+    private void SpawnFromSave(List<SpawnedContainerRecord> records)
+    {
+        foreach (var record in records)
+        {
+            SpawnObject(record.Position.ToVector(), record.RotationY, Vector3.one * record.Scale, record.HitsTaken);
+        }
+    }
+    #endregion
+
     private void SpawnObject(Vector3 position, float rotationY, Vector3 scale, int hitsTaken = 0)
     {
-        var go = Instantiate(_config.ObjectPrefab,
-            position,
-            Quaternion.Euler(0f, rotationY, 0f),
-            transform);
-        go.transform.localScale = scale;
-        go.GetComponent<IDestroyable>().OnObjectDestroyed += RemoveObjectFromList;
-        go.GetComponent<DestroyableResourceContainer>().Initialize();
-        //TODO: Добавить сеттер HitsTaken внутри DestroyableResourceContainer
-        go.GetComponent<DestroyableResourceContainer>().SetHitCount(hitsTaken);
+        var obj = Instantiate(
+            _config.ObjectPrefab, position, Quaternion.Euler(0f, rotationY, 0f), transform
+        );
+        obj.transform.localScale = scale;
+        obj.GetComponent<IDestroyable>().OnObjectDestroyed += RemoveObjectFromList;
+        obj.GetComponent<DestroyableResourceContainer>().Initialize(hitsTaken);
 
-        _spawnedObjects.Add(go);
+        _spawnedObjects.Add(obj);
     }
 }

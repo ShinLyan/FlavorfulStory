@@ -5,9 +5,7 @@ using System.Linq;
 using UnityEngine;
 using FlavorfulStory.Actions;
 using FlavorfulStory.InventorySystem.DropSystem;
-using UnityEngine.Serialization;
 
-//TODO: сделать сохранение (_hitsTaken). Зародителить и сделать 2 наследника ObjectSpawner(default & resourceContainer)?
 [RequireComponent(typeof(ItemDropper), typeof(ObjectSwitcher))]
 public class DestroyableResourceContainer : MonoBehaviour, IHitable, IDestroyable
 {
@@ -22,6 +20,8 @@ public class DestroyableResourceContainer : MonoBehaviour, IHitable, IDestroyabl
 
     public void Destroy()
     {
+        if (IsDestroyed) return;
+        
         IsDestroyed = true;
         OnObjectDestroyed?.Invoke(this);
         StartCoroutine(DestroyGameobjectAfterDelay());
@@ -57,24 +57,26 @@ public class DestroyableResourceContainer : MonoBehaviour, IHitable, IDestroyabl
         if (IsDestroyed || !_toolsToBeHit.Contains(toolType)) return;
 
         HitsTaken++;
+        
         if (HitsTaken >= HitsToDestroy)
         {
             Destroy();
             return;
         }
 
-        SwitchToCorrectGameobject(HitsTaken);
+        UpdateVisualGrade(true);
     }
 
-    private void SwitchToCorrectGameobject(int hitsTaken, bool dropResources = true)
+    private void UpdateVisualGrade( bool canDropResources)
     {
         for (int i = _hitsToGrades.Count - 1; i >= 0; i--)
         {
-            if (_hitsToGrades.Take(i + 1).Sum() == hitsTaken)
+            int cumulativeHits = _hitsToGrades.Take(i + 1).Sum();
+            if (cumulativeHits <= HitsTaken)
             {
-                _objectSwitcher.SwitchToGameobject(i + 1);
-                if (dropResources)
-                    DropResources();
+                _objectSwitcher.SwitchTo(i + 1);
+                if (canDropResources && cumulativeHits == HitsTaken) DropResources();
+                break;
             }
         }
     }
@@ -90,12 +92,9 @@ public class DestroyableResourceContainer : MonoBehaviour, IHitable, IDestroyabl
 
     private ObjectSwitcher _objectSwitcher;
 
-    private void Awake()
-    {
-        Initialize();
-    }
+    private void Awake() => Initialize();
 
-    public void Initialize()
+    public void Initialize(int hitsTaken = 0)
     {
         _itemDropper = GetComponent<ItemDropper>();
         _objectSwitcher = GetComponent<ObjectSwitcher>();
@@ -104,11 +103,8 @@ public class DestroyableResourceContainer : MonoBehaviour, IHitable, IDestroyabl
             Debug.LogError("Несоответствие между количеством грейдов и ударами!");
 
         _objectSwitcher.Initialize();
-    }
-
-    public void SetHitCount(int hitsTaken)
-    {
+        
         HitsTaken = hitsTaken;
-        SwitchToCorrectGameobject(HitsTaken, false);
+        UpdateVisualGrade(false);
     }
 }

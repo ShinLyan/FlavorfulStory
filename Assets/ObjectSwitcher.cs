@@ -24,7 +24,7 @@ public class ObjectSwitcher : MonoBehaviour
         }
     }
 
-    public void SwitchToGameobject(int index)
+    public void SwitchTo(int index)
     {
         for (int i = 0; i < _spawnedObjects.Count; i++)
             _spawnedObjects[i].SetActive(i == index);

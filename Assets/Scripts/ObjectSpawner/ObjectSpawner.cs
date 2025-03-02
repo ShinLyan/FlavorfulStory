@@ -56,7 +56,7 @@ namespace FlavorfulStory.ObjectSpawner
                 Debug.LogError("В конфиге спавнера не должен находится объект, реализующий интерфейс IHitable." +
                                " Используйте DestroyableContainerSpawner.cs");
         }
-        
+
         /// <summary> Запускает процесс спавна при старте сцены. </summary>
         private void Start()
         {
@@ -67,17 +67,21 @@ namespace FlavorfulStory.ObjectSpawner
         /// <summary> Спавнит объекты на основе конфигурации. </summary>
         protected void SpawnFromConfig()
         {
-            if (!_config) Debug.LogError("Спавнеру не назначен конфиг.");
+            if (_config == null)
+            {
+                Debug.LogError("Спавнеру не назначен конфиг.");
+                return;
+            }
 
             if (_config.EvenSpread)
-                SpawnEvenSpreadFromConfig();
+                SpawnEvenSpread();
             else
-                SpawnRandomlyFromConfig();
+                SpawnRandomly();
         }
 
         /// <summary> Спавнит объекты равномерно по сетке. </summary>
         // Пояснения по формулам см. здесь: https://www.youtube.com/watch?v=rSKMYc1CQHE&t=122s
-        private void SpawnEvenSpreadFromConfig()
+        private void SpawnEvenSpread()
         {
             var objectsPerRow = (int)Mathf.Sqrt(_config.Quantity);
             var objectsPerColumn = (_config.Quantity - 1) / objectsPerRow + 1;
@@ -86,8 +90,46 @@ namespace FlavorfulStory.ObjectSpawner
                 float x = (i / (float)objectsPerRow - objectsPerColumn / 2f + 0.5f) * _config.MinSpacing;
                 float z = (i % objectsPerRow - objectsPerRow / 2f + 0.5f) * _config.MinSpacing;
                 var offset = _config.Width > _config.Length ? new Vector3(x, 0, z) : new Vector3(z, 0, x);
-                SpawnObject(transform.position + offset, Random.value * 360f, GetScaleVariation());
+                SpawnObject(transform.position + offset, Random.value * 360f, GetRandomScale());
             }
+        }
+
+        /// <summary> Спавнит объекты случайным образом в заданной области. </summary>
+        private void SpawnRandomly()
+        {
+            int iterations = 0;
+            while (_spawnedObjects.Count < _config.Quantity && iterations < _maxIterations)
+            {
+                var position = GetRandomPosition(transform.position);
+                if (CanSpawnAtPosition(position))
+                {
+                    SpawnObject(position, Random.Range(0, 360f), GetRandomScale());
+                }
+
+                iterations++;
+            }
+
+            if (_spawnedObjects.Count != _config.Quantity)
+                Debug.LogError("Превышен лимит итераций! Увеличьте зону спавна или уменьшите количество объектов");
+        }
+
+        /// <summary> Генерирует случайную точку в пределах области спавна. </summary>
+        /// <param name="areaCenterPosition"> Центр области спавна. </param>
+        /// <returns> Случайная точка в пределах области. </returns>
+        private Vector3 GetRandomPosition(Vector3 areaCenterPosition) => new Vector3(
+            Random.Range(areaCenterPosition.x - _config.Width * 0.5f, areaCenterPosition.x + _config.Width * 0.5f),
+            0f,
+            Random.Range(areaCenterPosition.z - _config.Length * 0.5f, areaCenterPosition.z + _config.Length * 0.5f)
+        );
+
+        /// <summary> Проверяет возможность спавна объекта в заданной позиции. </summary>
+        /// <param name="position"> Позиция для проверки. </param>
+        /// <returns> Возвращает true, если объект может быть заспавнен в данной позиции, иначе false. </returns>
+        private bool CanSpawnAtPosition(Vector3 position)
+        {
+            return Physics.OverlapSphere(
+                position, _config.MinSpacing, _obstaclesLayerMask, QueryTriggerInteraction.Collide
+            ).Length == 0;
         }
 
         /// <summary> Спавнит объект в заданной позиции с заданными параметрами масштаба и вращения. </summary>
@@ -97,14 +139,12 @@ namespace FlavorfulStory.ObjectSpawner
         /// <param name="hitsTaken"> Количственно сделанных ударов по объекту. </param>
         private void SpawnObject(Vector3 position, float rotationY, Vector3 scale)
         {
-            var go = Instantiate(_config.ObjectPrefab,
-                position,
-                Quaternion.Euler(0f, rotationY, 0f),
-                transform);
-            go.transform.localScale = scale;
-            go.GetComponent<IDestroyable>().OnObjectDestroyed += RemoveObjectFromList;
-
-            _spawnedObjects.Add(go);
+            var obj = Instantiate(
+                _config.ObjectPrefab, position, Quaternion.Euler(0f, rotationY, 0f), transform
+            );
+            obj.transform.localScale = scale;
+            obj.GetComponent<IDestroyable>().OnObjectDestroyed += RemoveObjectFromList;
+            _spawnedObjects.Add(obj);
         }
 
         /// <summary> Удаляет объект из списка заспавненных объектов. </summary>
@@ -115,51 +155,9 @@ namespace FlavorfulStory.ObjectSpawner
                 _spawnedObjects.Remove(monoBehaviour.gameObject);
         }
 
-        /// <summary> Спавнит объекты случайным образом в заданной области. </summary>
-        private void SpawnRandomlyFromConfig()
-        {
-            int iterations = 0;
-            var areaCenter = transform.position;
-            while (_spawnedObjects.Count < _config.Quantity && iterations < _maxIterations)
-            {
-                var spawnPosition = GetRandomPointInArea(areaCenter);
-                if (CanSpawnObjectAtPosition(spawnPosition))
-                {
-                    SpawnObject(spawnPosition, GetRandomRotationY(), GetScaleVariation());
-                }
-
-                iterations++;
-            }
-
-            if (_spawnedObjects.Count != _config.Quantity)
-            {
-                Debug.LogError(
-                    "Превышен лимит итераций спавна! Увеличьте зону спавна или уменьшите количество объектов");
-            }
-        }
-
-        /// <summary> Генерирует случайную точку в пределах области спавна. </summary>
-        /// <param name="areaCenterPosition"> Центр области спавна. </param>
-        /// <returns> Случайная точка в пределах области. </returns>
-        private Vector3 GetRandomPointInArea(Vector3 areaCenterPosition) => new Vector3(
-            Random.Range(areaCenterPosition.x - _config.Width * 0.5f, areaCenterPosition.x + _config.Width * 0.5f),
-            0f,
-            Random.Range(areaCenterPosition.z - _config.Length * 0.5f, areaCenterPosition.z + _config.Length * 0.5f)
-        );
-
-        /// <summary> Проверяет возможность спавна объекта в заданной позиции. </summary>
-        /// <param name="position"> Позиция для проверки. </param>
-        /// <returns> Возвращает true, если объект может быть заспавнен в данной позиции, иначе false. </returns>
-        private bool CanSpawnObjectAtPosition(Vector3 position) =>
-            Physics.OverlapSphere(position, _config.MinSpacing, _obstaclesLayerMask).Length == 0;
-
-        /// <summary> Получить случайное значение поворота по оси Y. </summary>
-        /// <returns> Случайное значение поворота по оси Y. </returns>
-        private static float GetRandomRotationY() => Random.value * 360f;
-
         /// <summary> Получает случайный коэффициент масштабирования. </summary>
         /// <returns> Коэффициент масштабирования в виде вектора. </returns>
-        private Vector3 GetScaleVariation() => Vector3.one * Random.Range(_scaleVariation.x, _scaleVariation.y);
+        private Vector3 GetRandomScale() => Vector3.one * Random.Range(_scaleVariation.x, _scaleVariation.y);
 
         /// <summary> Отображает визуализацию области спавна в редакторе. </summary>
         private void OnDrawGizmos()
@@ -186,8 +184,8 @@ namespace FlavorfulStory.ObjectSpawner
         public virtual object CaptureState() => _spawnedObjects.Select(spawnedObject => new SpawnedObjectRecord
         {
             Position = new SerializableVector3(spawnedObject.transform.position),
-            RotationY = transform.rotation.y,
-            Scale = transform.localScale.x,
+            RotationY = spawnedObject.transform.eulerAngles.y,
+            Scale = spawnedObject.transform.localScale.x,
         }).ToList();
 
         /// <summary> Восстановление состояния объекта при загрузке. </summary>
@@ -197,20 +195,19 @@ namespace FlavorfulStory.ObjectSpawner
             if (_wasLoadedFromSavefile) return;
 
             _spawnedObjectRecords = state as List<SpawnedObjectRecord>;
-            _wasLoadedFromSavefile = _spawnedObjectRecords?.Count >= 0;
+            _wasLoadedFromSavefile = _spawnedObjectRecords is { Count: >= 0 };
             SpawnFromSave(_spawnedObjectRecords);
         }
 
         /// <summary> Восстанавливает заспавненные объекты из сохраненного состояния. </summary>
-        /// <param name="spawnedObjectRecords"> Заспавненные объекты. </param>
-        private void SpawnFromSave(List<SpawnedObjectRecord> spawnedObjectRecords) =>
-            spawnedObjectRecords.ForEach(record =>
-                SpawnObject(
-                    record.Position.ToVector(),
-                    record.RotationY,
-                    Vector3.one * record.Scale
-                )
-            );
+        /// <param name="records"> Список сохраненных объектов. </param>
+        private void SpawnFromSave(List<SpawnedObjectRecord> records)
+        {
+            foreach (var record in records)
+            {
+                SpawnObject(record.Position.ToVector(), record.RotationY, Vector3.one * record.Scale);
+            }
+        }
 
         #endregion
     }

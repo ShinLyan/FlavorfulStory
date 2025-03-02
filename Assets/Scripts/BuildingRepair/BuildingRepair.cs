@@ -58,7 +58,7 @@ namespace FlavorfulStory.BuildingRepair
             //SpawnStagesVisuals();
             _objectSwitcher.Initialize();
             //UpdateVisualStage();
-            _objectSwitcher.SwitchToGameobject(_repairStageIndex);
+            _objectSwitcher.SwitchTo(_repairStageIndex);
         }
 
         /// <summary> Инициализация списка вложенных ресурсов. </summary>
@@ -79,7 +79,7 @@ namespace FlavorfulStory.BuildingRepair
             if (RepairCompleted) return;
 
             _repairStageIndex++;
-            _objectSwitcher.SwitchToGameobject(_repairStageIndex);
+            _objectSwitcher.SwitchTo(_repairStageIndex);
             //UpdateVisualStage();
             UpdateInteractionState();
 
