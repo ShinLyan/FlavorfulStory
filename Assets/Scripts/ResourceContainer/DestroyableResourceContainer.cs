@@ -43,7 +43,7 @@ namespace FlavorfulStory.ResourceContainer
             _objectSwitcher.Initialize();
 
             HitsTaken = hitsTaken;
-            UpdateVisualGrade();
+            _objectSwitcher.SwitchTo(GetCurrentGradeIndex());
         }
 
         #region DestroyBehaviour
@@ -85,13 +85,17 @@ namespace FlavorfulStory.ResourceContainer
         /// <returns> Индекс текущего грейда. </returns>
         private int GetCurrentGradeIndex()
         {
-            for (var i = _hitsToGrades.Count - 1; i >= 0; i--)
+            var result = 0;
+            for (var i = 0; i < _hitsToGrades.Count; i++)
             {
                 var cumulativeHits = _hitsToGrades.Take(i + 1).Sum();
-                if (cumulativeHits <= HitsTaken) return i;
+                if (HitsTaken >= cumulativeHits)
+                    result = i + 1;
+                else
+                    break;
             }
 
-            return 0;
+            return HitsTaken == _hitsToGrades.Sum() ? _hitsToGrades.Count - 1 : result;
         }
 
         #endregion
@@ -124,32 +128,13 @@ namespace FlavorfulStory.ResourceContainer
                 return;
             }
 
-            for (var i = _hitsToGrades.Count - 1; i >= 0; i--)
+            var cumulativeSum = _hitsToGrades.Select(
+                (value, index) => _hitsToGrades.Take(index + 1).Sum()
+            ).ToArray();
+            if (cumulativeSum.Contains(HitsTaken))
             {
-                var cumulativeHits = _hitsToGrades.Take(i + 1).Sum();
-                if (cumulativeHits == HitsTaken)
-                {
-                    UpdateVisualGrade();
-                    DropResourcesForCurrentGrade();
-                    break;
-                }
-
-                if (cumulativeHits < HitsTaken) return;
-            }
-        }
-
-        /// <summary> Обновить визуальный грейд. </summary>
-        /// <remarks> Дропает ресурсы при смене грейда, если флаг (аргумент) позволяет. </remarks>
-        private void UpdateVisualGrade()
-        {
-            for (var i = _hitsToGrades.Count - 1; i >= 0; i--)
-            {
-                var cumulativeHits = _hitsToGrades.Take(i + 1).Sum();
-                if (cumulativeHits <= HitsTaken)
-                {
-                    _objectSwitcher.SwitchTo(i + 1);
-                    break;
-                }
+                _objectSwitcher.SwitchTo(GetCurrentGradeIndex());
+                DropResourcesForCurrentGrade();
             }
         }
 
