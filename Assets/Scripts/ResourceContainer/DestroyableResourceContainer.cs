@@ -15,7 +15,7 @@ namespace FlavorfulStory.ResourceContainer
     public class DestroyableResourceContainer : MonoBehaviour, IHitable, IDestroyable
     {
         /// <summary> Список предметов, которые выпадут при разрушении. </summary>
-        [Tooltip("Список предметов, которые выпадут при разрушении."), SerializeField]
+        [Tooltip("Список предметов, которые выпадут при разрушении.")] [SerializeField]
         private List<DropItemsForGrade> _dropItems;
 
         /// <summary> Выбрасыватель предметов. </summary>
@@ -25,7 +25,10 @@ namespace FlavorfulStory.ResourceContainer
         private ObjectSwitcher _objectSwitcher;
 
         /// <summary> Инициализировать добываемый объект. </summary>
-        private void Awake() => Initialize();
+        private void Awake()
+        {
+            Initialize();
+        }
 
         /// <summary> Инициализировать переключатель грейдов и обновить грейд. </summary>
         /// <param name="hitsTaken"> Количество полученных ударов. </param>
@@ -40,13 +43,13 @@ namespace FlavorfulStory.ResourceContainer
             _objectSwitcher.Initialize();
 
             HitsTaken = hitsTaken;
-            UpdateVisualGrade(false);
+            UpdateVisualGrade();
         }
 
         #region DestroyBehaviour
 
         /// <summary> Задержка перед окончательным уничтожением объекта. </summary>
-        [Tooltip("Задержка перед окончательным уничтожением объекта."), SerializeField]
+        [Tooltip("Задержка перед окончательным уничтожением объекта.")] [SerializeField]
         private float _destroyDelay = 4f;
 
         public bool IsDestroyed { get; private set; }
@@ -82,9 +85,9 @@ namespace FlavorfulStory.ResourceContainer
         /// <returns> Индекс текущего грейда. </returns>
         private int GetCurrentGradeIndex()
         {
-            for (int i = _hitsToGrades.Count - 1; i >= 0; i--)
+            for (var i = _hitsToGrades.Count - 1; i >= 0; i--)
             {
-                int cumulativeHits = _hitsToGrades.Take(i + 1).Sum();
+                var cumulativeHits = _hitsToGrades.Take(i + 1).Sum();
                 if (cumulativeHits <= HitsTaken) return i;
             }
 
@@ -121,22 +124,30 @@ namespace FlavorfulStory.ResourceContainer
                 return;
             }
 
-            UpdateVisualGrade(true);
+            for (var i = _hitsToGrades.Count - 1; i >= 0; i--)
+            {
+                var cumulativeHits = _hitsToGrades.Take(i + 1).Sum();
+                if (cumulativeHits == HitsTaken)
+                {
+                    UpdateVisualGrade();
+                    DropResourcesForCurrentGrade();
+                    break;
+                }
+
+                if (cumulativeHits < HitsTaken) return;
+            }
         }
 
         /// <summary> Обновить визуальный грейд. </summary>
         /// <remarks> Дропает ресурсы при смене грейда, если флаг (аргумент) позволяет. </remarks>
-        /// <param name="canDropResources"> Флаг возможности дропнуть ресурсы. </param>
-        private void UpdateVisualGrade(bool canDropResources)
+        private void UpdateVisualGrade()
         {
-            // TODO: canDropResources убрать и вынести логику в отдельный метод.
-            for (int i = _hitsToGrades.Count - 1; i >= 0; i--)
+            for (var i = _hitsToGrades.Count - 1; i >= 0; i--)
             {
-                int cumulativeHits = _hitsToGrades.Take(i + 1).Sum();
+                var cumulativeHits = _hitsToGrades.Take(i + 1).Sum();
                 if (cumulativeHits <= HitsTaken)
                 {
                     _objectSwitcher.SwitchTo(i + 1);
-                    if (canDropResources && cumulativeHits == HitsTaken) DropResourcesForCurrentGrade();
                     break;
                 }
             }
