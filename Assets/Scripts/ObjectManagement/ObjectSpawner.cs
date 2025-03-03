@@ -1,55 +1,17 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
+using FlavorfulStory.ResourceContainer;
 using FlavorfulStory.Saving;
-using Random = UnityEngine.Random;
 using GD.MinMaxSlider;
+using UnityEngine;
+using Random = UnityEngine.Random;
 
-namespace FlavorfulStory.ObjectSpawner
+namespace FlavorfulStory.ObjectManagement
 {
-    /// <summary> Класс для управления спавном объектов в сцене. </summary>
+    /// <summary> Спавнер объектов. </summary>
     public class ObjectSpawner : MonoBehaviour, ISaveable
     {
-        #region Fields
-
-        /// <summary> Конфигурация для спавнера объектов, содержащая параметры для спавна. </summary>
-        [SerializeField, Tooltip("Конфигурация для спавнера объектов, содержащая параметры для спавна.")]
-        protected ObjectSpawnerConfig _config;
-
-        /// <summary> Слой, на котором находятся препятствия, с которыми не должны пересекаться объекты. </summary>
-        [SerializeField,
-         Tooltip("Слой, на котором находятся препятствия, с которыми не должны пересекаться объекты.")]
-        private LayerMask _obstaclesLayerMask;
-
-        /// <summary> Если true, будет отображаться область конфигурации для спавна в редакторе. </summary>
-        [SerializeField, Tooltip("Если true, будет отображаться область конфигурации для спавна в редакторе.")]
-        private bool _visualizeConfigArea;
-
-        /// <summary> Цвет для визуализации области спавна в редакторе. </summary>
-        [SerializeField, Tooltip("Цвет для визуализации области спавна в редакторе.")]
-        private Color _gizmosColor;
-
-        /// <summary> Максимальное количество попыток спавна объектов. </summary>
-        [SerializeField, Tooltip("Максимальное количество попыток спавна объектов.")]
-        private int _maxIterations;
-
-        /// <summary> Вариация масштаба объектов при спавне (минимальный и максимальный коэффициенты масштаба). </summary>
-        [SerializeField, MinMaxSlider(0.5f, 2f),
-         Tooltip("Вариация масштаба объектов при спавне (минимальный и максимальный коэффициенты масштаба).")]
-        private Vector2 _scaleVariation;
-
-        /// <summary> Список всех заспавненных объектов. </summary>
-        protected readonly List<GameObject> _spawnedObjects = new();
-
-        /// <summary> Список записей заспавненных объектов, используемый для сохранения состояния. </summary>
-        private List<SpawnedObjectRecord> _spawnedObjectRecords = new(0);
-
-        /// <summary> Флаг, указывающий, были ли объекты загружены из файла. </summary>
-        protected bool _wasLoadedFromSavefile;
-
-        #endregion
-
         private void Awake()
         {
             if (_config.ObjectPrefab.GetComponent<IHitable>() != null)
@@ -62,6 +24,15 @@ namespace FlavorfulStory.ObjectSpawner
         {
             if (!_wasLoadedFromSavefile)
                 SpawnFromConfig();
+        }
+
+        /// <summary> Отображает визуализацию области спавна в редакторе. </summary>
+        private void OnDrawGizmos()
+        {
+            if (!_visualizeConfigArea) return;
+
+            Gizmos.color = _gizmosColor;
+            Gizmos.DrawWireCube(transform.position, new Vector3(_config.Width, 1f, _config.Length));
         }
 
         /// <summary> Спавнит объекты на основе конфигурации. </summary>
@@ -85,10 +56,10 @@ namespace FlavorfulStory.ObjectSpawner
         {
             var objectsPerRow = (int)Mathf.Sqrt(_config.Quantity);
             var objectsPerColumn = (_config.Quantity - 1) / objectsPerRow + 1;
-            for (int i = 0; i < _config.Quantity; i++)
+            for (var i = 0; i < _config.Quantity; i++)
             {
-                float x = (i / (float)objectsPerRow - objectsPerColumn / 2f + 0.5f) * _config.MinSpacing;
-                float z = (i % objectsPerRow - objectsPerRow / 2f + 0.5f) * _config.MinSpacing;
+                var x = (i / (float)objectsPerRow - objectsPerColumn / 2f + 0.5f) * _config.MinSpacing;
+                var z = (i % objectsPerRow - objectsPerRow / 2f + 0.5f) * _config.MinSpacing;
                 var offset = _config.Width > _config.Length ? new Vector3(x, 0, z) : new Vector3(z, 0, x);
                 SpawnObject(transform.position + offset, Random.value * 360f, GetRandomScale());
             }
@@ -97,14 +68,11 @@ namespace FlavorfulStory.ObjectSpawner
         /// <summary> Спавнит объекты случайным образом в заданной области. </summary>
         private void SpawnRandomly()
         {
-            int iterations = 0;
+            var iterations = 0;
             while (_spawnedObjects.Count < _config.Quantity && iterations < _maxIterations)
             {
                 var position = GetRandomPosition(transform.position);
-                if (CanSpawnAtPosition(position))
-                {
-                    SpawnObject(position, Random.Range(0, 360f), GetRandomScale());
-                }
+                if (CanSpawnAtPosition(position)) SpawnObject(position, Random.Range(0, 360f), GetRandomScale());
 
                 iterations++;
             }
@@ -116,11 +84,14 @@ namespace FlavorfulStory.ObjectSpawner
         /// <summary> Генерирует случайную точку в пределах области спавна. </summary>
         /// <param name="areaCenterPosition"> Центр области спавна. </param>
         /// <returns> Случайная точка в пределах области. </returns>
-        private Vector3 GetRandomPosition(Vector3 areaCenterPosition) => new Vector3(
-            Random.Range(areaCenterPosition.x - _config.Width * 0.5f, areaCenterPosition.x + _config.Width * 0.5f),
-            0f,
-            Random.Range(areaCenterPosition.z - _config.Length * 0.5f, areaCenterPosition.z + _config.Length * 0.5f)
-        );
+        private Vector3 GetRandomPosition(Vector3 areaCenterPosition)
+        {
+            return new Vector3(
+                Random.Range(areaCenterPosition.x - _config.Width * 0.5f, areaCenterPosition.x + _config.Width * 0.5f),
+                0f,
+                Random.Range(areaCenterPosition.z - _config.Length * 0.5f, areaCenterPosition.z + _config.Length * 0.5f)
+            );
+        }
 
         /// <summary> Проверяет возможность спавна объекта в заданной позиции. </summary>
         /// <param name="position"> Позиция для проверки. </param>
@@ -157,16 +128,49 @@ namespace FlavorfulStory.ObjectSpawner
 
         /// <summary> Получает случайный коэффициент масштабирования. </summary>
         /// <returns> Коэффициент масштабирования в виде вектора. </returns>
-        private Vector3 GetRandomScale() => Vector3.one * Random.Range(_scaleVariation.x, _scaleVariation.y);
-
-        /// <summary> Отображает визуализацию области спавна в редакторе. </summary>
-        private void OnDrawGizmos()
+        private Vector3 GetRandomScale()
         {
-            if (!_visualizeConfigArea) return;
-
-            Gizmos.color = _gizmosColor;
-            Gizmos.DrawWireCube(transform.position, new Vector3(_config.Width, 1f, _config.Length));
+            return Vector3.one * Random.Range(_scaleVariation.x, _scaleVariation.y);
         }
+
+        #region Fields
+
+        /// <summary> Конфигурация для спавнера объектов, содержащая параметры для спавна. </summary>
+        [SerializeField] [Tooltip("Конфигурация для спавнера объектов, содержащая параметры для спавна.")]
+        protected ObjectSpawnerConfig _config;
+
+        /// <summary> Слой, на котором находятся препятствия, с которыми не должны пересекаться объекты. </summary>
+        [SerializeField] [Tooltip("Слой, на котором находятся препятствия, с которыми не должны пересекаться объекты.")]
+        private LayerMask _obstaclesLayerMask;
+
+        /// <summary> Если true, будет отображаться область конфигурации для спавна в редакторе. </summary>
+        [SerializeField] [Tooltip("Если true, будет отображаться область конфигурации для спавна в редакторе.")]
+        private bool _visualizeConfigArea;
+
+        /// <summary> Цвет для визуализации области спавна в редакторе. </summary>
+        [SerializeField] [Tooltip("Цвет для визуализации области спавна в редакторе.")]
+        private Color _gizmosColor;
+
+        /// <summary> Максимальное количество попыток спавна объектов. </summary>
+        [SerializeField] [Tooltip("Максимальное количество попыток спавна объектов.")]
+        private int _maxIterations;
+
+        /// <summary> Вариация масштаба объектов при спавне (минимальный и максимальный коэффициенты масштаба). </summary>
+        [SerializeField]
+        [MinMaxSlider(0.5f, 2f)]
+        [Tooltip("Вариация масштаба объектов при спавне (минимальный и максимальный коэффициенты масштаба).")]
+        private Vector2 _scaleVariation;
+
+        /// <summary> Список всех заспавненных объектов. </summary>
+        protected readonly List<GameObject> _spawnedObjects = new();
+
+        /// <summary> Список записей заспавненных объектов, используемый для сохранения состояния. </summary>
+        private List<SpawnedObjectRecord> _spawnedObjectRecords = new(0);
+
+        /// <summary> Флаг, указывающий, были ли объекты загружены из файла. </summary>
+        protected bool _wasLoadedFromSavefile;
+
+        #endregion
 
         #region Saving
 
@@ -181,12 +185,15 @@ namespace FlavorfulStory.ObjectSpawner
 
         /// <summary> Фиксация состояния объекта при сохранении. </summary>
         /// <returns> Возвращает объект, в котором фиксируется состояние. </returns>
-        public virtual object CaptureState() => _spawnedObjects.Select(spawnedObject => new SpawnedObjectRecord
+        public virtual object CaptureState()
         {
-            Position = new SerializableVector3(spawnedObject.transform.position),
-            RotationY = spawnedObject.transform.eulerAngles.y,
-            Scale = spawnedObject.transform.localScale.x,
-        }).ToList();
+            return _spawnedObjects.Select(spawnedObject => new SpawnedObjectRecord
+            {
+                Position = new SerializableVector3(spawnedObject.transform.position),
+                RotationY = spawnedObject.transform.eulerAngles.y,
+                Scale = spawnedObject.transform.localScale.x
+            }).ToList();
+        }
 
         /// <summary> Восстановление состояния объекта при загрузке. </summary>
         /// <param name="state"> Объект состояния, который необходимо восстановить. </param>
@@ -204,9 +211,7 @@ namespace FlavorfulStory.ObjectSpawner
         private void SpawnFromSave(List<SpawnedObjectRecord> records)
         {
             foreach (var record in records)
-            {
                 SpawnObject(record.Position.ToVector(), record.RotationY, Vector3.one * record.Scale);
-            }
         }
 
         #endregion

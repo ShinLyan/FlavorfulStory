@@ -17,28 +17,20 @@ namespace FlavorfulStory.Actions.Interactables
         /// <summary> Аниматор для управления анимациями в процессе взаимодействия. </summary>
         [SerializeField] private Animator _animator;
 
-        /// <summary> Ближайший объект, с которым можно взаимодействовать. </summary>
-        private IInteractable _nearestAllowedInteractable;
+        /// <summary> Хэш для анимации сбора. </summary>
+        private readonly int _gather = Animator.StringToHash("Gather");
 
         /// <summary> Список объектов, доступных для взаимодействия. </summary>
         private readonly List<IInteractable> _reachableInteractables = new();
+
+        /// <summary> Ближайший объект, с которым можно взаимодействовать. </summary>
+        private IInteractable _nearestAllowedInteractable;
 
         /// <summary> PlayerController родительского объекта. </summary>
         private PlayerController _playerController;
 
         /// <summary> Флаг, указывающий, происходит ли в данный момент взаимодействие. </summary>
         public bool IsInteracting { get; private set; }
-
-        /// <summary> Хэш для анимации сбора. </summary>
-        private readonly int _gather = Animator.StringToHash("Gather");
-
-        /// <summary> Событие, вызываемое при начале взаимодействия.
-        /// Используется для звуковых эффектов и других действий. </summary>
-        public event Action OnInteractionStarted; // На будущее - для звуков и тд
-
-        /// <summary> Событие, вызываемое при завершении взаимодействия.
-        /// Используется для звуковых эффектов и других действий. </summary>
-        public event Action OnInteractionEnded; // На будущее - для звуков и тд
 
         /// <summary> Инициализация компонента. </summary>
         /// <remarks> Подписка на событие OnInteractionEnded (PlayerController.cs). </remarks>
@@ -47,9 +39,6 @@ namespace FlavorfulStory.Actions.Interactables
             _playerController = GetComponentInParent<PlayerController>();
             _playerController.OnInteractionEnded += EndInteraction;
         }
-
-        /// <summary> Отписка от события OnInteractionEnded (PlayerController.cs). </summary>
-        private void OnDestroy() => _playerController.OnInteractionEnded -= EndInteraction;
 
         /// <summary> Проверяет нажатие кнопки взаимодействия и вызывает метод Interact() для ближайшего объекта. </summary>
         private void Update()
@@ -62,14 +51,25 @@ namespace FlavorfulStory.Actions.Interactables
             }
         }
 
+        /// <summary> Отписка от события OnInteractionEnded (PlayerController.cs). </summary>
+        private void OnDestroy()
+        {
+            _playerController.OnInteractionEnded -= EndInteraction;
+        }
+
         /// <summary> Добавляет объект в список доступных для взаимодействия при входе в триггер. </summary>
         /// <param name="other"> Коллайдер объекта, вошедшего в триггер. </param>
         private void OnTriggerEnter(Collider other)
         {
+            if (other.TryGetComponent<IInteractable>(out var interactable)) _reachableInteractables.Add(interactable);
+        }
+
+        /// <summary> Удаляет объект из списка доступных для взаимодействия при выходе из триггера. </summary>
+        /// <param name="other"> Коллайдер объекта, покинувшего триггер. </param>
+        private void OnTriggerExit(Collider other)
+        {
             if (other.TryGetComponent<IInteractable>(out var interactable))
-            {
-                _reachableInteractables.Add(interactable);
-            }
+                _reachableInteractables.Remove(interactable);
         }
 
         /// <summary> Обновляет ближайший объект для взаимодействия и отображение тултипа. </summary>
@@ -79,29 +79,31 @@ namespace FlavorfulStory.Actions.Interactables
             _nearestAllowedInteractable = GetNearestAllowedInteractable();
 
             _interactableObjectTooltip.gameObject.SetActive(_nearestAllowedInteractable != null);
-            
+
             if (_nearestAllowedInteractable == null) return;
 
             _interactableObjectTooltip.SetTitleAndDescription(_nearestAllowedInteractable);
             _interactableObjectTooltip.SetPositionWithOffset(_nearestAllowedInteractable);
         }
 
-        /// <summary> Удаляет объект из списка доступных для взаимодействия при выходе из триггера. </summary>
-        /// <param name="other"> Коллайдер объекта, покинувшего триггер. </param>
-        private void OnTriggerExit(Collider other)
-        {
-            if (other.TryGetComponent<IInteractable>(out var interactable))
-            {
-                _reachableInteractables.Remove(interactable);
-            }
-        }
+        /// <summary>
+        ///     Событие, вызываемое при начале взаимодействия.
+        ///     Используется для звуковых эффектов и других действий.
+        /// </summary>
+        public event Action OnInteractionStarted; // На будущее - для звуков и тд
+
+        /// <summary>
+        ///     Событие, вызываемое при завершении взаимодействия.
+        ///     Используется для звуковых эффектов и других действий.
+        /// </summary>
+        public event Action OnInteractionEnded; // На будущее - для звуков и тд
 
         /// <summary> Определяет ближайший объект для взаимодействия из доступных. </summary>
         /// <returns> Ближайший объект, с которым можно взаимодействовать, или null. </returns>
         private IInteractable GetNearestAllowedInteractable()
         {
             if (IsInteracting) return _nearestAllowedInteractable;
-            
+
             return _reachableInteractables.Where(interactable => interactable.IsInteractionAllowed)
                 .OrderBy(interactable => interactable.GetDistanceTo(transform))
                 .FirstOrDefault();
@@ -124,10 +126,7 @@ namespace FlavorfulStory.Actions.Interactables
             OnInteractionEnded?.Invoke();
             IsInteracting = false;
             _animator.ResetTrigger(_gather);
-            if (_nearestAllowedInteractable is AbstractInteractableObject)
-            {
-                InputWrapper.UnblockPlayerMovement();
-            }
+            if (_nearestAllowedInteractable is AbstractHarvestableObject) InputWrapper.UnblockPlayerMovement();
         }
     }
 }

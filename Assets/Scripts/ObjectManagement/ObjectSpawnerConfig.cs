@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace FlavorfulStory.ObjectSpawner
+namespace FlavorfulStory.ObjectManagement
 {
     /// <summary> Конфигурация спавнера объектов. </summary>
     [CreateAssetMenu(menuName = "FlavorfulStory/Environment/ObjectSpawnerConfig", fileName = "SpawnerConfig")]
@@ -16,11 +16,12 @@ namespace FlavorfulStory.ObjectSpawner
 
         [Header("Область спавна")]
         /// <summary> Ширина, в пределах которой будут заспавнены объекты. </summary>
-        [Tooltip("Ширина, в пределах которой будут заспавнены объекты."), Range(0, 1000f)]
+        [Tooltip("Ширина, в пределах которой будут заспавнены объекты.")]
+        [Range(0, 1000f)]
         public int Width;
 
         /// <summary> Длина, в пределах которой будут заспавнены объекты. </summary>
-        [Tooltip("Длина, в пределах которой будут заспавнены объекты."), Range(0, 1000f)]
+        [Tooltip("Длина, в пределах которой будут заспавнены объекты.")] [Range(0, 1000f)]
         public int Length;
 
         // <summary> Минимальное расстояние между объектами. </summary>

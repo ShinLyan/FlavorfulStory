@@ -84,11 +84,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bfe96c20f54ba4d4fbfb5acabe29a3e5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _dropItems:
+  - Items:
+    - ItemPrefab: {fileID: 11400000, guid: c105c0283ae6d95488d48924be055535, type: 2}
+      Quantity: 5
+  - Items:
+    - ItemPrefab: {fileID: 11400000, guid: c105c0283ae6d95488d48924be055535, type: 2}
+      Quantity: 10
+  _destroyDelay: 4
   _toolsToBeHit: 00000000
   _hitsToGrades: 0300000002000000
-  _dropItems:
-  - ItemPrefab: {fileID: 11400000, guid: c105c0283ae6d95488d48924be055535, type: 2}
-    Quantity: 7
 --- !u!114 &1217464923912406356
 MonoBehaviour:
   m_ObjectHideFlags: 0
