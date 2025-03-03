@@ -5,8 +5,7 @@ using UnityEngine;
 namespace FlavorfulStory.Movement
 {
     /// <summary> Передвижение игрока. </summary>
-    [RequireComponent(typeof(Rigidbody))]
-    [RequireComponent(typeof(Animator))]
+    [RequireComponent(typeof(Rigidbody), typeof(Animator))]
     public class PlayerMover : MonoBehaviour, ISaveable
     {
         #region Private Fields
