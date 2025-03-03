@@ -9,8 +9,11 @@ namespace FlavorfulStory.AI.Scheduling
     [Serializable]
     public class ScheduleParams
     {
+        [Header("Npc name")]
+        [Tooltip("Для какого персонажа будет выполняться данное расписание.")] public NpcName NpcName;
+
         /// <summary> Сезоны, в которые будет выполняться заданное расписание. </summary>
-        [Header("Limitations")]
+        [Header("Limitations")] 
         [Tooltip("По каким сезонам будет выполнятся заданное расписание.")] public Seasons[] Season;
 
         /// <summary> Дни недели, в которые будет выполняться заданное расписание. </summary>
@@ -25,7 +28,9 @@ namespace FlavorfulStory.AI.Scheduling
         /// <summary> Указывает, будет ли расписание выполняться при дожде. </summary>
         [Tooltip("Расписание будет выполнятся при дожде.")] public bool IsRaining;
 
+        
         /// <summary> Массив точек расписания, которые NPC должен посетить. </summary>
+        [Header("Path")] 
         public SchedulePoint[] Path;
 
         /// <summary>
