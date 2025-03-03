@@ -43,7 +43,7 @@ namespace FlavorfulStory.InventorySystem.PickupSystem
         /// <summary> Добавить предмет в инвентарь и удалить его из мира. </summary>
         public void PickupItem()
         {
-            bool foundSlot = _inventory.TryAddToFirstEmptySlot(Item, Number);
+            bool foundSlot = _inventory.TryAddToFirstAvailableSlot(Item, Number);
             if (foundSlot) Destroy(gameObject);
         }
 

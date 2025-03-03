@@ -2,6 +2,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using FlavorfulStory.Saving;
+using FlavorfulStory.InputSystem;
 
 namespace FlavorfulStory.SceneManagement
 {
@@ -25,6 +26,7 @@ namespace FlavorfulStory.SceneManagement
             if (!SaveFileExists) return;
 
             StartCoroutine(LoadLastScene());
+            InputWrapper.UnblockAllInput();
         }
 
         /// <summary> Начинает новую игру с указанным файлом сохранения. </summary>
