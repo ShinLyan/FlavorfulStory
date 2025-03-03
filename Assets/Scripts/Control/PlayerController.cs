@@ -12,7 +12,7 @@ namespace FlavorfulStory.Control
 {
     /// <summary> Контроллер игрока, отвечающий за управление, 
     /// использование предметов и взаимодействие с окружением. </summary>
-    [RequireComponent(typeof(PlayerMover)), RequireComponent(typeof(Animator))]
+    [RequireComponent(typeof(PlayerMover), typeof(Animator))]
     public class PlayerController : MonoBehaviour
     {
         #region Fields
