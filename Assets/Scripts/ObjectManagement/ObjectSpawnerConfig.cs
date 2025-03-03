@@ -7,29 +7,28 @@ namespace FlavorfulStory.ObjectManagement
     public class ObjectSpawnerConfig : ScriptableObject
     {
         /// <summary> Префаб объекта для спавна. </summary>
-        [Tooltip("Префаб объекта для спавна.")]
-        public GameObject ObjectPrefab;
+        [field: Tooltip("Префаб объекта для спавна."), SerializeField]
+        public GameObject ObjectPrefab { get; private set; }
 
         /// <summary> Количество объектов для спавна. </summary>
-        [Tooltip("Количество объектов для спавна.")] [Range(1f, 100f)]
-        public int Quantity;
+        [field: Tooltip("Количество объектов для спавна."), SerializeField, Range(1f, 100f)]
+        public int Quantity { get; private set; }
 
-        [Header("Область спавна")]
         /// <summary> Ширина, в пределах которой будут заспавнены объекты. </summary>
-        [Tooltip("Ширина, в пределах которой будут заспавнены объекты.")]
-        [Range(0, 1000f)]
-        public int Width;
+        [field: Header("Область спавна")]
+        [field: Tooltip("Ширина, в пределах которой будут заспавнены объекты."), SerializeField, Range(0, 1000f)]
+        public int Width { get; private set; }
 
         /// <summary> Длина, в пределах которой будут заспавнены объекты. </summary>
-        [Tooltip("Длина, в пределах которой будут заспавнены объекты.")] [Range(0, 1000f)]
-        public int Length;
+        [field: Tooltip("Длина, в пределах которой будут заспавнены объекты."), SerializeField, Range(0, 1000f)]
+        public int Length { get; private set; }
 
         // <summary> Минимальное расстояние между объектами. </summary>
-        [Tooltip("Минимальное расстояние между объектами.")] [Range(1f, 50f)]
-        public int MinSpacing;
+        [field: Tooltip("Минимальное расстояние между объектами."), SerializeField, Range(1f, 50f)]
+        public int MinSpacing { get; private set; }
 
         /// <summary> Равномерное распределение объектов по сетке. </summary>
-        [Tooltip("Равномерное распределение. Объекты заспавнятся по автоматической сетке.")]
-        public bool EvenSpread;
+        [field: Tooltip("Равномерное распределение. Объекты заспавнятся по автоматической сетке."), SerializeField]
+        public bool EvenSpread { get; private set; }
     }
 }

@@ -8,10 +8,10 @@ namespace FlavorfulStory.ResourceContainer
     /// <summary> Набор предметов для определенного грейда. </summary>
     /// <remarks> Используется в <see cref="DestroyableResourceContainer" />. </remarks>
     [Serializable]
-    internal struct DropItemsForGrade
+    public struct DropItemsForGrade
     {
         /// <summary> Список предметов. </summary>
-        [Tooltip("Список предметов этого грейда")]
-        public List<DropItem> Items;
+        [field: Tooltip("Список предметов этого грейда"), SerializeField]
+        public List<DropItem> Items { get; private set; }
     }
 }

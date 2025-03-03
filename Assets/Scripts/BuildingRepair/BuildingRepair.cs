@@ -10,12 +10,13 @@ using UnityEngine;
 namespace FlavorfulStory.BuildingRepair
 {
     /// <summary> Ремонтируемое здание. </summary>
-    /// <remarks> Управляет стадиями ремонта, состоянием объектов, взаимодействием с ресурсами и сохранением прогресса. </remarks>
+    /// <remarks> Управляет стадиями ремонта, состоянием объектов,
+    /// взаимодействием с ресурсами и сохранением прогресса. </remarks>
     [RequireComponent(typeof(ObjectSwitcher))]
     public class BuildingRepair : MonoBehaviour, IInteractable, ISaveable
     {
         /// <summary> Стадии ремонта здания. </summary>
-        [Tooltip("Стадии строительства")] [SerializeField]
+        [Tooltip("Стадии строительства"), SerializeField]
         private List<RepairStage> _stages;
 
         /// <summary> Количество вложенных ресурсов для текущей стадии ремонта. </summary>
@@ -33,7 +34,7 @@ namespace FlavorfulStory.BuildingRepair
         private List<GameObject> _stagesVisuals;
 
         /// <summary> Завершен ли ремонт здания? </summary>
-        private bool RepairCompleted => _repairStageIndex >= _stages.Count;
+        private bool IsRepairCompleted => _repairStageIndex >= _stages.Count;
 
         /// <summary> Инициализация объекта. </summary>
         private void Awake()
@@ -57,9 +58,7 @@ namespace FlavorfulStory.BuildingRepair
         private void InitializeRepairStages()
         {
             UpdateInteractionState();
-            //SpawnStagesVisuals();
             _objectSwitcher.Initialize();
-            //UpdateVisualStage();
             _objectSwitcher.SwitchTo(_repairStageIndex);
         }
 
@@ -74,21 +73,20 @@ namespace FlavorfulStory.BuildingRepair
         /// <remarks> После завершения ремонта взаимодействие становится невозможным. </remarks>
         private void UpdateInteractionState()
         {
-            IsInteractionAllowed = !RepairCompleted;
+            IsInteractionAllowed = !IsRepairCompleted;
         }
 
         /// <summary> Проведение ремонта. </summary>
         /// <remarks> Переходит к следующей стадии ремонта, если все ресурсы добавлены. </remarks>
         private void Build()
         {
-            if (RepairCompleted) return;
+            if (IsRepairCompleted) return;
 
             _repairStageIndex++;
             _objectSwitcher.SwitchTo(_repairStageIndex);
-            //UpdateVisualStage();
             UpdateInteractionState();
 
-            if (RepairCompleted)
+            if (IsRepairCompleted)
             {
                 _repairView.DisplayCompletionMessage();
                 return;
@@ -115,12 +113,12 @@ namespace FlavorfulStory.BuildingRepair
         /// <param name="resource"> Ресурс, который будет добавлен в ремонт. </param>
         private void AddResource(InventoryItem resource)
         {
-            var investedResourceIndex = _stages[_repairStageIndex].Requirements
+            int investedResourceIndex = _stages[_repairStageIndex].Requirements
                 .FindIndex(r => r.Item.ItemID == resource.ItemID);
             if (investedResourceIndex == -1) return;
 
             var requirement = _stages[_repairStageIndex].Requirements[investedResourceIndex];
-            var investedNumber = Mathf.Min(requirement.Quantity - _investedResources[investedResourceIndex],
+            int investedNumber = Mathf.Min(requirement.Quantity - _investedResources[investedResourceIndex],
                 Inventory.PlayerInventory.GetItemNumber(resource));
             if (investedNumber <= 0) return;
 
@@ -132,11 +130,11 @@ namespace FlavorfulStory.BuildingRepair
         /// <param name="resource"> Ресурс, который возвращается в инвентарь. </param>
         private void ReturnResource(InventoryItem resource)
         {
-            var investedResourceIndex = _stages[_repairStageIndex].Requirements
+            int investedResourceIndex = _stages[_repairStageIndex].Requirements
                 .FindIndex(requirement => requirement.Item.ItemID == resource.ItemID);
             if (investedResourceIndex == -1) return;
 
-            var investedResourceNumber = _investedResources[investedResourceIndex];
+            int investedResourceNumber = _investedResources[investedResourceIndex];
             if (investedResourceNumber <= 0 || !Inventory.PlayerInventory.HasSpaceFor(resource)) return;
 
             Inventory.PlayerInventory.TryAddToFirstAvailableSlot(resource, investedResourceNumber);
@@ -145,35 +143,23 @@ namespace FlavorfulStory.BuildingRepair
 
         /// <summary> Возможно ли совершить ремонт? </summary>
         /// <returns> <c>true</c>, если все ресурсы для текущей стадии вложены, иначе <c>false</c>. </returns>
-        private bool IsRepairPossible()
-        {
-            return !RepairCompleted && _stages[_repairStageIndex].Requirements
-                .Select((requirement, i) => _investedResources[i] >= requirement.Quantity)
-                .All(requirementCompleted => requirementCompleted);
-        }
+        private bool IsRepairPossible() => !IsRepairCompleted && _stages[_repairStageIndex].Requirements
+            .Select((requirement, i) => _investedResources[i] >= requirement.Quantity)
+            .All(requirementCompleted => requirementCompleted);
 
         #region Interactable
 
         /// <summary> Получить название объекта для тултипа. </summary>
         /// <returns> Название объекта для тултипа. </returns>
-        public string GetTooltipTitle()
-        {
-            return "Building";
-        }
+        public string GetTooltipTitle() => "Building";
 
         /// <summary> Получить описание объекта для тултипа. </summary>
         /// <returns> Описание объекта для тултипа. </returns>
-        public string GetTooltipDescription()
-        {
-            return "Repair me!";
-        }
+        public string GetTooltipDescription() => "Repair me!";
 
         /// <summary> Получить мировую позицию объекта для взаимодействия. </summary>
         /// <returns> Мировая позиция объекта для взаимодействия. </returns>
-        public Vector3 GetWorldPosition()
-        {
-            return transform.position;
-        }
+        public Vector3 GetWorldPosition() => transform.position;
 
         /// <summary> Флаг, разрешающий взаимодействие с объектом. </summary>
         public bool IsInteractionAllowed { get; set; }
@@ -196,10 +182,8 @@ namespace FlavorfulStory.BuildingRepair
         /// <summary> Получить расстояние до указанного объекта. </summary>
         /// <param name="otherTransform"> Трансформ объекта, до которого нужно получить расстояние. </param>
         /// <returns> Расстояние до другого объекта в мировых координатах. </returns>
-        public float GetDistanceTo(Transform otherTransform)
-        {
-            return Vector3.Distance(otherTransform.position, transform.position);
-        }
+        public float GetDistanceTo(Transform otherTransform) =>
+            Vector3.Distance(otherTransform.position, transform.position);
 
         #endregion
 
@@ -218,14 +202,11 @@ namespace FlavorfulStory.BuildingRepair
 
         /// <summary> Сохранить состояние объекта для дальнейшего восстановления. </summary>
         /// <returns> Объект состояния для последующего восстановления. </returns>
-        public object CaptureState()
+        public object CaptureState() => new RepairableBuildingRecord
         {
-            return new RepairableBuildingRecord
-            {
-                RepairStageIndex = _repairStageIndex,
-                InvestedResources = _investedResources
-            };
-        }
+            RepairStageIndex = _repairStageIndex,
+            InvestedResources = _investedResources
+        };
 
         /// <summary> Восстановить состояние объекта из сохранённого состояния. </summary>
         /// <param name="state"> Сохраненное состояние для восстановления. </param>

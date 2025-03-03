@@ -40,15 +40,15 @@ namespace FlavorfulStory.Actions.Interactables
             _playerController.OnInteractionEnded += EndInteraction;
         }
 
-        /// <summary> Проверяет нажатие кнопки взаимодействия и вызывает метод Interact() для ближайшего объекта. </summary>
+        /// <summary> Проверяет нажатие кнопки взаимодействия и вызывает метод Interact()
+        /// для ближайшего объекта. </summary>
         private void Update()
         {
-            if (InputWrapper.GetButtonDown(InputButton.Interact) &&
-                _nearestAllowedInteractable != null && !IsInteracting)
-            {
-                BeginInteraction();
-                _nearestAllowedInteractable?.Interact();
-            }
+            if (!InputWrapper.GetButtonDown(InputButton.Interact) ||
+                _nearestAllowedInteractable == null || IsInteracting) return;
+
+            BeginInteraction();
+            _nearestAllowedInteractable?.Interact();
         }
 
         /// <summary> Отписка от события OnInteractionEnded (PlayerController.cs). </summary>
@@ -86,28 +86,21 @@ namespace FlavorfulStory.Actions.Interactables
             _interactableObjectTooltip.SetPositionWithOffset(_nearestAllowedInteractable);
         }
 
-        /// <summary>
-        ///     Событие, вызываемое при начале взаимодействия.
-        ///     Используется для звуковых эффектов и других действий.
-        /// </summary>
+        /// <summary> Событие, вызываемое при начале взаимодействия.
+        /// Используется для звуковых эффектов и других действий. </summary>
         public event Action OnInteractionStarted; // На будущее - для звуков и тд
 
-        /// <summary>
-        ///     Событие, вызываемое при завершении взаимодействия.
-        ///     Используется для звуковых эффектов и других действий.
-        /// </summary>
+        /// <summary> Событие, вызываемое при завершении взаимодействия.
+        /// Используется для звуковых эффектов и других действий. </summary>
         public event Action OnInteractionEnded; // На будущее - для звуков и тд
 
         /// <summary> Определяет ближайший объект для взаимодействия из доступных. </summary>
         /// <returns> Ближайший объект, с которым можно взаимодействовать, или null. </returns>
-        private IInteractable GetNearestAllowedInteractable()
-        {
-            if (IsInteracting) return _nearestAllowedInteractable;
-
-            return _reachableInteractables.Where(interactable => interactable.IsInteractionAllowed)
+        private IInteractable GetNearestAllowedInteractable() => IsInteracting
+            ? _nearestAllowedInteractable
+            : _reachableInteractables.Where(interactable => interactable.IsInteractionAllowed)
                 .OrderBy(interactable => interactable.GetDistanceTo(transform))
                 .FirstOrDefault();
-        }
 
         // TODO: Убрать анимацию для ремонта
         /// <summary> Начать взаимодействие. </summary>
@@ -126,7 +119,7 @@ namespace FlavorfulStory.Actions.Interactables
             OnInteractionEnded?.Invoke();
             IsInteracting = false;
             _animator.ResetTrigger(_gather);
-            if (_nearestAllowedInteractable is AbstractHarvestableObject) InputWrapper.UnblockPlayerMovement();
+            if (_nearestAllowedInteractable is HarvestableObject) InputWrapper.UnblockPlayerMovement();
         }
     }
 }

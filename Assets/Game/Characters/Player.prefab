@@ -179,12 +179,6 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1252148998401955777}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &5392083531846123405 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 6607908229998962764, guid: 8f662c7c217f34c4ca4aa8b95d9efda1,
-    type: 3}
-  m_PrefabInstance: {fileID: 1252148998401955777}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &3960271142364864290
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -388,8 +382,9 @@ MonoBehaviour:
   _toolbar: {fileID: 0}
   _toolCooldown: 1
   _toolMappings:
-  - ToolType: 0
-    ToolPrefab: {fileID: 5392083531846123405}
+  - <ToolType>k__BackingField: 0
+    <ToolPrefab>k__BackingField: {fileID: 6607908229998962764, guid: 8f662c7c217f34c4ca4aa8b95d9efda1,
+      type: 3}
 --- !u!114 &8120314572516739807
 MonoBehaviour:
   m_ObjectHideFlags: 0

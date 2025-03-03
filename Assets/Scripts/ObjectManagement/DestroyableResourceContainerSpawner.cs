@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using FlavorfulStory.ResourceContainer;
 using FlavorfulStory.Saving;
-using FlavorfulStory.SceneManagement;
 using UnityEngine;
 
 namespace FlavorfulStory.ObjectManagement
@@ -17,18 +16,10 @@ namespace FlavorfulStory.ObjectManagement
 
         /// <summary> Валидация данных. </summary>
         /// <remarks> Коллбэк из UnityAPI. </remarks>
-        private void Awake()
+        private void OnValidate()
         {
             if (_config.ObjectPrefab.GetComponent<IHitable>() == null)
                 Debug.LogError("В конфиге спавнера должен находится объект, реализующий интерфейс IHitable");
-        }
-
-        /// <summary> Заспавнить объекты из конфига. Сработает только если файл сохранения не существует. </summary>
-        /// <remarks> Коллбэк из UnityAPI. </remarks>
-        private void Start()
-        {
-            if (!_wasLoadedFromSavefile && !SavingWrapper.SaveFileExists)
-                SpawnFromConfig();
         }
 
         /// <summary> Заспавнить добываемый объект. </summary>
@@ -36,16 +27,16 @@ namespace FlavorfulStory.ObjectManagement
         /// <param name="rotationY"> Угол поворота вокруг оси Y. </param>
         /// <param name="scale"> Масштаб. </param>
         /// <param name="hitsTaken"> Количество нанесенных ударов. </param>
-        private void SpawnObject(Vector3 position, float rotationY, Vector3 scale, int hitsTaken = 0)
+        protected override GameObject SpawnObject(Vector3 position, float rotationY, Vector3 scale, object data = null)
         {
-            var obj = Instantiate(
-                _config.ObjectPrefab, position, Quaternion.Euler(0f, rotationY, 0f), transform
-            );
-            obj.transform.localScale = scale;
-            obj.GetComponent<IDestroyable>().OnObjectDestroyed += RemoveObjectFromList;
-            obj.GetComponent<DestroyableResourceContainer>().Initialize(hitsTaken);
+            var obj = base.SpawnObject(position, rotationY, scale);
+            if (data != null)
+            {
+                int hitsTaken = (int)data;
+                obj.GetComponent<DestroyableResourceContainer>().Initialize(hitsTaken);
+            }
 
-            _spawnedObjects.Add(obj);
+            return obj;
         }
 
         #region Saving
@@ -62,16 +53,13 @@ namespace FlavorfulStory.ObjectManagement
 
         /// <summary> Фиксация состояния объекта при сохранении. </summary>
         /// <returns> Возвращает объект, в котором фиксируется состояние. </returns>
-        public override object CaptureState()
+        public override object CaptureState() => _spawnedObjects.Select(spawnedObject => new SpawnedContainerRecord
         {
-            return _spawnedObjects.Select(spawnedObject => new SpawnedContainerRecord
-            {
-                Position = new SerializableVector3(spawnedObject.transform.position),
-                RotationY = spawnedObject.transform.eulerAngles.y,
-                Scale = spawnedObject.transform.localScale.x,
-                HitsTaken = spawnedObject.GetComponent<DestroyableResourceContainer>().HitsTaken
-            }).ToList();
-        }
+            Position = new SerializableVector3(spawnedObject.transform.position),
+            RotationY = spawnedObject.transform.eulerAngles.y,
+            Scale = spawnedObject.transform.localScale.x,
+            HitsTaken = spawnedObject.GetComponent<DestroyableResourceContainer>().HitsTaken
+        }).ToList();
 
         /// <summary> Восстановление состояния объекта при загрузке. </summary>
         /// <param name="state"> Объект состояния, который необходимо восстановить. </param>

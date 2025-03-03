@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using FlavorfulStory.ResourceContainer;
 using FlavorfulStory.Saving;
+using FlavorfulStory.SceneManagement;
 using GD.MinMaxSlider;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -12,18 +13,59 @@ namespace FlavorfulStory.ObjectManagement
     /// <summary> Спавнер объектов. </summary>
     public class ObjectSpawner : MonoBehaviour, ISaveable
     {
-        private void Awake()
-        {
-            if (_config.ObjectPrefab.GetComponent<IHitable>() != null)
-                Debug.LogError("В конфиге спавнера не должен находится объект, реализующий интерфейс IHitable." +
-                               " Используйте DestroyableContainerSpawner.cs");
-        }
+        #region Fields
+
+        /// <summary> Конфигурация для спавнера объектов, содержащая параметры для спавна. </summary>
+        [Tooltip("Конфигурация для спавнера объектов, содержащая параметры для спавна."), SerializeField]
+        protected ObjectSpawnerConfig _config;
+
+        /// <summary> Слой, на котором находятся препятствия, с которыми не должны пересекаться объекты. </summary>
+        [Tooltip("Слой, на котором находятся препятствия, с которыми не должны пересекаться объекты."), SerializeField]
+        private LayerMask _obstaclesLayerMask;
+
+        /// <summary> Если true, будет отображаться область конфигурации для спавна в редакторе. </summary>
+        [Tooltip("Если true, будет отображаться область конфигурации для спавна в редакторе."), SerializeField]
+        private bool _visualizeConfigArea;
+
+        /// <summary> Цвет для визуализации области спавна в редакторе. </summary>
+        [Tooltip("Цвет для визуализации области спавна в редакторе."), SerializeField]
+        private Color _gizmosColor;
+
+        /// <summary> Максимальное количество попыток спавна объектов. </summary>
+        [Tooltip("Максимальное количество попыток спавна объектов."), SerializeField]
+        private int _maxIterations;
+
+        /// <summary> Вариация масштаба объектов при спавне
+        /// (минимальный и максимальный коэффициенты масштаба). </summary>
+        [Tooltip("Вариация масштаба объектов при спавне (минимальный и максимальный коэффициенты масштаба)."),
+         SerializeField, MinMaxSlider(0.5f, 2f)]
+        private Vector2 _scaleVariation;
+
+        /// <summary> Список всех заспавненных объектов. </summary>
+        protected readonly List<GameObject> _spawnedObjects = new();
+
+        /// <summary> Список записей заспавненных объектов, используемый для сохранения состояния. </summary>
+        private List<SpawnedObjectRecord> _spawnedObjectRecords = new(0);
+
+        /// <summary> Флаг, указывающий, были ли объекты загружены из файла. </summary>
+        protected bool _wasLoadedFromSavefile;
+
+        #endregion
 
         /// <summary> Запускает процесс спавна при старте сцены. </summary>
         private void Start()
         {
-            if (!_wasLoadedFromSavefile)
+            if (!_wasLoadedFromSavefile && !SavingWrapper.SaveFileExists)
                 SpawnFromConfig();
+        }
+
+        /// <summary> Валидация данных. </summary>
+        /// <remarks> Коллбэк из UnityAPI. </remarks>
+        private void OnValidate()
+        {
+            if (_config.ObjectPrefab.GetComponent<IHitable>() != null)
+                Debug.LogError("В конфиге спавнера не должен находится объект, реализующий интерфейс IHitable." +
+                               " Используйте DestroyableContainerSpawner.cs");
         }
 
         /// <summary> Отображает визуализацию области спавна в редакторе. </summary>
@@ -38,7 +80,7 @@ namespace FlavorfulStory.ObjectManagement
         /// <summary> Спавнит объекты на основе конфигурации. </summary>
         protected void SpawnFromConfig()
         {
-            if (_config == null)
+            if (!_config)
             {
                 Debug.LogError("Спавнеру не назначен конфиг.");
                 return;
@@ -54,12 +96,12 @@ namespace FlavorfulStory.ObjectManagement
         // Пояснения по формулам см. здесь: https://www.youtube.com/watch?v=rSKMYc1CQHE&t=122s
         private void SpawnEvenSpread()
         {
-            var objectsPerRow = (int)Mathf.Sqrt(_config.Quantity);
-            var objectsPerColumn = (_config.Quantity - 1) / objectsPerRow + 1;
-            for (var i = 0; i < _config.Quantity; i++)
+            int objectsPerRow = (int)Mathf.Sqrt(_config.Quantity);
+            int objectsPerColumn = (_config.Quantity - 1) / objectsPerRow + 1;
+            for (int i = 0; i < _config.Quantity; i++)
             {
-                var x = (i / (float)objectsPerRow - objectsPerColumn / 2f + 0.5f) * _config.MinSpacing;
-                var z = (i % objectsPerRow - objectsPerRow / 2f + 0.5f) * _config.MinSpacing;
+                float x = (i / (float)objectsPerRow - objectsPerColumn / 2f + 0.5f) * _config.MinSpacing;
+                float z = (i % objectsPerRow - objectsPerRow / 2f + 0.5f) * _config.MinSpacing;
                 var offset = _config.Width > _config.Length ? new Vector3(x, 0, z) : new Vector3(z, 0, x);
                 SpawnObject(transform.position + offset, Random.value * 360f, GetRandomScale());
             }
@@ -68,7 +110,7 @@ namespace FlavorfulStory.ObjectManagement
         /// <summary> Спавнит объекты случайным образом в заданной области. </summary>
         private void SpawnRandomly()
         {
-            var iterations = 0;
+            int iterations = 0;
             while (_spawnedObjects.Count < _config.Quantity && iterations < _maxIterations)
             {
                 var position = GetRandomPosition(transform.position);
@@ -84,31 +126,25 @@ namespace FlavorfulStory.ObjectManagement
         /// <summary> Генерирует случайную точку в пределах области спавна. </summary>
         /// <param name="areaCenterPosition"> Центр области спавна. </param>
         /// <returns> Случайная точка в пределах области. </returns>
-        private Vector3 GetRandomPosition(Vector3 areaCenterPosition)
-        {
-            return new Vector3(
-                Random.Range(areaCenterPosition.x - _config.Width * 0.5f, areaCenterPosition.x + _config.Width * 0.5f),
-                0f,
-                Random.Range(areaCenterPosition.z - _config.Length * 0.5f, areaCenterPosition.z + _config.Length * 0.5f)
-            );
-        }
+        private Vector3 GetRandomPosition(Vector3 areaCenterPosition) => new(
+            Random.Range(areaCenterPosition.x - _config.Width * 0.5f, areaCenterPosition.x + _config.Width * 0.5f),
+            0f,
+            Random.Range(areaCenterPosition.z - _config.Length * 0.5f, areaCenterPosition.z + _config.Length * 0.5f)
+        );
 
         /// <summary> Проверяет возможность спавна объекта в заданной позиции. </summary>
         /// <param name="position"> Позиция для проверки. </param>
         /// <returns> Возвращает true, если объект может быть заспавнен в данной позиции, иначе false. </returns>
-        private bool CanSpawnAtPosition(Vector3 position)
-        {
-            return Physics.OverlapSphere(
-                position, _config.MinSpacing, _obstaclesLayerMask, QueryTriggerInteraction.Collide
-            ).Length == 0;
-        }
+        private bool CanSpawnAtPosition(Vector3 position) => Physics.OverlapSphere(
+            position, _config.MinSpacing, _obstaclesLayerMask, QueryTriggerInteraction.Collide
+        ).Length == 0;
 
         /// <summary> Спавнит объект в заданной позиции с заданными параметрами масштаба и вращения. </summary>
         /// <param name="position"> Позиция спавна объекта. </param>
         /// <param name="rotationY"> Угол вращения объекта по оси Y. </param>
         /// <param name="scale"> Масштаб объекта. </param>
         /// <param name="hitsTaken"> Количственно сделанных ударов по объекту. </param>
-        private void SpawnObject(Vector3 position, float rotationY, Vector3 scale)
+        protected virtual GameObject SpawnObject(Vector3 position, float rotationY, Vector3 scale, object data = null)
         {
             var obj = Instantiate(
                 _config.ObjectPrefab, position, Quaternion.Euler(0f, rotationY, 0f), transform
@@ -116,11 +152,12 @@ namespace FlavorfulStory.ObjectManagement
             obj.transform.localScale = scale;
             obj.GetComponent<IDestroyable>().OnObjectDestroyed += RemoveObjectFromList;
             _spawnedObjects.Add(obj);
+            return obj;
         }
 
         /// <summary> Удаляет объект из списка заспавненных объектов. </summary>
         /// <param name="destroyable"> Объект, который необходимо удалить из списка. </param>
-        protected void RemoveObjectFromList(IDestroyable destroyable)
+        private void RemoveObjectFromList(IDestroyable destroyable)
         {
             if (destroyable is MonoBehaviour monoBehaviour)
                 _spawnedObjects.Remove(monoBehaviour.gameObject);
@@ -128,49 +165,7 @@ namespace FlavorfulStory.ObjectManagement
 
         /// <summary> Получает случайный коэффициент масштабирования. </summary>
         /// <returns> Коэффициент масштабирования в виде вектора. </returns>
-        private Vector3 GetRandomScale()
-        {
-            return Vector3.one * Random.Range(_scaleVariation.x, _scaleVariation.y);
-        }
-
-        #region Fields
-
-        /// <summary> Конфигурация для спавнера объектов, содержащая параметры для спавна. </summary>
-        [SerializeField] [Tooltip("Конфигурация для спавнера объектов, содержащая параметры для спавна.")]
-        protected ObjectSpawnerConfig _config;
-
-        /// <summary> Слой, на котором находятся препятствия, с которыми не должны пересекаться объекты. </summary>
-        [SerializeField] [Tooltip("Слой, на котором находятся препятствия, с которыми не должны пересекаться объекты.")]
-        private LayerMask _obstaclesLayerMask;
-
-        /// <summary> Если true, будет отображаться область конфигурации для спавна в редакторе. </summary>
-        [SerializeField] [Tooltip("Если true, будет отображаться область конфигурации для спавна в редакторе.")]
-        private bool _visualizeConfigArea;
-
-        /// <summary> Цвет для визуализации области спавна в редакторе. </summary>
-        [SerializeField] [Tooltip("Цвет для визуализации области спавна в редакторе.")]
-        private Color _gizmosColor;
-
-        /// <summary> Максимальное количество попыток спавна объектов. </summary>
-        [SerializeField] [Tooltip("Максимальное количество попыток спавна объектов.")]
-        private int _maxIterations;
-
-        /// <summary> Вариация масштаба объектов при спавне (минимальный и максимальный коэффициенты масштаба). </summary>
-        [SerializeField]
-        [MinMaxSlider(0.5f, 2f)]
-        [Tooltip("Вариация масштаба объектов при спавне (минимальный и максимальный коэффициенты масштаба).")]
-        private Vector2 _scaleVariation;
-
-        /// <summary> Список всех заспавненных объектов. </summary>
-        protected readonly List<GameObject> _spawnedObjects = new();
-
-        /// <summary> Список записей заспавненных объектов, используемый для сохранения состояния. </summary>
-        private List<SpawnedObjectRecord> _spawnedObjectRecords = new(0);
-
-        /// <summary> Флаг, указывающий, были ли объекты загружены из файла. </summary>
-        protected bool _wasLoadedFromSavefile;
-
-        #endregion
+        private Vector3 GetRandomScale() => Vector3.one * Random.Range(_scaleVariation.x, _scaleVariation.y);
 
         #region Saving
 
@@ -185,15 +180,12 @@ namespace FlavorfulStory.ObjectManagement
 
         /// <summary> Фиксация состояния объекта при сохранении. </summary>
         /// <returns> Возвращает объект, в котором фиксируется состояние. </returns>
-        public virtual object CaptureState()
+        public virtual object CaptureState() => _spawnedObjects.Select(spawnedObject => new SpawnedObjectRecord
         {
-            return _spawnedObjects.Select(spawnedObject => new SpawnedObjectRecord
-            {
-                Position = new SerializableVector3(spawnedObject.transform.position),
-                RotationY = spawnedObject.transform.eulerAngles.y,
-                Scale = spawnedObject.transform.localScale.x
-            }).ToList();
-        }
+            Position = new SerializableVector3(spawnedObject.transform.position),
+            RotationY = spawnedObject.transform.eulerAngles.y,
+            Scale = spawnedObject.transform.localScale.x
+        }).ToList();
 
         /// <summary> Восстановление состояния объекта при загрузке. </summary>
         /// <param name="state"> Объект состояния, который необходимо восстановить. </param>

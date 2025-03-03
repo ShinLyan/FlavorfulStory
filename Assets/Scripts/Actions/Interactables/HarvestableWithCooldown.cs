@@ -4,18 +4,17 @@ using UnityEngine;
 namespace FlavorfulStory.Actions.Interactables
 {
     /// <summary> Собираемый многоразовый объект. </summary>
-    /// <remarks>
-    ///     После сбора ресурса/предмета уходит на кулдаун. Наследник от <see cref="AbstractHarvestableObject" />.
-    /// </remarks>
-    public class HarvestableWithCooldown : AbstractHarvestableObject
+    /// <remarks> После сбора ресурса/предмета уходит на кулдаун.
+    /// Наследник от <see cref="HarvestableObject" />. </remarks>
+    public class HarvestableWithCooldown : HarvestableObject
     {
         /// <summary> Плод собираемого объекта. </summary>
         /// <remarks> Является включенным только если многоразовый объект доступен к сбору. </remarks>
-        [Tooltip("Геймобджект плода")] [SerializeField]
+        [Tooltip("Плод собираемого объекта."), SerializeField]
         private GameObject _fruit;
 
         /// <summary> Кулдаун сбора. </summary>
-        [Tooltip("Кулдаун сбора ресурса/предмета")] [SerializeField]
+        [Tooltip("Кулдаун сбора ресурса/предмета"), SerializeField]
         private float _harvestCooldown;
 
         /// <summary> Флаг возможности взаимодействия с объектом. </summary>
@@ -29,8 +28,7 @@ namespace FlavorfulStory.Actions.Interactables
             set
             {
                 _isInteractionAllowed = value;
-                if (_fruit != null)
-                    _fruit.SetActive(_isInteractionAllowed);
+                if (_fruit) _fruit.SetActive(_isInteractionAllowed);
             }
         }
 

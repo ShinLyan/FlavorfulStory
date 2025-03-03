@@ -17,8 +17,7 @@ namespace FlavorfulStory.Actions
         private const float UseRadius = 1.5f;
 
         /// <summary> Тип инструмента. </summary>
-        [field: Tooltip("Тип инструмента.")]
-        [field: SerializeField]
+        [field: Tooltip("Тип инструмента."), SerializeField]
         public ToolType ToolType { get; private set; }
 
         /// <summary> Использовать инструмент. </summary>
@@ -42,6 +41,8 @@ namespace FlavorfulStory.Actions
             var origin = player.transform.position;
             var direction = (targetPosition - origin).normalized;
             var interactionCenter = origin + direction * (MaxInteractionDistance / 2);
+
+            // TODO: Проверь что корректно работает. Было написано под пивом
             var hitColliders = Physics.OverlapSphere(interactionCenter, UseRadius);
 
             foreach (var collider in hitColliders)

@@ -6,12 +6,12 @@ namespace FlavorfulStory.ResourceContainer
     public interface IDestroyable
     {
         /// <summary> Уничтожен ли объект. </summary>
-        bool IsDestroyed { get; }
+        public bool IsDestroyed { get; }
 
         /// <summary> Событие уничтожения объекта. </summary>
-        event Action<IDestroyable> OnObjectDestroyed;
+        public event Action<IDestroyable> OnObjectDestroyed;
 
         /// <summary> Уничтожить объект. </summary>
-        void Destroy();
+        public void Destroy();
     }
 }

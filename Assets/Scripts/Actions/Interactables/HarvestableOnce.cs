@@ -3,14 +3,12 @@ using UnityEngine;
 namespace FlavorfulStory.Actions.Interactables
 {
     /// <summary> Собираемый одноразовый объект. </summary>
-    /// <remarks>
-    ///     После сбора ресурса/предмета уничтожается после определенной задержки.
-    ///     Наследник от <see cref="AbstractHarvestableObject" />.
-    /// </remarks>
-    public class HarvestableOnce : AbstractHarvestableObject
+    /// <remarks> После сбора ресурса/предмета уничтожается после определенной задержки.
+    /// Наследник от <see cref="HarvestableObject"/>. </remarks>
+    public class HarvestableOnce : HarvestableObject
     {
-        /// <summary> Задержа перед уничтожением. </summary>
-        [Tooltip("Задержка перед уничтожением.")] [SerializeField]
+        /// <summary> Задержка перед уничтожением. </summary>
+        [Tooltip("Задержка перед уничтожением."), SerializeField]
         private float _destroyDelay;
 
         /// <summary> Собрать ресурс. </summary>

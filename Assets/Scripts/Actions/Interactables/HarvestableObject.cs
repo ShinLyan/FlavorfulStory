@@ -6,10 +6,10 @@ namespace FlavorfulStory.Actions.Interactables
 {
     /// <summary> Абстрактный класс для собираемых объектов. </summary>
     /// <remarks> Реализует интерфейс <see cref="IInteractable" />. </remarks>
-    public abstract class AbstractHarvestableObject : MonoBehaviour, IInteractable
+    public abstract class HarvestableObject : MonoBehaviour, IInteractable
     {
         /// <summary> Собираемые предметы/ресурсы, что будут добавлены в инвентарь при взаимодействии. </summary>
-        [Tooltip("Собираемые предметы.")] [SerializeField]
+        [Tooltip("Собираемые предметы."), SerializeField]
         private List<DropItem> _harvestItems;
 
         /// <summary> Свойство возможности взаимодействия с объектом. </summary>
@@ -18,10 +18,8 @@ namespace FlavorfulStory.Actions.Interactables
         /// <summary> Получить расстояние до другого трансформа. </summary>
         /// <param name="otherTransform"> Трансформ объекта, до которого вычисляется расстояние. </param>
         /// <returns> Расстояние между объектами. </returns>
-        public float GetDistanceTo(Transform otherTransform)
-        {
-            return Vector3.Distance(transform.position, otherTransform.position);
-        }
+        public float GetDistanceTo(Transform otherTransform) =>
+            Vector3.Distance(transform.position, otherTransform.position);
 
         /// <summary> Выполнить взаимодействие с объектом. </summary>
         public virtual void Interact()
@@ -45,24 +43,15 @@ namespace FlavorfulStory.Actions.Interactables
 
         /// <summary> Получить название для тултипа. </summary>
         /// <returns> Название объекта. </returns>
-        public string GetTooltipTitle()
-        {
-            return Name;
-        }
+        public string GetTooltipTitle() => Name;
 
         /// <summary> Получить описание для тултипа. </summary>
         /// <returns> Описание объекта. </returns>
-        public string GetTooltipDescription()
-        {
-            return Description;
-        }
+        public string GetTooltipDescription() => Description;
 
         /// <summary> Получить позицию объекта в мировых координатах. </summary>
         /// <returns> Мировая позиция объекта. </returns>
-        public Vector3 GetWorldPosition()
-        {
-            return transform.position;
-        }
+        public Vector3 GetWorldPosition() => transform.position;
 
         #endregion
     }
