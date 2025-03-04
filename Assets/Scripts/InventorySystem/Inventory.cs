@@ -115,7 +115,7 @@ namespace FlavorfulStory.InventorySystem
         /// <returns> Возвращает True, если предмет был добавлен в любое место инвентаря. </returns>
         public bool TryAddItemToSlot(int slotIndex, InventoryItem item, int number)
         {
-            if (_slots[slotIndex].Item) return TryAddToFirstEmptySlot(item, number);
+            if (_slots[slotIndex].Item) return TryAddToFirstAvailableSlot(item, number);
 
             while (number > 0)
             {
@@ -137,7 +137,7 @@ namespace FlavorfulStory.InventorySystem
         /// <param name="item"> Предмет, который нужно добавить. </param>
         /// <param name="number"> Количество предметов, которые нужно добавить. </param>
         /// <returns> Возвращает True, если предмет можно добавить, False - в противном случае. </returns>
-        public bool TryAddToFirstEmptySlot(InventoryItem item, int number)
+        public bool TryAddToFirstAvailableSlot(InventoryItem item, int number)
         {
             while (number > 0)
             {

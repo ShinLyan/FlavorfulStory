@@ -9,8 +9,6 @@ namespace FlavorfulStory.Actions.Interactables
         /// <summary> Проверяет, доступно ли взаимодействие с объектом. </summary>
         /// <returns> Возвращает true, если взаимодействие разрешено. </returns>
         public bool IsInteractionAllowed { get; set; }
-
-        public bool IsBlockingMovement{ get; set; }
         
         /// <summary> Выполняет взаимодействие с объектом. </summary>
         public void Interact();
