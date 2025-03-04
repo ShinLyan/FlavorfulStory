@@ -61,7 +61,8 @@ namespace FlavorfulStory.Actions.Interactables
         /// <param name="other"> Коллайдер объекта, вошедшего в триггер. </param>
         private void OnTriggerEnter(Collider other)
         {
-            if (other.TryGetComponent<IInteractable>(out var interactable)) _reachableInteractables.Add(interactable);
+            if (other.TryGetComponent<IInteractable>(out var interactable))
+                _reachableInteractables.Add(interactable);
         }
 
         /// <summary> Удаляет объект из списка доступных для взаимодействия при выходе из триггера. </summary>
