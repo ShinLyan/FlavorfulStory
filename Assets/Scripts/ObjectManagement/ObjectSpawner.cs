@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using FlavorfulStory.ResourceContainer;
 using FlavorfulStory.Saving;
-using FlavorfulStory.SceneManagement;
 using GD.MinMaxSlider;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -44,20 +43,10 @@ namespace FlavorfulStory.ObjectManagement
         /// <summary> Список всех заспавненных объектов. </summary>
         protected readonly List<GameObject> _spawnedObjects = new();
 
-        /// <summary> Список записей заспавненных объектов, используемый для сохранения состояния. </summary>
-        private List<SpawnedObjectRecord> _spawnedObjectRecords = new(0);
-
-        /// <summary> Флаг, указывающий, были ли объекты загружены из файла. </summary>
-        protected bool _wasLoadedFromSavefile;
-
         #endregion
 
         /// <summary> Запускает процесс спавна при старте сцены. </summary>
-        private void Start()
-        {
-            if (!_wasLoadedFromSavefile && !SavingWrapper.SaveFileExists)
-                SpawnFromConfig();
-        }
+        private void Start() => SpawnFromConfig();
 
         /// <summary> Валидация данных. </summary>
         /// <remarks> Коллбэк из UnityAPI. </remarks>
@@ -78,13 +67,15 @@ namespace FlavorfulStory.ObjectManagement
         }
 
         /// <summary> Спавнит объекты на основе конфигурации. </summary>
-        protected void SpawnFromConfig()
+        private void SpawnFromConfig()
         {
             if (!_config)
             {
                 Debug.LogError("Спавнеру не назначен конфиг.");
                 return;
             }
+
+            if (_spawnedObjects.Count != 0) return;
 
             if (_config.EvenSpread)
                 SpawnEvenSpread();
@@ -191,11 +182,18 @@ namespace FlavorfulStory.ObjectManagement
         /// <param name="state"> Объект состояния, который необходимо восстановить. </param>
         public virtual void RestoreState(object state)
         {
-            if (_wasLoadedFromSavefile) return;
+            if (_spawnedObjects != null && _spawnedObjects.Count != 0) DestroySpawnedObjects();
 
-            _spawnedObjectRecords = state as List<SpawnedObjectRecord>;
-            _wasLoadedFromSavefile = _spawnedObjectRecords is { Count: >= 0 };
-            SpawnFromSave(_spawnedObjectRecords);
+            var spawnedObjectRecords = state as List<SpawnedObjectRecord>;
+            SpawnFromSave(spawnedObjectRecords);
+        }
+
+        protected void DestroySpawnedObjects()
+        {
+            foreach (var spawnedObject in _spawnedObjects)
+                Destroy(spawnedObject);
+
+            _spawnedObjects.Clear();
         }
 
         /// <summary> Восстанавливает заспавненные объекты из сохраненного состояния. </summary>

@@ -30,12 +30,10 @@ namespace FlavorfulStory.ObjectManagement
         protected override GameObject SpawnObject(Vector3 position, float rotationY, Vector3 scale, object data = null)
         {
             var obj = base.SpawnObject(position, rotationY, scale);
-            if (data != null)
-            {
-                int hitsTaken = (int)data;
-                obj.GetComponent<DestroyableResourceContainer>().Initialize(hitsTaken);
-            }
+            if (data == null) return obj;
 
+            int hitsTaken = (int)data;
+            obj.GetComponent<DestroyableResourceContainer>().Initialize(hitsTaken);
             return obj;
         }
 
@@ -65,10 +63,9 @@ namespace FlavorfulStory.ObjectManagement
         /// <param name="state"> Объект состояния, который необходимо восстановить. </param>
         public override void RestoreState(object state)
         {
-            if (_wasLoadedFromSavefile) return;
+            if (_spawnedObjects != null && _spawnedObjects.Count != 0) DestroySpawnedObjects();
 
             _spawnedContainerRecords = state as List<SpawnedContainerRecord>;
-            _wasLoadedFromSavefile = _spawnedContainerRecords is { Count: >= 0 };
             SpawnFromSave(_spawnedContainerRecords);
         }
 
