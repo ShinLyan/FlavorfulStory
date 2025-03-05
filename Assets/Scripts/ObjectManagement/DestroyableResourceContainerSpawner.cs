@@ -9,6 +9,7 @@ namespace FlavorfulStory.ObjectManagement
 {
     /// <summary> Спавнер добываемых объектов. </summary>
     /// <remarks> Наследник от <see cref="ObjectSpawner" />. </remarks>
+    [RequireComponent(typeof(SaveableEntity))]
     public class DestroyableResourceContainerSpawner : ObjectSpawner
     {
         /// <summary> Список записей заспавненных объектов, используемый для сохранения состояния. </summary>
@@ -18,7 +19,7 @@ namespace FlavorfulStory.ObjectManagement
         /// <remarks> Коллбэк из UnityAPI. </remarks>
         private void OnValidate()
         {
-            if (_config.ObjectPrefab.GetComponent<IHitable>() == null)
+            if (ObjectPrefab.GetComponent<IHitable>() == null)
                 Debug.LogError("В конфиге спавнера должен находится объект, реализующий интерфейс IHitable");
         }
 
@@ -32,7 +33,7 @@ namespace FlavorfulStory.ObjectManagement
             var obj = base.SpawnObject(position, rotationY, scale);
             if (data == null) return obj;
 
-            int hitsTaken = (int)data;
+            var hitsTaken = (int)data;
             obj.GetComponent<DestroyableResourceContainer>().Initialize(hitsTaken);
             return obj;
         }
@@ -51,13 +52,16 @@ namespace FlavorfulStory.ObjectManagement
 
         /// <summary> Фиксация состояния объекта при сохранении. </summary>
         /// <returns> Возвращает объект, в котором фиксируется состояние. </returns>
-        public override object CaptureState() => _spawnedObjects.Select(spawnedObject => new SpawnedContainerRecord
+        public override object CaptureState()
         {
-            Position = new SerializableVector3(spawnedObject.transform.position),
-            RotationY = spawnedObject.transform.eulerAngles.y,
-            Scale = spawnedObject.transform.localScale.x,
-            HitsTaken = spawnedObject.GetComponent<DestroyableResourceContainer>().HitsTaken
-        }).ToList();
+            return _spawnedObjects.Select(spawnedObject => new SpawnedContainerRecord
+            {
+                Position = new SerializableVector3(spawnedObject.transform.position),
+                RotationY = spawnedObject.transform.eulerAngles.y,
+                Scale = spawnedObject.transform.localScale.x,
+                HitsTaken = spawnedObject.GetComponent<DestroyableResourceContainer>().HitsTaken
+            }).ToList();
+        }
 
         /// <summary> Восстановление состояния объекта при загрузке. </summary>
         /// <param name="state"> Объект состояния, который необходимо восстановить. </param>
