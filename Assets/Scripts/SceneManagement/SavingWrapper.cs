@@ -26,7 +26,6 @@ namespace FlavorfulStory.SceneManagement
             if (!SaveFileExists) return;
 
             StartCoroutine(LoadLastScene());
-            InputWrapper.UnblockAllInput();
         }
 
         /// <summary> Начинает новую игру с указанным файлом сохранения. </summary>

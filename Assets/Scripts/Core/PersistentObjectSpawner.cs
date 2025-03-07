@@ -24,6 +24,7 @@ namespace FlavorfulStory.Core
             _hasSpawned = true;
             
             InputWrapper.Initialize();
+            InputWrapper.UnblockAllInput();
         }
 
         /// <summary> Создает постоянный объект и устанавливает его сохранение между сценами. </summary>
