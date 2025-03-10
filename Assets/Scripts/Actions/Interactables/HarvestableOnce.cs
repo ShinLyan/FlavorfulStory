@@ -18,6 +18,8 @@ namespace FlavorfulStory.Actions.Interactables
         public bool IsDestroyed { get; private set; }
         public event Action<IDestroyable> OnObjectDestroyed;
 
+        /// <summary> Уничтожить объект. </summary>
+        /// <remarks> Уничтожение сработает спустя задержку <see cref="_destroyDelay" />. </remarks>
         public void Destroy()
         {
             IsDestroyed = true;

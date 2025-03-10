@@ -166,6 +166,7 @@ namespace FlavorfulStory.Control
         /// <summary> Аниматор игрока. </summary>
         private Animator _animator;
 
+        /// <summary> Фунециональность взаимодействия с объектами. </summary>
         private InteractFeature _interactFeature;
 
         #region Tools
