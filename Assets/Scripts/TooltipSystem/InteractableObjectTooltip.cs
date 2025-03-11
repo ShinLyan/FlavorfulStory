@@ -16,18 +16,18 @@ namespace FlavorfulStory.TooltipSystem
         [SerializeField] private Vector3 _offset;
 
         /// <summary> Устанавливает заголовок и описание тултипа на основе данных из переданного объекта. </summary>
-        /// <param name="tooltipable"> Объект, предоставляющий данные для тултипа. </param>
-        public void SetTitleAndDescription(ITooltipable tooltipable)
+        /// <param name="tooltip"> Объект, предоставляющий данные для тултипа. </param>
+        public void SetTitleAndDescription(ITooltipable tooltip)
         {
-            _title.text = tooltipable.GetTooltipTitle();
-            _description.text = tooltipable.GetTooltipDescription();
+            _title.text = tooltip.GetTooltipTitle();
+            _description.text = tooltip.GetTooltipDescription();
         }
 
         /// <summary> Устанавливает позицию тултипа с учетом смещения. </summary>
-        /// <param name="tooltipable"> Объект, предоставляющий позицию для тултипа. </param>
-        public void SetPositionWithOffset(ITooltipable tooltipable)
+        /// <param name="tooltip"> Объект, предоставляющий позицию для тултипа. </param>
+        public void SetPositionWithOffset(ITooltipable tooltip)
         {
-            transform.position = tooltipable.GetWorldPosition() + _offset;
+            transform.position = tooltip.GetWorldPosition() + _offset;
         }
     }
 }

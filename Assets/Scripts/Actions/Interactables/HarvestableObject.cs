@@ -12,6 +12,14 @@ namespace FlavorfulStory.Actions.Interactables
         [Tooltip("Собираемые предметы."), SerializeField]
         private List<DropItem> _harvestItems;
 
+        /// <summary> Название объекта, отображаемое в тултипе. </summary>
+        // TODO: Возможно надо будет выпилить и сделать нормально, более универсально
+        [SerializeField] private string _name;
+
+        /// <summary> Описание объекта, отображаемое в тултипе. </summary>
+        // TODO: Возможно надо будет выпилить и сделать нормально, более универсально
+        [SerializeField] private string _description = "Press E, if hungry";
+
         /// <summary> Свойство возможности взаимодействия с объектом. </summary>
         public virtual bool IsInteractionAllowed { get; set; } = true;
 
@@ -33,21 +41,13 @@ namespace FlavorfulStory.Actions.Interactables
 
         #region TooltipBehaviour
 
-        /// <summary> Название объекта, отображаемое в тултипе. </summary>
-        // TODO: Возможно надо будет выпилить и сделать нормально, более универсально
-        private const string Name = "Wending stump";
-
-        /// <summary> Описание объекта, отображаемое в тултипе. </summary>
-        // TODO: Возможно надо будет выпилить и сделать нормально, более универсально
-        private const string Description = "Press E, if hungry";
-
         /// <summary> Получить название для тултипа. </summary>
         /// <returns> Название объекта. </returns>
-        public string GetTooltipTitle() => Name;
+        public string GetTooltipTitle() => _name;
 
         /// <summary> Получить описание для тултипа. </summary>
         /// <returns> Описание объекта. </returns>
-        public string GetTooltipDescription() => Description;
+        public string GetTooltipDescription() => _description;
 
         /// <summary> Получить позицию объекта в мировых координатах. </summary>
         /// <returns> Мировая позиция объекта. </returns>

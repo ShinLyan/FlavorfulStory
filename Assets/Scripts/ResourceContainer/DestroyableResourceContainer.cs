@@ -99,13 +99,14 @@ namespace FlavorfulStory.ResourceContainer
         #region DestroyBehaviour
 
         /// <summary> Уничтожить объект. </summary>
-        public void Destroy()
+        /// <param name="destroyDelay"> Задержка перед уничтожением. </param>
+        public void Destroy(float destroyDelay = 0)
         {
             if (IsDestroyed) return;
 
             IsDestroyed = true;
             OnObjectDestroyed?.Invoke(this);
-            StartCoroutine(DestroyGameObjectAfterDelay(_destroyDelay));
+            StartCoroutine(DestroyGameObjectAfterDelay(destroyDelay));
         }
 
         /// <summary> Уничтожить объект после задержки. </summary>
@@ -138,7 +139,7 @@ namespace FlavorfulStory.ResourceContainer
             HitsTaken++;
             if (HitsTaken >= _hitsToDestroy)
             {
-                Destroy();
+                Destroy(_destroyDelay);
                 return;
             }
 

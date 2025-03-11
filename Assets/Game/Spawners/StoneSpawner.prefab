@@ -58,17 +58,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 33645acca8a796846b88657453196405, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _spawnObjectPrefab: {fileID: 6864038402131264558, guid: 9445b5cf8ad49424fb39458d5ece091b,
+    type: 3}
+  _spawnObjectsNumber: 10
+  _scaleVariation: {x: 0.5, y: 1.2}
+  _widthSpawnArea: 77
+  _lengthSpawnArea: 101
+  _minSpacing: 10
+  _evenSpread: 0
   _obstaclesLayerMask:
     serializedVersion: 2
     m_Bits: 88
-  _visualizeConfigArea: 1
-  _gizmosColor: {r: 0.839221, g: 0, b: 1, a: 1}
   _maxIterations: 1000
-  <ObjectPrefab>k__BackingField: {fileID: 6864038402131264558, guid: 9445b5cf8ad49424fb39458d5ece091b,
-    type: 3}
-  _scaleVariation: {x: 0.5, y: 1.2}
-  <Quantity>k__BackingField: 10
-  <Width>k__BackingField: 96
-  <Length>k__BackingField: 120
-  <MinSpacing>k__BackingField: 5
-  <EvenSpread>k__BackingField: 0
+  _spawnAreaVisualizationColor: {r: 0.090271905, g: 0.0047169924, b: 1, a: 1}
