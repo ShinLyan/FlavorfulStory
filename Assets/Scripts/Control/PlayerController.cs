@@ -11,53 +11,13 @@ using UnityEngine.EventSystems;
 
 namespace FlavorfulStory.Control
 {
-    /// <summary> Контроллер игрока, отвечающий за управление,
-    /// использование предметов и взаимодействие с окружением. </summary>
+    /// <summary>
+    ///     Контроллер игрока, отвечающий за управление,
+    ///     использование предметов и взаимодействие с окружением.
+    /// </summary>
     [RequireComponent(typeof(PlayerMover), typeof(Animator))]
     public class PlayerController : MonoBehaviour
     {
-        #region Fields
-
-        /// <summary> Панель быстрого доступа. </summary>
-        [SerializeField] private Toolbar _toolbar;
-
-        /// <summary> Время перезарядки использования инструмента. </summary>
-        [SerializeField] private float _toolCooldown = 1f;
-
-        /// <summary> Передвижение игрока. </summary>
-        private PlayerMover _playerMover;
-
-        /// <summary> Аниматор игрока. </summary>
-        private Animator _animator;
-
-        /// <summary> Фунециональность взаимодействия с объектами. </summary>
-        private InteractFeature _interactFeature;
-
-        #region Tools
-
-        /// <summary> Соответствия типов инструментов и их префабов. </summary>
-        [SerializeField] private ToolPrefabMapping[] _toolMappings;
-
-        /// <summary> Текущий экипированный инструмент. </summary>
-        private GameObject _currentTool;
-
-        /// <summary> Таймер перезарядки использования инструмента. </summary>
-        private float _toolCooldownTimer;
-
-        /// <summary> Можно ли использовать инструмент? </summary>
-        private bool CanUseTool => _toolCooldownTimer <= 0f;
-
-        #endregion
-
-        /// <summary> Текущий выбранный предмет из панели быстрого доступа. </summary>
-        private InventoryItem CurrentItem => _toolbar?.SelectedItem;
-
-        /// <summary> Событие, вызываемое при окончании взаимодейтсвия. </summary>
-        /// <remarks> Событие срабатывает внутри метода EndInteraction(). </remarks>
-        public event Action OnInteractionEnded;
-
-        #endregion
-
         /// <summary> Инициализация компонентов. </summary>
         private void Awake()
         {
@@ -85,7 +45,7 @@ namespace FlavorfulStory.Control
         private void HandleToolbarSelection()
         {
             const int ToolbarItemsCount = 9;
-            for (int i = 0; i < ToolbarItemsCount; i++)
+            for (var i = 0; i < ToolbarItemsCount; i++)
                 if (Input.GetKeyDown(KeyCode.Alpha1 + i))
                     _toolbar.SelectItem(i);
         }
@@ -137,11 +97,17 @@ namespace FlavorfulStory.Control
 
         /// <summary> Завершение взаимодействия. </summary>
         /// <remarks> Метод подписан на событие в анимации игрока (Gather_interaction). </remarks>
-        private void EndInteraction() => OnInteractionEnded?.Invoke();
+        private void EndInteraction()
+        {
+            OnInteractionEnded?.Invoke();
+        }
 
         /// <summary> Запуск анимации. </summary>
         /// <param name="animationName"> Название анимации. </param>
-        public void TriggerAnimation(string animationName) => _animator.SetTrigger(animationName);
+        public void TriggerAnimation(string animationName)
+        {
+            _animator.SetTrigger(animationName);
+        }
 
         /// <summary> Получение позиции курсора. </summary>
         /// <returns> Позиция точки, в которую направлен курсор. </returns>
@@ -169,6 +135,7 @@ namespace FlavorfulStory.Control
             var mapping = _toolMappings.FirstOrDefault(m => m.ToolType == tool.ToolType);
             if (mapping == null) return;
 
+            tool.SetLayerMask(_hitableLayers);
             _currentTool = mapping.ToolPrefab;
             _currentTool.SetActive(true);
             InputWrapper.BlockInput(InputButton.MouseScroll);
@@ -184,5 +151,49 @@ namespace FlavorfulStory.Control
             InputWrapper.UnblockPlayerMovement();
             InputWrapper.UnblockInput(InputButton.MouseScroll);
         }
+
+        #region Fields
+
+        [SerializeField] private LayerMask _hitableLayers;
+
+        /// <summary> Панель быстрого доступа. </summary>
+        [SerializeField] private Toolbar _toolbar;
+
+        /// <summary> Время перезарядки использования инструмента. </summary>
+        [SerializeField] private float _toolCooldown = 1f;
+
+        /// <summary> Передвижение игрока. </summary>
+        private PlayerMover _playerMover;
+
+        /// <summary> Аниматор игрока. </summary>
+        private Animator _animator;
+
+        /// <summary> Фунециональность взаимодействия с объектами. </summary>
+        private InteractFeature _interactFeature;
+
+        #region Tools
+
+        /// <summary> Соответствия типов инструментов и их префабов. </summary>
+        [SerializeField] private ToolPrefabMapping[] _toolMappings;
+
+        /// <summary> Текущий экипированный инструмент. </summary>
+        private GameObject _currentTool;
+
+        /// <summary> Таймер перезарядки использования инструмента. </summary>
+        private float _toolCooldownTimer;
+
+        /// <summary> Можно ли использовать инструмент? </summary>
+        private bool CanUseTool => _toolCooldownTimer <= 0f;
+
+        #endregion
+
+        /// <summary> Текущий выбранный предмет из панели быстрого доступа. </summary>
+        private InventoryItem CurrentItem => _toolbar?.SelectedItem;
+
+        /// <summary> Событие, вызываемое при окончании взаимодейтсвия. </summary>
+        /// <remarks> Событие срабатывает внутри метода EndInteraction(). </remarks>
+        public event Action OnInteractionEnded;
+
+        #endregion
     }
 }

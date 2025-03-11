@@ -16,21 +16,25 @@ namespace FlavorfulStory.InventorySystem.PickupSystem
         /// <summary> Был ли предмет собран? </summary>
         private bool IsItemCollected => GetPickup() == null;
 
-        /// <summary> Возвращает объект Pickup, если он существует на сцене. </summary>
-        /// <returns> Экземпляр объекта Pickup или null, если его нет. </returns>
-        private Pickup GetPickup() => GetComponentInChildren<Pickup>();
-        
         /// <summary> Создает предмет при загрузке сцены. </summary>
         private void Awake()
         {
             SpawnPickup();
         }
-        
+
+        /// <summary> Возвращает объект Pickup, если он существует на сцене. </summary>
+        /// <returns> Экземпляр объекта Pickup или null, если его нет. </returns>
+        private Pickup GetPickup()
+        {
+            return GetComponentInChildren<Pickup>();
+        }
+
         /// <summary> Создает объект Pickup на сцене. </summary>
         private void SpawnPickup()
         {
             var spawnedPickup = _item.SpawnPickup(transform.position, _number);
             spawnedPickup.transform.SetParent(transform);
+            spawnedPickup.transform.localRotation = Quaternion.Euler(0, 0, 0);
         }
 
         /// <summary> Удаляет объект Pickup со сцены. </summary>
@@ -43,18 +47,21 @@ namespace FlavorfulStory.InventorySystem.PickupSystem
 
         /// <summary> Сохраняет состояние объекта (собран предмет или нет). </summary>
         /// <returns> true, если предмет был собран, иначе false. </returns>
-        public object CaptureState() => IsItemCollected;
+        public object CaptureState()
+        {
+            return IsItemCollected;
+        }
 
         /// <summary> Восстанавливает состояние объекта при загрузке. </summary>
         /// <param name="state"> Сохраненное состояние объекта. </param>
         public void RestoreState(object state)
         {
-            bool shouldBeCollected = (bool)state;
+            var shouldBeCollected = (bool)state;
 
             if (shouldBeCollected && !IsItemCollected) DestroyPickup();
             if (!shouldBeCollected && IsItemCollected) SpawnPickup();
         }
-    
+
         #endregion
     }
 }

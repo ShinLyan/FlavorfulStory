@@ -9,7 +9,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3368727472200560402}
-  - component: {fileID: 2260574136566096821}
   - component: {fileID: 8044469358630156836}
   - component: {fileID: 4185133068772401190}
   - component: {fileID: 1217464923912406356}
@@ -37,27 +36,6 @@ Transform:
   - {fileID: 1883867307573778705}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!65 &2260574136566096821
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2504854051262580730}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 0.8, y: 5, z: 0.8}
-  m_Center: {x: 0, y: 2.5, z: 0}
 --- !u!114 &8044469358630156836
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -131,6 +109,10 @@ PrefabInstance:
     - target: {fileID: 1263149652669372, guid: 41282c525de09854e95ed5d9f9c17fb5, type: 3}
       propertyPath: m_Name
       value: Birch_tree3
+      objectReference: {fileID: 0}
+    - target: {fileID: 1263149652669372, guid: 41282c525de09854e95ed5d9f9c17fb5, type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 4356059539544546, guid: 41282c525de09854e95ed5d9f9c17fb5, type: 3}
       propertyPath: m_LocalPosition.x
