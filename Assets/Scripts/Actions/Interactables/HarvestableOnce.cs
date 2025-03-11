@@ -23,6 +23,7 @@ namespace FlavorfulStory.Actions.Interactables
         public override void Interact()
         {
             base.Interact();
+
             Destroy(_destroyDelay);
         }
 

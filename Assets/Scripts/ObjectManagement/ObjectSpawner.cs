@@ -137,7 +137,8 @@ namespace FlavorfulStory.ObjectManagement
             }
 
             if (_spawnedObjects.Count != _spawnObjectsNumber)
-                Debug.LogError("Превышен лимит итераций! Увеличьте зону спавна или уменьшите количество объектов");
+                Debug.LogError(
+                    $"Превышен лимит итераций у {name}! Увеличьте зону спавна или уменьшите количество объектов");
         }
 
         /// <summary> Генерирует случайную точку в пределах зоны спавна. </summary>

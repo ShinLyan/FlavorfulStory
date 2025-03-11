@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 5058554141972890885}
   - component: {fileID: 4426246605376126007}
   - component: {fileID: 5812921456861707386}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: StoneOneGrade
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -73,13 +73,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bfe96c20f54ba4d4fbfb5acabe29a3e5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _dropItems:
+  _stages:
   - <Items>k__BackingField:
-    - ItemPrefab: {fileID: 11400000, guid: 615d2c1474bbd6b40a381e8f02f49dc3, type: 2}
-      Quantity: 2
+    - ItemPrefab: {fileID: 11400000, guid: 3e31ae779574be343a52d151fa604692, type: 2}
+      Quantity: 10
+    <RequiredHits>k__BackingField: 3
   _destroyDelay: 4
   _toolsToBeHit: 01000000
-  _hitsToGrades: 03000000
 --- !u!65 &5812921456861707386
 BoxCollider:
   m_ObjectHideFlags: 0
