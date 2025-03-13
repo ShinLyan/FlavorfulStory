@@ -7,26 +7,21 @@ namespace FlavorfulStory.InventorySystem.PickupSystem
     /// <remarks> Автоматически создает префаб для заданного предмета инвентаря. </remarks>
     public class PickupSpawner : MonoBehaviour, ISaveable
     {
-        /// <summary> Предмет, который будет создан в сцене. </summary>
-        [SerializeField] private InventoryItem _item;
+        /// <summary> Предмет, который будет заспавнен в сцене. </summary>
+        [Tooltip("Предмет, который будет заспавнен в сцене."), SerializeField]
+        private InventoryItem _item;
 
-        /// <summary> Количество предметов, которые будут созданы. </summary>
-        [SerializeField] private int _number = 1;
+        /// <summary> Количество предметов, которые будут заспавнены. </summary>
+        [Tooltip("Количество предметов, которые будут заспавнены."), SerializeField, Range(1, 100)]
+        private int _number;
 
         /// <summary> Был ли предмет собран? </summary>
-        private bool IsItemCollected => GetPickup() == null;
+        private bool _isPickedUp;
 
         /// <summary> Создает предмет при загрузке сцены. </summary>
-        private void Awake()
+        private void Start()
         {
-            SpawnPickup();
-        }
-
-        /// <summary> Возвращает объект Pickup, если он существует на сцене. </summary>
-        /// <returns> Экземпляр объекта Pickup или null, если его нет. </returns>
-        private Pickup GetPickup()
-        {
-            return GetComponentInChildren<Pickup>();
+            if (!_isPickedUp) SpawnPickup();
         }
 
         /// <summary> Создает объект Pickup на сцене. </summary>
@@ -35,32 +30,19 @@ namespace FlavorfulStory.InventorySystem.PickupSystem
             var spawnedPickup = _item.SpawnPickup(transform.position, _number);
             spawnedPickup.transform.SetParent(transform);
             spawnedPickup.transform.localRotation = Quaternion.Euler(0, 0, 0);
-        }
 
-        /// <summary> Удаляет объект Pickup со сцены. </summary>
-        private void DestroyPickup()
-        {
-            if (GetPickup()) Destroy(GetPickup().gameObject);
+            _isPickedUp = true;
         }
 
         #region Saving
 
         /// <summary> Сохраняет состояние объекта (собран предмет или нет). </summary>
         /// <returns> true, если предмет был собран, иначе false. </returns>
-        public object CaptureState()
-        {
-            return IsItemCollected;
-        }
+        public object CaptureState() => _isPickedUp;
 
         /// <summary> Восстанавливает состояние объекта при загрузке. </summary>
         /// <param name="state"> Сохраненное состояние объекта. </param>
-        public void RestoreState(object state)
-        {
-            var shouldBeCollected = (bool)state;
-
-            if (shouldBeCollected && !IsItemCollected) DestroyPickup();
-            if (!shouldBeCollected && IsItemCollected) SpawnPickup();
-        }
+        public void RestoreState(object state) => _isPickedUp = (bool)state;
 
         #endregion
     }

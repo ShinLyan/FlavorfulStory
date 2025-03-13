@@ -219,8 +219,9 @@ namespace FlavorfulStory.ObjectManagement
         private void OnValidate()
         {
             if (_spawnObjectPrefab.GetComponent<IHitable>() != null)
-                Debug.LogError("В конфиге спавнера не должен находится объект, реализующий интерфейс IHitable." +
-                               " Используйте DestroyableContainerSpawner.cs");
+                Debug.LogError(
+                    "В конфиге спавнера не должен находится объект, реализующий интерфейс IHitable. " +
+                    $"Используйте DestroyableContainerSpawner для {name}");
         }
 
         /// <summary> Отображает визуализацию зоны спавна в редакторе. </summary>

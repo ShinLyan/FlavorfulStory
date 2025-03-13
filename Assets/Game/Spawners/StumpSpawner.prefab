@@ -10,9 +10,9 @@ GameObject:
   m_Component:
   - component: {fileID: 867389754241914057}
   - component: {fileID: 401559070978247132}
-  - component: {fileID: 3820366981471281330}
+  - component: {fileID: 1075083845093383872}
   m_Layer: 0
-  m_Name: BreadStumpSpawner
+  m_Name: StumpSpawner
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -45,8 +45,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3deb9cfb883439a4d9da32368c0a55b4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _uniqueIdentifier: 39447c50-d786-4fb7-814b-8de849c4f622
---- !u!114 &3820366981471281330
+  _uniqueIdentifier: 81eddf72-462f-416b-9a6f-583615f10df5
+--- !u!114 &1075083845093383872
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -55,12 +55,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 5607523428808096428}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7545c17adf4bed9468e99cd00b7810b6, type: 3}
+  m_Script: {fileID: 11500000, guid: 33645acca8a796846b88657453196405, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _spawnObjectPrefab: {fileID: 305568157476844852, guid: 9af41a7b99fd7df4f8c4059d095b95f6,
+  _spawnObjectPrefab: {fileID: 1844832195497820, guid: 8fd3b9566894b4a4ab94446f74ca4e84,
     type: 3}
-  _spawnObjectsNumber: 10
+  _spawnObjectsNumber: 20
   _scaleVariation: {x: 0.8, y: 1.2}
   _widthSpawnArea: 71
   _lengthSpawnArea: 83
@@ -70,4 +70,4 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 88
   _maxIterations: 1000
-  _spawnAreaVisualizationColor: {r: 0.07163501, g: 1, b: 0, a: 1}
+  _spawnAreaVisualizationColor: {r: 1, g: 0.91820973, b: 0, a: 0}

@@ -183,8 +183,11 @@ GameObject:
   - component: {fileID: 4191413475911042}
   - component: {fileID: 205388090323476004}
   - component: {fileID: 8144353432167161579}
+  - component: {fileID: -7526101058570705088}
+  - component: {fileID: -5867076748924092305}
+  - component: {fileID: -8415494727045516929}
   m_Layer: 6
-  m_Name: RegularStump
+  m_Name: Stump
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -200,7 +203,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.8, y: 0.8, z: 0.8}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2409858612139681822}
@@ -257,6 +260,50 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 2, y: 2, z: 2}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &-7526101058570705088
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1844832195497820}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0c3a970a862f6824fbdca652389c28ac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &-5867076748924092305
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1844832195497820}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 77167c34a287f3649a5af49f7fc5703f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _objectPrefabs: []
+--- !u!114 &-8415494727045516929
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1844832195497820}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bfe96c20f54ba4d4fbfb5acabe29a3e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _stages:
+  - <Items>k__BackingField:
+    - ItemPrefab: {fileID: 11400000, guid: c105c0283ae6d95488d48924be055535, type: 2}
+      Quantity: 5
+    <RequiredHits>k__BackingField: 4
+  _destroyDelay: 4
+  _toolsToBeHit: 00000000
 --- !u!1 &1848476735672012
 GameObject:
   m_ObjectHideFlags: 0
