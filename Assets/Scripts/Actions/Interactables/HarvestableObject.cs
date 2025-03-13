@@ -51,8 +51,8 @@ namespace FlavorfulStory.Actions.Interactables
 
         /// <summary> Получить позицию объекта в мировых координатах. </summary>
         /// <returns> Мировая позиция объекта. </returns>
-        public Vector3 GetWorldPosition() => transform.position;
-
-        #endregion
+        public Vector3 GetWorldPosition() => this == null ? Vector3.zero : transform.position;
     }
+
+    #endregion
 }

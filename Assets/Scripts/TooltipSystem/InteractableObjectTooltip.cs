@@ -19,6 +19,8 @@ namespace FlavorfulStory.TooltipSystem
         /// <param name="tooltip"> Объект, предоставляющий данные для тултипа. </param>
         public void SetTitleAndDescription(ITooltipable tooltip)
         {
+            if (tooltip == null) return;
+
             _title.text = tooltip.GetTooltipTitle();
             _description.text = tooltip.GetTooltipDescription();
         }
@@ -27,6 +29,8 @@ namespace FlavorfulStory.TooltipSystem
         /// <param name="tooltip"> Объект, предоставляющий позицию для тултипа. </param>
         public void SetPositionWithOffset(ITooltipable tooltip)
         {
+            if (tooltip == null) return;
+
             transform.position = tooltip.GetWorldPosition() + _offset;
         }
     }
