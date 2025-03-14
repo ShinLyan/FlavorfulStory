@@ -1,3 +1,5 @@
+using System.Collections;
+using System.Linq;
 using FlavorfulStory.InputSystem;
 using UnityEngine;
 
@@ -36,7 +38,7 @@ namespace FlavorfulStory.SceneManagement
 
         /// <summary> Телепортирует игрока через портал, загружая новую сцену. </summary>
         /// <returns> Корутина для выполнения последовательных действий. </returns>
-        private System.Collections.IEnumerator TeleportPlayer()
+        private IEnumerator TeleportPlayer()
         {
             transform.parent = null;
             DontDestroyOnLoad(gameObject);
@@ -61,7 +63,7 @@ namespace FlavorfulStory.SceneManagement
 
         /// <summary> Обновляет позицию и поворот игрока после телепортации. </summary>
         /// <param name="portal"> Портал, в который переместился игрок. </param>
-        private void UpdatePlayerPosition(Portal portal)
+        private static void UpdatePlayerPosition(Portal portal)
         {
             var player = GameObject.FindWithTag("Player");
             player.transform.SetPositionAndRotation(portal._spawnPoint.position, portal._spawnPoint.rotation);
@@ -69,14 +71,7 @@ namespace FlavorfulStory.SceneManagement
 
         /// <summary> Находит другой портал с тем же идентификатором назначения. </summary>
         /// <returns> Портал с совпадающим идентификатором или null, если такого нет. </returns>
-        private Portal GetOtherPortal()
-        {
-            foreach (var portal in FindObjectsByType<Portal>(FindObjectsSortMode.None))
-            {
-                if (portal == this || portal._destination != _destination) continue;
-                return portal;
-            }
-            return null;
-        }
+        private Portal GetOtherPortal() => FindObjectsByType<Portal>(FindObjectsSortMode.None)
+            .FirstOrDefault(portal => portal != this && portal._destination == _destination);
     }
 }

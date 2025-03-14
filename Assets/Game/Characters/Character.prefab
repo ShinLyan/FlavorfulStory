@@ -224,6 +224,9 @@ MonoBehaviour:
   - <ToolType>k__BackingField: 0
     <ToolPrefab>k__BackingField: {fileID: 6607908229998962764, guid: 8f662c7c217f34c4ca4aa8b95d9efda1,
       type: 3}
+  <HitableLayers>k__BackingField:
+    serializedVersion: 2
+    m_Bits: 0
 --- !u!114 &2757997727752145096
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -363,8 +366,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5533667830511996338}
-  - component: {fileID: 5209452968189734520}
   - component: {fileID: 4294786505282547278}
+  - component: {fileID: 5209452968189734520}
   m_Layer: 0
   m_Name: InteractFeature
   m_TagString: Untagged
@@ -387,20 +390,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 8339340054995701919}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &5209452968189734520
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8917595665580247949}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 56725fc63c93a8240a4146a5ea94263e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _interactableObjectTooltip: {fileID: 0}
-  _animator: {fileID: 309001130825355856}
 --- !u!65 &4294786505282547278
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -422,6 +411,20 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1.5, y: 2, z: 1.5}
   m_Center: {x: 0, y: 1, z: 0}
+--- !u!114 &5209452968189734520
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8917595665580247949}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 56725fc63c93a8240a4146a5ea94263e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _interactableObjectTooltip: {fileID: 0}
+  _animator: {fileID: 309001130825355856}
 --- !u!1001 &1514231464935391157
 PrefabInstance:
   m_ObjectHideFlags: 0

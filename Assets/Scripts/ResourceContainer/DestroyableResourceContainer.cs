@@ -14,9 +14,11 @@ namespace FlavorfulStory.ResourceContainer
     [RequireComponent(typeof(ItemDropper), typeof(ObjectSwitcher))]
     public class DestroyableResourceContainer : MonoBehaviour, IHitable, IDestroyable
     {
-        /// <summary> Список предметов, которые выпадут при разрушении. </summary>
-        [Tooltip("Список предметов, которые выпадут при разрушении."), SerializeField]
-        private List<DropItemsForGrade> _dropItems;
+        #region Fields and Properties
+
+        /// <summary> Список стадий. </summary>
+        [Tooltip("Список стадий."), SerializeField]
+        private List<Stage> _stages;
 
         /// <summary> Задержка перед окончательным уничтожением объекта. </summary>
         [Tooltip("Задержка перед окончательным уничтожением объекта."), SerializeField]
@@ -25,10 +27,6 @@ namespace FlavorfulStory.ResourceContainer
         /// <summary> Тип инструмента, необходимого для разрушения. </summary>
         [Tooltip("Тип инструмента, необходимого для разрушения."), SerializeField]
         private ToolType[] _toolsToBeHit;
-
-        /// <summary> Количество ударов для каждой стадии объекта. </summary>
-        [Tooltip("Количество ударов для каждой стадии объекта."), SerializeField, Range(1, 5)]
-        private List<int> _hitsToGrades;
 
         /// <summary> Выбрасыватель предметов. </summary>
         private ItemDropper _itemDropper;
@@ -62,18 +60,20 @@ namespace FlavorfulStory.ResourceContainer
         /// <summary> Событие, вызываемое при полном разрушении объекта. </summary>
         public event Action<IDestroyable> OnObjectDestroyed;
 
+        #endregion
+
         /// <summary> Рассчитать индекс текущей стадии объекта. </summary>
         /// <returns> Индекс текущей стадии. </returns>
         private int CalculateCurrentGradeIndex()
         {
-            for (int i = 0, cumulativeHits = 0; i < _hitsToGrades.Count; i++)
+            for (int i = 0, cumulativeHits = 0; i < _stages.Count; i++)
             {
-                cumulativeHits += _hitsToGrades[i];
+                cumulativeHits += _stages[i].RequiredHits;
                 if (HitsTaken < cumulativeHits)
                     return i;
             }
 
-            return _hitsToGrades.Count - 1;
+            return _stages.Count - 1;
         }
 
         /// <summary> Инициализация объекта. </summary>
@@ -83,12 +83,13 @@ namespace FlavorfulStory.ResourceContainer
         /// <param name="hitsTaken"> Количество полученных ударов. </param>
         public void Initialize(int hitsTaken = 0)
         {
-            _hitsToDestroy = _hitsToGrades.Sum();
+            foreach (var stage in _stages)
+                _hitsToDestroy += stage.RequiredHits;
 
             _itemDropper = GetComponent<ItemDropper>();
             _objectSwitcher = GetComponent<ObjectSwitcher>();
 
-            if (_objectSwitcher.ObjectsCount != _hitsToGrades.Count)
+            if (_objectSwitcher.ObjectsCount != _stages.Count)
                 Debug.LogError("Несоответствие количества грейдов и ударов!");
 
             _objectSwitcher.Initialize();
@@ -99,13 +100,14 @@ namespace FlavorfulStory.ResourceContainer
         #region DestroyBehaviour
 
         /// <summary> Уничтожить объект. </summary>
-        public void Destroy()
+        /// <param name="destroyDelay"> Задержка перед уничтожением. </param>
+        public void Destroy(float destroyDelay = 0)
         {
             if (IsDestroyed) return;
 
             IsDestroyed = true;
             OnObjectDestroyed?.Invoke(this);
-            StartCoroutine(DestroyGameObjectAfterDelay(_destroyDelay));
+            StartCoroutine(DestroyGameObjectAfterDelay(destroyDelay));
         }
 
         /// <summary> Уничтожить объект после задержки. </summary>
@@ -121,7 +123,7 @@ namespace FlavorfulStory.ResourceContainer
         /// <summary> Выбросить ресурсы для текущей стадии объекта. </summary>
         private void DropResourcesForCurrentGrade()
         {
-            foreach (var item in _dropItems[_currentGradeIndex].Items)
+            foreach (var item in _stages[_currentGradeIndex].Items)
                 _itemDropper.DropItem(item.ItemPrefab, item.Quantity);
         }
 
@@ -138,11 +140,11 @@ namespace FlavorfulStory.ResourceContainer
             HitsTaken++;
             if (HitsTaken >= _hitsToDestroy)
             {
-                Destroy();
+                Destroy(_destroyDelay);
                 return;
             }
 
-            int hitsToGrade = _hitsToGrades.Take(_currentGradeIndex).Sum();
+            int hitsToGrade = _stages.Take(_currentGradeIndex).Sum(stage => stage.RequiredHits);
             if (hitsToGrade != HitsTaken) return;
 
             _objectSwitcher.SwitchTo(_currentGradeIndex);

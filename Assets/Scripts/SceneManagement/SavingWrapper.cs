@@ -1,8 +1,7 @@
 ﻿using System.Collections;
+using FlavorfulStory.Saving;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using FlavorfulStory.Saving;
-using FlavorfulStory.InputSystem;
 
 namespace FlavorfulStory.SceneManagement
 {
@@ -26,7 +25,6 @@ namespace FlavorfulStory.SceneManagement
             if (!SaveFileExists) return;
 
             StartCoroutine(LoadLastScene());
-            InputWrapper.UnblockAllInput();
         }
 
         /// <summary> Начинает новую игру с указанным файлом сохранения. </summary>
@@ -41,7 +39,8 @@ namespace FlavorfulStory.SceneManagement
 
         /// <summary> Устанавливает текущее сохранение. </summary>
         /// <param name="saveFileName"> Название файла сохранения. </param>
-        private static void SetCurrentSaveFileName(string saveFileName) => PlayerPrefs.SetString(CurrentSaveKey, saveFileName);
+        private static void SetCurrentSaveFileName(string saveFileName) =>
+            PlayerPrefs.SetString(CurrentSaveKey, saveFileName);
 
         /// <summary> Получает название текущего сохранения. </summary>
         /// <returns> Название текущего сохранения. </returns>

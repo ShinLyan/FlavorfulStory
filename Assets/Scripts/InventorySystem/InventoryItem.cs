@@ -1,13 +1,13 @@
-﻿using FlavorfulStory.InventorySystem.PickupSystem;
+﻿using System;
 using System.Collections.Generic;
+using FlavorfulStory.InventorySystem.PickupSystem;
 using UnityEngine;
 
 namespace FlavorfulStory.InventorySystem
 {
-    /// <summary> ScriptableObject, представляющий предмет, 
-    /// который может быть помещен в инвентарь. </summary>
+    /// <summary> ScriptableObject, представляющий предмет, который может быть помещен в инвентарь. </summary>
     // TODO: сделать абстрактным, когда все типы предметов будут реализованы
-    [CreateAssetMenu(menuName = ("FlavorfulStory/Inventory/Item"))]
+    [CreateAssetMenu(menuName = "FlavorfulStory/Inventory/Item")]
     public class InventoryItem : ScriptableObject, ISerializationCallbackReceiver
     {
         #region Fields and Properties
@@ -95,14 +95,10 @@ namespace FlavorfulStory.InventorySystem
         /// <summary> Генерация и сохранение нового GUID, если он пустой. </summary>
         public void OnBeforeSerialize()
         {
-            if (string.IsNullOrWhiteSpace(ItemID))
-            {
-                ItemID = System.Guid.NewGuid().ToString();
-            }
+            if (string.IsNullOrWhiteSpace(ItemID)) ItemID = Guid.NewGuid().ToString();
         }
 
-        /// <summary> Требуется для ISerializationCallbackReceiver, 
-        /// но нам не нужно ничего с ним делать. </summary>
+        /// <summary> Требуется для ISerializationCallbackReceiver, но нам не нужно ничего с ним делать. </summary>
         public void OnAfterDeserialize()
         {
         }

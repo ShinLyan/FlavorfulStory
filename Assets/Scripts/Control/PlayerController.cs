@@ -11,18 +11,20 @@ using UnityEngine.EventSystems;
 
 namespace FlavorfulStory.Control
 {
-    /// <summary> Контроллер игрока, отвечающий за управление, 
+    /// <summary> Контроллер игрока, отвечающий за управление,
     /// использование предметов и взаимодействие с окружением. </summary>
     [RequireComponent(typeof(PlayerMover), typeof(Animator))]
     public class PlayerController : MonoBehaviour
     {
-        #region Fields
+        #region Fields and Properties
 
-        /// <summary> Панель быстрого доступа. </summary>
-        [SerializeField] private Toolbar _toolbar;
+        /// <summary> Панель быстрого доступа, содержащая инвентарь игрока. </summary>
+        [Tooltip("Панель быстрого доступа, содержащая инвентарь игрока."), SerializeField]
+        private Toolbar _toolbar;
 
-        /// <summary> Время перезарядки использования инструмента. </summary>
-        [SerializeField] private float _toolCooldown = 1f;
+        /// <summary> Время перезарядки перед повторным использованием инструмента. </summary>
+        [Tooltip("Время перезарядки перед повторным использованием инструмента."), SerializeField, Range(1f, 5f)]
+        private float _toolCooldown;
 
         /// <summary> Передвижение игрока. </summary>
         private PlayerMover _playerMover;
@@ -30,12 +32,18 @@ namespace FlavorfulStory.Control
         /// <summary> Аниматор игрока. </summary>
         private Animator _animator;
 
+        /// <summary> Взаимодействие игрока с объектами. </summary>
         private InteractFeature _interactFeature;
 
         #region Tools
 
         /// <summary> Соответствия типов инструментов и их префабов. </summary>
-        [SerializeField] private ToolPrefabMapping[] _toolMappings;
+        [Tooltip("Соответствия типов инструментов и их префабов."), SerializeField]
+        private ToolPrefabMapping[] _toolMappings;
+
+        /// <summary> Слой объектов, по которым можно нанести удар. </summary>
+        [field: Tooltip("Слой объектов, по которым можно нанести удар."), SerializeField]
+        public LayerMask HitableLayers { get; private set; }
 
         /// <summary> Текущий экипированный инструмент. </summary>
         private GameObject _currentTool;
@@ -44,15 +52,14 @@ namespace FlavorfulStory.Control
         private float _toolCooldownTimer;
 
         /// <summary> Можно ли использовать инструмент? </summary>
-        public bool CanUseTool => _toolCooldownTimer <= 0f;
+        private bool CanUseTool => _toolCooldownTimer <= 0f;
 
         #endregion
 
         /// <summary> Текущий выбранный предмет из панели быстрого доступа. </summary>
-        public InventoryItem CurrentItem => _toolbar?.SelectedItem;
+        private InventoryItem CurrentItem => _toolbar?.SelectedItem;
 
-        /// <summary> Событие, вызываемое при окончании взаимодейтсвия. </summary>
-        /// <remarks> Событие срабатывает внутри метода EndInteraction(). </remarks>
+        /// <summary> Событие, вызываемое при окончании взаимодействия с объектом. </summary>
         public event Action OnInteractionEnded;
 
         #endregion
@@ -72,7 +79,7 @@ namespace FlavorfulStory.Control
             ReduceCooldownTimer();
         }
 
-        /// <summary> Обработка ввода. </summary>
+        /// <summary> Обработка пользовательского ввода. </summary>
         private void HandleInput()
         {
             HandleToolbarSelection();
@@ -85,12 +92,8 @@ namespace FlavorfulStory.Control
         {
             const int ToolbarItemsCount = 9;
             for (int i = 0; i < ToolbarItemsCount; i++)
-            {
                 if (Input.GetKeyDown(KeyCode.Alpha1 + i))
-                {
                     _toolbar.SelectItem(i);
-                }
-            }
         }
 
         /// <summary> Обработка использования предмета из панели быстрого доступа. </summary>
@@ -100,8 +103,8 @@ namespace FlavorfulStory.Control
                 EventSystem.current.IsPointerOverGameObject() || _interactFeature.IsInteracting)
                 return;
 
-            if (Input.GetMouseButton(0) && actionItem.UseActionType == UseActionType.LeftClick ||
-                Input.GetMouseButton(1) && actionItem.UseActionType == UseActionType.RightClick)
+            if ((Input.GetMouseButton(0) && actionItem.UseActionType == UseActionType.LeftClick) ||
+                (Input.GetMouseButton(1) && actionItem.UseActionType == UseActionType.RightClick))
             {
                 actionItem.Use(this);
                 _toolCooldownTimer = _toolCooldown;
@@ -129,8 +132,7 @@ namespace FlavorfulStory.Control
             ).normalized;
 
             _playerMover.SetMoveDirection(direction);
-            if (direction != Vector3.zero)
-                _playerMover.SetLookRotation(direction);
+            if (direction != Vector3.zero) _playerMover.SetLookRotation(direction);
         }
 
         /// <summary> Уменьшение таймера перезарядки. </summary>
@@ -160,7 +162,7 @@ namespace FlavorfulStory.Control
         public void RotateTowards(Vector3 position)
         {
             var direction = (position - transform.position).normalized;
-            direction.y = 0; // Игнорируем вертикальную составляющую
+            direction.y = 0;
             _playerMover.SetLookRotation(direction);
         }
 
@@ -175,6 +177,7 @@ namespace FlavorfulStory.Control
 
             _currentTool = mapping.ToolPrefab;
             _currentTool.SetActive(true);
+            InputWrapper.BlockInput(InputButton.MouseScroll);
         }
 
         /// <summary> Убрать инструмент из руки игрока. </summary>
@@ -182,9 +185,10 @@ namespace FlavorfulStory.Control
         {
             if (!_currentTool) return;
 
-            InputWrapper.UnblockPlayerMovement();
             _currentTool.SetActive(false);
             _currentTool = null;
+            InputWrapper.UnblockPlayerMovement();
+            InputWrapper.UnblockInput(InputButton.MouseScroll);
         }
     }
 }
