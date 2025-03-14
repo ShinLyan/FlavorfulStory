@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using FlavorfulStory.Control;
 using FlavorfulStory.InputSystem;
+using FlavorfulStory.ResourceContainer;
 using FlavorfulStory.TooltipSystem;
 using UnityEngine;
 
@@ -12,10 +13,13 @@ namespace FlavorfulStory.Actions.Interactables
     public class InteractFeature : MonoBehaviour
     {
         /// <summary> UI-объект для отображения тултипа взаимодействия. </summary>
-        [SerializeField] private InteractableObjectTooltip _interactableObjectTooltip;
+        [SerializeField] private InteractableObjectTooltip _tooltip;
+
+        /// <summary> PlayerController родительского объекта. </summary>
+        private PlayerController _playerController;
 
         /// <summary> Аниматор для управления анимациями в процессе взаимодействия. </summary>
-        [SerializeField] private Animator _animator;
+        private Animator _animator;
 
         /// <summary> Хэш для анимации сбора. </summary>
         private readonly int _gather = Animator.StringToHash("Gather");
@@ -24,68 +28,10 @@ namespace FlavorfulStory.Actions.Interactables
         private readonly List<IInteractable> _reachableInteractables = new();
 
         /// <summary> Ближайший объект, с которым можно взаимодействовать. </summary>
-        private IInteractable _nearestAllowedInteractable;
-
-        /// <summary> PlayerController родительского объекта. </summary>
-        private PlayerController _playerController;
+        private IInteractable _closestAllowedInteractable;
 
         /// <summary> Флаг, указывающий, происходит ли в данный момент взаимодействие. </summary>
         public bool IsInteracting { get; private set; }
-
-        /// <summary> Инициализация компонента. </summary>
-        /// <remarks> Подписка на событие OnInteractionEnded (PlayerController.cs). </remarks>
-        private void Awake()
-        {
-            _playerController = GetComponentInParent<PlayerController>();
-            _playerController.OnInteractionEnded += EndInteraction;
-        }
-
-        /// <summary> Проверяет нажатие кнопки взаимодействия и вызывает метод Interact()
-        /// для ближайшего объекта. </summary>
-        private void Update()
-        {
-            if (!InputWrapper.GetButtonDown(InputButton.Interact) ||
-                _nearestAllowedInteractable == null || IsInteracting) return;
-
-            BeginInteraction();
-            _nearestAllowedInteractable?.Interact();
-        }
-
-        /// <summary> Отписка от события OnInteractionEnded (PlayerController.cs). </summary>
-        private void OnDestroy()
-        {
-            _playerController.OnInteractionEnded -= EndInteraction;
-        }
-
-        /// <summary> Добавляет объект в список доступных для взаимодействия при входе в триггер. </summary>
-        /// <param name="other"> Коллайдер объекта, вошедшего в триггер. </param>
-        private void OnTriggerEnter(Collider other)
-        {
-            if (other.TryGetComponent<IInteractable>(out var interactable))
-                _reachableInteractables.Add(interactable);
-        }
-
-        /// <summary> Удаляет объект из списка доступных для взаимодействия при выходе из триггера. </summary>
-        /// <param name="other"> Коллайдер объекта, покинувшего триггер. </param>
-        private void OnTriggerExit(Collider other)
-        {
-            if (other.TryGetComponent<IInteractable>(out var interactable))
-                _reachableInteractables.Remove(interactable);
-        }
-
-        /// <summary> Обновляет ближайший объект для взаимодействия и отображение тултипа. </summary>
-        /// <param name="other"> Коллайдер объекта, находящегося в триггере. </param>
-        private void OnTriggerStay(Collider other)
-        {
-            _nearestAllowedInteractable = GetNearestAllowedInteractable();
-
-            _interactableObjectTooltip.gameObject.SetActive(_nearestAllowedInteractable != null);
-
-            if (_nearestAllowedInteractable == null) return;
-
-            _interactableObjectTooltip.SetTitleAndDescription(_nearestAllowedInteractable);
-            _interactableObjectTooltip.SetPositionWithOffset(_nearestAllowedInteractable);
-        }
 
         /// <summary> Событие, вызываемое при начале взаимодействия.
         /// Используется для звуковых эффектов и других действий. </summary>
@@ -95,13 +41,77 @@ namespace FlavorfulStory.Actions.Interactables
         /// Используется для звуковых эффектов и других действий. </summary>
         public event Action OnInteractionEnded; // На будущее - для звуков и тд
 
+        /// <summary> Инициализация компонента. </summary>
+        /// <remarks> Подписка на событие OnInteractionEnded (PlayerController.cs). </remarks>
+        private void Awake()
+        {
+            _playerController = GetComponentInParent<PlayerController>();
+            if (_playerController) _playerController.OnInteractionEnded += EndInteraction;
+
+            _animator = GetComponentInParent<Animator>();
+        }
+
+        /// <summary> Проверяет нажатие кнопки взаимодействия и вызывает метод Interact()
+        /// для ближайшего объекта. </summary>
+        private void Update()
+        {
+            _closestAllowedInteractable = GetClosestAllowedInteractable();
+            UpdateTooltip();
+
+            if (IsInteracting || _closestAllowedInteractable == null ||
+                !InputWrapper.GetButtonDown(InputButton.Interact)) return;
+
+            BeginInteraction();
+            _closestAllowedInteractable?.Interact();
+        }
+
         /// <summary> Определяет ближайший объект для взаимодействия из доступных. </summary>
         /// <returns> Ближайший объект, с которым можно взаимодействовать, или null. </returns>
-        private IInteractable GetNearestAllowedInteractable() => IsInteracting
-            ? _nearestAllowedInteractable
-            : _reachableInteractables.Where(interactable => interactable.IsInteractionAllowed)
-                .OrderBy(interactable => interactable.GetDistanceTo(transform))
-                .FirstOrDefault();
+        private IInteractable GetClosestAllowedInteractable() => _reachableInteractables
+            .Where(interactable => interactable.IsInteractionAllowed)
+            .OrderBy(interactable => interactable.GetDistanceTo(transform))
+            .FirstOrDefault();
+
+        /// <summary> Обновить тултип. </summary>
+        private void UpdateTooltip()
+        {
+            if (_closestAllowedInteractable != null) _tooltip.Show(_closestAllowedInteractable);
+            else _tooltip.Hide();
+        }
+
+        /// <summary> Добавляет объект в список доступных для взаимодействия при входе в триггер. </summary>
+        /// <param name="other"> Коллайдер объекта, вошедшего в триггер. </param>
+        private void OnTriggerEnter(Collider other)
+        {
+            if (!other.TryGetComponent<IInteractable>(out var interactable)) return;
+
+            _reachableInteractables.Add(interactable);
+
+            if (other.TryGetComponent<IDestroyable>(out var destroyable))
+                destroyable.OnObjectDestroyed += RemoveObjectFromList;
+        }
+
+        /// <summary> Удаляет объект из списка доступных для взаимодействия при выходе из триггера. </summary>
+        /// <param name="other"> Коллайдер объекта, покинувшего триггер. </param>
+        private void OnTriggerExit(Collider other)
+        {
+            if (!other.TryGetComponent<IInteractable>(out var interactable)) return;
+
+            _reachableInteractables.Remove(interactable);
+
+            if (other.TryGetComponent<IDestroyable>(out var destroyable))
+                destroyable.OnObjectDestroyed -= RemoveObjectFromList;
+        }
+
+        /// <summary> Удаляет объект из списка заспавненных объектов. </summary>
+        /// <param name="destroyable"> Объект, который необходимо удалить из списка. </param>
+        private void RemoveObjectFromList(IDestroyable destroyable)
+        {
+            if (destroyable is not IInteractable interactable) return;
+
+            destroyable.OnObjectDestroyed -= RemoveObjectFromList;
+            _reachableInteractables.Remove(interactable);
+        }
 
         // TODO: Убрать анимацию для ремонта
         /// <summary> Начать взаимодействие. </summary>
@@ -109,7 +119,7 @@ namespace FlavorfulStory.Actions.Interactables
         {
             OnInteractionStarted?.Invoke();
             IsInteracting = true;
-            _animator.SetTrigger(_gather);
+            if (_animator) _animator.SetTrigger(_gather);
             InputWrapper.BlockPlayerMovement();
         }
 
@@ -119,8 +129,14 @@ namespace FlavorfulStory.Actions.Interactables
         {
             OnInteractionEnded?.Invoke();
             IsInteracting = false;
-            _animator.ResetTrigger(_gather);
-            if (_nearestAllowedInteractable is HarvestableObject) InputWrapper.UnblockPlayerMovement();
+            if (_animator) _animator.ResetTrigger(_gather);
+            InputWrapper.UnblockPlayerMovement();
+        }
+
+        /// <summary> Отписка от события OnInteractionEnded (PlayerController.cs). </summary>
+        private void OnDestroy()
+        {
+            if (_playerController) _playerController.OnInteractionEnded -= EndInteraction;
         }
     }
 }

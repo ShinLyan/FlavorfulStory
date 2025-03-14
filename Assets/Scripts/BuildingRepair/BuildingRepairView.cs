@@ -1,11 +1,12 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-using TMPro;
 using FlavorfulStory.InputSystem;
 using FlavorfulStory.InventorySystem;
 using FlavorfulStory.TimeManagement;
 using FlavorfulStory.UI;
+using TMPro;
+using UnityEngine;
 
 namespace FlavorfulStory.BuildingRepair
 {
@@ -45,7 +46,7 @@ namespace FlavorfulStory.BuildingRepair
         /// <remarks> Собирает вьюшки ресурсных требований. Собирает кнопку строительства. </remarks>
         private void Awake()
         {
-            _requirementViews = new();
+            _requirementViews = new List<ResourceRequirementView>();
             _content = transform.GetChild(0).gameObject;
             BuildButton = GetComponentInChildren<UIButton>(true);
         }
@@ -53,6 +54,9 @@ namespace FlavorfulStory.BuildingRepair
         /// <summary> Обновление состояния окна. Коллбэк из UnityAPI. </summary>
         private void Update()
         {
+            // TODO: КОСТЫЛЬ. Добавлен, чтобы после проигрывания анимации, игрок не мог бегать
+            if (_isOpen) InputWrapper.BlockPlayerMovement();
+
             if (!_isOpen || !InputWrapper.GetButtonDown(InputButton.SwitchGameMenu)) return;
 
             Close();
@@ -70,7 +74,7 @@ namespace FlavorfulStory.BuildingRepair
         }
 
         /// <summary> Заблокировать кнопку переключения игрового меню на один кадр. </summary>
-        private static System.Collections.IEnumerator BlockGameMenuForOneFrame()
+        private static IEnumerator BlockGameMenuForOneFrame()
         {
             InputWrapper.BlockInput(InputButton.SwitchGameMenu);
             yield return null;
@@ -111,9 +115,7 @@ namespace FlavorfulStory.BuildingRepair
             _requirementViews.ForEach(view => view.gameObject.SetActive(true));
 
             for (int i = 0; i < stage.Requirements.Count; i++)
-            {
                 _requirementViews[i].Setup(stage.Requirements[i], investedResources[i]);
-            }
         }
 
         public void DisplayCompletionMessage()
@@ -146,10 +148,7 @@ namespace FlavorfulStory.BuildingRepair
                 _requirementViews.Add(requirementView.GetComponent<ResourceRequirementView>());
             }
 
-            foreach (var view in _requirementViews)
-            {
-                view.OnResourceTransferButtonClick += _resourceTransferHandler;
-            }
+            foreach (var view in _requirementViews) view.OnResourceTransferButtonClick += _resourceTransferHandler;
         }
     }
 }
