@@ -113,14 +113,16 @@ namespace FlavorfulStory.Actions.Interactables
             _reachableInteractables.Remove(interactable);
         }
 
-        // TODO: Убрать анимацию для ремонта
         /// <summary> Начать взаимодействие. </summary>
         private void BeginInteraction()
         {
             OnInteractionStarted?.Invoke();
             IsInteracting = true;
-            if (_animator) _animator.SetTrigger(_gather);
             InputWrapper.BlockPlayerMovement();
+
+            //TODO: Не проигрывать анимацию для ремонта
+            if (_animator)
+                _animator.SetTrigger(_gather);
         }
 
         /// <summary> Закончить взаимодействие. </summary>
@@ -129,8 +131,10 @@ namespace FlavorfulStory.Actions.Interactables
         {
             OnInteractionEnded?.Invoke();
             IsInteracting = false;
-            if (_animator) _animator.ResetTrigger(_gather);
             InputWrapper.UnblockPlayerMovement();
+
+            if (_animator)
+                _animator.ResetTrigger(_gather);
         }
 
         /// <summary> Отписка от события OnInteractionEnded (PlayerController.cs). </summary>

@@ -54,9 +54,6 @@ namespace FlavorfulStory.BuildingRepair
         /// <summary> Обновление состояния окна. Коллбэк из UnityAPI. </summary>
         private void Update()
         {
-            // TODO: КОСТЫЛЬ. Добавлен, чтобы после проигрывания анимации, игрок не мог бегать
-            if (_isOpen) InputWrapper.BlockPlayerMovement();
-
             if (!_isOpen || !InputWrapper.GetButtonDown(InputButton.SwitchGameMenu)) return;
 
             Close();

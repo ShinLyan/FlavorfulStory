@@ -49,9 +49,6 @@ namespace FlavorfulStory.BuildingRepair
         {
             InitializeRepairStages();
             InitializeInvestedResourcesList();
-
-            // TODO: На рефакторинг
-            IsBlockingMovement = true;
         }
 
         /// <summary> Инициализация стадий ремонта. </summary>
@@ -163,10 +160,6 @@ namespace FlavorfulStory.BuildingRepair
 
         /// <summary> Флаг, разрешающий взаимодействие с объектом. </summary>
         public bool IsInteractionAllowed { get; set; }
-
-        /// <summary> Флаг, блокирующий передвижение персонажа. </summary>
-        [field: SerializeField]
-        public bool IsBlockingMovement { get; set; }
 
         /// <summary> Провести взаимодействие с объектом. </summary>
         /// <remarks> Инициализирует интерфейс и позволяет пользователю взаимодействовать с объектом. </remarks>
