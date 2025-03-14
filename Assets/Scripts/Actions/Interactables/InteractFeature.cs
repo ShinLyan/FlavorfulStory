@@ -22,13 +22,13 @@ namespace FlavorfulStory.Actions.Interactables
         private Animator _animator;
 
         /// <summary> Хэш для анимации сбора. </summary>
-        private readonly int _gather = Animator.StringToHash("Gather");
+        private readonly int _gatherAnimationHash = Animator.StringToHash("Gather");
 
         /// <summary> Список объектов, доступных для взаимодействия. </summary>
-        private readonly List<IInteractable> _reachableInteractables = new();
+        private readonly List<IInteractable> _availableInteractables = new();
 
         /// <summary> Ближайший объект, с которым можно взаимодействовать. </summary>
-        private IInteractable _closestAllowedInteractable;
+        private IInteractable _closestInteractable;
 
         /// <summary> Флаг, указывающий, происходит ли в данный момент взаимодействие. </summary>
         public bool IsInteracting { get; private set; }
@@ -55,24 +55,25 @@ namespace FlavorfulStory.Actions.Interactables
         /// для ближайшего объекта. </summary>
         private void Update()
         {
-            if (_reachableInteractables.Count != 0) UpdateClosestAllowedInteractable();
-            UpdateTooltip();
+            if (_availableInteractables.Count != 0) UpdateClosestInteractable();
 
-            if (IsInteracting || _closestAllowedInteractable == null ||
+            if (IsInteracting || _closestInteractable == null ||
                 !InputWrapper.GetButtonDown(InputButton.Interact)) return;
 
             BeginInteraction();
-            _closestAllowedInteractable?.Interact();
+            _closestInteractable?.Interact();
         }
 
-        private void UpdateClosestAllowedInteractable()
+        /// <summary> Обновить ближайший интерактивный объект. </summary>
+        private void UpdateClosestInteractable()
         {
-            _closestAllowedInteractable = GetClosestAllowedInteractable();
+            _closestInteractable = FindClosestInteractable();
+            UpdateTooltip();
         }
 
         /// <summary> Определяет ближайший объект для взаимодействия из доступных. </summary>
         /// <returns> Ближайший объект, с которым можно взаимодействовать, или null. </returns>
-        private IInteractable GetClosestAllowedInteractable() => _reachableInteractables
+        private IInteractable FindClosestInteractable() => _availableInteractables
             .Where(interactable => interactable.IsInteractionAllowed)
             .OrderBy(interactable => interactable.GetDistanceTo(transform))
             .FirstOrDefault();
@@ -80,7 +81,7 @@ namespace FlavorfulStory.Actions.Interactables
         /// <summary> Обновить тултип. </summary>
         private void UpdateTooltip()
         {
-            if (_closestAllowedInteractable != null) _tooltip.Show(_closestAllowedInteractable);
+            if (_closestInteractable != null) _tooltip.Show(_closestInteractable);
             else _tooltip.Hide();
         }
 
@@ -90,10 +91,10 @@ namespace FlavorfulStory.Actions.Interactables
         {
             if (!other.TryGetComponent<IInteractable>(out var interactable)) return;
 
-            _reachableInteractables.Add(interactable);
+            _availableInteractables.Add(interactable);
 
             if (other.TryGetComponent<IDestroyable>(out var destroyable))
-                destroyable.OnObjectDestroyed += RemoveObjectFromList;
+                destroyable.OnObjectDestroyed += RemoveInteractable;
         }
 
         /// <summary> Удаляет объект из списка доступных для взаимодействия при выходе из триггера. </summary>
@@ -102,22 +103,22 @@ namespace FlavorfulStory.Actions.Interactables
         {
             if (!other.TryGetComponent<IInteractable>(out var interactable)) return;
 
-            _reachableInteractables.Remove(interactable);
-            UpdateClosestAllowedInteractable();
+            _availableInteractables.Remove(interactable);
+            UpdateClosestInteractable();
 
             if (other.TryGetComponent<IDestroyable>(out var destroyable))
-                destroyable.OnObjectDestroyed -= RemoveObjectFromList;
+                destroyable.OnObjectDestroyed -= RemoveInteractable;
         }
 
         /// <summary> Удаляет объект из списка заспавненных объектов. </summary>
         /// <param name="destroyable"> Объект, который необходимо удалить из списка. </param>
-        private void RemoveObjectFromList(IDestroyable destroyable)
+        private void RemoveInteractable(IDestroyable destroyable)
         {
             if (destroyable is not IInteractable interactable) return;
 
-            destroyable.OnObjectDestroyed -= RemoveObjectFromList;
-            _reachableInteractables.Remove(interactable);
-            UpdateClosestAllowedInteractable();
+            destroyable.OnObjectDestroyed -= RemoveInteractable;
+            _availableInteractables.Remove(interactable);
+            UpdateClosestInteractable();
         }
 
         /// <summary> Начать взаимодействие. </summary>
@@ -128,7 +129,7 @@ namespace FlavorfulStory.Actions.Interactables
             InputWrapper.BlockPlayerMovement();
 
             //TODO: Не проигрывать анимацию для ремонта
-            if (_animator) _animator.SetTrigger(_gather);
+            if (_animator) _animator.SetTrigger(_gatherAnimationHash);
         }
 
         /// <summary> Закончить взаимодействие. </summary>
@@ -139,7 +140,7 @@ namespace FlavorfulStory.Actions.Interactables
             IsInteracting = false;
             InputWrapper.UnblockPlayerMovement();
 
-            if (_animator) _animator.ResetTrigger(_gather);
+            if (_animator) _animator.ResetTrigger(_gatherAnimationHash);
         }
 
         /// <summary> Отписка от события OnInteractionEnded (PlayerController.cs). </summary>
