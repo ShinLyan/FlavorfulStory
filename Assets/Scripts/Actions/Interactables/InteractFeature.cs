@@ -55,7 +55,7 @@ namespace FlavorfulStory.Actions.Interactables
         /// для ближайшего объекта. </summary>
         private void Update()
         {
-            _closestAllowedInteractable = GetClosestAllowedInteractable();
+            if (_reachableInteractables.Count != 0) UpdateClosestAllowedInteractable();
             UpdateTooltip();
 
             if (IsInteracting || _closestAllowedInteractable == null ||
@@ -63,6 +63,11 @@ namespace FlavorfulStory.Actions.Interactables
 
             BeginInteraction();
             _closestAllowedInteractable?.Interact();
+        }
+
+        private void UpdateClosestAllowedInteractable()
+        {
+            _closestAllowedInteractable = GetClosestAllowedInteractable();
         }
 
         /// <summary> Определяет ближайший объект для взаимодействия из доступных. </summary>
@@ -98,6 +103,7 @@ namespace FlavorfulStory.Actions.Interactables
             if (!other.TryGetComponent<IInteractable>(out var interactable)) return;
 
             _reachableInteractables.Remove(interactable);
+            UpdateClosestAllowedInteractable();
 
             if (other.TryGetComponent<IDestroyable>(out var destroyable))
                 destroyable.OnObjectDestroyed -= RemoveObjectFromList;
@@ -111,6 +117,7 @@ namespace FlavorfulStory.Actions.Interactables
 
             destroyable.OnObjectDestroyed -= RemoveObjectFromList;
             _reachableInteractables.Remove(interactable);
+            UpdateClosestAllowedInteractable();
         }
 
         /// <summary> Начать взаимодействие. </summary>
@@ -121,8 +128,7 @@ namespace FlavorfulStory.Actions.Interactables
             InputWrapper.BlockPlayerMovement();
 
             //TODO: Не проигрывать анимацию для ремонта
-            if (_animator)
-                _animator.SetTrigger(_gather);
+            if (_animator) _animator.SetTrigger(_gather);
         }
 
         /// <summary> Закончить взаимодействие. </summary>
@@ -133,8 +139,7 @@ namespace FlavorfulStory.Actions.Interactables
             IsInteracting = false;
             InputWrapper.UnblockPlayerMovement();
 
-            if (_animator)
-                _animator.ResetTrigger(_gather);
+            if (_animator) _animator.ResetTrigger(_gather);
         }
 
         /// <summary> Отписка от события OnInteractionEnded (PlayerController.cs). </summary>
