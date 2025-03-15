@@ -1,8 +1,9 @@
 using System.Collections.Generic;
+using System.Linq;
 using FlavorfulStory.SceneManagement;
 using UnityEngine;
 
-namespace FlavorfulStory.AI.SceneGraphSystem
+namespace FlavorfulStory.AI.WarpGraphSystem
 {
     /// <summary> Граф варпов, представляющий связи между локациями и варпами. </summary>
     public class WarpGraph
@@ -133,6 +134,51 @@ namespace FlavorfulStory.AI.SceneGraphSystem
                 foreach (var edge in node.Edges) connections += $"{edge.TargetNode.SourceWarp.ParentLocation} -> ";
                 Debug.Log($"[{location}] Connected to: {connections.TrimEnd(" -> ".ToCharArray())}");
             }
+        }
+
+        /// <summary> Строит граф варпов на основе списка всех варпов. </summary>
+        /// <param name="allWarps"> Список всех варпов для построения графа. </param>
+        /// <returns> Построенный граф варпов. </returns>
+        public static WarpGraph Build(IEnumerable<Warp> allWarps)
+        {
+            var warpsByLocation = new Dictionary<LocationName, List<Warp>>();
+
+            // Группируем варпы по локациям
+            var enumerable = allWarps.ToList();
+            foreach (var warp in enumerable)
+            {
+                if (!warpsByLocation.ContainsKey(warp.ParentLocation))
+                    warpsByLocation[warp.ParentLocation] = new List<Warp>();
+
+                warpsByLocation[warp.ParentLocation].Add(warp);
+            }
+
+            var graph = new WarpGraph();
+            var nodeMap = new Dictionary<Warp, WarpNode>();
+
+            // Создаем узлы и связи внутри локаций
+            foreach (var warpsInLocation in warpsByLocation.Keys.Select(location => warpsByLocation[location]))
+            {
+                foreach (var warp in warpsInLocation)
+                {
+                    var node = new WarpNode(warp);
+                    nodeMap[warp] = node;
+                    graph.AddNode(node);
+                }
+
+                // Связываем все варпы внутри локации между собой
+                foreach (var warpA in warpsInLocation)
+                foreach (var warpB in warpsInLocation.Where(warpB => warpA != warpB))
+                    nodeMap[warpA].Edges.Add(new WarpEdge(nodeMap[warpB]));
+            }
+
+            // Добавляем связи между варпами разных локаций
+            foreach (var warp in enumerable)
+            foreach (var connectedWarp in warp.ConnectedWarps)
+                if (nodeMap.TryGetValue(connectedWarp, out var targetNode))
+                    nodeMap[warp].Edges.Add(new WarpEdge(targetNode));
+
+            return graph;
         }
     }
 }

@@ -1,7 +1,7 @@
 using FlavorfulStory.SceneManagement;
 using UnityEngine;
 
-namespace FlavorfulStory.AI.SceneGraphSystem
+namespace FlavorfulStory.AI.WarpGraphSystem
 {
     /// <summary> Класс, представляющий варп (точку перехода между локациями). </summary>
     public class Warp : MonoBehaviour
@@ -36,7 +36,7 @@ namespace FlavorfulStory.AI.SceneGraphSystem
                 }
 
             // Связи внутри локаций
-            var allWarps = FindObjectsOfType<Warp>();
+            var allWarps = FindObjectsByType<Warp>(FindObjectsSortMode.None);
             foreach (var otherWarp in allWarps)
                 if (otherWarp.ParentLocation == ParentLocation && otherWarp != this)
                 {

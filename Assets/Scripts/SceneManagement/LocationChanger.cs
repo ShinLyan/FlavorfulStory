@@ -10,7 +10,7 @@ namespace FlavorfulStory.SceneManagement
 
         public static void InitializeLocations()
         {
-            var locations = Resources.FindObjectsOfTypeAll<Location>();
+            var locations = Object.FindObjectsByType<Location>(FindObjectsSortMode.None);
             _locationsDictionary = new Dictionary<LocationName, Location>();
 
             foreach (var location in locations)

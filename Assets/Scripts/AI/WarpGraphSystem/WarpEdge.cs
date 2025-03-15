@@ -1,4 +1,4 @@
-namespace FlavorfulStory.AI.SceneGraphSystem
+namespace FlavorfulStory.AI.WarpGraphSystem
 {
     /// <summary> Ребро графа варпов, представляющее связь между двумя узлами (варпами). </summary>
     public class WarpEdge

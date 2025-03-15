@@ -1,15 +1,11 @@
 using FlavorfulStory.AI.Scheduling;
 using FlavorfulStory.TimeManagement;
-using UnityEngine;
 
 namespace FlavorfulStory.AI.FiniteStateMachine
 {
     /// <summary> Состояние рутины NPC, в котором персонаж выполняет действия согласно расписанию. </summary>
     public class RoutineState : CharacterState
     {
-        /// <summary> Контроллер состояний, управляющий переключением между состояниями NPC. </summary>
-        private readonly StateController _stateController;
-
         /// <summary> Расписание NPC, определяющее его действия и маршруты. </summary>
         private readonly NpcSchedule _npcSchedule;
 
@@ -51,13 +47,12 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         /// <param name="deltaTime"> Время, прошедшее с последнего кадра. </param>
         public override void Update(float deltaTime)
         {
-            if (_currentPoint != null)
-            {
-                var animationClipName = _currentPoint.NpcAnimationClipName;
+            if (_currentPoint == null) return;
 
-                if (_currentPoint != null)
-                    _npc.PlayStateAnimation(animationClipName);
-            }
+            var animationClipName = _currentPoint.NpcAnimationClipName;
+
+            if (_currentPoint != null)
+                _npc.PlayStateAnimation(animationClipName);
         }
 
         /// <summary> Проверяет, изменилось ли время, и обновляет текущую точку расписания.
@@ -66,14 +61,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         private void CheckNewTime(DateTime currentTime)
         {
             var closestPoint = _npcSchedule.Params[0].GetClosestSchedulePointInPath(currentTime);
-            if (closestPoint == null)
-            {
-                Debug.LogError("Ближайшая точка отсутствует!");
-                return;
-            }
-
-            if (closestPoint == _currentPoint)
-                return;
+            if (closestPoint == null || closestPoint == _currentPoint) return;
 
             _currentPoint = closestPoint;
             if (closestPoint.Hour == currentTime.Hour && closestPoint.Minutes == currentTime.Minute)

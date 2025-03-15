@@ -5,7 +5,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine
     public abstract class CharacterState
     {
         /// <summary> Контроллер состояний, который управляет переключением между состояниями.  </summary>
-        protected readonly StateController _stateController;
+        protected StateController _stateController;
 
         /// <summary>  Инициализирует новый экземпляр класса <see cref="CharacterState"/>. </summary>
         /// <param name="stateController"> Контроллер состояний, к которому принадлежит это состояние. </param>

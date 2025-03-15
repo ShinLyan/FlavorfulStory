@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
-using FlavorfulStory.AI.SceneGraphSystem;
 using FlavorfulStory.AI.Scheduling;
+using FlavorfulStory.AI.WarpGraphSystem;
 using FlavorfulStory.SceneManagement;
 using FlavorfulStory.TimeManagement;
 using UnityEngine;
@@ -23,9 +23,6 @@ namespace FlavorfulStory.AI.FiniteStateMachine
 
         /// <summary> Расписание NPC, определяющее его маршруты и точки перемещения. </summary>
         private readonly NpcSchedule _npcSchedule;
-
-        /// <summary> Контроллер состояний, управляющий переключением между состояниями NPC. </summary>
-        private readonly StateController _stateController;
 
         /// <summary> Контроллер NPC, управляющий его поведением и анимациями. </summary>
         private readonly NPC _npc;
@@ -89,8 +86,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         /// <summary> Проверяет, достиг ли NPC текущей точки, и переключает состояние, если это так. </summary>
         private void SwitchStateIfPointReached()
         {
-            if (_currentPoint == null)
-                return;
+            if (_currentPoint == null) return;
 
             bool isInTargetLocation = _npc.CurrentLocationName == _currentPoint.LocationName;
             bool isCloseEnough = _navMeshAgent.remainingDistance <= DistanceToReachPoint;
@@ -114,7 +110,6 @@ namespace FlavorfulStory.AI.FiniteStateMachine
 
             if (_currentPoint == newPoint) return;
 
-            Debug.Log(_currentPathCoroutine);
             if (_currentPathCoroutine != null)
             {
                 Debug.Log("STOP COROUTINE");

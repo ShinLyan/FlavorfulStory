@@ -30,7 +30,7 @@ namespace FlavorfulStory.TimeManagement
         public int SeasonDay => _totalMinutes % SeasonMinutes / DayMinutes + 1;
 
         /// <summary> Получает день недели. </summary>
-        public WeekDay WeekDay => (WeekDay)(_totalMinutes / DayMinutes % 7 + 1);
+        public DayOfWeek DayOfWeek => (DayOfWeek)(_totalMinutes / DayMinutes % 7 + 1);
 
         /// <summary> Получает текущий час. </summary>
         public int Hour => _totalMinutes % DayMinutes / 60;
@@ -77,7 +77,7 @@ namespace FlavorfulStory.TimeManagement
 
         /// <summary> Преобразует текущую дату в строку. </summary>
         /// <returns> Строковое представление текущей даты. </returns>
-        public string DateToString() => $"{WeekDay} {SeasonDay} {Year}";
+        public string DateToString() => $"{DayOfWeek} {SeasonDay} {Year}";
 
         /// <summary> Преобразует время в строку с учётом выбранного формата отображения. </summary>
         /// <param name="is24HourFormat"> Если true, время отображается в 24-часовом формате (например, "14:05"). 

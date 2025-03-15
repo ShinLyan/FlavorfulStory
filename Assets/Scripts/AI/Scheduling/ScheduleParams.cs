@@ -1,7 +1,9 @@
 using System;
 using FlavorfulStory.TimeManagement;
+using GD.MinMaxSlider;
 using UnityEngine;
 using DateTime = FlavorfulStory.TimeManagement.DateTime;
+using DayOfWeek = FlavorfulStory.TimeManagement.DayOfWeek;
 
 namespace FlavorfulStory.AI.Scheduling
 {
@@ -11,16 +13,16 @@ namespace FlavorfulStory.AI.Scheduling
     {
         /// <summary> Сезоны, в которые будет выполняться расписание. </summary>]
         [field: Header("Limitations")]
-        [field: Tooltip("Сезоны, в которые будет выполняться расписание."), SerializeField]
+        [field: Tooltip("Сезоны, в которые будет выполняться расписание."), SerializeField, EnumButtons]
         public Season Seasons { get; private set; }
 
         /// <summary> Дни недели, в которые будет выполняться расписание. </summary>
         [field: Tooltip("Дни недели, в которые будет выполняться расписание."), SerializeField]
-        public WeekDay WeekDays { get; private set; }
+        public DayOfWeek DayOfWeek { get; private set; }
 
         /// <summary> Дни месяца, в которые будет выполняться расписание. </summary>
-        [field: Tooltip("Дни месяца, в которые будет выполняться расписание."), Range(1, 28), SerializeField]
-        public int[] Dates { get; private set; }
+        [field: Tooltip("Дни месяца, в которые будет выполняться расписание."), SerializeField, MinMaxSlider(1, 28)]
+        public Vector2Int[] Dates { get; private set; }
 
         /// <summary> Минимальный уровень отношений, необходимый для выполнения расписания. </summary>
         [field: Tooltip("Минимальный уровень отношений, необходимый для выполнения расписания."),

@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace FlavorfulStory.AI.SceneGraphSystem
+namespace FlavorfulStory.AI.WarpGraphSystem
 {
     /// <summary> Узел графа варпов, представляющий варп и его связи. </summary>
     public class WarpNode

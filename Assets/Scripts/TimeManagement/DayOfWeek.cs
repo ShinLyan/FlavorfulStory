@@ -4,7 +4,7 @@ namespace FlavorfulStory.TimeManagement
 {
     /// <summary> Перечисление дней недели. </summary>
     [Serializable, Flags]
-    public enum WeekDay
+    public enum DayOfWeek
     {
         /// <summary> Понедельник. </summary>
         Monday = 1 << 0,
