@@ -5,33 +5,33 @@ namespace FlavorfulStory.SceneManagement
 {
     public static class LocationChanger
     {
-        private static LocationType _currentLocation;
-        private static Dictionary<LocationType, Location> _locationsDictionary;
+        private static LocationName _currentLocation;
+        private static Dictionary<LocationName, Location> _locationsDictionary;
 
         public static void InitializeLocations()
         {
             var locations = Resources.FindObjectsOfTypeAll<Location>();
-            _locationsDictionary = new Dictionary<LocationType, Location>();
+            _locationsDictionary = new Dictionary<LocationName, Location>();
 
             foreach (var location in locations)
             {
-                var type = location.LocationType;
+                var type = location.LocationName;
                 if (!_locationsDictionary.TryAdd(type, location))
                     Debug.LogWarning($"Duplicate LocationType found: {type} in {location.name}");
             }
         }
 
-        public static void EnableLocation(LocationType newLocation)
+        public static void EnableLocation(LocationName newLocation)
         {
-            if (_locationsDictionary.TryGetValue(newLocation, out Location location))
+            if (_locationsDictionary.TryGetValue(newLocation, out var location))
                 location.gameObject.SetActive(true);
             else
                 Debug.LogError($"Location {newLocation} not found!");
         }
 
-        public static void DisableLocation(LocationType location)
+        public static void DisableLocation(LocationName location)
         {
-            if (_locationsDictionary.TryGetValue(location, out Location locationObj))
+            if (_locationsDictionary.TryGetValue(location, out var locationObj))
                 locationObj.gameObject.SetActive(false);
             else
                 Debug.LogError($"Location {location} not found!");

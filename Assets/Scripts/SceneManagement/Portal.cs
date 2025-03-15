@@ -1,8 +1,7 @@
-using System;
+using System.Collections;
 using FlavorfulStory.InputSystem;
 using FlavorfulStory.Movement;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace FlavorfulStory.SceneManagement
 {
@@ -12,10 +11,13 @@ namespace FlavorfulStory.SceneManagement
         /// <summary> Точка появления игрока после телепортации. </summary>
         [SerializeField] private Transform _spawnPoint;
 
-        [SerializeField] private LocationType _parentLocation;
+        /// <summary>
+        /// 
+        /// </summary>
+        [SerializeField] private LocationName _parentLocation;
 
         /// <summary> Тип сцены, в которую нужно перейти. </summary>
-        [SerializeField] private LocationType _locationToLoad;
+        [SerializeField] private LocationName _locationToLoad;
 
         /// <summary> Идентификатор назначения портала. </summary>
         [SerializeField] private DestinationIdentifier _destination;
@@ -35,13 +37,13 @@ namespace FlavorfulStory.SceneManagement
         private void OnTriggerEnter(Collider other)
         {
             if (!other.CompareTag("Player")) return;
-            
+
             StartCoroutine(TeleportPlayer(other.GetComponent<Rigidbody>(), other.GetComponent<PlayerMover>()));
         }
 
         /// <summary> Телепортирует игрока через портал, загружая новую сцену. </summary>
         /// <returns> Корутина для выполнения последовательных действий. </returns>
-        private System.Collections.IEnumerator TeleportPlayer(Rigidbody playerRigidbody, PlayerMover playerMover)
+        private IEnumerator TeleportPlayer(Rigidbody playerRigidbody, PlayerMover playerMover)
         {
             InputWrapper.BlockAllInput();
 

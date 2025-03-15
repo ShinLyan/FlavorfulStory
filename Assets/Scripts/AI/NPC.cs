@@ -10,16 +10,15 @@ namespace FlavorfulStory.AI
     /// <summary> Контроллер NPC, управляющий состояниями и поведением персонажа. </summary>
     public class NPC : MonoBehaviour
     {
-        /// <summary> Имя NPC. </summary>
-        public NpcName Name => _npcName;
+        /// <summary> Имя персонажа. </summary>
+        [field: Tooltip("Имя персонажа."), SerializeField]
+        public NpcName NpcName { get; private set; }
 
-        /// <summary> Текущая локация, в которой находится NPC. </summary>
-        public LocationType _currentLocationName;
-
-        [SerializeField] private NpcName _npcName;
-        
         /// <summary> Расписание NPC, определяющее его поведение и маршруты. </summary>
         [SerializeField] private NpcSchedule _npcSchedule;
+
+        /// <summary> Текущая локация, в которой находится NPC. </summary>
+        public LocationName CurrentLocationName { get; set; }
 
         /// <summary> Компонент аниматора, управляющий анимациями NPC. </summary>
         private Animator _animator;
@@ -44,10 +43,10 @@ namespace FlavorfulStory.AI
 
         /// <summary> Контроллер состояний, управляющий переключением между состояниями NPC. </summary>
         private StateController _stateController;
-        
+
         /// <summary> Текущие параметры расписания NPC. </summary>
         private ScheduleParams _currentScheduleParams;
-        
+
         /// <summary> Массив всех варпов на сцене. </summary>
         private Warp[] _warps;
 
@@ -64,17 +63,17 @@ namespace FlavorfulStory.AI
 
             _warps = FindObjectsByType<Warp>(FindObjectsInactive.Include, FindObjectsSortMode.None);
             _warpGraph = WarpGraphBuilder.BuildGraph(_warps);
-            
+
             _interactionState = new InteractionState(_stateController);
             _movementState = new MovementState(_stateController, _npcSchedule, _navMeshAgent, this, _warpGraph);
             _routineState = new RoutineState(_stateController, _npcSchedule, this);
             _waitingState = new WaitingState(_stateController);
-            
+
             _stateController.AddState(_interactionState);
             _stateController.AddState(_movementState);
             _stateController.AddState(_routineState);
             _stateController.AddState(_waitingState);
-            
+
             _stateController.SetState<RoutineState>();
         }
 

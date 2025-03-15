@@ -1,7 +1,8 @@
 ﻿using System.Collections;
+using FlavorfulStory.Saving;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using FlavorfulStory.Saving;
+using UnityEngine.Serialization;
 
 namespace FlavorfulStory.SceneManagement
 {
@@ -9,7 +10,8 @@ namespace FlavorfulStory.SceneManagement
     public class SavingWrapper : MonoBehaviour
     {
         /// <summary> Первая сцена, загружаемая после главного меню. </summary>
-        [SerializeField] private SceneType _firstUploadedScene;
+        [FormerlySerializedAs("_firstUploadedScene")] [SerializeField]
+        private LocationName _firstUploadedLocation;
 
         /// <summary> Ключ для хранения имени текущего сохранения в PlayerPrefs. </summary>
         private const string CurrentSaveKey = "currentSaveName";
@@ -39,7 +41,8 @@ namespace FlavorfulStory.SceneManagement
 
         /// <summary> Устанавливает текущее сохранение. </summary>
         /// <param name="saveFileName"> Название файла сохранения. </param>
-        private static void SetCurrentSaveFileName(string saveFileName) => PlayerPrefs.SetString(CurrentSaveKey, saveFileName);
+        private static void SetCurrentSaveFileName(string saveFileName) =>
+            PlayerPrefs.SetString(CurrentSaveKey, saveFileName);
 
         /// <summary> Получает название текущего сохранения. </summary>
         /// <returns> Название текущего сохранения. </returns>
@@ -50,7 +53,7 @@ namespace FlavorfulStory.SceneManagement
         private IEnumerator LoadFirstScene()
         {
             yield return PersistentObject.Instance.Fader.FadeOut(Fader.FadeOutTime);
-            yield return SceneManager.LoadSceneAsync(_firstUploadedScene.ToString());
+            yield return SceneManager.LoadSceneAsync(_firstUploadedLocation.ToString());
             yield return PersistentObject.Instance.Fader.FadeIn(Fader.FadeInTime);
         }
 

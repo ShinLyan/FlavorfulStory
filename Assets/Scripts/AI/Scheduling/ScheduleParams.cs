@@ -1,0 +1,62 @@
+using System;
+using FlavorfulStory.TimeManagement;
+using UnityEngine;
+using DateTime = FlavorfulStory.TimeManagement.DateTime;
+
+namespace FlavorfulStory.AI.Scheduling
+{
+    /// <summary> Параметры расписания для NPC. </summary>
+    [Serializable]
+    public class ScheduleParams
+    {
+        /// <summary> Сезоны, в которые будет выполняться расписание. </summary>]
+        [field: Header("Limitations")]
+        [field: Tooltip("Сезоны, в которые будет выполняться расписание."), SerializeField]
+        public Season Seasons { get; private set; }
+
+        /// <summary> Дни недели, в которые будет выполняться расписание. </summary>
+        [field: Tooltip("Дни недели, в которые будет выполняться расписание."), SerializeField]
+        public WeekDay WeekDays { get; private set; }
+
+        /// <summary> Дни месяца, в которые будет выполняться расписание. </summary>
+        [field: Tooltip("Дни месяца, в которые будет выполняться расписание."), Range(1, 28), SerializeField]
+        public int[] Dates { get; private set; }
+
+        /// <summary> Минимальный уровень отношений, необходимый для выполнения расписания. </summary>
+        [field: Tooltip("Минимальный уровень отношений, необходимый для выполнения расписания."),
+                Range(0, 14), SerializeField]
+        public int Hearts { get; private set; }
+
+        /// <summary> Будет ли расписание выполняться в дождливую погоду. </summary>
+        [field: Tooltip("Расписание будет выполнятся при дожде."), SerializeField]
+        public bool IsRaining { get; private set; }
+
+        /// <summary> Массив точек, которые NPC должен посетить в рамках расписания. </summary>
+        [field: Header("Path")]
+        [field: Tooltip("Массив точек, которые NPC должен посетить в рамках расписания."), SerializeField]
+        public SchedulePoint[] Path { get; private set; }
+
+        /// <summary> Найти ближайшую точку маршрута, соответствующую текущему времени. </summary>
+        /// <param name="currentTime"> Текущее игровое время. </param>
+        /// <returns> Ближайшая точка маршрута или <c>null</c>, если подходящая точка не найдена. </returns>
+        public SchedulePoint GetClosestSchedulePointInPath(DateTime currentTime)
+        {
+            int currentMinutes = currentTime.Hour * 60 + currentTime.Minute;
+            SchedulePoint closestPoint = null;
+            int minTimeDifference = int.MaxValue;
+
+            foreach (var pathPoint in Path)
+            {
+                int pathPointMinutes = pathPoint.Hour * 60 + pathPoint.Minutes;
+                int timeDifference = currentMinutes - pathPointMinutes;
+
+                if (timeDifference < 0 || timeDifference >= minTimeDifference) continue;
+
+                minTimeDifference = timeDifference;
+                closestPoint = pathPoint;
+            }
+
+            return closestPoint;
+        }
+    }
+}

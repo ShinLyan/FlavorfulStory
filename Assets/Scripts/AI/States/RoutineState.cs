@@ -8,13 +8,13 @@ namespace FlavorfulStory.AI.FiniteStateMachine
     public class RoutineState : CharacterState
     {
         /// <summary> Контроллер состояний, управляющий переключением между состояниями NPC. </summary>
-        private StateController _stateController;
+        private readonly StateController _stateController;
 
         /// <summary> Расписание NPC, определяющее его действия и маршруты. </summary>
-        private NpcSchedule _npcSchedule;
+        private readonly NpcSchedule _npcSchedule;
 
         /// <summary> Контроллер NPC, управляющий его поведением и анимациями. </summary>
-        private NPC _npc;
+        private readonly NPC _npc;
 
         /// <summary> Текущая точка расписания, в которой находится NPC. </summary>
         private SchedulePoint _currentPoint;
@@ -35,14 +35,14 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         /// <summary> Вызывается при входе в состояние рутины. Подписывается на событие изменения времени. </summary>
         public override void Enter()
         {
-            WorldTime.OnDateTimeChanged += CheckNewTime;
+            WorldTime.OnTimeUpdated += CheckNewTime;
         }
 
         /// <summary> Вызывается при выходе из состояния рутины. Отписывается от события изменения времени
         /// и сбрасывает текущую точку. </summary>
         public override void Exit()
         {
-            WorldTime.OnDateTimeChanged -= CheckNewTime;
+            WorldTime.OnTimeUpdated -= CheckNewTime;
             _currentPoint = null;
         }
 
@@ -65,7 +65,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         /// <param name="currentTime"> Текущее время в игре. </param>
         private void CheckNewTime(DateTime currentTime)
         {
-            SchedulePoint closestPoint = _npcSchedule.Params[0].GetClosestSchedulePointInPath(currentTime);
+            var closestPoint = _npcSchedule.Params[0].GetClosestSchedulePointInPath(currentTime);
             if (closestPoint == null)
             {
                 Debug.LogError("Ближайшая точка отсутствует!");

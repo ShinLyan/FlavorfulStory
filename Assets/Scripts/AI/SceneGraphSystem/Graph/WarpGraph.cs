@@ -8,10 +8,10 @@ namespace FlavorfulStory.AI.SceneGraphSystem
     public class WarpGraph
     {
         /// <summary> Словарь, хранящий узлы (варпы) по локациям. </summary>
-        private Dictionary<LocationType, List<WarpNode>> _nodesByLocation = new Dictionary<LocationType, List<WarpNode>>();
+        private readonly Dictionary<LocationName, List<WarpNode>> _nodesByLocation = new();
 
         /// <summary> Список всех узлов (варпов) в графе. </summary>
-        private List<WarpNode> _allNodes = new List<WarpNode>();
+        private readonly List<WarpNode> _allNodes = new();
 
         /// <summary> Добавляет узел (варп) в граф. </summary>
         /// <param name="node"> Узел, который нужно добавить. </param>
@@ -19,7 +19,7 @@ namespace FlavorfulStory.AI.SceneGraphSystem
         {
             if (!_nodesByLocation.ContainsKey(node.SourceWarp.ParentLocation))
                 _nodesByLocation[node.SourceWarp.ParentLocation] = new List<WarpNode>();
-            
+
             _nodesByLocation[node.SourceWarp.ParentLocation].Add(node);
             _allNodes.Add(node);
         }
@@ -33,7 +33,7 @@ namespace FlavorfulStory.AI.SceneGraphSystem
             var queue = new Queue<WarpNode>();
             var visited = new HashSet<WarpNode>();
             var path = new Dictionary<WarpNode, WarpNode>();
-            
+
             var startNode = _allNodes.Find(n => n.SourceWarp == start);
             var endNode = _allNodes.Find(n => n.SourceWarp == end);
 
@@ -61,14 +61,13 @@ namespace FlavorfulStory.AI.SceneGraphSystem
                 }
 
                 foreach (var edge in current.Edges)
-                {
                     if (visited.Add(edge.TargetNode))
                     {
                         path[edge.TargetNode] = current;
                         queue.Enqueue(edge.TargetNode);
                     }
-                }
             }
+
             return null;
         }
 
@@ -80,21 +79,21 @@ namespace FlavorfulStory.AI.SceneGraphSystem
         {
             var result = new List<Warp>();
             var current = endNode;
-            
+
             while (current != null)
             {
                 result.Add(current.SourceWarp);
                 current = path[current];
             }
-            
+
             result.Reverse();
             return result;
         }
-        
+
         /// <summary> Возвращает все узлы в указанной локации. </summary>
         /// <param name="location"> Локация, для которой нужно получить узлы. </param>
         /// <returns> Список узлов в локации или null, если локация не найдена. </returns>
-        private List<WarpNode> GetNodesByLocation(LocationType location)
+        private List<WarpNode> GetNodesByLocation(LocationName location)
         {
             return _nodesByLocation.GetValueOrDefault(location);
         }
@@ -103,7 +102,7 @@ namespace FlavorfulStory.AI.SceneGraphSystem
         /// <param name="position"> Позиция для поиска ближайшего узла. </param>
         /// <param name="location"> Локация, в которой искать узел. </param>
         /// <returns> Ближайший узел или null, если узел не найден. </returns>
-        public WarpNode FindClosestWarp(Vector3 position, LocationType location)
+        public WarpNode FindClosestWarp(Vector3 position, LocationName location)
         {
             var nodes = GetNodesByLocation(location);
             if (nodes == null || nodes.Count == 0) return null;
@@ -128,16 +127,11 @@ namespace FlavorfulStory.AI.SceneGraphSystem
         public void PrintGraph()
         {
             foreach (var location in _nodesByLocation.Keys)
+            foreach (var node in _nodesByLocation[location])
             {
-                foreach (var node in _nodesByLocation[location])
-                {
-                    string connections = "";
-                    foreach (var edge in node.Edges)
-                    {
-                        connections += $"{edge.TargetNode.SourceWarp.ParentLocation} -> ";
-                    }
-                    Debug.Log($"[{location}] Connected to: {connections.TrimEnd(" -> ".ToCharArray())}");
-                }
+                string connections = "";
+                foreach (var edge in node.Edges) connections += $"{edge.TargetNode.SourceWarp.ParentLocation} -> ";
+                Debug.Log($"[{location}] Connected to: {connections.TrimEnd(" -> ".ToCharArray())}");
             }
         }
     }

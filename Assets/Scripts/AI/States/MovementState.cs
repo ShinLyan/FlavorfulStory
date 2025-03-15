@@ -16,28 +16,28 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         private const float DistanceToReachPoint = 0.3f;
 
         /// <summary> Компонент для навигации NPC по NavMesh. </summary>
-        private NavMeshAgent _navMeshAgent;
+        private readonly NavMeshAgent _navMeshAgent;
 
         /// <summary> Компонент аниматора, управляющий анимациями NPC. </summary>
         private Animator _animator;
 
         /// <summary> Расписание NPC, определяющее его маршруты и точки перемещения. </summary>
-        private NpcSchedule _npcSchedule;
+        private readonly NpcSchedule _npcSchedule;
 
         /// <summary> Контроллер состояний, управляющий переключением между состояниями NPC. </summary>
-        private StateController _stateController;
+        private readonly StateController _stateController;
 
         /// <summary> Контроллер NPC, управляющий его поведением и анимациями. </summary>
-        private NPC _npc;
+        private readonly NPC _npc;
 
         /// <summary> Текущая точка маршрута, к которой движется NPC. </summary>
         private SchedulePoint _currentPoint;
 
         /// <summary> Текущая скорость NPC, используемая для анимации. </summary>
         private float _speed;
-        
+
         /// <summary> Граф варпов, используемый для поиска пути между локациями. </summary>
-        private WarpGraph _warpGraph;
+        private readonly WarpGraph _warpGraph;
 
         /// <summary> Текущая корутина, выполняющая перемещение NPC по пути. </summary>
         private Coroutine _currentPathCoroutine;
@@ -60,16 +60,16 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         /// <summary> Вызывается при входе в состояние движения. </summary>
         public override void Enter()
         {
-            WorldTime.OnDateTimeChanged += FindDestinationPoint;
+            WorldTime.OnTimeUpdated += FindDestinationPoint;
         }
 
         /// <summary> Вызывается при выходе из состояния движения. </summary>
         public override void Exit()
         {
-            WorldTime.OnDateTimeChanged -= FindDestinationPoint;
+            WorldTime.OnTimeUpdated -= FindDestinationPoint;
             _npc.PlayMoveAnimation(0f, 0f);
             _currentPoint = null;
-            
+
             if (_currentPathCoroutine != null)
             {
                 _npc.StopCoroutine(_currentPathCoroutine);
@@ -89,12 +89,12 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         /// <summary> Проверяет, достиг ли NPC текущей точки, и переключает состояние, если это так. </summary>
         private void SwitchStateIfPointReached()
         {
-            if (_currentPoint == null) 
+            if (_currentPoint == null)
                 return;
 
-            bool isInTargetLocation = _npc._currentLocationName == _currentPoint.LocationName;
+            bool isInTargetLocation = _npc.CurrentLocationName == _currentPoint.LocationName;
             bool isCloseEnough = _navMeshAgent.remainingDistance <= DistanceToReachPoint;
-    
+
             if (isInTargetLocation && isCloseEnough)
                 _stateController.SetState<RoutineState>();
         }
@@ -104,16 +104,16 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         /// <param name="currentTime"> Текущее время в игре. </param>
         private void FindDestinationPoint(DateTime currentTime)
         {
-            SchedulePoint newPoint = _npcSchedule.Params[0].GetClosestSchedulePointInPath(currentTime);
+            var newPoint = _npcSchedule.Params[0].GetClosestSchedulePointInPath(currentTime);
 
             if (newPoint == null)
             {
                 Debug.LogError("Ближайшая точка отсутствует!");
                 return;
             }
-            
+
             if (_currentPoint == newPoint) return;
-            
+
             Debug.Log(_currentPathCoroutine);
             if (_currentPathCoroutine != null)
             {
@@ -124,7 +124,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine
 
             _currentPoint = newPoint;
 
-            if (_npc._currentLocationName != newPoint.LocationName)
+            if (_npc.CurrentLocationName != newPoint.LocationName)
                 HandleWarpTransition(newPoint);
             else
                 _navMeshAgent.SetDestination(newPoint.Position);
@@ -134,23 +134,23 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         /// <param name="destination"> Целевая точка расписания. </param>
         private void HandleWarpTransition(SchedulePoint destination)
         {
-            Warp currentWarp = FindClosestWarpInCurrentScene();
-            Warp targetWarp = FindClosestWarpInScene(destination.Position, destination.LocationName);
+            var currentWarp = FindClosestWarpInCurrentScene();
+            var targetWarp = FindClosestWarpInScene(destination.Position, destination.LocationName);
 
             if (currentWarp == null || targetWarp == null)
             {
                 Debug.LogError("Не удалось найти начальный или конечный варп!");
                 return;
             }
-            
-            List<Warp> path = _warpGraph.FindShortestPath(currentWarp, targetWarp);
+
+            var path = _warpGraph.FindShortestPath(currentWarp, targetWarp);
 
             if (path == null)
             {
                 Debug.LogError("Путь не найден!");
                 return;
             }
-            
+
             _currentPathCoroutine = _npc.StartCoroutine(TraverseWarpPath(path, destination));
         }
 
@@ -160,11 +160,10 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         private IEnumerator TraverseWarpPath(List<Warp> path, SchedulePoint destination)
         {
             foreach (var currentWarp in path)
-            {
-                if (currentWarp.ParentLocation != _npc._currentLocationName)
+                if (currentWarp.ParentLocation != _npc.CurrentLocationName)
                 {
                     _navMeshAgent.Warp(currentWarp.transform.position);
-                    _npc._currentLocationName = currentWarp.ParentLocation;
+                    _npc.CurrentLocationName = currentWarp.ParentLocation;
                 }
                 else
                 {
@@ -173,21 +172,21 @@ namespace FlavorfulStory.AI.FiniteStateMachine
                     while (_navMeshAgent.pathPending || _navMeshAgent.remainingDistance > DistanceToReachPoint)
                         yield return null;
                 }
-            }
+
             // когда прошел через все варпы и оказался на конечной сцене
-            _navMeshAgent.SetDestination(destination.Position); 
-    
+            _navMeshAgent.SetDestination(destination.Position);
+
             while (_navMeshAgent.remainingDistance > DistanceToReachPoint)
                 yield return null;
         }
 
         /// <summary> Находит ближайший варп в указанной локации. </summary>
         /// <param name="position"> Позиция для поиска ближайшего варпа. </param>
-        /// <param name="scene"> Локация, в которой искать варп. </param>
+        /// <param name="location"> Локация, в которой искать варп. </param>
         /// <returns> Ближайший варп или null, если варп не найден. </returns>
-        private Warp FindClosestWarpInScene(Vector3 position, LocationType scene)
+        private Warp FindClosestWarpInScene(Vector3 position, LocationName location)
         {
-            WarpNode closestWarp = _warpGraph.FindClosestWarp(position, scene);
+            var closestWarp = _warpGraph.FindClosestWarp(position, location);
             return closestWarp?.SourceWarp;
         }
 
@@ -195,7 +194,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         /// <returns> Ближайший варп или null, если варп не найден. </returns>
         private Warp FindClosestWarpInCurrentScene()
         {
-            WarpNode closestWarp = _warpGraph.FindClosestWarp(_npc.transform.position, _npc._currentLocationName);
+            var closestWarp = _warpGraph.FindClosestWarp(_npc.transform.position, _npc.CurrentLocationName);
             return closestWarp?.SourceWarp;
         }
     }

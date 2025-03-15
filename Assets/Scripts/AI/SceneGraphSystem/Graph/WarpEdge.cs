@@ -11,11 +11,9 @@ namespace FlavorfulStory.AI.SceneGraphSystem
 
         /// <summary> Инициализирует новое ребро графа варпов. </summary>
         /// <param name="target">Целевой узел, к которому ведет это ребро.</param>
-        /// <param name="duration">Длительность перехода между узлами (в секундах).</param>
-        public WarpEdge(WarpNode target, int duration)
+        public WarpEdge(WarpNode target)
         {
             TargetNode = target;
-            Duration = duration;
         }
     }
 }
