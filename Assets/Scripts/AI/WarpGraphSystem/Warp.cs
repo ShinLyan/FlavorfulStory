@@ -8,7 +8,7 @@ namespace FlavorfulStory.AI.WarpGraphSystem
     {
         /// <summary> Связанные точки телепорта. </summary>
         [field: Tooltip("Связанные точки телепорта."), SerializeField]
-        public Warp[] ConnectedWarps { get; private set; }
+        public Warp ConnectedWarp { get; private set; }
 
         /// <summary> Локация, к которой принадлежит этот варп. </summary>
         public LocationName ParentLocation { get; private set; }
@@ -27,13 +27,12 @@ namespace FlavorfulStory.AI.WarpGraphSystem
             Gizmos.color = Color.cyan;
             Gizmos.DrawSphere(transform.position, 0.3f);
 
-            // Связи с другими локациями
-            foreach (var connected in ConnectedWarps)
-                if (connected)
-                {
-                    Gizmos.color = Color.yellow;
-                    Gizmos.DrawLine(transform.position, connected.transform.position);
-                }
+            // Связь с другими локациями
+            if (ConnectedWarp)
+            {
+                Gizmos.color = Color.yellow;
+                Gizmos.DrawLine(transform.position, ConnectedWarp.transform.position);
+            }
 
             // Связи внутри локаций
             var allWarps = FindObjectsByType<Warp>(FindObjectsSortMode.None);

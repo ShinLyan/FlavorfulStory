@@ -8,15 +8,15 @@ namespace FlavorfulStory.AI.WarpGraphSystem
     /// <summary> Граф варпов, представляющий связи между локациями и варпами. </summary>
     public class WarpGraph
     {
-        /// <summary> Словарь, хранящий узлы (варпы) по локациям. </summary>
-        private readonly Dictionary<LocationName, List<WarpNode>> _nodesByLocation = new();
-
         /// <summary> Список всех узлов (варпов) в графе. </summary>
         private readonly List<WarpNode> _allNodes = new();
 
+        /// <summary> Словарь, хранящий узлы (варпы) по локациям. </summary>
+        private readonly Dictionary<LocationName, List<WarpNode>> _nodesByLocation = new();
+
         /// <summary> Добавляет узел (варп) в граф. </summary>
         /// <param name="node"> Узел, который нужно добавить. </param>
-        public void AddNode(WarpNode node)
+        private void AddNode(WarpNode node)
         {
             if (!_nodesByLocation.ContainsKey(node.SourceWarp.ParentLocation))
                 _nodesByLocation[node.SourceWarp.ParentLocation] = new List<WarpNode>();
@@ -53,8 +53,8 @@ namespace FlavorfulStory.AI.WarpGraphSystem
                     var finalPath = ReconstructPath(path, endNode);
                     if (finalPath.Count < 2) return finalPath;
 
-                    bool isLastDuplicate = finalPath[^2].ParentLocation == finalPath[^1].ParentLocation;
-                    bool isFirstDuplicate = finalPath[0].ParentLocation == finalPath[1].ParentLocation;
+                    var isLastDuplicate = finalPath[^2].ParentLocation == finalPath[^1].ParentLocation;
+                    var isFirstDuplicate = finalPath[0].ParentLocation == finalPath[1].ParentLocation;
 
                     return isLastDuplicate ? finalPath.GetRange(0, finalPath.Count - 1)
                         : isFirstDuplicate ? finalPath.GetRange(1, finalPath.Count - 1)
@@ -109,11 +109,11 @@ namespace FlavorfulStory.AI.WarpGraphSystem
             if (nodes == null || nodes.Count == 0) return null;
 
             WarpNode closestNode = null;
-            float minDistance = float.MaxValue;
+            var minDistance = float.MaxValue;
 
             foreach (var node in nodes)
             {
-                float distance = Vector3.Distance(position, node.SourceWarp.transform.position);
+                var distance = Vector3.Distance(position, node.SourceWarp.transform.position);
                 if (distance < minDistance)
                 {
                     minDistance = distance;
@@ -130,7 +130,7 @@ namespace FlavorfulStory.AI.WarpGraphSystem
             foreach (var location in _nodesByLocation.Keys)
             foreach (var node in _nodesByLocation[location])
             {
-                string connections = "";
+                var connections = "";
                 foreach (var edge in node.Edges) connections += $"{edge.TargetNode.SourceWarp.ParentLocation} -> ";
                 Debug.Log($"[{location}] Connected to: {connections.TrimEnd(" -> ".ToCharArray())}");
             }
@@ -144,8 +144,8 @@ namespace FlavorfulStory.AI.WarpGraphSystem
             var warpsByLocation = new Dictionary<LocationName, List<Warp>>();
 
             // Группируем варпы по локациям
-            var enumerable = allWarps.ToList();
-            foreach (var warp in enumerable)
+            var warps = allWarps.ToList();
+            foreach (var warp in warps)
             {
                 if (!warpsByLocation.ContainsKey(warp.ParentLocation))
                     warpsByLocation[warp.ParentLocation] = new List<Warp>();
@@ -173,10 +173,10 @@ namespace FlavorfulStory.AI.WarpGraphSystem
             }
 
             // Добавляем связи между варпами разных локаций
-            foreach (var warp in enumerable)
-            foreach (var connectedWarp in warp.ConnectedWarps)
-                if (nodeMap.TryGetValue(connectedWarp, out var targetNode))
+            foreach (var warp in warps)
+                if (nodeMap.TryGetValue(warp.ConnectedWarp, out var targetNode))
                     nodeMap[warp].Edges.Add(new WarpEdge(targetNode));
+
 
             return graph;
         }

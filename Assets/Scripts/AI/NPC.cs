@@ -10,6 +10,63 @@ namespace FlavorfulStory.AI
     /// <summary> Контроллер NPC, управляющий состояниями и поведением персонажа. </summary>
     public class NPC : MonoBehaviour
     {
+        private void Awake()
+        {
+            _navMeshAgent = GetComponent<NavMeshAgent>();
+            _animator = GetComponent<Animator>();
+            _stateController = new StateController();
+        }
+
+        private void Start()
+        {
+            InitializeStates();
+            AddStatesToController();
+
+            _stateController.SetState<RoutineState>();
+        }
+
+        /// <summary> Обновление логики состояний каждый кадр. </summary>
+        private void Update() => _stateController.Update(Time.deltaTime);
+
+        /// <summary> Создает экземпляры всех состояний NPC. </summary>
+        private void InitializeStates()
+        {
+            var graph = WarpGraph.Build(FindObjectsByType<Warp>(FindObjectsInactive.Include, FindObjectsSortMode.None));
+            graph.PrintGraph();
+            _interactionState = new InteractionState(_stateController);
+            _movementState = new MovementState(_stateController, _npcSchedule, _navMeshAgent, this, graph);
+            _routineState = new RoutineState(_stateController, _npcSchedule, this);
+            _waitingState = new WaitingState(_stateController);
+        }
+
+        /// <summary> Добавляет состояния в контроллер. </summary>
+        private void AddStatesToController()
+        {
+            _stateController.AddState(_interactionState);
+            _stateController.AddState(_movementState);
+            _stateController.AddState(_routineState);
+            _stateController.AddState(_waitingState);
+        }
+
+        /// <summary> Воспроизведение анимации движения. </summary>
+        /// <param name="speed"> Скорость движения. </param>
+        /// <param name="dampTime"> Время сглаживания перехода анимации. </param>
+        public void PlayMoveAnimation(float speed, float dampTime = 0.2f)
+        {
+            _animator.SetFloat(_speedParameterHash, speed, dampTime, Time.deltaTime);
+        }
+
+        /// <summary> Воспроизведение анимации состояния. </summary>
+        /// <param name="animationStateName"> Название состояния анимации. </param>
+        public void PlayStateAnimation(NpcAnimationClipName animationStateName)
+        {
+            _animator.Play(animationStateName.ToString());
+        }
+
+        /// <summary> Устанавливает новое расписание для NPC. </summary>
+        /// <param name="newScheduleParams"> Новые параметры расписания. </param>
+        public void SetNewSchedule(ScheduleParams newScheduleParams) => _currentScheduleParams = newScheduleParams;
+
         #region Fields and Properties
 
         /// <summary> Имя персонажа. </summary>
@@ -52,62 +109,5 @@ namespace FlavorfulStory.AI
         private ScheduleParams _currentScheduleParams;
 
         #endregion
-
-        private void Awake()
-        {
-            _navMeshAgent = GetComponent<NavMeshAgent>();
-            _animator = GetComponent<Animator>();
-            _stateController = new StateController();
-        }
-
-        private void Start()
-        {
-            InitializeStates();
-            AddStatesToController();
-
-            _stateController.SetState<RoutineState>();
-        }
-
-        /// <summary> Создает экземпляры всех состояний NPC. </summary>
-        private void InitializeStates()
-        {
-            _interactionState = new InteractionState(_stateController);
-            _movementState = new MovementState(_stateController, _npcSchedule, _navMeshAgent, this,
-                WarpGraph.Build(FindObjectsByType<Warp>(FindObjectsInactive.Include, FindObjectsSortMode.None))
-            );
-            _routineState = new RoutineState(_stateController, _npcSchedule, this);
-            _waitingState = new WaitingState(_stateController);
-        }
-
-        /// <summary> Добавляет состояния в контроллер. </summary>
-        private void AddStatesToController()
-        {
-            _stateController.AddState(_interactionState);
-            _stateController.AddState(_movementState);
-            _stateController.AddState(_routineState);
-            _stateController.AddState(_waitingState);
-        }
-
-        /// <summary> Обновление логики состояний каждый кадр. </summary>
-        private void Update() => _stateController.Update(Time.deltaTime);
-
-        /// <summary> Воспроизведение анимации движения. </summary>
-        /// <param name="speed"> Скорость движения. </param>
-        /// <param name="dampTime"> Время сглаживания перехода анимации. </param>
-        public void PlayMoveAnimation(float speed, float dampTime = 0.2f)
-        {
-            _animator.SetFloat(_speedParameterHash, speed, dampTime, Time.deltaTime);
-        }
-
-        /// <summary> Воспроизведение анимации состояния. </summary>
-        /// <param name="animationStateName"> Название состояния анимации. </param>
-        public void PlayStateAnimation(NpcAnimationClipName animationStateName)
-        {
-            _animator.Play(animationStateName.ToString());
-        }
-
-        /// <summary> Устанавливает новое расписание для NPC. </summary>
-        /// <param name="newScheduleParams"> Новые параметры расписания. </param>
-        public void SetNewSchedule(ScheduleParams newScheduleParams) => _currentScheduleParams = newScheduleParams;
     }
 }
