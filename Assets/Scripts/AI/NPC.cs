@@ -31,10 +31,10 @@ namespace FlavorfulStory.AI
         /// <summary> Создает экземпляры всех состояний NPC. </summary>
         private void InitializeStates()
         {
-            var graph = WarpGraph.Build(FindObjectsByType<Warp>(FindObjectsInactive.Include, FindObjectsSortMode.None));
-            graph.PrintGraph();
             _interactionState = new InteractionState(_stateController);
-            _movementState = new MovementState(_stateController, _npcSchedule, _navMeshAgent, this, graph);
+            _movementState = new MovementState(_stateController, _npcSchedule, _navMeshAgent, this,
+                WarpGraph.Build(FindObjectsByType<Warp>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+            );
             _routineState = new RoutineState(_stateController, _npcSchedule, this);
             _waitingState = new WaitingState(_stateController);
         }

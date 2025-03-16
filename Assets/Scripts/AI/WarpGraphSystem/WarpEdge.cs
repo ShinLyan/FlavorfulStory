@@ -1,16 +1,14 @@
 namespace FlavorfulStory.AI.WarpGraphSystem
 {
-    /// <summary> Ребро графа варпов, представляющее связь между двумя узлами (варпами). </summary>
-    public class WarpEdge
+    public struct WarpEdge
     {
-        /// <summary> Инициализирует новое ребро графа варпов. </summary>
-        /// <param name="target">Целевой узел, к которому ведет это ребро.</param>
-        public WarpEdge(WarpNode target)
+        public WarpEdge(WarpNode source, WarpNode target)
         {
+            SourceNode = source;
             TargetNode = target;
         }
 
-        /// <summary> Целевой узел, к которому ведет это ребро. </summary>
+        public WarpNode SourceNode { get; }
         public WarpNode TargetNode { get; }
     }
 }

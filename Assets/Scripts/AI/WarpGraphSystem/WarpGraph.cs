@@ -12,16 +12,16 @@ namespace FlavorfulStory.AI.WarpGraphSystem
         private readonly List<WarpNode> _allNodes = new();
 
         /// <summary> Словарь, хранящий узлы (варпы) по локациям. </summary>
-        private readonly Dictionary<LocationName, List<WarpNode>> _nodesByLocation = new();
+        private readonly Dictionary<LocationName, List<WarpNode>> _locationToNodes = new();
 
         /// <summary> Добавляет узел (варп) в граф. </summary>
         /// <param name="node"> Узел, который нужно добавить. </param>
         private void AddNode(WarpNode node)
         {
-            if (!_nodesByLocation.ContainsKey(node.SourceWarp.ParentLocation))
-                _nodesByLocation[node.SourceWarp.ParentLocation] = new List<WarpNode>();
+            if (!_locationToNodes.ContainsKey(node.SourceWarp.ParentLocation))
+                _locationToNodes[node.SourceWarp.ParentLocation] = new List<WarpNode>();
 
-            _nodesByLocation[node.SourceWarp.ParentLocation].Add(node);
+            _locationToNodes[node.SourceWarp.ParentLocation].Add(node);
             _allNodes.Add(node);
         }
 
@@ -96,7 +96,7 @@ namespace FlavorfulStory.AI.WarpGraphSystem
         /// <returns> Список узлов в локации или null, если локация не найдена. </returns>
         private List<WarpNode> GetNodesByLocation(LocationName location)
         {
-            return _nodesByLocation.GetValueOrDefault(location);
+            return _locationToNodes.GetValueOrDefault(location);
         }
 
         /// <summary> Находит ближайший узел к позиции в указанной локации. </summary>
@@ -106,29 +106,15 @@ namespace FlavorfulStory.AI.WarpGraphSystem
         public WarpNode FindClosestWarp(Vector3 position, LocationName location)
         {
             var nodes = GetNodesByLocation(location);
-            if (nodes == null || nodes.Count == 0) return null;
-
-            WarpNode closestNode = null;
-            var minDistance = float.MaxValue;
-
-            foreach (var node in nodes)
-            {
-                var distance = Vector3.Distance(position, node.SourceWarp.transform.position);
-                if (distance < minDistance)
-                {
-                    minDistance = distance;
-                    closestNode = node;
-                }
-            }
-
-            return closestNode;
+            return nodes?.OrderBy(n => Vector3.Distance(position, n.SourceWarp.transform.position))
+                .FirstOrDefault();
         }
 
         /// <summary> Выводит структуру графа в консоль для отладки. </summary>
         public void PrintGraph()
         {
-            foreach (var location in _nodesByLocation.Keys)
-            foreach (var node in _nodesByLocation[location])
+            foreach (var location in _locationToNodes.Keys)
+            foreach (var node in _locationToNodes[location])
             {
                 var connections = "";
                 foreach (var edge in node.Edges) connections += $"{edge.TargetNode.SourceWarp.ParentLocation} -> ";
@@ -141,41 +127,41 @@ namespace FlavorfulStory.AI.WarpGraphSystem
         /// <returns> Построенный граф варпов. </returns>
         public static WarpGraph Build(IEnumerable<Warp> allWarps)
         {
-            var warpsByLocation = new Dictionary<LocationName, List<Warp>>();
+            var locationToWarps = new Dictionary<LocationName, List<Warp>>();
+            var warps = allWarps.ToList();
 
             // Группируем варпы по локациям
-            var warps = allWarps.ToList();
             foreach (var warp in warps)
             {
-                if (!warpsByLocation.ContainsKey(warp.ParentLocation))
-                    warpsByLocation[warp.ParentLocation] = new List<Warp>();
+                if (!locationToWarps.ContainsKey(warp.ParentLocation))
+                    locationToWarps[warp.ParentLocation] = new List<Warp>();
 
-                warpsByLocation[warp.ParentLocation].Add(warp);
+                locationToWarps[warp.ParentLocation].Add(warp);
             }
 
+            var warpToNode = new Dictionary<Warp, WarpNode>();
             var graph = new WarpGraph();
-            var nodeMap = new Dictionary<Warp, WarpNode>();
 
             // Создаем узлы и связи внутри локаций
-            foreach (var warpsInLocation in warpsByLocation.Keys.Select(location => warpsByLocation[location]))
+            foreach (var warpsInLocation in locationToWarps.Keys.Select(location => locationToWarps[location]))
             {
                 foreach (var warp in warpsInLocation)
                 {
                     var node = new WarpNode(warp);
-                    nodeMap[warp] = node;
+                    warpToNode[warp] = node;
                     graph.AddNode(node);
                 }
 
                 // Связываем все варпы внутри локации между собой
                 foreach (var warpA in warpsInLocation)
                 foreach (var warpB in warpsInLocation.Where(warpB => warpA != warpB))
-                    nodeMap[warpA].Edges.Add(new WarpEdge(nodeMap[warpB]));
+                    warpToNode[warpA].Edges.Add(new WarpEdge(warpToNode[warpA], warpToNode[warpB]));
             }
 
             // Добавляем связи между варпами разных локаций
             foreach (var warp in warps)
-                if (nodeMap.TryGetValue(warp.ConnectedWarp, out var targetNode))
-                    nodeMap[warp].Edges.Add(new WarpEdge(targetNode));
+                if (warpToNode.TryGetValue(warp.ConnectedWarp, out var targetNode))
+                    warpToNode[warp].Edges.Add(new WarpEdge(warpToNode[warp], targetNode));
 
 
             return graph;

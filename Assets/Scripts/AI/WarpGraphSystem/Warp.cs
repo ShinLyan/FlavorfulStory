@@ -13,9 +13,8 @@ namespace FlavorfulStory.AI.WarpGraphSystem
         /// <summary> Локация, к которой принадлежит этот варп. </summary>
         public LocationName ParentLocation { get; private set; }
 
-        /// <summary>
-        /// 
-        /// </summary>
+        /// <summary> Инициализация компонента. </summary>
+        /// <remarks> Получение имени локации через родительский объект. </remarks>
         private void Awake()
         {
             ParentLocation = GetComponentInParent<Location>().LocationName;
