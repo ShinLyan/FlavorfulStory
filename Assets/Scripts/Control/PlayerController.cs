@@ -90,6 +90,8 @@ namespace FlavorfulStory.Control
         /// <summary> Обработка выбора предмета на панели быстрого доступа. </summary>
         private void HandleToolbarSelection()
         {
+            if (_toolCooldownTimer > 0) return;
+
             const int ToolbarItemsCount = 9;
             for (int i = 0; i < ToolbarItemsCount; i++)
                 if (Input.GetKeyDown(KeyCode.Alpha1 + i))
@@ -103,9 +105,10 @@ namespace FlavorfulStory.Control
                 EventSystem.current.IsPointerOverGameObject() || _interactFeature.IsInteracting)
                 return;
 
-            if ((Input.GetMouseButton(0) && actionItem.UseActionType == UseActionType.LeftClick) ||
-                (Input.GetMouseButton(1) && actionItem.UseActionType == UseActionType.RightClick))
+            if (Input.GetMouseButton(0) && actionItem.UseActionType == UseActionType.LeftClick ||
+                Input.GetMouseButton(1) && actionItem.UseActionType == UseActionType.RightClick)
             {
+                _toolbar.SetInteractableState(false);
                 actionItem.Use(this);
                 _toolCooldownTimer = _toolCooldown;
                 InputWrapper.BlockPlayerMovement();
@@ -185,6 +188,7 @@ namespace FlavorfulStory.Control
         {
             if (!_currentTool) return;
 
+            _toolbar.SetInteractableState(true);
             _currentTool.SetActive(false);
             _currentTool = null;
             InputWrapper.UnblockPlayerMovement();

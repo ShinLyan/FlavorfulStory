@@ -11,6 +11,9 @@ namespace FlavorfulStory.InventorySystem.UI
         /// <summary> Массив слотов панели инструментов. </summary>
         private ToolbarSlotUI[] _slots;
 
+        /// <summary> Можно ли взаимодействовать?. </summary>
+        private bool _isInteractable;
+
         /// <summary> Индекс выбранного предмета. </summary>
         public int SelectedItemIndex { get; private set; }
 
@@ -31,6 +34,7 @@ namespace FlavorfulStory.InventorySystem.UI
         /// <summary> Первоначальная настройка панели инструментов. </summary>
         private void Start()
         {
+            _isInteractable = true;
             ResetToolbar();
             RedrawToolbar();
             _slots[SelectedItemIndex].Select();
@@ -57,25 +61,29 @@ namespace FlavorfulStory.InventorySystem.UI
             foreach (var slot in _slots) slot.Redraw();
         }
 
+        /// <summary> Обрабатывает ввод колесика мыши для смены выбранного предмета. </summary>
+        private void HandleMouseScrollInput()
+        {
+            int scrollInput = InputWrapper.GetMouseScrollDelta();
+
+            if (scrollInput == 0) return;
+
+            int newSelectedItemIndex = Mathf.Clamp(SelectedItemIndex - scrollInput, 0, _slots.Length - 1);
+            SelectItem(newSelectedItemIndex);
+        }
+
         /// <summary> Выбирает предмет в панели инструментов по указанному индексу. </summary>
         /// <param name="index"> Индекс предмета, который нужно выбрать. </param>
         public void SelectItem(int index)
         {
+            if (!_isInteractable) return;
+
             _slots[SelectedItemIndex].ResetSelection();
             SelectedItemIndex = index;
             _slots[SelectedItemIndex].Select();
         }
 
-        /// <summary> Обрабатывает ввод колесика мыши для смены выбранного предмета. </summary>
-        private void HandleMouseScrollInput()
-        {
-            var scrollInput = InputWrapper.GetMouseScrollDelta();
-
-            if (scrollInput == 0) return;
-
-            var newSelectedItemIndex = Mathf.Clamp(SelectedItemIndex - scrollInput, 0, _slots.Length - 1);
-            SelectItem(newSelectedItemIndex);
-        }
+        public void SetInteractableState(bool state) => _isInteractable = state;
 
         #region Saving
 

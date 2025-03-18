@@ -51,6 +51,7 @@ namespace FlavorfulStory.InventorySystem
         /// <param name="spawnPosition"> Позиция спавна предмета. </param>
         /// <param name="number"> Количество предметов. </param>
         /// <returns> Возвращает ссылку на заспавненный предмет Pickup. </returns>
+        //TODO: Вынести куда-то. Item не должен сам себя спавнить!
         public Pickup SpawnPickup(Vector3 spawnPosition, int number)
         {
             var pickup = Instantiate(_pickup);
