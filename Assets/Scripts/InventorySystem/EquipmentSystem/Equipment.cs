@@ -1,5 +1,6 @@
-using FlavorfulStory.Saving;
+using System;
 using System.Collections.Generic;
+using FlavorfulStory.Saving;
 using UnityEngine;
 
 namespace FlavorfulStory.InventorySystem.EquipmentSystem
@@ -12,7 +13,7 @@ namespace FlavorfulStory.InventorySystem.EquipmentSystem
         private Dictionary<EquipmentType, EquipableItem> _equippedItems = new();
 
         /// <summary> Событие, вызываемое при изменении состояния экипировки. </summary>
-        public event System.Action EquipmentUpdated;
+        public event Action EquipmentUpdated;
 
         /// <summary> Получить предмет из указанного слота экипировки. </summary>
         /// <param name="equipLocation"> Слот экипировки. </param>
@@ -64,7 +65,7 @@ namespace FlavorfulStory.InventorySystem.EquipmentSystem
             var equippedItemsForSerialization = state as Dictionary<EquipmentType, string>;
             foreach (var pair in equippedItemsForSerialization)
             {
-                var item = InventoryItem.GetItemFromID(pair.Value) as EquipableItem;
+                var item = ItemDatabase.GetItemFromID(pair.Value) as EquipableItem;
                 if (item) _equippedItems[pair.Key] = item;
             }
         }

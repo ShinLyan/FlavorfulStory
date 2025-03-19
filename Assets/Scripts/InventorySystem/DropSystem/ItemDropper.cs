@@ -1,8 +1,10 @@
-﻿using FlavorfulStory.InventorySystem.PickupSystem;
-using FlavorfulStory.Saving;
+﻿using System;
 using System.Collections.Generic;
+using FlavorfulStory.InventorySystem.PickupSystem;
+using FlavorfulStory.Saving;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Random = UnityEngine.Random;
 
 namespace FlavorfulStory.InventorySystem.DropSystem
 {
@@ -49,7 +51,7 @@ namespace FlavorfulStory.InventorySystem.DropSystem
         #region Saving
 
         /// <summary> Запись о выпавших предметах. </summary>
-        [System.Serializable]
+        [Serializable]
         private struct DropRecord
         {
             /// <summary> ID выпавшего предмета. </summary>
@@ -72,7 +74,7 @@ namespace FlavorfulStory.InventorySystem.DropSystem
 
             var droppedItemsList = new List<DropRecord>();
             int buildIndex = SceneManager.GetActiveScene().buildIndex;
-            foreach (Pickup pickup in _droppedItems)
+            foreach (var pickup in _droppedItems)
             {
                 var droppedItem = new DropRecord
                 {
@@ -115,8 +117,8 @@ namespace FlavorfulStory.InventorySystem.DropSystem
                     continue;
                 }
 
-                var pickupItem = InventoryItem.GetItemFromID(item.ItemID);
-                Vector3 position = item.Position.ToVector();
+                var pickupItem = ItemDatabase.GetItemFromID(item.ItemID);
+                var position = item.Position.ToVector();
                 int number = item.Number;
                 SpawnPickup(pickupItem, number, position);
             }

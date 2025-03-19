@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using FlavorfulStory.InventorySystem.PickupSystem;
 using UnityEngine;
 
@@ -42,9 +41,6 @@ namespace FlavorfulStory.InventorySystem
         [field: Tooltip("Вместимость одного стака. "), SerializeField]
         public int StackSize { get; private set; } = 99;
 
-        /// <summary> База данных всех предметов игры. </summary>
-        private static Dictionary<string, InventoryItem> _itemDatabase;
-
         #endregion
 
         /// <summary> Заспавнить предмет Pickup на сцене. </summary>
@@ -60,37 +56,6 @@ namespace FlavorfulStory.InventorySystem
             return pickup;
         }
 
-        /// <summary> Получить экземпляр предмета инвентаря по его ID. </summary>
-        /// <param name="itemID"> ID предмета инвентаря. </param>
-        /// <returns> Экземпляр Inventoryitem, соответствующий ID. </returns>
-        public static InventoryItem GetItemFromID(string itemID)
-        {
-            if (_itemDatabase == null) CreateItemDatabase();
-
-            if (itemID == null || !_itemDatabase.ContainsKey(itemID)) return null;
-            return _itemDatabase[itemID];
-        }
-
-        /// <summary> Создать базу данных предметов. </summary>
-        private static void CreateItemDatabase()
-        {
-            _itemDatabase = new Dictionary<string, InventoryItem>();
-
-            // Загрузка все ресурсов с типом InventoryItem по всему проекту.
-            var items = Resources.LoadAll<InventoryItem>(string.Empty);
-            foreach (var item in items)
-            {
-                if (_itemDatabase.TryGetValue(item.ItemID, out var value))
-                {
-                    Debug.LogError("Присутствует дубликат ID InventoryItem для объектов: " +
-                                   $"{value} и {item}. Замените ID у данного объекта.");
-                    continue;
-                }
-
-                _itemDatabase[item.ItemID] = item;
-            }
-        }
-
         #region ISerializationCallbackReceiver
 
         /// <summary> Генерация и сохранение нового GUID, если он пустой. </summary>
@@ -100,9 +65,7 @@ namespace FlavorfulStory.InventorySystem
         }
 
         /// <summary> Требуется для ISerializationCallbackReceiver, но нам не нужно ничего с ним делать. </summary>
-        public void OnAfterDeserialize()
-        {
-        }
+        public void OnAfterDeserialize() { }
 
         #endregion
     }

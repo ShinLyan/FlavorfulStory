@@ -73,7 +73,7 @@ namespace FlavorfulStory.InventorySystem
         /// <returns> Возвращает общее количество заданного предмета в инвентаре. </returns>
         public int GetItemNumber(InventoryItem item) =>
             _slots.Where(slot => slot.Item == item).Sum(slot => slot.Number);
-        
+
         public void RemoveItem(InventoryItem item, int number)
         {
             if (!HasItem(item))
@@ -206,7 +206,7 @@ namespace FlavorfulStory.InventorySystem
             {
                 if (slotRecords == null) continue;
 
-                _slots[i].Item = InventoryItem.GetItemFromID(slotRecords[i].ItemID);
+                _slots[i].Item = ItemDatabase.GetItemFromID(slotRecords[i].ItemID);
                 _slots[i].Number = slotRecords[i].Number;
             }
 

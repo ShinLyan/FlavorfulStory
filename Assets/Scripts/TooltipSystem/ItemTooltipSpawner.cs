@@ -5,6 +5,7 @@ namespace FlavorfulStory.InventorySystem.TooltipSystem
 {
     /// <summary> Помещается в слот UI инвентаря для отображения тултипа предмета. </summary>
     [RequireComponent(typeof(IItemHolder))]
+    //TODO: Рефакторинг тултипов!!! Никаких спавнеров - один для игровых объектов, один для UI
     public class ItemTooltipSpawner : TooltipSpawner
     {
         #region Override Methods
@@ -25,7 +26,7 @@ namespace FlavorfulStory.InventorySystem.TooltipSystem
             if (itemTooltip == null) return;
 
             var item = GetComponent<IItemHolder>().GetItem();
-            itemTooltip.Setup(item);
+            itemTooltip.Setup(item.ItemName, item.Description);
         }
 
         #endregion

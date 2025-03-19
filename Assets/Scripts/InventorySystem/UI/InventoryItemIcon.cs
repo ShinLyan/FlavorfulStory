@@ -11,19 +11,28 @@ namespace FlavorfulStory.InventorySystem.UI
     {
         /// <summary> Gameobject-контейнер количества предметов. </summary>
         [SerializeField] private GameObject _itemNumberContainer;
-        
+
         /// <summary> Текст количества предметов. </summary>
         [SerializeField] private TMP_Text _itemNumberText;
-        
+
+        /// <summary> Изображение иконки предмета в инвентаре. </summary>
+        [SerializeField] private Image _iconImage;
+
+        /// <summary> Снятие компонента <see cref="Image"/> текущего объекта
+        /// в <see cref="_iconImage"/>. </summary>
+        private void Awake()
+        {
+            _iconImage = GetComponent<Image>();
+        }
+
         /// <summary> Установить предмет инвентаря. </summary>
         /// <param name="item"> Предмет инвентаря. </param>
         /// <param name="number"> Количество предметов. </param>
         public void SetItem(InventoryItem item, int number)
         {
-            var iconImage = GetComponent<Image>();
-            iconImage.enabled = item;
-            if (item) iconImage.sprite = item.Icon;
-            
+            _iconImage.enabled = item;
+            if (item) _iconImage.sprite = item.Icon;
+
             _itemNumberContainer.SetActive(number > 1);
             _itemNumberText.text = number.ToString();
         }
