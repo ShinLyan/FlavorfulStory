@@ -21,6 +21,7 @@ namespace FlavorfulStory.Actions
         /// <summary> Радиус использования инструмента. </summary>
         private const float UseRadius = 1.5f;
 
+        /// <summary> Кнопка использования предмета. </summary>
         [field: Tooltip("Кнопка использования"), SerializeField]
         public UseActionType UseActionType { get; set; }
 
@@ -53,7 +54,6 @@ namespace FlavorfulStory.Actions
             var direction = (targetPosition - origin).normalized;
             var interactionCenter = origin + direction * (MaxInteractionDistance / 2);
 
-            // TODO: Проверь что корректно работает. Было написано под пивом
             var hitColliders = Physics.OverlapSphere(interactionCenter, UseRadius, hitableLayers);
 
             foreach (var collider in hitColliders)
@@ -61,7 +61,7 @@ namespace FlavorfulStory.Actions
                     hitable.TakeHit(ToolType);
 
             // Debug
-            Debug.DrawLine(origin, interactionCenter, Color.red, 50);
+            Debug.DrawLine(origin, interactionCenter, Color.red, 5f);
         }
     }
 }

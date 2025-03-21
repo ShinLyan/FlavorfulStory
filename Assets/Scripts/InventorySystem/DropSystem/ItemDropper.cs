@@ -16,6 +16,7 @@ namespace FlavorfulStory.InventorySystem.DropSystem
         /// <summary> Выброшенные предметы. </summary>
         private List<Pickup> _droppedItems = new();
 
+        /// <summary> Список прочих заспавненных предметов инвентаря. </summary>
         private readonly List<DropRecord> _otherSceneDroppedItems = new();
 
         /// <summary> Создание pickup в определенной позиции. </summary>
@@ -42,9 +43,9 @@ namespace FlavorfulStory.InventorySystem.DropSystem
         /// <param name="item"> Предмет, который необходимо заспавнить. </param>
         /// <param name="number"> Количество предметов. </param>
         /// <param name="spawnPosition"> Позиция спавна предмета. </param>
-        public void SpawnPickup(InventoryItem item, int number, Vector3 spawnPosition)
+        private void SpawnPickup(InventoryItem item, int number, Vector3 spawnPosition)
         {
-            var pickup = item.SpawnPickup(spawnPosition, number);
+            var pickup = PickupFactory.Spawn(item, spawnPosition, number);
             _droppedItems.Add(pickup);
         }
 

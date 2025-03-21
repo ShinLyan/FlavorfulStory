@@ -33,21 +33,19 @@ namespace FlavorfulStory.Control
         /// <summary> Взаимодействие игрока с объектами. </summary>
         private InteractFeature _interactFeature;
 
+        /// <summary> Обработчик инструмента. </summary>
         private ToolHandler _toolHandler;
 
         #region Tools
 
-        /// <summary> Текущий экипированный инструмент. </summary>
-        private GameObject _currentTool;
-
         [SerializeField, Range(1f, 5f)] private float _toolCooldown = 1.5f;
-
         /// <summary> Таймер перезарядки использования инструмента. </summary>
         private float _toolCooldownTimer;
 
         /// <summary> Можно ли использовать инструмент? </summary>
         private bool CanUseTool => _toolCooldownTimer <= 0f;
 
+        /// <summary> Заблокировано ли использование предмета? </summary>
         private bool IsToolUseBlocked => !CanUseTool || _isBusy || EventSystem.current.IsPointerOverGameObject();
 
         #endregion
@@ -76,7 +74,6 @@ namespace FlavorfulStory.Control
             HandleInput();
             if (_toolCooldownTimer > 0f)
                 _toolCooldownTimer -= Time.deltaTime;
-            //ReduceCooldownTimer();
         }
 
         /// <summary> Обработка пользовательского ввода. </summary>
@@ -109,6 +106,9 @@ namespace FlavorfulStory.Control
                 BeginInteraction(usable);
             }
         }
+
+        /// <summary> Начать взаимодйствие с предметом. </summary>
+        /// <param name="usable"> Используемый предмет. </param>
         private void BeginInteraction(IUsable usable)
         {
             if (_isBusy) return;
@@ -117,6 +117,8 @@ namespace FlavorfulStory.Control
             if (usable is EdibleInventoryItem) ConsumeEdibleItem();
         }
 
+        /// <summary> Начать использование предмета. </summary>
+        /// <param name="usable"> Используемый предмет. </param>
         private void StartUsingItem(IUsable usable)
         {
             usable.Use(this, _toolHandler.HitableLayers);
@@ -127,6 +129,7 @@ namespace FlavorfulStory.Control
             SetBusyState(true);
         }
 
+        /// <summary> Съесть используемый предмет. </summary>
         private void ConsumeEdibleItem()
         {
             Inventory.PlayerInventory.RemoveFromSlot(_toolbar.SelectedItemIndex, 1);
@@ -136,6 +139,9 @@ namespace FlavorfulStory.Control
             SetBusyState(false);
         }
 
+        /// <summary> Задать состояние занятости игрока. </summary>
+        /// <param name="state"> Состояние. </param>
+        /// <remarks> Когда игрок занят - не может использовать инструмент или взаимодействовать с окружением. </remarks>
         private void SetBusyState(bool state)
         {
             _isBusy = state;

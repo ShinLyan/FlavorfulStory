@@ -5,14 +5,22 @@ using UnityEngine;
 
 namespace FlavorfulStory
 {
+    /// <summary> Отвечает за отображение и управление визуальным отображением инструментов в руке игрока. </summary>
+    /// <remarks> Также блокирует/разблокирует ввод, связанный с прокруткой тулбара. </remarks>
     public class ToolHandler : MonoBehaviour
     {
+        /// <summary> Сопоставления типов инструментов с их префабами для визуализации в руке игрока. </summary>
         [SerializeField] private ToolPrefabMapping[] _toolMappings;
 
+        /// <summary> Слои, по которым производится удар с помощью инструмента. </summary>
         [field: SerializeField] public LayerMask HitableLayers { get; private set; }
 
+        /// <summary> Текущий отображаемый инструмент, прикреплённый к руке игрока. </summary>
         private GameObject _currentTool;
 
+        /// <summary> Активирует визуальное отображение инструмента на основе переданного объекта Tool. </summary>
+        /// <param name="tool">Инструмент, который нужно отобразить.</param>
+        /// <remarks> Также блокирует прокрутку мыши, чтобы исключить случайную смену предмета. </remarks>
         public void Equip(Tool tool)
         {
             if (tool == null || _currentTool != null) return;
@@ -22,10 +30,11 @@ namespace FlavorfulStory
 
             _currentTool = mapping.ToolPrefab;
             _currentTool.SetActive(true);
-
             InputWrapper.BlockInput(InputButton.MouseScroll);
         }
 
+        /// <summary> Удаляет текущий отображаемый инструмент из руки игрока. </summary>
+        /// <remarks> Также разблокирует ввод (прокрутку мыши и движение). </remarks>
         public void Unequip()
         {
             if (_currentTool == null) return;

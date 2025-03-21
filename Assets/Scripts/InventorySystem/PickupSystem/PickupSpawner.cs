@@ -27,7 +27,7 @@ namespace FlavorfulStory.InventorySystem.PickupSystem
         /// <summary> Создает объект Pickup на сцене. </summary>
         private void SpawnPickup()
         {
-            var spawnedPickup = _item.SpawnPickup(transform.position, _number);
+            var spawnedPickup = PickupFactory.Spawn(_item, transform.position, _number);
             spawnedPickup.transform.SetParent(transform);
             spawnedPickup.transform.localRotation = Quaternion.Euler(0, 0, 0);
 

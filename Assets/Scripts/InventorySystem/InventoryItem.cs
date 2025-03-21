@@ -30,8 +30,8 @@ namespace FlavorfulStory.InventorySystem
         public Sprite Icon { get; private set; }
 
         /// <summary> Префаб, который должен появиться при выпадении этого предмета. </summary>
-        [Tooltip("Префаб, который должен появиться при выпадении этого предмета."), SerializeField]
-        private Pickup _pickup;
+        [field: Tooltip("Префаб, который должен появиться при выпадении этого предмета."), SerializeField]
+        public Pickup PickupPrefab { get; private set; }
 
         /// <summary> Можно ли поместить несколько предметов одного типа в один слот инвентаря? </summary>
         [field: Tooltip("Можно ли поместить несколько предметов одного типа в один слот инвентаря?"), SerializeField]
@@ -42,19 +42,6 @@ namespace FlavorfulStory.InventorySystem
         public int StackSize { get; private set; } = 99;
 
         #endregion
-
-        /// <summary> Заспавнить предмет Pickup на сцене. </summary>
-        /// <param name="spawnPosition"> Позиция спавна предмета. </param>
-        /// <param name="number"> Количество предметов. </param>
-        /// <returns> Возвращает ссылку на заспавненный предмет Pickup. </returns>
-        //TODO: Вынести куда-то. Item не должен сам себя спавнить!
-        public Pickup SpawnPickup(Vector3 spawnPosition, int number)
-        {
-            var pickup = Instantiate(_pickup);
-            pickup.transform.position = spawnPosition;
-            pickup.Setup(this, number);
-            return pickup;
-        }
 
         #region ISerializationCallbackReceiver
 
