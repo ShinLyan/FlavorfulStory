@@ -27,6 +27,7 @@ namespace FlavorfulStory.Core
             InputWrapper.UnblockAllInput();
 
             ItemDatabase.Initialize();
+            WorldCoordinates.Initialize();
         }
 
         /// <summary> Создает постоянный объект и устанавливает его сохранение между сценами. </summary>

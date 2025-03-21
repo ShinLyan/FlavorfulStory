@@ -154,6 +154,12 @@ Transform:
   - {fileID: 611011619}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &10287554 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6338285482569189420, guid: a9114609ac4097e459c8c7e1f3d67d2b,
+    type: 3}
+  m_PrefabInstance: {fileID: 895288242}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &47347160
 GameObject:
   m_ObjectHideFlags: 0
@@ -164,7 +170,7 @@ GameObject:
   m_Component:
   - component: {fileID: 47347161}
   - component: {fileID: 47347162}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: InvisibleWall
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -216,7 +222,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 149422753}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: InvisibleWalls
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -252,7 +258,7 @@ GameObject:
   m_Component:
   - component: {fileID: 216407153}
   - component: {fileID: 216407154}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: InvisibleWall (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -311,7 +317,7 @@ GameObject:
   m_Component:
   - component: {fileID: 569561795}
   - component: {fileID: 569561796}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: InvisibleWall (3)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -478,11 +484,6 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 234035469302854988, guid: a9114609ac4097e459c8c7e1f3d67d2b,
-        type: 3}
-      propertyPath: _tooltip
-      value: 
-      objectReference: {fileID: 1221746698}
     - target: {fileID: 817048356032404972, guid: a9114609ac4097e459c8c7e1f3d67d2b,
         type: 3}
       propertyPath: m_AnchorMax.y
@@ -853,6 +854,36 @@ PrefabInstance:
       propertyPath: m_SizeDelta.x
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6263922946271475265, guid: a9114609ac4097e459c8c7e1f3d67d2b,
+        type: 3}
+      propertyPath: _toolCooldown
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6263922946271475265, guid: a9114609ac4097e459c8c7e1f3d67d2b,
+        type: 3}
+      propertyPath: _toolMappings.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6263922946271475265, guid: a9114609ac4097e459c8c7e1f3d67d2b,
+        type: 3}
+      propertyPath: <HitableLayers>k__BackingField.m_Bits
+      value: 320
+      objectReference: {fileID: 0}
+    - target: {fileID: 6263922946271475265, guid: a9114609ac4097e459c8c7e1f3d67d2b,
+        type: 3}
+      propertyPath: _toolMappings.Array.data[1].<ToolType>k__BackingField
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6263922946271475265, guid: a9114609ac4097e459c8c7e1f3d67d2b,
+        type: 3}
+      propertyPath: _toolMappings.Array.data[0].<ToolPrefab>k__BackingField
+      value: 
+      objectReference: {fileID: 10287554}
+    - target: {fileID: 6263922946271475265, guid: a9114609ac4097e459c8c7e1f3d67d2b,
+        type: 3}
+      propertyPath: _toolMappings.Array.data[1].<ToolPrefab>k__BackingField
+      value: 
+      objectReference: {fileID: 2123411365}
     - target: {fileID: 6658276117331273708, guid: a9114609ac4097e459c8c7e1f3d67d2b,
         type: 3}
       propertyPath: m_SizeDelta.x
@@ -1134,18 +1165,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b7a58d4c54fbce54f8fcd204f439a8c9, type: 3}
---- !u!114 &1221746698 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 9085885338099040057, guid: a9114609ac4097e459c8c7e1f3d67d2b,
-    type: 3}
-  m_PrefabInstance: {fileID: 895288242}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c06144297ef175a4c9da49d8e4f1ec7d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1300621968
 GameObject:
   m_ObjectHideFlags: 0
@@ -1230,7 +1249,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1449952506}
   - component: {fileID: 1449952507}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: InvisibleWall (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1909,6 +1928,12 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 867389754241914057, guid: f521d3a35ac06814982211287275d932,
     type: 3}
   m_PrefabInstance: {fileID: 2044461875}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &2123411365 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6026711994082090595, guid: a9114609ac4097e459c8c7e1f3d67d2b,
+    type: 3}
+  m_PrefabInstance: {fileID: 895288242}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &2129707503
 PrefabInstance:

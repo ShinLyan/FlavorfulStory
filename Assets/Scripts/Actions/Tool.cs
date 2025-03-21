@@ -1,4 +1,5 @@
 using FlavorfulStory.Control;
+using FlavorfulStory.InputSystem;
 using FlavorfulStory.InventorySystem;
 using FlavorfulStory.ResourceContainer;
 using UnityEngine;
@@ -8,7 +9,7 @@ namespace FlavorfulStory.Actions
     /// <summary> Инструмент, используемый игроком для взаимодействия с объектами. </summary>
     /// <remarks> Может выполнять действия, специфичные для типа инструмента. </remarks>
     [CreateAssetMenu(menuName = "FlavorfulStory/Inventory/Tool")]
-    public class Tool : ActionItem
+    public class Tool : InventoryItem, IUsable
     {
         /// <summary> Тип инструмента. </summary>
         [field: Tooltip("Тип инструмента."), SerializeField]
@@ -20,15 +21,24 @@ namespace FlavorfulStory.Actions
         /// <summary> Радиус использования инструмента. </summary>
         private const float UseRadius = 1.5f;
 
+        [field: Tooltip("Кнопка использования"), SerializeField]
+        public UseActionType UseActionType { get; set; }
+
         /// <summary> Использовать инструмент для взаимодействия с объектами. </summary>
         /// <param name="player"> Контроллер игрока. </param>
-        public override void Use(PlayerController player)
+        /// <param name="hitableLayers"> Слои, по котормы будем делать удар. </param>
+        public void Use(PlayerController player, LayerMask hitableLayers)
         {
-            var targetPosition = PlayerController.GetCursorPosition();
-            player.RotateTowards(targetPosition);
-            player.TriggerAnimation($"Use{ToolType}");
-            player.EquipTool(this);
-            UseToolInDirection(targetPosition, player, player.HitableLayers);
+            int playerLayer = player.gameObject.layer;
+            if (WorldCoordinates.GetWorldCoordinatesFromScreenPoint(
+                    //~(1 << playerLayer) = LayerMask.all except player.layer
+                    InputWrapper.GetMousePosition(), ~(1 << playerLayer), out var targetPosition
+                ))
+            {
+                player.RotateTowards(targetPosition);
+                player.TriggerAnimation($"Use{ToolType}");
+                UseToolInDirection(targetPosition, player, hitableLayers);
+            }
 
             // TODO: Реализовать трату энергии игрока при использовании инструмента
         }
@@ -51,7 +61,7 @@ namespace FlavorfulStory.Actions
                     hitable.TakeHit(ToolType);
 
             // Debug
-            Debug.DrawLine(origin, interactionCenter, Color.red, 5f);
+            Debug.DrawLine(origin, interactionCenter, Color.red, 50);
         }
     }
 }
