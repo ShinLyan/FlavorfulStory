@@ -16,14 +16,11 @@ namespace FlavorfulStory.InventorySystem.UI
         [SerializeField] private TMP_Text _itemNumberText;
 
         /// <summary> Изображение иконки предмета в инвентаре. </summary>
-        [SerializeField] private Image _iconImage;
+        private Image _iconImage;
 
         /// <summary> Снятие компонента <see cref="Image"/> текущего объекта
         /// в <see cref="_iconImage"/>. </summary>
-        private void Awake()
-        {
-            _iconImage = GetComponent<Image>();
-        }
+        private void Awake() => _iconImage = GetComponent<Image>();
 
         /// <summary> Установить предмет инвентаря. </summary>
         /// <param name="item"> Предмет инвентаря. </param>

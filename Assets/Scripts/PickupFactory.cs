@@ -13,7 +13,7 @@ namespace FlavorfulStory
         /// <param name="quantity"> Количество предметов. </param>
         public static Pickup Spawn(InventoryItem item, Vector3 position, int quantity)
         {
-            if (item.PickupPrefab == null)
+            if (!item.PickupPrefab)
             {
                 Debug.LogError($"PickupPrefab не назначен для предмета {item.name}");
                 return null;

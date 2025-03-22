@@ -39,6 +39,7 @@ namespace FlavorfulStory.Control
         #region Tools
 
         [SerializeField, Range(1f, 5f)] private float _toolCooldown = 1.5f;
+
         /// <summary> Таймер перезарядки использования инструмента. </summary>
         private float _toolCooldownTimer;
 
@@ -72,16 +73,15 @@ namespace FlavorfulStory.Control
         private void Update()
         {
             HandleInput();
-            if (_toolCooldownTimer > 0f)
-                _toolCooldownTimer -= Time.deltaTime;
+            if (_toolCooldownTimer > 0f) _toolCooldownTimer -= Time.deltaTime;
         }
 
         /// <summary> Обработка пользовательского ввода. </summary>
         private void HandleInput()
         {
-            HandleMovementInput();
             HandleToolbarSelectionInput();
             HandleToolbarUseInput();
+            HandleMovementInput();
         }
 
         /// <summary> Обработка выбора предмета на панели быстрого доступа. </summary>
@@ -89,6 +89,7 @@ namespace FlavorfulStory.Control
         {
             if (_isBusy) return;
 
+            // TODO: Переделать на количество 10
             const int ToolbarItemsCount = 9;
             for (int i = 0; i < ToolbarItemsCount; i++)
                 if (Input.GetKeyDown(KeyCode.Alpha1 + i))
@@ -100,21 +101,19 @@ namespace FlavorfulStory.Control
         {
             if (CurrentItem is not IUsable usable || IsToolUseBlocked) return;
 
-            if (Input.GetMouseButton(0) && usable.UseActionType == UseActionType.LeftClick ||
-                Input.GetMouseButton(1) && usable.UseActionType == UseActionType.RightClick)
-            {
-                BeginInteraction(usable);
-            }
+            if ((!Input.GetMouseButton(0) || usable.UseActionType != UseActionType.LeftClick) &&
+                (!Input.GetMouseButton(1) || usable.UseActionType != UseActionType.RightClick)) return;
+
+            BeginInteraction(usable);
         }
 
         /// <summary> Начать взаимодйствие с предметом. </summary>
         /// <param name="usable"> Используемый предмет. </param>
         private void BeginInteraction(IUsable usable)
         {
-            if (_isBusy) return;
-
             StartUsingItem(usable);
             if (usable is EdibleInventoryItem) ConsumeEdibleItem();
+            _toolCooldownTimer = _toolCooldown;
         }
 
         /// <summary> Начать использование предмета. </summary>
@@ -123,9 +122,6 @@ namespace FlavorfulStory.Control
         {
             usable.Use(this, _toolHandler.HitableLayers);
             _toolHandler.Equip(CurrentItem as Tool);
-            _toolCooldownTimer = _toolCooldown;
-
-            InputWrapper.BlockPlayerMovement();
             SetBusyState(true);
         }
 
@@ -133,8 +129,6 @@ namespace FlavorfulStory.Control
         private void ConsumeEdibleItem()
         {
             Inventory.PlayerInventory.RemoveFromSlot(_toolbar.SelectedItemIndex, 1);
-            _toolCooldownTimer = _toolCooldown;
-
             InputWrapper.UnblockPlayerMovement();
             SetBusyState(false);
         }
@@ -177,14 +171,6 @@ namespace FlavorfulStory.Control
             var direction = (position - transform.position).normalized;
             direction.y = 0;
             _playerMover.SetLookRotation(direction);
-        }
-
-        /// <summary> Убрать инструмент из руки игрока. </summary>
-        /// <remarks> Вызывается в последнем кадре анимации использования инструмента. </remarks>
-        private void UnequipTool()
-        {
-            _toolHandler.Unequip();
-            SetBusyState(false);
         }
     }
 }

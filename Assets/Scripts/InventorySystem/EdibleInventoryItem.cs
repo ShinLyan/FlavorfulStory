@@ -5,7 +5,7 @@ using UnityEngine;
 namespace FlavorfulStory.InventorySystem
 {
     /// <summary> Предмет инвентаря, который можно съесть. </summary>
-    /// <remarks> Является насодеником класса <see cref="InventoryItem"/>. </remarks>
+    /// <remarks> Является наследником класса <see cref="InventoryItem"/>. </remarks>
     [CreateAssetMenu(menuName = "FlavorfulStory/Inventory/Edible Item")]
     public class EdibleInventoryItem : InventoryItem, IUsable, IEdible
     {
@@ -20,10 +20,11 @@ namespace FlavorfulStory.InventorySystem
         {
             Eat();
 
-            //На будущее
+            // TODO: На будущее
             //Eat(player.GetComponent<PlayerStats>());
         }
 
+        /// <summary> Съесть предмет и применить его эффект к игроку. </summary>
         public void Eat()
         {
             Debug.Log("🍎 Ем вкусную еду. Восстановил HP и энергию.");

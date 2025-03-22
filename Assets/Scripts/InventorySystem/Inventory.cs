@@ -84,21 +84,19 @@ namespace FlavorfulStory.InventorySystem
 
             if (GetItemNumber(item) < number)
             {
-                Debug.LogError(
-                    $"You are trying to remove {number} item[{item.ItemName}], but only {GetItemNumber(item)} present in inventory!");
+                Debug.LogError($"You are trying to remove {number} item[{item.ItemName}], " +
+                               $"but only {GetItemNumber(item)} present in inventory!");
                 return;
             }
 
             int remainingToRemove = number;
             for (int i = 0; i < _slots.Length && remainingToRemove > 0; i++)
-            {
                 if (_slots[i].Item == item)
                 {
                     int numberToRemove = Math.Min(_slots[i].Number, remainingToRemove);
                     RemoveFromSlot(i, numberToRemove);
                     remainingToRemove -= numberToRemove;
                 }
-            }
         }
 
         /// <summary> Получить количество предметов инвентаря в заданном слоте. </summary>

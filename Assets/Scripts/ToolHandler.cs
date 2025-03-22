@@ -13,7 +13,8 @@ namespace FlavorfulStory
         [SerializeField] private ToolPrefabMapping[] _toolMappings;
 
         /// <summary> Слои, по которым производится удар с помощью инструмента. </summary>
-        [field: SerializeField] public LayerMask HitableLayers { get; private set; }
+        [field: SerializeField]
+        public LayerMask HitableLayers { get; private set; }
 
         /// <summary> Текущий отображаемый инструмент, прикреплённый к руке игрока. </summary>
         private GameObject _currentTool;
@@ -23,7 +24,7 @@ namespace FlavorfulStory
         /// <remarks> Также блокирует прокрутку мыши, чтобы исключить случайную смену предмета. </remarks>
         public void Equip(Tool tool)
         {
-            if (tool == null || _currentTool != null) return;
+            if (!tool || _currentTool) return;
 
             var mapping = _toolMappings.FirstOrDefault(m => m.ToolType == tool.ToolType);
             if (mapping == null) return;
@@ -37,7 +38,7 @@ namespace FlavorfulStory
         /// <remarks> Также разблокирует ввод (прокрутку мыши и движение). </remarks>
         public void Unequip()
         {
-            if (_currentTool == null) return;
+            if (!_currentTool) return;
 
             _currentTool.SetActive(false);
             _currentTool = null;

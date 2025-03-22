@@ -13,7 +13,6 @@ namespace FlavorfulStory.InventorySystem
         /// <summary> Создать базу данных предметов. </summary>
         public static void Initialize()
         {
-            //Защита от дурака. Чтоб 2+ вызова этого метода не ломало ничего
             if (_itemDatabase != null) return;
 
             _itemDatabase = new Dictionary<string, InventoryItem>();

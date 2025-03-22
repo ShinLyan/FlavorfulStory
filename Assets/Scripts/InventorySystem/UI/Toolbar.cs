@@ -5,13 +5,14 @@ using UnityEngine;
 namespace FlavorfulStory.InventorySystem.UI
 {
     /// <summary> Панель инструментов, отображающая и управляющая экипированными предметами. </summary>
-    /// <remarks> Данный класс обрабатывает выбор предметов, ввод мыши и поддерживает визуальное состояние слотов панели инструментов. </remarks>
+    /// <remarks> Данный класс обрабатывает выбор предметов, ввод мыши и поддерживает
+    /// визуальное состояние слотов панели инструментов. </remarks>
     public class Toolbar : MonoBehaviour, ISaveable
     {
         /// <summary> Массив слотов панели инструментов. </summary>
         private ToolbarSlotUI[] _slots;
 
-        /// <summary> Можно ли взаимодействовать?. </summary>
+        /// <summary> Можно ли взаимодействовать? </summary>
         private bool _isInteractable;
 
         /// <summary> Индекс выбранного предмета. </summary>
@@ -24,17 +25,15 @@ namespace FlavorfulStory.InventorySystem.UI
         private void Awake()
         {
             _slots = GetComponentsInChildren<ToolbarSlotUI>();
+            _isInteractable = true;
+
             Inventory.PlayerInventory.InventoryUpdated += RedrawToolbar;
-            foreach (var slot in _slots)
-            {
-                slot.OnSlotClicked += SelectItem;
-            }
+            foreach (var slot in _slots) slot.OnSlotClicked += SelectItem;
         }
 
         /// <summary> Первоначальная настройка панели инструментов. </summary>
         private void Start()
         {
-            _isInteractable = true;
             ResetToolbar();
             RedrawToolbar();
             _slots[SelectedItemIndex].Select();
@@ -49,10 +48,7 @@ namespace FlavorfulStory.InventorySystem.UI
         /// <summary> Сбрасывает состояние выделения всех слотов панели инструментов. </summary>
         private void ResetToolbar()
         {
-            foreach (var slot in _slots)
-            {
-                slot.ResetSelection();
-            }
+            foreach (var slot in _slots) slot.ResetSelection();
         }
 
         /// <summary> Обновляет визуальное представление всех слотов панели инструментов. </summary>
@@ -83,6 +79,8 @@ namespace FlavorfulStory.InventorySystem.UI
             _slots[SelectedItemIndex].Select();
         }
 
+        /// <summary> Установить состояние взаимодействия. </summary>
+        /// <param name="state"> Состояние взаимодействия. </param>
         public void SetInteractableState(bool state) => _isInteractable = state;
 
         #region Saving

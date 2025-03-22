@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using FlavorfulStory.InventorySystem.PickupSystem;
 using FlavorfulStory.Saving;
 using UnityEngine;
@@ -22,20 +23,16 @@ namespace FlavorfulStory.InventorySystem.DropSystem
         /// <summary> Создание pickup в определенной позиции. </summary>
         /// <param name="item"> Предмет, который необходимо заспавнить. </param>
         /// <param name="number"> Количество предметов. </param>
-        public void DropItem(InventoryItem item, int number)
-        {
-            SpawnPickup(item, number, GetDropPosition());
-        }
+        public void DropItem(InventoryItem item, int number) => SpawnPickup(item, number, GetDropPosition());
 
         /// <summary> Получить позицию для спавна предмета. </summary>
         /// <remarks> Можете переопределить для задания кастомной позиции спавна предмета. </remarks>
         /// <returns> Возвращает позицию, где должен быть заспавнен предмет. </returns>
         protected virtual Vector3 GetDropPosition()
         {
-            float dropOffsetRange = 2f; // Диапазон случайного смещения по осям X и Z
-            float randomOffsetX = Random.Range(-dropOffsetRange, dropOffsetRange);
-            float randomOffsetZ = Random.Range(-dropOffsetRange, dropOffsetRange);
-            //TODO: Убрать хардкод - подумать, как адекватно сделать.
+            const float DropOffsetRange = 2f; // Диапазон случайного смещения по осям X и Z
+            float randomOffsetX = Random.Range(-DropOffsetRange, DropOffsetRange);
+            float randomOffsetZ = Random.Range(-DropOffsetRange, DropOffsetRange);
             return transform.position + new Vector3(randomOffsetX, 1, randomOffsetZ);
         }
 
@@ -64,7 +61,8 @@ namespace FlavorfulStory.InventorySystem.DropSystem
             /// <summary> Количество выпавших предметов. </summary>
             public int Number;
 
-            public int SceneBuildIndex;
+            /// <summary> Индекс сцены. </summary>
+            public int SceneIndex;
         }
 
         /// <summary> Фиксация состояния объекта при сохранении. </summary>
@@ -73,35 +71,20 @@ namespace FlavorfulStory.InventorySystem.DropSystem
         {
             RemovePickedUpItems();
 
-            var droppedItemsList = new List<DropRecord>();
-            int buildIndex = SceneManager.GetActiveScene().buildIndex;
-            foreach (var pickup in _droppedItems)
+            var droppedItemsList = _droppedItems.Select(pickup => new DropRecord
             {
-                var droppedItem = new DropRecord
-                {
-                    ItemID = pickup.Item.ItemID,
-                    Position = new SerializableVector3(pickup.transform.position),
-                    Number = pickup.Number,
-                    SceneBuildIndex = buildIndex
-                };
-                droppedItemsList.Add(droppedItem);
-            }
+                ItemID = pickup.Item.ItemID,
+                Position = new SerializableVector3(pickup.transform.position),
+                Number = pickup.Number,
+                SceneIndex = SceneManager.GetActiveScene().buildIndex
+            }).ToList();
 
             droppedItemsList.AddRange(_otherSceneDroppedItems);
             return droppedItemsList;
         }
 
         /// <summary> Удалить из списка все предметы, которые были подобраны в мире. </summary>
-        private void RemovePickedUpItems()
-        {
-            var newList = new List<Pickup>();
-            foreach (var item in _droppedItems)
-            {
-                if (item != null) newList.Add(item);
-            }
-
-            _droppedItems = newList;
-        }
+        private void RemovePickedUpItems() => _droppedItems = _droppedItems.Where(item => item).ToList();
 
         /// <summary> Восстановление состояния объекта при загрузке. </summary>
         /// <param name="state"> Объект состояния, который необходимо восстановить. </param>
@@ -112,7 +95,7 @@ namespace FlavorfulStory.InventorySystem.DropSystem
             _otherSceneDroppedItems.Clear();
             foreach (var item in droppedItemsList)
             {
-                if (item.SceneBuildIndex != buildIndex)
+                if (item.SceneIndex != buildIndex)
                 {
                     _otherSceneDroppedItems.Add(item);
                     continue;

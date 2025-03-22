@@ -11,9 +11,15 @@ namespace FlavorfulStory.Actions
     [CreateAssetMenu(menuName = "FlavorfulStory/Inventory/Tool")]
     public class Tool : InventoryItem, IUsable
     {
+        #region Fields and Properties
+
         /// <summary> Тип инструмента. </summary>
         [field: Tooltip("Тип инструмента."), SerializeField]
         public ToolType ToolType { get; private set; }
+
+        /// <summary> Кнопка использования предмета. </summary>
+        [field: Tooltip("Кнопка использования"), SerializeField]
+        public UseActionType UseActionType { get; set; }
 
         /// <summary> Максимальная дистанция взаимодействия инструментом. </summary>
         private const float MaxInteractionDistance = 2f;
@@ -21,25 +27,23 @@ namespace FlavorfulStory.Actions
         /// <summary> Радиус использования инструмента. </summary>
         private const float UseRadius = 1.5f;
 
-        /// <summary> Кнопка использования предмета. </summary>
-        [field: Tooltip("Кнопка использования"), SerializeField]
-        public UseActionType UseActionType { get; set; }
+        #endregion
 
         /// <summary> Использовать инструмент для взаимодействия с объектами. </summary>
         /// <param name="player"> Контроллер игрока. </param>
-        /// <param name="hitableLayers"> Слои, по котормы будем делать удар. </param>
+        /// <param name="hitableLayers"> Слои, по которым будем делать удар. </param>
         public void Use(PlayerController player, LayerMask hitableLayers)
         {
-            int playerLayer = player.gameObject.layer;
-            if (WorldCoordinates.GetWorldCoordinatesFromScreenPoint(
-                    //~(1 << playerLayer) = LayerMask.all except player.layer
-                    InputWrapper.GetMousePosition(), ~(1 << playerLayer), out var targetPosition
-                ))
-            {
-                player.RotateTowards(targetPosition);
-                player.TriggerAnimation($"Use{ToolType}");
-                UseToolInDirection(targetPosition, player, hitableLayers);
-            }
+            if (!WorldCoordinates.GetWorldCoordinatesFromScreenPoint(
+                    InputWrapper.GetMousePosition(),
+                    ~(1 << player.gameObject.layer), // LayerMask.all except player.layer
+                    out var targetPosition
+                )) return;
+
+            player.RotateTowards(targetPosition);
+            player.TriggerAnimation($"Use{ToolType}");
+            UseToolInDirection(targetPosition, player, hitableLayers);
+            InputWrapper.BlockPlayerMovement();
 
             // TODO: Реализовать трату энергии игрока при использовании инструмента
         }
@@ -59,9 +63,6 @@ namespace FlavorfulStory.Actions
             foreach (var collider in hitColliders)
                 if (collider.transform.parent.TryGetComponent<IHitable>(out var hitable))
                     hitable.TakeHit(ToolType);
-
-            // Debug
-            Debug.DrawLine(origin, interactionCenter, Color.red, 5f);
         }
     }
 }

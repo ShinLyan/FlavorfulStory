@@ -31,11 +31,18 @@ namespace FlavorfulStory.Actions.Interactables
         /// <summary> Ближайший объект, с которым можно взаимодействовать. </summary>
         private IInteractable _closestInteractable;
 
+        /// <summary>
+        /// 
+        /// </summary>
         private Action _endInteractionAction;
+
+        /// <summary>
+        /// 
+        /// </summary>
         private Action _startInteractionAction;
 
-        /// <summary> Флаг, указывающий, происходит ли в данный момент взаимодействие. </summary>
-        public bool IsInteracting { get; set; }
+        /// <summary> Происходит ли в данный момент взаимодействие? </summary>
+        public bool IsInteracting { get; private set; }
 
         /// <summary> Событие, вызываемое при начале взаимодействия.
         /// Используется для звуковых эффектов и других действий. </summary>
@@ -45,12 +52,16 @@ namespace FlavorfulStory.Actions.Interactables
         /// Используется для звуковых эффектов и других действий. </summary>
         public event Action OnInteractionEnded; // На будущее - для звуков и тд
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="startInteractionAction"></param>
+        /// <param name="endInteractionAction"></param>
         public void SetInteractionActions(Action startInteractionAction, Action endInteractionAction)
         {
             _startInteractionAction = startInteractionAction;
             _endInteractionAction = endInteractionAction;
         }
-
 
         /// <summary> Инициализация компонента. </summary>
         /// <remarks> Подписка на событие OnInteractionEnded (PlayerController.cs). </remarks>
@@ -160,6 +171,10 @@ namespace FlavorfulStory.Actions.Interactables
             if (_playerController) _playerController.OnInteractionEnded -= EndInteraction;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="state"></param>
         public void SetInteractionState(bool state) => IsInteracting = state;
     }
 }

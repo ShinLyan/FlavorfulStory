@@ -1,8 +1,7 @@
-﻿using FlavorfulStory.InventorySystem.DropSystem;
-using FlavorfulStory.InventorySystem.UI.Dragging;
+﻿using FlavorfulStory.InventorySystem.UI.Dragging;
 using UnityEngine;
 
-namespace FlavorfulStory.InventorySystem
+namespace FlavorfulStory.InventorySystem.DropSystem
 {
     /// <summary> Целевой контейнер для предметов, выбрасываемых из инвентаря. </summary>
     public class ItemDropTarget : MonoBehaviour, IDragDestination<InventoryItem>
