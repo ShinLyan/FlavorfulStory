@@ -8,6 +8,43 @@ namespace FlavorfulStory.DialogueSystem.Editor
     /// <summary> Окно редактора диалогов. </summary>
     public class DialogueEditor : EditorWindow
     {
+        #region Fields
+
+        /// <summary> Текущий выбранный диалог. </summary>
+        private Dialogue _selectedDialogue;
+
+        /// <summary> Текущий выбранный диалог. </summary>
+        private GUIStyle _nodeStyle;
+
+        /// <summary> Стиль узла для NPC. </summary>
+        private GUIStyle _playerNodeStyle;
+
+        /// <summary> Узел, который в данный момент перетаскивается. </summary>
+        private DialogueNode _draggingNode;
+
+        /// <summary> Смещение перетаскиваемого узла относительно курсора. </summary>
+        private Vector2 _draggingOffset;
+
+        /// <summary> Узел, который создается. </summary>
+        private DialogueNode _creatingNode;
+
+        /// <summary> Узел, который создается. </summary>
+        private DialogueNode _deletingNode;
+
+        /// <summary> Родительский узел, к которому добавляется связь. </summary>
+        private DialogueNode _linkingParentNode;
+
+        /// <summary> Текущая позиция скроллинга редактора. </summary>
+        private Vector2 _scrollPosition;
+
+        /// <summary> Происходит ли перетаскивание канваса? </summary>
+        private bool _isDraggingCanvas;
+
+        /// <summary> Смещение при перетаскивании канваса. </summary>
+        private Vector2 _draggingCanvasOffset;
+
+        #endregion
+
         /// <summary> Инициализация редактора при открытии. </summary>
         private void OnEnable()
         {
@@ -243,42 +280,5 @@ namespace FlavorfulStory.DialogueSystem.Editor
                 _deletingNode = null;
             }
         }
-
-        #region Fields
-
-        /// <summary> Текущий выбранный диалог. </summary>
-        private Dialogue _selectedDialogue;
-
-        /// <summary> Текущий выбранный диалог. </summary>
-        private GUIStyle _nodeStyle;
-
-        /// <summary> Стиль узла для NPC. </summary>
-        private GUIStyle _playerNodeStyle;
-
-        /// <summary> Узел, который в данный момент перетаскивается. </summary>
-        private DialogueNode _draggingNode;
-
-        /// <summary> Смещение перетаскиваемого узла относительно курсора. </summary>
-        private Vector2 _draggingOffset;
-
-        /// <summary> Узел, который создается. </summary>
-        private DialogueNode _creatingNode;
-
-        /// <summary> Узел, который создается. </summary>
-        private DialogueNode _deletingNode;
-
-        /// <summary> Родительский узел, к которому добавляется связь. </summary>
-        private DialogueNode _linkingParentNode;
-
-        /// <summary> Текущая позиция скроллинга редактора. </summary>
-        private Vector2 _scrollPosition;
-
-        /// <summary> Происходит ли перетаскивание канваса? </summary>
-        private bool _isDraggingCanvas;
-
-        /// <summary> Смещение при перетаскивании канваса. </summary>
-        private Vector2 _draggingCanvasOffset;
-
-        #endregion
     }
 }

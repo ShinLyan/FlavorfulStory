@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
@@ -18,8 +19,48 @@ namespace FlavorfulStory.DialogueSystem
         /// <summary> Все узлы диалога. </summary>
         public IEnumerable<DialogueNode> Nodes => _nodes;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        public DialogueNode RootNode => _nodes[0];
+
+        /// <summary> Получить дочерние узлы указанного узла. </summary>
+        /// <param name="parentNode"> Родительский узел. </param>
+        /// <returns> Перечисление дочерних узлов. </returns>
+        public IEnumerable<DialogueNode> GetChildNodes(DialogueNode parentNode)
+        {
+            foreach (string childId in parentNode.ChildNodes)
+                if (_nodeLookup.TryGetValue(childId, out var childNode))
+                    yield return childNode;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="currentNode"></param>
+        /// <returns></returns>
+        public IEnumerable<DialogueNode> GetPlayerChildNodes(DialogueNode currentNode) =>
+            GetChildNodes(currentNode).Where(node => node.IsPlayerSpeaking);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="currentNode"></param>
+        /// <returns></returns>
+        public IEnumerable<DialogueNode> GetAIChildNodes(DialogueNode currentNode) =>
+            GetChildNodes(currentNode).Where(node => !node.IsPlayerSpeaking);
+
         /// <summary> Пересоздать словарь узлов при изменении ScriptableObject в редакторе. </summary>
         private void OnValidate() => RebuildNodeLookup();
+
+        /// <summary> Пересоздать словарь узлов. </summary>
+        private void RebuildNodeLookup()
+        {
+            _nodeLookup.Clear();
+            foreach (var node in Nodes)
+                if (node)
+                    _nodeLookup[node.name] = node;
+        }
 
         /// <summary> Действия перед сериализацией объекта. </summary>
         public void OnBeforeSerialize()
@@ -38,25 +79,6 @@ namespace FlavorfulStory.DialogueSystem
         /// <summary> Действия после десериализации объекта. </summary>
         public void OnAfterDeserialize()
         {
-        }
-
-        /// <summary> Пересоздать словарь узлов. </summary>
-        private void RebuildNodeLookup()
-        {
-            _nodeLookup.Clear();
-            foreach (var node in Nodes)
-                if (node)
-                    _nodeLookup[node.name] = node;
-        }
-
-        /// <summary> Получить дочерние узлы указанного узла. </summary>
-        /// <param name="parentNode"> Родительский узел. </param>
-        /// <returns> Перечисление дочерних узлов. </returns>
-        public IEnumerable<DialogueNode> GetChildNodes(DialogueNode parentNode)
-        {
-            foreach (string childId in parentNode.ChildNodes)
-                if (_nodeLookup.TryGetValue(childId, out var childNode))
-                    yield return childNode;
         }
 
 #if UNITY_EDITOR
