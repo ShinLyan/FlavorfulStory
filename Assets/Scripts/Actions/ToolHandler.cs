@@ -1,14 +1,20 @@
+using System;
 using System.Linq;
-using FlavorfulStory.Actions;
 using FlavorfulStory.InputSystem;
 using UnityEngine;
 
-namespace FlavorfulStory
+namespace FlavorfulStory.Actions
 {
     /// <summary> Отвечает за отображение и управление визуальным отображением инструментов в руке игрока. </summary>
     /// <remarks> Также блокирует/разблокирует ввод, связанный с прокруткой тулбара. </remarks>
     public class ToolHandler : MonoBehaviour
     {
+        /// <summary> Текущий отображаемый инструмент, прикреплённый к руке игрока. </summary>
+        private GameObject _currentTool;
+
+        /// <summary> Действие, что должно выполниться при UnEquip'е инструмента. </summary>
+        private Action _unequipAction;
+
         /// <summary> Сопоставления типов инструментов с их префабами для визуализации в руке игрока. </summary>
         [SerializeField] private ToolPrefabMapping[] _toolMappings;
 
@@ -16,8 +22,9 @@ namespace FlavorfulStory
         [field: SerializeField]
         public LayerMask HitableLayers { get; private set; }
 
-        /// <summary> Текущий отображаемый инструмент, прикреплённый к руке игрока. </summary>
-        private GameObject _currentTool;
+        /// <summary> Задать действие анэквипа. </summary>
+        /// <param name="action"> Действие анэквипа. </param>
+        public void SetUnequipAction(Action action) => _unequipAction = action;
 
         /// <summary> Активирует визуальное отображение инструмента на основе переданного объекта Tool. </summary>
         /// <param name="tool">Инструмент, который нужно отобразить.</param>
@@ -45,6 +52,8 @@ namespace FlavorfulStory
 
             InputWrapper.UnblockPlayerMovement();
             InputWrapper.UnblockInput(InputButton.MouseScroll);
+
+            _unequipAction?.Invoke();
         }
     }
 }

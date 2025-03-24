@@ -1,5 +1,4 @@
 ﻿using FlavorfulStory.InputSystem;
-using FlavorfulStory.InventorySystem;
 using UnityEngine;
 
 namespace FlavorfulStory.Core
@@ -22,9 +21,7 @@ namespace FlavorfulStory.Core
             if (_hasSpawned) return;
 
             SpawnPersistentObject();
-            InputWrapper.Initialize();
             InputWrapper.UnblockAllInput();
-            ItemDatabase.Initialize();
         }
 
         /// <summary> Создает постоянный объект и устанавливает его сохранение между сценами. </summary>

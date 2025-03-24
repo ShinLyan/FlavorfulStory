@@ -7,11 +7,12 @@ namespace FlavorfulStory.Actions
     public interface IUsable
     {
         /// <summary> Кнопка мыши для использования предмета. </summary>
+        /// <returns> Флаг успешности совершения действия. </returns>
         public UseActionType UseActionType { get; }
 
         /// <summary> Использование объекта. </summary>
         /// <param name="player"> Игрок, использующий объект. </param>
         /// <param name="hitableLayers"> Слои, которые можно бить. </param>
-        public void Use(PlayerController player, LayerMask hitableLayers);
+        public bool Use(PlayerController player, LayerMask hitableLayers);
     }
 }

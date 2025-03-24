@@ -16,10 +16,11 @@ namespace FlavorfulStory.InventorySystem
         /// <summary> Съесть поедаемый предмет инвентаря. </summary>
         /// <param name="player"> Контроллер игрока. </param>
         /// <param name="hitableLayers"></param>
-        public void Use(PlayerController player, LayerMask hitableLayers)
+        public bool Use(PlayerController player, LayerMask hitableLayers)
         {
             Eat();
 
+            return true;
             // TODO: На будущее
             //Eat(player.GetComponent<PlayerStats>());
         }

@@ -67,6 +67,7 @@ namespace FlavorfulStory.Control
             _interactFeature = GetComponentInChildren<InteractFeature>();
             _interactFeature.SetInteractionActions(() => SetBusyState(true), () => SetBusyState(false));
             _toolHandler = GetComponent<ToolHandler>();
+            _toolHandler.SetUnequipAction(() => SetBusyState(false));
         }
 
         /// <summary> Обновление состояния игрока. </summary>
@@ -120,7 +121,9 @@ namespace FlavorfulStory.Control
         /// <param name="usable"> Используемый предмет. </param>
         private void StartUsingItem(IUsable usable)
         {
-            usable.Use(this, _toolHandler.HitableLayers);
+            if (!usable.Use(this, _toolHandler.HitableLayers))
+                return;
+
             _toolHandler.Equip(CurrentItem as Tool);
             SetBusyState(true);
         }

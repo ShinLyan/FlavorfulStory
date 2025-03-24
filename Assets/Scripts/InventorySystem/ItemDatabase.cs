@@ -8,13 +8,12 @@ namespace FlavorfulStory.InventorySystem
     {
         /// <summary> Словарь предметов. </summary>
         /// <remarks> Хранит пары (GUID, предмет). </remarks>
-        private static Dictionary<string, InventoryItem> _itemDatabase;
+        private static readonly Dictionary<string, InventoryItem> _itemDatabase;
 
-        /// <summary> Создать базу данных предметов. </summary>
-        public static void Initialize()
+        /// <summary> Инициализирует базу данных предметов. </summary>
+        /// <remarks> Загружает все предметы из папки Resources. </remarks>
+        static ItemDatabase()
         {
-            if (_itemDatabase != null) return;
-
             _itemDatabase = new Dictionary<string, InventoryItem>();
 
             // Загрузка все ресурсов с типом InventoryItem по всему проекту.

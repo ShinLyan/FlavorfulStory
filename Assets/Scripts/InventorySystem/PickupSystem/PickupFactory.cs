@@ -1,8 +1,6 @@
-using FlavorfulStory.InventorySystem;
-using FlavorfulStory.InventorySystem.PickupSystem;
 using UnityEngine;
 
-namespace FlavorfulStory
+namespace FlavorfulStory.InventorySystem.PickupSystem
 {
     /// <summary> Сервис для спавна Pickup объектов на сцене. </summary>
     public static class PickupFactory

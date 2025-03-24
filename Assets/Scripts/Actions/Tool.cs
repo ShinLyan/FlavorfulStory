@@ -2,6 +2,7 @@ using FlavorfulStory.Control;
 using FlavorfulStory.InputSystem;
 using FlavorfulStory.InventorySystem;
 using FlavorfulStory.ResourceContainer;
+using FlavorfulStory.Utils;
 using UnityEngine;
 
 namespace FlavorfulStory.Actions
@@ -32,18 +33,22 @@ namespace FlavorfulStory.Actions
         /// <summary> Использовать инструмент для взаимодействия с объектами. </summary>
         /// <param name="player"> Контроллер игрока. </param>
         /// <param name="hitableLayers"> Слои, по которым будем делать удар. </param>
-        public void Use(PlayerController player, LayerMask hitableLayers)
+        public bool Use(PlayerController player, LayerMask hitableLayers)
         {
             if (!WorldCoordinates.GetWorldCoordinatesFromScreenPoint(
                     InputWrapper.GetMousePosition(),
-                    ~(1 << player.gameObject.layer), // LayerMask.all except player.layer
-                    out var targetPosition
-                )) return;
+                    ~(1 << player.gameObject.layer),
+                    out var targetPosition))
+                return false;
+
+            bool didHit = UseToolInDirection(targetPosition, player, hitableLayers);
+            if (!didHit) return false;
 
             player.RotateTowards(targetPosition);
             player.TriggerAnimation($"Use{ToolType}");
-            UseToolInDirection(targetPosition, player, hitableLayers);
             InputWrapper.BlockPlayerMovement();
+
+            return true;
 
             // TODO: Реализовать трату энергии игрока при использовании инструмента
         }
@@ -52,7 +57,7 @@ namespace FlavorfulStory.Actions
         /// <param name="targetPosition"> Целевая позиция для взаимодействия. </param>
         /// <param name="player"> Контроллер игрока. </param>
         /// <param name="hitableLayers"> Слой объектов, с которыми можно взаимодействовать. </param>
-        private void UseToolInDirection(Vector3 targetPosition, PlayerController player, LayerMask hitableLayers)
+        private bool UseToolInDirection(Vector3 targetPosition, PlayerController player, LayerMask hitableLayers)
         {
             var origin = player.transform.position;
             var direction = (targetPosition - origin).normalized;
@@ -63,6 +68,8 @@ namespace FlavorfulStory.Actions
             foreach (var collider in hitColliders)
                 if (collider.transform.parent.TryGetComponent<IHitable>(out var hitable))
                     hitable.TakeHit(ToolType);
+
+            return hitColliders.Length > 0;
         }
     }
 }
