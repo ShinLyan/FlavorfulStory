@@ -66,8 +66,12 @@ namespace FlavorfulStory.Actions
             var hitColliders = Physics.OverlapSphere(interactionCenter, UseRadius, hitableLayers);
 
             foreach (var collider in hitColliders)
+            {
+                //if (collider.transform.parent == null) continue;
+
                 if (collider.transform.parent.TryGetComponent<IHitable>(out var hitable))
                     hitable.TakeHit(ToolType);
+            }
 
             return hitColliders.Length > 0;
         }

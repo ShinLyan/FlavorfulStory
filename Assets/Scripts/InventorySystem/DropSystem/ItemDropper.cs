@@ -28,7 +28,7 @@ namespace FlavorfulStory.InventorySystem.DropSystem
         /// <summary> Получить позицию для спавна предмета. </summary>
         /// <remarks> Можете переопределить для задания кастомной позиции спавна предмета. </remarks>
         /// <returns> Возвращает позицию, где должен быть заспавнен предмет. </returns>
-        protected virtual Vector3 GetDropPosition()
+        private Vector3 GetDropPosition()
         {
             const float DropOffsetRange = 2f; // Диапазон случайного смещения по осям X и Z
             float randomOffsetX = Random.Range(-DropOffsetRange, DropOffsetRange);
@@ -59,7 +59,7 @@ namespace FlavorfulStory.InventorySystem.DropSystem
             public SerializableVector3 Position;
 
             /// <summary> Количество выпавших предметов. </summary>
-            public int Number;
+            public int Quantity;
 
             /// <summary> Индекс сцены. </summary>
             public int SceneIndex;
@@ -75,7 +75,7 @@ namespace FlavorfulStory.InventorySystem.DropSystem
             {
                 ItemID = pickup.Item.ItemID,
                 Position = new SerializableVector3(pickup.transform.position),
-                Number = pickup.Number,
+                Quantity = pickup.Number,
                 SceneIndex = SceneManager.GetActiveScene().buildIndex
             }).ToList();
 
@@ -103,7 +103,7 @@ namespace FlavorfulStory.InventorySystem.DropSystem
 
                 var pickupItem = ItemDatabase.GetItemFromID(item.ItemID);
                 var position = item.Position.ToVector();
-                int number = item.Number;
+                int number = item.Quantity;
                 SpawnPickup(pickupItem, number, position);
             }
         }

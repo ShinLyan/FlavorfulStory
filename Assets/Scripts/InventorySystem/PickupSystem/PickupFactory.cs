@@ -9,7 +9,8 @@ namespace FlavorfulStory.InventorySystem.PickupSystem
         /// <param name="item"> Предмет, на основе которого будет создан Pickup. </param>
         /// <param name="position"> Позиция спавна. </param>
         /// <param name="quantity"> Количество предметов. </param>
-        public static Pickup Spawn(InventoryItem item, Vector3 position, int quantity)
+        /// <param name="parent"> Родитель, контейнер на сцене. </param>
+        public static Pickup Spawn(InventoryItem item, Vector3 position, int quantity, Transform parent = null)
         {
             if (!item.PickupPrefab)
             {
@@ -17,7 +18,7 @@ namespace FlavorfulStory.InventorySystem.PickupSystem
                 return null;
             }
 
-            var pickup = Object.Instantiate(item.PickupPrefab);
+            var pickup = Object.Instantiate(item.PickupPrefab, parent);
             pickup.transform.position = position;
             pickup.Setup(item, quantity);
             return pickup;

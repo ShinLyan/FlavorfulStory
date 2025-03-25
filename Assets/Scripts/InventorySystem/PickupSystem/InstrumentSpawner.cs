@@ -1,19 +1,16 @@
-﻿using FlavorfulStory.Saving;
+﻿using FlavorfulStory.Actions;
+using FlavorfulStory.Saving;
 using UnityEngine;
 
 namespace FlavorfulStory.InventorySystem.PickupSystem
 {
     /// <summary> Отвечает за создание объектов Pickup, которые появляются при первой загрузке уровня. </summary>
     /// <remarks> Автоматически создает префаб для заданного предмета инвентаря. </remarks>
-    public class PickupSpawner : MonoBehaviour, ISaveable
+    public class InstrumentSpawner : MonoBehaviour, ISaveable
     {
         /// <summary> Предмет, который будет заспавнен в сцене. </summary>
         [Tooltip("Предмет, который будет заспавнен в сцене."), SerializeField]
-        private InventoryItem _item;
-
-        /// <summary> Количество предметов, которые будут заспавнены. </summary>
-        [Tooltip("Количество предметов, которые будут заспавнены."), SerializeField, Range(1, 100)]
-        private int _number;
+        private Tool _tool;
 
         /// <summary> Был ли предмет собран? </summary>
         private bool _isPickedUp;
@@ -27,8 +24,7 @@ namespace FlavorfulStory.InventorySystem.PickupSystem
         /// <summary> Создает объект Pickup на сцене. </summary>
         private void SpawnPickup()
         {
-            var spawnedPickup = PickupFactory.Spawn(_item, transform.position, _number);
-            spawnedPickup.transform.SetParent(transform);
+            var spawnedPickup = PickupFactory.Spawn(_tool, transform.position, 1, transform);
             spawnedPickup.transform.localRotation = Quaternion.Euler(0, 0, 0);
 
             _isPickedUp = true;

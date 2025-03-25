@@ -112,6 +112,8 @@ namespace FlavorfulStory.Control
         /// <param name="usable"> Используемый предмет. </param>
         private void BeginInteraction(IUsable usable)
         {
+            if (usable == null) return;
+
             StartUsingItem(usable);
             if (usable is EdibleInventoryItem) ConsumeEdibleItem();
             _toolCooldownTimer = _toolCooldown;
