@@ -18,10 +18,10 @@ namespace FlavorfulStory.AI.WarpGraphSystem
         /// <param name="node"> Узел, который нужно добавить. </param>
         private void AddNode(WarpNode node)
         {
-            if (!_locationToNodes.ContainsKey(node.SourceWarp.ParentLocation))
-                _locationToNodes[node.SourceWarp.ParentLocation] = new List<WarpNode>();
+            if (!_locationToNodes.ContainsKey(node.SourceWarp.ParentLocationName))
+                _locationToNodes[node.SourceWarp.ParentLocationName] = new List<WarpNode>();
 
-            _locationToNodes[node.SourceWarp.ParentLocation].Add(node);
+            _locationToNodes[node.SourceWarp.ParentLocationName].Add(node);
             _allNodes.Add(node);
         }
 
@@ -29,7 +29,7 @@ namespace FlavorfulStory.AI.WarpGraphSystem
         /// <param name="start"> Начальный варп. </param>
         /// <param name="end"> Конечный варп. </param>
         /// <returns> Список варпов, представляющий путь, или null, если путь не найден. </returns>
-        public List<Warp> FindShortestPath(Warp start, Warp end)
+        public List<WarpPortal> FindShortestPath(WarpPortal start, WarpPortal end)
         {
             var queue = new Queue<WarpNode>();
             var visited = new HashSet<WarpNode>();
@@ -53,8 +53,8 @@ namespace FlavorfulStory.AI.WarpGraphSystem
                     var finalPath = ReconstructPath(path, endNode);
                     if (finalPath.Count < 2) return finalPath;
 
-                    var isLastDuplicate = finalPath[^2].ParentLocation == finalPath[^1].ParentLocation;
-                    var isFirstDuplicate = finalPath[0].ParentLocation == finalPath[1].ParentLocation;
+                    var isLastDuplicate = finalPath[^2].ParentLocationName == finalPath[^1].ParentLocationName;
+                    var isFirstDuplicate = finalPath[0].ParentLocationName == finalPath[1].ParentLocationName;
 
                     return isLastDuplicate ? finalPath.GetRange(0, finalPath.Count - 1)
                         : isFirstDuplicate ? finalPath.GetRange(1, finalPath.Count - 1)
@@ -76,9 +76,9 @@ namespace FlavorfulStory.AI.WarpGraphSystem
         /// <param name="path"> Словарь, содержащий связи между узлами. </param>
         /// <param name="endNode"> Конечный узел. </param>
         /// <returns> Список варпов, представляющий путь. </returns>
-        private static List<Warp> ReconstructPath(Dictionary<WarpNode, WarpNode> path, WarpNode endNode)
+        private static List<WarpPortal> ReconstructPath(Dictionary<WarpNode, WarpNode> path, WarpNode endNode)
         {
-            var result = new List<Warp>();
+            var result = new List<WarpPortal>();
             var current = endNode;
 
             while (current != null)
@@ -117,7 +117,7 @@ namespace FlavorfulStory.AI.WarpGraphSystem
             foreach (var node in _locationToNodes[location])
             {
                 var connections = "";
-                foreach (var edge in node.Edges) connections += $"{edge.TargetNode.SourceWarp.ParentLocation} -> ";
+                foreach (var edge in node.Edges) connections += $"{edge.TargetNode.SourceWarp.ParentLocationName} -> ";
                 Debug.Log($"[{location}] Connected to: {connections.TrimEnd(" -> ".ToCharArray())}");
             }
         }
@@ -125,21 +125,21 @@ namespace FlavorfulStory.AI.WarpGraphSystem
         /// <summary> Строит граф варпов на основе списка всех варпов. </summary>
         /// <param name="allWarps"> Список всех варпов для построения графа. </param>
         /// <returns> Построенный граф варпов. </returns>
-        public static WarpGraph Build(IEnumerable<Warp> allWarps)
+        public static WarpGraph Build(IEnumerable<WarpPortal> allWarps)
         {
-            var locationToWarps = new Dictionary<LocationName, List<Warp>>();
+            var locationToWarps = new Dictionary<LocationName, List<WarpPortal>>();
             var warps = allWarps.ToList();
 
             // Группируем варпы по локациям
             foreach (var warp in warps)
             {
-                if (!locationToWarps.ContainsKey(warp.ParentLocation))
-                    locationToWarps[warp.ParentLocation] = new List<Warp>();
+                if (!locationToWarps.ContainsKey(warp.ParentLocationName))
+                    locationToWarps[warp.ParentLocationName] = new List<WarpPortal>();
 
-                locationToWarps[warp.ParentLocation].Add(warp);
+                locationToWarps[warp.ParentLocationName].Add(warp);
             }
 
-            var warpToNode = new Dictionary<Warp, WarpNode>();
+            var warpToNode = new Dictionary<WarpPortal, WarpNode>();
             var graph = new WarpGraph();
 
             // Создаем узлы и связи внутри локаций

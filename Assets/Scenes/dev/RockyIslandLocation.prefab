@@ -192,7 +192,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c8797726b244934981371ffe7a3a884, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <ConnectedWarps>k__BackingField: []
+  _spawnPoint: {fileID: 7416678122090115380}
+  <ConnectedWarp>k__BackingField: {fileID: 0}
+  _localConnectionColor: {r: 0, g: 0, b: 1, a: 1}
+  _remoteConnectionColor: {r: 0, g: 1, b: 0, a: 1}
 --- !u!1 &1255580587148540985
 GameObject:
   m_ObjectHideFlags: 0
@@ -450,7 +453,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7929789076899124060}
-  - component: {fileID: 2185553001047046275}
+  - component: {fileID: 7293641175146997572}
   m_Layer: 0
   m_Name: RockyIslandLocation
   m_TagString: Untagged
@@ -471,12 +474,11 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 4883119416647367339}
-  - {fileID: 5871377167784892263}
-  - {fileID: 2641352676095297372}
+  - {fileID: 540751132522862008}
+  - {fileID: 4519493624782662115}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2185553001047046275
+--- !u!114 &7293641175146997572
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -489,6 +491,39 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   <LocationName>k__BackingField: 0
+  <ObjectsToDisable>k__BackingField: {fileID: 2763592030262913532}
+--- !u!1 &2763592030262913532
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4519493624782662115}
+  m_Layer: 0
+  m_Name: Location
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4519493624782662115
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2763592030262913532}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 5871377167784892263}
+  m_Father: {fileID: 7929789076899124060}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &3167790633206082866
 GameObject:
   m_ObjectHideFlags: 0
@@ -513,7 +548,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3167790633206082866}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -521,6 +556,39 @@ Transform:
   - {fileID: 4224204993659184041}
   - {fileID: 6163326459572307293}
   - {fileID: 2526610155787909748}
+  m_Father: {fileID: 540751132522862008}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &3390946683320263965
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 540751132522862008}
+  m_Layer: 0
+  m_Name: NpcUtils
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &540751132522862008
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3390946683320263965}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 4883119416647367339}
+  - {fileID: 2641352676095297372}
   m_Father: {fileID: 7929789076899124060}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &3526135097027656932
@@ -716,8 +784,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c8797726b244934981371ffe7a3a884, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <ConnectedWarps>k__BackingField:
-  - {fileID: 0}
+  _spawnPoint: {fileID: 746083968941061089}
+  <ConnectedWarp>k__BackingField: {fileID: 0}
+  _localConnectionColor: {r: 0, g: 0, b: 1, a: 1}
+  _remoteConnectionColor: {r: 0, g: 1, b: 0, a: 1}
 --- !u!1 &5123110283496581498
 GameObject:
   m_ObjectHideFlags: 0
@@ -802,8 +872,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c8797726b244934981371ffe7a3a884, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <ConnectedWarps>k__BackingField:
-  - {fileID: 0}
+  _spawnPoint: {fileID: 2514164242687627655}
+  <ConnectedWarp>k__BackingField: {fileID: 0}
+  _localConnectionColor: {r: 0, g: 0, b: 1, a: 1}
+  _remoteConnectionColor: {r: 0, g: 1, b: 0, a: 1}
 --- !u!1 &5288930543662386460
 GameObject:
   m_ObjectHideFlags: 0
@@ -936,7 +1008,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5735415679858895434}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -945,7 +1017,7 @@ Transform:
   - {fileID: 40290891243905291}
   - {fileID: 6581967194108730990}
   - {fileID: 5358065315895152045}
-  m_Father: {fileID: 7929789076899124060}
+  m_Father: {fileID: 4519493624782662115}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &7028785065881608815
 GameObject:
@@ -1143,14 +1215,14 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8199601931043015298}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6489563486471630410}
   - {fileID: 1741282383724356422}
-  m_Father: {fileID: 7929789076899124060}
+  m_Father: {fileID: 540751132522862008}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &8524628844682128789
 MonoBehaviour:

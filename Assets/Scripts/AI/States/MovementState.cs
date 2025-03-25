@@ -152,13 +152,13 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         /// <summary> Перемещает NPC по пути через варпы. </summary>
         /// <param name="path"> Список варпов, через которые нужно пройти. </param>
         /// <param name="destination"> Целевая точка расписания. </param>
-        private IEnumerator TraverseWarpPath(List<Warp> path, SchedulePoint destination)
+        private IEnumerator TraverseWarpPath(List<WarpPortal> path, SchedulePoint destination)
         {
             foreach (var currentWarp in path)
-                if (currentWarp.ParentLocation != _npc.CurrentLocationName)
+                if (currentWarp.ParentLocationName != _npc.CurrentLocationName)
                 {
                     _navMeshAgent.Warp(currentWarp.transform.position);
-                    _npc.CurrentLocationName = currentWarp.ParentLocation;
+                    _npc.CurrentLocationName = currentWarp.ParentLocationName;
                 }
                 else
                 {
@@ -180,7 +180,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         /// <param name="location"> Локация, в которой искать варп. </param>
         /// <returns> Ближайший варп или null, если варп не найден. </returns>
         [CanBeNull]
-        private Warp FindClosestWarpInScene(Vector3 position, LocationName location)
+        private WarpPortal FindClosestWarpInScene(Vector3 position, LocationName location)
         {
             var closestWarp = _warpGraph.FindClosestWarp(position, location);
             return closestWarp?.SourceWarp;

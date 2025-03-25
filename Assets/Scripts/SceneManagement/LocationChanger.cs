@@ -6,35 +6,35 @@ namespace FlavorfulStory.SceneManagement
     public static class LocationChanger
     {
         private static LocationName _currentLocation;
-        private static Dictionary<LocationName, Location> _locationsDictionary;
+        private static Dictionary<LocationName, GameObject> _locationsDictionary;
 
         public static void InitializeLocations()
         {
-            var locations = Object.FindObjectsByType<Location>(FindObjectsSortMode.None);
-            _locationsDictionary = new Dictionary<LocationName, Location>();
+            var locations = Object.FindObjectsByType<Location>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+            _locationsDictionary = new Dictionary<LocationName, GameObject>();
 
             foreach (var location in locations)
             {
-                var type = location.LocationName;
-                if (!_locationsDictionary.TryAdd(type, location))
-                    Debug.LogWarning($"Duplicate LocationType found: {type} in {location.name}");
+                var name = location.LocationName;
+                if (!_locationsDictionary.TryAdd(name, location.ObjectsToDisable))
+                    Debug.LogWarning($"Найден дупликат локации: {name} in {location.name}");
             }
         }
 
         public static void EnableLocation(LocationName newLocation)
         {
-            if (_locationsDictionary.TryGetValue(newLocation, out var location))
-                location.gameObject.SetActive(true);
+            if (_locationsDictionary.TryGetValue(newLocation, out var locationObjects))
+                locationObjects.SetActive(true);
             else
-                Debug.LogError($"Location {newLocation} not found!");
+                Debug.LogError($"Локации {newLocation} не существует!");
         }
 
-        public static void DisableLocation(LocationName location)
+        public static void DisableLocation(LocationName oldLocation)
         {
-            if (_locationsDictionary.TryGetValue(location, out var locationObj))
-                locationObj.gameObject.SetActive(false);
+            if (_locationsDictionary.TryGetValue(oldLocation, out var locationObjects))
+                locationObjects.SetActive(false);
             else
-                Debug.LogError($"Location {location} not found!");
+                Debug.LogError($"Локации {oldLocation} не существует!");
         }
     }
 }

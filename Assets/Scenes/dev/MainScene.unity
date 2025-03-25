@@ -129,6 +129,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2759370476529085049, guid: 6cdd8394e4a804b4bab33bcfb840cdbd,
         type: 3}
+      propertyPath: <ConnectedWarp>k__BackingField
+      value: 
+      objectReference: {fileID: 1625581793}
+    - target: {fileID: 2759370476529085049, guid: 6cdd8394e4a804b4bab33bcfb840cdbd,
+        type: 3}
       propertyPath: '<ConnectedWarps>k__BackingField.Array.data[0]'
       value: 
       objectReference: {fileID: 1625581793}
@@ -185,6 +190,11 @@ PrefabInstance:
     - target: {fileID: 7064185731535865277, guid: 6cdd8394e4a804b4bab33bcfb840cdbd,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8563929597273759543, guid: 6cdd8394e4a804b4bab33bcfb840cdbd,
+        type: 3}
+      propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -270,9 +280,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2636561383568387328, guid: db760588a687241aeb4966d2098f65c0,
         type: 3}
+      propertyPath: <ConnectedWarp>k__BackingField
+      value: 
+      objectReference: {fileID: 912398233}
+    - target: {fileID: 2636561383568387328, guid: db760588a687241aeb4966d2098f65c0,
+        type: 3}
       propertyPath: '<ConnectedWarps>k__BackingField.Array.data[0]'
       value: 
       objectReference: {fileID: 912398233}
+    - target: {fileID: 4990995839956669120, guid: db760588a687241aeb4966d2098f65c0,
+        type: 3}
+      propertyPath: <ConnectedWarp>k__BackingField
+      value: 
+      objectReference: {fileID: 1548247607}
     - target: {fileID: 4990995839956669120, guid: db760588a687241aeb4966d2098f65c0,
         type: 3}
       propertyPath: <ConnectedWarps>k__BackingField.Array.size
@@ -283,6 +303,11 @@ PrefabInstance:
       propertyPath: '<ConnectedWarps>k__BackingField.Array.data[0]'
       value: 
       objectReference: {fileID: 1548247607}
+    - target: {fileID: 5670265026625316414, guid: db760588a687241aeb4966d2098f65c0,
+        type: 3}
+      propertyPath: <ConnectedWarp>k__BackingField
+      value: 
+      objectReference: {fileID: 125366537}
     - target: {fileID: 5670265026625316414, guid: db760588a687241aeb4966d2098f65c0,
         type: 3}
       propertyPath: '<ConnectedWarps>k__BackingField.Array.data[0]'
@@ -582,7 +607,7 @@ PrefabInstance:
     - target: {fileID: 7922225790736311418, guid: ce24d4a198b4c7748b5d9d8f1aaa3a22,
         type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7984978308017419769, guid: ce24d4a198b4c7748b5d9d8f1aaa3a22,
         type: 3}
@@ -793,6 +818,37 @@ MonoBehaviour:
     m_MipBias: 0
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
+--- !u!1 &1511860814
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1511860815}
+  m_Layer: 0
+  m_Name: SceneCheckPoint (1)
+  m_TagString: Untagged
+  m_Icon: {fileID: 4162164826716764455, guid: 0000000000000000d000000000000000, type: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1511860815
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1511860814}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 8.08, y: 1, z: -3.94}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1548247606
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -803,9 +859,19 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 934915529047330402, guid: b8bb01aa5c19e4968b4c73ae4dd69b46,
         type: 3}
+      propertyPath: <ConnectedWarp>k__BackingField
+      value: 
+      objectReference: {fileID: 314910372}
+    - target: {fileID: 934915529047330402, guid: b8bb01aa5c19e4968b4c73ae4dd69b46,
+        type: 3}
       propertyPath: '<ConnectedWarps>k__BackingField.Array.data[0]'
       value: 
       objectReference: {fileID: 314910372}
+    - target: {fileID: 3398236007541438789, guid: b8bb01aa5c19e4968b4c73ae4dd69b46,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4417830824635749005, guid: b8bb01aa5c19e4968b4c73ae4dd69b46,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -3824,6 +3890,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1275979994}
     m_Modifications:
+    - target: {fileID: 2321227473512042736, guid: a17d258a2d710414da60eb12daeeb478,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2458064098256051765, guid: a17d258a2d710414da60eb12daeeb478,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -3876,6 +3947,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4577134873943986354, guid: a17d258a2d710414da60eb12daeeb478,
         type: 3}
+      propertyPath: <ConnectedWarp>k__BackingField
+      value: 
+      objectReference: {fileID: 1614568517}
+    - target: {fileID: 4577134873943986354, guid: a17d258a2d710414da60eb12daeeb478,
+        type: 3}
       propertyPath: '<ConnectedWarps>k__BackingField.Array.data[0]'
       value: 
       objectReference: {fileID: 1614568517}
@@ -3904,5 +3980,6 @@ SceneRoots:
   - {fileID: 1805398930}
   - {fileID: 1562363598}
   - {fileID: 1785250497}
+  - {fileID: 1511860815}
   - {fileID: 1275979994}
   - {fileID: 538943390}
