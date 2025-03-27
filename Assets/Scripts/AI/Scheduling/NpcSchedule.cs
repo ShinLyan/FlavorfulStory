@@ -12,7 +12,7 @@ namespace FlavorfulStory.AI.Scheduling
         [field: Tooltip("Параметры расписания NPC."), SerializeField]
         public ScheduleParams[] Params { get; private set; }
 
-        /// <summary> Получить подходящие параметры расписания по текущим условиям </summary>
+        /// <summary> Получить отсортированные параметры расписания по текущим условиям. </summary>
         public IEnumerable<ScheduleParams> GetSortedScheduleParams()
         {
             if (Params == null) return Enumerable.Empty<ScheduleParams>();
@@ -20,7 +20,9 @@ namespace FlavorfulStory.AI.Scheduling
             return Params
                 .OrderByDescending(p => p.IsRaining)
                 .ThenByDescending(p => p.Hearts)
-                .ThenByDescending(p => p.Seasons != 0);
+                .ThenByDescending(p => p.Dates.Length > 0 ? p.Dates[0].x : 0)
+                .ThenByDescending(p => p.DayOfWeek)
+                .ThenByDescending(p => p.Seasons);
         }
     }
 }

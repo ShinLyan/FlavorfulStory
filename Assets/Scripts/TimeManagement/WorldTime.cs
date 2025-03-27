@@ -25,7 +25,7 @@ namespace FlavorfulStory.TimeManagement
         private int _dayEndHour;
 
         /// <summary> Текущее игровое время. </summary>
-        private DateTime _currentGameTime;
+        private static DateTime _currentGameTime;
 
         /// <summary> Время, прошедшее с момента последнего тика. </summary>
         private float _elapsedTime;
@@ -91,6 +91,8 @@ namespace FlavorfulStory.TimeManagement
 
         /// <summary> Снять паузу с игрового времени. </summary>
         public static void Unpause() => _isPaused = false;
+
+        public static DateTime GetCurrentGameTime() => _currentGameTime;
 
         #region Saving
 

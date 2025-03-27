@@ -61,29 +61,23 @@ namespace FlavorfulStory.AI.Scheduling
             return closestPoint;
         }
 
-        public bool AreConditionsMet(DateTime currentTime, int currentHearts, bool isRaining)
+        /// <summary> Проверка на подходящие условия</summary>
+        /// <param name="currentTime"> Текущее время. </param>
+        /// <param name="currentHearts"> Текущие отнощения. </param>
+        /// <param name="isRaining"> Идет ли дождь. </param>
+        /// <returns></returns>
+        public bool AreConditionsSuitable(DateTime currentTime, int currentHearts, bool isRaining)
         {
-            // 1. Проверка погоды
             if (IsRaining != isRaining)
                 return false;
-            Debug.Log("weather done");
-            // 2. Проверка уровня отношений
             if (Hearts > 0 && currentHearts < Hearts)
                 return false;
-            Debug.Log("hearts done");
-            // 3. Проверка дней месяца
             if (Dates.Length > 0 && !IsDateInRanges(currentTime.SeasonDay))
                 return false;
-            Debug.Log("day done");
-            // 4. Проверка дня недели
             if (DayOfWeek != 0 && (DayOfWeek & currentTime.DayOfWeek) == 0)
                 return false;
-            Debug.Log("weekday done");
-            // 5. Проверка сезона
             if (Seasons != 0 && (Seasons & currentTime.Season) == 0)
                 return false;
-            Debug.Log("season done");
-            Debug.Log("==========");
             return true;
         }
 

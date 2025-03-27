@@ -5,6 +5,7 @@ using FlavorfulStory.SceneManagement;
 using FlavorfulStory.TimeManagement;
 using UnityEngine;
 using UnityEngine.AI;
+using DateTime = FlavorfulStory.TimeManagement.DateTime;
 
 namespace FlavorfulStory.AI
 {
@@ -28,9 +29,11 @@ namespace FlavorfulStory.AI
         [field: Tooltip("Текущая локация, в которой находится NPC."), SerializeField]
         public LocationName CurrentLocationName { get; set; }
 
+        /// <summary> Базовая точка спавна NPC. </summary>
         [field: Tooltip("Базовая точка спавна NPC."), SerializeField]
         private Transform _spawnPoint;
 
+        /// <summary> Базовая точка спавна NPC. </summary>
         private LocationName _spawnLocation;
 
         /// <summary> Компонент аниматора, управляющий анимациями NPC. </summary>
@@ -59,6 +62,7 @@ namespace FlavorfulStory.AI
 
         #endregion
 
+        /// <summary> Получение компонентов. </summary>
         private void Awake()
         {
             _navMeshAgent = GetComponent<NavMeshAgent>();
@@ -66,6 +70,7 @@ namespace FlavorfulStory.AI
             _stateController = new StateController();
         }
 
+        /// <summary>  </summary>
         private void Start()
         {
             _spawnLocation = CurrentLocationName;
@@ -73,17 +78,22 @@ namespace FlavorfulStory.AI
             AddStatesToController();
 
             _stateController.SetState<RoutineState>();
-            WorldTime.OnDayEnded?.Invoke(new DateTime(1, Season.Spring, 1, 6, 0));
+            OnReset(WorldTime.GetCurrentGameTime());
         }
 
         /// <summary> Обновление логики состояний каждый кадр. </summary>
         private void Update() => _stateController.Update(Time.deltaTime);
 
+        /// <summary> Подписка на события. </summary>
         private void OnEnable()
         {
-            WorldTime.OnTimeUpdated += abc;
             WorldTime.OnDayEnded += OnReset;
-            WorldTime.OnDayEnded += PrioritisedSchedule;
+        }
+
+        /// <summary> Отписка от событий. </summary>
+        private void OnDisable()
+        {
+            WorldTime.OnDayEnded -= OnReset;
         }
 
         /// <summary> Создает экземпляры всех состояний NPC. </summary>
@@ -121,7 +131,9 @@ namespace FlavorfulStory.AI
             _animator.Play(animationStateName.ToString());
         }
 
-        private void PrioritisedSchedule(DateTime currentTime)
+        /// <summary> Приоритизировать расписание. </summary>
+        /// <param name="currentTime"> Текущее время. </param>
+        private void PrioritiseSchedule(DateTime currentTime)
         {
             var sortedList = _npcSchedule.GetSortedScheduleParams();
 
@@ -129,32 +141,31 @@ namespace FlavorfulStory.AI
             var hearts = 0; //TODO: поменять на получение текущих отношений с данным нпс
 
             foreach (var param in sortedList)
-                if (param.AreConditionsMet(currentTime, param.Hearts, isRaining))
+                if (param.AreConditionsSuitable(currentTime, param.Hearts, isRaining))
                 {
                     SetNewSchedule(param);
                     return;
                 }
-                else
-                {
-                    Debug.LogError("На текущую дату не подходит ни одно расписание!");
-                }
+
+            Debug.LogError("На текущую дату не подходит ни одно расписание!");
         }
 
         /// <summary> Устанавливает новое расписание для NPC. </summary>
         /// <param name="newScheduleParams"> Новые параметры расписания. </param>
         private void SetNewSchedule(ScheduleParams newScheduleParams) => CurrentScheduleParams = newScheduleParams;
 
+        /// <summary> Обновление состояния NPC. </summary>
+        /// <param name="currentTime"> Текущее время. </param>
         private void OnReset(DateTime currentTime)
         {
             SetNewSchedule(null);
+
+            _movementState.StopCoroutine();
             _navMeshAgent.ResetPath();
             _navMeshAgent.Warp(_spawnPoint.position);
-            CurrentLocationName = _spawnLocation;
-        }
 
-        private void abc(DateTime currentTime)
-        {
-            Debug.Log((int)currentTime.DayOfWeek);
+            CurrentLocationName = _spawnLocation;
+            PrioritiseSchedule(currentTime);
         }
     }
 }

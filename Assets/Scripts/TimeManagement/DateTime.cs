@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace FlavorfulStory.TimeManagement
 {
@@ -10,6 +11,27 @@ namespace FlavorfulStory.TimeManagement
 
         /// <summary> Общее количество минут, прошедших с начала игры. </summary>
         private int _totalMinutes;
+
+        /// <summary> Словарь для конвертации дней недели. </summary>
+        private static readonly Dictionary<DayOfWeek, DayOfWeek> DayOfWeekConvertDict = new()
+        {
+            { (DayOfWeek)1, (DayOfWeek)1 },
+            { (DayOfWeek)2, (DayOfWeek)2 },
+            { (DayOfWeek)3, (DayOfWeek)4 },
+            { (DayOfWeek)4, (DayOfWeek)8 },
+            { (DayOfWeek)5, (DayOfWeek)16 },
+            { (DayOfWeek)6, (DayOfWeek)32 },
+            { (DayOfWeek)7, (DayOfWeek)64 }
+        };
+
+        /// <summary> Словарь для конвертации сезонов. </summary>
+        private static readonly Dictionary<Season, Season> SeasonConvertDict = new()
+        {
+            { (Season)1, (Season)1 },
+            { (Season)2, (Season)2 },
+            { (Season)3, (Season)4 },
+            { (Season)4, (Season)8 }
+        };
 
         /// <summary> Количество дней в одном сезоне. </summary>
         private const int DaysCount = 28;
@@ -24,13 +46,13 @@ namespace FlavorfulStory.TimeManagement
         public int Year => _totalMinutes / (SeasonMinutes * 4) + 1;
 
         /// <summary> Получает текущий сезон. </summary>
-        public Season Season => (Season)(_totalMinutes % (SeasonMinutes * 4) / SeasonMinutes);
+        public Season Season => SeasonConvertDict[(Season)(_totalMinutes % (SeasonMinutes * 4) / SeasonMinutes)];
 
         /// <summary> Получает день в текущем сезоне. </summary>
         public int SeasonDay => _totalMinutes % SeasonMinutes / DayMinutes + 1;
 
         /// <summary> Получает день недели. </summary>
-        public DayOfWeek DayOfWeek => (DayOfWeek)(_totalMinutes / DayMinutes % 7 + 1);
+        public DayOfWeek DayOfWeek => DayOfWeekConvertDict[(DayOfWeek)(_totalMinutes / DayMinutes % 7 + 1)];
 
         /// <summary> Получает текущий час. </summary>
         public int Hour => _totalMinutes % DayMinutes / 60;

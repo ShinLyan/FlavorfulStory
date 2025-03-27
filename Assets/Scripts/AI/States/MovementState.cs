@@ -39,11 +39,11 @@ namespace FlavorfulStory.AI.FiniteStateMachine
 
         /// <summary> Инициализирует новое состояние движения. </summary>
         /// <param name="stateController"> Контроллер состояний. </param>
-        /// <param name="npcSchedule"> Расписание NPC. </param>
         /// <param name="navMeshAgent"> Компонент для навигации по NavMesh. </param>
         /// <param name="npc"> Контроллер NPC. </param>
-        public MovementState(StateController stateController,
-            NavMeshAgent navMeshAgent, NPC npc, WarpGraph warpGraph) : base(stateController)
+        /// <param name="warpGraph"> Граф варпов. </param>
+        public MovementState(StateController stateController, NavMeshAgent navMeshAgent,
+            NPC npc, WarpGraph warpGraph) : base(stateController)
         {
             _stateController = stateController;
             _navMeshAgent = navMeshAgent;
@@ -64,11 +64,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine
             _npc.PlayMoveAnimation(0f, 0f);
             _currentPoint = null;
 
-            if (_currentPathCoroutine != null)
-            {
-                _npc.StopCoroutine(_currentPathCoroutine);
-                _currentPathCoroutine = null;
-            }
+            StopCoroutine();
         }
 
         /// <summary> Обновляет логику состояния движения каждый кадр. </summary>
@@ -97,7 +93,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         /// <param name="currentTime"> Текущее время в игре. </param>
         private void FindDestinationPoint(DateTime currentTime)
         {
-            var closestPoint = _npc.CurrentScheduleParams.GetClosestSchedulePointInPath(currentTime);
+            var closestPoint = _npc.CurrentScheduleParams?.GetClosestSchedulePointInPath(currentTime);
 
             if (closestPoint == null)
             {
@@ -107,11 +103,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine
 
             if (_currentPoint == closestPoint) return;
 
-            if (_currentPathCoroutine != null)
-            {
-                _npc.StopCoroutine(_currentPathCoroutine);
-                _currentPathCoroutine = null;
-            }
+            StopCoroutine();
 
             _currentPoint = closestPoint;
 
@@ -180,6 +172,15 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         {
             var closestWarp = _warpGraph.FindClosestWarp(position, location);
             return closestWarp?.SourceWarp;
+        }
+
+        /// <summary> Остановить корутину. </summary>
+        public void StopCoroutine()
+        {
+            if (_currentPathCoroutine == null) return;
+
+            _npc.StopCoroutine(_currentPathCoroutine);
+            _currentPathCoroutine = null;
         }
     }
 }
