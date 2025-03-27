@@ -160,6 +160,9 @@ namespace FlavorfulStory.Actions.Interactables
         {
             OnInteractionEnded?.Invoke();
             _endInteractionAction();
+
+            if (_closestInteractable is BuildingRepair.BuildingRepair && !IsInteracting) return;
+
             InputWrapper.UnblockPlayerMovement();
 
             if (_animator) _animator.ResetTrigger(_gatherAnimationHash);
