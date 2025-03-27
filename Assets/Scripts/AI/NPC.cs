@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using FlavorfulStory.AI.FiniteStateMachine;
 using FlavorfulStory.AI.Scheduling;
 using FlavorfulStory.AI.WarpGraphSystem;
@@ -60,6 +61,8 @@ namespace FlavorfulStory.AI
         /// <summary> Состояние ожидания, когда NPC не выполняет активных действий. </summary>
         private WaitingState _waitingState;
 
+        private IEnumerable<ScheduleParams> _sortedScheduleParams;
+
         #endregion
 
         /// <summary> Получение компонентов. </summary>
@@ -78,6 +81,8 @@ namespace FlavorfulStory.AI
             AddStatesToController();
 
             _stateController.SetState<RoutineState>();
+
+            _sortedScheduleParams = _npcSchedule.GetSortedScheduleParams();
             OnReset(WorldTime.GetCurrentGameTime());
         }
 
@@ -131,29 +136,6 @@ namespace FlavorfulStory.AI
             _animator.Play(animationStateName.ToString());
         }
 
-        /// <summary> Приоритизировать расписание. </summary>
-        /// <param name="currentTime"> Текущее время. </param>
-        private void PrioritiseSchedule(DateTime currentTime)
-        {
-            var sortedList = _npcSchedule.GetSortedScheduleParams();
-
-            var isRaining = false; //TODO: поменять на получение текущей погоды из спец. скрипта
-            var hearts = 0; //TODO: поменять на получение текущих отношений с данным нпс
-
-            foreach (var param in sortedList)
-                if (param.AreConditionsSuitable(currentTime, param.Hearts, isRaining))
-                {
-                    SetNewSchedule(param);
-                    return;
-                }
-
-            Debug.LogError("На текущую дату не подходит ни одно расписание!");
-        }
-
-        /// <summary> Устанавливает новое расписание для NPC. </summary>
-        /// <param name="newScheduleParams"> Новые параметры расписания. </param>
-        private void SetNewSchedule(ScheduleParams newScheduleParams) => CurrentScheduleParams = newScheduleParams;
-
         /// <summary> Обновление состояния NPC. </summary>
         /// <param name="currentTime"> Текущее время. </param>
         private void OnReset(DateTime currentTime)
@@ -166,6 +148,30 @@ namespace FlavorfulStory.AI
 
             CurrentLocationName = _spawnLocation;
             PrioritiseSchedule(currentTime);
+
+            _stateController.SetState<MovementState>();
+            _stateController.SetState<RoutineState>();
         }
+
+        /// <summary> Приоритизировать расписание. </summary>
+        /// <param name="currentTime"> Текущее время. </param>
+        private void PrioritiseSchedule(DateTime currentTime)
+        {
+            var isRaining = false; //TODO: поменять на получение текущей погоды из спец. скрипта
+            var hearts = 0; //TODO: поменять на получение текущих отношений с данным нпс
+
+            foreach (var param in _sortedScheduleParams)
+                if (param.AreConditionsSuitable(currentTime, param.Hearts, isRaining))
+                {
+                    SetNewSchedule(param);
+                    return;
+                }
+
+            Debug.LogError("На текущую дату не подходит ни одно расписание!");
+        }
+
+        /// <summary> Устанавливает новое расписание для NPC. </summary>
+        /// <param name="newScheduleParams"> Новые параметры расписания. </param>
+        private void SetNewSchedule(ScheduleParams newScheduleParams) => CurrentScheduleParams = newScheduleParams;
     }
 }
