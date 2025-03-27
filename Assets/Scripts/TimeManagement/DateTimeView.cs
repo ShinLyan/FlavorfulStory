@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
@@ -15,6 +16,17 @@ namespace FlavorfulStory.TimeManagement
         /// <summary> Текстовое поле отображения текущего времени. </summary>
         [SerializeField] private TMP_Text _timeText;
 
+        private static readonly Dictionary<int, string> IntToDayOfWeek = new()
+        {
+            { 1, "Monday" },
+            { 2, "Tuesday" },
+            { 3, "Wednesday" },
+            { 4, "Thursday" },
+            { 5, "Friday" },
+            { 6, "Saturday" },
+            { 7, "Sunday" }
+        };
+
         /// <summary> Подписка на событие изменения времени при активации объекта. </summary>
         private void OnEnable() => WorldTime.OnTimeUpdated += SetDateTimeText;
 
@@ -26,7 +38,7 @@ namespace FlavorfulStory.TimeManagement
         private void SetDateTimeText(DateTime dateTime)
         {
             _seasonText.text = dateTime.Season.ToString();
-            _dayText.text = $"{dateTime.DayOfWeek} {dateTime.SeasonDay}";
+            _dayText.text = $"{IntToDayOfWeek[(int)dateTime.DayOfWeek]} {dateTime.SeasonDay}";
             _timeText.text = dateTime.TimeToString(false);
         }
     }
