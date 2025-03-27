@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using FlavorfulStory.Actions;
+using FlavorfulStory.Control.CursorSystem;
 using FlavorfulStory.InputSystem;
 using FlavorfulStory.InventorySystem;
 using FlavorfulStory.InventorySystem.UI;
@@ -22,6 +23,11 @@ namespace FlavorfulStory.Control
 
         /// <summary> Время перезарядки использования инструмента. </summary>
         [SerializeField] private float _toolCooldown = 1f;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private const float SphereCastRadius = 0.1f;
 
         /// <summary> Передвижение игрока. </summary>
         private PlayerMover _playerMover;
@@ -66,6 +72,8 @@ namespace FlavorfulStory.Control
         {
             HandleInput();
             ReduceCooldownTimer();
+            if (InteractWithComponent()) return;
+            CursorController.SetCursor(CursorType.Default);
         }
 
         /// <summary> Обработка ввода. </summary>
@@ -76,17 +84,39 @@ namespace FlavorfulStory.Control
             HandleMovement();
         }
 
+        private bool InteractWithComponent()
+        {
+            var hits = SphereCastAllSorted();
+            foreach (var hit in hits)
+            {
+                var cursorInteractables = hit.transform.GetComponents<ICursorInteractable>();
+                foreach (var cursorInteractable in cursorInteractables)
+                    if (cursorInteractable.HandleCursorInteraction(this))
+                    {
+                        CursorController.SetCursor(cursorInteractable.GetCursorType());
+                        return true;
+                    }
+            }
+
+            return false;
+        }
+
+        private RaycastHit[] SphereCastAllSorted()
+        {
+            var hits = Physics.SphereCastAll(InputWrapper.GetMouseRay(), SphereCastRadius);
+            float[] distances = new float[hits.Length];
+            for (int i = 0; i < hits.Length; i++) distances[i] = hits[i].distance;
+            Array.Sort(distances, hits);
+            return hits;
+        }
+
         /// <summary> Обработка выбора предмета на панели быстрого доступа. </summary>
         private void HandleToolbarSelection()
         {
             const int ToolbarItemsCount = 9;
             for (int i = 0; i < ToolbarItemsCount; i++)
-            {
                 if (Input.GetKeyDown(KeyCode.Alpha1 + i))
-                {
                     _toolbar.SelectItem(i);
-                }
-            }
         }
 
         /// <summary> Обработка использования предмета из панели быстрого доступа. </summary>
@@ -96,8 +126,8 @@ namespace FlavorfulStory.Control
                 EventSystem.current.IsPointerOverGameObject())
                 return;
 
-            if (Input.GetMouseButton(0) && actionItem.UseActionType == UseActionType.LeftClick ||
-                Input.GetMouseButton(1) && actionItem.UseActionType == UseActionType.RightClick)
+            if ((Input.GetMouseButton(0) && actionItem.UseActionType == UseActionType.LeftClick) ||
+                (Input.GetMouseButton(1) && actionItem.UseActionType == UseActionType.RightClick))
             {
                 actionItem.Use(this);
                 _toolCooldownTimer = _toolCooldown;

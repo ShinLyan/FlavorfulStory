@@ -6,6 +6,6 @@ namespace FlavorfulStory.ObjectSpawner
     public interface ISpawnable
     {
         /// <summary> Событие, возникающее при уничтожении объекта. </summary>
-        public event Action<ISpawnable> OnObjectDestroyed;
+        event Action<ISpawnable> OnObjectDestroyed;
     }
 }

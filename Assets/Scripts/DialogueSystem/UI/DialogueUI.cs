@@ -1,4 +1,5 @@
-﻿using TMPro;
+﻿using FlavorfulStory.UI;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -10,7 +11,7 @@ namespace FlavorfulStory.DialogueSystem.UI
         [SerializeField] private Button _nextButton;
         [SerializeField] private GameObject _nextButtonPreview;
         [SerializeField] private Transform _choiceContainer;
-        [SerializeField] private GameObject _choicePrefab;
+        [SerializeField] private DialogueChoiceButton _choiceButtonPrefab;
 
         private PlayerConversant _playerConversant;
 
@@ -59,11 +60,10 @@ namespace FlavorfulStory.DialogueSystem.UI
         {
             foreach (var choice in _playerConversant.GetChoices())
             {
-                var choiceInstance = Instantiate(_choicePrefab, _choiceContainer);
-                choiceInstance.GetComponentInChildren<TMP_Text>().text = choice.Text;
-
-                var button = choiceInstance.GetComponent<Button>();
-                button.onClick.AddListener(() => { OnClickSelectChoice(choice); });
+                var choiceInstance = Instantiate(_choiceButtonPrefab, _choiceContainer);
+                choiceInstance.SetText(choice.Text);
+                var button = choiceInstance.GetComponent<UIButton>();
+                button.OnClick += () => { OnClickSelectChoice(choice); };
             }
         }
 

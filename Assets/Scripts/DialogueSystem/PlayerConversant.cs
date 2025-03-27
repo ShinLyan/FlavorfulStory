@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -20,11 +19,11 @@ namespace FlavorfulStory.DialogueSystem
 
         public event Action OnConversationUpdated;
 
-        private IEnumerator Start()
-        {
-            yield return new WaitForSeconds(2);
-            StartDialogue(_testDialogue);
-        }
+        // private IEnumerator Start()
+        // {
+        //     yield return new WaitForSeconds(2);
+        //     StartDialogue(_testDialogue);
+        // }
 
         public void StartDialogue(Dialogue dialogue)
         {

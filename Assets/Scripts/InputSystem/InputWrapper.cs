@@ -14,6 +14,7 @@ namespace FlavorfulStory.InputSystem
         /// <summary> Флаг инициализации класса. </summary>
         private static bool _isInitialized;
 
+        private static Camera _mainCamera;
 
         /// <summary> Инициализирует словарь разрешенных кнопок ввода. </summary>
         public static void Initialize()
@@ -21,28 +22,24 @@ namespace FlavorfulStory.InputSystem
             if (_isInitialized) return;
 
             foreach (InputButton inputButton in Enum.GetValues(typeof(InputButton)))
-            {
                 _allowedButtons.Add(inputButton, true);
-            }
 
             _isInitialized = true;
+            _mainCamera = Camera.main;
         }
 
         /// <summary> Блокирует указанную кнопку ввода. </summary>
         /// <param name="inputToBlock"> Кнопка для блокировки. </param>
-        public static void BlockInput(InputButton inputToBlock)
-        {
-            _allowedButtons[inputToBlock] = false;
-        }
+        public static void BlockInput(InputButton inputToBlock) => _allowedButtons[inputToBlock] = false;
 
         /// <summary> Блокирует указанные кнопки ввода. </summary>
         ///<param name="inputToBlock"> Коллекция кнопок для блокировки. </param>
         public static void BlockInput(IEnumerable<InputButton> inputToBlock) =>
-            inputToBlock.ToList().ForEach((button) => _allowedButtons[button] = false);
+            inputToBlock.ToList().ForEach(button => _allowedButtons[button] = false);
 
         /// <summary> Блокирует все кнопки ввода. </summary>
         public static void BlockAllInput() =>
-            _allowedButtons.Keys.ToList().ForEach((button) => _allowedButtons[button] = false);
+            _allowedButtons.Keys.ToList().ForEach(button => _allowedButtons[button] = false);
 
         /// <summary> Разблокирует указанную кнопку ввода. </summary>
         /// <param name="inputToUnlock"> Кнопка для разблокировки. </param>
@@ -54,11 +51,11 @@ namespace FlavorfulStory.InputSystem
         /// <summary> Разблокирует указанные кнопки ввода. </summary>
         ///<param name="inputToUnlock"> Коллекция кнопок для разблокировки. </param>
         public static void UnblockInput(IEnumerable<InputButton> inputToUnlock) =>
-            inputToUnlock.ToList().ForEach((button) => _allowedButtons[button] = true);
+            inputToUnlock.ToList().ForEach(button => _allowedButtons[button] = true);
 
         /// <summary> Разблокирует все кнопки ввода. </summary>
         public static void UnblockAllInput() =>
-            _allowedButtons.Keys.ToList().ForEach((button) => _allowedButtons[button] = true);
+            _allowedButtons.Keys.ToList().ForEach(button => _allowedButtons[button] = true);
 
         /// <summary> Проверяет отпускание кнопки в текущем кадре. </summary>
         ///<param name="button"> Проверяемая кнопка. </param>
@@ -95,6 +92,10 @@ namespace FlavorfulStory.InputSystem
         ///<returns> Вектор позиции курсора мыши. </returns>
         public static Vector3 GetMousePosition() =>
             !_allowedButtons[InputButton.MousePosition] ? Vector3.zero : Input.mousePosition;
+
+        /// <summary> Получить луч основной камеры. </summary>
+        /// <returns> Луч основной камеры. </returns>
+        public static Ray GetMouseRay() => _mainCamera.ScreenPointToRay(GetMousePosition());
 
         public static void BlockPlayerMovement() =>
             BlockInput(new[] { InputButton.Horizontal, InputButton.Vertical });

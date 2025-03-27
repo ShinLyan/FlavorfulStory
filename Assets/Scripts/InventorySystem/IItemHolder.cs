@@ -5,6 +5,6 @@ namespace FlavorfulStory.InventorySystem
     {
         /// <summary> Получить предмет, который содержится в объекте. </summary>
         /// <returns> Предмет инвентаря, который содержится в объекте. </returns>
-        public InventoryItem GetItem();
+        InventoryItem GetItem();
     }
 }

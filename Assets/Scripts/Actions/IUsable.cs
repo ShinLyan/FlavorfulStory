@@ -5,5 +5,5 @@ public interface IUsable
 {
     /// <summary> Использование объекта. </summary>
     /// <param name="player"> Игрок, использующий объект. </param>
-    public void Use(PlayerController player);
+    void Use(PlayerController player);
 }
