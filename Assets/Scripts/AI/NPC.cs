@@ -2,6 +2,7 @@ using FlavorfulStory.AI.FiniteStateMachine;
 using FlavorfulStory.AI.Scheduling;
 using FlavorfulStory.AI.WarpGraphSystem;
 using FlavorfulStory.SceneManagement;
+using FlavorfulStory.TimeManagement;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -27,11 +28,16 @@ namespace FlavorfulStory.AI
         [field: Tooltip("Текущая локация, в которой находится NPC."), SerializeField]
         public LocationName CurrentLocationName { get; set; }
 
+        [field: Tooltip("Базовая точка спавна NPC."), SerializeField]
+        private Transform _spawnPoint;
+
+        private LocationName _spawnLocation;
+
         /// <summary> Компонент аниматора, управляющий анимациями NPC. </summary>
         private Animator _animator;
 
         /// <summary> Текущие параметры расписания NPC. </summary>
-        private ScheduleParams _currentScheduleParams;
+        public ScheduleParams CurrentScheduleParams { get; private set; }
 
         /// <summary> Состояние взаимодействия NPC с другими объектами. </summary>
         private InteractionState _interactionState;
@@ -62,23 +68,32 @@ namespace FlavorfulStory.AI
 
         private void Start()
         {
+            _spawnLocation = CurrentLocationName;
             InitializeStates();
             AddStatesToController();
 
             _stateController.SetState<RoutineState>();
+            WorldTime.OnDayEnded?.Invoke(new DateTime(1, Season.Spring, 1, 6, 0));
         }
 
         /// <summary> Обновление логики состояний каждый кадр. </summary>
         private void Update() => _stateController.Update(Time.deltaTime);
 
+        private void OnEnable()
+        {
+            WorldTime.OnTimeUpdated += abc;
+            WorldTime.OnDayEnded += OnReset;
+            WorldTime.OnDayEnded += PrioritisedSchedule;
+        }
+
         /// <summary> Создает экземпляры всех состояний NPC. </summary>
         private void InitializeStates()
         {
             _interactionState = new InteractionState(_stateController);
-            _movementState = new MovementState(_stateController, _npcSchedule, _navMeshAgent, this,
+            _movementState = new MovementState(_stateController, _navMeshAgent, this,
                 WarpGraph.Build(FindObjectsByType<WarpPortal>(FindObjectsInactive.Include, FindObjectsSortMode.None))
             );
-            _routineState = new RoutineState(_stateController, _npcSchedule, this);
+            _routineState = new RoutineState(_stateController, this);
             _waitingState = new WaitingState(_stateController);
         }
 
@@ -106,8 +121,40 @@ namespace FlavorfulStory.AI
             _animator.Play(animationStateName.ToString());
         }
 
+        private void PrioritisedSchedule(DateTime currentTime)
+        {
+            var sortedList = _npcSchedule.GetSortedScheduleParams();
+
+            var isRaining = false; //TODO: поменять на получение текущей погоды из спец. скрипта
+            var hearts = 0; //TODO: поменять на получение текущих отношений с данным нпс
+
+            foreach (var param in sortedList)
+                if (param.AreConditionsMet(currentTime, param.Hearts, isRaining))
+                {
+                    SetNewSchedule(param);
+                    return;
+                }
+                else
+                {
+                    Debug.LogError("На текущую дату не подходит ни одно расписание!");
+                }
+        }
+
         /// <summary> Устанавливает новое расписание для NPC. </summary>
         /// <param name="newScheduleParams"> Новые параметры расписания. </param>
-        public void SetNewSchedule(ScheduleParams newScheduleParams) => _currentScheduleParams = newScheduleParams;
+        private void SetNewSchedule(ScheduleParams newScheduleParams) => CurrentScheduleParams = newScheduleParams;
+
+        private void OnReset(DateTime currentTime)
+        {
+            SetNewSchedule(null);
+            _navMeshAgent.ResetPath();
+            _navMeshAgent.Warp(_spawnPoint.position);
+            CurrentLocationName = _spawnLocation;
+        }
+
+        private void abc(DateTime currentTime)
+        {
+            Debug.Log((int)currentTime.DayOfWeek);
+        }
     }
 }

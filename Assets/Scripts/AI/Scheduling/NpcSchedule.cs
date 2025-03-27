@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace FlavorfulStory.AI.Scheduling
@@ -6,12 +8,19 @@ namespace FlavorfulStory.AI.Scheduling
     [CreateAssetMenu(menuName = "FlavorfulStory/NPC Schedule")]
     public class NpcSchedule : ScriptableObject
     {
-        /// <summary> Имя NPC, для которого будет выполняться данное расписание. </summary>
-        [field: Tooltip("Имя NPC, для которого будет выполняться данное расписание."), SerializeField]
-        public NpcName NpcName { get; private set; }
-
         /// <summary> Параметры расписания NPC. </summary>
         [field: Tooltip("Параметры расписания NPC."), SerializeField]
         public ScheduleParams[] Params { get; private set; }
+
+        /// <summary> Получить подходящие параметры расписания по текущим условиям </summary>
+        public IEnumerable<ScheduleParams> GetSortedScheduleParams()
+        {
+            if (Params == null) return Enumerable.Empty<ScheduleParams>();
+
+            return Params
+                .OrderByDescending(p => p.IsRaining)
+                .ThenByDescending(p => p.Hearts)
+                .ThenByDescending(p => p.Seasons != 0);
+        }
     }
 }

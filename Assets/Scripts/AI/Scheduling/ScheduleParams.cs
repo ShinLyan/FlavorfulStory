@@ -43,14 +43,14 @@ namespace FlavorfulStory.AI.Scheduling
         /// <returns> Ближайшая точка маршрута или <c>null</c>, если подходящая точка не найдена. </returns>
         public SchedulePoint GetClosestSchedulePointInPath(DateTime currentTime)
         {
-            int currentMinutes = currentTime.Hour * 60 + currentTime.Minute;
+            var currentMinutes = currentTime.Hour * 60 + currentTime.Minute;
             SchedulePoint closestPoint = null;
-            int minTimeDifference = int.MaxValue;
+            var minTimeDifference = int.MaxValue;
 
             foreach (var pathPoint in Path)
             {
-                int pathPointMinutes = pathPoint.Hour * 60 + pathPoint.Minutes;
-                int timeDifference = currentMinutes - pathPointMinutes;
+                var pathPointMinutes = pathPoint.Hour * 60 + pathPoint.Minutes;
+                var timeDifference = currentMinutes - pathPointMinutes;
 
                 if (timeDifference < 0 || timeDifference >= minTimeDifference) continue;
 
@@ -59,6 +59,41 @@ namespace FlavorfulStory.AI.Scheduling
             }
 
             return closestPoint;
+        }
+
+        public bool AreConditionsMet(DateTime currentTime, int currentHearts, bool isRaining)
+        {
+            // 1. Проверка погоды
+            if (IsRaining != isRaining)
+                return false;
+            Debug.Log("weather done");
+            // 2. Проверка уровня отношений
+            if (Hearts > 0 && currentHearts < Hearts)
+                return false;
+            Debug.Log("hearts done");
+            // 3. Проверка дней месяца
+            if (Dates.Length > 0 && !IsDateInRanges(currentTime.SeasonDay))
+                return false;
+            Debug.Log("day done");
+            // 4. Проверка дня недели
+            if (DayOfWeek != 0 && (DayOfWeek & currentTime.DayOfWeek) == 0)
+                return false;
+            Debug.Log("weekday done");
+            // 5. Проверка сезона
+            if (Seasons != 0 && (Seasons & currentTime.Season) == 0)
+                return false;
+            Debug.Log("season done");
+            Debug.Log("==========");
+            return true;
+        }
+
+        /// <summary> Проверяет, попадает ли день в заданные диапазоны. </summary>
+        private bool IsDateInRanges(int day)
+        {
+            foreach (var range in Dates)
+                if (day >= range.x && day <= range.y)
+                    return true;
+            return false;
         }
     }
 }

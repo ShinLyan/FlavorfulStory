@@ -265,6 +265,37 @@ Transform:
   - {fileID: 1317543304}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &646391353
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 646391354}
+  m_Layer: 0
+  m_Name: CheckPointPath2
+  m_TagString: Untagged
+  m_Icon: {fileID: 4162164826716764455, guid: 0000000000000000d000000000000000, type: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &646391354
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 646391353}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -49.32, y: 1, z: 5}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &686576860
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -278,6 +309,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: RockyIslandScene
       objectReference: {fileID: 0}
+    - target: {fileID: 2636561383568387328, guid: db760588a687241aeb4966d2098f65c0,
+        type: 3}
+      propertyPath: _spawnPoint
+      value: 
+      objectReference: {fileID: 1848649720}
     - target: {fileID: 2636561383568387328, guid: db760588a687241aeb4966d2098f65c0,
         type: 3}
       propertyPath: <ConnectedWarp>k__BackingField
@@ -392,6 +428,37 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c8797726b244934981371ffe7a3a884, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &1088060082
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1088060083}
+  m_Layer: 0
+  m_Name: LuxorSpawnPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 4162164826716764455, guid: 0000000000000000d000000000000000, type: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1088060083
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1088060082}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -54.12, y: 0.3, z: 0.06}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &1120886195 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2458064098256051765, guid: a17d258a2d710414da60eb12daeeb478,
@@ -828,7 +895,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1511860815}
   m_Layer: 0
-  m_Name: SceneCheckPoint (1)
+  m_Name: CheckPointPath1d_2
   m_TagString: Untagged
   m_Icon: {fileID: 4162164826716764455, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
@@ -1022,7 +1089,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1785250497}
   m_Layer: 0
-  m_Name: SceneCheckPoint
+  m_Name: CheckPointPath1_1
   m_TagString: Untagged
   m_Icon: {fileID: 4162164826716764455, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
@@ -3641,6 +3708,16 @@ PrefabInstance:
       propertyPath: m_AnchorMax.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8615130694586661768, guid: a9114609ac4097e459c8c7e1f3d67d2b,
+        type: 3}
+      propertyPath: _dayEndHour
+      value: 13
+      objectReference: {fileID: 0}
+    - target: {fileID: 8615130694586661768, guid: a9114609ac4097e459c8c7e1f3d67d2b,
+        type: 3}
+      propertyPath: _dayStartHour
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 8631143195207105161, guid: a9114609ac4097e459c8c7e1f3d67d2b,
         type: 3}
       propertyPath: m_AnchorMax.y
@@ -3750,6 +3827,12 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 1903756356}
   m_SourcePrefab: {fileID: 100100000, guid: a9114609ac4097e459c8c7e1f3d67d2b, type: 3}
+--- !u!4 &1848649720 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2514164242687627655, guid: db760588a687241aeb4966d2098f65c0,
+    type: 3}
+  m_PrefabInstance: {fileID: 686576860}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1903756353 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4318599472999242280, guid: a9114609ac4097e459c8c7e1f3d67d2b,
@@ -3780,6 +3863,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 538943390}
     m_Modifications:
+    - target: {fileID: 2760265604884861489, guid: ce24d4a198b4c7748b5d9d8f1aaa3a22,
+        type: 3}
+      propertyPath: _spawnPoint
+      value: 
+      objectReference: {fileID: 1088060083}
     - target: {fileID: 2760265604884861489, guid: ce24d4a198b4c7748b5d9d8f1aaa3a22,
         type: 3}
       propertyPath: _npcSchedule
@@ -3981,5 +4069,7 @@ SceneRoots:
   - {fileID: 1562363598}
   - {fileID: 1785250497}
   - {fileID: 1511860815}
+  - {fileID: 646391354}
+  - {fileID: 1088060083}
   - {fileID: 1275979994}
   - {fileID: 538943390}

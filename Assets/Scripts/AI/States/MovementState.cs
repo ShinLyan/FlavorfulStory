@@ -22,9 +22,6 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         /// <summary> Контроллер NPC, управляющий его поведением и анимациями. </summary>
         private readonly NPC _npc;
 
-        /// <summary> Расписание NPC, определяющее его маршруты и точки перемещения. </summary>
-        private readonly NpcSchedule _npcSchedule;
-
         /// <summary> Граф варпов, используемый для поиска пути между локациями. </summary>
         private readonly WarpGraph _warpGraph;
 
@@ -45,11 +42,10 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         /// <param name="npcSchedule"> Расписание NPC. </param>
         /// <param name="navMeshAgent"> Компонент для навигации по NavMesh. </param>
         /// <param name="npc"> Контроллер NPC. </param>
-        public MovementState(StateController stateController, NpcSchedule npcSchedule,
+        public MovementState(StateController stateController,
             NavMeshAgent navMeshAgent, NPC npc, WarpGraph warpGraph) : base(stateController)
         {
             _stateController = stateController;
-            _npcSchedule = npcSchedule;
             _navMeshAgent = navMeshAgent;
             _npc = npc;
             _warpGraph = warpGraph;
@@ -101,7 +97,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         /// <param name="currentTime"> Текущее время в игре. </param>
         private void FindDestinationPoint(DateTime currentTime)
         {
-            var closestPoint = _npcSchedule.Params[0].GetClosestSchedulePointInPath(currentTime);
+            var closestPoint = _npc.CurrentScheduleParams.GetClosestSchedulePointInPath(currentTime);
 
             if (closestPoint == null)
             {

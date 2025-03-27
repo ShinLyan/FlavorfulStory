@@ -6,9 +6,6 @@ namespace FlavorfulStory.AI.FiniteStateMachine
     /// <summary> Состояние рутины NPC, в котором персонаж выполняет действия согласно расписанию. </summary>
     public class RoutineState : CharacterState
     {
-        /// <summary> Расписание NPC, определяющее его действия и маршруты. </summary>
-        private readonly NpcSchedule _npcSchedule;
-
         /// <summary> Контроллер NPC, управляющий его поведением и анимациями. </summary>
         private readonly NPC _npc;
 
@@ -19,11 +16,10 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         /// <param name="stateController"> Контроллер состояний. </param>
         /// <param name="npcSchedule"> Расписание NPC. </param>
         /// <param name="npc"> Контроллер NPC. </param>
-        public RoutineState(StateController stateController, NpcSchedule npcSchedule,
+        public RoutineState(StateController stateController,
             NPC npc) : base(stateController)
         {
             _stateController = stateController;
-            _npcSchedule = npcSchedule;
             _npc = npc;
             _currentPoint = null;
         }
@@ -60,7 +56,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         /// <param name="currentTime"> Текущее время в игре. </param>
         private void CheckNewTime(DateTime currentTime)
         {
-            var closestPoint = _npcSchedule.Params[0].GetClosestSchedulePointInPath(currentTime);
+            var closestPoint = _npc.CurrentScheduleParams.GetClosestSchedulePointInPath(currentTime);
             if (closestPoint == null || closestPoint == _currentPoint) return;
 
             _currentPoint = closestPoint;
