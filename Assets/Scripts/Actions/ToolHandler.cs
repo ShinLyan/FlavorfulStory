@@ -9,18 +9,18 @@ namespace FlavorfulStory.Actions
     /// <remarks> Также блокирует/разблокирует ввод, связанный с прокруткой тулбара. </remarks>
     public class ToolHandler : MonoBehaviour
     {
-        /// <summary> Текущий отображаемый инструмент, прикреплённый к руке игрока. </summary>
-        private GameObject _currentTool;
-
-        /// <summary> Действие, что должно выполниться при UnEquip'е инструмента. </summary>
-        private Action _unequipAction;
-
         /// <summary> Сопоставления типов инструментов с их префабами для визуализации в руке игрока. </summary>
         [SerializeField] private ToolPrefabMapping[] _toolMappings;
 
         /// <summary> Слои, по которым производится удар с помощью инструмента. </summary>
         [field: SerializeField]
         public LayerMask HitableLayers { get; private set; }
+
+        /// <summary> Текущий отображаемый инструмент, прикреплённый к руке игрока. </summary>
+        private GameObject _currentTool;
+
+        /// <summary> Действие, что должно выполниться при UnEquip'е инструмента. </summary>
+        private Action _unequipAction;
 
         /// <summary> Задать действие анэквипа. </summary>
         /// <param name="action"> Действие анэквипа. </param>
@@ -42,7 +42,7 @@ namespace FlavorfulStory.Actions
         }
 
         /// <summary> Удаляет текущий отображаемый инструмент из руки игрока. </summary>
-        /// <remarks> Также разблокирует ввод (прокрутку мыши и движение). </remarks>
+        /// <remarks> Вызывается при окончании анимации. Также разблокирует ввод (прокрутку мыши и движение). </remarks>
         public void Unequip()
         {
             if (!_currentTool) return;

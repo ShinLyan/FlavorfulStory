@@ -42,7 +42,7 @@ namespace FlavorfulStory.InventorySystem.DropSystem
         /// <param name="spawnPosition"> Позиция спавна предмета. </param>
         private void SpawnPickup(InventoryItem item, int number, Vector3 spawnPosition)
         {
-            var pickup = PickupFactory.Spawn(item, spawnPosition, number);
+            var pickup = PickupSpawner.Spawn(item, spawnPosition, number);
             _droppedItems.Add(pickup);
         }
 
@@ -102,8 +102,8 @@ namespace FlavorfulStory.InventorySystem.DropSystem
                 }
 
                 var pickupItem = ItemDatabase.GetItemFromID(item.ItemID);
-                var position = item.Position.ToVector();
                 int number = item.Quantity;
+                var position = item.Position.ToVector();
                 SpawnPickup(pickupItem, number, position);
             }
         }

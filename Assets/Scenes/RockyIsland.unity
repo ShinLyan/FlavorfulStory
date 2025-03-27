@@ -1039,7 +1039,7 @@ PrefabInstance:
     - target: {fileID: 319015060972705785, guid: b7a58d4c54fbce54f8fcd204f439a8c9,
         type: 3}
       propertyPath: m_Name
-      value: AxeInstrumentSpawner
+      value: AxeSpawner
       objectReference: {fileID: 0}
     - target: {fileID: 319015060972705785, guid: b7a58d4c54fbce54f8fcd204f439a8c9,
         type: 3}
@@ -1118,6 +1118,17 @@ PrefabInstance:
       propertyPath: _number
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 8927424724265319718, guid: b7a58d4c54fbce54f8fcd204f439a8c9,
+        type: 3}
+      propertyPath: _inventorySlot.<Item>k__BackingField
+      value: 
+      objectReference: {fileID: 11400000, guid: f52e46c028eba1e438c99795992bf6d5,
+        type: 2}
+    - target: {fileID: 8927424724265319718, guid: b7a58d4c54fbce54f8fcd204f439a8c9,
+        type: 3}
+      propertyPath: _inventorySlot.<Number>k__BackingField
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1133,7 +1144,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1300621969}
   m_Layer: 0
-  m_Name: Pickups
+  m_Name: PickupSpawners
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1258,7 +1269,7 @@ PrefabInstance:
     - target: {fileID: 319015060972705785, guid: b7a58d4c54fbce54f8fcd204f439a8c9,
         type: 3}
       propertyPath: m_Name
-      value: PickaxeInstrumentSpawner
+      value: PickaxeSpawner
       objectReference: {fileID: 0}
     - target: {fileID: 319015060972705785, guid: b7a58d4c54fbce54f8fcd204f439a8c9,
         type: 3}
@@ -1335,6 +1346,17 @@ PrefabInstance:
     - target: {fileID: 8927424724265319718, guid: b7a58d4c54fbce54f8fcd204f439a8c9,
         type: 3}
       propertyPath: _number
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8927424724265319718, guid: b7a58d4c54fbce54f8fcd204f439a8c9,
+        type: 3}
+      propertyPath: _inventorySlot.<Item>k__BackingField
+      value: 
+      objectReference: {fileID: 11400000, guid: bce861ac3c00da94b92e70c22de74b57,
+        type: 2}
+    - target: {fileID: 8927424724265319718, guid: b7a58d4c54fbce54f8fcd204f439a8c9,
+        type: 3}
+      propertyPath: _inventorySlot.<Number>k__BackingField
       value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []

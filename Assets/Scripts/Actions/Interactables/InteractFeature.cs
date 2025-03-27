@@ -12,6 +12,8 @@ namespace FlavorfulStory.Actions.Interactables
     /// <summary> Реализует возможность взаимодействия с объектами, используя триггеры. </summary>
     public class InteractFeature : MonoBehaviour
     {
+        #region Fields and Properties
+
         /// <summary> UI-объект для отображения тултипа взаимодействия. </summary>
         [SerializeField] private InteractableObjectTooltip _tooltip;
 
@@ -31,14 +33,10 @@ namespace FlavorfulStory.Actions.Interactables
         /// <summary> Ближайший объект, с которым можно взаимодействовать. </summary>
         private IInteractable _closestInteractable;
 
-        /// <summary>
-        /// 
-        /// </summary>
+        /// <summary> Делегат действия, вызываемый при завершении взаимодействия. </summary>
         private Action _endInteractionAction;
 
-        /// <summary>
-        /// 
-        /// </summary>
+        /// <summary> Делегат действия, вызываемый при начале взаимодействия. </summary>
         private Action _startInteractionAction;
 
         /// <summary> Происходит ли в данный момент взаимодействие? </summary>
@@ -46,17 +44,19 @@ namespace FlavorfulStory.Actions.Interactables
 
         /// <summary> Событие, вызываемое при начале взаимодействия.
         /// Используется для звуковых эффектов и других действий. </summary>
-        public event Action OnInteractionStarted; // На будущее - для звуков и тд
+        /// TODO: На будущее - для звуков и тд
+        public event Action OnInteractionStarted;
 
         /// <summary> Событие, вызываемое при завершении взаимодействия.
         /// Используется для звуковых эффектов и других действий. </summary>
-        public event Action OnInteractionEnded; // На будущее - для звуков и тд
+        /// TODO: На будущее - для звуков и тд
+        public event Action OnInteractionEnded;
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="startInteractionAction"></param>
-        /// <param name="endInteractionAction"></param>
+        #endregion
+
+        /// <summary> Устанавливает действия, вызываемые при начале и завершении взаимодействия. </summary>
+        /// <param name="startInteractionAction"> Действие при начале взаимодействия. </param>
+        /// <param name="endInteractionAction"> Действие при завершении взаимодействия. </param>
         public void SetInteractionActions(Action startInteractionAction, Action endInteractionAction)
         {
             _startInteractionAction = startInteractionAction;
@@ -171,10 +171,8 @@ namespace FlavorfulStory.Actions.Interactables
             if (_playerController) _playerController.OnInteractionEnded -= EndInteraction;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="state"></param>
+        /// <summary> Устанавливает текущее состояние взаимодействия. </summary>
+        /// <param name="state"> Новое состояние (true — идёт взаимодействие). </param>
         public void SetInteractionState(bool state) => IsInteracting = state;
     }
 }
