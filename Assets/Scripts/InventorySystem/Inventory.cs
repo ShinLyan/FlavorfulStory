@@ -73,7 +73,7 @@ namespace FlavorfulStory.InventorySystem
         /// <returns> Возвращает общее количество заданного предмета в инвентаре. </returns>
         public int GetItemNumber(InventoryItem item) =>
             _slots.Where(slot => slot.Item == item).Sum(slot => slot.Number);
-        
+
         public void RemoveItem(InventoryItem item, int number)
         {
             if (!HasItem(item))
@@ -84,21 +84,19 @@ namespace FlavorfulStory.InventorySystem
 
             if (GetItemNumber(item) < number)
             {
-                Debug.LogError(
-                    $"You are trying to remove {number} item[{item.ItemName}], but only {GetItemNumber(item)} present in inventory!");
+                Debug.LogError($"You are trying to remove {number} item[{item.ItemName}], " +
+                               $"but only {GetItemNumber(item)} present in inventory!");
                 return;
             }
 
             int remainingToRemove = number;
             for (int i = 0; i < _slots.Length && remainingToRemove > 0; i++)
-            {
                 if (_slots[i].Item == item)
                 {
                     int numberToRemove = Math.Min(_slots[i].Number, remainingToRemove);
                     RemoveFromSlot(i, numberToRemove);
                     remainingToRemove -= numberToRemove;
                 }
-            }
         }
 
         /// <summary> Получить количество предметов инвентаря в заданном слоте. </summary>
@@ -206,7 +204,7 @@ namespace FlavorfulStory.InventorySystem
             {
                 if (slotRecords == null) continue;
 
-                _slots[i].Item = InventoryItem.GetItemFromID(slotRecords[i].ItemID);
+                _slots[i].Item = ItemDatabase.GetItemFromID(slotRecords[i].ItemID);
                 _slots[i].Number = slotRecords[i].Number;
             }
 

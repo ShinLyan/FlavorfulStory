@@ -12,6 +12,8 @@ namespace FlavorfulStory.Actions.Interactables
     /// <summary> Реализует возможность взаимодействия с объектами, используя триггеры. </summary>
     public class InteractFeature : MonoBehaviour
     {
+        #region Fields and Properties
+
         /// <summary> UI-объект для отображения тултипа взаимодействия. </summary>
         [SerializeField] private InteractableObjectTooltip _tooltip;
 
@@ -21,6 +23,7 @@ namespace FlavorfulStory.Actions.Interactables
         /// <summary> Аниматор для управления анимациями в процессе взаимодействия. </summary>
         private Animator _animator;
 
+        //TODO: Когда будут определные все анимации => вынести в Enum(public Enum PlayerAnimation {} ).
         /// <summary> Хэш для анимации сбора. </summary>
         private readonly int _gatherAnimationHash = Animator.StringToHash("Gather");
 
@@ -30,16 +33,35 @@ namespace FlavorfulStory.Actions.Interactables
         /// <summary> Ближайший объект, с которым можно взаимодействовать. </summary>
         private IInteractable _closestInteractable;
 
-        /// <summary> Флаг, указывающий, происходит ли в данный момент взаимодействие. </summary>
+        /// <summary> Делегат действия, вызываемый при завершении взаимодействия. </summary>
+        private Action _endInteractionAction;
+
+        /// <summary> Делегат действия, вызываемый при начале взаимодействия. </summary>
+        private Action _startInteractionAction;
+
+        /// <summary> Происходит ли в данный момент взаимодействие? </summary>
         public bool IsInteracting { get; private set; }
 
         /// <summary> Событие, вызываемое при начале взаимодействия.
         /// Используется для звуковых эффектов и других действий. </summary>
-        public event Action OnInteractionStarted; // На будущее - для звуков и тд
+        /// TODO: На будущее - для звуков и тд
+        public event Action OnInteractionStarted;
 
         /// <summary> Событие, вызываемое при завершении взаимодействия.
         /// Используется для звуковых эффектов и других действий. </summary>
-        public event Action OnInteractionEnded; // На будущее - для звуков и тд
+        /// TODO: На будущее - для звуков и тд
+        public event Action OnInteractionEnded;
+
+        #endregion
+
+        /// <summary> Устанавливает действия, вызываемые при начале и завершении взаимодействия. </summary>
+        /// <param name="startInteractionAction"> Действие при начале взаимодействия. </param>
+        /// <param name="endInteractionAction"> Действие при завершении взаимодействия. </param>
+        public void SetInteractionActions(Action startInteractionAction, Action endInteractionAction)
+        {
+            _startInteractionAction = startInteractionAction;
+            _endInteractionAction = endInteractionAction;
+        }
 
         /// <summary> Инициализация компонента. </summary>
         /// <remarks> Подписка на событие OnInteractionEnded (PlayerController.cs). </remarks>
@@ -124,8 +146,8 @@ namespace FlavorfulStory.Actions.Interactables
         /// <summary> Начать взаимодействие. </summary>
         private void BeginInteraction()
         {
+            _startInteractionAction();
             OnInteractionStarted?.Invoke();
-            IsInteracting = true;
             InputWrapper.BlockPlayerMovement();
 
             //TODO: Не проигрывать анимацию для ремонта
@@ -137,7 +159,10 @@ namespace FlavorfulStory.Actions.Interactables
         private void EndInteraction()
         {
             OnInteractionEnded?.Invoke();
-            IsInteracting = false;
+            _endInteractionAction();
+
+            if (_closestInteractable is BuildingRepair.BuildingRepair && !IsInteracting) return;
+
             InputWrapper.UnblockPlayerMovement();
 
             if (_animator) _animator.ResetTrigger(_gatherAnimationHash);
@@ -148,5 +173,9 @@ namespace FlavorfulStory.Actions.Interactables
         {
             if (_playerController) _playerController.OnInteractionEnded -= EndInteraction;
         }
+
+        /// <summary> Устанавливает текущее состояние взаимодействия. </summary>
+        /// <param name="state"> Новое состояние (true — идёт взаимодействие). </param>
+        public void SetInteractionState(bool state) => IsInteracting = state;
     }
 }

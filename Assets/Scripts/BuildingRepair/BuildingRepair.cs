@@ -20,8 +20,10 @@ namespace FlavorfulStory.BuildingRepair
         private List<RepairStage> _stages;
 
         /// <summary> Количество вложенных ресурсов для текущей стадии ремонта. </summary>
-        private List<int> _investedResources;
+        private List<int> _investedResources = new();
 
+        /// <summary> Обджект свитчер. </summary>
+        /// <remarks> Изменяет визуальное отображение для разных стадий ремонта. </remarks>
         private ObjectSwitcher _objectSwitcher;
 
         /// <summary> Индекс текущей стадии ремонта. </summary>
@@ -41,14 +43,13 @@ namespace FlavorfulStory.BuildingRepair
         {
             _repairView = FindFirstObjectByType<BuildingRepairView>(FindObjectsInactive.Include);
             _objectSwitcher = GetComponent<ObjectSwitcher>();
-            _investedResources = new List<int>();
+            InitializeInvestedResourcesList();
         }
 
         /// <summary> Загрузка состояния или установка значений по умолчанию. </summary>
         private void Start()
         {
             InitializeRepairStages();
-            InitializeInvestedResourcesList();
         }
 
         /// <summary> Инициализация стадий ремонта. </summary>
@@ -208,7 +209,6 @@ namespace FlavorfulStory.BuildingRepair
             var record = state is RepairableBuildingRecord buildingRecord ? buildingRecord : default;
             _repairStageIndex = record.RepairStageIndex;
             _investedResources = record.InvestedResources;
-            InitializeRepairStages();
         }
 
         #endregion

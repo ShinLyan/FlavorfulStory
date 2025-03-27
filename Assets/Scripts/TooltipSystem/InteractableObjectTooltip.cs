@@ -15,6 +15,9 @@ namespace FlavorfulStory.TooltipSystem
         /// <summary> Смещение позиции тултипа относительно объекта. </summary>
         [SerializeField] private Vector3 _offset;
 
+        /// <summary> Инициализация тултипа. Сокрытие окна при старте игры. </summary>
+        private void Start() => Hide();
+
         /// <summary> Показать тултип. </summary>
         /// <param name="tooltip"> Объект с тултипом. </param>
         public void Show(ITooltipable tooltip)

@@ -1,6 +1,8 @@
 using FlavorfulStory.Control;
+using FlavorfulStory.InputSystem;
 using FlavorfulStory.InventorySystem;
 using FlavorfulStory.ResourceContainer;
+using FlavorfulStory.Utils;
 using UnityEngine;
 
 namespace FlavorfulStory.Actions
@@ -8,11 +10,17 @@ namespace FlavorfulStory.Actions
     /// <summary> Инструмент, используемый игроком для взаимодействия с объектами. </summary>
     /// <remarks> Может выполнять действия, специфичные для типа инструмента. </remarks>
     [CreateAssetMenu(menuName = "FlavorfulStory/Inventory/Tool")]
-    public class Tool : ActionItem
+    public class Tool : InventoryItem, IUsable
     {
+        #region Fields and Properties
+
         /// <summary> Тип инструмента. </summary>
         [field: Tooltip("Тип инструмента."), SerializeField]
         public ToolType ToolType { get; private set; }
+
+        /// <summary> Кнопка использования предмета. </summary>
+        [field: Tooltip("Кнопка использования"), SerializeField]
+        public UseActionType UseActionType { get; set; }
 
         /// <summary> Максимальная дистанция взаимодействия инструментом. </summary>
         private const float MaxInteractionDistance = 2f;
@@ -20,15 +28,27 @@ namespace FlavorfulStory.Actions
         /// <summary> Радиус использования инструмента. </summary>
         private const float UseRadius = 1.5f;
 
+        #endregion
+
         /// <summary> Использовать инструмент для взаимодействия с объектами. </summary>
         /// <param name="player"> Контроллер игрока. </param>
-        public override void Use(PlayerController player)
+        /// <param name="hitableLayers"> Слои, по которым будем делать удар. </param>
+        public bool Use(PlayerController player, LayerMask hitableLayers)
         {
-            var targetPosition = PlayerController.GetCursorPosition();
+            if (!WorldCoordinates.GetWorldCoordinatesFromScreenPoint(
+                    InputWrapper.GetMousePosition(),
+                    ~(1 << player.gameObject.layer),
+                    out var targetPosition))
+                return false;
+
+            bool didHit = UseToolInDirection(targetPosition, player, hitableLayers);
+            if (!didHit) return false;
+
             player.RotateTowards(targetPosition);
             player.TriggerAnimation($"Use{ToolType}");
-            player.EquipTool(this);
-            UseToolInDirection(targetPosition, player, player.HitableLayers);
+            InputWrapper.BlockPlayerMovement();
+
+            return true;
 
             // TODO: Реализовать трату энергии игрока при использовании инструмента
         }
@@ -37,21 +57,18 @@ namespace FlavorfulStory.Actions
         /// <param name="targetPosition"> Целевая позиция для взаимодействия. </param>
         /// <param name="player"> Контроллер игрока. </param>
         /// <param name="hitableLayers"> Слой объектов, с которыми можно взаимодействовать. </param>
-        private void UseToolInDirection(Vector3 targetPosition, PlayerController player, LayerMask hitableLayers)
+        private bool UseToolInDirection(Vector3 targetPosition, PlayerController player, LayerMask hitableLayers)
         {
             var origin = player.transform.position;
             var direction = (targetPosition - origin).normalized;
             var interactionCenter = origin + direction * (MaxInteractionDistance / 2);
 
-            // TODO: Проверь что корректно работает. Было написано под пивом
             var hitColliders = Physics.OverlapSphere(interactionCenter, UseRadius, hitableLayers);
-
             foreach (var collider in hitColliders)
                 if (collider.transform.parent.TryGetComponent<IHitable>(out var hitable))
                     hitable.TakeHit(ToolType);
 
-            // Debug
-            Debug.DrawLine(origin, interactionCenter, Color.red, 5f);
+            return hitColliders.Length > 0;
         }
     }
 }

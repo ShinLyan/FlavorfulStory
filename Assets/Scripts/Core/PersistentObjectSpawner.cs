@@ -21,8 +21,6 @@ namespace FlavorfulStory.Core
             if (_hasSpawned) return;
 
             SpawnPersistentObject();
-
-            InputWrapper.Initialize();
             InputWrapper.UnblockAllInput();
         }
 

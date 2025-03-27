@@ -9,11 +9,7 @@ namespace FlavorfulStory.InventorySystem.PickupSystem
     {
         /// <summary> Предмет, который будет заспавнен в сцене. </summary>
         [Tooltip("Предмет, который будет заспавнен в сцене."), SerializeField]
-        private InventoryItem _item;
-
-        /// <summary> Количество предметов, которые будут заспавнены. </summary>
-        [Tooltip("Количество предметов, которые будут заспавнены."), SerializeField, Range(1, 100)]
-        private int _number;
+        private InventorySlot _inventorySlot;
 
         /// <summary> Был ли предмет собран? </summary>
         private bool _isPickedUp;
@@ -27,11 +23,29 @@ namespace FlavorfulStory.InventorySystem.PickupSystem
         /// <summary> Создает объект Pickup на сцене. </summary>
         private void SpawnPickup()
         {
-            var spawnedPickup = _item.SpawnPickup(transform.position, _number);
-            spawnedPickup.transform.SetParent(transform);
+            var spawnedPickup = Spawn(_inventorySlot.Item, transform.position, _inventorySlot.Number, transform);
             spawnedPickup.transform.localRotation = Quaternion.Euler(0, 0, 0);
 
             _isPickedUp = true;
+        }
+
+        /// <summary> Заспавнить предмет Pickup на сцене. </summary>
+        /// <param name="item"> Предмет, на основе которого будет создан Pickup. </param>
+        /// <param name="position"> Позиция спавна. </param>
+        /// <param name="number"> Количество предметов. </param>
+        /// <param name="parent"> Родитель, контейнер на сцене. </param>
+        public static Pickup Spawn(InventoryItem item, Vector3 position, int number, Transform parent = null)
+        {
+            if (!item.PickupPrefab)
+            {
+                Debug.LogError($"PickupPrefab не назначен для предмета {item.name}");
+                return null;
+            }
+
+            var pickup = Instantiate(item.PickupPrefab, parent);
+            pickup.transform.position = position;
+            pickup.Setup(item, number);
+            return pickup;
         }
 
         #region Saving

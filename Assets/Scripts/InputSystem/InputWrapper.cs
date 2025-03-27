@@ -11,18 +11,11 @@ namespace FlavorfulStory.InputSystem
         /// <summary> Словарь для хранения состояний блокировки кнопок ввода. </summary>
         private static readonly Dictionary<InputButton, bool> _allowedButtons = new();
 
-        /// <summary> Флаг инициализации класса. </summary>
-        private static bool _isInitialized;
-
         /// <summary> Инициализирует словарь разрешенных кнопок ввода. </summary>
-        public static void Initialize()
+        static InputWrapper()
         {
-            if (_isInitialized) return;
-
             foreach (InputButton inputButton in Enum.GetValues(typeof(InputButton)))
                 _allowedButtons.Add(inputButton, true);
-
-            _isInitialized = true;
         }
 
         /// <summary> Блокирует указанную кнопку ввода. </summary>
