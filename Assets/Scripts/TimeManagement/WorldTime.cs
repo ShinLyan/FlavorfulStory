@@ -17,11 +17,11 @@ namespace FlavorfulStory.TimeManagement
 
         [Header("Day/night settings")]
         /// <summary> Час начала нового дня. </summary>
-        [Tooltip("Во сколько начинается новый день."), SerializeField]
+        [Tooltip("Во сколько начинается новый день."), SerializeField, Range(0, 24)]
         private int _dayStartHour;
 
         /// <summary> Час окончания дня. </summary>
-        [Tooltip("Во сколько заканчивается день."), SerializeField]
+        [Tooltip("Во сколько заканчивается день."), SerializeField, Range(0, 24)]
         private int _dayEndHour;
 
         /// <summary> Текущее игровое время. </summary>
@@ -64,8 +64,8 @@ namespace FlavorfulStory.TimeManagement
 
             if (_currentGameTime.Hour == _dayEndHour)
             {
-                OnDayEnded?.Invoke(_currentGameTime);
                 BeginNewDay();
+                OnDayEnded?.Invoke(_currentGameTime);
             }
 
             OnTimeUpdated?.Invoke(_currentGameTime);
@@ -74,8 +74,8 @@ namespace FlavorfulStory.TimeManagement
         /// <summary> Обновляет время до начала нового дня в зависимости от текущего времени. </summary>
         private void BeginNewDay()
         {
-            bool isSameDay = _currentGameTime.Hour < _dayStartHour;
-            int dayAdjustment = isSameDay ? 0 : 1;
+            var isSameDay = _currentGameTime.Hour < _dayStartHour;
+            var dayAdjustment = isSameDay ? 0 : 1;
 
             _currentGameTime = new DateTime(
                 _currentGameTime.Year,
@@ -84,8 +84,6 @@ namespace FlavorfulStory.TimeManagement
                 _dayStartHour,
                 0
             );
-
-            OnTimeUpdated?.Invoke(_currentGameTime);
         }
 
         /// <summary> Поставить игровое время на паузу. </summary>
