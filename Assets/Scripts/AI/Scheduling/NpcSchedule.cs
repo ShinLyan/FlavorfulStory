@@ -13,16 +13,12 @@ namespace FlavorfulStory.AI.Scheduling
         public ScheduleParams[] Params { get; private set; }
 
         /// <summary> Получить отсортированные параметры расписания по текущим условиям. </summary>
-        public IEnumerable<ScheduleParams> GetSortedScheduleParams()
-        {
-            if (Params == null) return Enumerable.Empty<ScheduleParams>();
-
-            return Params
-                .OrderByDescending(p => p.IsRaining)
-                .ThenByDescending(p => p.Hearts)
-                .ThenByDescending(p => p.Dates.Length > 0 ? p.Dates[0].x : 0)
-                .ThenByDescending(p => p.DayOfWeek)
-                .ThenByDescending(p => p.Seasons);
-        }
+        /// <remarks> Приоритеты: 1. IsRaining; 2. Max Hearts; 3. По дате; 4. По DayOfWeek; 5. По Seasons </remarks>
+        public IEnumerable<ScheduleParams> GetSortedScheduleParams() => Params?
+            .OrderByDescending(p => p.IsRaining)
+            .ThenByDescending(p => p.Hearts)
+            .ThenByDescending(p => p.Dates.Length > 0 ? p.Dates[0].x : 0)
+            .ThenByDescending(p => p.DayOfWeek)
+            .ThenByDescending(p => p.Seasons);
     }
 }

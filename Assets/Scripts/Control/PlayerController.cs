@@ -81,12 +81,8 @@ namespace FlavorfulStory.Control
         {
             const int ToolbarItemsCount = 9;
             for (int i = 0; i < ToolbarItemsCount; i++)
-            {
                 if (Input.GetKeyDown(KeyCode.Alpha1 + i))
-                {
                     _toolbar.SelectItem(i);
-                }
-            }
         }
 
         /// <summary> Обработка использования предмета из панели быстрого доступа. </summary>
@@ -96,8 +92,8 @@ namespace FlavorfulStory.Control
                 EventSystem.current.IsPointerOverGameObject())
                 return;
 
-            if (Input.GetMouseButton(0) && actionItem.UseActionType == UseActionType.LeftClick ||
-                Input.GetMouseButton(1) && actionItem.UseActionType == UseActionType.RightClick)
+            if ((Input.GetMouseButton(0) && actionItem.UseActionType == UseActionType.LeftClick) ||
+                (Input.GetMouseButton(1) && actionItem.UseActionType == UseActionType.RightClick))
             {
                 actionItem.Use(this);
                 _toolCooldownTimer = _toolCooldown;
@@ -123,10 +119,7 @@ namespace FlavorfulStory.Control
             ).normalized;
 
             _playerMover.SetMoveDirection(direction);
-            if (direction != Vector3.zero)
-            {
-                _playerMover.SetLookRotation(Quaternion.LookRotation(direction));
-            }
+            if (direction != Vector3.zero) _playerMover.SetLookRotation(Quaternion.LookRotation(direction));
         }
 
         /// <summary> Уменьшение таймера перезарядки. </summary>
@@ -180,6 +173,14 @@ namespace FlavorfulStory.Control
 
             _currentTool.SetActive(false);
             _currentTool = null;
+        }
+
+        /// <summary> Обновить позицию и направление взгляда игрока после телепортации. </summary>
+        /// <param name="newTransform"> Новый трансформ игрока. </param>
+        public void UpdatePosition(Transform newTransform)
+        {
+            _playerMover.SetPosition(newTransform.position);
+            _playerMover.SetLookRotation(newTransform.rotation);
         }
     }
 }

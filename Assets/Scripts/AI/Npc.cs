@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using FlavorfulStory.AI.FiniteStateMachine;
 using FlavorfulStory.AI.Scheduling;
 using FlavorfulStory.AI.WarpGraphSystem;
@@ -11,12 +11,10 @@ using DateTime = FlavorfulStory.TimeManagement.DateTime;
 namespace FlavorfulStory.AI
 {
     /// <summary> Контроллер NPC, управляющий состояниями и поведением персонажа. </summary>
-    public class NPC : MonoBehaviour
+    [RequireComponent(typeof(NavMeshAgent), typeof(Animator))]
+    public class Npc : MonoBehaviour
     {
         #region Fields and Properties
-
-        /// <summary> Хэшированное значение параметра "скорость" для анимации. </summary>
-        private static readonly int _speedParameterHash = Animator.StringToHash("Speed");
 
         /// <summary> Имя персонажа. </summary>
         [field: Tooltip("Имя персонажа."), SerializeField]
@@ -31,7 +29,6 @@ namespace FlavorfulStory.AI
         public LocationName CurrentLocationName { get; set; }
 
         /// <summary> Базовая точка спавна NPC. </summary>
-        [field: Tooltip("Базовая точка спавна NPC."), SerializeField]
         private Transform _spawnPoint;
 
         /// <summary> Базовая точка спавна NPC. </summary>
@@ -39,6 +36,9 @@ namespace FlavorfulStory.AI
 
         /// <summary> Компонент аниматора, управляющий анимациями NPC. </summary>
         private Animator _animator;
+
+        /// <summary> Хэшированное значение параметра "скорость" для анимации. </summary>
+        private static readonly int _speedParameterHash = Animator.StringToHash("Speed");
 
         /// <summary> Текущие параметры расписания NPC. </summary>
         public ScheduleParams CurrentScheduleParams { get; private set; }
@@ -71,18 +71,21 @@ namespace FlavorfulStory.AI
             _navMeshAgent = GetComponent<NavMeshAgent>();
             _animator = GetComponent<Animator>();
             _stateController = new StateController();
+            _spawnPoint = transform;
+            _spawnLocation = CurrentLocationName;
         }
 
         /// <summary>  </summary>
         private void Start()
         {
-            _spawnLocation = CurrentLocationName;
             InitializeStates();
             AddStatesToController();
 
             _stateController.SetState<RoutineState>();
 
             _sortedScheduleParams = _npcSchedule.GetSortedScheduleParams();
+            if (_sortedScheduleParams == null) Debug.LogError("SortedScheduleParams is null");
+
             OnReset(WorldTime.GetCurrentGameTime());
         }
 
@@ -90,16 +93,10 @@ namespace FlavorfulStory.AI
         private void Update() => _stateController.Update(Time.deltaTime);
 
         /// <summary> Подписка на события. </summary>
-        private void OnEnable()
-        {
-            WorldTime.OnDayEnded += OnReset;
-        }
+        private void OnEnable() => WorldTime.OnDayEnded += OnReset;
 
         /// <summary> Отписка от событий. </summary>
-        private void OnDisable()
-        {
-            WorldTime.OnDayEnded -= OnReset;
-        }
+        private void OnDisable() => WorldTime.OnDayEnded -= OnReset;
 
         /// <summary> Создает экземпляры всех состояний NPC. </summary>
         private void InitializeStates()
@@ -157,8 +154,8 @@ namespace FlavorfulStory.AI
         /// <param name="currentTime"> Текущее время. </param>
         private void PrioritiseSchedule(DateTime currentTime)
         {
-            var isRaining = false; //TODO: поменять на получение текущей погоды из спец. скрипта
-            var hearts = 0; //TODO: поменять на получение текущих отношений с данным нпс
+            bool isRaining = false; //TODO: поменять на получение текущей погоды из спец. скрипта
+            int hearts = 0; //TODO: поменять на получение текущих отношений с данным нпс
 
             foreach (var param in _sortedScheduleParams)
                 if (param.AreConditionsSuitable(currentTime, param.Hearts, isRaining))

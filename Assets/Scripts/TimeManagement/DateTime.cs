@@ -110,18 +110,18 @@ namespace FlavorfulStory.TimeManagement
             if (is24HourFormat)
             {
                 // 24-часовой формат
-                var hourString = Hour.ToString("D2");
-                var minuteString = Minute.ToString("D2");
+                string hourString = Hour.ToString("D2");
+                string minuteString = Minute.ToString("D2");
                 return $"{hourString}:{minuteString}";
             }
             else
             {
                 // 12-часовой AM/PM формат
-                var period = Hour >= 12 ? "PM" : "AM";
-                var hour12 = Hour % 12;
+                string period = Hour >= 12 ? "PM" : "AM";
+                int hour12 = Hour % 12;
                 if (hour12 == 0) hour12 = 12; // Если час = 0 или 12, то в 12-часовом формате это будет 12
-                var hourString = hour12.ToString("D2");
-                var minuteString = Minute.ToString("D2");
+                string hourString = hour12.ToString("D2");
+                string minuteString = Minute.ToString("D2");
                 return $"{hourString}:{minuteString} {period}";
             }
         }

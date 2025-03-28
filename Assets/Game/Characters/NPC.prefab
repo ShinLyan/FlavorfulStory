@@ -104,7 +104,7 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 8113930228413350172, guid: b78da40e1e8265344bc64d80efddd24b,
         type: 3}
       insertIndex: -1
-      addedObject: {fileID: 2760265604884861489}
+      addedObject: {fileID: 9216231004728534982}
   m_SourcePrefab: {fileID: 100100000, guid: b78da40e1e8265344bc64d80efddd24b, type: 3}
 --- !u!1 &7922225790736311418 stripped
 GameObject:
@@ -155,7 +155,7 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 2, y: 2, z: 1}
   m_Center: {x: 0, y: 1, z: 0.75}
---- !u!114 &2760265604884861489
+--- !u!114 &9216231004728534982
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -164,9 +164,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 7922225790736311418}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cd6823f9b85e466e9cf50234e65b9f24, type: 3}
+  m_Script: {fileID: 11500000, guid: 042fc74a97164fb0a37fff7ee5ff6bf9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _currentLocationName: 1
-  _npcName: 1
-  _npcSchedule: {fileID: 11400000, guid: 256da594c14e24536b4d003563c371f8, type: 2}
+  <NpcName>k__BackingField: 0
+  _npcSchedule: {fileID: 0}
+  <CurrentLocationName>k__BackingField: 0
+  _spawnPoint: {fileID: 0}

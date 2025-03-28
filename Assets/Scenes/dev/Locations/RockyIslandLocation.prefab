@@ -118,7 +118,6 @@ GameObject:
   m_Component:
   - component: {fileID: 2526610155787909748}
   - component: {fileID: 3418992172496934461}
-  - component: {fileID: 729835974972460185}
   - component: {fileID: 4990995839956669120}
   m_Layer: 0
   m_Name: FromRockyIslandToShop
@@ -164,22 +163,6 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 14, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &729835974972460185
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1044424989227299716}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 275a5430c35eb5f41a6e785c8d20be69, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _spawnPoint: {fileID: 7416678122090115380}
-  _parentLocation: 1
-  _locationToLoad: 3
-  _destination: 2
 --- !u!114 &4990995839956669120
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -474,8 +457,9 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 540751132522862008}
-  - {fileID: 4519493624782662115}
+  - {fileID: 4883119416647367339}
+  - {fileID: 5871377167784892263}
+  - {fileID: 2641352676095297372}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &7293641175146997572
@@ -491,39 +475,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   <LocationName>k__BackingField: 0
-  <ObjectsToDisable>k__BackingField: {fileID: 2763592030262913532}
---- !u!1 &2763592030262913532
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 4519493624782662115}
-  m_Layer: 0
-  m_Name: Location
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &4519493624782662115
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2763592030262913532}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 5871377167784892263}
-  m_Father: {fileID: 7929789076899124060}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  _objectsToDisable:
+  - {fileID: 5735415679858895434}
 --- !u!1 &3167790633206082866
 GameObject:
   m_ObjectHideFlags: 0
@@ -556,39 +509,6 @@ Transform:
   - {fileID: 4224204993659184041}
   - {fileID: 6163326459572307293}
   - {fileID: 2526610155787909748}
-  m_Father: {fileID: 540751132522862008}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &3390946683320263965
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 540751132522862008}
-  m_Layer: 0
-  m_Name: NpcUtils
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &540751132522862008
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3390946683320263965}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 4883119416647367339}
-  - {fileID: 2641352676095297372}
   m_Father: {fileID: 7929789076899124060}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &3526135097027656932
@@ -710,7 +630,6 @@ GameObject:
   m_Component:
   - component: {fileID: 6163326459572307293}
   - component: {fileID: 3896958171409355137}
-  - component: {fileID: 5095344924639482000}
   - component: {fileID: 5670265026625316414}
   m_Layer: 0
   m_Name: FromRockyIslandToRestaurant
@@ -756,22 +675,6 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 11.726007}
   m_Center: {x: 0, y: 0, z: -0.03693366}
---- !u!114 &5095344924639482000
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3937332064431818049}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 275a5430c35eb5f41a6e785c8d20be69, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _spawnPoint: {fileID: 746083968941061089}
-  _parentLocation: 1
-  _locationToLoad: 2
-  _destination: 1
 --- !u!114 &5670265026625316414
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -798,7 +701,6 @@ GameObject:
   m_Component:
   - component: {fileID: 4224204993659184041}
   - component: {fileID: 1867186935407248353}
-  - component: {fileID: 4597541027959546511}
   - component: {fileID: 2636561383568387328}
   m_Layer: 0
   m_Name: FromRockyIslandToForest
@@ -844,22 +746,6 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 11.726007}
   m_Center: {x: 0, y: 0, z: -0.03693366}
---- !u!114 &4597541027959546511
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5123110283496581498}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 275a5430c35eb5f41a6e785c8d20be69, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _spawnPoint: {fileID: 2514164242687627655}
-  _parentLocation: 1
-  _locationToLoad: 3
-  _destination: 0
 --- !u!114 &2636561383568387328
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1017,7 +903,7 @@ Transform:
   - {fileID: 40290891243905291}
   - {fileID: 6581967194108730990}
   - {fileID: 5358065315895152045}
-  m_Father: {fileID: 4519493624782662115}
+  m_Father: {fileID: 7929789076899124060}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &7028785065881608815
 GameObject:
@@ -1201,7 +1087,7 @@ GameObject:
   - component: {fileID: 4883119416647367339}
   - component: {fileID: 8524628844682128789}
   m_Layer: 0
-  m_Name: NavMesh
+  m_Name: NpcNavMesh
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1222,7 +1108,7 @@ Transform:
   m_Children:
   - {fileID: 6489563486471630410}
   - {fileID: 1741282383724356422}
-  m_Father: {fileID: 540751132522862008}
+  m_Father: {fileID: 7929789076899124060}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &8524628844682128789
 MonoBehaviour:

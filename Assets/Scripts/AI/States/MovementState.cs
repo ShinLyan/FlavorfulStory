@@ -4,7 +4,6 @@ using FlavorfulStory.AI.Scheduling;
 using FlavorfulStory.AI.WarpGraphSystem;
 using FlavorfulStory.SceneManagement;
 using FlavorfulStory.TimeManagement;
-using JetBrains.Annotations;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -20,7 +19,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         private readonly NavMeshAgent _navMeshAgent;
 
         /// <summary> Контроллер NPC, управляющий его поведением и анимациями. </summary>
-        private readonly NPC _npc;
+        private readonly Npc _npc;
 
         /// <summary> Граф варпов, используемый для поиска пути между локациями. </summary>
         private readonly WarpGraph _warpGraph;
@@ -43,9 +42,8 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         /// <param name="npc"> Контроллер NPC. </param>
         /// <param name="warpGraph"> Граф варпов. </param>
         public MovementState(StateController stateController, NavMeshAgent navMeshAgent,
-            NPC npc, WarpGraph warpGraph) : base(stateController)
+            Npc npc, WarpGraph warpGraph) : base(stateController)
         {
-            _stateController = stateController;
             _navMeshAgent = navMeshAgent;
             _npc = npc;
             _warpGraph = warpGraph;
@@ -81,8 +79,8 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         /// <summary> Проверяет, достиг ли NPC текущей точки, и переключает состояние, если это так. </summary>
         private void SwitchStateIfPointReached()
         {
-            var isInTargetLocation = _npc.CurrentLocationName == _currentPoint.LocationName;
-            var isCloseEnough = _navMeshAgent.remainingDistance <= DistanceToReachPoint;
+            bool isInTargetLocation = _npc.CurrentLocationName == _currentPoint.LocationName;
+            bool isCloseEnough = _navMeshAgent.remainingDistance <= DistanceToReachPoint;
 
             if (isInTargetLocation && isCloseEnough)
                 _stateController.SetState<RoutineState>();
@@ -120,7 +118,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine
             var currentWarp = FindClosestWarpInScene(_npc.transform.position, _npc.CurrentLocationName);
             var targetWarp = FindClosestWarpInScene(destination.Position, destination.LocationName);
 
-            if (currentWarp == null || targetWarp == null)
+            if (!currentWarp || !targetWarp)
             {
                 Debug.LogError("Не удалось найти начальный или конечный варп!");
                 return;
@@ -167,7 +165,6 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         /// <param name="position"> Позиция для поиска ближайшего варпа. </param>
         /// <param name="location"> Локация, в которой искать варп. </param>
         /// <returns> Ближайший варп или null, если варп не найден. </returns>
-        [CanBeNull]
         private WarpPortal FindClosestWarpInScene(Vector3 position, LocationName location)
         {
             var closestWarp = _warpGraph.FindClosestWarp(position, location);

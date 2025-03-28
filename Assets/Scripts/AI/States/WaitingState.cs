@@ -7,7 +7,6 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         /// <param name="stateController"> Контроллер состояний. </param>
         public WaitingState(StateController stateController) : base(stateController)
         {
-            _stateController = stateController;
         }
 
         /// <summary> Вызывается при входе в состояние. 

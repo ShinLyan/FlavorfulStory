@@ -1,5 +1,6 @@
-using FlavorfulStory.Saving;
+using System;
 using FlavorfulStory.InputSystem;
+using FlavorfulStory.Saving;
 using UnityEngine;
 
 namespace FlavorfulStory.Movement
@@ -60,7 +61,7 @@ namespace FlavorfulStory.Movement
         /// <summary> Выполняет передвижение игрока в соответствии с направлением движения. </summary>
         private void Move()
         {
-            Vector3 moveForce = _moveSpeed * CountSpeedMultiplier() * _moveDirection;
+            var moveForce = _moveSpeed * CountSpeedMultiplier() * _moveDirection;
             moveForce.y = _rigidbody.linearVelocity.y;
             _rigidbody.linearVelocity = moveForce;
         }
@@ -77,7 +78,7 @@ namespace FlavorfulStory.Movement
 
         /// <summary> Вычисляет множитель скорости в зависимости от режима (ходьба или бег). </summary>
         /// <returns> Множитель скорости (0.5 для ходьбы, 1 для бега). </returns>
-        private float CountSpeedMultiplier()
+        private static float CountSpeedMultiplier()
         {
             const float WalkingMultiplier = 0.5f;
             const float RunningMultiplier = 1f;
@@ -101,10 +102,14 @@ namespace FlavorfulStory.Movement
         /// <param name="rotation"> Кватернион направления взгляда. </param>
         public void SetLookRotation(Quaternion rotation) => _lookRotation = rotation;
 
+        /// <summary> Установить позицию и мгновенно перенести к ней игрока. </summary>
+        /// <param name="position"> Позиция, к которой необходимо перенести игрока. </param>
+        public void SetPosition(Vector3 position) => _rigidbody.MovePosition(position);
+
         #region Saving
 
         /// <summary> Структура для сохранения позиции и поворота игрока. </summary>
-        [System.Serializable]
+        [Serializable]
         private struct MoverSaveData
         {
             /// <summary> Позиция игрока. </summary>
@@ -116,7 +121,7 @@ namespace FlavorfulStory.Movement
 
         /// <summary> Сохраняет текущее состояние игрока (позиция и поворот). </summary>
         /// <returns> Объект с данными позиции и поворота. </returns>
-        public object CaptureState() => new MoverSaveData()
+        public object CaptureState() => new MoverSaveData
         {
             Position = new SerializableVector3(transform.position),
             Rotation = new SerializableVector3(transform.eulerAngles)

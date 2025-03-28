@@ -34,9 +34,5 @@ namespace FlavorfulStory.AI.Scheduling
         [field: Header("Other Settings")]
         [field: Tooltip("Название анимации, которая будет воспроизводиться в данной точке."), SerializeField]
         public NpcAnimationClipName NpcAnimationClipName { get; private set; }
-
-        /// <summary> Набор диалогов в указанных координатах. </summary>
-        [Tooltip("Набор диалогов в указанных координатах.")]
-        public string[] DialoguePool { get; private set; } // TODO: в будущем заменить на спец. класс для диалогов
     }
 }

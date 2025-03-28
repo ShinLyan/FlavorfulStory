@@ -3,38 +3,54 @@ using UnityEngine;
 
 namespace FlavorfulStory.SceneManagement
 {
+    /// <summary> Класс для активации и деактивации локаций в сцене. </summary>
     public static class LocationChanger
     {
-        private static LocationName _currentLocation;
-        private static Dictionary<LocationName, GameObject> _locationsDictionary;
+        /// <summary> Словарь с локациями и связанными с ними объектами, которые нужно включать/выключать. </summary>
+        private static readonly Dictionary<LocationName, Location> _locations = new();
 
-        public static void InitializeLocations()
+        /// <summary> Текущая активная локация. </summary>
+        private static Location _currentLocation;
+
+        /// <summary> Инициализирует систему локаций, собирая все объекты типа <see cref="Location"/> в сцене. </summary>
+        public static void Initialize()
         {
-            var locations = Object.FindObjectsByType<Location>(FindObjectsInactive.Include, FindObjectsSortMode.None);
-            _locationsDictionary = new Dictionary<LocationName, GameObject>();
+            _locations.Clear();
 
-            foreach (var location in locations)
+            foreach (var location in Object.FindObjectsByType<Location>(
+                         FindObjectsInactive.Include, FindObjectsSortMode.None))
+                if (!_locations.TryAdd(location.LocationName, location))
+                    Debug.LogWarning($"Найден дубликат локации: {location.LocationName} в {location.name}");
+
+            // TODO: Выключать все локации, кроме _currentLocation
+            // foreach (var location in _locations.Values) location.Disable();
+            // _currentLocation.Enable();
+        }
+
+        /// <summary> Включает указанную локацию. </summary>
+        /// <param name="location"> Имя локации, которую нужно включить. </param>
+        public static void EnableLocation(LocationName location)
+        {
+            if (!_locations.TryGetValue(location, out var locationObject))
             {
-                var name = location.LocationName;
-                if (!_locationsDictionary.TryAdd(name, location.ObjectsToDisable))
-                    Debug.LogWarning($"Найден дупликат локации: {name} in {location.name}");
+                Debug.LogError($"Локации {location} не существует!");
+                return;
             }
+
+            locationObject.Enable();
         }
 
-        public static void EnableLocation(LocationName newLocation)
+        /// <summary> Выключает указанную локацию. </summary>
+        /// <param name="location"> Имя локации, которую нужно выключить. </param>
+        public static void DisableLocation(LocationName location)
         {
-            if (_locationsDictionary.TryGetValue(newLocation, out var locationObjects))
-                locationObjects.SetActive(true);
-            else
-                Debug.LogError($"Локации {newLocation} не существует!");
-        }
+            if (!_locations.TryGetValue(location, out var locationObject))
+            {
+                Debug.LogError($"Локации {location} не существует!");
+                return;
+            }
 
-        public static void DisableLocation(LocationName oldLocation)
-        {
-            if (_locationsDictionary.TryGetValue(oldLocation, out var locationObjects))
-                locationObjects.SetActive(false);
-            else
-                Debug.LogError($"Локации {oldLocation} не существует!");
+            locationObject.Disable();
         }
     }
 }

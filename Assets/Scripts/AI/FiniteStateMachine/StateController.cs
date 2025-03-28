@@ -22,9 +22,8 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         public void SetState<T>() where T : CharacterState
         {
             var type = typeof(T);
-            if (_currentState?.GetType() == type) return;
-
-            if (!_states.TryGetValue(type, out var newState)) return;
+            if (_currentState?.GetType() == type ||
+                !_states.TryGetValue(type, out var newState)) return;
 
             _currentState?.Exit();
             _currentState = newState;

@@ -53,8 +53,8 @@ namespace FlavorfulStory.AI.WarpGraphSystem
                     var finalPath = ReconstructPath(path, endNode);
                     if (finalPath.Count < 2) return finalPath;
 
-                    var isLastDuplicate = finalPath[^2].ParentLocationName == finalPath[^1].ParentLocationName;
-                    var isFirstDuplicate = finalPath[0].ParentLocationName == finalPath[1].ParentLocationName;
+                    bool isLastDuplicate = finalPath[^2].ParentLocationName == finalPath[^1].ParentLocationName;
+                    bool isFirstDuplicate = finalPath[0].ParentLocationName == finalPath[1].ParentLocationName;
 
                     return isLastDuplicate ? finalPath.GetRange(0, finalPath.Count - 1)
                         : isFirstDuplicate ? finalPath.GetRange(1, finalPath.Count - 1)
@@ -94,10 +94,8 @@ namespace FlavorfulStory.AI.WarpGraphSystem
         /// <summary> Возвращает все узлы в указанной локации. </summary>
         /// <param name="location"> Локация, для которой нужно получить узлы. </param>
         /// <returns> Список узлов в локации или null, если локация не найдена. </returns>
-        private List<WarpNode> GetNodesByLocation(LocationName location)
-        {
-            return _locationToNodes.GetValueOrDefault(location);
-        }
+        private List<WarpNode> GetNodesByLocation(LocationName location) =>
+            _locationToNodes.GetValueOrDefault(location);
 
         /// <summary> Находит ближайший узел к позиции в указанной локации. </summary>
         /// <param name="position"> Позиция для поиска ближайшего узла. </param>
@@ -108,18 +106,6 @@ namespace FlavorfulStory.AI.WarpGraphSystem
             var nodes = GetNodesByLocation(location);
             return nodes?.OrderBy(n => Vector3.Distance(position, n.SourceWarp.transform.position))
                 .FirstOrDefault();
-        }
-
-        /// <summary> Выводит структуру графа в консоль для отладки. </summary>
-        public void PrintGraph()
-        {
-            foreach (var location in _locationToNodes.Keys)
-            foreach (var node in _locationToNodes[location])
-            {
-                var connections = "";
-                foreach (var edge in node.Edges) connections += $"{edge.TargetNode.SourceWarp.ParentLocationName} -> ";
-                Debug.Log($"[{location}] Connected to: {connections.TrimEnd(" -> ".ToCharArray())}");
-            }
         }
 
         /// <summary> Строит граф варпов на основе списка всех варпов. </summary>
@@ -162,8 +148,6 @@ namespace FlavorfulStory.AI.WarpGraphSystem
             foreach (var warp in warps)
                 if (warpToNode.TryGetValue(warp.ConnectedWarp, out var targetNode))
                     warpToNode[warp].Edges.Add(new WarpEdge(warpToNode[warp], targetNode));
-
-
             return graph;
         }
     }

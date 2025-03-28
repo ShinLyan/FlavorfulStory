@@ -1,6 +1,6 @@
 using System.Collections;
+using FlavorfulStory.Control;
 using FlavorfulStory.InputSystem;
-using FlavorfulStory.Movement;
 using FlavorfulStory.SceneManagement;
 using UnityEngine;
 
@@ -9,38 +9,47 @@ namespace FlavorfulStory.AI.WarpGraphSystem
     /// <summary> Объединенный класс для управления телепортами и связями между локациями </summary>
     public class WarpPortal : MonoBehaviour
     {
-        [Header("Teleport Settings")] [SerializeField]
+        /// <summary> Точка, куда будет телепортирован персонаж при переходе. </summary>
+        [Header("Teleport Settings")]
+        [Tooltip("Точка, куда будет телепортирован персонаж при переходе."), SerializeField]
         private Transform _spawnPoint;
 
+        /// <summary> Связанная точка телепорта (целевой портал). </summary>
         [field: Tooltip("Связанная точка телепорта."), SerializeField]
         public WarpPortal ConnectedWarp { get; private set; }
 
-        [Header("Visualization")] [Tooltip("Цвет соединений внутри локации"), SerializeField]
+        /// <summary> Цвет соединений внутри одной локации (визуализация в редакторе). </summary>
+        [Header("Visualization")] [Tooltip("Цвет соединений внутри одной локации"), SerializeField]
         private Color _localConnectionColor = Color.blue;
 
-        [Tooltip("Цвет соединений между локациями"), SerializeField]
+        /// <summary> Цвет соединений между разными локациями (визуализация в редакторе). </summary>
+        [Tooltip("Цвет соединений между разными локациями"), SerializeField]
         private Color _remoteConnectionColor = Color.green;
 
+        /// <summary> Имя локации, к которой принадлежит данный портал. </summary>
         public LocationName ParentLocationName { get; private set; }
 
-        private void Awake()
-        {
-            ParentLocationName = GetComponentInParent<Location>().LocationName;
-        }
+        /// <summary> Определение локации портала при инициализации. </summary>
+        private void Awake() => ParentLocationName = GetComponentInParent<Location>().LocationName;
 
+        /// <summary> Обработка входа игрока в триггер телепортации. </summary>
+        /// <param name="other"> Коллайдер объекта, вошедшего в триггер. </param>
         private void OnTriggerEnter(Collider other)
         {
             if (!other.CompareTag("Player")) return;
-            StartCoroutine(TeleportPlayer(other.GetComponent<Rigidbody>(), other.GetComponent<PlayerMover>()));
+
+            StartCoroutine(TeleportPlayer(other.GetComponent<PlayerController>()));
         }
 
-        private IEnumerator TeleportPlayer(Rigidbody playerRigidbody, PlayerMover playerMover)
+        /// <summary> Корутин телепортации игрока с управлением фейдами и сменой локаций. </summary>
+        /// <param name="playerController"> Контроллер игрока. </param>
+        private IEnumerator TeleportPlayer(PlayerController playerController)
         {
             InputWrapper.BlockAllInput();
             yield return PersistentObject.Instance.Fader.FadeOut(Fader.FadeOutTime);
 
             LocationChanger.EnableLocation(ConnectedWarp.ParentLocationName);
-            ConnectedWarp.UpdatePlayerPosition(playerRigidbody, playerMover);
+            playerController.UpdatePosition(ConnectedWarp._spawnPoint);
 
             yield return new WaitForSeconds(Fader.FadeWaitTime);
             PersistentObject.Instance.Fader.FadeIn(Fader.FadeInTime);
@@ -49,12 +58,7 @@ namespace FlavorfulStory.AI.WarpGraphSystem
             LocationChanger.DisableLocation(ParentLocationName);
         }
 
-        private void UpdatePlayerPosition(Rigidbody playerRigidbody, PlayerMover playerMover)
-        {
-            playerRigidbody.MovePosition(_spawnPoint.position);
-            playerMover.SetLookRotation(_spawnPoint.rotation);
-        }
-
+        /// <summary> Визуализация соединений между порталами в редакторе. </summary>
         private void OnDrawGizmosSelected()
         {
             Gizmos.color = Color.cyan;

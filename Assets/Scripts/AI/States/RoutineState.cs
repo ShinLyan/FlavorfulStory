@@ -7,7 +7,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine
     public class RoutineState : CharacterState
     {
         /// <summary> Контроллер NPC, управляющий его поведением и анимациями. </summary>
-        private readonly NPC _npc;
+        private readonly Npc _npc;
 
         /// <summary> Текущая точка расписания, в которой находится NPC. </summary>
         private SchedulePoint _currentPoint;
@@ -15,9 +15,8 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         /// <summary> Инициализирует новое состояние рутины. </summary>
         /// <param name="stateController"> Контроллер состояний. </param>
         /// <param name="npc"> Контроллер NPC. </param>
-        public RoutineState(StateController stateController, NPC npc) : base(stateController)
+        public RoutineState(StateController stateController, Npc npc) : base(stateController)
         {
-            _stateController = stateController;
             _npc = npc;
             _currentPoint = null;
         }

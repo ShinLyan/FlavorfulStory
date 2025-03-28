@@ -1,4 +1,5 @@
 ﻿using FlavorfulStory.InputSystem;
+using FlavorfulStory.SceneManagement;
 using UnityEngine;
 
 namespace FlavorfulStory.Core
@@ -9,8 +10,8 @@ namespace FlavorfulStory.Core
     public class PersistentObjectSpawner : MonoBehaviour
     {
         /// <summary> Префаб, создаваемый один раз и сохраняемый между сценами. </summary>
-        [Tooltip("Префаб, который создается только один раз и сохраняется между сценами.")]
-        [SerializeField] private GameObject _persistentObjectsPrefab;
+        [Tooltip("Префаб, который создается только один раз и сохраняется между сценами.")] [SerializeField]
+        private GameObject _persistentObjectsPrefab;
 
         /// <summary> Был ли префаб уже создан? </summary>
         private bool _hasSpawned;
@@ -22,8 +23,9 @@ namespace FlavorfulStory.Core
 
             SpawnPersistentObject();
             _hasSpawned = true;
-            
+
             InputWrapper.Initialize();
+            LocationChanger.Initialize();
         }
 
         /// <summary> Создает постоянный объект и устанавливает его сохранение между сценами. </summary>

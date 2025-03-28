@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using FlavorfulStory.TimeManagement;
 using GD.MinMaxSlider;
 using UnityEngine;
@@ -43,14 +44,13 @@ namespace FlavorfulStory.AI.Scheduling
         /// <returns> Ближайшая точка маршрута или <c>null</c>, если подходящая точка не найдена. </returns>
         public SchedulePoint GetClosestSchedulePointInPath(DateTime currentTime)
         {
-            var currentMinutes = currentTime.Hour * 60 + currentTime.Minute;
+            int currentMinutes = currentTime.Hour * 60 + currentTime.Minute;
             SchedulePoint closestPoint = null;
-            var minTimeDifference = int.MaxValue;
-
+            int minTimeDifference = int.MaxValue;
             foreach (var pathPoint in Path)
             {
-                var pathPointMinutes = pathPoint.Hour * 60 + pathPoint.Minutes;
-                var timeDifference = currentMinutes - pathPointMinutes;
+                int pathPointMinutes = pathPoint.Hour * 60 + pathPoint.Minutes;
+                int timeDifference = currentMinutes - pathPointMinutes;
 
                 if (timeDifference < 0 || timeDifference >= minTimeDifference) continue;
 
@@ -61,33 +61,21 @@ namespace FlavorfulStory.AI.Scheduling
             return closestPoint;
         }
 
-        /// <summary> Проверка на подходящие условия</summary>
+        /// <summary> Проверка на подходящие условия. </summary>
         /// <param name="currentTime"> Текущее время. </param>
         /// <param name="currentHearts"> Текущие отнощения. </param>
         /// <param name="isRaining"> Идет ли дождь. </param>
         /// <returns></returns>
-        public bool AreConditionsSuitable(DateTime currentTime, int currentHearts, bool isRaining)
-        {
-            if (IsRaining != isRaining)
-                return false;
-            if (Hearts > 0 && currentHearts < Hearts)
-                return false;
-            if (Dates.Length > 0 && !IsDateInRanges(currentTime.SeasonDay))
-                return false;
-            if (DayOfWeek != 0 && (DayOfWeek & currentTime.DayOfWeek) == 0)
-                return false;
-            if (Seasons != 0 && (Seasons & currentTime.Season) == 0)
-                return false;
-            return true;
-        }
+        public bool AreConditionsSuitable(DateTime currentTime, int currentHearts, bool isRaining) =>
+            IsRaining == isRaining &&
+            (Hearts == 0 || currentHearts >= Hearts) &&
+            (Dates.Length == 0 || IsDateInRanges(currentTime.SeasonDay)) &&
+            (DayOfWeek == 0 || (DayOfWeek & currentTime.DayOfWeek) != 0) &&
+            (Seasons == 0 || (Seasons & currentTime.Season) != 0);
 
         /// <summary> Проверяет, попадает ли день в заданные диапазоны. </summary>
-        private bool IsDateInRanges(int day)
-        {
-            foreach (var range in Dates)
-                if (day >= range.x && day <= range.y)
-                    return true;
-            return false;
-        }
+        /// <param name="day"></param>
+        /// <returns></returns>
+        private bool IsDateInRanges(int day) => Dates.Any(range => day >= range.x && day <= range.y);
     }
 }

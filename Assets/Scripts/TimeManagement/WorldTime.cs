@@ -7,6 +7,8 @@ namespace FlavorfulStory.TimeManagement
     /// <summary> Управляет глобальным игровым временем, изменяя его по тикам и вызывая события. </summary>
     public class WorldTime : MonoBehaviour, ISaveable
     {
+        #region Fields
+
         /// <summary> Количество игровых минут, добавляемых за один тик. </summary>
         [Header("Tick settings")] [Tooltip("Сколько минут проходит за один тик."), SerializeField, Range(0.1f, 20f)]
         private int _minutesPerTick = 10;
@@ -38,6 +40,8 @@ namespace FlavorfulStory.TimeManagement
 
         /// <summary> Вызывается при завершении игрового дня. </summary>
         public static Action<DateTime> OnDayEnded;
+
+        #endregion
 
         /// <summary> Инициализировать начальное игровое время. </summary>
         private void Awake() => _currentGameTime = new DateTime(1, Season.Spring, 1, _dayStartHour, 0);
@@ -74,8 +78,8 @@ namespace FlavorfulStory.TimeManagement
         /// <summary> Обновляет время до начала нового дня в зависимости от текущего времени. </summary>
         private void BeginNewDay()
         {
-            var isSameDay = _currentGameTime.Hour < _dayStartHour;
-            var dayAdjustment = isSameDay ? 0 : 1;
+            bool isSameDay = _currentGameTime.Hour < _dayStartHour;
+            int dayAdjustment = isSameDay ? 0 : 1;
 
             _currentGameTime = new DateTime(
                 _currentGameTime.Year,
