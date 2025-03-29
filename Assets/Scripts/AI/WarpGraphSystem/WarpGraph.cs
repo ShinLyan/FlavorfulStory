@@ -25,20 +25,34 @@ namespace FlavorfulStory.AI.WarpGraphSystem
             _allNodes.Add(node);
         }
 
-        /// <summary> Находит кратчайший путь между двумя варпами. </summary>
-        /// <param name="start"> Начальный варп. </param>
-        /// <param name="end"> Конечный варп. </param>
-        /// <returns> Список варпов, представляющий путь, или null, если путь не найден. </returns>
+        /// <summary> Находит кратчайший путь между двумя варп-порталами через поиск в ширину (BFS). </summary>
+        /// <param name="start"> Стартовый варп-портал. </param>
+        /// <param name="end"> Целевой варп-портал. </param>
+        /// <returns> Список варп-порталов пути или null, если путь не найден. </returns>
         public List<WarpPortal> FindShortestPath(WarpPortal start, WarpPortal end)
         {
-            var queue = new Queue<WarpNode>();
-            var visited = new HashSet<WarpNode>();
-            var path = new Dictionary<WarpNode, WarpNode>();
-
             var startNode = _allNodes.Find(n => n.SourceWarp == start);
             var endNode = _allNodes.Find(n => n.SourceWarp == end);
 
             if (startNode == null || endNode == null) return null;
+
+            (bool pathFound, var pathMap) = PerformBFS(startNode, endNode);
+            return pathFound
+                ? TrimPath(ReconstructPath(pathMap, endNode))
+                : null;
+        }
+
+        /// <summary> Выполняет обход графа в ширину (BFS) для поиска пути между узлами. </summary>
+        /// <param name="startNode"> Начальный узел графа. </param>
+        /// <param name="endNode"> Целевой узел графа. </param>
+        /// <returns> Кортеж: 
+        /// - found: флаг успешности поиска пути,
+        /// - pathMap: словарь связей для восстановления пути. </returns>
+        private (bool found, Dictionary<WarpNode, WarpNode> pathMap) PerformBFS(WarpNode startNode, WarpNode endNode)
+        {
+            var queue = new Queue<WarpNode>();
+            var visited = new HashSet<WarpNode>();
+            var path = new Dictionary<WarpNode, WarpNode>();
 
             queue.Enqueue(startNode);
             visited.Add(startNode);
@@ -47,19 +61,7 @@ namespace FlavorfulStory.AI.WarpGraphSystem
             while (queue.Count > 0)
             {
                 var current = queue.Dequeue();
-
-                if (current == endNode)
-                {
-                    var finalPath = ReconstructPath(path, endNode);
-                    if (finalPath.Count < 2) return finalPath;
-
-                    bool isLastDuplicate = finalPath[^2].ParentLocationName == finalPath[^1].ParentLocationName;
-                    bool isFirstDuplicate = finalPath[0].ParentLocationName == finalPath[1].ParentLocationName;
-
-                    return isLastDuplicate ? finalPath.GetRange(0, finalPath.Count - 1)
-                        : isFirstDuplicate ? finalPath.GetRange(1, finalPath.Count - 1)
-                        : finalPath;
-                }
+                if (current == endNode) return (true, path);
 
                 foreach (var edge in current.Edges)
                     if (visited.Add(edge.TargetNode))
@@ -69,8 +71,24 @@ namespace FlavorfulStory.AI.WarpGraphSystem
                     }
             }
 
-            return null;
+            return (false, null);
         }
+
+        /// <summary> Удаляет дублирующиеся локации в начале или конце пути. </summary>
+        /// <param name="path"> Исходный путь для обработки. </param>
+        /// <returns> Оптимизированный путь без избыточных локаций. </returns>
+        private List<WarpPortal> TrimPath(List<WarpPortal> path)
+        {
+            if (path.Count < 2) return path;
+
+            bool isLastDuplicate = path[^2].ParentLocationName == path[^1].ParentLocationName;
+            bool isFirstDuplicate = path[0].ParentLocationName == path[1].ParentLocationName;
+
+            return isLastDuplicate ? path.GetRange(0, path.Count - 1)
+                : isFirstDuplicate ? path.GetRange(1, path.Count - 1)
+                : path;
+        }
+
 
         /// <summary> Восстанавливает путь от конечного узла к начальному. </summary>
         /// <param name="path"> Словарь, содержащий связи между узлами. </param>
@@ -109,46 +127,72 @@ namespace FlavorfulStory.AI.WarpGraphSystem
         }
 
         /// <summary> Строит граф варпов на основе списка всех варпов. </summary>
-        /// <param name="allWarps"> Список всех варпов для построения графа. </param>
-        /// <returns> Построенный граф варпов. </returns>
+        /// <param name="allWarps">Список всех варпов для построения графа.</param>
+        /// <returns>Построенный граф варпов.</returns>
         public static WarpGraph Build(IEnumerable<WarpPortal> allWarps)
         {
-            var locationToWarps = new Dictionary<LocationName, List<WarpPortal>>();
             var warps = allWarps.ToList();
+            var locationToWarps = GroupWarpsByLocation(warps);
+            var (warpToNode, graph) = CreateNodesAndMap(locationToWarps);
 
-            // Группируем варпы по локациям
+            ConnectIntraLocationEdges(locationToWarps, warpToNode);
+            ConnectInterLocationEdges(warps, warpToNode);
+
+            return graph;
+        }
+
+        /// <summary> Группирует варпы по их родительским локациям. </summary>
+        private static Dictionary<LocationName, List<WarpPortal>> GroupWarpsByLocation(List<WarpPortal> warps)
+        {
+            var locationMap = new Dictionary<LocationName, List<WarpPortal>>();
+
             foreach (var warp in warps)
             {
-                if (!locationToWarps.ContainsKey(warp.ParentLocationName))
-                    locationToWarps[warp.ParentLocationName] = new List<WarpPortal>();
+                if (!locationMap.ContainsKey(warp.ParentLocationName))
+                    locationMap[warp.ParentLocationName] = new List<WarpPortal>();
 
-                locationToWarps[warp.ParentLocationName].Add(warp);
+                locationMap[warp.ParentLocationName].Add(warp);
             }
 
+            return locationMap;
+        }
+
+        /// <summary> Создает узлы графа и карту соответствия варпов узлам. </summary>
+        private static (Dictionary<WarpPortal, WarpNode>, WarpGraph) CreateNodesAndMap(
+            Dictionary<LocationName, List<WarpPortal>> locationMap)
+        {
             var warpToNode = new Dictionary<WarpPortal, WarpNode>();
             var graph = new WarpGraph();
 
-            // Создаем узлы и связи внутри локаций
-            foreach (var warpsInLocation in locationToWarps.Keys.Select(location => locationToWarps[location]))
+            foreach (var warpsInLocation in locationMap.Values)
+            foreach (var warp in warpsInLocation)
             {
-                foreach (var warp in warpsInLocation)
-                {
-                    var node = new WarpNode(warp);
-                    warpToNode[warp] = node;
-                    graph.AddNode(node);
-                }
-
-                // Связываем все варпы внутри локации между собой
-                foreach (var warpA in warpsInLocation)
-                foreach (var warpB in warpsInLocation.Where(warpB => warpA != warpB))
-                    warpToNode[warpA].Edges.Add(new WarpEdge(warpToNode[warpA], warpToNode[warpB]));
+                var node = new WarpNode(warp);
+                warpToNode[warp] = node;
+                graph.AddNode(node);
             }
 
-            // Добавляем связи между варпами разных локаций
+            return (warpToNode, graph);
+        }
+
+        /// <summary> Создает связи между варпами внутри одной локации. </summary>
+        private static void ConnectIntraLocationEdges(
+            Dictionary<LocationName, List<WarpPortal>> locationMap,
+            Dictionary<WarpPortal, WarpNode> warpToNode)
+        {
+            foreach (var warpsInLocation in locationMap.Values)
+            foreach (var warpA in warpsInLocation)
+            foreach (var warpB in warpsInLocation.Where(warpB => warpA != warpB))
+                warpToNode[warpA].Edges.Add(new WarpEdge(warpToNode[warpB]));
+        }
+
+        /// <summary> Создает связи между варпами разных локаций. </summary>
+        private static void ConnectInterLocationEdges(List<WarpPortal> warps,
+            Dictionary<WarpPortal, WarpNode> warpToNode)
+        {
             foreach (var warp in warps)
-                if (warpToNode.TryGetValue(warp.ConnectedWarp, out var targetNode))
-                    warpToNode[warp].Edges.Add(new WarpEdge(warpToNode[warp], targetNode));
-            return graph;
+                if (warp.ConnectedWarp != null && warpToNode.TryGetValue(warp.ConnectedWarp, out var targetNode))
+                    warpToNode[warp].Edges.Add(new WarpEdge(targetNode));
         }
     }
 }

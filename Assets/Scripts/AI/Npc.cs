@@ -94,8 +94,6 @@ namespace FlavorfulStory.AI
                 }
             );
 
-            _stateController.SetState<RoutineState>();
-
             _sortedScheduleParams = _npcSchedule.GetSortedScheduleParams();
             if (_sortedScheduleParams == null) Debug.LogError("SortedScheduleParams is null");
 
@@ -132,7 +130,6 @@ namespace FlavorfulStory.AI
         {
             PrioritiseSchedule(currentTime);
             _stateController.ResetStates();
-
             CurrentLocationName = _spawnLocation;
             _navMeshAgent.Warp(_spawnPoint);
         }

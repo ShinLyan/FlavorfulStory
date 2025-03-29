@@ -45,6 +45,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         {
             foreach (var state in _states.Values)
                 state.Reset();
+            SetState<RoutineState>();
         }
     }
 }
