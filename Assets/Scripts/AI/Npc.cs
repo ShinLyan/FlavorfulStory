@@ -70,7 +70,22 @@ namespace FlavorfulStory.AI
         {
             _navMeshAgent = GetComponent<NavMeshAgent>();
             _animator = GetComponent<Animator>();
-            _stateController = new StateController();
+            _stateController = new StateController(
+                new CharacterState[]
+                {
+                    new InteractionState(() => _stateController),
+                    new MovementState(
+                        () => _stateController,
+                        _navMeshAgent,
+                        this,
+                        WarpGraph.Build(
+                            FindObjectsByType<WarpPortal>(FindObjectsInactive.Include, FindObjectsSortMode.None)
+                        )
+                    ),
+                    new RoutineState(() => _stateController, this),
+                    new WaitingState(() => _stateController)
+                }
+            );
             _spawnPoint = transform;
             _spawnLocation = CurrentLocationName;
         }
@@ -78,8 +93,8 @@ namespace FlavorfulStory.AI
         /// <summary>  </summary>
         private void Start()
         {
-            InitializeStates();
-            AddStatesToController();
+            // InitializeStates();
+            // AddStatesToController();
 
             _stateController.SetState<RoutineState>();
 
@@ -98,25 +113,25 @@ namespace FlavorfulStory.AI
         /// <summary> Отписка от событий. </summary>
         private void OnDisable() => WorldTime.OnDayEnded -= OnReset;
 
-        /// <summary> Создает экземпляры всех состояний NPC. </summary>
-        private void InitializeStates()
-        {
-            _interactionState = new InteractionState(_stateController);
-            _movementState = new MovementState(_stateController, _navMeshAgent, this,
-                WarpGraph.Build(FindObjectsByType<WarpPortal>(FindObjectsInactive.Include, FindObjectsSortMode.None))
-            );
-            _routineState = new RoutineState(_stateController, this);
-            _waitingState = new WaitingState(_stateController);
-        }
+        // /// <summary> Создает экземпляры всех состояний NPC. </summary>
+        // private void InitializeStates()
+        // {
+        //     _interactionState = new InteractionState(_stateController);
+        //     _movementState = new MovementState(_stateController, _navMeshAgent, this,
+        //         WarpGraph.Build(FindObjectsByType<WarpPortal>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+        //     );
+        //     _routineState = new RoutineState(_stateController, this);
+        //     _waitingState = new WaitingState(_stateController);
+        // }
 
-        /// <summary> Добавляет состояния в контроллер. </summary>
-        private void AddStatesToController()
-        {
-            _stateController.AddState(_interactionState);
-            _stateController.AddState(_movementState);
-            _stateController.AddState(_routineState);
-            _stateController.AddState(_waitingState);
-        }
+        // /// <summary> Добавляет состояния в контроллер. </summary>
+        // private void AddStatesToController()
+        // {
+        //     _stateController.AddState(_interactionState);
+        //     _stateController.AddState(_movementState);
+        //     _stateController.AddState(_routineState);
+        //     _stateController.AddState(_waitingState);
+        // }
 
         /// <summary> Воспроизведение анимации движения. </summary>
         /// <param name="speed"> Скорость движения. </param>
@@ -139,8 +154,6 @@ namespace FlavorfulStory.AI
         {
             SetNewSchedule(null);
 
-            _movementState.StopCoroutine();
-            _navMeshAgent.ResetPath();
             _navMeshAgent.Warp(_spawnPoint.position);
 
             CurrentLocationName = _spawnLocation;

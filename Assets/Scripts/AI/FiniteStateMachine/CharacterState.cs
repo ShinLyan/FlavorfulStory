@@ -1,3 +1,5 @@
+using System;
+
 namespace FlavorfulStory.AI.FiniteStateMachine
 {
     /// <summary>  Абстрактный базовый класс для всех состояний, используемых в конечном автомате (FSM).
@@ -5,11 +7,11 @@ namespace FlavorfulStory.AI.FiniteStateMachine
     public abstract class CharacterState
     {
         /// <summary> Контроллер состояний, который управляет переключением между состояниями.  </summary>
-        protected StateController _stateController;
+        protected Func<StateController> _stateController;
 
         /// <summary>  Инициализирует новый экземпляр класса <see cref="CharacterState"/>. </summary>
         /// <param name="stateController"> Контроллер состояний, к которому принадлежит это состояние. </param>
-        protected CharacterState(StateController stateController) => _stateController = stateController;
+        protected CharacterState(Func<StateController> stateController) => _stateController = stateController;
 
         /// <summary> Вызывается при входе в состояние. Должен быть переопределен в производных классах
         /// для реализации логики, которая выполняется при активации состояния. </summary>
@@ -23,5 +25,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         /// в производных классах для реализации логики, которая выполняется каждый кадр. </summary>
         /// <param name="deltaTime"> Время в секундах, прошедшее с последнего кадра. </param>
         public abstract void Update(float deltaTime);
+
+        public abstract void Reset();
     }
 }

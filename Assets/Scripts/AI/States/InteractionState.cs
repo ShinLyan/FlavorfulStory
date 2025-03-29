@@ -1,3 +1,5 @@
+using System;
+
 namespace FlavorfulStory.AI.FiniteStateMachine
 {
     /// <summary> Состояние взаимодействия, наследующий базовый класс <see cref="CharacterState"/>.
@@ -6,7 +8,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine
     {
         /// <summary> Инициализирует новый экземпляр класса <see cref="InteractionState"/>. </summary>
         /// <param name="stateController">Конечный автомат (FSM), к которому принадлежит это состояние.</param>
-        public InteractionState(StateController stateController) : base(stateController)
+        public InteractionState(Func<StateController> stateController) : base(stateController)
         {
         }
 
@@ -26,6 +28,10 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         /// Используется для обновления логики взаимодействия. </summary>
         /// <param name="deltaTime"> Время, прошедшее с предыдущего кадра. </param>
         public override void Update(float deltaTime)
+        {
+        }
+
+        public override void Reset()
         {
         }
     }

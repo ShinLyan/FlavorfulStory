@@ -1,5 +1,7 @@
+using System;
 using FlavorfulStory.AI.Scheduling;
 using FlavorfulStory.TimeManagement;
+using DateTime = FlavorfulStory.TimeManagement.DateTime;
 
 namespace FlavorfulStory.AI.FiniteStateMachine
 {
@@ -15,7 +17,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         /// <summary> Инициализирует новое состояние рутины. </summary>
         /// <param name="stateController"> Контроллер состояний. </param>
         /// <param name="npc"> Контроллер NPC. </param>
-        public RoutineState(StateController stateController, Npc npc) : base(stateController)
+        public RoutineState(Func<StateController> stateController, Npc npc) : base(stateController)
         {
             _npc = npc;
             _currentPoint = null;
@@ -31,8 +33,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         /// и сбрасывает текущую точку. </summary>
         public override void Exit()
         {
-            WorldTime.OnTimeUpdated -= CheckNewTime;
-            _currentPoint = null;
+            Reset();
         }
 
         /// <summary> Обновляет логику состояния рутины каждый кадр.
@@ -48,6 +49,12 @@ namespace FlavorfulStory.AI.FiniteStateMachine
                 _npc.PlayStateAnimation(animationClipName);
         }
 
+        public override void Reset()
+        {
+            WorldTime.OnTimeUpdated -= CheckNewTime;
+            _currentPoint = null;
+        }
+
         /// <summary> Проверяет, изменилось ли время, и обновляет текущую точку расписания.
         /// Переключает состояние на движение, если время совпадает с точкой. </summary>
         /// <param name="currentTime"> Текущее время в игре. </param>
@@ -58,7 +65,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine
 
             _currentPoint = closestPoint;
             if (closestPoint.Hour == currentTime.Hour && closestPoint.Minutes == currentTime.Minute)
-                _stateController.SetState<MovementState>();
+                _stateController().SetState<MovementState>();
         }
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using FlavorfulStory.AI.Scheduling;
@@ -6,6 +7,7 @@ using FlavorfulStory.SceneManagement;
 using FlavorfulStory.TimeManagement;
 using UnityEngine;
 using UnityEngine.AI;
+using DateTime = FlavorfulStory.TimeManagement.DateTime;
 
 namespace FlavorfulStory.AI.FiniteStateMachine
 {
@@ -41,7 +43,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         /// <param name="navMeshAgent"> Компонент для навигации по NavMesh. </param>
         /// <param name="npc"> Контроллер NPC. </param>
         /// <param name="warpGraph"> Граф варпов. </param>
-        public MovementState(StateController stateController, NavMeshAgent navMeshAgent,
+        public MovementState(Func<StateController> stateController, NavMeshAgent navMeshAgent,
             Npc npc, WarpGraph warpGraph) : base(stateController)
         {
             _navMeshAgent = navMeshAgent;
@@ -58,10 +60,15 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         /// <summary> Вызывается при выходе из состояния движения. </summary>
         public override void Exit()
         {
+            Reset();
+        }
+
+        public override void Reset()
+        {
             WorldTime.OnTimeUpdated -= FindDestinationPoint;
             _npc.PlayMoveAnimation(0f, 0f);
             _currentPoint = null;
-
+            _navMeshAgent.ResetPath();
             StopCoroutine();
         }
 
@@ -83,7 +90,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine
             bool isCloseEnough = _navMeshAgent.remainingDistance <= DistanceToReachPoint;
 
             if (isInTargetLocation && isCloseEnough)
-                _stateController.SetState<RoutineState>();
+                _stateController().SetState<RoutineState>();
         }
 
         /// <summary> Находит ближайшую точку маршрута на основе текущего времени
@@ -120,6 +127,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine
 
             if (!currentWarp || !targetWarp)
             {
+                Debug.Log(currentWarp?.ParentLocationName + " " + targetWarp?.ParentLocationName);
                 Debug.LogError("Не удалось найти начальный или конечный варп!");
                 return;
             }
@@ -172,7 +180,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         }
 
         /// <summary> Остановить корутину. </summary>
-        public void StopCoroutine()
+        private void StopCoroutine()
         {
             if (_currentPathCoroutine == null) return;
 

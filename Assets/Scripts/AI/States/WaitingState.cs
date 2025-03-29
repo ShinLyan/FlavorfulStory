@@ -1,3 +1,5 @@
+using System;
+
 namespace FlavorfulStory.AI.FiniteStateMachine
 {
     /// <summary> Состояние ожидания NPC, в котором персонаж не выполняет активных действий. </summary>
@@ -5,7 +7,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine
     {
         /// <summary> Инициализирует новое состояние ожидания. </summary>
         /// <param name="stateController"> Контроллер состояний. </param>
-        public WaitingState(StateController stateController) : base(stateController)
+        public WaitingState(Func<StateController> stateController) : base(stateController)
         {
         }
 
@@ -25,6 +27,10 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         /// Используется для обновления логики взаимодействия. </summary>
         /// <param name="deltaTime"> Время, прошедшее с предыдущего кадра. </param>
         public override void Update(float deltaTime)
+        {
+        }
+
+        public override void Reset()
         {
         }
     }
