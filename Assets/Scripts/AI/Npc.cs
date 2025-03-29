@@ -29,7 +29,7 @@ namespace FlavorfulStory.AI
         public LocationName CurrentLocationName { get; set; }
 
         /// <summary> Базовая точка спавна NPC. </summary>
-        private Transform _spawnPoint;
+        private Vector3 _spawnPoint;
 
         /// <summary> Базовая точка спавна NPC. </summary>
         private LocationName _spawnLocation;
@@ -70,6 +70,13 @@ namespace FlavorfulStory.AI
         {
             _navMeshAgent = GetComponent<NavMeshAgent>();
             _animator = GetComponent<Animator>();
+            _spawnPoint = transform.position;
+            _spawnLocation = CurrentLocationName;
+        }
+
+        /// <summary>  </summary>
+        private void Start()
+        {
             _stateController = new StateController(
                 new CharacterState[]
                 {
@@ -86,15 +93,6 @@ namespace FlavorfulStory.AI
                     new WaitingState(() => _stateController)
                 }
             );
-            _spawnPoint = transform;
-            _spawnLocation = CurrentLocationName;
-        }
-
-        /// <summary>  </summary>
-        private void Start()
-        {
-            // InitializeStates();
-            // AddStatesToController();
 
             _stateController.SetState<RoutineState>();
 
@@ -112,26 +110,6 @@ namespace FlavorfulStory.AI
 
         /// <summary> Отписка от событий. </summary>
         private void OnDisable() => WorldTime.OnDayEnded -= OnReset;
-
-        // /// <summary> Создает экземпляры всех состояний NPC. </summary>
-        // private void InitializeStates()
-        // {
-        //     _interactionState = new InteractionState(_stateController);
-        //     _movementState = new MovementState(_stateController, _navMeshAgent, this,
-        //         WarpGraph.Build(FindObjectsByType<WarpPortal>(FindObjectsInactive.Include, FindObjectsSortMode.None))
-        //     );
-        //     _routineState = new RoutineState(_stateController, this);
-        //     _waitingState = new WaitingState(_stateController);
-        // }
-
-        // /// <summary> Добавляет состояния в контроллер. </summary>
-        // private void AddStatesToController()
-        // {
-        //     _stateController.AddState(_interactionState);
-        //     _stateController.AddState(_movementState);
-        //     _stateController.AddState(_routineState);
-        //     _stateController.AddState(_waitingState);
-        // }
 
         /// <summary> Воспроизведение анимации движения. </summary>
         /// <param name="speed"> Скорость движения. </param>
@@ -152,15 +130,11 @@ namespace FlavorfulStory.AI
         /// <param name="currentTime"> Текущее время. </param>
         private void OnReset(DateTime currentTime)
         {
-            SetNewSchedule(null);
-
-            _navMeshAgent.Warp(_spawnPoint.position);
+            PrioritiseSchedule(currentTime);
+            _stateController.ResetStates();
 
             CurrentLocationName = _spawnLocation;
-            PrioritiseSchedule(currentTime);
-
-            _stateController.SetState<MovementState>();
-            _stateController.SetState<RoutineState>();
+            _navMeshAgent.Warp(_spawnPoint);
         }
 
         /// <summary> Приоритизировать расписание. </summary>
@@ -173,15 +147,11 @@ namespace FlavorfulStory.AI
             foreach (var param in _sortedScheduleParams)
                 if (param.AreConditionsSuitable(currentTime, param.Hearts, isRaining))
                 {
-                    SetNewSchedule(param);
+                    CurrentScheduleParams = param;
                     return;
                 }
 
             Debug.LogError("На текущую дату не подходит ни одно расписание!");
         }
-
-        /// <summary> Устанавливает новое расписание для NPC. </summary>
-        /// <param name="newScheduleParams"> Новые параметры расписания. </param>
-        private void SetNewSchedule(ScheduleParams newScheduleParams) => CurrentScheduleParams = newScheduleParams;
     }
 }

@@ -23,7 +23,10 @@ namespace FlavorfulStory.AI.FiniteStateMachine
 
         /// <summary> Обновляет логику текущего состояния. </summary>
         /// <param name="deltaTime"> Время в секундах, прошедшее с последнего кадра. </param>
-        public void Update(float deltaTime) => _currentState?.Update(deltaTime);
+        public void Update(float deltaTime)
+        {
+            _currentState?.Update(deltaTime);
+        }
 
         /// <summary> Устанавливает текущее состояние персонажа на состояние указанного типа. </summary>
         /// <typeparam name="T"> Тип состояния, на которое нужно переключиться. </typeparam>

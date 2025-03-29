@@ -33,7 +33,13 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         /// и сбрасывает текущую точку. </summary>
         public override void Exit()
         {
+            WorldTime.OnTimeUpdated -= CheckNewTime;
             Reset();
+        }
+
+        public override void Reset()
+        {
+            _currentPoint = null;
         }
 
         /// <summary> Обновляет логику состояния рутины каждый кадр.
@@ -47,12 +53,6 @@ namespace FlavorfulStory.AI.FiniteStateMachine
 
             if (_currentPoint != null)
                 _npc.PlayStateAnimation(animationClipName);
-        }
-
-        public override void Reset()
-        {
-            WorldTime.OnTimeUpdated -= CheckNewTime;
-            _currentPoint = null;
         }
 
         /// <summary> Проверяет, изменилось ли время, и обновляет текущую точку расписания.

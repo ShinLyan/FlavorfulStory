@@ -61,15 +61,15 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         public override void Exit()
         {
             Reset();
+            WorldTime.OnTimeUpdated -= FindDestinationPoint;
         }
 
         public override void Reset()
         {
-            WorldTime.OnTimeUpdated -= FindDestinationPoint;
+            StopCoroutine();
             _npc.PlayMoveAnimation(0f, 0f);
             _currentPoint = null;
             _navMeshAgent.ResetPath();
-            StopCoroutine();
         }
 
         /// <summary> Обновляет логику состояния движения каждый кадр. </summary>
@@ -127,7 +127,6 @@ namespace FlavorfulStory.AI.FiniteStateMachine
 
             if (!currentWarp || !targetWarp)
             {
-                Debug.Log(currentWarp?.ParentLocationName + " " + targetWarp?.ParentLocationName);
                 Debug.LogError("Не удалось найти начальный или конечный варп!");
                 return;
             }
