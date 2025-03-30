@@ -15532,6 +15532,14 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 1302083809}
+    - targetCorrespondingSourceObject: {fileID: 7922225790736311418, guid: ce24d4a198b4c7748b5d9d8f1aaa3a22,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1302083817}
+    - targetCorrespondingSourceObject: {fileID: 7922225790736311418, guid: ce24d4a198b4c7748b5d9d8f1aaa3a22,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1302083818}
   m_SourcePrefab: {fileID: 100100000, guid: ce24d4a198b4c7748b5d9d8f1aaa3a22, type: 3}
 --- !u!1 &645812886
 GameObject:
@@ -34345,6 +34353,41 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _dialogue: {fileID: 11400000, guid: 9e5424065cee3bd4893b828eeb63d49c, type: 2}
+--- !u!114 &1302083817
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1302083801}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f3b9ae5c53549e799e764e99f1d885a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <DialogueEvents>k__BackingField:
+  - <ActionName>k__BackingField: Attack
+    <OnTriggered>k__BackingField:
+      m_PersistentCalls:
+        m_Calls: []
+  - <ActionName>k__BackingField: 
+    <OnTriggered>k__BackingField:
+      m_PersistentCalls:
+        m_Calls: []
+--- !u!114 &1302083818
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1302083801}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7579b0cdc8074084b643a1e9e46fcfb9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <NpcInfo>k__BackingField: {fileID: 11400000, guid: fb9b5b85a36cdae4bb95828eb817e767,
+    type: 2}
 --- !u!1 &1303990296
 GameObject:
   m_ObjectHideFlags: 0
@@ -37884,7 +37927,7 @@ PrefabInstance:
     - target: {fileID: 5093981746467568246, guid: a9114609ac4097e459c8c7e1f3d67d2b,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -40.000122
+      value: -40.000183
       objectReference: {fileID: 0}
     - target: {fileID: 5117726083988815848, guid: a9114609ac4097e459c8c7e1f3d67d2b,
         type: 3}

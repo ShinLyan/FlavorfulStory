@@ -25,11 +25,11 @@ namespace FlavorfulStory.DialogueSystem
 
         /// <summary> Имя действия, вызываемого при входе в этот узел. </summary>
         [field: SerializeField]
-        public string OnEnterAction { get; private set; }
+        public string EnterActionName { get; private set; }
 
         /// <summary> Имя действия, вызываемого при выходе из этого узла. </summary>
         [field: SerializeField]
-        public string OnExitAction { get; private set; }
+        public string ExitActionName { get; private set; }
 
 #if UNITY_EDITOR
         /// <summary> Установить новую позицию узла в редакторе. </summary>

@@ -687,7 +687,7 @@ GameObject:
   - component: {fileID: 3010706025658649778}
   - component: {fileID: 7124857970305802465}
   m_Layer: 5
-  m_Name: Speaker
+  m_Name: SpeakerPreview
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1120,7 +1120,7 @@ GameObject:
   - component: {fileID: 8210113837462387217}
   - component: {fileID: 2821367162098595731}
   m_Layer: 5
-  m_Name: CurrentSpeakerIcon
+  m_Name: RomanceableIcon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1210,7 +1210,7 @@ GameObject:
   - component: {fileID: 569345626324324260}
   - component: {fileID: 8725130006526383074}
   m_Layer: 5
-  m_Name: CurrentSpeakerText
+  m_Name: SpeakerName
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1263,7 +1263,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Dirk
+  m_text: NPC Name
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: d70f485aa27dc43f79a8fd168f58435c, type: 2}
   m_sharedMaterial: {fileID: 5416806443266638455, guid: d70f485aa27dc43f79a8fd168f58435c,
@@ -1533,11 +1533,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _dialogueText: {fileID: 6961960383163679714}
-  _nextButton: {fileID: 6999169951467848083}
-  _nextButtonPreview: {fileID: 7862243926019251127}
+  _speakerName: {fileID: 8725130006526383074}
+  _romanceableIcon: {fileID: 8210113837462387217}
+  _speakerPreview: {fileID: 3381226298988689454}
   _choiceContainer: {fileID: 3116392578304403528}
   _choiceButtonPrefab: {fileID: 4352690513910526773, guid: 6572cf70b7dfa6541a62e2d873735e77,
     type: 3}
+  _nextButton: {fileID: 6999169951467848083}
+  _nextButtonPreview: {fileID: 7862243926019251127}
 --- !u!1 &8612412726239332359
 GameObject:
   m_ObjectHideFlags: 0

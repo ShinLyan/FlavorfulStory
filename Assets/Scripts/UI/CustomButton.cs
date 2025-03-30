@@ -15,12 +15,16 @@ namespace FlavorfulStory.UI
         /// <summary> Находится ли курсор над кнопкой? </summary>
         protected bool IsMouseOver { get; private set; }
 
+        /// <summary> Цвет кнопки при отключённом взаимодействии. </summary>
         private readonly Color _interactionDisabledColor = Color.gray;
 
+        /// <summary> Цвет кнопки при включённом взаимодействии. </summary>
         private readonly Color _interactionEnabledColor = Color.white;
 
+        /// <summary> Доступна ли кнопка для взаимодействия? </summary>
         private bool _isInteractable;
 
+        /// <summary> Доступна ли кнопка для взаимодействия? </summary>
         public bool IsInteractable
         {
             get => _isInteractable;
@@ -76,10 +80,12 @@ namespace FlavorfulStory.UI
         {
         }
 
+        /// <summary> Вызывается при включении взаимодействия. </summary>
         protected virtual void OnInteractionEnabled()
         {
         }
 
+        /// <summary> Вызывается при выключении взаимодействия. </summary>
         protected virtual void OnInteractionDisabled()
         {
         }

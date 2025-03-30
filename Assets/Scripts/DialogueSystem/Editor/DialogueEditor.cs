@@ -167,7 +167,7 @@ namespace FlavorfulStory.DialogueSystem.Editor
 
             _scrollPosition = EditorGUILayout.BeginScrollView(_scrollPosition);
             var canvas = GUILayoutUtility.GetRect(CanvasSize, CanvasSize);
-            var backgroundTexture = Resources.Load("background") as Texture2D;
+            var backgroundTexture = Resources.Load<Texture2D>("background");
             var textureCoords = new Rect(0, 0, CanvasSize / BackgroundSize, CanvasSize / BackgroundSize);
             GUI.DrawTextureWithTexCoords(canvas, backgroundTexture, textureCoords);
 
