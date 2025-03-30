@@ -1,8 +1,8 @@
 using System;
+using FlavorfulStory.InventorySystem;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
-using FlavorfulStory.InventorySystem;
 
 namespace FlavorfulStory.BuildingRepair
 {
@@ -76,10 +76,10 @@ namespace FlavorfulStory.BuildingRepair
         /// <summary> Обновить состояние кнопок добавления и возврата ресурса. </summary>
         private void UpdateButtonsStates()
         {
-            _addResourceButton.IsInteractable = _investedQuantity < _requiredQuantity &&
-                                                Inventory.PlayerInventory.GetItemNumber(_resource) > 0;
-            _returnResourceButton.IsInteractable = _investedQuantity > 0 &&
-                                                   Inventory.PlayerInventory.HasSpaceFor(_resource);
+            _addResourceButton.IsInteractable =
+                _investedQuantity < _requiredQuantity && Inventory.PlayerInventory.GetItemNumber(_resource) > 0;
+            _returnResourceButton.IsInteractable =
+                _investedQuantity > 0 && Inventory.PlayerInventory.HasSpaceFor(_resource);
         }
 
         /// <summary> Подписаться на события добавления и возврата ресурсов при активации объекта. </summary>

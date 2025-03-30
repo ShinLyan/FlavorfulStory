@@ -5,11 +5,15 @@ using UnityEngine;
 namespace FlavorfulStory.InventorySystem.UI
 {
     /// <summary> Панель инструментов, отображающая и управляющая экипированными предметами. </summary>
-    /// <remarks> Данный класс обрабатывает выбор предметов, ввод мыши и поддерживает визуальное состояние слотов панели инструментов. </remarks>
+    /// <remarks> Данный класс обрабатывает выбор предметов, ввод мыши и поддерживает
+    /// визуальное состояние слотов панели инструментов. </remarks>
     public class Toolbar : MonoBehaviour, ISaveable
     {
         /// <summary> Массив слотов панели инструментов. </summary>
         private ToolbarSlotUI[] _slots;
+
+        /// <summary> Можно ли взаимодействовать? </summary>
+        private bool _isInteractable;
 
         /// <summary> Индекс выбранного предмета. </summary>
         public int SelectedItemIndex { get; private set; }
@@ -21,6 +25,8 @@ namespace FlavorfulStory.InventorySystem.UI
         private void Awake()
         {
             _slots = GetComponentsInChildren<ToolbarSlotUI>();
+            _isInteractable = true;
+
             Inventory.PlayerInventory.InventoryUpdated += RedrawToolbar;
             foreach (var slot in _slots) slot.OnSlotClicked += SelectItem;
         }
@@ -51,15 +57,6 @@ namespace FlavorfulStory.InventorySystem.UI
             foreach (var slot in _slots) slot.Redraw();
         }
 
-        /// <summary> Выбирает предмет в панели инструментов по указанному индексу. </summary>
-        /// <param name="index"> Индекс предмета, который нужно выбрать. </param>
-        public void SelectItem(int index)
-        {
-            _slots[SelectedItemIndex].ResetSelection();
-            SelectedItemIndex = index;
-            _slots[SelectedItemIndex].Select();
-        }
-
         /// <summary> Обрабатывает ввод колесика мыши для смены выбранного предмета. </summary>
         private void HandleMouseScrollInput()
         {
@@ -70,6 +67,21 @@ namespace FlavorfulStory.InventorySystem.UI
             int newSelectedItemIndex = Mathf.Clamp(SelectedItemIndex - scrollInput, 0, _slots.Length - 1);
             SelectItem(newSelectedItemIndex);
         }
+
+        /// <summary> Выбирает предмет в панели инструментов по указанному индексу. </summary>
+        /// <param name="index"> Индекс предмета, который нужно выбрать. </param>
+        public void SelectItem(int index)
+        {
+            if (!_isInteractable) return;
+
+            _slots[SelectedItemIndex].ResetSelection();
+            SelectedItemIndex = index;
+            _slots[SelectedItemIndex].Select();
+        }
+
+        /// <summary> Установить состояние взаимодействия. </summary>
+        /// <param name="state"> Состояние взаимодействия. </param>
+        public void SetInteractableState(bool state) => _isInteractable = state;
 
         #region Saving
 

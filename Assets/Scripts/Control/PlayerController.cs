@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Linq;
 using FlavorfulStory.Actions;
+using FlavorfulStory.Actions.Interactables;
 using FlavorfulStory.Control.CursorSystem;
 using FlavorfulStory.InputSystem;
 using FlavorfulStory.InventorySystem;
@@ -11,18 +11,19 @@ using UnityEngine.EventSystems;
 
 namespace FlavorfulStory.Control
 {
-    /// <summary> Контроллер игрока, отвечающий за управление, 
+    /// <summary> Контроллер игрока, отвечающий за управление,
     /// использование предметов и взаимодействие с окружением. </summary>
-    [RequireComponent(typeof(PlayerMover), typeof(Animator))]
+    [RequireComponent(typeof(PlayerMover), typeof(Animator), typeof(ToolHandler))]
     public class PlayerController : MonoBehaviour
     {
-        #region Fields
+        #region Fields and Properties
 
-        /// <summary> Панель быстрого доступа. </summary>
-        [SerializeField] private Toolbar _toolbar;
+        /// <summary> Занят ли игрок? </summary>2
+        private bool _isBusy;
 
-        /// <summary> Время перезарядки использования инструмента. </summary>
-        [SerializeField] private float _toolCooldown = 1f;
+        /// <summary> Панель быстрого доступа, содержащая инвентарь игрока. </summary>
+        [Tooltip("Панель быстрого доступа, содержащая инвентарь игрока."), SerializeField]
+        private Toolbar _toolbar;
 
         /// <summary>
         /// 
@@ -35,27 +36,31 @@ namespace FlavorfulStory.Control
         /// <summary> Аниматор игрока. </summary>
         private Animator _animator;
 
+        /// <summary> Взаимодействие игрока с объектами. </summary>
+        private InteractFeature _interactFeature;
+
+        /// <summary> Обработчик инструмента. </summary>
+        private ToolHandler _toolHandler;
+
         #region Tools
 
-        /// <summary> Соответствия типов инструментов и их префабов. </summary>
-        [SerializeField] private ToolPrefabMapping[] _toolMappings;
-
-        /// <summary> Текущий экипированный инструмент. </summary>
-        private GameObject _currentTool;
+        [SerializeField, Range(1f, 5f)] private float _toolCooldown = 1.5f;
 
         /// <summary> Таймер перезарядки использования инструмента. </summary>
         private float _toolCooldownTimer;
 
         /// <summary> Можно ли использовать инструмент? </summary>
-        public bool CanUseTool => _toolCooldownTimer <= 0f;
+        private bool CanUseTool => _toolCooldownTimer <= 0f;
+
+        /// <summary> Заблокировано ли использование предмета? </summary>
+        private bool IsToolUseBlocked => !CanUseTool || _isBusy || EventSystem.current.IsPointerOverGameObject();
 
         #endregion
 
         /// <summary> Текущий выбранный предмет из панели быстрого доступа. </summary>
-        public InventoryItem CurrentItem => _toolbar?.SelectedItem;
+        private InventoryItem CurrentItem => _toolbar?.SelectedItem;
 
-        /// <summary> Событие, вызываемое при окончании взаимодейтсвия. </summary>
-        /// <remarks> Событие срабатывает внутри метода EndInteraction(). </remarks>
+        /// <summary> Событие, вызываемое при окончании взаимодействия с объектом. </summary>
         public event Action OnInteractionEnded;
 
         #endregion
@@ -65,23 +70,27 @@ namespace FlavorfulStory.Control
         {
             _playerMover = GetComponent<PlayerMover>();
             _animator = GetComponent<Animator>();
+            _interactFeature = GetComponentInChildren<InteractFeature>();
+            _interactFeature.SetInteractionActions(() => SetBusyState(true), () => SetBusyState(false));
+            _toolHandler = GetComponent<ToolHandler>();
+            _toolHandler.SetUnequipAction(() => SetBusyState(false));
         }
 
         /// <summary> Обновление состояния игрока. </summary>
         private void Update()
         {
             HandleInput();
-            ReduceCooldownTimer();
+            if (_toolCooldownTimer > 0f) _toolCooldownTimer -= Time.deltaTime;
             if (InteractWithComponent()) return;
             CursorController.SetCursor(CursorType.Default);
         }
 
-        /// <summary> Обработка ввода. </summary>
+        /// <summary> Обработка пользовательского ввода. </summary>
         private void HandleInput()
         {
-            HandleToolbarSelection();
-            HandleToolbarUsage();
-            HandleMovement();
+            HandleToolbarSelectionInput();
+            HandleToolbarUseInput();
+            HandleMovementInput();
         }
 
         private bool InteractWithComponent()
@@ -103,16 +112,29 @@ namespace FlavorfulStory.Control
 
         private RaycastHit[] SphereCastAllSorted()
         {
-            var hits = Physics.SphereCastAll(InputWrapper.GetMouseRay(), SphereCastRadius);
+            var hits = Physics.SphereCastAll(GetMouseRay(), SphereCastRadius);
             float[] distances = new float[hits.Length];
             for (int i = 0; i < hits.Length; i++) distances[i] = hits[i].distance;
             Array.Sort(distances, hits);
             return hits;
         }
 
-        /// <summary> Обработка выбора предмета на панели быстрого доступа. </summary>
-        private void HandleToolbarSelection()
+        private static Camera _mainCamera;
+
+        /// <summary> Получить луч основной камеры. </summary>
+        /// <returns> Луч основной камеры. </returns>
+        public static Ray GetMouseRay()
         {
+            if (!_mainCamera) _mainCamera = Camera.main;
+            return _mainCamera.ScreenPointToRay(InputWrapper.GetMousePosition());
+        }
+
+        /// <summary> Обработка выбора предмета на панели быстрого доступа. </summary>
+        private void HandleToolbarSelectionInput()
+        {
+            if (_isBusy) return;
+
+            // TODO: Переделать на количество 10
             const int ToolbarItemsCount = 9;
             for (int i = 0; i < ToolbarItemsCount; i++)
                 if (Input.GetKeyDown(KeyCode.Alpha1 + i))
@@ -120,31 +142,58 @@ namespace FlavorfulStory.Control
         }
 
         /// <summary> Обработка использования предмета из панели быстрого доступа. </summary>
-        private void HandleToolbarUsage()
+        private void HandleToolbarUseInput()
         {
-            if (!CanUseTool || CurrentItem is not ActionItem actionItem ||
-                EventSystem.current.IsPointerOverGameObject())
+            if (CurrentItem is not IUsable usable || IsToolUseBlocked) return;
+
+            if ((!Input.GetMouseButton(0) || usable.UseActionType != UseActionType.LeftClick) &&
+                (!Input.GetMouseButton(1) || usable.UseActionType != UseActionType.RightClick)) return;
+
+            BeginInteraction(usable);
+        }
+
+        /// <summary> Начать взаимодйствие с предметом. </summary>
+        /// <param name="usable"> Используемый предмет. </param>
+        private void BeginInteraction(IUsable usable)
+        {
+            if (usable == null) return;
+
+            StartUsingItem(usable);
+            if (usable is EdibleInventoryItem) ConsumeEdibleItem();
+            _toolCooldownTimer = _toolCooldown;
+        }
+
+        /// <summary> Начать использование предмета. </summary>
+        /// <param name="usable"> Используемый предмет. </param>
+        private void StartUsingItem(IUsable usable)
+        {
+            if (!usable.Use(this, _toolHandler.HitableLayers))
                 return;
 
-            if ((Input.GetMouseButton(0) && actionItem.UseActionType == UseActionType.LeftClick) ||
-                (Input.GetMouseButton(1) && actionItem.UseActionType == UseActionType.RightClick))
-            {
-                actionItem.Use(this);
-                _toolCooldownTimer = _toolCooldown;
-                InputWrapper.BlockPlayerMovement();
+            _toolHandler.Equip(CurrentItem as Tool);
+            SetBusyState(true);
+        }
 
-                if (actionItem.IsConsumable)
-                    Inventory.PlayerInventory.RemoveFromSlot(_toolbar.SelectedItemIndex, 1);
-            }
-
-            if (!CanUseTool) return;
-
-            UnequipTool();
+        /// <summary> Съесть используемый предмет. </summary>
+        private void ConsumeEdibleItem()
+        {
+            Inventory.PlayerInventory.RemoveFromSlot(_toolbar.SelectedItemIndex, 1);
             InputWrapper.UnblockPlayerMovement();
+            SetBusyState(false);
+        }
+
+        /// <summary> Задать состояние занятости игрока. </summary>
+        /// <param name="state"> Состояние. </param>
+        /// <remarks> Когда игрок занят - не может использовать инструмент или взаимодействовать с окружением. </remarks>
+        private void SetBusyState(bool state)
+        {
+            _isBusy = state;
+            _interactFeature.SetInteractionState(state);
+            _toolbar.SetInteractableState(!state);
         }
 
         /// <summary> Обработка передвижения. </summary>
-        private void HandleMovement()
+        private void HandleMovementInput()
         {
             var direction = new Vector3(
                 InputWrapper.GetAxisRaw(InputButton.Horizontal),
@@ -153,14 +202,7 @@ namespace FlavorfulStory.Control
             ).normalized;
 
             _playerMover.SetMoveDirection(direction);
-            if (direction != Vector3.zero)
-                _playerMover.SetLookRotation(direction);
-        }
-
-        /// <summary> Уменьшение таймера перезарядки. </summary>
-        private void ReduceCooldownTimer()
-        {
-            if (_toolCooldownTimer > 0f) _toolCooldownTimer -= Time.deltaTime;
+            if (direction != Vector3.zero) _playerMover.SetLookRotation(direction);
         }
 
         /// <summary> Завершение взаимодействия. </summary>
@@ -171,43 +213,13 @@ namespace FlavorfulStory.Control
         /// <param name="animationName"> Название анимации. </param>
         public void TriggerAnimation(string animationName) => _animator.SetTrigger(animationName);
 
-        /// <summary> Получение позиции курсора. </summary>
-        /// <returns> Позиция точки, в которую направлен курсор. </returns>
-        public static Vector3 GetCursorPosition()
-        {
-            var ray = Camera.main.ScreenPointToRay(InputWrapper.GetMousePosition());
-            return Physics.Raycast(ray, out var hit, Mathf.Infinity) ? hit.point : Vector3.zero;
-        }
-
         /// <summary> Повернуть игрока в направлении указанной позиции. </summary>
         /// <param name="position"> Позиция для поворота. </param>
         public void RotateTowards(Vector3 position)
         {
             var direction = (position - transform.position).normalized;
-            direction.y = 0; // Игнорируем вертикальную составляющую
+            direction.y = 0;
             _playerMover.SetLookRotation(direction);
-        }
-
-        /// <summary> Экипировать инструмент в руку игрока. </summary>
-        /// <param name="tool"> Инструмент, который должен быть экипирован. </param>
-        public void EquipTool(Tool tool)
-        {
-            if (_currentTool) return;
-
-            var mapping = _toolMappings.FirstOrDefault(m => m.ToolType == tool.ToolType);
-            if (mapping == null) return;
-
-            _currentTool = mapping.ToolPrefab;
-            _currentTool.SetActive(true);
-        }
-
-        /// <summary> Убрать инструмент из руки игрока. </summary>
-        private void UnequipTool()
-        {
-            if (!_currentTool) return;
-
-            _currentTool.SetActive(false);
-            _currentTool = null;
         }
     }
 }
