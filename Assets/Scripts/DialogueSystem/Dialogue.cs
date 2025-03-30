@@ -6,49 +6,21 @@ using UnityEngine;
 
 namespace FlavorfulStory.DialogueSystem
 {
-    /// <summary> ScriptableObject, представляющий диалог. </summary>
+    /// <summary> Диалог. </summary>
     [CreateAssetMenu(menuName = "FlavorfulStory/Dialogue")]
     public class Dialogue : ScriptableObject, ISerializationCallbackReceiver
     {
         /// <summary> Узлы диалога. </summary>
         [SerializeField] private List<DialogueNode> _nodes = new();
 
-        /// <summary> Словарь для быстрого поиска узлов по идентификатору. </summary>
+        /// <summary> Словарь для поиска узлов по идентификатору. </summary>
         private readonly Dictionary<string, DialogueNode> _nodeLookup = new();
 
         /// <summary> Все узлы диалога. </summary>
         public IEnumerable<DialogueNode> Nodes => _nodes;
 
-        /// <summary>
-        /// 
-        /// </summary>
+        /// <summary> Корневой узел диалога (первый узел в списке). </summary>
         public DialogueNode RootNode => _nodes[0];
-
-        /// <summary> Получить дочерние узлы указанного узла. </summary>
-        /// <param name="parentNode"> Родительский узел. </param>
-        /// <returns> Перечисление дочерних узлов. </returns>
-        public IEnumerable<DialogueNode> GetChildNodes(DialogueNode parentNode)
-        {
-            foreach (string childId in parentNode.ChildNodes)
-                if (_nodeLookup.TryGetValue(childId, out var childNode))
-                    yield return childNode;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="currentNode"></param>
-        /// <returns></returns>
-        public IEnumerable<DialogueNode> GetPlayerChildNodes(DialogueNode currentNode) =>
-            GetChildNodes(currentNode).Where(node => node.IsPlayerSpeaking);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="currentNode"></param>
-        /// <returns></returns>
-        public IEnumerable<DialogueNode> GetAIChildNodes(DialogueNode currentNode) =>
-            GetChildNodes(currentNode).Where(node => !node.IsPlayerSpeaking);
 
         /// <summary> Пересоздать словарь узлов при изменении ScriptableObject в редакторе. </summary>
         private void OnValidate() => RebuildNodeLookup();
@@ -62,24 +34,27 @@ namespace FlavorfulStory.DialogueSystem
                     _nodeLookup[node.name] = node;
         }
 
-        /// <summary> Действия перед сериализацией объекта. </summary>
-        public void OnBeforeSerialize()
+        /// <summary> Получить дочерние узлы указанного узла. </summary>
+        /// <param name="parentNode"> Родительский узел. </param>
+        /// <returns> Перечисление дочерних узлов. </returns>
+        public IEnumerable<DialogueNode> GetChildNodes(DialogueNode parentNode)
         {
-#if UNITY_EDITOR
-            if (_nodes.Count == 0) AddNode(CreateDialogueNode(null));
-
-            if (string.IsNullOrEmpty(AssetDatabase.GetAssetPath(this))) return;
-
-            foreach (var node in Nodes)
-                if (string.IsNullOrEmpty(AssetDatabase.GetAssetPath(node)))
-                    AssetDatabase.AddObjectToAsset(node, this);
-#endif
+            foreach (string childId in parentNode.ChildNodes)
+                if (_nodeLookup.TryGetValue(childId, out var childNode))
+                    yield return childNode;
         }
 
-        /// <summary> Действия после десериализации объекта. </summary>
-        public void OnAfterDeserialize()
-        {
-        }
+        /// <summary> Получить дочерние узлы, в которых говорит игрок. </summary>
+        /// <param name="currentNode"> Текущий узел. </param>
+        /// <returns> Дочерние узлы, где говорит игрок. </returns>
+        public IEnumerable<DialogueNode> GetPlayerChildNodes(DialogueNode currentNode) =>
+            GetChildNodes(currentNode).Where(node => node.IsPlayerSpeaking);
+
+        /// <summary> Получить дочерние узлы, в которых говорит NPC. </summary>
+        /// <param name="currentNode"> Текущий узел. </param>
+        /// <returns> Дочерние узлы, где говорит NPC. </returns>
+        public IEnumerable<DialogueNode> GetNpcChildNodes(DialogueNode currentNode) =>
+            GetChildNodes(currentNode).Where(node => !node.IsPlayerSpeaking);
 
 #if UNITY_EDITOR
         /// <summary> Создать новый узел и добавить его к родителю. </summary>
@@ -137,5 +112,28 @@ namespace FlavorfulStory.DialogueSystem
             foreach (var node in Nodes) node.RemoveChild(nodeToDelete.name);
         }
 #endif
+
+        #region ISerializationCallbackReceiver
+
+        /// <summary> Действия перед сериализацией объекта. </summary>
+        public void OnBeforeSerialize()
+        {
+#if UNITY_EDITOR
+            if (_nodes.Count == 0) AddNode(CreateDialogueNode(null));
+
+            if (string.IsNullOrEmpty(AssetDatabase.GetAssetPath(this))) return;
+
+            foreach (var node in Nodes)
+                if (string.IsNullOrEmpty(AssetDatabase.GetAssetPath(node)))
+                    AssetDatabase.AddObjectToAsset(node, this);
+#endif
+        }
+
+        /// <summary> Действия после десериализации объекта. </summary>
+        public void OnAfterDeserialize()
+        {
+        }
+
+        #endregion
     }
 }

@@ -23,6 +23,14 @@ namespace FlavorfulStory.DialogueSystem
         [field: SerializeField]
         public Rect Rect { get; private set; } = new(0, 0, 200, 100);
 
+        /// <summary> Имя действия, вызываемого при входе в этот узел. </summary>
+        [field: SerializeField]
+        public string OnEnterAction { get; private set; }
+
+        /// <summary> Имя действия, вызываемого при выходе из этого узла. </summary>
+        [field: SerializeField]
+        public string OnExitAction { get; private set; }
+
 #if UNITY_EDITOR
         /// <summary> Установить новую позицию узла в редакторе. </summary>
         /// <param name="position"> Новая позиция узла. </param>

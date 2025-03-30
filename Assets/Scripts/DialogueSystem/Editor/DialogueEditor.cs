@@ -245,6 +245,13 @@ namespace FlavorfulStory.DialogueSystem.Editor
         }
 
         /// <summary> Нарисовать кривую Безье со стрелкой на конце. </summary>
+        /// <param name="start"> Начальная точка кривой. </param>
+        /// <param name="end"> Конечная точка кривой. </param>
+        /// <param name="startTangent"> Тангенс начальной точки (управляющая точка для Безье). </param>
+        /// <param name="endTangent"> Тангенс конечной точки (управляющая точка для Безье). </param>
+        /// <param name="color"> Цвет кривой. </param>
+        /// <param name="width"> Толщина линии. </param>
+        /// <param name="arrowSize"> Размер стрелки. </param>
         private static void DrawBezierWithArrow(Vector3 start, Vector3 end, Vector3 startTangent, Vector3 endTangent,
             Color color, float width, float arrowSize)
         {
