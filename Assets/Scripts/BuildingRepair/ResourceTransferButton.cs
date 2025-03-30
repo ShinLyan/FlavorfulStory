@@ -1,6 +1,7 @@
-using UnityEngine;
+using System;
 using FlavorfulStory.InventorySystem;
 using FlavorfulStory.UI;
+using UnityEngine;
 
 namespace FlavorfulStory.BuildingRepair
 {
@@ -15,35 +16,10 @@ namespace FlavorfulStory.BuildingRepair
         private InventoryItem _resource;
 
         /// <summary> Событие, которое вызывается при нажатии на кнопку. </summary>
-        public event System.Action<InventoryItem, ResourceTransferButtonType> OnClick;
-
-        /// <summary> Инициализация кнопки (в данной реализации ничего не делает). </summary>
-        protected override void Initialize()
-        {
-        }
-
-        /// <summary> Вызывается при начале наведения курсора на кнопку (в данной реализации ничего не делает). </summary>
-        protected override void HoverStart()
-        {
-        }
-
-        /// <summary> Вызывается при окончании наведения курсора на кнопку (в данной реализации ничего не делает). </summary>
-        protected override void HoverEnd()
-        {
-        }
+        public event Action<InventoryItem, ResourceTransferButtonType> OnClick;
 
         /// <summary> Обработчик события клика по кнопке. Проверяет наличие ресурса и вызывает событие OnClick. </summary>
         protected override void Click() => OnClick?.Invoke(_resource, _buttonType);
-
-        /// <summary> Вызывается при включении взаимодействия с кнопкой (в данной реализации ничего не делает). </summary>
-        protected override void OnInteractionEnabled()
-        {
-        }
-
-        /// <summary> Вызывается при отключении взаимодействия с кнопкой (в данной реализации ничего не делает). </summary>
-        protected override void OnInteractionDisabled()
-        {
-        }
 
         /// <summary> Устанавливает ресурс для кнопки. </summary>
         /// <param name="resource"> Ресурс, который будет привязан к кнопке. </param>

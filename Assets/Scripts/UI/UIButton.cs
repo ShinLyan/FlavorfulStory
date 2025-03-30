@@ -20,32 +20,7 @@ namespace FlavorfulStory.UI
         /// <summary> Удаляет все слушатели для события клика. </summary>
         public void RemoveAllListeners() => OnClick = null;
 
-        /// <summary> Инициализация кнопки. </summary>
-        protected override void Initialize()
-        {
-        }
-
-        /// <summary> Вызывается при начале наведения курсора на кнопку. </summary>
-        protected override void HoverStart()
-        {
-        }
-
-        /// <summary> Вызывается при окончании наведения курсора на кнопку. </summary>
-        protected override void HoverEnd()
-        {
-        }
-
         /// <summary> Обработчик события клика по кнопке. Вызывает событие OnClick. </summary>
         protected override void Click() => OnClick?.Invoke();
-
-        /// <summary> Вызывается при включении взаимодействия с кнопкой. </summary>
-        protected override void OnInteractionEnabled()
-        {
-        }
-
-        /// <summary> Вызывается при отключении взаимодействия с кнопкой. </summary>
-        protected override void OnInteractionDisabled()
-        {
-        }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using FlavorfulStory.Actions;
 using FlavorfulStory.Actions.Interactables;
+using FlavorfulStory.Control.CursorSystem;
 using FlavorfulStory.InputSystem;
 using FlavorfulStory.InventorySystem;
 using FlavorfulStory.InventorySystem.UI;
@@ -23,6 +24,11 @@ namespace FlavorfulStory.Control
         /// <summary> Панель быстрого доступа, содержащая инвентарь игрока. </summary>
         [Tooltip("Панель быстрого доступа, содержащая инвентарь игрока."), SerializeField]
         private Toolbar _toolbar;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private const float SphereCastRadius = 0.1f;
 
         /// <summary> Передвижение игрока. </summary>
         private PlayerMover _playerMover;
@@ -75,6 +81,8 @@ namespace FlavorfulStory.Control
         {
             HandleInput();
             if (_toolCooldownTimer > 0f) _toolCooldownTimer -= Time.deltaTime;
+            if (InteractWithComponent()) return;
+            CursorController.SetCursor(CursorType.Default);
         }
 
         /// <summary> Обработка пользовательского ввода. </summary>
@@ -83,6 +91,42 @@ namespace FlavorfulStory.Control
             HandleToolbarSelectionInput();
             HandleToolbarUseInput();
             HandleMovementInput();
+        }
+
+        private bool InteractWithComponent()
+        {
+            var hits = SphereCastAllSorted();
+            foreach (var hit in hits)
+            {
+                var cursorInteractables = hit.transform.GetComponents<ICursorInteractable>();
+                foreach (var cursorInteractable in cursorInteractables)
+                    if (cursorInteractable.HandleCursorInteraction(this))
+                    {
+                        CursorController.SetCursor(cursorInteractable.GetCursorType());
+                        return true;
+                    }
+            }
+
+            return false;
+        }
+
+        private RaycastHit[] SphereCastAllSorted()
+        {
+            var hits = Physics.SphereCastAll(GetMouseRay(), SphereCastRadius);
+            float[] distances = new float[hits.Length];
+            for (int i = 0; i < hits.Length; i++) distances[i] = hits[i].distance;
+            Array.Sort(distances, hits);
+            return hits;
+        }
+
+        private static Camera _mainCamera;
+
+        /// <summary> Получить луч основной камеры. </summary>
+        /// <returns> Луч основной камеры. </returns>
+        public static Ray GetMouseRay()
+        {
+            if (!_mainCamera) _mainCamera = Camera.main;
+            return _mainCamera.ScreenPointToRay(InputWrapper.GetMousePosition());
         }
 
         /// <summary> Обработка выбора предмета на панели быстрого доступа. </summary>

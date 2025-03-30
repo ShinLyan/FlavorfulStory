@@ -7,16 +7,16 @@
     {
         /// <summary> Получить элемент, который находится в этом источнике. </summary>
         /// <returns> Элемент, находящийся в данном источнике. </returns>
-        public T GetItem();
-        
+        T GetItem();
+
         /// <summary> Получить количество элементов в источнике. </summary>
         /// <returns> Количество элементов в источнике. </returns>
-        public int GetNumber();
+        int GetNumber();
 
         /// <summary> Удалить указанное количество элементов из источника. </summary>
         /// <param name="number"> Количество удаляемых элементов. </param>
         /// <remarks> Параметр <paramref name="number"/> не должен превышать количество,
         /// возвращаемое методом <c>GetNumber</c>. </remarks>
-        public void RemoveItems(int number);
+        void RemoveItems(int number);
     }
 }

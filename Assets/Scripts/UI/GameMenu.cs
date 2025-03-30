@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using FlavorfulStory.InputSystem;
 using FlavorfulStory.SceneManagement;
 using TMPro;

@@ -6,16 +6,16 @@ namespace FlavorfulStory.Actions.Interactables
     /// <summary> Интерфейс для объектов, с которыми можно взаимодействовать. </summary>
     public interface IInteractable : ITooltipable
     {
-        /// <summary> Проверяет, доступно ли взаимодействие с объектом. </summary>
+        /// <summary> Доступно ли взаимодействие с объектом? </summary>
         /// <returns> Возвращает true, если взаимодействие разрешено. </returns>
-        public bool IsInteractionAllowed { get; }
+        bool IsInteractionAllowed { get; }
 
         /// <summary> Выполняет взаимодействие с объектом. </summary>
-        public void Interact();
+        void Interact();
 
         /// <summary> Вычисляет расстояние до указанного трансформа. </summary>
         /// <param name="otherTransform"> Трансформ объекта, до которого измеряется расстояние. </param>
         /// <returns> Расстояние до указанного трансформа. </returns>
-        public float GetDistanceTo(Transform otherTransform);
+        float GetDistanceTo(Transform otherTransform);
     }
 }

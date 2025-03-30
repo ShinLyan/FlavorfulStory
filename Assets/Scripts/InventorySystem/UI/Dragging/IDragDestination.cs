@@ -10,11 +10,11 @@
         /// <remarks> Если ограничений нет, метод должен возвращать значение <c>Int.MaxValue</c>. </remarks>
         /// <param name="item"> Тип элемента, который потенциально может быть добавлен. </param>
         /// <returns> Максимально допустимое количество элементов. </returns>
-        public int GetMaxAcceptableItemsNumber(T item);
-        
+        int GetMaxAcceptableItemsNumber(T item);
+
         /// <summary> Добавить элементы в это место назначения с обновлением UI и данных. </summary>
         /// <param name="item"> Тип добавляемого элемента. </param>
         /// <param name="number"> Количество добавляемых элементов. </param>
-        public void AddItems(T item, int number);
+        void AddItems(T item, int number);
     }
 }
