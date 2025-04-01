@@ -13,6 +13,14 @@ namespace FlavorfulStory.SceneManagement
         [Tooltip("Объекты, которые выключаются, когда игрок уходит с локации."), SerializeField]
         private GameObject[] _objectsToDisable;
 
+        private Bounds _locationBounds;
+
+        private void Awake()
+        {
+            if (TryGetComponent(out Collider collider))
+                _locationBounds = collider.bounds;
+        }
+
         /// <summary> Включает все объекты локации, отмеченные для активации. </summary>
         public void Enable()
         {
@@ -24,5 +32,7 @@ namespace FlavorfulStory.SceneManagement
         {
             foreach (var objectToDisable in _objectsToDisable) objectToDisable.SetActive(false);
         }
+
+        public bool IsInside(Vector3 position) => _locationBounds.Contains(position);
     }
 }

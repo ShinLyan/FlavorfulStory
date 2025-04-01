@@ -6,7 +6,7 @@ using DateTime = FlavorfulStory.TimeManagement.DateTime;
 namespace FlavorfulStory.AI.FiniteStateMachine
 {
     /// <summary> Состояние рутины NPC, в котором персонаж выполняет действия согласно расписанию. </summary>
-    public class RoutineState : CharacterState
+    public class RoutineState : CharacterState, IScheduleDependable
     {
         #region Variables
 

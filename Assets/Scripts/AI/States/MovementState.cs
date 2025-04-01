@@ -11,7 +11,7 @@ using DateTime = FlavorfulStory.TimeManagement.DateTime;
 namespace FlavorfulStory.AI.FiniteStateMachine
 {
     /// <summary> Состояние движения NPC, в котором персонаж перемещается к заданной точке. </summary>
-    public class MovementState : CharacterState
+    public class MovementState : CharacterState, IScheduleDependable
     {
         #region Variables
 
@@ -59,21 +59,29 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         /// <summary> Инициализирует новое состояние движения. </summary>
         /// <param name="navMeshAgent"> Компонент для навигации по NavMesh. </param>
         /// <param name="warpGraph"> Граф варпов. </param>
-        /// <param name="spawnLocation"> Локация спавна. </param>
+        /// <param name="locations"> Локации. </param>
         /// <param name="animator"> Аниматор. </param>
         /// <param name="npcTransform"> Компонент Transform. </param>
         /// <param name="coroutineRunner"> Проигрыватель корутин. </param>
-        public MovementState(NavMeshAgent navMeshAgent, WarpGraph warpGraph, LocationName spawnLocation,
+        public MovementState(NavMeshAgent navMeshAgent, WarpGraph warpGraph, IEnumerable<Location> locations,
             Animator animator, Transform npcTransform, MonoBehaviour coroutineRunner)
         {
             _navMeshAgent = navMeshAgent;
             _warpGraph = warpGraph;
-            _spawnLocation = spawnLocation;
-            _currentLocation = spawnLocation;
             _animator = animator;
             _currentScheduleParams = null;
             _npcTransform = npcTransform;
             _coroutineRunner = coroutineRunner;
+            _spawnLocation = SetLocationName(locations);
+            _currentLocation = _spawnLocation;
+        }
+
+        private LocationName SetLocationName(IEnumerable<Location> locations)
+        {
+            foreach (var location in locations)
+                if (location.IsInside(_npcTransform.position))
+                    return location.LocationName;
+            return LocationName.Forest;
         }
 
         /// <summary> Вызывается при входе в состояние движения. </summary>

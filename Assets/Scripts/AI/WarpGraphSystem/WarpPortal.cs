@@ -32,6 +32,7 @@ namespace FlavorfulStory.AI.WarpGraphSystem
         /// <summary> Определение локации портала при инициализации. </summary>
         private void Awake() => ParentLocationName = GetComponentInParent<Location>().LocationName;
 
+
         /// <summary> Обработка входа игрока в триггер телепортации. </summary>
         /// <param name="other"> Коллайдер объекта, вошедшего в триггер. </param>
         private void OnTriggerEnter(Collider other)

@@ -1,6 +1,7 @@
 ﻿using FlavorfulStory.AI.FiniteStateMachine;
 using FlavorfulStory.AI.Scheduling;
 using FlavorfulStory.AI.WarpGraphSystem;
+using FlavorfulStory.SceneManagement;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -31,7 +32,8 @@ namespace FlavorfulStory.AI
                 GetComponent<Animator>(),
                 _npcSchedule,
                 transform,
-                this
+                this,
+                FindObjectsByType<Location>(FindObjectsInactive.Include, FindObjectsSortMode.None)
             );
         }
 

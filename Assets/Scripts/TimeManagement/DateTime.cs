@@ -99,7 +99,8 @@ namespace FlavorfulStory.TimeManagement
 
         /// <summary> Преобразует текущую дату в строку. </summary>
         /// <returns> Строковое представление текущей даты. </returns>
-        public string DateToString() => $"{DayOfWeek} {SeasonDay} {Year}";
+        public string DateToString() =>
+            $"Year: {Year}, Season: {Season.ToString()}, Day of week: {DayOfWeek.ToString()}, Day of month: {SeasonDay}";
 
         /// <summary> Преобразует время в строку с учётом выбранного формата отображения. </summary>
         /// <param name="is24HourFormat"> Если true, время отображается в 24-часовом формате (например, "14:05"). 

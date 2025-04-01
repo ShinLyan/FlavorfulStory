@@ -49,32 +49,49 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         /// <summary> Событие изменения текущего расписания. </summary>
         private event Action<ScheduleParams> OnCurrentScheduleParamsChanged;
 
+        /// <summary> Компонент MonoBehaviour от Npc. </summary>
+        private readonly MonoBehaviour _npcMonoBehaviour;
+
         #endregion
 
+        /// <summary> Конструктор контроллера состояний. </summary>
+        /// <param name="navMeshAgent"> Компонент NavMesh. </param>
+        /// <param name="portals"> Порталы. </param>
+        /// <param name="animator"> Компонент Animator. </param>
+        /// <param name="npcSchedule"> Набор расписаний. </param>
+        /// <param name="npcTransform"> Компонент Transform. </param>
+        /// <param name="coroutineRunner"> Проигрыватель корутин. </param>
+        /// <param name="locations"> Локации. </param>
         public StateController(NavMeshAgent navMeshAgent, IEnumerable<WarpPortal> portals, Animator animator,
-            NpcSchedule npcSchedule, Transform npcTransform, MonoBehaviour coroutineRunner)
+            NpcSchedule npcSchedule, Transform npcTransform, MonoBehaviour coroutineRunner,
+            IEnumerable<Location> locations)
         {
             _typeToCharacterStates = new Dictionary<Type, CharacterState>();
             _navMeshAgent = navMeshAgent;
             _sortedScheduleParams = npcSchedule.GetSortedScheduleParams();
             if (_sortedScheduleParams == null) Debug.LogError("SortedScheduleParams is null");
             _spawnPoint = npcTransform.position;
-            InitializeStates(portals, animator, coroutineRunner, npcTransform);
+            _npcMonoBehaviour = coroutineRunner;
+            InitializeStates(portals, animator, coroutineRunner, npcTransform, locations);
 
-            OnCurrentScheduleParamsChanged += UpdateStatesSchedule; //TODO: INTERFACE FOR SCHEDULE
             WorldTime.OnDayEnded += OnReset;
             OnReset(WorldTime.GetCurrentGameTime());
         }
 
-        /// <summary> Инициализировать состоянияю. </summary>
+        /// <summary> Инициализировать состояния. </summary>
+        /// <param name="portals"> Порталы. </param>
+        /// <param name="animator"> Компонент Animator. </param>
+        /// <param name="coroutineRunner"> Проигрыватель корутин. </param>
+        /// <param name="npcTransform"> Компонент Transform. </param>
+        /// <param name="locations"> Локации. </param>
         private void InitializeStates(IEnumerable<WarpPortal> portals, Animator animator,
-            MonoBehaviour coroutineRunner, Transform npcTransform)
+            MonoBehaviour coroutineRunner, Transform npcTransform, IEnumerable<Location> locations)
         {
             _interactionState = new InteractionState();
             _movementState = new MovementState(
                 _navMeshAgent,
                 WarpGraph.Build(portals),
-                LocationName.Forest, // TODO: LOCATION
+                locations,
                 animator,
                 npcTransform,
                 coroutineRunner
@@ -87,6 +104,9 @@ namespace FlavorfulStory.AI.FiniteStateMachine
             {
                 _typeToCharacterStates.Add(state.GetType(), state);
                 state.OnStateChangeRequested += SetState;
+
+                if (state is IScheduleDependable dependable)
+                    OnCurrentScheduleParamsChanged += dependable.SetCurrentScheduleParams;
             }
         }
 
@@ -135,15 +155,9 @@ namespace FlavorfulStory.AI.FiniteStateMachine
                     return;
                 }
 
-            Debug.LogError("На текущую дату не подходит ни одно расписание!");
-        }
-
-        /// <summary> Обновить расписание в состояниях. </summary>
-        /// <param name="newScheduleParams"> Новое расписание. </param>
-        private void UpdateStatesSchedule(ScheduleParams newScheduleParams)
-        {
-            _routineState.SetCurrentScheduleParams(newScheduleParams);
-            _movementState.SetCurrentScheduleParams(newScheduleParams);
+            Debug.LogError(
+                $"На текущую дату ({currentTime.DateToString()}) не подходит ни одно расписание у НПС: {_npcMonoBehaviour.name}");
+            OnCurrentScheduleParamsChanged?.Invoke(null);
         }
     }
 }
