@@ -150,7 +150,7 @@ GameObject:
   - component: {fileID: 3819153882611237840}
   - component: {fileID: 2980101029542535840}
   m_Layer: 5
-  m_Name: BuildingRepairCanvas
+  m_Name: BuildingRepairView
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -253,8 +253,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _objectNameText: {fileID: 6504815465646436196}
   _repairCompletedText: {fileID: 8686139902825881009}
-  _requirementViewPrefab: {fileID: 0}
-  _requirementViewsContainer: {fileID: 0}
+  _requirementViewPrefab: {fileID: 8107993037165025684, guid: 5749c982e2521b24b9546ef7bf59b5d9,
+    type: 3}
+  _requirementViewsContainer: {fileID: 8800185379289686496}
 --- !u!1 &3094879986224751104
 GameObject:
   m_ObjectHideFlags: 0
@@ -757,7 +758,7 @@ GameObject:
   - component: {fileID: 8800185379289686496}
   - component: {fileID: 41541744926130788}
   m_Layer: 5
-  m_Name: ResourceRequirements
+  m_Name: RequirementViewsContainer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1175,7 +1176,7 @@ PrefabInstance:
     - target: {fileID: 3336740871693969319, guid: 5749c982e2521b24b9546ef7bf59b5d9,
         type: 3}
       propertyPath: m_Name
-      value: ResourceRequirement
+      value: RequirementView
       objectReference: {fileID: 0}
     - target: {fileID: 6969688490521398588, guid: 5749c982e2521b24b9546ef7bf59b5d9,
         type: 3}
@@ -1299,7 +1300,7 @@ PrefabInstance:
     - target: {fileID: 3336740871693969319, guid: 5749c982e2521b24b9546ef7bf59b5d9,
         type: 3}
       propertyPath: m_Name
-      value: ResourceRequirement (2)
+      value: RequirementView
       objectReference: {fileID: 0}
     - target: {fileID: 6969688490521398588, guid: 5749c982e2521b24b9546ef7bf59b5d9,
         type: 3}
@@ -1423,7 +1424,7 @@ PrefabInstance:
     - target: {fileID: 3336740871693969319, guid: 5749c982e2521b24b9546ef7bf59b5d9,
         type: 3}
       propertyPath: m_Name
-      value: ResourceRequirement (3)
+      value: RequirementView
       objectReference: {fileID: 0}
     - target: {fileID: 6969688490521398588, guid: 5749c982e2521b24b9546ef7bf59b5d9,
         type: 3}
@@ -1547,7 +1548,7 @@ PrefabInstance:
     - target: {fileID: 3336740871693969319, guid: 5749c982e2521b24b9546ef7bf59b5d9,
         type: 3}
       propertyPath: m_Name
-      value: ResourceRequirement (1)
+      value: RequirementView
       objectReference: {fileID: 0}
     - target: {fileID: 6969688490521398588, guid: 5749c982e2521b24b9546ef7bf59b5d9,
         type: 3}

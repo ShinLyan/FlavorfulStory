@@ -10,8 +10,8 @@ namespace FlavorfulStory.DialogueSystem
     [CreateAssetMenu(menuName = "FlavorfulStory/Dialogue")]
     public class Dialogue : ScriptableObject, ISerializationCallbackReceiver
     {
-        /// <summary> Узлы диалога. </summary>
-        [SerializeField] private List<DialogueNode> _nodes = new();
+        /// <summary> Узлы диалога. </summary> 
+        [SerializeField, HideInInspector] private List<DialogueNode> _nodes = new();
 
         /// <summary> Словарь для поиска узлов по идентификатору. </summary>
         private readonly Dictionary<string, DialogueNode> _nodeLookup = new();
@@ -101,13 +101,16 @@ namespace FlavorfulStory.DialogueSystem
             Undo.RecordObject(this, "Deleted Dialogue Node");
             _nodes.Remove(nodeToDelete);
             RebuildNodeLookup();
-            RemoveDanglingChildren(nodeToDelete);
+            RemoveNodeReferences(nodeToDelete);
             Undo.DestroyObjectImmediate(nodeToDelete);
         }
 
-        /// <summary> Удалить связи удаленного узла с другими узлами. </summary>
-        /// <param name="nodeToDelete"> Удаляемый узел. </param>
-        private void RemoveDanglingChildren(DialogueNode nodeToDelete)
+        /// <summary> Удалить все ссылки на указанный узел из других узлов. </summary>
+        /// <param name="nodeToDelete"> Узел, который необходимо полностью удалить из графа,
+        /// включая все входящие ссылки. </param>
+        /// <remarks> Проходится по всем дочерним узлам и удаляет из них все связи, указывающие на удаляемый узел.
+        /// После вызова метода другие узлы больше не будут ссылаться на <paramref name="nodeToDelete"/>. </remarks>
+        private void RemoveNodeReferences(DialogueNode nodeToDelete)
         {
             foreach (var node in Nodes) node.RemoveChild(nodeToDelete.name);
         }
@@ -130,9 +133,7 @@ namespace FlavorfulStory.DialogueSystem
         }
 
         /// <summary> Действия после десериализации объекта. </summary>
-        public void OnAfterDeserialize()
-        {
-        }
+        public void OnAfterDeserialize() { }
 
         #endregion
     }

@@ -1,4 +1,5 @@
 using System.Collections;
+using FlavorfulStory.Control;
 using UnityEngine;
 
 namespace FlavorfulStory.Actions.Interactables
@@ -13,8 +14,8 @@ namespace FlavorfulStory.Actions.Interactables
         [Tooltip("Плод собираемого объекта."), SerializeField]
         private GameObject _fruit;
 
-        /// <summary> Кулдаун сбора. </summary>
-        [Tooltip("Кулдаун сбора ресурса/предмета"), SerializeField]
+        /// <summary> Перезарядка сбора. </summary>
+        [Tooltip("Перезарядка сбора ресурса/предмета"), SerializeField]
         private float _harvestCooldown;
 
         /// <summary> Флаг возможности взаимодействия с объектом. </summary>
@@ -25,7 +26,7 @@ namespace FlavorfulStory.Actions.Interactables
         public override bool IsInteractionAllowed
         {
             get => _isInteractionAllowed;
-            set
+            protected set
             {
                 _isInteractionAllowed = value;
                 if (_fruit) _fruit.SetActive(_isInteractionAllowed);
@@ -33,9 +34,9 @@ namespace FlavorfulStory.Actions.Interactables
         }
 
         /// <summary> Собрать предмет/ресурс. </summary>
-        public override void Interact()
+        public override void Interact(PlayerController player)
         {
-            base.Interact();
+            base.Interact(player);
             StartCoroutine(EnableInteractionAfterCooldown());
         }
 

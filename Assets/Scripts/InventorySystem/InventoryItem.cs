@@ -52,9 +52,7 @@ namespace FlavorfulStory.InventorySystem
         }
 
         /// <summary> Требуется для ISerializationCallbackReceiver, но нам не нужно ничего с ним делать. </summary>
-        public void OnAfterDeserialize()
-        {
-        }
+        public void OnAfterDeserialize() { }
 
         #endregion
     }

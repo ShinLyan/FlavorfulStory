@@ -14,9 +14,9 @@ namespace FlavorfulStory.AI.States
         [field: Tooltip("Доступен ли NPC для романтических отношений."), SerializeField]
         public bool IsRomanceable { get; private set; }
 
-        /// <summary> Объект предпросмотра диалога (может отображаться в UI или для отладки). </summary>
-        [field: Tooltip("Объект предпросмотра диалога (например, иконка или модель для UI)."), SerializeField]
-        public GameObject DialoguePreviewObject { get; private set; }
+        /// <summary> Представление персонажа в диалоге (например, иконка или 3d модель). </summary>
+        [field: Tooltip("Представление персонажа в диалоге."), SerializeField]
+        public GameObject NpcDialogueView { get; private set; }
 
         /// <summary> Иконка NPC для отображения в UI. </summary>
         [field: Tooltip("Иконка NPC для отображения в пользовательском интерфейсе (например, на мини-карте)."),

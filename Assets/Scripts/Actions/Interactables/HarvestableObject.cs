@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using FlavorfulStory.Control;
 using FlavorfulStory.InventorySystem;
 using UnityEngine;
 
@@ -20,8 +21,10 @@ namespace FlavorfulStory.Actions.Interactables
         // TODO: Возможно надо будет выпилить и сделать нормально, более универсально
         [SerializeField] private string _description = "Press E, if hungry";
 
+        #region IInteractable
+
         /// <summary> Свойство возможности взаимодействия с объектом. </summary>
-        public virtual bool IsInteractionAllowed { get; set; } = true;
+        public virtual bool IsInteractionAllowed { get; protected set; } = true;
 
         /// <summary> Получить расстояние до другого трансформа. </summary>
         /// <param name="otherTransform"> Трансформ объекта, до которого вычисляется расстояние. </param>
@@ -29,30 +32,42 @@ namespace FlavorfulStory.Actions.Interactables
         public float GetDistanceTo(Transform otherTransform) =>
             Vector3.Distance(transform.position, otherTransform.position);
 
+        public void BeginInteraction(PlayerController player)
+        {
+            if (!IsInteractionAllowed) return;
+
+            player.TriggerAnimation(AnimationType.Gather);
+        }
+
         /// <summary> Выполнить взаимодействие с объектом. </summary>
-        public virtual void Interact()
+        public virtual void Interact(PlayerController player)
         {
             if (!IsInteractionAllowed) return;
 
             IsInteractionAllowed = false;
+
             foreach (var dropItem in _harvestItems)
                 Inventory.PlayerInventory.TryAddToFirstAvailableSlot(dropItem.ItemPrefab, dropItem.Quantity);
         }
 
-        #region TooltipBehaviour
+        public void EndInteraction(PlayerController player) { }
+
+        #endregion
+
+        #region ITooltipable
 
         /// <summary> Получить название для тултипа. </summary>
         /// <returns> Название объекта. </returns>
-        public string GetTooltipTitle() => _name;
+        public string TooltipTitle => _name;
 
         /// <summary> Получить описание для тултипа. </summary>
         /// <returns> Описание объекта. </returns>
-        public string GetTooltipDescription() => _description;
+        public string TooltipDescription => _description;
 
         /// <summary> Получить позицию объекта в мировых координатах. </summary>
         /// <returns> Мировая позиция объекта. </returns>
-        public Vector3 GetWorldPosition() => this == null ? Vector3.zero : transform.position;
-    }
+        public Vector3 WorldPosition => !this ? Vector3.zero : transform.position;
 
-    #endregion
+        #endregion
+    }
 }

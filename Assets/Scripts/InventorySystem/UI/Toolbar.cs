@@ -40,10 +40,7 @@ namespace FlavorfulStory.InventorySystem.UI
         }
 
         /// <summary> Обрабатывает ввод колесика мыши в каждом кадре. </summary>
-        private void Update()
-        {
-            HandleMouseScrollInput();
-        }
+        private void Update() => HandleMouseScrollInput();
 
         /// <summary> Сбрасывает состояние выделения всех слотов панели инструментов. </summary>
         private void ResetToolbar()

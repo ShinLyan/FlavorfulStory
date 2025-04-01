@@ -33,11 +33,13 @@ namespace FlavorfulStory.UI
                 _isInteractable = value;
                 if (_isInteractable)
                 {
+                    if (!ButtonImage) ButtonImage = GetComponent<Image>();
                     ButtonImage.CrossFadeColor(_interactionEnabledColor, 0.01f, true, false);
                     OnInteractionEnabled();
                 }
                 else
                 {
+                    if (!ButtonImage) ButtonImage = GetComponent<Image>();
                     ButtonImage.CrossFadeColor(_interactionDisabledColor, 0.01f, true, false);
                     IsMouseOver = false;
                     HoverEnd();
@@ -61,34 +63,22 @@ namespace FlavorfulStory.UI
         }
 
         /// <summary> Метод инициализации, который должен быть реализован в дочерних классах. </summary>
-        protected virtual void Initialize()
-        {
-        }
+        protected virtual void Initialize() { }
 
         /// <summary> Действие при наведении курсора на кнопку. </summary>
-        protected virtual void HoverStart()
-        {
-        }
+        protected virtual void HoverStart() { }
 
         /// <summary> Действие при уходе курсора с кнопки. </summary>
-        protected virtual void HoverEnd()
-        {
-        }
+        protected virtual void HoverEnd() { }
 
         /// <summary> Действие при клике на кнопку. </summary>
-        protected virtual void Click()
-        {
-        }
+        protected virtual void Click() { }
 
         /// <summary> Вызывается при включении взаимодействия. </summary>
-        protected virtual void OnInteractionEnabled()
-        {
-        }
+        protected virtual void OnInteractionEnabled() { }
 
         /// <summary> Вызывается при выключении взаимодействия. </summary>
-        protected virtual void OnInteractionDisabled()
-        {
-        }
+        protected virtual void OnInteractionDisabled() { }
 
         /// <summary> Вызывается при клике на кнопку. </summary>
         /// <param name="eventData"> Данные события клика. </param>

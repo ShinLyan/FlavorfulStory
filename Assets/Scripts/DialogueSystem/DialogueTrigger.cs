@@ -20,7 +20,7 @@ namespace FlavorfulStory.DialogueSystem
 
             foreach (var dialogueEvent in DialogueEvents.Where(dialogueEvent =>
                          dialogueEvent.ActionName == actionToTrigger))
-                dialogueEvent.OnTriggered?.Invoke();
+                dialogueEvent.OnTrigger?.Invoke();
         }
     }
 }

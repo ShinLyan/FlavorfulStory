@@ -1,5 +1,72 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &4077371235678234943
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6534723508259446912}
+  - component: {fileID: 1364109224960208815}
+  - component: {fileID: 468311781800477114}
+  m_Layer: 0
+  m_Name: InteractionController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6534723508259446912
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4077371235678234943}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4994206146913357757}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &1364109224960208815
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4077371235678234943}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 8
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 1
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1.5, y: 2, z: 1.5}
+  m_Center: {x: 0, y: 1, z: 0}
+--- !u!114 &468311781800477114
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4077371235678234943}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 56725fc63c93a8240a4146a5ea94263e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _tooltipView: {fileID: 0}
 --- !u!1001 &3960271142364864290
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -437,7 +504,7 @@ PrefabInstance:
     - target: {fileID: 8339340054995701919, guid: b78da40e1e8265344bc64d80efddd24b,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -25.23
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8339340054995701919, guid: b78da40e1e8265344bc64d80efddd24b,
         type: 3}
@@ -447,7 +514,7 @@ PrefabInstance:
     - target: {fileID: 8339340054995701919, guid: b78da40e1e8265344bc64d80efddd24b,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: -11.25
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8339340054995701919, guid: b78da40e1e8265344bc64d80efddd24b,
         type: 3}
@@ -541,7 +608,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 8339340054995701919, guid: b78da40e1e8265344bc64d80efddd24b,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6534723508259446912}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 8113930228413350172, guid: b78da40e1e8265344bc64d80efddd24b,
         type: 3}
@@ -588,6 +659,12 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 3960271142364864290}
   m_PrefabAsset: {fileID: 0}
+--- !u!4 &4994206146913357757 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 8339340054995701919, guid: b78da40e1e8265344bc64d80efddd24b,
+    type: 3}
+  m_PrefabInstance: {fileID: 3960271142364864290}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &5075500785383677502 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8113930228413350172, guid: b78da40e1e8265344bc64d80efddd24b,
@@ -615,7 +692,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _toolbar: {fileID: 0}
-  _toolCooldown: 1.5
+  _isBusy: 0
+  _interactionController: {fileID: 0}
+  InteractionDistance: 1.8
 --- !u!114 &4395527661552930977
 MonoBehaviour:
   m_ObjectHideFlags: 0

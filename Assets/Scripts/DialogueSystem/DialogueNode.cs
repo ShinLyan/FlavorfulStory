@@ -8,28 +8,24 @@ namespace FlavorfulStory.DialogueSystem
     public class DialogueNode : ScriptableObject
     {
         /// <summary> Говорит ли игрок в данном узле диалога? </summary>
-        [field: SerializeField]
-        public bool IsPlayerSpeaking { get; private set; }
+        [field: SerializeField] public bool IsPlayerSpeaking { get; private set; }
 
         /// <summary> Текст, отображаемый в узле диалога. </summary>
         [field: SerializeField, TextArea(3, 5)]
         public string Text { get; private set; } = "Dialogue Text";
 
         /// <summary> Список идентификаторов дочерних узлов. </summary>
-        [field: SerializeField]
+        [field: SerializeField, HideInInspector]
         public List<string> ChildNodes { get; private set; } = new();
 
         /// <summary> Позиция и размер узла в редакторе. </summary>
-        [field: SerializeField]
-        public Rect Rect { get; private set; } = new(0, 0, 200, 100);
+        [field: SerializeField] public Rect Rect { get; private set; } = new(0, 0, 200, 100);
 
         /// <summary> Имя действия, вызываемого при входе в этот узел. </summary>
-        [field: SerializeField]
-        public string EnterActionName { get; private set; }
+        [field: SerializeField] public string EnterActionName { get; private set; }
 
         /// <summary> Имя действия, вызываемого при выходе из этого узла. </summary>
-        [field: SerializeField]
-        public string ExitActionName { get; private set; }
+        [field: SerializeField] public string ExitActionName { get; private set; }
 
 #if UNITY_EDITOR
         /// <summary> Установить новую позицию узла в редакторе. </summary>

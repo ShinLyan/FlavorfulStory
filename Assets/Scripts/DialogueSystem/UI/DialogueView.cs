@@ -41,13 +41,13 @@ namespace FlavorfulStory.DialogueSystem.UI
             _playerSpeaker = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerSpeaker>();
             _nextButton.onClick.AddListener(OnClickNextDialogue);
             _playerSpeaker.OnConversationUpdated += UpdateView;
-
-            // TODO: УБРАТЬ
-            UpdateView();
         }
 
+        /// <summary> При старте обновляем отображение. </summary>
+        private void Start() => UpdateView();
+
         /// <summary> Обработчик нажатия на кнопку перехода к следующей реплике. </summary>
-        private void OnClickNextDialogue() => _playerSpeaker.NextDialogue();
+        private void OnClickNextDialogue() => _playerSpeaker.PlayNextDialogueNode();
 
         /// <summary> Обновить отображение в зависимости от состояния диалога. </summary>
         private void UpdateView()

@@ -1,6 +1,5 @@
 ﻿using System;
 using FlavorfulStory.Actions;
-using FlavorfulStory.Actions.Interactables;
 using FlavorfulStory.Control.CursorSystem;
 using FlavorfulStory.InputSystem;
 using FlavorfulStory.InventorySystem;
@@ -18,17 +17,12 @@ namespace FlavorfulStory.Control
     {
         #region Fields and Properties
 
-        /// <summary> Занят ли игрок? </summary>2
-        private bool _isBusy;
-
         /// <summary> Панель быстрого доступа, содержащая инвентарь игрока. </summary>
         [Tooltip("Панель быстрого доступа, содержащая инвентарь игрока."), SerializeField]
         private Toolbar _toolbar;
 
-        /// <summary>
-        /// 
-        /// </summary>
-        private const float SphereCastRadius = 0.1f;
+        /// <summary> Занят ли игрок? </summary>2
+        private bool _isBusy;
 
         /// <summary> Передвижение игрока. </summary>
         private PlayerMover _playerMover;
@@ -37,14 +31,17 @@ namespace FlavorfulStory.Control
         private Animator _animator;
 
         /// <summary> Взаимодействие игрока с объектами. </summary>
-        private InteractFeature _interactFeature;
+        private InteractionController _interactionController;
+
+        #region Tools
 
         /// <summary> Обработчик инструмента. </summary>
         private ToolHandler _toolHandler;
 
-        #region Tools
-
-        [SerializeField, Range(1f, 5f)] private float _toolCooldown = 1.5f;
+        /// <summary>
+        /// 
+        /// </summary>
+        private const float ToolCooldown = 1.5f;
 
         /// <summary> Таймер перезарядки использования инструмента. </summary>
         private float _toolCooldownTimer;
@@ -60,8 +57,12 @@ namespace FlavorfulStory.Control
         /// <summary> Текущий выбранный предмет из панели быстрого доступа. </summary>
         private InventoryItem CurrentItem => _toolbar?.SelectedItem;
 
-        /// <summary> Событие, вызываемое при окончании взаимодействия с объектом. </summary>
-        public event Action OnInteractionEnded;
+        /// <summary> Находится ли объект в радиусе досягаемости игрока? </summary>
+        public bool IsPlayerInRange(Vector3 targetPosition)
+        {
+            const float InteractionDistance = 1.8f;
+            return Vector3.Distance(transform.position, targetPosition) <= InteractionDistance;
+        }
 
         #endregion
 
@@ -70,8 +71,8 @@ namespace FlavorfulStory.Control
         {
             _playerMover = GetComponent<PlayerMover>();
             _animator = GetComponent<Animator>();
-            _interactFeature = GetComponentInChildren<InteractFeature>();
-            _interactFeature.SetInteractionActions(() => SetBusyState(true), () => SetBusyState(false));
+            _interactionController = GetComponentInChildren<InteractionController>();
+            _interactionController.SetInteractionActions(() => SetBusyState(true), () => SetBusyState(false));
             _toolHandler = GetComponent<ToolHandler>();
             _toolHandler.SetUnequipAction(() => SetBusyState(false));
         }
@@ -100,9 +101,9 @@ namespace FlavorfulStory.Control
             {
                 var cursorInteractables = hit.transform.GetComponents<ICursorInteractable>();
                 foreach (var cursorInteractable in cursorInteractables)
-                    if (cursorInteractable.HandleCursorInteraction(this))
+                    if (cursorInteractable.TryInteractWithCursor(this))
                     {
-                        CursorController.SetCursor(cursorInteractable.GetCursorType());
+                        CursorController.SetCursor(cursorInteractable.CursorType);
                         return true;
                     }
             }
@@ -110,8 +111,9 @@ namespace FlavorfulStory.Control
             return false;
         }
 
-        private RaycastHit[] SphereCastAllSorted()
+        private static RaycastHit[] SphereCastAllSorted()
         {
+            const float SphereCastRadius = 0.1f;
             var hits = Physics.SphereCastAll(GetMouseRay(), SphereCastRadius);
             float[] distances = new float[hits.Length];
             for (int i = 0; i < hits.Length; i++) distances[i] = hits[i].distance;
@@ -123,7 +125,7 @@ namespace FlavorfulStory.Control
 
         /// <summary> Получить луч основной камеры. </summary>
         /// <returns> Луч основной камеры. </returns>
-        public static Ray GetMouseRay()
+        private static Ray GetMouseRay()
         {
             if (!_mainCamera) _mainCamera = Camera.main;
             return _mainCamera.ScreenPointToRay(InputWrapper.GetMousePosition());
@@ -160,7 +162,7 @@ namespace FlavorfulStory.Control
 
             StartUsingItem(usable);
             if (usable is EdibleInventoryItem) ConsumeEdibleItem();
-            _toolCooldownTimer = _toolCooldown;
+            _toolCooldownTimer = ToolCooldown;
         }
 
         /// <summary> Начать использование предмета. </summary>
@@ -185,11 +187,12 @@ namespace FlavorfulStory.Control
         /// <summary> Задать состояние занятости игрока. </summary>
         /// <param name="state"> Состояние. </param>
         /// <remarks> Когда игрок занят - не может использовать инструмент или взаимодействовать с окружением. </remarks>
-        private void SetBusyState(bool state)
+        public void SetBusyState(bool state)
         {
             _isBusy = state;
-            _interactFeature.SetInteractionState(state);
             _toolbar.SetInteractableState(!state);
+            if (state) InputWrapper.BlockAllInput();
+            else InputWrapper.UnblockAllInput();
         }
 
         /// <summary> Обработка передвижения. </summary>
@@ -207,11 +210,20 @@ namespace FlavorfulStory.Control
 
         /// <summary> Завершение взаимодействия. </summary>
         /// <remarks> Метод подписан на событие в анимации игрока (Gather_interaction). </remarks>
-        private void EndInteraction() => OnInteractionEnded?.Invoke();
+        private void EndInteraction() => _interactionController.EndInteraction();
 
-        /// <summary> Запуск анимации. </summary>
-        /// <param name="animationName"> Название анимации. </param>
-        public void TriggerAnimation(string animationName) => _animator.SetTrigger(animationName);
+        /// <summary> Запустить анимацию. </summary>
+        /// <param name="animationType"> Тип проигрываемой анимации.</param>
+        public void TriggerAnimation(AnimationType animationType)
+        {
+            string animationName = animationType.ToString();
+            _animator.SetTrigger(Animator.StringToHash(animationName));
+        }
+
+        /// <summary> Запустить анимацию. </summary>
+        /// <param name="animationName"> Тип проигрываемой анимации.</param>
+        public void TriggerAnimation(string animationName) =>
+            _animator.SetTrigger(Animator.StringToHash(animationName));
 
         /// <summary> Повернуть игрока в направлении указанной позиции. </summary>
         /// <param name="position"> Позиция для поворота. </param>

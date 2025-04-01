@@ -7,14 +7,14 @@ namespace FlavorfulStory.TooltipSystem
     {
         /// <summary> Возвращает заголовок тултипа. </summary>
         /// <returns> Строка с заголовком тултипа. </returns>
-        public string GetTooltipTitle();
+        string TooltipTitle { get; }
 
         /// <summary> Возвращает описание тултипа. </summary>
         /// <returns> Строка с описанием тултипа. </returns>
-        public string GetTooltipDescription();
+        string TooltipDescription { get; }
 
         /// <summary> Возвращает мировую позицию объекта. </summary>
         /// <returns> Вектор позиции объекта в мировых координатах. </returns>
-        public Vector3 GetWorldPosition();
+        Vector3 WorldPosition { get; }
     }
 }

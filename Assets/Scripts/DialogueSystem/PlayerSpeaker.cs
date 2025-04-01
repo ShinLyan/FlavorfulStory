@@ -43,8 +43,8 @@ namespace FlavorfulStory.DialogueSystem
         /// <returns> Текст текущей реплики или пустая строка, если диалог не активен. </returns>
         public string GetText() => _currentNode ? _currentNode.Text : string.Empty;
 
-        /// <summary> Перейти к следующему узлу диалога. </summary>
-        public void NextDialogue()
+        /// <summary> Воспроизвести следующий узел диалога. </summary>
+        public void PlayNextDialogueNode()
         {
             // Если есть выбор для игрока — перейти в режим выбора
             if (_currentDialogue.GetPlayerChildNodes(_currentNode).Any())
@@ -85,7 +85,7 @@ namespace FlavorfulStory.DialogueSystem
             _currentNode = chosenNode;
             TriggerEnterAction();
             IsChoosingDialogue = false;
-            NextDialogue();
+            PlayNextDialogueNode();
         }
 
         /// <summary> Завершить текущий диалог. </summary>

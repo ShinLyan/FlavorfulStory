@@ -5,11 +5,12 @@
     {
         /// <summary> Возвращает тип курсора, который должен отображаться при наведении на объект. </summary>
         /// <returns> Тип курсора (например, указатель, рука и т.д.). </returns>
-        CursorType GetCursorType();
+        CursorType CursorType { get; }
 
-        /// <summary> Обрабатывает взаимодействие с объектом при наведении курсора и действии игрока. </summary>
+        /// <summary> Пытается выполнить взаимодействие с объектом при наведении курсора. </summary>
         /// <param name="controller"> Контроллер игрока, выполняющий взаимодействие. </param>
-        /// <returns> True, если взаимодействие успешно обработано. </returns>
-        bool HandleCursorInteraction(PlayerController controller);
+        /// <returns> <c>true</c> — взаимодействие успешно обработано и курсор должен быть заменён на указанный
+        /// для этого объекта. <c>false</c> — объект не требует замены курсора в текущем контексте. </returns>
+        bool TryInteractWithCursor(PlayerController controller);
     }
 }
