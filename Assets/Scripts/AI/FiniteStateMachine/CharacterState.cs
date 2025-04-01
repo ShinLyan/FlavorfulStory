@@ -6,7 +6,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine
     /// Определяет основные методы, которые должны быть реализованы в производных классах. </summary>
     public abstract class CharacterState
     {
-        // Событие для запроса смены состояния
+        // <summary> Событие для запроса смены состояния </summary>
         public event Action<Type> OnStateChangeRequested;
 
         /// <summary> Вызывается при входе в состояние. Должен быть переопределен в производных классах

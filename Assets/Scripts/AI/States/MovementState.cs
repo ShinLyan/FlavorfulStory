@@ -33,16 +33,22 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         /// <summary> Текущая точка маршрута, к которой движется NPC. </summary>
         private SchedulePoint _currentPoint;
 
+        /// <summary> Текущая локация. </summary>
         private LocationName _currentLocation;
+
+        /// <summary> Локация спавна. </summary>
         private readonly LocationName _spawnLocation;
 
+        /// <summary> Текущее расписание. </summary>  
         private ScheduleParams _currentScheduleParams;
 
         /// <summary> Текущая скорость NPC, используемая для анимации. </summary>
         private float _speed;
 
+        /// <summary> Компонент Transform. </summary>
         private readonly Transform _npcTransform;
 
+        /// <summary> Проигрыватель корутин. </summary>
         private readonly MonoBehaviour _coroutineRunner;
 
         /// <summary> Хэшированное значение параметра "скорость" для анимации. </summary>
@@ -53,7 +59,10 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         /// <summary> Инициализирует новое состояние движения. </summary>
         /// <param name="navMeshAgent"> Компонент для навигации по NavMesh. </param>
         /// <param name="warpGraph"> Граф варпов. </param>
-        /// <param name="spawnLocation"> </param>
+        /// <param name="spawnLocation"> Локация спавна. </param>
+        /// <param name="animator"> Аниматор. </param>
+        /// <param name="npcTransform"> Компонент Transform. </param>
+        /// <param name="coroutineRunner"> Проигрыватель корутин. </param>
         public MovementState(NavMeshAgent navMeshAgent, WarpGraph warpGraph, LocationName spawnLocation,
             Animator animator, Transform npcTransform, MonoBehaviour coroutineRunner)
         {
@@ -80,6 +89,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine
             WorldTime.OnTimeUpdated -= FindDestinationPoint;
         }
 
+        /// <summary> Обновить состояние. </summary>
         public override void Reset()
         {
             StopCoroutine();
@@ -99,8 +109,6 @@ namespace FlavorfulStory.AI.FiniteStateMachine
             if (_currentPoint == null) return;
             SwitchStateIfPointReached();
         }
-
-        public void SetCurrentScheduleParams(ScheduleParams scheduleParams) => _currentScheduleParams = scheduleParams;
 
         /// <summary> Проверяет, достиг ли NPC текущей точки, и переключает состояние, если это так. </summary>
         private void SwitchStateIfPointReached()
@@ -127,13 +135,10 @@ namespace FlavorfulStory.AI.FiniteStateMachine
             if (_currentPoint == closestPoint) return;
 
             StopCoroutine();
-
             _currentPoint = closestPoint;
 
-            if (_currentLocation != closestPoint.LocationName)
-                HandleWarpTransition(closestPoint);
-            else
-                _navMeshAgent.SetDestination(closestPoint.Position);
+            if (_currentLocation != closestPoint.LocationName) HandleWarpTransition(closestPoint);
+            else _navMeshAgent.SetDestination(closestPoint.Position);
         }
 
         /// <summary> Обрабатывает переход NPC через варпы между локациями. </summary>
@@ -204,6 +209,10 @@ namespace FlavorfulStory.AI.FiniteStateMachine
             _coroutineRunner.StopCoroutine(_currentPathCoroutine);
             _currentPathCoroutine = null;
         }
+
+        /// <summary> Установить новое расписание. </summary>
+        /// <param name="scheduleParams"> Новое расписание. </param>
+        public void SetCurrentScheduleParams(ScheduleParams scheduleParams) => _currentScheduleParams = scheduleParams;
 
         /// <summary> Воспроизведение анимации движения. </summary>
         /// <param name="speed"> Скорость движения. </param>

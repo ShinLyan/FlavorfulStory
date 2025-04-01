@@ -59,7 +59,6 @@ namespace FlavorfulStory.AI.FiniteStateMachine
             _sortedScheduleParams = npcSchedule.GetSortedScheduleParams();
             if (_sortedScheduleParams == null) Debug.LogError("SortedScheduleParams is null");
             _spawnPoint = npcTransform.position;
-
             InitializeStates(portals, animator, coroutineRunner, npcTransform);
 
             OnCurrentScheduleParamsChanged += UpdateStatesSchedule; //TODO: INTERFACE FOR SCHEDULE
@@ -119,7 +118,6 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         {
             PrioritiseSchedule(currentTime);
             ResetStates();
-            // CurrentLocationName = _spawnLocation;
             _navMeshAgent.Warp(_spawnPoint);
         }
 
@@ -133,8 +131,6 @@ namespace FlavorfulStory.AI.FiniteStateMachine
             foreach (var param in _sortedScheduleParams)
                 if (param.AreConditionsSuitable(currentTime, param.Hearts, isRaining))
                 {
-                    //     CurrentScheduleParams = param;
-                    Debug.Log("SUITABALE");
                     OnCurrentScheduleParamsChanged?.Invoke(param);
                     return;
                 }
@@ -142,6 +138,8 @@ namespace FlavorfulStory.AI.FiniteStateMachine
             Debug.LogError("На текущую дату не подходит ни одно расписание!");
         }
 
+        /// <summary> Обновить расписание в состояниях. </summary>
+        /// <param name="newScheduleParams"> Новое расписание. </param>
         private void UpdateStatesSchedule(ScheduleParams newScheduleParams)
         {
             _routineState.SetCurrentScheduleParams(newScheduleParams);

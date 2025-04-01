@@ -8,12 +8,18 @@ namespace FlavorfulStory.AI.FiniteStateMachine
     /// <summary> Состояние рутины NPC, в котором персонаж выполняет действия согласно расписанию. </summary>
     public class RoutineState : CharacterState
     {
+        #region Variables
+
+        /// <summary> Компонент Animator. </summary>
         private readonly Animator _animator;
 
         /// <summary> Текущая точка расписания, в которой находится NPC. </summary>
         private SchedulePoint _currentPoint;
 
+        /// <summary> Текущее расписание. </summary>  
         private ScheduleParams _currentScheduleParams;
+
+        #endregion
 
         /// <summary> Инициализирует новое состояние рутины. </summary>
         public RoutineState(Animator animator)
@@ -36,6 +42,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine
             Reset();
         }
 
+        /// <summary> Обновить состояние. </summary>
         public override void Reset()
         {
             _currentPoint = null;
@@ -65,6 +72,8 @@ namespace FlavorfulStory.AI.FiniteStateMachine
                 RequestStateChange(typeof(MovementState));
         }
 
+        /// <summary> Установить новое расписание. </summary>
+        /// <param name="scheduleParams"> Новое расписание. </param>
         public void SetCurrentScheduleParams(ScheduleParams scheduleParams) => _currentScheduleParams = scheduleParams;
 
         /// <summary> Воспроизведение анимации состояния. </summary>
