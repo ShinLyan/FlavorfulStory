@@ -1,14 +1,11 @@
-using System;
-
 namespace FlavorfulStory.AI.FiniteStateMachine
 {
-    /// <summary> Состояние взаимодействия, наследующий базовый класс <see cref="CharacterState"/>.
+    /// <summary> Состояние взаимодействия, наследующий базовый класс <see cref="ICharacterState"/>.
     /// Используется для реализации логики, связанной с взаимодействиями в конечном автомате (FSM). </summary>
     public class InteractionState : CharacterState
     {
         /// <summary> Инициализирует новый экземпляр класса <see cref="InteractionState"/>. </summary>
-        /// <param name="stateController">Конечный автомат (FSM), к которому принадлежит это состояние.</param>
-        public InteractionState(Func<StateController> stateController) : base(stateController)
+        public InteractionState()
         {
         }
 

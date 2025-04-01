@@ -1,6 +1,6 @@
-using System;
 using FlavorfulStory.AI.Scheduling;
 using FlavorfulStory.TimeManagement;
+using UnityEngine;
 using DateTime = FlavorfulStory.TimeManagement.DateTime;
 
 namespace FlavorfulStory.AI.FiniteStateMachine
@@ -8,18 +8,17 @@ namespace FlavorfulStory.AI.FiniteStateMachine
     /// <summary> Состояние рутины NPC, в котором персонаж выполняет действия согласно расписанию. </summary>
     public class RoutineState : CharacterState
     {
-        /// <summary> Контроллер NPC, управляющий его поведением и анимациями. </summary>
-        private readonly Npc _npc;
+        private readonly Animator _animator;
 
         /// <summary> Текущая точка расписания, в которой находится NPC. </summary>
         private SchedulePoint _currentPoint;
 
+        private ScheduleParams _currentScheduleParams;
+
         /// <summary> Инициализирует новое состояние рутины. </summary>
-        /// <param name="stateController"> Контроллер состояний. </param>
-        /// <param name="npc"> Контроллер NPC. </param>
-        public RoutineState(Func<StateController> stateController, Npc npc) : base(stateController)
+        public RoutineState(Animator animator)
         {
-            _npc = npc;
+            _animator = animator;
             _currentPoint = null;
         }
 
@@ -50,9 +49,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine
             if (_currentPoint == null) return;
 
             var animationClipName = _currentPoint.NpcAnimationClipName;
-
-            if (_currentPoint != null)
-                _npc.PlayStateAnimation(animationClipName);
+            if (_currentPoint != null) PlayStateAnimation(animationClipName);
         }
 
         /// <summary> Проверяет, изменилось ли время, и обновляет текущую точку расписания.
@@ -60,12 +57,21 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         /// <param name="currentTime"> Текущее время в игре. </param>
         private void CheckNewTime(DateTime currentTime)
         {
-            var closestPoint = _npc.CurrentScheduleParams?.GetClosestSchedulePointInPath(currentTime);
+            var closestPoint = _currentScheduleParams?.GetClosestSchedulePointInPath(currentTime);
             if (closestPoint == null || closestPoint == _currentPoint) return;
 
             _currentPoint = closestPoint;
             if (closestPoint.Hour == currentTime.Hour && closestPoint.Minutes == currentTime.Minute)
-                _stateController().SetState<MovementState>();
+                RequestStateChange(typeof(MovementState));
+        }
+
+        public void SetCurrentScheduleParams(ScheduleParams scheduleParams) => _currentScheduleParams = scheduleParams;
+
+        /// <summary> Воспроизведение анимации состояния. </summary>
+        /// <param name="animationStateName"> Название состояния анимации. </param>
+        private void PlayStateAnimation(NpcAnimationClipName animationStateName)
+        {
+            _animator.Play(animationStateName.ToString());
         }
     }
 }

@@ -1,13 +1,10 @@
-using System;
-
 namespace FlavorfulStory.AI.FiniteStateMachine
 {
     /// <summary> Состояние ожидания NPC, в котором персонаж не выполняет активных действий. </summary>
     public class WaitingState : CharacterState
     {
         /// <summary> Инициализирует новое состояние ожидания. </summary>
-        /// <param name="stateController"> Контроллер состояний. </param>
-        public WaitingState(Func<StateController> stateController) : base(stateController)
+        public WaitingState()
         {
         }
 

@@ -6,12 +6,8 @@ namespace FlavorfulStory.AI.FiniteStateMachine
     /// Определяет основные методы, которые должны быть реализованы в производных классах. </summary>
     public abstract class CharacterState
     {
-        /// <summary> Контроллер состояний, который управляет переключением между состояниями.  </summary>
-        protected Func<StateController> _stateController;
-
-        /// <summary>  Инициализирует новый экземпляр класса <see cref="CharacterState"/>. </summary>
-        /// <param name="stateController"> Контроллер состояний, к которому принадлежит это состояние. </param>
-        protected CharacterState(Func<StateController> stateController) => _stateController = stateController;
+        // Событие для запроса смены состояния
+        public event Action<Type> OnStateChangeRequested;
 
         /// <summary> Вызывается при входе в состояние. Должен быть переопределен в производных классах
         /// для реализации логики, которая выполняется при активации состояния. </summary>
@@ -27,5 +23,10 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         public abstract void Update(float deltaTime);
 
         public abstract void Reset();
+
+        protected void RequestStateChange(Type stateType)
+        {
+            OnStateChangeRequested?.Invoke(stateType);
+        }
     }
 }
