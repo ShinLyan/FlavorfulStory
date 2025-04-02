@@ -2,11 +2,11 @@ using System;
 using System.Collections.Generic;
 using FlavorfulStory.AI.Scheduling;
 using FlavorfulStory.AI.WarpGraphSystem;
-using FlavorfulStory.SceneManagement;
 using FlavorfulStory.TimeManagement;
 using UnityEngine;
 using UnityEngine.AI;
 using DateTime = FlavorfulStory.TimeManagement.DateTime;
+using Object = UnityEngine.Object;
 
 namespace FlavorfulStory.AI.FiniteStateMachine
 {
@@ -56,15 +56,12 @@ namespace FlavorfulStory.AI.FiniteStateMachine
 
         /// <summary> Конструктор контроллера состояний. </summary>
         /// <param name="navMeshAgent"> Компонент NavMesh. </param>
-        /// <param name="portals"> Порталы. </param>
         /// <param name="animator"> Компонент Animator. </param>
         /// <param name="npcSchedule"> Набор расписаний. </param>
         /// <param name="npcTransform"> Компонент Transform. </param>
         /// <param name="coroutineRunner"> Проигрыватель корутин. </param>
-        /// <param name="locations"> Локации. </param>
-        public StateController(NavMeshAgent navMeshAgent, IEnumerable<WarpPortal> portals, Animator animator,
-            NpcSchedule npcSchedule, Transform npcTransform, MonoBehaviour coroutineRunner,
-            IEnumerable<Location> locations)
+        public StateController(NavMeshAgent navMeshAgent, Animator animator,
+            NpcSchedule npcSchedule, Transform npcTransform, MonoBehaviour coroutineRunner)
         {
             _typeToCharacterStates = new Dictionary<Type, CharacterState>();
             _navMeshAgent = navMeshAgent;
@@ -72,26 +69,24 @@ namespace FlavorfulStory.AI.FiniteStateMachine
             if (_sortedScheduleParams == null) Debug.LogError("SortedScheduleParams is null");
             _spawnPoint = npcTransform.position;
             _npcMonoBehaviour = coroutineRunner;
-            InitializeStates(portals, animator, coroutineRunner, npcTransform, locations);
+            InitializeStates(animator, coroutineRunner, npcTransform);
 
             WorldTime.OnDayEnded += OnReset;
             OnReset(WorldTime.GetCurrentGameTime());
         }
 
         /// <summary> Инициализировать состояния. </summary>
-        /// <param name="portals"> Порталы. </param>
         /// <param name="animator"> Компонент Animator. </param>
         /// <param name="coroutineRunner"> Проигрыватель корутин. </param>
         /// <param name="npcTransform"> Компонент Transform. </param>
-        /// <param name="locations"> Локации. </param>
-        private void InitializeStates(IEnumerable<WarpPortal> portals, Animator animator,
-            MonoBehaviour coroutineRunner, Transform npcTransform, IEnumerable<Location> locations)
+        private void InitializeStates(Animator animator,
+            MonoBehaviour coroutineRunner, Transform npcTransform)
         {
             _interactionState = new InteractionState();
             _movementState = new MovementState(
                 _navMeshAgent,
-                WarpGraph.Build(portals),
-                locations,
+                WarpGraph.Build(
+                    Object.FindObjectsByType<WarpPortal>(FindObjectsInactive.Include, FindObjectsSortMode.None)),
                 animator,
                 npcTransform,
                 coroutineRunner

@@ -17,8 +17,8 @@ namespace FlavorfulStory.SceneManagement
 
         private void Awake()
         {
-            if (TryGetComponent(out Collider collider))
-                _locationBounds = collider.bounds;
+            if (TryGetComponent(out Collider component))
+                _locationBounds = component.bounds;
         }
 
         /// <summary> Включает все объекты локации, отмеченные для активации. </summary>

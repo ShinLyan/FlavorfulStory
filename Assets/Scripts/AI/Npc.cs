@@ -1,7 +1,5 @@
 ﻿using FlavorfulStory.AI.FiniteStateMachine;
 using FlavorfulStory.AI.Scheduling;
-using FlavorfulStory.AI.WarpGraphSystem;
-using FlavorfulStory.SceneManagement;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -28,12 +26,10 @@ namespace FlavorfulStory.AI
         {
             _stateController = new StateController(
                 GetComponent<NavMeshAgent>(),
-                FindObjectsByType<WarpPortal>(FindObjectsInactive.Include, FindObjectsSortMode.None),
                 GetComponent<Animator>(),
                 _npcSchedule,
                 transform,
-                this,
-                FindObjectsByType<Location>(FindObjectsInactive.Include, FindObjectsSortMode.None)
+                this
             );
         }
 

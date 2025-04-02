@@ -59,11 +59,10 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         /// <summary> Инициализирует новое состояние движения. </summary>
         /// <param name="navMeshAgent"> Компонент для навигации по NavMesh. </param>
         /// <param name="warpGraph"> Граф варпов. </param>
-        /// <param name="locations"> Локации. </param>
         /// <param name="animator"> Аниматор. </param>
         /// <param name="npcTransform"> Компонент Transform. </param>
         /// <param name="coroutineRunner"> Проигрыватель корутин. </param>
-        public MovementState(NavMeshAgent navMeshAgent, WarpGraph warpGraph, IEnumerable<Location> locations,
+        public MovementState(NavMeshAgent navMeshAgent, WarpGraph warpGraph,
             Animator animator, Transform npcTransform, MonoBehaviour coroutineRunner)
         {
             _navMeshAgent = navMeshAgent;
@@ -72,13 +71,14 @@ namespace FlavorfulStory.AI.FiniteStateMachine
             _currentScheduleParams = null;
             _npcTransform = npcTransform;
             _coroutineRunner = coroutineRunner;
-            _spawnLocation = SetLocationName(locations);
+            _spawnLocation = SetLocationName();
             _currentLocation = _spawnLocation;
         }
 
-        private LocationName SetLocationName(IEnumerable<Location> locations)
+        private LocationName SetLocationName()
         {
-            foreach (var location in locations)
+            foreach (var location in Object.FindObjectsByType<Location>(FindObjectsInactive.Include,
+                         FindObjectsSortMode.None))
                 if (location.IsInside(_npcTransform.position))
                     return location.LocationName;
             return LocationName.Forest;

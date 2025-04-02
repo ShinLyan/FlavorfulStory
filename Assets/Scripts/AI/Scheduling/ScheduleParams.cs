@@ -39,6 +39,7 @@ namespace FlavorfulStory.AI.Scheduling
         [field: Tooltip("Массив точек, которые NPC должен посетить в рамках расписания."), SerializeField]
         public SchedulePoint[] Path { get; private set; }
 
+
         /// <summary> Найти ближайшую точку маршрута, соответствующую текущему времени. </summary>
         /// <param name="currentTime"> Текущее игровое время. </param>
         /// <returns> Ближайшая точка маршрута или <c>null</c>, если подходящая точка не найдена. </returns>
