@@ -1,7 +1,7 @@
 namespace FlavorfulStory.Audio
 {
     /// <summary> Тип громкости для управления уровнями звука. </summary>
-    public enum VolumeType
+    public enum MixerChannelType
     {
         /// <summary> Общая громкость. </summary>
         Master,
@@ -10,6 +10,6 @@ namespace FlavorfulStory.Audio
         SFX,
 
         /// <summary> Громкость музыки. </summary>
-        Music,
+        Music
     }
 }

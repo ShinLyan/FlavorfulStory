@@ -8,10 +8,10 @@ namespace FlavorfulStory.Audio
     public class AudioSliderHandler : MonoBehaviour
     {
         /// <summary> Тип громкости, связанный с этим слайдером. </summary>
-        [SerializeField] private VolumeType _volumeType;
+        [SerializeField] private MixerChannelType _mixerChannelType;
 
         /// <summary> Ссылка на настройки звука. </summary>
-        private Settings.AudioSettings _audioSettings;
+        private AudioSettings _audioSettings;
 
         /// <summary> Компонент слайдера. </summary>
         private Slider _slider;
@@ -19,21 +19,21 @@ namespace FlavorfulStory.Audio
         /// <summary> Инициализация ссылки на слайдер и подписка на событие изменения значения. </summary>
         private void Awake()
         {
-            _audioSettings = FindAnyObjectByType<Settings.AudioSettings>();
+            _audioSettings = FindAnyObjectByType<AudioSettings>();
             _slider = GetComponent<Slider>();
-            _slider.onValueChanged.AddListener(delegate { ValueChanged(); });
         }
 
         /// <summary> Установка начального значения слайдера на основе текущих настроек звука. </summary>
         private void Start()
         {
-            _slider.value = _audioSettings.GetVolumeValueFromType(_volumeType);
+            _slider.onValueChanged.AddListener(HandleSliderChanged);
+            _slider.value = _audioSettings.GetVolumeValueFromType(_mixerChannelType);
         }
 
-        /// <summary> Изменение значения в настройках звука при взаимодействии со слайдером. </summary>
-        private void ValueChanged()
+        /// <summary> Обработчик звукового слайдера. </summary>
+        private void HandleSliderChanged(float sliderValue)
         {
-            _audioSettings.SetMixerValue(_volumeType, _slider.value);
+            _audioSettings.SetMixerValue(_mixerChannelType, sliderValue);
         }
     }
 }

@@ -1,5 +1,7 @@
-using FlavorfulStory.Saving;
+using System;
+using FlavorfulStory.Audio;
 using FlavorfulStory.InputSystem;
+using FlavorfulStory.Saving;
 using UnityEngine;
 
 namespace FlavorfulStory.Movement
@@ -10,13 +12,15 @@ namespace FlavorfulStory.Movement
     {
         #region Private Fields
 
-        [Header("Параметры движения")]
         /// <summary> Скорость передвижения игрока. </summary>
-        [SerializeField, Tooltip("Скорость передвижения игрока.")] private float _moveSpeed;
+        [Header("Параметры движения")]
+        [SerializeField, Tooltip("Скорость передвижения игрока.")]
+        private float _moveSpeed;
 
         /// <summary> Скорость поворота игрока. </summary>
-        [SerializeField, Tooltip("Скорость поворота игрока.")] private float _rotateSpeed;
-        
+        [SerializeField, Tooltip("Скорость поворота игрока.")]
+        private float _rotateSpeed;
+
         /// <summary> Компонент Rigidbody, отвечающий за физику движения игрока. </summary>
         private Rigidbody _rigidbody;
 
@@ -29,6 +33,9 @@ namespace FlavorfulStory.Movement
         /// <summary> Компонент Animator для управления анимациями игрока. </summary>
         private Animator _animator;
 
+        /// <summary> Компонент источника звука для передвижения. </summary>
+        private CharacterLocomotionSound _locomotionSound;
+
         /// <summary> Хэшированное значение параметра "скорость" для анимации. </summary>
         private static readonly int _speedParameterHash = Animator.StringToHash("Speed");
 
@@ -39,6 +46,7 @@ namespace FlavorfulStory.Movement
         {
             _rigidbody = GetComponent<Rigidbody>();
             _animator = GetComponent<Animator>();
+            _locomotionSound = GetComponentInChildren<CharacterLocomotionSound>();
         }
 
         /// <summary> Обновление движения и поворота игрока через FixedUpdate. </summary>
@@ -57,7 +65,7 @@ namespace FlavorfulStory.Movement
         /// <summary> Выполняет передвижение игрока в соответствии с направлением движения. </summary>
         private void Move()
         {
-            Vector3 moveForce = _moveSpeed * CountSpeedMultiplier() * _moveDirection;
+            var moveForce = _moveSpeed * GetSpeedMultiplier() * _moveDirection;
             moveForce.y = _rigidbody.linearVelocity.y;
             _rigidbody.linearVelocity = moveForce;
         }
@@ -76,32 +84,50 @@ namespace FlavorfulStory.Movement
 
         /// <summary> Вычисляет множитель скорости в зависимости от режима (ходьба или бег). </summary>
         /// <returns> Множитель скорости (0.5 для ходьбы, 1 для бега). </returns>
-        private float CountSpeedMultiplier()
+        private float GetSpeedMultiplier()
         {
             const float WalkingMultiplier = 0.5f;
             const float RunningMultiplier = 1f;
-            return InputWrapper.GetButton(InputButton.Walking) ? WalkingMultiplier : RunningMultiplier;         }
+
+            if (InputWrapper.GetButton(InputButton.Walking))
+            {
+                _locomotionSound.SetWalkingState();
+                return WalkingMultiplier;
+            }
+            _locomotionSound.SetRunningState();
+            return RunningMultiplier;
+        }
 
         /// <summary> Обновляет анимацию движения игрока в зависимости от скорости. </summary>
         /// <param name="directionMagnitude"> Величина направления движения. </param>
         private void AnimateMovement(float directionMagnitude)
         {
-            float speed = Mathf.Clamp01(directionMagnitude) * CountSpeedMultiplier();
+            float speed = Mathf.Clamp01(directionMagnitude) * GetSpeedMultiplier();
             const float DampTime = 0.2f; // Время сглаживания перехода анимации
             _animator.SetFloat(_speedParameterHash, speed, DampTime, Time.deltaTime);
         }
 
         /// <summary> Устанавливает направление движения игрока. </summary>
         /// <param name="direction"> Вектор направления движения. </param>
-        public void SetMoveDirection(Vector3 direction) => _moveDirection = direction;
+        public void SetMoveDirection(Vector3 direction)
+        {
+            _moveDirection = direction;
+
+            if (_moveDirection == Vector3.zero)
+                _locomotionSound.Disable();
+            else
+                _locomotionSound.Enable();
+
+        }
 
         /// <summary> Устанавливает направление поворота игрока. </summary>
         /// <param name="direction"> Вектор направления взгляда. </param>
         public void SetLookRotation(Vector3 direction) => _lookDirection = direction;
 
         #region Saving
+
         /// <summary> Структура для сохранения позиции и поворота игрока. </summary>
-        [System.Serializable]
+        [Serializable]
         private struct MoverSaveData
         {
             /// <summary> Позиция игрока. </summary>
@@ -113,7 +139,7 @@ namespace FlavorfulStory.Movement
 
         /// <summary> Сохраняет текущее состояние игрока (позиция и поворот). </summary>
         /// <returns> Объект с данными позиции и поворота. </returns>
-        public object CaptureState() => new MoverSaveData()
+        public object CaptureState() => new MoverSaveData
         {
             Position = new SerializableVector3(transform.position),
             Rotation = new SerializableVector3(transform.eulerAngles)
@@ -127,6 +153,7 @@ namespace FlavorfulStory.Movement
             transform.position = data.Position.ToVector();
             transform.eulerAngles = data.Rotation.ToVector();
         }
+
         #endregion
     }
 }
