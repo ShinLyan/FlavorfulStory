@@ -2,31 +2,27 @@ using System;
 
 namespace FlavorfulStory.AI.FiniteStateMachine
 {
-    /// <summary>  Абстрактный базовый класс для всех состояний, используемых в конечном автомате (FSM).
-    /// Определяет основные методы, которые должны быть реализованы в производных классах. </summary>
+    /// <summary> Абстрактный базовый класс для всех состояний, используемых в конечном автомате (FSM). </summary>
     public abstract class CharacterState
     {
-        // <summary> Событие для запроса смены состояния </summary>
+        /// <summary> Событие, вызываемое для запроса перехода к другому состоянию. </summary>
         public event Action<Type> OnStateChangeRequested;
 
-        /// <summary> Вызывается при входе в состояние. Должен быть переопределен в производных классах
-        /// для реализации логики, которая выполняется при активации состояния. </summary>
+        /// <summary> Вызывается при входе в состояние. </summary>
         public abstract void Enter();
 
-        /// <summary> Вызывается при выходе из состояния. Должен быть переопределен в производных классах
-        /// для реализации логики, которая выполняется при деактивации состояния. </summary>
+        /// <summary> Вызывается при выходе из состояния. </summary>
         public abstract void Exit();
 
-        /// <summary> Вызывается каждый кадр для обновления логики состояния. Должен быть переопределен
-        /// в производных классах для реализации логики, которая выполняется каждый кадр. </summary>
-        /// <param name="deltaTime"> Время в секундах, прошедшее с последнего кадра. </param>
+        /// <summary> Обновление логики состояния, вызываемое каждый кадр. </summary>
+        /// <param name="deltaTime"> Время, прошедшее с последнего кадра. </param>
         public abstract void Update(float deltaTime);
 
+        /// <summary> Сброс состояния в начальное состояние. </summary>
         public abstract void Reset();
 
-        protected void RequestStateChange(Type stateType)
-        {
-            OnStateChangeRequested?.Invoke(stateType);
-        }
+        /// <summary> Запросить смену состояния. </summary>
+        /// <param name="stateType"> Тип состояния, на которое требуется перейти. </param>
+        protected void RequestStateChange(Type stateType) => OnStateChangeRequested?.Invoke(stateType);
     }
 }

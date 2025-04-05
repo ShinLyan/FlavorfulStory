@@ -2,8 +2,11 @@ using FlavorfulStory.AI.Scheduling;
 
 namespace FlavorfulStory.AI
 {
+    /// <summary> Интерфейс для объектов, зависящих от расписания NPC. </summary>
     public interface IScheduleDependable
     {
-        public void SetCurrentScheduleParams(ScheduleParams scheduleParams);
+        /// <summary> Установить текущие параметры расписания. </summary>
+        /// <param name="scheduleParams"> Активные параметры расписания, применяемые к объекту. </param>
+        void SetCurrentScheduleParams(ScheduleParams scheduleParams);
     }
 }

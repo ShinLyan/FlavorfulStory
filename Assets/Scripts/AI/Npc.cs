@@ -9,17 +9,12 @@ namespace FlavorfulStory.AI
     [RequireComponent(typeof(NavMeshAgent), typeof(Animator))]
     public class Npc : MonoBehaviour
     {
-        #region Fields and Properties
-
         /// <summary> Расписание NPC, определяющее его поведение и маршруты. </summary>
         [Tooltip("Расписание NPC, определяющее его поведение и маршруты."), SerializeField]
         private NpcSchedule _npcSchedule;
 
         /// <summary> Контроллер состояний, управляющий переключением между состояниями NPC. </summary>
         private StateController _stateController;
-
-        #endregion
-
 
         /// <summary> Инициализация контроллера состояний. </summary>
         private void Start()

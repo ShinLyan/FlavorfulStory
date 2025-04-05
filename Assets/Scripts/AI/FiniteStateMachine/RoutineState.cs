@@ -8,7 +8,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine
     /// <summary> Состояние рутины NPC, в котором персонаж выполняет действия согласно расписанию. </summary>
     public class RoutineState : CharacterState, IScheduleDependable
     {
-        #region Variables
+        #region Fields
 
         /// <summary> Компонент Animator. </summary>
         private readonly Animator _animator;
@@ -22,30 +22,17 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         #endregion
 
         /// <summary> Инициализирует новое состояние рутины. </summary>
-        public RoutineState(Animator animator)
-        {
-            _animator = animator;
-            _currentPoint = null;
-        }
+        public RoutineState(Animator animator) => _animator = animator;
 
         /// <summary> Вызывается при входе в состояние рутины. Подписывается на событие изменения времени. </summary>
-        public override void Enter()
-        {
-            WorldTime.OnTimeUpdated += CheckNewTime;
-        }
+        public override void Enter() => WorldTime.OnTimeUpdated += CheckNewTime;
 
         /// <summary> Вызывается при выходе из состояния рутины. Отписывается от события изменения времени
         /// и сбрасывает текущую точку. </summary>
         public override void Exit()
         {
-            WorldTime.OnTimeUpdated -= CheckNewTime;
             Reset();
-        }
-
-        /// <summary> Обновить состояние. </summary>
-        public override void Reset()
-        {
-            _currentPoint = null;
+            WorldTime.OnTimeUpdated -= CheckNewTime;
         }
 
         /// <summary> Обновляет логику состояния рутины каждый кадр.
@@ -58,6 +45,9 @@ namespace FlavorfulStory.AI.FiniteStateMachine
             var animationClipName = _currentPoint.NpcAnimationClipName;
             if (_currentPoint != null) PlayStateAnimation(animationClipName);
         }
+
+        /// <summary> Обновить состояние. </summary>
+        public override void Reset() => _currentPoint = null;
 
         /// <summary> Проверяет, изменилось ли время, и обновляет текущую точку расписания.
         /// Переключает состояние на движение, если время совпадает с точкой. </summary>
@@ -78,9 +68,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine
 
         /// <summary> Воспроизведение анимации состояния. </summary>
         /// <param name="animationStateName"> Название состояния анимации. </param>
-        private void PlayStateAnimation(NpcAnimationClipName animationStateName)
-        {
+        private void PlayStateAnimation(NpcAnimationClipName animationStateName) =>
             _animator.Play(animationStateName.ToString());
-        }
     }
 }

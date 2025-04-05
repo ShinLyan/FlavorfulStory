@@ -22,10 +22,7 @@ namespace FlavorfulStory.Core
             if (_hasSpawned) return;
 
             SpawnPersistentObject();
-            _hasSpawned = true;
-
-            InputWrapper.Initialize();
-            LocationChanger.Initialize();
+            InitializeSystems();
         }
 
         /// <summary> Создает постоянный объект и устанавливает его сохранение между сценами. </summary>
@@ -33,6 +30,15 @@ namespace FlavorfulStory.Core
         {
             var persistentObject = Instantiate(_persistentObjectsPrefab);
             DontDestroyOnLoad(persistentObject);
+
+            _hasSpawned = true;
+        }
+
+        /// <summary> Инициализация глобальных систем после спавна объектов. </summary>
+        private static void InitializeSystems()
+        {
+            InputWrapper.Initialize();
+            LocationChanger.ActivatePlayerCurrentLocation();
         }
     }
 }

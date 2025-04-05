@@ -3,54 +3,48 @@ using UnityEngine;
 
 namespace FlavorfulStory.SceneManagement
 {
-    /// <summary> Класс для активации и деактивации локаций в сцене. </summary>
+    /// <summary> Управляет активацией и деактивацией локаций. </summary>
     public static class LocationChanger
     {
-        /// <summary> Словарь с локациями и связанными с ними объектами, которые нужно включать/выключать. </summary>
+        /// <summary> Хранилище всех локаций, найденных в сцене. </summary>
         private static readonly Dictionary<LocationName, Location> _locations = new();
 
-        /// <summary> Текущая активная локация. </summary>
-        private static Location _currentLocation;
+        /// <summary> Статический конструктор. </summary>
+        static LocationChanger() => InitializeLocations();
 
-        /// <summary> Инициализирует систему локаций, собирая все объекты типа <see cref="Location"/> в сцене. </summary>
-        public static void Initialize()
+        /// <summary> Инициализация всех локаций. </summary>
+        /// <remarks> Находит все <see cref="Location"/> в сцене и добавляет их в словарь.</remarks>
+        private static void InitializeLocations()
         {
-            _locations.Clear();
-
             foreach (var location in Object.FindObjectsByType<Location>(
                          FindObjectsInactive.Include, FindObjectsSortMode.None))
                 if (!_locations.TryAdd(location.LocationName, location))
-                    Debug.LogWarning($"Найден дубликат локации: {location.LocationName} в {location.name}");
+                    Debug.LogError($"Найден дубликат локации: {location.LocationName} в {location.name}");
+        }
 
-            // TODO: Выключать все локации, кроме _currentLocation
-            // foreach (var location in _locations.Values) location.Disable();
-            // _currentLocation.Enable();
+        /// <summary> Активирует локацию, в которой находится игрок, и деактивирует все остальные. </summary>
+        public static void ActivatePlayerCurrentLocation()
+        {
+            var playerPosition = GameObject.FindWithTag("Player").transform.position;
+            foreach (var location in _locations.Values)
+                if (location.IsPositionInLocation(playerPosition)) location.Enable();
+                else location.Disable();
         }
 
         /// <summary> Включает указанную локацию. </summary>
         /// <param name="location"> Имя локации, которую нужно включить. </param>
         public static void EnableLocation(LocationName location)
         {
-            if (!_locations.TryGetValue(location, out var locationObject))
-            {
-                Debug.LogError($"Локации {location} не существует!");
-                return;
-            }
-
-            locationObject.Enable();
+            if (_locations.TryGetValue(location, out var locationObject)) locationObject.Enable();
+            else Debug.LogError($"Локации {location} не существует!");
         }
 
         /// <summary> Выключает указанную локацию. </summary>
         /// <param name="location"> Имя локации, которую нужно выключить. </param>
         public static void DisableLocation(LocationName location)
         {
-            if (!_locations.TryGetValue(location, out var locationObject))
-            {
-                Debug.LogError($"Локации {location} не существует!");
-                return;
-            }
-
-            locationObject.Disable();
+            if (_locations.TryGetValue(location, out var locationObject)) locationObject.Disable();
+            else Debug.LogError($"Локации {location} не существует!");
         }
     }
 }

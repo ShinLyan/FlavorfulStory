@@ -13,10 +13,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine
     /// <summary> Состояние движения NPC, в котором персонаж перемещается к заданной точке. </summary>
     public class MovementState : CharacterState, IScheduleDependable
     {
-        #region Variables
-
-        /// <summary> Минимальное расстояние до точки, при котором считается, что NPC достиг её. </summary>
-        private const float DistanceToReachPoint = 0.3f;
+        #region Fields
 
         /// <summary> Компонент для навигации NPC по NavMesh. </summary>
         private readonly NavMeshAgent _navMeshAgent;
@@ -54,6 +51,9 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         /// <summary> Хэшированное значение параметра "скорость" для анимации. </summary>
         private static readonly int _speedParameterHash = Animator.StringToHash("Speed");
 
+        /// <summary> Минимальное расстояние до точки, при котором считается, что NPC достиг её. </summary>
+        private const float DistanceToReachPoint = 0.3f;
+
         #endregion
 
         /// <summary> Инициализирует новое состояние движения. </summary>
@@ -75,36 +75,27 @@ namespace FlavorfulStory.AI.FiniteStateMachine
             _currentLocation = _spawnLocation;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         private LocationName SetLocationName()
         {
             foreach (var location in Object.FindObjectsByType<Location>(FindObjectsInactive.Include,
                          FindObjectsSortMode.None))
-                if (location.IsInside(_npcTransform.position))
+                if (location.IsPositionInLocation(_npcTransform.position))
                     return location.LocationName;
-            return LocationName.Forest;
+            return LocationName.RockyIsland;
         }
 
         /// <summary> Вызывается при входе в состояние движения. </summary>
-        public override void Enter()
-        {
-            WorldTime.OnTimeUpdated += FindDestinationPoint;
-        }
+        public override void Enter() => WorldTime.OnTimeUpdated += FindDestinationPoint;
 
         /// <summary> Вызывается при выходе из состояния движения. </summary>
         public override void Exit()
         {
             Reset();
             WorldTime.OnTimeUpdated -= FindDestinationPoint;
-        }
-
-        /// <summary> Обновить состояние. </summary>
-        public override void Reset()
-        {
-            StopCoroutine();
-            PlayMoveAnimation(0f, 0f);
-            _currentPoint = null;
-            _navMeshAgent.ResetPath();
-            _currentLocation = _spawnLocation;
         }
 
         /// <summary> Обновляет логику состояния движения каждый кадр. </summary>
@@ -118,13 +109,14 @@ namespace FlavorfulStory.AI.FiniteStateMachine
             SwitchStateIfPointReached();
         }
 
-        /// <summary> Проверяет, достиг ли NPC текущей точки, и переключает состояние, если это так. </summary>
-        private void SwitchStateIfPointReached()
+        /// <summary> Сброс состояния в начальное состояние. </summary>
+        public override void Reset()
         {
-            bool isInTargetLocation = _currentLocation == _currentPoint.LocationName;
-            bool isCloseEnough = _navMeshAgent.remainingDistance <= DistanceToReachPoint;
-
-            if (isInTargetLocation && isCloseEnough) RequestStateChange(typeof(RoutineState));
+            StopCoroutine();
+            PlayMoveAnimation(0f, 0f);
+            _currentPoint = null;
+            _navMeshAgent.ResetPath();
+            _currentLocation = _spawnLocation;
         }
 
         /// <summary> Находит ближайшую точку маршрута на основе текущего времени
@@ -133,7 +125,6 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         private void FindDestinationPoint(DateTime currentTime)
         {
             var closestPoint = _currentScheduleParams?.GetClosestSchedulePointInPath(currentTime);
-
             if (closestPoint == null)
             {
                 Debug.LogError("Ближайшая точка отсутствует!");
@@ -149,13 +140,22 @@ namespace FlavorfulStory.AI.FiniteStateMachine
             else _navMeshAgent.SetDestination(closestPoint.Position);
         }
 
+
+        /// <summary> Проверяет, достиг ли NPC текущей точки, и переключает состояние, если это так. </summary>
+        private void SwitchStateIfPointReached()
+        {
+            bool isInTargetLocation = _currentLocation == _currentPoint.LocationName;
+            bool isCloseEnough = _navMeshAgent.remainingDistance <= DistanceToReachPoint;
+
+            if (isInTargetLocation && isCloseEnough) RequestStateChange(typeof(RoutineState));
+        }
+
         /// <summary> Обрабатывает переход NPC через варпы между локациями. </summary>
         /// <param name="destination"> Целевая точка расписания. </param>
         private void HandleWarpTransition(SchedulePoint destination)
         {
             var currentWarp = FindClosestWarpInScene(_npcTransform.position, _currentLocation);
             var targetWarp = FindClosestWarpInScene(destination.Position, destination.LocationName);
-
             if (!currentWarp || !targetWarp)
             {
                 Debug.LogError("Не удалось найти начальный или конечный варп!");
@@ -163,7 +163,6 @@ namespace FlavorfulStory.AI.FiniteStateMachine
             }
 
             var path = _warpGraph.FindShortestPath(currentWarp, targetWarp);
-
             if (path == null)
             {
                 Debug.LogError("Путь не найден!");
@@ -225,9 +224,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         /// <summary> Воспроизведение анимации движения. </summary>
         /// <param name="speed"> Скорость движения. </param>
         /// <param name="dampTime"> Время сглаживания перехода анимации. </param>
-        private void PlayMoveAnimation(float speed, float dampTime = 0.2f)
-        {
+        private void PlayMoveAnimation(float speed, float dampTime = 0.2f) =>
             _animator.SetFloat(_speedParameterHash, speed, dampTime, Time.deltaTime);
-        }
     }
 }

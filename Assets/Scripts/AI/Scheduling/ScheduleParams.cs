@@ -21,8 +21,9 @@ namespace FlavorfulStory.AI.Scheduling
         [field: Tooltip("Дни недели, в которые будет выполняться расписание."), SerializeField]
         public DayOfWeek DayOfWeek { get; private set; }
 
-        /// <summary> Дни месяца, в которые будет выполняться расписание. </summary>
-        [field: Tooltip("Дни месяца, в которые будет выполняться расписание."), SerializeField, MinMaxSlider(1, 28)]
+        /// <summary> Диапазоны дней месяца (1–28), в которые будет выполняться расписание. </summary>
+        [field: Tooltip("Диапазоны дней месяца (1–28), в которые будет выполняться расписание."),
+                SerializeField, MinMaxSlider(1, 28)]
         public Vector2Int[] Dates { get; private set; }
 
         /// <summary> Минимальный уровень отношений, необходимый для выполнения расписания. </summary>
@@ -30,15 +31,14 @@ namespace FlavorfulStory.AI.Scheduling
                 Range(0, 14), SerializeField]
         public int Hearts { get; private set; }
 
-        /// <summary> Будет ли расписание выполняться в дождливую погоду. </summary>
-        [field: Tooltip("Расписание будет выполнятся при дожде."), SerializeField]
+        /// <summary> Должен ли идти дождь для активации расписания? </summary>
+        [field: Tooltip("Должен ли идти дождь для активации расписания?"), SerializeField]
         public bool IsRaining { get; private set; }
 
-        /// <summary> Массив точек, которые NPC должен посетить в рамках расписания. </summary>
+        /// <summary> Массив точек маршрута, которые NPC должен посетить в рамках расписания. </summary>
         [field: Header("Path")]
-        [field: Tooltip("Массив точек, которые NPC должен посетить в рамках расписания."), SerializeField]
+        [field: Tooltip("Массив точек маршрута, которые NPC должен посетить в рамках расписания."), SerializeField]
         public SchedulePoint[] Path { get; private set; }
-
 
         /// <summary> Найти ближайшую точку маршрута, соответствующую текущему времени. </summary>
         /// <param name="currentTime"> Текущее игровое время. </param>
@@ -62,11 +62,11 @@ namespace FlavorfulStory.AI.Scheduling
             return closestPoint;
         }
 
-        /// <summary> Проверка на подходящие условия. </summary>
-        /// <param name="currentTime"> Текущее время. </param>
-        /// <param name="currentHearts"> Текущие отнощения. </param>
-        /// <param name="isRaining"> Идет ли дождь. </param>
-        /// <returns></returns>
+        /// <summary> Удовлетворяют ли текущие условия требованиям расписания? </summary>
+        /// <param name="currentTime"> Текущее игровое время. </param>
+        /// <param name="currentHearts"> Текущий уровень отношений. </param>
+        /// <param name="isRaining"> Идёт ли в данный момент дождь? </param>
+        /// <returns> <c>true</c>, если все условия выполняются; иначе — <c>false</c>. </returns>
         public bool AreConditionsSuitable(DateTime currentTime, int currentHearts, bool isRaining) =>
             IsRaining == isRaining &&
             (Hearts == 0 || currentHearts >= Hearts) &&
@@ -74,9 +74,9 @@ namespace FlavorfulStory.AI.Scheduling
             (DayOfWeek == 0 || (DayOfWeek & currentTime.DayOfWeek) != 0) &&
             (Seasons == 0 || (Seasons & currentTime.Season) != 0);
 
-        /// <summary> Проверяет, попадает ли день в заданные диапазоны. </summary>
-        /// <param name="day"></param>
-        /// <returns></returns>
+        /// <summary> Входит ли указанный день в хотя бы один из заданных диапазонов дат? </summary>
+        /// <param name="day"> Номер дня месяца (1–28). </param>
+        /// <returns> <c>true</c>, если день попадает в один из диапазонов; иначе — <c>false</c>. </returns>
         private bool IsDateInRanges(int day) => Dates.Any(range => day >= range.x && day <= range.y);
     }
 }

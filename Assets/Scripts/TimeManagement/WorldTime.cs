@@ -17,8 +17,8 @@ namespace FlavorfulStory.TimeManagement
         [Tooltip("Сколько реального времени длится один тик."), SerializeField, Range(0.1f, 20f)]
         private float _timeBetweenTicks = 1;
 
-        [Header("Day/night settings")]
         /// <summary> Час начала нового дня. </summary>
+        [Header("Day/night settings")]
         [Tooltip("Во сколько начинается новый день."), SerializeField, Range(0, 24)]
         private int _dayStartHour;
 
@@ -64,6 +64,8 @@ namespace FlavorfulStory.TimeManagement
         /// <summary> Увеличить игровое время и проверить завершение дня. </summary>
         private void IncreaseTime()
         {
+            print(_currentGameTime);
+
             _currentGameTime.AddMinutes(_minutesPerTick);
 
             if (_currentGameTime.Hour == _dayEndHour)
@@ -96,6 +98,8 @@ namespace FlavorfulStory.TimeManagement
         /// <summary> Снять паузу с игрового времени. </summary>
         public static void Unpause() => _isPaused = false;
 
+        /// <summary> Получить текущее игровое время. </summary>
+        /// <returns> Текущее игрвоое время. </returns>
         public static DateTime GetCurrentGameTime() => _currentGameTime;
 
         #region Saving

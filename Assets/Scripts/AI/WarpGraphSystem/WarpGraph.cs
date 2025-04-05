@@ -77,7 +77,7 @@ namespace FlavorfulStory.AI.WarpGraphSystem
         /// <summary> Удаляет дублирующиеся локации в начале или конце пути. </summary>
         /// <param name="path"> Исходный путь для обработки. </param>
         /// <returns> Оптимизированный путь без избыточных локаций. </returns>
-        private List<WarpPortal> TrimPath(List<WarpPortal> path)
+        private static List<WarpPortal> TrimPath(List<WarpPortal> path)
         {
             if (path.Count < 2) return path;
 
@@ -119,12 +119,9 @@ namespace FlavorfulStory.AI.WarpGraphSystem
         /// <param name="position"> Позиция для поиска ближайшего узла. </param>
         /// <param name="location"> Локация, в которой искать узел. </param>
         /// <returns> Ближайший узел или null, если узел не найден. </returns>
-        public WarpNode FindClosestWarp(Vector3 position, LocationName location)
-        {
-            var nodes = GetNodesByLocation(location);
-            return nodes?.OrderBy(n => Vector3.Distance(position, n.SourceWarp.transform.position))
-                .FirstOrDefault();
-        }
+        public WarpNode FindClosestWarp(Vector3 position, LocationName location) => GetNodesByLocation(location)
+            ?.OrderBy(n => Vector3.Distance(position, n.SourceWarp.transform.position))
+            .FirstOrDefault();
 
         /// <summary> Строит граф варпов на основе списка всех варпов. </summary>
         /// <param name="allWarps">Список всех варпов для построения графа.</param>

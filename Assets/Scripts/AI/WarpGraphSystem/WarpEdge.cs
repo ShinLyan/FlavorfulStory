@@ -7,11 +7,7 @@ namespace FlavorfulStory.AI.WarpGraphSystem
         public WarpNode TargetNode { get; }
 
         /// <summary> Создает новое ребро между двумя узлами. </summary>
-        /// <param name="source"> Исходный узел. </param>
         /// <param name="target"> Целевой узел. </param>
-        public WarpEdge(WarpNode target)
-        {
-            TargetNode = target;
-        }
+        public WarpEdge(WarpNode target) => TargetNode = target;
     }
 }

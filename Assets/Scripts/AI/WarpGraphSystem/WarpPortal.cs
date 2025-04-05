@@ -32,7 +32,6 @@ namespace FlavorfulStory.AI.WarpGraphSystem
         /// <summary> Определение локации портала при инициализации. </summary>
         private void Awake() => ParentLocationName = GetComponentInParent<Location>().LocationName;
 
-
         /// <summary> Обработка входа игрока в триггер телепортации. </summary>
         /// <param name="other"> Коллайдер объекта, вошедшего в триггер. </param>
         private void OnTriggerEnter(Collider other)
@@ -59,10 +58,11 @@ namespace FlavorfulStory.AI.WarpGraphSystem
             LocationChanger.DisableLocation(ParentLocationName);
         }
 
+#if UNITY_EDITOR
         /// <summary> Визуализация соединений между порталами в редакторе. </summary>
         private void OnDrawGizmosSelected()
         {
-            Gizmos.color = Color.cyan;
+            Gizmos.color = Color.red;
             Gizmos.DrawSphere(transform.position, 0.3f);
 
             // Соединение с парным порталом
@@ -80,5 +80,6 @@ namespace FlavorfulStory.AI.WarpGraphSystem
                     Gizmos.DrawLine(transform.position, portal.transform.position);
                 }
         }
+#endif
     }
 }
