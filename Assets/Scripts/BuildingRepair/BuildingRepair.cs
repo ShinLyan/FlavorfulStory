@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using FlavorfulStory.Actions.Interactables;
+using FlavorfulStory.Audio;
 using FlavorfulStory.Control;
 using FlavorfulStory.InventorySystem;
 using FlavorfulStory.ObjectManagement;
@@ -83,6 +84,7 @@ namespace FlavorfulStory.BuildingRepair
             _repairStageIndex++;
             _objectSwitcher.SwitchTo(_repairStageIndex);
             UpdateInteractionState();
+            SfxPlayer.Instance.PlayOneShot(SfxType.Build);
 
             if (IsRepairCompleted)
             {

@@ -19,7 +19,12 @@ namespace FlavorfulStory.BuildingRepair
         public event Action<InventoryItem, ResourceTransferButtonType> OnClick;
 
         /// <summary> Обработчик события клика по кнопке. Проверяет наличие ресурса и вызывает событие OnClick. </summary>
-        protected override void Click() => OnClick?.Invoke(_resource, _buttonType);
+        protected override void Click()
+        {
+            base.Click();
+            OnClick?.Invoke(_resource, _buttonType);
+        }
+
 
         /// <summary> Устанавливает ресурс для кнопки. </summary>
         /// <param name="resource"> Ресурс, который будет привязан к кнопке. </param>

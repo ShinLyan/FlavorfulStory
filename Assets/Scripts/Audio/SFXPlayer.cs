@@ -11,10 +11,6 @@ namespace FlavorfulStory.Audio
         /// <summary> Экземпляр синглтона. </summary>
         public static SfxPlayer Instance { get; private set; }
 
-        /// <summary> Максимальность дальность, на которой слышен звук. </summary>
-        [Range(10, 50)]
-        [SerializeField] private float _maxDistance;
-
         /// <summary> Источник аудио. </summary>
         private AudioSource _audioSource;
 
@@ -48,7 +44,6 @@ namespace FlavorfulStory.Audio
 
         /// <summary> Проиграть SFX. </summary>
         /// <param name="type"> Тип проигрываемого звука. </param>
-        /// <param name="otherTransform"> Transform источника звука. Используется для рассчета громкости в зависисмости от расстояния. </param>
         public void PlayOneShot(SfxType type)
         {
             if (_sfxData.TryGetValue(type, out var clips))
@@ -62,6 +57,12 @@ namespace FlavorfulStory.Audio
             }
         }
 
-        public void PlayOneShot(AudioClip clip) => _audioSource.PlayOneShot(clip);
+        /// <summary> Проиграть случайный звук. </summary>
+        /// <param name="clips"> Аудиоклипы. </param>
+        public void PlayOneShot(IEnumerable<AudioClip> clips)
+        {
+            var audioClips = clips as AudioClip[] ?? clips.ToArray();
+            _audioSource.PlayOneShot(audioClips.ElementAt(Random.Range(0, audioClips.Count())));
+        }
     }
 }

@@ -1,3 +1,4 @@
+using FlavorfulStory.Audio;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -72,7 +73,7 @@ namespace FlavorfulStory.UI
         protected virtual void HoverEnd() { }
 
         /// <summary> Действие при клике на кнопку. </summary>
-        protected virtual void Click() { }
+        protected virtual void Click() => SfxPlayer.Instance.PlayOneShot(SfxType.UIClick);
 
         /// <summary> Вызывается при включении взаимодействия. </summary>
         protected virtual void OnInteractionEnabled() { }

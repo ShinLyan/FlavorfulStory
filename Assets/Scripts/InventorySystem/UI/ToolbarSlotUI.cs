@@ -50,7 +50,11 @@ namespace FlavorfulStory.InventorySystem.UI
         protected override void HoverEnd() => _hoverImage.CrossFadeAlpha(0.0f, FadeDuration, true);
 
         /// <summary> Обрабатывает клик по слоту. </summary>
-        protected override void Click() => OnSlotClicked?.Invoke(_index);
+        protected override void Click()
+        {
+            base.Click();
+            OnSlotClicked?.Invoke(_index);
+        } 
 
         /// <summary> Выделяет данный слот. </summary>
         public void Select() => FadeToColor(_selectedColor);

@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using FlavorfulStory.Actions.Interactables;
-using FlavorfulStory.Audio;
 using FlavorfulStory.InputSystem;
 using FlavorfulStory.ResourceContainer;
 using FlavorfulStory.TooltipSystem;
@@ -113,7 +112,6 @@ namespace FlavorfulStory.Control
         /// <summary> Начало взаимодействия с объектом. </summary>
         private void BeginInteraction()
         {
-            SfxPlayer.Instance.PlayOneShot(SfxType.Chop);
             _startInteractionAction?.Invoke();
             _activeInteractable = _closestInteractable;
             _activeInteractable?.BeginInteraction(_playerController);

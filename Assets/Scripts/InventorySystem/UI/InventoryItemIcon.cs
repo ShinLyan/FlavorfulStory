@@ -27,7 +27,7 @@ namespace FlavorfulStory.InventorySystem.UI
         /// <param name="number"> Количество предметов. </param>
         public void SetItem(InventoryItem item, int number)
         {
-            _iconImage.enabled = item;
+                _iconImage.enabled = item;
             if (item) _iconImage.sprite = item.Icon;
 
             _itemNumberContainer.SetActive(number > 1);

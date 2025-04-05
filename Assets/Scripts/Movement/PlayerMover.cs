@@ -1,5 +1,4 @@
 using System;
-using FlavorfulStory.Audio;
 using FlavorfulStory.InputSystem;
 using FlavorfulStory.Saving;
 using UnityEngine;
@@ -33,11 +32,11 @@ namespace FlavorfulStory.Movement
         /// <summary> Компонент Animator для управления анимациями игрока. </summary>
         private Animator _animator;
 
-        /// <summary> Компонент источника звука для передвижения. </summary>
-        private CharacterLocomotionSound _locomotionSound;
-
         /// <summary> Хэшированное значение параметра "скорость" для анимации. </summary>
         private static readonly int _speedParameterHash = Animator.StringToHash("Speed");
+
+        private const float WalkingMultiplier = 0.5f;
+        private const float RunningMultiplier = 1f;
 
         #endregion
 
@@ -46,7 +45,6 @@ namespace FlavorfulStory.Movement
         {
             _rigidbody = GetComponent<Rigidbody>();
             _animator = GetComponent<Animator>();
-            _locomotionSound = GetComponentInChildren<CharacterLocomotionSound>();
         }
 
         /// <summary> Обновление движения и поворота игрока через FixedUpdate. </summary>
@@ -86,16 +84,7 @@ namespace FlavorfulStory.Movement
         /// <returns> Множитель скорости (0.5 для ходьбы, 1 для бега). </returns>
         private float GetSpeedMultiplier()
         {
-            const float WalkingMultiplier = 0.5f;
-            const float RunningMultiplier = 1f;
-
-            if (InputWrapper.GetButton(InputButton.Walking))
-            {
-                _locomotionSound.SetWalkingState();
-                return WalkingMultiplier;
-            }
-            _locomotionSound.SetRunningState();
-            return RunningMultiplier;
+            return InputWrapper.GetButton(InputButton.Walking) ? WalkingMultiplier : RunningMultiplier;
         }
 
         /// <summary> Обновляет анимацию движения игрока в зависимости от скорости. </summary>
@@ -109,16 +98,7 @@ namespace FlavorfulStory.Movement
 
         /// <summary> Устанавливает направление движения игрока. </summary>
         /// <param name="direction"> Вектор направления движения. </param>
-        public void SetMoveDirection(Vector3 direction)
-        {
-            _moveDirection = direction;
-
-            if (_moveDirection == Vector3.zero)
-                _locomotionSound.Disable();
-            else
-                _locomotionSound.Enable();
-
-        }
+        public void SetMoveDirection(Vector3 direction) => _moveDirection = direction;
 
         /// <summary> Устанавливает направление поворота игрока. </summary>
         /// <param name="direction"> Вектор направления взгляда. </param>

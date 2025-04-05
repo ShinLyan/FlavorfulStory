@@ -1,4 +1,5 @@
 using System;
+using FlavorfulStory.Audio;
 using TMPro;
 using UnityEngine;
 
@@ -30,7 +31,11 @@ namespace FlavorfulStory.UI
         protected override void Initialize() => SetNameState(false);
 
         /// <summary> Наведение курсора на кнопку. </summary>
-        protected override void HoverStart() => SetNameState(true);
+        protected override void HoverStart()
+        {
+            SfxPlayer.Instance.PlayOneShot(SfxType.UIHover);
+            SetNameState(true);
+        }
 
         /// <summary> Уход курсора с кнопки. </summary>
         protected override void HoverEnd()
@@ -41,6 +46,7 @@ namespace FlavorfulStory.UI
         /// <summary> Клик по кнопке. </summary>
         protected override void Click()
         {
+            base.Click();
             SetNameState(true);
             OnClick?.Invoke();
         }

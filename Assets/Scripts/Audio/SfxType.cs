@@ -2,8 +2,13 @@
 {
     public enum SfxType
     {
-        Chop,
-        Pick,
-        UIButton
+        WoodHit,
+        StoneHit,
+        UIClick,
+        UIHover,
+        Walk,
+        Run,
+        Eat,
+        Build
     }
 }

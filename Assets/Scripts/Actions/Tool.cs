@@ -1,3 +1,4 @@
+using FlavorfulStory.Audio;
 using FlavorfulStory.Control;
 using FlavorfulStory.InputSystem;
 using FlavorfulStory.InventorySystem;
@@ -21,6 +22,9 @@ namespace FlavorfulStory.Actions
         /// <summary> Кнопка использования предмета. </summary>
         [field: Tooltip("Кнопка использования"), SerializeField]
         public UseActionType UseActionType { get; set; }
+
+        [field: Tooltip("Тип SFX использования"), SerializeField]
+        public SfxType SfxType { get; set; }
 
         /// <summary> Максимальная дистанция взаимодействия инструментом. </summary>
         private const float MaxInteractionDistance = 2f;

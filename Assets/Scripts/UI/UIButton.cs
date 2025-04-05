@@ -21,6 +21,10 @@ namespace FlavorfulStory.UI
         public void RemoveAllListeners() => OnClick = null;
 
         /// <summary> Обработчик события клика по кнопке. Вызывает событие OnClick. </summary>
-        protected override void Click() => OnClick?.Invoke();
+        protected override void Click()
+        {
+            base.Click();
+            OnClick?.Invoke();
+        }
     }
 }
