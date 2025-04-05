@@ -1,4 +1,5 @@
-﻿using FlavorfulStory.UI;
+﻿using FlavorfulStory.InputSystem;
+using FlavorfulStory.UI;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -32,8 +33,15 @@ namespace FlavorfulStory.DialogueSystem.UI
         /// <summary> Объект текста кнопки Next. </summary>
         [SerializeField] private GameObject _nextButtonPreview;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        [SerializeField] private Canvas _hud;
+
         /// <summary> Ссылка на компонент PlayerConversant для управления диалогом. </summary>
         private PlayerSpeaker _playerSpeaker;
+
+        private bool IsActive => _playerSpeaker.IsDialogueActive;
 
         /// <summary> Инициализация компонентов и подписка на события. </summary>
         private void Awake()
@@ -41,10 +49,31 @@ namespace FlavorfulStory.DialogueSystem.UI
             _playerSpeaker = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerSpeaker>();
             _nextButton.onClick.AddListener(OnClickNextDialogue);
             _playerSpeaker.OnConversationUpdated += UpdateView;
+            _playerSpeaker.OnConversationUpdated += UpdateHud;
         }
 
         /// <summary> При старте обновляем отображение. </summary>
         private void Start() => UpdateView();
+
+        private void Update()
+        {
+            if (!IsActive) return;
+
+            if (InputWrapper.GetButtonDown(InputButton.NextDialogue)) OnNextClicked();
+
+            if (InputWrapper.GetButtonDown(InputButton.SkipDialogue)) OnSkipClicked();
+        }
+
+        private void OnNextClicked()
+        {
+            print("Next button clicked");
+        }
+
+        private void OnSkipClicked()
+        {
+            print("Skip clicked");
+        }
+
 
         /// <summary> Обработчик нажатия на кнопку перехода к следующей реплике. </summary>
         private void OnClickNextDialogue() => _playerSpeaker.PlayNextDialogueNode();
@@ -52,8 +81,8 @@ namespace FlavorfulStory.DialogueSystem.UI
         /// <summary> Обновить отображение в зависимости от состояния диалога. </summary>
         private void UpdateView()
         {
-            gameObject.SetActive(_playerSpeaker.IsDialogueActive);
-            if (!_playerSpeaker.IsDialogueActive) return;
+            gameObject.SetActive(IsActive);
+            if (!IsActive) return;
 
             SetSpeakerView(_playerSpeaker.CurrentNpcSpeaker);
             _nextButton.enabled = !_playerSpeaker.IsChoosingDialogue;
@@ -103,5 +132,10 @@ namespace FlavorfulStory.DialogueSystem.UI
         /// <summary> Обработчик выбора варианта ответа. </summary>
         /// <param name="choice"> Выбранный узел диалога. </param>
         private void OnClickSelectChoice(DialogueNode choice) => _playerSpeaker.SelectChoice(choice);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void UpdateHud() => _hud.gameObject.SetActive(!IsActive);
     }
 }

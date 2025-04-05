@@ -3,6 +3,7 @@ using FlavorfulStory.AI;
 using FlavorfulStory.AI.States;
 using FlavorfulStory.Control;
 using FlavorfulStory.Control.CursorSystem;
+using FlavorfulStory.InputSystem;
 using UnityEngine;
 
 namespace FlavorfulStory.DialogueSystem
@@ -27,6 +28,39 @@ namespace FlavorfulStory.DialogueSystem
             IsInteractionAllowed = true;
         }
 
+        #region IInteractable
+
+        public bool IsInteractionAllowed { get; private set; }
+
+        public float GetDistanceTo(Transform otherTransform) =>
+            Vector3.Distance(otherTransform.position, transform.position);
+
+        public void BeginInteraction(PlayerController player)
+        {
+            if (!IsInteractionAllowed) return;
+        }
+
+        public void Interact(PlayerController player)
+        {
+            if (!IsInteractionAllowed) return;
+
+            player.GetComponent<PlayerSpeaker>().StartDialogue(this, _dialogue);
+        }
+
+        public void EndInteraction(PlayerController player) { }
+
+        #endregion
+
+        #region ITooltipable
+
+        public string TooltipTitle => NpcInfo.NpcName.ToString();
+
+        public string TooltipDescription => "Talk";
+
+        public Vector3 WorldPosition => transform.position;
+
+        #endregion
+
         #region ICursorInteractable
 
         /// <summary> Возвращает тип курсора "Диалог" при наведении на NPC. </summary>
@@ -44,40 +78,13 @@ namespace FlavorfulStory.DialogueSystem
 
             if (Input.GetMouseButtonDown(1))
             {
+                InputWrapper.BlockAllInput();
                 BeginInteraction(controller);
                 Interact(controller);
             }
 
             return true;
         }
-
-        #endregion
-
-        #region ITooltipable
-
-        public string TooltipTitle => "хер";
-
-        public string TooltipDescription => "большой";
-
-        public Vector3 WorldPosition => transform.position;
-
-        #endregion
-
-        #region IInteractable
-
-        public bool IsInteractionAllowed { get; private set; }
-
-        public float GetDistanceTo(Transform otherTransform) =>
-            Vector3.Distance(otherTransform.position, transform.position);
-
-        public void BeginInteraction(PlayerController player) { }
-
-        public void Interact(PlayerController player)
-        {
-            player.GetComponent<PlayerSpeaker>().StartDialogue(this, _dialogue);
-        }
-
-        public void EndInteraction(PlayerController player) { }
 
         #endregion
     }

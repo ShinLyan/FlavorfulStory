@@ -37,6 +37,16 @@
         Interact,
 
         /// <summary> Позиция курсора мыши. </summary>
-        MousePosition
+        MousePosition,
+
+        /// <summary>
+        /// 
+        /// </summary>
+        NextDialogue,
+
+        /// <summary>
+        /// 
+        /// </summary>
+        SkipDialogue
     }
 }

@@ -118,5 +118,8 @@ namespace FlavorfulStory.DialogueSystem
             if (action == string.Empty) return;
             CurrentNpcSpeaker.GetComponent<DialogueTrigger>().TriggerDialogue(action);
         }
+
+        /// <summary> При уничтожении событие отписать от подписчиков. </summary>
+        private void OnDestroy() => OnConversationUpdated = null;
     }
 }
