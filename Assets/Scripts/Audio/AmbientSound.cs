@@ -30,10 +30,7 @@ namespace FlavorfulStory.Audio
         /// <summary> Запуск воспроизведения треков. </summary>
         private void Start() => StartCoroutine(PlayTracks());
 
-        private IEnumerable<AudioClip> GetShuffledTracklist()
-        {
-            return _trackList.OrderBy(_ => _random.Next());
-        }
+        private IEnumerable<AudioClip> GetShuffledTracklist() => _trackList.OrderBy(_ => _random.Next());
 
         /// <summary> Воспроизведение указанного трека. </summary>
         /// <param name="audioClip"> Трек, который нужно воспроизвести. </param>
