@@ -48,11 +48,15 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         /// <summary> Проигрыватель корутин. </summary>
         private readonly MonoBehaviour _coroutineRunner;
 
+        private readonly Vector3 _spawnPoint;
+
+        private bool _isExiting; //TODO: исправить костыль
+
         /// <summary> Хэшированное значение параметра "скорость" для анимации. </summary>
         private static readonly int _speedParameterHash = Animator.StringToHash("Speed");
 
         /// <summary> Минимальное расстояние до точки, при котором считается, что NPC достиг её. </summary>
-        private const float DistanceToReachPoint = 0.3f;
+        private const float DistanceToReachPoint = 1.0f;
 
         #endregion
 
@@ -71,15 +75,15 @@ namespace FlavorfulStory.AI.FiniteStateMachine
             _currentScheduleParams = null;
             _npcTransform = npcTransform;
             _coroutineRunner = coroutineRunner;
-            _spawnLocation = SetLocationName();
+            _spawnPoint = npcTransform.position;
+            _spawnLocation = GetCurrentLocationName();
             _currentLocation = _spawnLocation;
+            _isExiting = false; //TODO: исправить костыль
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        private LocationName SetLocationName()
+        /// <summary> Получить имя локации, в которой находится NPC. </summary>
+        /// <returns> Имя локации. </returns>
+        private LocationName GetCurrentLocationName()
         {
             foreach (var location in Object.FindObjectsByType<Location>(FindObjectsInactive.Include,
                          FindObjectsSortMode.None))
@@ -89,12 +93,18 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         }
 
         /// <summary> Вызывается при входе в состояние движения. </summary>
-        public override void Enter() => WorldTime.OnTimeUpdated += FindDestinationPoint;
+        public override void Enter()
+        {
+            _isExiting = false;
+            WorldTime.OnTimeUpdated += FindDestinationPoint;
+        }
 
         /// <summary> Вызывается при выходе из состояния движения. </summary>
         public override void Exit()
         {
-            Reset();
+            _isExiting = true; 
+            Reset(); 
+            _isExiting = false;
             WorldTime.OnTimeUpdated -= FindDestinationPoint;
         }
 
@@ -116,6 +126,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine
             PlayMoveAnimation(0f, 0f);
             _currentPoint = null;
             _navMeshAgent.ResetPath();
+            if (!_isExiting) _navMeshAgent.Warp(_spawnPoint); //TODO: исправить костыль
             _currentLocation = _spawnLocation;
         }
 
@@ -145,7 +156,8 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         private void SwitchStateIfPointReached()
         {
             bool isInTargetLocation = _currentLocation == _currentPoint.LocationName;
-            bool isCloseEnough = _navMeshAgent.remainingDistance <= DistanceToReachPoint;
+            bool isCloseEnough =
+                Vector3.Distance(_currentPoint.Position, _npcTransform.position) <= DistanceToReachPoint;
 
             if (isInTargetLocation && isCloseEnough) RequestStateChange(typeof(RoutineState));
         }
