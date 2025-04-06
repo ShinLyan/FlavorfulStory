@@ -64,8 +64,6 @@ namespace FlavorfulStory.TimeManagement
         /// <summary> Увеличить игровое время и проверить завершение дня. </summary>
         private void IncreaseTime()
         {
-            print(_currentGameTime);
-
             _currentGameTime.AddMinutes(_minutesPerTick);
 
             if (_currentGameTime.Hour == _dayEndHour)

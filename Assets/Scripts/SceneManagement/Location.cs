@@ -14,15 +14,6 @@ namespace FlavorfulStory.SceneManagement
         [Tooltip("Объекты, которые будут отключены при выходе игрока из локации."), SerializeField]
         private GameObject[] _objectsToDisable;
 
-        /// <summary> Границы локации, вычисленные по Collider. </summary>
-        private Bounds _locationBounds;
-
-        /// <summary> Инициализация границ локации по компоненту Collider. </summary>
-        private void Awake()
-        {
-            if (TryGetComponent(out Collider component)) _locationBounds = component.bounds;
-        }
-
         /// <summary> Активирует объекты, связанные с этой локацией. </summary>
         public void Enable() => SetObjectsActive(true);
 
@@ -41,6 +32,7 @@ namespace FlavorfulStory.SceneManagement
         /// <summary> Находится ли заданная позиция внутри границ локации? </summary>
         /// <param name="position"> Позиция в мировом пространстве. </param>
         /// <returns> <c>true</c>, если позиция внутри локации; иначе — <c>false</c>. </returns>
-        public bool IsPositionInLocation(Vector3 position) => _locationBounds.Contains(position);
+        public bool IsPositionInLocation(Vector3 position) =>
+            TryGetComponent(out Collider component) && component.bounds.Contains(position);
     }
 }
