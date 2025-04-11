@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4597948272031919339}
   - component: {fileID: 9180861555591881885}
-  - component: {fileID: 1089281359516442780}
+  - component: {fileID: 8042676014535670791}
   m_Layer: 0
   m_Name: TreeSpawner
   m_TagString: Untagged
@@ -26,7 +26,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5234204699844818196}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -35, y: 0, z: -20}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -45,8 +45,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3deb9cfb883439a4d9da32368c0a55b4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _uniqueIdentifier: f2e87569-195c-4b10-83a2-19367fee6a6d
---- !u!114 &1089281359516442780
+  _uniqueIdentifier: 1e5ca0b5-0ad7-4153-958e-6fdb365bd45c
+--- !u!114 &8042676014535670791
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -55,14 +55,19 @@ MonoBehaviour:
   m_GameObject: {fileID: 5234204699844818196}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7545c17adf4bed9468e99cd00b7810b6, type: 3}
+  m_Script: {fileID: 11500000, guid: 33645acca8a796846b88657453196405, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _config: {fileID: 11400000, guid: a5555a9fb5db63e4ba14d59e2d9929a4, type: 2}
+  _spawnObjectPrefab: {fileID: 2504854051262580730, guid: 3861c5899c52f8f47963ded7cf819e5a,
+    type: 3}
+  _spawnObjectsNumber: 30
+  _scaleVariation: {x: 0.8, y: 1.2}
+  _widthSpawnArea: 89
+  _lengthSpawnArea: 107
+  _minSpacing: 6
+  _evenSpread: 0
   _obstaclesLayerMask:
     serializedVersion: 2
-    m_Bits: 63
-  _visualizeConfigArea: 1
-  _gizmosColor: {r: 0.06607056, g: 0, b: 1, a: 1}
-  _maxIterations: 300
-  _scaleVariation: {x: 0.8, y: 1.2}
+    m_Bits: 88
+  _maxIterations: 1000
+  _spawnAreaVisualizationColor: {r: 1, g: 0, b: 0, a: 1}

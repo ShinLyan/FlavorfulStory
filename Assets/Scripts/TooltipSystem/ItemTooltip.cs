@@ -13,11 +13,12 @@ namespace FlavorfulStory.InventorySystem.TooltipSystem
         [SerializeField] private TMP_Text _descriptionText;
 
         /// <summary> Устанавливает значения для отображения тултипа. </summary>
-        /// <param name="item"> Предмет, данные которого будут отображены. </param>
-        public void Setup(InventoryItem item)
+        /// <param name="title"> Текст заголовка. </param>
+        /// <param name="description"> Текст описания. </param>
+        public void Setup(string title, string description)
         {
-            _titleText.text = item.ItemName;
-            _descriptionText.text = item.Description;
+            _titleText.text = title;
+            _descriptionText.text = description;
         }
     }
 }

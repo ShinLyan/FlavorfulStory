@@ -41,7 +41,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4739337702425036554}
   - component: {fileID: 3716522116146875282}
-  - component: {fileID: 1832171432571562821}
+  - component: {fileID: 2538533393900910625}
   m_Layer: 0
   m_Name: Portal
   m_TagString: Untagged
@@ -86,7 +86,7 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 2.2, z: 1.45}
   m_Center: {x: 0, y: 1.12, z: 0}
---- !u!114 &1832171432571562821
+--- !u!114 &2538533393900910625
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -95,9 +95,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 7704774167071567273}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 275a5430c35eb5f41a6e785c8d20be69, type: 3}
+  m_Script: {fileID: 11500000, guid: 4c8797726b244934981371ffe7a3a884, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _spawnPoint: {fileID: 5638649953441028367}
-  _sceneToLoad: 2
-  _destination: 0
+  _spawnPoint: {fileID: 0}
+  <ConnectedWarp>k__BackingField: {fileID: 0}
+  _localConnectionColor: {r: 0, g: 0, b: 1, a: 1}
+  _remoteConnectionColor: {r: 0, g: 1, b: 0, a: 1}

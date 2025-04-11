@@ -10,7 +10,7 @@ namespace FlavorfulStory.Core
     public class PersistentObjectSpawner : MonoBehaviour
     {
         /// <summary> Префаб, создаваемый один раз и сохраняемый между сценами. </summary>
-        [Tooltip("Префаб, который создается только один раз и сохраняется между сценами.")] [SerializeField]
+        [Tooltip("Префаб, который создается только один раз и сохраняется между сценами."), SerializeField]
         private GameObject _persistentObjectsPrefab;
 
         /// <summary> Был ли префаб уже создан? </summary>
@@ -22,7 +22,8 @@ namespace FlavorfulStory.Core
             if (_hasSpawned) return;
 
             SpawnPersistentObject();
-            InitializeSystems();
+            LocationChanger.ActivatePlayerCurrentLocation();
+            InputWrapper.UnblockAllInput();
         }
 
         /// <summary> Создает постоянный объект и устанавливает его сохранение между сценами. </summary>
@@ -32,13 +33,6 @@ namespace FlavorfulStory.Core
             DontDestroyOnLoad(persistentObject);
 
             _hasSpawned = true;
-        }
-
-        /// <summary> Инициализация глобальных систем после спавна объектов. </summary>
-        private static void InitializeSystems()
-        {
-            InputWrapper.Initialize();
-            LocationChanger.ActivatePlayerCurrentLocation();
         }
     }
 }

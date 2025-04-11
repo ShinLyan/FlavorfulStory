@@ -6,19 +6,17 @@ using UnityEngine;
 namespace FlavorfulStory.Movement
 {
     /// <summary> Передвижение игрока. </summary>
-    [RequireComponent(typeof(Rigidbody))]
-    [RequireComponent(typeof(Animator))]
+    [RequireComponent(typeof(Rigidbody), typeof(Animator))]
     public class PlayerMover : MonoBehaviour, ISaveable
     {
         #region Private Fields
 
-        [Header("Параметры движения")]
         /// <summary> Скорость передвижения игрока. </summary>
-        [SerializeField, Tooltip("Скорость передвижения игрока.")]
+        [Header("Параметры движения")] [Tooltip("Скорость передвижения игрока."), SerializeField]
         private float _moveSpeed;
 
         /// <summary> Скорость поворота игрока. </summary>
-        [SerializeField, Tooltip("Скорость поворота игрока.")]
+        [Tooltip("Скорость поворота игрока."), SerializeField]
         private float _rotateSpeed;
 
         /// <summary> Компонент Rigidbody, отвечающий за физику движения игрока. </summary>
@@ -28,7 +26,7 @@ namespace FlavorfulStory.Movement
         private Vector3 _moveDirection;
 
         /// <summary> Текущее направление взгляда игрока. </summary>
-        private Quaternion _lookRotation = Quaternion.identity;
+        private Vector3 _lookDirection;
 
         /// <summary> Компонент Animator для управления анимациями игрока. </summary>
         private Animator _animator;
@@ -58,6 +56,18 @@ namespace FlavorfulStory.Movement
             AnimateMovement(_moveDirection.magnitude);
         }
 
+        /// <summary> Плавно поворачивает игрока в указанном направлении. </summary>
+        private void Rotate()
+        {
+            if (_lookDirection == Vector3.zero) return;
+            
+            _rigidbody.MoveRotation(
+                Quaternion.Slerp(transform.rotation,
+                    Quaternion.LookRotation( _lookDirection),
+                    Time.fixedDeltaTime * _rotateSpeed)
+            );
+        }
+
         /// <summary> Выполняет передвижение игрока в соответствии с направлением движения. </summary>
         private void Move()
         {
@@ -65,17 +75,7 @@ namespace FlavorfulStory.Movement
             moveForce.y = _rigidbody.linearVelocity.y;
             _rigidbody.linearVelocity = moveForce;
         }
-
-        /// <summary> Плавно поворачивает игрока в указанном направлении. </summary>
-        private void Rotate()
-        {
-            _rigidbody.MoveRotation(
-                Quaternion.Slerp(transform.rotation,
-                    _lookRotation,
-                    Time.fixedDeltaTime * _rotateSpeed)
-            );
-        }
-
+        
         /// <summary> Вычисляет множитель скорости в зависимости от режима (ходьба или бег). </summary>
         /// <returns> Множитель скорости (0.5 для ходьбы, 1 для бега). </returns>
         private static float CountSpeedMultiplier()
@@ -98,9 +98,9 @@ namespace FlavorfulStory.Movement
         /// <param name="direction"> Вектор направления движения. </param>
         public void SetMoveDirection(Vector3 direction) => _moveDirection = direction;
 
-        /// <summary> Устанавливает направление взгяда игрока. </summary>
-        /// <param name="rotation"> Кватернион направления взгляда. </param>
-        public void SetLookRotation(Quaternion rotation) => _lookRotation = rotation;
+        /// <summary> Устанавливает направление поворота игрока. </summary>
+        /// <param name="rotation"> Вектор направления взгляда. </param>
+        public void SetLookRotation(Vector3 rotation) => _lookDirection = rotation;
 
         /// <summary> Установить позицию и мгновенно перенести к ней игрока. </summary>
         /// <param name="position"> Позиция, к которой необходимо перенести игрока. </param>
