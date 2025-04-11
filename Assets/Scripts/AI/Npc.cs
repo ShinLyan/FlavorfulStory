@@ -20,10 +20,10 @@ namespace FlavorfulStory.AI
         private void Start()
         {
             _stateController = new StateController(
-                GetComponent<NavMeshAgent>(),
-                GetComponent<Animator>(),
                 _npcSchedule,
+                GetComponent<Animator>(),
                 transform,
+                GetComponent<NavMeshAgent>(),
                 this
             );
         }

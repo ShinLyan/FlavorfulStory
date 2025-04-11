@@ -25,14 +25,14 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         public RoutineState(Animator animator) => _animator = animator;
 
         /// <summary> Вызывается при входе в состояние рутины. Подписывается на событие изменения времени. </summary>
-        public override void Enter() => WorldTime.OnTimeUpdated += CheckNewTime;
+        public override void Enter() => WorldTime.OnTimeUpdated += OnNewTimeTick;
 
         /// <summary> Вызывается при выходе из состояния рутины. Отписывается от события изменения времени
         /// и сбрасывает текущую точку. </summary>
         public override void Exit()
         {
             Reset();
-            WorldTime.OnTimeUpdated -= CheckNewTime;
+            WorldTime.OnTimeUpdated -= OnNewTimeTick;
         }
 
         /// <summary> Обновляет логику состояния рутины каждый кадр.
@@ -52,7 +52,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         /// <summary> Проверяет, изменилось ли время, и обновляет текущую точку расписания.
         /// Переключает состояние на движение, если время совпадает с точкой. </summary>
         /// <param name="currentTime"> Текущее время в игре. </param>
-        private void CheckNewTime(DateTime currentTime)
+        private void OnNewTimeTick(DateTime currentTime)
         {
             var closestPoint = _currentScheduleParams?.GetClosestSchedulePointInPath(currentTime);
             if (closestPoint == null || closestPoint == _currentPoint) return;

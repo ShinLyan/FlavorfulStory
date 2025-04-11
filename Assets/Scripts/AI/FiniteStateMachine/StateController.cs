@@ -19,15 +19,9 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         /// <summary> Текущее состояние персонажа. </summary>
         private CharacterState _currentState;
 
-        /// <summary> Компонент NavMeshAgent. </summary>
-        private readonly NavMeshAgent _navMeshAgent;
-
         /// <summary> Словарь, хранящий все возможные состояния персонажа, где ключ — тип состояния,
         /// а значение — экземпляр состояния. </summary>
         private readonly Dictionary<Type, CharacterState> _typeToCharacterStates;
-
-        /// <summary> Точка спавна. </summary>
-        private readonly Vector3 _spawnPoint;
 
         /// <summary> Расписания, отсортированные по приоритетам. </summary>
         private readonly IEnumerable<ScheduleParams> _sortedScheduleParams;
@@ -38,20 +32,18 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         #endregion
 
         /// <summary> Конструктор контроллера состояний. </summary>
-        /// <param name="navMeshAgent"> Компонент NavMesh. </param>
-        /// <param name="animator"> Компонент Animator. </param>
         /// <param name="npcSchedule"> Набор расписаний. </param>
+        /// <param name="animator"> Компонент Animator. </param>
         /// <param name="npcTransform"> Компонент Transform. </param>
+        /// <param name="navMeshAgent"> Компонент NavMesh. </param>
         /// <param name="coroutineRunner"> Проигрыватель корутин. </param>
-        public StateController(NavMeshAgent navMeshAgent, Animator animator,
-            NpcSchedule npcSchedule, Transform npcTransform, MonoBehaviour coroutineRunner)
+        public StateController(NpcSchedule npcSchedule, Animator animator, Transform npcTransform,
+            NavMeshAgent navMeshAgent, MonoBehaviour coroutineRunner)
         {
             _typeToCharacterStates = new Dictionary<Type, CharacterState>();
-            _navMeshAgent = navMeshAgent;
             _sortedScheduleParams = npcSchedule.GetSortedScheduleParams();
             if (_sortedScheduleParams == null) Debug.LogError("SortedScheduleParams is null");
-            _spawnPoint = npcTransform.position;
-            InitializeStates(animator, coroutineRunner, npcTransform);
+            InitializeStates(animator, npcTransform, navMeshAgent, coroutineRunner);
 
             WorldTime.OnDayEnded += OnReset;
             OnReset(WorldTime.GetCurrentGameTime());
@@ -59,16 +51,17 @@ namespace FlavorfulStory.AI.FiniteStateMachine
 
         /// <summary> Инициализировать состояния. </summary>
         /// <param name="animator"> Компонент Animator. </param>
-        /// <param name="coroutineRunner"> Проигрыватель корутин. </param>
         /// <param name="npcTransform"> Компонент Transform. </param>
-        private void InitializeStates(Animator animator,
-            MonoBehaviour coroutineRunner, Transform npcTransform)
+        /// <param name="navMeshAgent"> Компонент NavMesh. </param>
+        /// <param name="coroutineRunner"> Проигрыватель корутин. </param>
+        private void InitializeStates(Animator animator, Transform npcTransform,
+            NavMeshAgent navMeshAgent, MonoBehaviour coroutineRunner)
         {
             var states = new CharacterState[]
             {
                 new InteractionState(),
                 new MovementState(
-                    _navMeshAgent,
+                    navMeshAgent,
                     WarpGraph.Build(
                         Object.FindObjectsByType<WarpPortal>(FindObjectsInactive.Include, FindObjectsSortMode.None)),
                     animator,
@@ -99,7 +92,6 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         {
             PrioritizeSchedule(currentTime);
             ResetStates();
-            _navMeshAgent.Warp(_spawnPoint);
         }
 
         /// <summary> Приоритизировать расписание. </summary>
