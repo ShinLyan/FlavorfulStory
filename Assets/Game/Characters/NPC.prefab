@@ -99,10 +99,6 @@ PrefabInstance:
       addedObject: {fileID: 1981188202499589719}
     - targetCorrespondingSourceObject: {fileID: 8113930228413350172, guid: b78da40e1e8265344bc64d80efddd24b,
         type: 3}
-      insertIndex: 3
-      addedObject: {fileID: 6762634182957664526}
-    - targetCorrespondingSourceObject: {fileID: 8113930228413350172, guid: b78da40e1e8265344bc64d80efddd24b,
-        type: 3}
       insertIndex: -1
       addedObject: {fileID: 9216231004728534982}
   m_SourcePrefab: {fileID: 100100000, guid: b78da40e1e8265344bc64d80efddd24b, type: 3}
@@ -134,27 +130,6 @@ NavMeshAgent:
   m_BaseOffset: 0
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
---- !u!65 &6762634182957664526
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7922225790736311418}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 2, y: 2, z: 1}
-  m_Center: {x: 0, y: 1, z: 0.75}
 --- !u!114 &9216231004728534982
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -168,4 +143,3 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _npcSchedule: {fileID: 0}
-  <CurrentLocationName>k__BackingField: 0

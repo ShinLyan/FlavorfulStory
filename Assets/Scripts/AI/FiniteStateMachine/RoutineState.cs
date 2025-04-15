@@ -68,7 +68,10 @@ namespace FlavorfulStory.AI.FiniteStateMachine
 
         /// <summary> Воспроизведение анимации состояния. </summary>
         /// <param name="animationStateName"> Название состояния анимации. </param>
-        private void PlayStateAnimation(NpcAnimationClipName animationStateName) =>
+        private void PlayStateAnimation(NpcAnimationClipName animationStateName)
+        {
+            if (animationStateName == NpcAnimationClipName.Idle) return;
             _animator.Play(animationStateName.ToString());
+        }
     }
 }

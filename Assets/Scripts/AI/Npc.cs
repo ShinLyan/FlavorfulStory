@@ -17,7 +17,7 @@ namespace FlavorfulStory.AI
         private StateController _stateController;
 
         /// <summary> Инициализация контроллера состояний. </summary>
-        private void Start()
+        private void Awake()
         {
             _stateController = new StateController(
                 _npcSchedule,
