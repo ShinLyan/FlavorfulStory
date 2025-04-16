@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 8982573050181053363}
   - component: {fileID: 6801226478386728203}
   - component: {fileID: 2430854140333003521}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: InteractFeature
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -27,7 +27,7 @@ Transform:
   m_GameObject: {fileID: 3112144153974705329}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 25.23, y: 0, z: 11.25}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -86,6 +86,21 @@ PrefabInstance:
       value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 107118824688962860, guid: b78da40e1e8265344bc64d80efddd24b,
+        type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 145213435301659984, guid: b78da40e1e8265344bc64d80efddd24b,
+        type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 145213435301659994, guid: b78da40e1e8265344bc64d80efddd24b,
+        type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 145213435301659998, guid: b78da40e1e8265344bc64d80efddd24b,
         type: 3}
       propertyPath: m_Layer
       value: 7
@@ -211,6 +226,11 @@ PrefabInstance:
       value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 2972767821109505740, guid: b78da40e1e8265344bc64d80efddd24b,
+        type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 3022612793171272312, guid: b78da40e1e8265344bc64d80efddd24b,
         type: 3}
       propertyPath: m_Layer
       value: 7
@@ -629,10 +649,6 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 8113930228413350172, guid: b78da40e1e8265344bc64d80efddd24b,
         type: 3}
       insertIndex: -1
-      addedObject: {fileID: 5731089188578584039}
-    - targetCorrespondingSourceObject: {fileID: 8113930228413350172, guid: b78da40e1e8265344bc64d80efddd24b,
-        type: 3}
-      insertIndex: -1
       addedObject: {fileID: 7966854098110225172}
     - targetCorrespondingSourceObject: {fileID: 8113930228413350172, guid: b78da40e1e8265344bc64d80efddd24b,
         type: 3}
@@ -642,6 +658,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 8764958242865914222}
+    - targetCorrespondingSourceObject: {fileID: 8113930228413350172, guid: b78da40e1e8265344bc64d80efddd24b,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5731089188578584039}
   m_SourcePrefab: {fileID: 100100000, guid: b78da40e1e8265344bc64d80efddd24b, type: 3}
 --- !u!1 &3060036881891773498 stripped
 GameObject:
@@ -702,26 +722,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _moveSpeed: 5
   _rotateSpeed: 20
---- !u!114 &5731089188578584039
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5075500785383677502}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5067c1a87ab0e8d4d921e38cba09ce02, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _toolMappings:
-  - <ToolType>k__BackingField: 0
-    <ToolPrefab>k__BackingField: {fileID: 3060036881891773498}
-  - <ToolType>k__BackingField: 1
-    <ToolPrefab>k__BackingField: {fileID: 3816329296589773432}
-  <HitableLayers>k__BackingField:
-    serializedVersion: 2
-    m_Bits: 0
 --- !u!114 &7966854098110225172
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -759,3 +759,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c3a970a862f6824fbdca652389c28ac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &5731089188578584039
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5075500785383677502}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5067c1a87ab0e8d4d921e38cba09ce02, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _toolMappings:
+  - <ToolType>k__BackingField: 0
+    <ToolPrefab>k__BackingField: {fileID: 3060036881891773498}
+  - <ToolType>k__BackingField: 1
+    <ToolPrefab>k__BackingField: {fileID: 3816329296589773432}
+  <HitableLayers>k__BackingField:
+    serializedVersion: 2
+    m_Bits: 321
