@@ -1,4 +1,3 @@
-
 using System;
 
 namespace FlavorfulStory.TimeManagement
@@ -8,7 +7,7 @@ namespace FlavorfulStory.TimeManagement
     public struct DateTime
     {
         /// <summary> Общее количество минут, прошедших с начала игры. </summary>
-        private int _totalMinutes;
+        public float TotalMinutes { get; private set; }
 
         /// <summary> Количество дней в одном сезоне. </summary>
         private const int DaysCount = 28;
@@ -22,28 +21,28 @@ namespace FlavorfulStory.TimeManagement
         #region Properties
 
         /// <summary> Получает текущий год. </summary>
-        public int Year => _totalMinutes / (SeasonMinutes * 4) + 1;
+        public int Year => (int)TotalMinutes / (SeasonMinutes * 4) + 1;
 
         /// <summary> Получает текущий сезон. </summary>
-        public Seasons Season => (Seasons)(_totalMinutes % (SeasonMinutes * 4) / SeasonMinutes);
+        public Seasons Season => (Seasons)(TotalMinutes % (SeasonMinutes * 4) / SeasonMinutes);
 
         /// <summary> Получает день в текущем сезоне. </summary>
-        public int DayInSeason => _totalMinutes % SeasonMinutes / DayMinutes + 1;
+        public int DayInSeason => (int)(TotalMinutes % SeasonMinutes / DayMinutes + 1);
 
         /// <summary> Получает день недели. </summary>
-        public WeekDays DayOfWeek => (WeekDays)(_totalMinutes / DayMinutes % 7);
+        public WeekDays DayOfWeek => (WeekDays)(TotalMinutes / DayMinutes % 7);
 
         /// <summary> Получает текущий час. </summary>
-        public int Hour => _totalMinutes % DayMinutes / 60;
+        public int Hour => (int)TotalMinutes % DayMinutes / 60;
 
         /// <summary> Получает текущую минуту. </summary>
-        public int Minute => _totalMinutes % 60;
+        public int Minute => (int)TotalMinutes % 60;
 
         /// <summary> Получает количество полных недель, прошедших с начала игры. </summary>
-        public int TotalWeeks => _totalMinutes / (DayMinutes * 7);
+        public int TotalWeeks => (int)TotalMinutes / (DayMinutes * 7);
 
         /// <summary> Получает количество полных дней, прошедших с начала игры. </summary>
-        public int TotalDays => _totalMinutes / DayMinutes;
+        public int TotalDays => (int)TotalMinutes / DayMinutes;
 
         #endregion
 
@@ -55,25 +54,25 @@ namespace FlavorfulStory.TimeManagement
         /// <param name="minute"> Минуты. </param>
         public DateTime(int year, Seasons season, int day, int hour, int minute)
         {
-            _totalMinutes = (year - 1) * SeasonMinutes * 4 // Годы в минутах
-                            + ((int)season) * SeasonMinutes // Сезоны в минутах
-                            + (day - 1) * DayMinutes // Дни в минутах
-                            + hour * 60 // Часы в минутах
-                            + minute; // Минуты
+            TotalMinutes = (year - 1) * SeasonMinutes * 4 // Годы в минутах
+                           + (int)season * SeasonMinutes // Сезоны в минутах
+                           + (day - 1) * DayMinutes // Дни в минутах
+                           + hour * 60 // Часы в минутах
+                           + minute; // Минуты
         }
 
         /// <summary> Создаёт объект времени, задав общее количество минут. </summary>
         /// <param name="totalMinutes"> Общее количество минут. </param>
         public DateTime(int totalMinutes)
         {
-            _totalMinutes = totalMinutes;
+            TotalMinutes = totalMinutes;
         }
 
         /// <summary> Добавляет указанное количество минут к текущему времени. </summary>
         /// <param name="minutes"> Количество минут для добавления. </param>
-        public void AddMinutes(int minutes)
+        public void AddMinutes(float minutes)
         {
-            _totalMinutes += minutes;
+            TotalMinutes += minutes;
         }
 
         #region ToString
@@ -100,8 +99,8 @@ namespace FlavorfulStory.TimeManagement
             if (is24HourFormat)
             {
                 // 24-часовой формат
-                var hourString = Hour.ToString("D2");
-                var minuteString = Minute.ToString("D2");
+                string hourString = Hour.ToString("D2");
+                string minuteString = Minute.ToString("D2");
                 return $"{hourString}:{minuteString}";
             }
             else
@@ -110,8 +109,8 @@ namespace FlavorfulStory.TimeManagement
                 string period = Hour >= 12 ? "PM" : "AM";
                 int hour12 = Hour % 12;
                 if (hour12 == 0) hour12 = 12; // Если час = 0 или 12, то в 12-часовом формате это будет 12
-                var hourString = hour12.ToString("D2");
-                var minuteString = Minute.ToString("D2");
+                string hourString = hour12.ToString("D2");
+                string minuteString = Minute.ToString("D2");
                 return $"{hourString}:{minuteString} {period}";
             }
         }
