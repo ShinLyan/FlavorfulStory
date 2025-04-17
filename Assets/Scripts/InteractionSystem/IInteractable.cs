@@ -2,7 +2,7 @@
 using FlavorfulStory.TooltipSystem;
 using UnityEngine;
 
-namespace FlavorfulStory.Actions.Interactables
+namespace FlavorfulStory.InteractionSystem
 {
     /// <summary> Интерфейс для объектов, с которыми можно взаимодействовать
     /// (например, двери, предметы, NPC). </summary>
@@ -11,7 +11,6 @@ namespace FlavorfulStory.Actions.Interactables
     public interface IInteractable : ITooltipable
     {
         /// <summary> Доступно ли взаимодействие с объектом в текущий момент? </summary>
-        /// <returns> True, если объект доступен для взаимодействия; иначе — False. </returns>
         bool IsInteractionAllowed { get; }
 
         /// <summary> Вычисляет расстояние от объекта до другого указанного трансформа. </summary>
@@ -19,18 +18,14 @@ namespace FlavorfulStory.Actions.Interactables
         /// <returns> Расстояние до указанного трансформа. </returns>
         float GetDistanceTo(Transform otherTransform);
 
-        /// <summary> Начинает процесс взаимодействия с объектом
-        /// (например, отображение UI, анимации, подготовка логики). </summary>
+        /// <summary> Начинает процесс взаимодействия с объектом. </summary>
         /// <param name="player"> Игрок, который начал взаимодействие. </param>
+        /// <remarks> Например, отображение UI, анимации, подготовка логики. </remarks>
         void BeginInteraction(PlayerController player);
 
-        /// <summary> Выполняет основное действие взаимодействия
-        /// (например, открыть дверь, взять предмет, запустить диалог). </summary>
-        /// <param name="player"> Игрок, который взаимодействует. </param>
-        void Interact(PlayerController player);
-
-        /// <summary> Завершает взаимодействие (например, закрытие UI, сброс состояний, завершение анимаций). </summary>
+        /// <summary> Завершает взаимодействие. </summary>
         /// <param name="player"> Игрок, завершивший взаимодействие. </param>
+        /// <remarks> Например, закрытие UI, сброс состояний, завершение анимаций. </remarks>
         void EndInteraction(PlayerController player);
     }
 }

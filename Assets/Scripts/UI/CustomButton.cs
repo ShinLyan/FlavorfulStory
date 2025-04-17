@@ -49,10 +49,7 @@ namespace FlavorfulStory.UI
         }
 
         /// <summary> Сброс состояния наведения при деактивации компонента. </summary>
-        private void OnDisable()
-        {
-            IsMouseOver = false;
-        }
+        private void OnDisable() => IsMouseOver = false;
 
         /// <summary> Инициализация кнопки, получение компонента <see cref="Image"/>. </summary>
         protected virtual void Awake()

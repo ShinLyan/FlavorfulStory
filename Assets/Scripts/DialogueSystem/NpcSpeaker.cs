@@ -1,9 +1,9 @@
-﻿using FlavorfulStory.Actions.Interactables;
-using FlavorfulStory.AI;
+﻿using FlavorfulStory.AI;
 using FlavorfulStory.AI.States;
 using FlavorfulStory.Control;
 using FlavorfulStory.Control.CursorSystem;
 using FlavorfulStory.InputSystem;
+using FlavorfulStory.InteractionSystem;
 using UnityEngine;
 
 namespace FlavorfulStory.DialogueSystem
@@ -36,11 +36,6 @@ namespace FlavorfulStory.DialogueSystem
             Vector3.Distance(otherTransform.position, transform.position);
 
         public void BeginInteraction(PlayerController player)
-        {
-            if (!IsInteractionAllowed) return;
-        }
-
-        public void Interact(PlayerController player)
         {
             if (!IsInteractionAllowed) return;
 
@@ -80,7 +75,6 @@ namespace FlavorfulStory.DialogueSystem
             {
                 InputWrapper.BlockAllInput();
                 BeginInteraction(controller);
-                Interact(controller);
             }
 
             return true;

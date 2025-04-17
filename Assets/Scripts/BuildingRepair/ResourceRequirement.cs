@@ -1,10 +1,11 @@
-﻿using UnityEngine;
+﻿using System;
 using FlavorfulStory.InventorySystem;
+using UnityEngine;
 
 namespace FlavorfulStory.BuildingRepair
 {
     /// <summary> Структура, определяющая требование ресурса для ремонта. </summary>
-    [System.Serializable]
+    [Serializable]
     public struct ResourceRequirement
     {
         /// <summary> Требуемый предмет из инвентаря. </summary>

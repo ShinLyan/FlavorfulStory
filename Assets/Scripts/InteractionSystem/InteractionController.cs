@@ -1,13 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using FlavorfulStory.Actions.Interactables;
+using FlavorfulStory.Control;
 using FlavorfulStory.InputSystem;
 using FlavorfulStory.ResourceContainer;
 using FlavorfulStory.TooltipSystem;
 using UnityEngine;
 
-namespace FlavorfulStory.Control
+namespace FlavorfulStory.InteractionSystem
 {
     /// <summary> Контроллер взаимодействия с интерактивными объектами через триггер-зону. </summary>
     public class InteractionController : MonoBehaviour
@@ -115,7 +115,6 @@ namespace FlavorfulStory.Control
             _startInteractionAction?.Invoke();
             _activeInteractable = _closestInteractable;
             _activeInteractable?.BeginInteraction(_playerController);
-            _activeInteractable?.Interact(_playerController);
         }
 
         /// <summary> Завершение взаимодействия с объектом. </summary>

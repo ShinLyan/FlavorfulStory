@@ -2,6 +2,7 @@
 using FlavorfulStory.Actions;
 using FlavorfulStory.Control.CursorSystem;
 using FlavorfulStory.InputSystem;
+using FlavorfulStory.InteractionSystem;
 using FlavorfulStory.InventorySystem;
 using FlavorfulStory.InventorySystem.UI;
 using FlavorfulStory.Movement;

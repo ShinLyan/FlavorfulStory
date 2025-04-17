@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using FlavorfulStory.Control;
+using FlavorfulStory.InteractionSystem;
 using FlavorfulStory.InventorySystem;
 using UnityEngine;
 
@@ -32,17 +33,11 @@ namespace FlavorfulStory.Actions.Interactables
         public float GetDistanceTo(Transform otherTransform) =>
             Vector3.Distance(transform.position, otherTransform.position);
 
-        public void BeginInteraction(PlayerController player)
+        public virtual void BeginInteraction(PlayerController player)
         {
             if (!IsInteractionAllowed) return;
 
             player.TriggerAnimation(AnimationType.Gather);
-        }
-
-        /// <summary> Выполнить взаимодействие с объектом. </summary>
-        public virtual void Interact(PlayerController player)
-        {
-            if (!IsInteractionAllowed) return;
 
             IsInteractionAllowed = false;
 
