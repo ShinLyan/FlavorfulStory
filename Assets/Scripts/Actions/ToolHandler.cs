@@ -10,10 +10,12 @@ namespace FlavorfulStory.Actions
     public class ToolHandler : MonoBehaviour
     {
         /// <summary> Сопоставления типов инструментов с их префабами для визуализации в руке игрока. </summary>
-        [SerializeField] private ToolPrefabMapping[] _toolMappings;
+        [Tooltip("Сопоставления типов инструментов с их префабами для визуализации в руке игрока."), SerializeField]
+        private ToolPrefabMapping[] _toolMappings;
 
         /// <summary> Слои, по которым производится удар с помощью инструмента. </summary>
-        [field: SerializeField]
+        [field: Tooltip("Слои, по которым производится удар с помощью инструмента. " +
+                        "Выбирать Default, Obstacle, Terrain"), SerializeField]
         public LayerMask HitableLayers { get; private set; }
 
         /// <summary> Текущий отображаемый инструмент, прикреплённый к руке игрока. </summary>

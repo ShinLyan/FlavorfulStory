@@ -1,12 +1,24 @@
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace FlavorfulStory.AI.Scheduling
 {
-    /// <summary> ScriptableObject, представляющий расписание NPC. </summary>
-    [CreateAssetMenu(fileName = "NpcSchedule", menuName = "FlavorfulStory/AI Behavior/NpcSchedule", order = 0)]
+    /// <summary> Расписание NPC. </summary>
+    [CreateAssetMenu(menuName = "FlavorfulStory/NPC Schedule")]
     public class NpcSchedule : ScriptableObject
     {
-        /// <summary> Массив параметров расписаний для NPC. </summary>
-        public ScheduleParams[] Params;
+        /// <summary> Параметры расписания NPC. </summary>
+        [field: Tooltip("Параметры расписания NPC."), SerializeField]
+        public ScheduleParams[] Params { get; private set; }
+
+        /// <summary> Получить отсортированные параметры расписания по текущим условиям. </summary>
+        /// <remarks> Приоритеты: 1. IsRaining; 2. Max Hearts; 3. По дате; 4. По DayOfWeek; 5. По Seasons </remarks>
+        public IEnumerable<ScheduleParams> GetSortedScheduleParams() => Params?
+            .OrderByDescending(p => p.IsRaining)
+            .ThenByDescending(p => p.Hearts)
+            .ThenByDescending(p => p.Dates.Length > 0 ? p.Dates[0].x : 0)
+            .ThenByDescending(p => p.DayOfWeek)
+            .ThenByDescending(p => p.Seasons);
     }
 }
