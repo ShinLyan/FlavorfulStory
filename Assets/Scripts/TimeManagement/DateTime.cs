@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace FlavorfulStory.TimeManagement
 {
@@ -6,8 +7,31 @@ namespace FlavorfulStory.TimeManagement
     [Serializable]
     public struct DateTime
     {
+        #region Fields and Properties
+
         /// <summary> Общее количество минут, прошедших с начала игры. </summary>
-        public float TotalMinutes { get; private set; }
+        private int _totalMinutes;
+
+        /// <summary> Словарь для конвертации дней недели. </summary>
+        private static readonly Dictionary<DayOfWeek, DayOfWeek> DayOfWeekConvertDict = new()
+        {
+            { (DayOfWeek)1, (DayOfWeek)1 },
+            { (DayOfWeek)2, (DayOfWeek)2 },
+            { (DayOfWeek)3, (DayOfWeek)4 },
+            { (DayOfWeek)4, (DayOfWeek)8 },
+            { (DayOfWeek)5, (DayOfWeek)16 },
+            { (DayOfWeek)6, (DayOfWeek)32 },
+            { (DayOfWeek)7, (DayOfWeek)64 }
+        };
+
+        /// <summary> Словарь для конвертации сезонов. </summary>
+        private static readonly Dictionary<Season, Season> SeasonConvertDict = new()
+        {
+            { (Season)1, (Season)1 },
+            { (Season)2, (Season)2 },
+            { (Season)3, (Season)4 },
+            { (Season)4, (Season)8 }
+        };
 
         /// <summary> Количество дней в одном сезоне. </summary>
         private const int DaysCount = 28;
@@ -18,31 +42,29 @@ namespace FlavorfulStory.TimeManagement
         /// <summary> Количество минут в одном сезоне. </summary>
         private const int SeasonMinutes = DayMinutes * DaysCount;
 
-        #region Properties
-
         /// <summary> Получает текущий год. </summary>
-        public int Year => (int)TotalMinutes / (SeasonMinutes * 4) + 1;
+        public int Year => _totalMinutes / (SeasonMinutes * 4) + 1;
 
         /// <summary> Получает текущий сезон. </summary>
-        public Seasons Season => (Seasons)(TotalMinutes % (SeasonMinutes * 4) / SeasonMinutes);
+        public Season Season => SeasonConvertDict[(Season)(_totalMinutes % (SeasonMinutes * 4) / SeasonMinutes)];
 
         /// <summary> Получает день в текущем сезоне. </summary>
-        public int DayInSeason => (int)(TotalMinutes % SeasonMinutes / DayMinutes + 1);
+        public int SeasonDay => _totalMinutes % SeasonMinutes / DayMinutes + 1;
 
         /// <summary> Получает день недели. </summary>
-        public WeekDays DayOfWeek => (WeekDays)(TotalMinutes / DayMinutes % 7);
+        public DayOfWeek DayOfWeek => DayOfWeekConvertDict[(DayOfWeek)(_totalMinutes / DayMinutes % 7 + 1)];
 
         /// <summary> Получает текущий час. </summary>
-        public int Hour => (int)TotalMinutes % DayMinutes / 60;
+        public int Hour => _totalMinutes % DayMinutes / 60;
 
         /// <summary> Получает текущую минуту. </summary>
-        public int Minute => (int)TotalMinutes % 60;
+        public int Minute => _totalMinutes % 60;
 
         /// <summary> Получает количество полных недель, прошедших с начала игры. </summary>
-        public int TotalWeeks => (int)TotalMinutes / (DayMinutes * 7);
+        public int TotalWeeks => _totalMinutes / (DayMinutes * 7);
 
         /// <summary> Получает количество полных дней, прошедших с начала игры. </summary>
-        public int TotalDays => (int)TotalMinutes / DayMinutes;
+        public int TotalDays => _totalMinutes / DayMinutes;
 
         #endregion
 
@@ -52,47 +74,37 @@ namespace FlavorfulStory.TimeManagement
         /// <param name="day"> День в сезоне. </param>
         /// <param name="hour"> Часы. </param>
         /// <param name="minute"> Минуты. </param>
-        public DateTime(int year, Seasons season, int day, int hour, int minute)
+        public DateTime(int year, Season season, int day, int hour, int minute)
         {
-            TotalMinutes = (year - 1) * SeasonMinutes * 4 // Годы в минутах
-                           + (int)season * SeasonMinutes // Сезоны в минутах
-                           + (day - 1) * DayMinutes // Дни в минутах
-                           + hour * 60 // Часы в минутах
-                           + minute; // Минуты
+            _totalMinutes = (year - 1) * SeasonMinutes * 4 // Годы в минутах
+                            + (int)season * SeasonMinutes // Сезоны в минутах
+                            + (day - 1) * DayMinutes // Дни в минутах
+                            + hour * 60 // Часы в минутах
+                            + minute; // Минуты
         }
 
         /// <summary> Создаёт объект времени, задав общее количество минут. </summary>
         /// <param name="totalMinutes"> Общее количество минут. </param>
-        public DateTime(int totalMinutes)
-        {
-            TotalMinutes = totalMinutes;
-        }
+        public DateTime(int totalMinutes) => _totalMinutes = totalMinutes;
 
         /// <summary> Добавляет указанное количество минут к текущему времени. </summary>
         /// <param name="minutes"> Количество минут для добавления. </param>
-        public void AddMinutes(float minutes)
-        {
-            TotalMinutes += minutes;
-        }
+        public void AddMinutes(int minutes) => _totalMinutes += minutes;
 
         #region ToString
 
         /// <summary> Преобразует текущую дату и время в строку. </summary>
         /// <returns> Строковое представление текущей даты и времени. </returns>
-        public override string ToString() => $"{Year} year {Season} {DayInSeason} day {TimeToString()}";
+        public override string ToString() => $"{Year} year {Season} {SeasonDay} day {TimeToString()}";
 
         /// <summary> Преобразует текущую дату в строку. </summary>
         /// <returns> Строковое представление текущей даты. </returns>
-        public string DateToString()
-        {
-            return $"{DayOfWeek} {DayInSeason} {Year}";
-        }
+        public string DateToString() =>
+            $"Year: {Year}, Season: {Season.ToString()}, Day of week: {DayOfWeek.ToString()}, Day of month: {SeasonDay}";
 
         /// <summary> Преобразует время в строку с учётом выбранного формата отображения. </summary>
-        /// <param name="is24HourFormat"> 
-        /// Если true, время отображается в 24-часовом формате (например, "14:05"). 
-        /// Если false, время отображается в 12-часовом формате с AM/PM (например, "02:05 PM"). 
-        /// </param>
+        /// <param name="is24HourFormat"> Если true, время отображается в 24-часовом формате (например, "14:05"). 
+        /// Если false, время отображается в 12-часовом формате с AM/PM (например, "02:05 PM"). </param>
         /// <returns> Строковое представление времени. </returns> 
         public string TimeToString(bool is24HourFormat = true)
         {

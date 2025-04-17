@@ -80,7 +80,8 @@ namespace FlavorfulStory.Actions.Interactables
             if (_availableInteractables.Count != 0) UpdateClosestInteractable();
 
             if (IsInteracting || _closestInteractable == null ||
-                !InputWrapper.GetButtonDown(InputButton.Interact)) return;
+                !InputWrapper.GetButtonDown(InputButton.Interact))
+                return;
 
             BeginInteraction();
             _closestInteractable?.Interact();
@@ -103,8 +104,10 @@ namespace FlavorfulStory.Actions.Interactables
         /// <summary> Обновить тултип. </summary>
         private void UpdateTooltip()
         {
-            if (_closestInteractable != null) _tooltip.Show(_closestInteractable);
-            else _tooltip.Hide();
+            if (_closestInteractable != null)
+                _tooltip.Show(_closestInteractable);
+            else
+                _tooltip.Hide();
         }
 
         /// <summary> Добавляет объект в список доступных для взаимодействия при входе в триггер. </summary>
