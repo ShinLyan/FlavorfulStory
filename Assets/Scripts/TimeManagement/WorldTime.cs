@@ -18,13 +18,15 @@ namespace FlavorfulStory.TimeManagement
         private float _timeBetweenTicks = 1;
 
         /// <summary> Час начала нового дня. </summary>
-        [Header("Day/night settings")]
-        [Tooltip("Во сколько начинается новый день."), SerializeField, Range(0, 24)]
+        [Header("Day/night settings")] [Tooltip("Во сколько начинается новый день."), SerializeField, Range(0, 24)]
         private int _dayStartHour;
 
         /// <summary> Час окончания дня. </summary>
         [Tooltip("Во сколько заканчивается день."), SerializeField, Range(0, 24)]
         private int _dayEndHour;
+
+        [Header("Night settings"), Tooltip("Час начала ночи."), SerializeField, Range(17, 24)]
+        private int _nightStartHour = 18;
 
         /// <summary> Текущее игровое время. </summary>
         private static DateTime _currentGameTime;
@@ -40,6 +42,8 @@ namespace FlavorfulStory.TimeManagement
 
         /// <summary> Вызывается при завершении игрового дня. </summary>
         public static Action<DateTime> OnDayEnded;
+
+        public static Action<DateTime> OnNightStarted;
 
         #endregion
 
@@ -64,7 +68,11 @@ namespace FlavorfulStory.TimeManagement
         /// <summary> Увеличить игровое время и проверить завершение дня. </summary>
         private void IncreaseTime()
         {
+            int previousHour = _currentGameTime.Hour;
             _currentGameTime.AddMinutes(_minutesPerTick);
+
+            if (previousHour < _nightStartHour && _currentGameTime.Hour >= _nightStartHour)
+                OnNightStarted?.Invoke(_currentGameTime);
 
             if (_currentGameTime.Hour == _dayEndHour)
             {
