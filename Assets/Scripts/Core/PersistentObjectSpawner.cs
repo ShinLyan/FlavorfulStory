@@ -1,4 +1,5 @@
 ﻿using FlavorfulStory.InputSystem;
+using FlavorfulStory.SceneManagement;
 using UnityEngine;
 
 namespace FlavorfulStory.Core
@@ -21,6 +22,7 @@ namespace FlavorfulStory.Core
             if (_hasSpawned) return;
 
             SpawnPersistentObject();
+            LocationChanger.ActivatePlayerCurrentLocation();
             InputWrapper.UnblockAllInput();
         }
 

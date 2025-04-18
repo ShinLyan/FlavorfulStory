@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using FlavorfulStory.Actions;
 using FlavorfulStory.Actions.Interactables;
 using FlavorfulStory.InputSystem;
@@ -17,12 +18,12 @@ namespace FlavorfulStory.Control
     {
         #region Fields and Properties
 
-        /// <summary> Занят ли игрок? </summary>2
-        private bool _isBusy;
-
         /// <summary> Панель быстрого доступа, содержащая инвентарь игрока. </summary>
         [Tooltip("Панель быстрого доступа, содержащая инвентарь игрока."), SerializeField]
         private Toolbar _toolbar;
+
+        /// <summary> Занят ли игрок? </summary>2
+        private bool _isBusy;
 
         /// <summary> Передвижение игрока. </summary>
         private PlayerMover _playerMover;
@@ -38,8 +39,6 @@ namespace FlavorfulStory.Control
 
         #region Tools
 
-        [SerializeField, Range(1f, 5f)] private float _toolCooldown = 1.5f;
-
         /// <summary> Таймер перезарядки использования инструмента. </summary>
         private float _toolCooldownTimer;
 
@@ -49,6 +48,9 @@ namespace FlavorfulStory.Control
         /// <summary> Заблокировано ли использование предмета? </summary>
         private bool IsToolUseBlocked => !CanUseTool || _isBusy || EventSystem.current.IsPointerOverGameObject();
 
+        /// <summary> Время перезарядки использования инструмента. </summary>
+        private const float ToolCooldown = 1.5f;
+        
         #endregion
 
         /// <summary> Текущий выбранный предмет из панели быстрого доступа. </summary>
@@ -116,7 +118,7 @@ namespace FlavorfulStory.Control
 
             StartUsingItem(usable);
             if (usable is EdibleInventoryItem) ConsumeEdibleItem();
-            _toolCooldownTimer = _toolCooldown;
+            _toolCooldownTimer = ToolCooldown;
         }
 
         /// <summary> Начать использование предмета. </summary>
@@ -176,6 +178,14 @@ namespace FlavorfulStory.Control
             var direction = (position - transform.position).normalized;
             direction.y = 0;
             _playerMover.SetLookRotation(direction);
+        }
+
+        /// <summary> Обновить позицию и направление взгляда игрока после телепортации. </summary>
+        /// <param name="newTransform"> Новый трансформ игрока. </param>
+        public void UpdatePosition(Transform newTransform)
+        {
+            _playerMover.SetPosition(newTransform.position);
+            _playerMover.SetLookRotation(newTransform.position);
         }
     }
 }

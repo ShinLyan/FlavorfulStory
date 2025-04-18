@@ -1,5 +1,6 @@
-using FlavorfulStory.Saving;
+using System;
 using FlavorfulStory.InputSystem;
+using FlavorfulStory.Saving;
 using UnityEngine;
 
 namespace FlavorfulStory.Movement
@@ -10,20 +11,21 @@ namespace FlavorfulStory.Movement
     {
         #region Private Fields
 
-        [Header("Параметры движения")]
         /// <summary> Скорость передвижения игрока. </summary>
-        [SerializeField, Tooltip("Скорость передвижения игрока.")] private float _moveSpeed;
+        [Header("Параметры движения")] [Tooltip("Скорость передвижения игрока."), SerializeField]
+        private float _moveSpeed;
 
         /// <summary> Скорость поворота игрока. </summary>
-        [SerializeField, Tooltip("Скорость поворота игрока.")] private float _rotateSpeed;
-        
+        [Tooltip("Скорость поворота игрока."), SerializeField]
+        private float _rotateSpeed;
+
         /// <summary> Компонент Rigidbody, отвечающий за физику движения игрока. </summary>
         private Rigidbody _rigidbody;
 
         /// <summary> Текущий вектор направления движения игрока. </summary>
         private Vector3 _moveDirection;
 
-        /// <summary> Текущий вектор поворота (направления взгляда) игрока. </summary>
+        /// <summary> Текущее направление взгляда игрока. </summary>
         private Vector3 _lookDirection;
 
         /// <summary> Компонент Animator для управления анимациями игрока. </summary>
@@ -54,33 +56,34 @@ namespace FlavorfulStory.Movement
             AnimateMovement(_moveDirection.magnitude);
         }
 
-        /// <summary> Выполняет передвижение игрока в соответствии с направлением движения. </summary>
-        private void Move()
-        {
-            Vector3 moveForce = _moveSpeed * CountSpeedMultiplier() * _moveDirection;
-            moveForce.y = _rigidbody.linearVelocity.y;
-            _rigidbody.linearVelocity = moveForce;
-        }
-
         /// <summary> Плавно поворачивает игрока в указанном направлении. </summary>
         private void Rotate()
         {
             if (_lookDirection == Vector3.zero) return;
-
+            
             _rigidbody.MoveRotation(
                 Quaternion.Slerp(transform.rotation,
-                    Quaternion.LookRotation(_lookDirection),
+                    Quaternion.LookRotation( _lookDirection),
                     Time.fixedDeltaTime * _rotateSpeed)
             );
         }
 
+        /// <summary> Выполняет передвижение игрока в соответствии с направлением движения. </summary>
+        private void Move()
+        {
+            var moveForce = _moveSpeed * CountSpeedMultiplier() * _moveDirection;
+            moveForce.y = _rigidbody.linearVelocity.y;
+            _rigidbody.linearVelocity = moveForce;
+        }
+        
         /// <summary> Вычисляет множитель скорости в зависимости от режима (ходьба или бег). </summary>
         /// <returns> Множитель скорости (0.5 для ходьбы, 1 для бега). </returns>
-        private float CountSpeedMultiplier()
+        private static float CountSpeedMultiplier()
         {
             const float WalkingMultiplier = 0.5f;
             const float RunningMultiplier = 1f;
-            return InputWrapper.GetButton(InputButton.Walking) ? WalkingMultiplier : RunningMultiplier;         }
+            return InputWrapper.GetButton(InputButton.Walking) ? WalkingMultiplier : RunningMultiplier;
+        }
 
         /// <summary> Обновляет анимацию движения игрока в зависимости от скорости. </summary>
         /// <param name="directionMagnitude"> Величина направления движения. </param>
@@ -96,12 +99,17 @@ namespace FlavorfulStory.Movement
         public void SetMoveDirection(Vector3 direction) => _moveDirection = direction;
 
         /// <summary> Устанавливает направление поворота игрока. </summary>
-        /// <param name="direction"> Вектор направления взгляда. </param>
-        public void SetLookRotation(Vector3 direction) => _lookDirection = direction;
+        /// <param name="rotation"> Вектор направления взгляда. </param>
+        public void SetLookRotation(Vector3 rotation) => _lookDirection = rotation;
+
+        /// <summary> Установить позицию и мгновенно перенести к ней игрока. </summary>
+        /// <param name="position"> Позиция, к которой необходимо перенести игрока. </param>
+        public void SetPosition(Vector3 position) => _rigidbody.MovePosition(position);
 
         #region Saving
+
         /// <summary> Структура для сохранения позиции и поворота игрока. </summary>
-        [System.Serializable]
+        [Serializable]
         private struct MoverSaveData
         {
             /// <summary> Позиция игрока. </summary>
@@ -113,7 +121,7 @@ namespace FlavorfulStory.Movement
 
         /// <summary> Сохраняет текущее состояние игрока (позиция и поворот). </summary>
         /// <returns> Объект с данными позиции и поворота. </returns>
-        public object CaptureState() => new MoverSaveData()
+        public object CaptureState() => new MoverSaveData
         {
             Position = new SerializableVector3(transform.position),
             Rotation = new SerializableVector3(transform.eulerAngles)
@@ -127,6 +135,7 @@ namespace FlavorfulStory.Movement
             transform.position = data.Position.ToVector();
             transform.eulerAngles = data.Rotation.ToVector();
         }
+
         #endregion
     }
 }

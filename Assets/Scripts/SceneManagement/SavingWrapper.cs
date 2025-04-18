@@ -9,7 +9,7 @@ namespace FlavorfulStory.SceneManagement
     public class SavingWrapper : MonoBehaviour
     {
         /// <summary> Первая сцена, загружаемая после главного меню. </summary>
-        [SerializeField] private SceneType _firstUploadedScene;
+        [SerializeField] private SceneName _firstUploadedScene;
 
         /// <summary> Ключ для хранения имени текущего сохранения в PlayerPrefs. </summary>
         private const string CurrentSaveKey = "currentSaveName";
