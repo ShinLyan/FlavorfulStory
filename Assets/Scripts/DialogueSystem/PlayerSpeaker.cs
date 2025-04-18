@@ -1,13 +1,17 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using FlavorfulStory.DialogueSystem.UI;
+using FlavorfulStory.InputSystem;
+using FlavorfulStory.TimeManagement;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
 namespace FlavorfulStory.DialogueSystem
 {
     /// <summary> Компонент для управления диалогом игрока. </summary>
-    public class PlayerSpeaker : MonoBehaviour
+    public class PlayerSpeaker : MonoBehaviour, IDialogueInitiator
     {
         /// <summary> NPC, с которым в данный момент ведётся диалог. </summary>
         public NpcSpeaker CurrentNpcSpeaker { get; private set; }
@@ -27,16 +31,65 @@ namespace FlavorfulStory.DialogueSystem
         /// <summary> Событие, вызываемое при любом изменении состояния диалога (обновление текста, вариантов и т.п.). </summary>
         public event Action OnConversationUpdated;
 
+        public event Action OnConversationEnded;
+
+        private DialogueView _dialogueView;
+
+        private void Awake()
+        {
+            _dialogueView = FindFirstObjectByType<DialogueView>(FindObjectsInactive.Include);
+        }
+
+        private void Update()
+        {
+            if (!IsDialogueActive || IsChoosingDialogue ||
+                !InputWrapper.GetButtonDown(InputButton.NextDialogue)) return;
+
+            PlayNextDialogueNode();
+        }
+
+        #region IDialogueInitiator
+
         /// <summary> Запуск нового диалога. </summary>
         /// <param name="npcSpeaker"> NPC, с которым начинается диалог. </param>
         /// <param name="dialogue"> Диалог для запуска. </param>
         public void StartDialogue(NpcSpeaker npcSpeaker, Dialogue dialogue)
         {
+            WorldTime.Pause();
             CurrentNpcSpeaker = npcSpeaker;
             _currentDialogue = dialogue;
             _currentNode = dialogue.RootNode;
             TriggerEnterAction();
+
+            _dialogueView.Initialize(this);
             OnConversationUpdated?.Invoke();
+
+
+            StartCoroutine(EnableNextDialogueInput());
+        }
+
+        public void EndDialogue()
+        {
+            _currentDialogue = null;
+            TriggerExitAction();
+            CurrentNpcSpeaker = null;
+            _currentNode = null;
+            IsChoosingDialogue = false;
+            OnConversationUpdated?.Invoke();
+            OnConversationEnded?.Invoke();
+            WorldTime.Unpause();
+        }
+
+        #endregion
+
+        /// <summary> Разблокировка ввода для перехода к следующей реплике. </summary>
+        /// <remarks> Используется для предотвращения пропуска первой реплики диалога,
+        /// если кнопка NextDialogue была нажата в том же кадре, что и начало диалога.
+        /// Блокирует ввод на один кадр, чтобы избежать двойного срабатывания. </remarks>
+        private static IEnumerator EnableNextDialogueInput()
+        {
+            yield return null; // Пропустить кадр, в котором был вызван StartDialogue
+            InputWrapper.UnblockInput(new[] { InputButton.NextDialogue, InputButton.SkipDialogue });
         }
 
         /// <summary> Получить текст текущего узла диалога. </summary>
@@ -46,6 +99,8 @@ namespace FlavorfulStory.DialogueSystem
         /// <summary> Воспроизвести следующий узел диалога. </summary>
         public void PlayNextDialogueNode()
         {
+            if (!IsDialogueActive) return;
+
             // Если есть выбор для игрока — перейти в режим выбора
             if (_currentDialogue.GetPlayerChildNodes(_currentNode).Any())
             {
@@ -58,7 +113,7 @@ namespace FlavorfulStory.DialogueSystem
             // Если нет дальнейших узлов — завершить диалог
             if (!_currentDialogue.GetChildNodes(_currentNode).Any())
             {
-                QuitDialogue();
+                EndDialogue();
                 return;
             }
 
@@ -86,17 +141,6 @@ namespace FlavorfulStory.DialogueSystem
             TriggerEnterAction();
             IsChoosingDialogue = false;
             PlayNextDialogueNode();
-        }
-
-        /// <summary> Завершить текущий диалог. </summary>
-        public void QuitDialogue()
-        {
-            _currentDialogue = null;
-            TriggerExitAction();
-            CurrentNpcSpeaker = null;
-            _currentNode = null;
-            IsChoosingDialogue = false;
-            OnConversationUpdated?.Invoke();
         }
 
         /// <summary> Выполнить действие, назначенное при входе в текущий узел. </summary>

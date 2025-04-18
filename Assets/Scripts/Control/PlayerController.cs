@@ -58,13 +58,6 @@ namespace FlavorfulStory.Control
         /// <summary> Текущий выбранный предмет из панели быстрого доступа. </summary>
         private InventoryItem CurrentItem => _toolbar?.SelectedItem;
 
-        /// <summary> Находится ли объект в радиусе досягаемости игрока? </summary>
-        public bool IsPlayerInRange(Vector3 targetPosition)
-        {
-            const float InteractionDistance = 1.8f;
-            return Vector3.Distance(transform.position, targetPosition) <= InteractionDistance;
-        }
-
         #endregion
 
         /// <summary> Инициализация компонентов. </summary>

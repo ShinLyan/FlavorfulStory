@@ -69,7 +69,7 @@ namespace FlavorfulStory.UI
         protected virtual void HoverEnd() { }
 
         /// <summary> Действие при клике на кнопку. </summary>
-        protected virtual void Click() { }
+        protected abstract void Click();
 
         /// <summary> Вызывается при включении взаимодействия. </summary>
         protected virtual void OnInteractionEnabled() { }

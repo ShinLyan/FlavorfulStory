@@ -12,6 +12,12 @@
         /// <summary> Вертикальная ось ввода. </summary> 
         Vertical,
 
+        /// <summary> Переход к следующей реплике диалога. </summary>
+        NextDialogue,
+
+        /// <summary> Пропуск текущей реплики или всего диалога. </summary>
+        SkipDialogue,
+
         /// <summary> Режим ходьбы. </summary>
         Walking,
 
@@ -37,16 +43,6 @@
         Interact,
 
         /// <summary> Позиция курсора мыши. </summary>
-        MousePosition,
-
-        /// <summary>
-        /// 
-        /// </summary>
-        NextDialogue,
-
-        /// <summary>
-        /// 
-        /// </summary>
-        SkipDialogue
+        MousePosition
     }
 }
