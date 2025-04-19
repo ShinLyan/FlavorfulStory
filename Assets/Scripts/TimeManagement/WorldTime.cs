@@ -10,12 +10,15 @@ namespace FlavorfulStory.TimeManagement
         #region Fields
 
         /// <summary> Количество игровых минут, добавляемых за один тик. </summary>
-        [Header("Tick settings")] [Tooltip("Сколько минут проходит за один тик."), SerializeField, Range(0.1f, 20f)]
-        private int _minutesPerTick = 10;
+        // [Header("Tick settings")] [Tooltip("Сколько минут проходит за один тик."), SerializeField, Range(0.1f, 20f)]
+        // private int _minutesPerTick = 10;
 
-        /// <summary> Время в секундах между тиками. </summary>
-        [Tooltip("Сколько реального времени длится один тик."), SerializeField, Range(0.1f, 20f)]
-        private float _timeBetweenTicks = 1;
+        // /// <summary> Время в секундах между тиками. </summary>
+        // [Tooltip("Сколько реального времени длится один тик."), SerializeField, Range(0.1f, 20f)]
+        // private float _timeBetweenTicks = 1;
+        [Header("Time Scale")]
+        [Tooltip("Сколько игровых минут проходит за реальную секунду."), SerializeField, Range(-100f, 500f)]
+        private float _timeScale = 1f;
 
         /// <summary> Час начала нового дня. </summary>
         [Header("Day/night settings")] [Tooltip("Во сколько начинается новый день."), SerializeField, Range(0, 24)]
@@ -57,23 +60,14 @@ namespace FlavorfulStory.TimeManagement
         {
             if (_isPaused) return;
 
-            _elapsedTime += Time.deltaTime;
-            if (_elapsedTime < _timeBetweenTicks) return;
+            var previousTime = _currentGameTime;
+            float gameMinutesToAdd = Time.deltaTime * _timeScale;
+            _currentGameTime = _currentGameTime.AddMinutes(gameMinutesToAdd);
 
-            _elapsedTime = 0f;
-            IncreaseTime();
-        }
-
-        /// <summary> Увеличить игровое время и проверить завершение дня. </summary>
-        private void IncreaseTime()
-        {
-            int previousHour = _currentGameTime.Hour;
-            _currentGameTime.AddMinutes(_minutesPerTick);
-
-            if (previousHour < NightStartHour && _currentGameTime.Hour >= NightStartHour)
+            if (previousTime.Hour < NightStartHour && _currentGameTime.Hour >= NightStartHour)
                 OnNightStarted?.Invoke(_currentGameTime);
 
-            if (_currentGameTime.Hour == _dayEndHour)
+            if (previousTime.Hour < _dayEndHour && _currentGameTime.Hour >= _dayEndHour)
             {
                 BeginNewDay();
                 OnDayEnded?.Invoke(_currentGameTime);
@@ -85,9 +79,10 @@ namespace FlavorfulStory.TimeManagement
         /// <summary> Обновляет время до начала нового дня в зависимости от текущего времени. </summary>
         private void BeginNewDay()
         {
-            bool isSameDay = _currentGameTime.Hour < _dayStartHour;
+            bool isSameDay = 0f <= _currentGameTime.Hour && _currentGameTime.Hour < _dayStartHour;
             int dayAdjustment = isSameDay ? 0 : 1;
-
+            Debug.Log(_currentGameTime.Hour + " " + isSameDay + " " + dayAdjustment);
+            Debug.Log(_currentGameTime.SeasonDay);
             _currentGameTime = new DateTime(
                 _currentGameTime.Year,
                 _currentGameTime.Season,

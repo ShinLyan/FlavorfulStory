@@ -26,7 +26,7 @@ namespace FlavorfulStory.TimeManagement
         private void SetDateTimeText(DateTime dateTime)
         {
             _seasonText.text = dateTime.Season.ToString();
-            _dayText.text = $"{dateTime.DayOfWeek} {dateTime.SeasonDay}";
+            _dayText.text = $"{dateTime.DayOfWeek} {(int)dateTime.SeasonDay}";
             _timeText.text = dateTime.TimeToString(false);
         }
     }

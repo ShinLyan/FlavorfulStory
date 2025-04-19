@@ -30,7 +30,7 @@ namespace FlavorfulStory.Lightning
 
         private void UpdateSun(DateTime gameTime)
         {
-            float currentTimeInHours = gameTime.Hour + gameTime.Minute / 60f;
+            float currentTimeInHours = gameTime.Hour;
 
             bool isSunActive = currentTimeInHours >= DayStartTime && currentTimeInHours < NightStartTime;
             _sunLight.enabled = isSunActive;
@@ -81,7 +81,7 @@ namespace FlavorfulStory.Lightning
 
         private void UpdateMoon(DateTime gameTime)
         {
-            float currentTimeInHours = gameTime.Hour + gameTime.Minute / 60f;
+            float currentTimeInHours = gameTime.Hour;
 
             bool isMoonActive = currentTimeInHours >= MoonStartTime || currentTimeInHours < DayStartTime;
             _moonLight.enabled = isMoonActive;
@@ -91,9 +91,14 @@ namespace FlavorfulStory.Lightning
             _moonLight.shadows = _currentWeatherLightSettings.MoonShadowType;
             _moonLight.shadowNormalBias = 0.4f;
 
-            if (currentTimeInHours >= NightStartTime &&
-                currentTimeInHours < 19f) // плавно включаем тени если время 18:00 - 19:00
+            if (DayStartTime < currentTimeInHours && currentTimeInHours < NightStartTime)
             {
+                // 17:00 - 18:00 теней от луны нету
+                _moonLight.shadowStrength = 0f;
+            }
+            else if (currentTimeInHours >= NightStartTime && currentTimeInHours < 19f)
+            {
+                // плавно включаем тени если время 18:00 - 19:00
                 float shadowProgress = Mathf.InverseLerp(NightStartTime, 19f, currentTimeInHours);
                 _moonLight.shadowStrength =
                     Mathf.Lerp(0f, _currentWeatherLightSettings.MoonShadowStrength, shadowProgress);
@@ -103,7 +108,6 @@ namespace FlavorfulStory.Lightning
                 _moonLight.shadowStrength = _currentWeatherLightSettings.MoonShadowStrength;
             }
 
-            Debug.Log(currentTimeInHours >= MoonStartTime ? currentTimeInHours : currentTimeInHours + 24f);
             float moonProgress = Mathf.InverseLerp(MoonStartTime, 26f,
                 currentTimeInHours >= MoonStartTime ? currentTimeInHours : currentTimeInHours + 24f);
             float moonAngleY = Mathf.Lerp(-45f, 45f, moonProgress);
