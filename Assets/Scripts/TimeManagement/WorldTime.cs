@@ -25,8 +25,7 @@ namespace FlavorfulStory.TimeManagement
         [Tooltip("Во сколько заканчивается день."), SerializeField, Range(0, 24)]
         private int _dayEndHour;
 
-        [Header("Night settings"), Tooltip("Час начала ночи."), SerializeField, Range(17, 24)]
-        private int _nightStartHour = 18;
+        private const int NightStartHour = 18;
 
         /// <summary> Текущее игровое время. </summary>
         private static DateTime _currentGameTime;
@@ -71,7 +70,7 @@ namespace FlavorfulStory.TimeManagement
             int previousHour = _currentGameTime.Hour;
             _currentGameTime.AddMinutes(_minutesPerTick);
 
-            if (previousHour < _nightStartHour && _currentGameTime.Hour >= _nightStartHour)
+            if (previousHour < NightStartHour && _currentGameTime.Hour >= NightStartHour)
                 OnNightStarted?.Invoke(_currentGameTime);
 
             if (_currentGameTime.Hour == _dayEndHour)

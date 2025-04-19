@@ -218,7 +218,7 @@ Light:
     serializedVersion: 2
     m_Bits: 4294967295
   m_RenderingLayerMask: 1
-  m_Lightmapping: 2
+  m_Lightmapping: 4
   m_LightShadowCasterMode: 0
   m_AreaSize: {x: 1, y: 1}
   m_BounceIntensity: 1
@@ -871,7 +871,7 @@ PrefabInstance:
     - target: {fileID: 8615130694586661768, guid: a9114609ac4097e459c8c7e1f3d67d2b,
         type: 3}
       propertyPath: _dayStartHour
-      value: 6
+      value: 17
       objectReference: {fileID: 0}
     - target: {fileID: 8615130694586661768, guid: a9114609ac4097e459c8c7e1f3d67d2b,
         type: 3}
@@ -881,7 +881,7 @@ PrefabInstance:
     - target: {fileID: 8615130694586661768, guid: a9114609ac4097e459c8c7e1f3d67d2b,
         type: 3}
       propertyPath: _timeBetweenTicks
-      value: 0.1
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8631143195207105161, guid: a9114609ac4097e459c8c7e1f3d67d2b,
         type: 3}
@@ -941,6 +941,7 @@ MonoBehaviour:
   _moonLight: {fileID: 88258721}
   _weatherLightSettings:
   - {fileID: 11400000, guid: a9db27aa3723f4cf8a58ec778ab6eebc, type: 2}
+  - {fileID: 11400000, guid: efb703e5d89b44472b96c8cbe650035e, type: 2}
 --- !u!4 &1063129459
 Transform:
   m_ObjectHideFlags: 0
@@ -1345,13 +1346,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1928827198}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.32861742, y: -0.35346472, z: 0.32899344, w: -0.8116876}
+  m_LocalRotation: {x: -0.42516702, y: -0.56051314, z: 0.54910463, w: -0.45115638}
   m_LocalPosition: {x: 1.2692957, y: 2.205581, z: 0.28973764}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 50, y: 33.8, z: -388}
+  m_LocalEulerAnglesHint: {x: 87.7, y: 75.4, z: -388}
 --- !u!114 &1928827200
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1425,7 +1426,7 @@ Light:
     serializedVersion: 2
     m_Bits: 4294967295
   m_RenderingLayerMask: 1
-  m_Lightmapping: 2
+  m_Lightmapping: 4
   m_LightShadowCasterMode: 0
   m_AreaSize: {x: 1, y: 1}
   m_BounceIntensity: 1

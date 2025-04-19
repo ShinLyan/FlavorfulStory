@@ -23,6 +23,5 @@ namespace FlavorfulStory.Lightning
 
         [Header("Moon Shadow Settings")] public LightShadows MoonShadowType = LightShadows.Soft;
         [Range(0, 1)] public float MoonShadowStrength = 0.6f;
-        [Range(0, 0.1f)] public float MoonShadowBias = 0.05f;
     }
 }
