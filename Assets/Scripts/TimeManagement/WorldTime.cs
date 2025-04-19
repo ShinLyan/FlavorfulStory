@@ -17,7 +17,7 @@ namespace FlavorfulStory.TimeManagement
         // [Tooltip("Сколько реального времени длится один тик."), SerializeField, Range(0.1f, 20f)]
         // private float _timeBetweenTicks = 1;
         [Header("Time Scale")]
-        [Tooltip("Сколько игровых минут проходит за реальную секунду."), SerializeField, Range(-100f, 500f)]
+        [Tooltip("Сколько игровых минут проходит за реальную секунду."), SerializeField, Range(-100f, 1000f)]
         private float _timeScale = 1f;
 
         /// <summary> Час начала нового дня. </summary>
@@ -73,6 +73,7 @@ namespace FlavorfulStory.TimeManagement
                 OnDayEnded?.Invoke(_currentGameTime);
             }
 
+            Debug.Log(_currentGameTime.TotalDays);
             OnTimeUpdated?.Invoke(_currentGameTime);
         }
 
@@ -81,8 +82,6 @@ namespace FlavorfulStory.TimeManagement
         {
             bool isSameDay = 0f <= _currentGameTime.Hour && _currentGameTime.Hour < _dayStartHour;
             int dayAdjustment = isSameDay ? 0 : 1;
-            Debug.Log(_currentGameTime.Hour + " " + isSameDay + " " + dayAdjustment);
-            Debug.Log(_currentGameTime.SeasonDay);
             _currentGameTime = new DateTime(
                 _currentGameTime.Year,
                 _currentGameTime.Season,

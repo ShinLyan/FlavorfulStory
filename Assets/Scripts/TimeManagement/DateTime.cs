@@ -34,7 +34,7 @@ namespace FlavorfulStory.TimeManagement
         };
 
         /// <summary> Количество дней в одном сезоне. </summary>
-        private const float DaysCount = 28f;
+        private const int DaysCount = 28;
 
         /// <summary> Количество минут в одном дне. </summary>
         private const float DayMinutes = 60f * 24f;
@@ -46,7 +46,7 @@ namespace FlavorfulStory.TimeManagement
         public float Year => _totalMinutes / (SeasonMinutes * 4) + 1;
 
         /// <summary> Получает текущий сезон. </summary>
-        public Season Season => SeasonConvertDict[(Season)(int)(_totalMinutes % (SeasonMinutes * 4) / SeasonMinutes)];
+        public Season Season => SeasonConvertDict[(Season)((int)TotalDays % (DaysCount * 4) / DaysCount)];
 
         /// <summary> Получает день в текущем сезоне. </summary>
         public float SeasonDay => _totalMinutes % SeasonMinutes / DayMinutes + 1;
