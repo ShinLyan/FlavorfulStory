@@ -9,13 +9,6 @@ namespace FlavorfulStory.TimeManagement
     {
         #region Fields
 
-        /// <summary> Количество игровых минут, добавляемых за один тик. </summary>
-        // [Header("Tick settings")] [Tooltip("Сколько минут проходит за один тик."), SerializeField, Range(0.1f, 20f)]
-        // private int _minutesPerTick = 10;
-
-        // /// <summary> Время в секундах между тиками. </summary>
-        // [Tooltip("Сколько реального времени длится один тик."), SerializeField, Range(0.1f, 20f)]
-        // private float _timeBetweenTicks = 1;
         [Header("Time Scale")]
         [Tooltip("Сколько игровых минут проходит за реальную секунду."), SerializeField, Range(-100f, 1000f)]
         private float _timeScale = 1f;
