@@ -73,7 +73,6 @@ namespace FlavorfulStory.TimeManagement
                 OnDayEnded?.Invoke(_currentGameTime);
             }
 
-            Debug.Log(_currentGameTime.TotalDays);
             OnTimeUpdated?.Invoke(_currentGameTime);
         }
 
