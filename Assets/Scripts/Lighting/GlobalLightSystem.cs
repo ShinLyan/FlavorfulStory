@@ -4,35 +4,54 @@ using DateTime = FlavorfulStory.TimeManagement.DateTime;
 
 namespace FlavorfulStory.Lightning
 {
-    public class DynamicLighting : MonoBehaviour
+    /// <summary> Система глобального освещения, управляющая поведением солнечного и лунного света в зависимости от
+    /// времени суток и погодных условий. </summary>  
+    public class GlobalLightSystem : MonoBehaviour
     {
+        /// <summary> Источник света, представляющий солнце. </summary> 
         [SerializeField] private Light _sunLight;
+
+        /// <summary> Источник света, представляющий луну. </summary> 
         [SerializeField] private Light _moonLight;
 
+        /// <summary> Массив настроек освещения для различных погодных условий. </summary> 
         [SerializeField] private WeatherLightSettings[] _weatherLightSettings;
 
+        /// <summary> Текущие настройки освещения в зависимости от погоды. </summary> 
         private LightSettings _currentWeatherLightSettings;
 
+        /// <summary> Время начала дня (6:00). </summary> 
         private const float DayStartTime = 6f;
+
+        /// <summary> Время начала ночи (18:00). </summary> 
         private const float NightStartTime = 18f;
+
+        /// <summary> Время появления луны (за 1 час до наступления ночи). </summary> 
         private const float MoonStartTime = NightStartTime - 1f;
 
+        /// <summary> Подписывается на событие обновления времени при активации. </summary> 
         private void OnEnable() => WorldTime.OnTimeUpdated += UpdateLighting;
+
+        /// <summary> Отписывается от события обновления времени при деактивации. </summary> 
         private void OnDisable() => WorldTime.OnTimeUpdated -= UpdateLighting;
 
+        /// <summary> Инициализирует начальные настройки освещения. </summary> 
         private void Start()
         {
             _currentWeatherLightSettings = _weatherLightSettings[0].LightSettings;
             //TODO: добавить определение текущей погоды из стороннего скрипта
         }
 
-
+        /// <summary> Обновляет освещение в соответствии с текущим игровым временем. </summary> 
+        /// <param name="gameTime"> Текущее игровое время. </param>
         private void UpdateLighting(DateTime gameTime)
         {
             UpdateSun(gameTime);
             UpdateMoon(gameTime);
         }
 
+        /// <summary> Обновляет параметры солнечного света. </summary> 
+        /// <param name="gameTime"> Текущее игровое время. </param>
         private void UpdateSun(DateTime gameTime)
         {
             float currentTimeInHours = gameTime.Hour;
@@ -49,11 +68,12 @@ namespace FlavorfulStory.Lightning
             ColorizeSun(sunProgress);
         }
 
+        /// <summary> Устанавливает параметры теней для солнца. </summary> 
+        /// <param name="currentTimeInHours"> Текущее время в часах. </param>
         private void SetSunShadows(float currentTimeInHours)
         {
             _sunLight.shadows = _currentWeatherLightSettings.SunShadowType;
             _sunLight.shadowBias = 0.01f;
-
 
             if (currentTimeInHours >= 17.5f) // убираем тени если время 17:30 - 18:00
             {
@@ -67,6 +87,8 @@ namespace FlavorfulStory.Lightning
             }
         }
 
+        /// <summary> Вращает солнце в зависимости от времени дня. </summary> 
+        /// <param name="sunProgress"> Прогресс дня от 0 до 1. </param>
         private void RotateSun(float sunProgress)
         {
             float sunAngleX;
@@ -90,6 +112,8 @@ namespace FlavorfulStory.Lightning
             _sunLight.transform.rotation = Quaternion.Euler(sunAngleX, sunAngleY, 0f);
         }
 
+        /// <summary> Изменяет цвет и интенсивность солнечного света. </summary> 
+        /// <param name="sunProgress"> Прогресс дня от 0 до 1. </param>
         private void ColorizeSun(float sunProgress)
         {
             _sunLight.color = _currentWeatherLightSettings.SunColorGradient.Evaluate(sunProgress);
@@ -98,6 +122,8 @@ namespace FlavorfulStory.Lightning
                 _currentWeatherLightSettings.MaxSunIntensity;
         }
 
+        /// <summary> Обновляет параметры лунного света. </summary> 
+        /// <param name="gameTime"> Текущее игровое время. </param>
         private void UpdateMoon(DateTime gameTime)
         {
             float currentTimeInHours = gameTime.Hour;
@@ -115,6 +141,8 @@ namespace FlavorfulStory.Lightning
             ColorizeMoon(moonProgress);
         }
 
+        /// <summary> Устанавливает параметры теней для луны. </summary> 
+        /// <param name="currentTimeInHours"> Текущее время в часах. </param>
         private void SetMoonShadows(float currentTimeInHours)
         {
             _moonLight.shadows = _currentWeatherLightSettings.MoonShadowType;
@@ -138,12 +166,16 @@ namespace FlavorfulStory.Lightning
             }
         }
 
+        /// <summary> Вращает луну в зависимости от времени ночи. </summary> 
+        /// <param name="moonProgress"> Прогресс ночи от 0 до 1. </param>
         private void RotateMoon(float moonProgress)
         {
             float moonAngleY = Mathf.Lerp(-45f, 45f, moonProgress);
             _moonLight.transform.rotation = Quaternion.Euler(30f, moonAngleY, 0f);
         }
 
+        /// <summary> Изменяет цвет и интенсивность лунного света. </summary> 
+        /// <param name="moonProgress"> Прогресс ночи от 0 до 1. </param>
         private void ColorizeMoon(float moonProgress)
         {
             _moonLight.color = _currentWeatherLightSettings.MoonColorGradient.Evaluate(moonProgress);
