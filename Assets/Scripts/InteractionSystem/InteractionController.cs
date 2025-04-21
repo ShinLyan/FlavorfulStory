@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using FlavorfulStory.Control;
 using FlavorfulStory.InputSystem;
+using FlavorfulStory.Player;
 using FlavorfulStory.ResourceContainer;
 using FlavorfulStory.TooltipSystem;
 using UnityEngine;
@@ -39,10 +39,7 @@ namespace FlavorfulStory.InteractionSystem
 
         /// <summary> Инициализация компонента. </summary>
         /// <remarks> Подписка на событие OnInteractionEnded (PlayerController.cs). </remarks>
-        private void Awake()
-        {
-            _playerController = GetComponentInParent<PlayerController>();
-        }
+        private void Awake() => _playerController = GetComponentInParent<PlayerController>();
 
         /// <summary> Проверяет нажатие кнопки взаимодействия и вызывает метод Interact()
         /// для ближайшего объекта. </summary>

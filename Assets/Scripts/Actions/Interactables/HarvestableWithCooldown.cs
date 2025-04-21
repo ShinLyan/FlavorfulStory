@@ -1,5 +1,5 @@
 using System.Collections;
-using FlavorfulStory.Control;
+using FlavorfulStory.Player;
 using UnityEngine;
 
 namespace FlavorfulStory.Actions.Interactables

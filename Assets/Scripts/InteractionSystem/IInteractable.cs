@@ -1,4 +1,4 @@
-﻿using FlavorfulStory.Control;
+﻿using FlavorfulStory.Player;
 using FlavorfulStory.TooltipSystem;
 using UnityEngine;
 

@@ -1,15 +1,14 @@
-﻿using System;
-using FlavorfulStory.Actions;
-using FlavorfulStory.Control.CursorSystem;
+﻿using FlavorfulStory.Actions;
+using FlavorfulStory.CursorSystem;
 using FlavorfulStory.InputSystem;
 using FlavorfulStory.InteractionSystem;
 using FlavorfulStory.InventorySystem;
 using FlavorfulStory.InventorySystem.UI;
-using FlavorfulStory.Movement;
+using FlavorfulStory.Utils;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace FlavorfulStory.Control
+namespace FlavorfulStory.Player
 {
     /// <summary> Контроллер игрока, отвечающий за управление,
     /// использование предметов и взаимодействие с окружением. </summary>
@@ -39,11 +38,6 @@ namespace FlavorfulStory.Control
         /// <summary> Обработчик инструмента. </summary>
         private ToolHandler _toolHandler;
 
-        /// <summary>
-        /// 
-        /// </summary>
-        private const float ToolCooldown = 1.5f;
-
         /// <summary> Таймер перезарядки использования инструмента. </summary>
         private float _toolCooldownTimer;
 
@@ -69,6 +63,7 @@ namespace FlavorfulStory.Control
             _interactionController.SetInteractionActions(() => SetBusyState(true), () => SetBusyState(false));
             _toolHandler = GetComponent<ToolHandler>();
             _toolHandler.SetUnequipAction(() => SetBusyState(false));
+            PlayerModel.SetPositionProvider(() => transform.position);
         }
 
         /// <summary> Обновление состояния игрока. </summary>
@@ -90,7 +85,7 @@ namespace FlavorfulStory.Control
 
         private bool InteractWithComponent()
         {
-            var hits = SphereCastAllSorted();
+            var hits = PhysicsUtils.SphereCastAllSorted(CameraUtils.GetMouseRay());
             foreach (var hit in hits)
             {
                 var cursorInteractables = hit.transform.GetComponents<ICursorInteractable>();
@@ -103,26 +98,6 @@ namespace FlavorfulStory.Control
             }
 
             return false;
-        }
-
-        private static RaycastHit[] SphereCastAllSorted()
-        {
-            const float SphereCastRadius = 0.1f;
-            var hits = Physics.SphereCastAll(GetMouseRay(), SphereCastRadius);
-            float[] distances = new float[hits.Length];
-            for (int i = 0; i < hits.Length; i++) distances[i] = hits[i].distance;
-            Array.Sort(distances, hits);
-            return hits;
-        }
-
-        private static Camera _mainCamera;
-
-        /// <summary> Получить луч основной камеры. </summary>
-        /// <returns> Луч основной камеры. </returns>
-        private static Ray GetMouseRay()
-        {
-            if (!_mainCamera) _mainCamera = Camera.main;
-            return _mainCamera.ScreenPointToRay(InputWrapper.GetMousePosition());
         }
 
         /// <summary> Обработка выбора предмета на панели быстрого доступа. </summary>
@@ -156,15 +131,14 @@ namespace FlavorfulStory.Control
 
             StartUsingItem(usable);
             if (usable is EdibleInventoryItem) ConsumeEdibleItem();
-            _toolCooldownTimer = ToolCooldown;
+            _toolCooldownTimer = PlayerModel.ToolCooldown;
         }
 
         /// <summary> Начать использование предмета. </summary>
         /// <param name="usable"> Используемый предмет. </param>
         private void StartUsingItem(IUsable usable)
         {
-            if (!usable.Use(this, _toolHandler.HitableLayers))
-                return;
+            if (!usable.Use(this, _toolHandler.HitableLayers)) return;
 
             _toolHandler.Equip(CurrentItem as Tool);
             SetBusyState(true);

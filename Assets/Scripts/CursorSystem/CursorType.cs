@@ -1,4 +1,4 @@
-﻿namespace FlavorfulStory.Control.CursorSystem
+﻿namespace FlavorfulStory.CursorSystem
 {
     /// <summary> Тип курсора. </summary>
     public enum CursorType

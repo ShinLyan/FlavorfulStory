@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace FlavorfulStory.Control.CursorSystem
+namespace FlavorfulStory.CursorSystem
 {
     /// <summary> Контроллер для управления типом курсора. </summary>
     /// <remarks> Загружает данные курсоров из ресурсов и предоставляет метод для установки подходящего курсора

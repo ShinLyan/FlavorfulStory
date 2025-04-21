@@ -1,5 +1,5 @@
 using System;
-using FlavorfulStory.Control;
+using FlavorfulStory.Player;
 using FlavorfulStory.ResourceContainer;
 using UnityEngine;
 

@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace FlavorfulStory.Control.CursorSystem
+namespace FlavorfulStory.CursorSystem
 {
     /// <summary> Настройки отображения курсора для конкретного типа взаимодействия. </summary>
     [Serializable]

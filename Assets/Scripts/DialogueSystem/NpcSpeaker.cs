@@ -1,7 +1,5 @@
 ﻿using FlavorfulStory.AI;
-using FlavorfulStory.AI.States;
-using FlavorfulStory.Control;
-using FlavorfulStory.Control.CursorSystem;
+using FlavorfulStory.CursorSystem;
 using FlavorfulStory.InputSystem;
 using FlavorfulStory.InteractionSystem;
 using FlavorfulStory.Player;

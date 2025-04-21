@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using FlavorfulStory.Control;
 using FlavorfulStory.InteractionSystem;
 using FlavorfulStory.InventorySystem;
 using FlavorfulStory.ObjectManagement;
+using FlavorfulStory.Player;
 using FlavorfulStory.Saving;
 using UnityEngine;
 

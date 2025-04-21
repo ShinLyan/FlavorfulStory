@@ -1,7 +1,7 @@
 using System.Collections.Generic;
-using FlavorfulStory.Control;
 using FlavorfulStory.InteractionSystem;
 using FlavorfulStory.InventorySystem;
+using FlavorfulStory.Player;
 using UnityEngine;
 
 namespace FlavorfulStory.Actions.Interactables

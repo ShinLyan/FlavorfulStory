@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace FlavorfulStory.Control.CursorSystem
+namespace FlavorfulStory.CursorSystem
 {
     /// <summary> Настройки курсоров для разных типов взаимодействия. </summary>
     [CreateAssetMenu(menuName = "FlavorfulStory/Cursor Data")]

@@ -1,4 +1,6 @@
-﻿namespace FlavorfulStory.Control.CursorSystem
+﻿using FlavorfulStory.Player;
+
+namespace FlavorfulStory.CursorSystem
 {
     /// <summary> Интерфейс для объектов, с которыми можно взаимодействовать с помощью курсора. </summary>
     public interface ICursorInteractable
