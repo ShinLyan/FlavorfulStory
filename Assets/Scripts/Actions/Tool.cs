@@ -1,6 +1,6 @@
-using FlavorfulStory.Control;
 using FlavorfulStory.InputSystem;
 using FlavorfulStory.InventorySystem;
+using FlavorfulStory.Player;
 using FlavorfulStory.ResourceContainer;
 using FlavorfulStory.Utils;
 using UnityEngine;
@@ -35,7 +35,7 @@ namespace FlavorfulStory.Actions
         /// <param name="hitableLayers"> Слои, по которым будем делать удар. </param>
         public bool Use(PlayerController player, LayerMask hitableLayers)
         {
-            if (!WorldCoordinates.GetWorldCoordinatesFromScreenPoint(
+            if (!RaycastUtils.TryGetScreenPointToWorld(
                     InputWrapper.GetMousePosition(),
                     ~(1 << player.gameObject.layer),
                     out var targetPosition))
@@ -62,7 +62,6 @@ namespace FlavorfulStory.Actions
             var origin = player.transform.position;
             var direction = (targetPosition - origin).normalized;
             var interactionCenter = origin + direction * (MaxInteractionDistance / 2);
-
             var hitColliders = Physics.OverlapSphere(interactionCenter, UseRadius, hitableLayers);
             foreach (var collider in hitColliders)
                 if (collider.transform.parent.TryGetComponent<IHitable>(out var hitable))

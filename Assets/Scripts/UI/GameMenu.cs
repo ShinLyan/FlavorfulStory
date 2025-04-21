@@ -1,5 +1,6 @@
 using FlavorfulStory.InputSystem;
 using FlavorfulStory.SceneManagement;
+using FlavorfulStory.TimeManagement;
 using TMPro;
 using UnityEngine;
 
@@ -66,11 +67,13 @@ namespace FlavorfulStory.UI
             {
                 InputWrapper.BlockPlayerMovement();
                 InputWrapper.BlockInput(InputButton.MouseScroll);
+                WorldTime.Pause();
             }
             else
             {
                 InputWrapper.UnblockPlayerMovement();
                 InputWrapper.UnblockInput(InputButton.MouseScroll);
+                WorldTime.Unpause();
             }
 
             _content.SetActive(isEnabled);
