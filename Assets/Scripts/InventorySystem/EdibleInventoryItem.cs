@@ -14,7 +14,7 @@ namespace FlavorfulStory.InventorySystem
         [field: Tooltip("Кнопка использования предмета."), SerializeField]
         public UseActionType UseActionType { get; set; }
 
-        /// <summary> Кнопка мыши для использования предмета. </summary>
+        /// <summary> Тип звуков поедания. </summary>
         [field: Tooltip("Тип звуков поедания."), SerializeField]
         public SfxType SfxType { get; set; }
 

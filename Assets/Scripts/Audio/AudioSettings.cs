@@ -36,9 +36,9 @@ namespace FlavorfulStory.Audio
         }
 
         /// <summary> Получает сохранённое значение громкости по её типу. </summary>
-        /// <param name="mixerChannelType"> Тип громкости (Master, Music, SFX). </param>
+        /// <param name="mixerChannelType"> Тип микшера (Master, Music, SFX). </param>
         /// <returns> Возвращает сохранённое значение громкости. </returns>
-        public float GetVolumeValueFromType(MixerChannelType mixerChannelType) => mixerChannelType switch
+        public static float GetVolumeValueFromType(MixerChannelType mixerChannelType) => mixerChannelType switch
         {
             MixerChannelType.Master => SavingSettings.MasterVolume,
             MixerChannelType.SFX => SavingSettings.SFXVolume,

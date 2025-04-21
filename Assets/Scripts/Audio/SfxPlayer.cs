@@ -20,7 +20,7 @@ namespace FlavorfulStory.Audio
         /// <summary> Создать Источник аудио. Загрузить звуки. </summary>
         private void Awake()
         {
-            if (Instance == null)
+            if (!Instance)
             {
                 Instance = this;
                 DontDestroyOnLoad(gameObject);
@@ -38,7 +38,7 @@ namespace FlavorfulStory.Audio
         /// <summary> Загрузить аудиоклипы. </summary>
         private void LoadSfxData()
         {
-            foreach (var resource in Resources.LoadAll<SfxData>(string.Empty).ToList())
+            foreach (var resource in Resources.LoadAll<SfxData>(string.Empty))
                 _sfxData.Add(resource.Type, new List<AudioClip>(resource.Clips));
         }
 

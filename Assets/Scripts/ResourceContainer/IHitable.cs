@@ -7,7 +7,9 @@ namespace FlavorfulStory.ResourceContainer
     /// <summary> Интерфейс объекта, который можно бить инструментом. </summary>
     public interface IHitable
     {
-        [Tooltip("Тип проигрываемого звука при ударе.")]
+        /// <summary>
+        /// Тип 
+        /// </summary>
         SfxType SfxType { set; }
 
         /// <summary> Получить удар. </summary>

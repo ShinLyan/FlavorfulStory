@@ -1,30 +1,30 @@
 ﻿namespace FlavorfulStory.Audio
 {
-    /// <summary>  </summary>
+    /// <summary> Типы звуковых эффектов (SFX) в игре. </summary>
     public enum SfxType
     {
-        /// <summary> </summary>
+        /// <summary> Звук удара по дереву. </summary>
         WoodHit,
 
-        /// <summary> </summary>
+        /// <summary> Звук удара по камню. </summary>
         StoneHit,
 
-        /// <summary> </summary>
+        /// <summary> Звук клика по элементу интерфейса. </summary>
         UIClick,
 
-        /// <summary> </summary>
+        /// <summary> Звук наведения курсора на элемент интерфейса. </summary>
         UIHover,
 
-        /// <summary> </summary>
+        /// <summary> Звук шагов при ходьбе. </summary>
         Walk,
 
-        /// <summary> </summary>
+        /// <summary> Звук шагов при беге. </summary>
         Run,
 
-        /// <summary> </summary>
+        /// <summary> Звук еды. </summary>
         Eat,
 
-        /// <summary> </summary>
+        /// <summary> Звук строительства. </summary>
         Build
     }
 }
