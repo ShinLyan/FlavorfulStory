@@ -116,7 +116,7 @@ Transform:
   m_GameObject: {fileID: 2552806493909497570}
   serializedVersion: 2
   m_LocalRotation: {x: 0.2588191, y: 0, z: 0, w: 0.9659258}
-  m_LocalPosition: {x: -25.23, y: 8.900002, z: -24.24038}
+  m_LocalPosition: {x: -25.23, y: 7.500002, z: -24.240381}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -677,7 +677,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cdb848314c79401d9b6ce3fbacacf6fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _tickMinutesIncrease: 10
+  _minutesPerTick: 10
   _timeBetweenTicks: 1
   _dayStartHour: 6
   _dayEndHour: 2
@@ -2150,7 +2150,7 @@ PrefabInstance:
         type: 3}
       propertyPath: _interactionController
       value: 
-      objectReference: {fileID: 8934778073855067564}
+      objectReference: {fileID: 0}
     - target: {fileID: 4395527661552930977, guid: 50bac7ab5e92c0c42b2f011229fcb264,
         type: 3}
       propertyPath: _moveSpeed
@@ -2284,15 +2284,3 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 9043635164215608342}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &8934778073855067564 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 468311781800477114, guid: 50bac7ab5e92c0c42b2f011229fcb264,
-    type: 3}
-  m_PrefabInstance: {fileID: 9043635164215608342}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 56725fc63c93a8240a4146a5ea94263e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 

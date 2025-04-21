@@ -37,7 +37,7 @@ namespace FlavorfulStory.Actions.Interactables
         {
             if (!IsInteractionAllowed) return;
 
-            player.TriggerAnimation(AnimationType.Gather);
+            player.TriggerAnimation(AnimationType.Gather_interaction);
 
             IsInteractionAllowed = false;
 

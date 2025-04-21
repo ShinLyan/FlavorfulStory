@@ -132,6 +132,6 @@ namespace FlavorfulStory.UI
         public void OnClickContinue() => SwitchContent(false);
 
         /// <summary> Обработчик нажатия кнопки возврата в главное меню. Загружает сцену главного меню. </summary>
-        public void OnClickReturnToMainMenu() => SavingWrapper.LoadSceneByName(SceneType.MainMenu.ToString());
+        public void OnClickReturnToMainMenu() => SavingWrapper.LoadSceneByName(SceneName.MainMenu.ToString());
     }
 }

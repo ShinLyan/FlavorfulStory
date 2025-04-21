@@ -1,4 +1,4 @@
-﻿using FlavorfulStory.Actions;
+using FlavorfulStory.Actions;
 using FlavorfulStory.CursorSystem;
 using FlavorfulStory.InputSystem;
 using FlavorfulStory.InteractionSystem;
@@ -118,7 +118,8 @@ namespace FlavorfulStory.Player
             if (CurrentItem is not IUsable usable || IsToolUseBlocked) return;
 
             if ((!Input.GetMouseButton(0) || usable.UseActionType != UseActionType.LeftClick) &&
-                (!Input.GetMouseButton(1) || usable.UseActionType != UseActionType.RightClick)) return;
+                (!Input.GetMouseButton(1) || usable.UseActionType != UseActionType.RightClick))
+                return;
 
             BeginInteraction(usable);
         }
@@ -159,8 +160,10 @@ namespace FlavorfulStory.Player
         {
             _isBusy = state;
             _toolbar.SetInteractableState(!state);
-            if (state) InputWrapper.BlockAllInput();
-            else InputWrapper.UnblockAllInput();
+            if (state)
+                InputWrapper.BlockAllInput();
+            else
+                InputWrapper.UnblockAllInput();
         }
 
         /// <summary> Обработка передвижения. </summary>
@@ -200,6 +203,14 @@ namespace FlavorfulStory.Player
             var direction = (position - transform.position).normalized;
             direction.y = 0;
             _playerMover.SetLookRotation(direction);
+        }
+
+        /// <summary> Обновить позицию и направление взгляда игрока после телепортации. </summary>
+        /// <param name="newTransform"> Новый трансформ игрока. </param>
+        public void UpdatePosition(Transform newTransform)
+        {
+            _playerMover.SetPosition(newTransform.position);
+            _playerMover.SetLookRotation(newTransform.position);
         }
     }
 }

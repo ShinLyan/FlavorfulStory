@@ -1,0 +1,50 @@
+using System.Collections.Generic;
+using UnityEngine;
+
+namespace FlavorfulStory.SceneManagement
+{
+    /// <summary> Управляет активацией и деактивацией локаций. </summary>
+    public static class LocationChanger
+    {
+        /// <summary> Хранилище всех локаций, найденных в сцене. </summary>
+        private static readonly Dictionary<LocationName, Location> _locations = new();
+
+        /// <summary> Статический конструктор. </summary>
+        static LocationChanger() => InitializeLocations();
+
+        /// <summary> Инициализация всех локаций. </summary>
+        /// <remarks> Находит все <see cref="Location"/> в сцене и добавляет их в словарь.</remarks>
+        private static void InitializeLocations()
+        {
+            foreach (var location in Object.FindObjectsByType<Location>(
+                         FindObjectsInactive.Include, FindObjectsSortMode.None))
+                if (!_locations.TryAdd(location.LocationName, location))
+                    Debug.LogError($"Найден дубликат локации: {location.LocationName} в {location.name}");
+        }
+
+        /// <summary> Активирует локацию, в которой находится игрок, и деактивирует все остальные. </summary>
+        public static void ActivatePlayerCurrentLocation()
+        {
+            var playerPosition = GameObject.FindWithTag("Player").transform.position;
+            foreach (var location in _locations.Values)
+                if (location.IsPositionInLocation(playerPosition)) location.Enable();
+                else location.Disable();
+        }
+
+        /// <summary> Включает указанную локацию. </summary>
+        /// <param name="location"> Имя локации, которую нужно включить. </param>
+        public static void EnableLocation(LocationName location)
+        {
+            if (_locations.TryGetValue(location, out var locationObject)) locationObject.Enable();
+            else Debug.LogError($"Локации {location} не существует!");
+        }
+
+        /// <summary> Выключает указанную локацию. </summary>
+        /// <param name="location"> Имя локации, которую нужно выключить. </param>
+        public static void DisableLocation(LocationName location)
+        {
+            if (_locations.TryGetValue(location, out var locationObject)) locationObject.Disable();
+            else Debug.LogError($"Локации {location} не существует!");
+        }
+    }
+}
