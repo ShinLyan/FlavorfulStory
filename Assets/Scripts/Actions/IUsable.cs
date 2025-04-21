@@ -1,4 +1,4 @@
-using FlavorfulStory.Control;
+using FlavorfulStory.Player;
 using UnityEngine;
 
 namespace FlavorfulStory.Actions
@@ -8,11 +8,11 @@ namespace FlavorfulStory.Actions
     {
         /// <summary> Кнопка мыши для использования предмета. </summary>
         /// <returns> Флаг успешности совершения действия. </returns>
-        public UseActionType UseActionType { get; }
+        UseActionType UseActionType { get; }
 
         /// <summary> Использование объекта. </summary>
         /// <param name="player"> Игрок, использующий объект. </param>
         /// <param name="hitableLayers"> Слои, которые можно бить. </param>
-        public bool Use(PlayerController player, LayerMask hitableLayers);
+        bool Use(PlayerController player, LayerMask hitableLayers);
     }
 }

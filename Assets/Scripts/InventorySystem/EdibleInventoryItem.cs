@@ -1,5 +1,5 @@
 using FlavorfulStory.Actions;
-using FlavorfulStory.Control;
+using FlavorfulStory.Player;
 using UnityEngine;
 
 namespace FlavorfulStory.InventorySystem

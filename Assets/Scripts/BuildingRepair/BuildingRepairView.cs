@@ -10,48 +10,48 @@ using UnityEngine;
 
 namespace FlavorfulStory.BuildingRepair
 {
-// <summary> Представление UI для системы ремонта зданий. </summary>
+    /// <summary> Представление UI для системы ремонта зданий. </summary>
     public class BuildingRepairView : MonoBehaviour
     {
+        #region Fields and Properties
+
+        /// <summary> Контейнер содержимого окна. </summary>
+        [SerializeField] private GameObject _content;
+
         /// <summary> Текст с названием ремонтируемого объекта. </summary>
         [SerializeField] private TMP_Text _objectNameText;
 
         /// <summary> Текст, отображаемый при завершении ремонта. </summary>
         [SerializeField] private TMP_Text _repairCompletedText;
 
-        /// <summary> Префаб вьюшки ресурсного требования. </summary>
-        /// <remarks> Спавнится в родителя, что имеет VerticalLayoutGroup. </remarks>
-        [SerializeField] private GameObject _requirementViewPrefab;
+        /// <summary> Префаб отображения ресурсного требования. </summary>
+        [SerializeField] private ResourceRequirementView _requirementViewPrefab;
 
-        /// <summary> Родитель вьюшек ресурсных требований. </summary>
-        /// <remarks> Содержит компонент VerticalLayoutGroup. </remarks>
+        /// <summary> Родитель для префабов отображений ресурсных требований. </summary>
         [SerializeField] private Transform _requirementViewsContainer;
 
-        /// <summary> Список вьюшек требований ресурсов. </summary>
-        private List<ResourceRequirementView> _requirementViews;
+        /// <summary> Кнопка подтверждения ремонта. </summary>
+        [SerializeField] private UIButton _buildButton;
 
-        /// <summary> Флаг, указывающий открыто ли окно ремонта. </summary>
+        /// <summary> Список вьюшек требований ресурсов. </summary>
+        private readonly List<ResourceRequirementView> _requirementViews = new();
+
+        /// <summary> Открыто ли окно ремонта? </summary>
         private bool _isOpen;
 
-        /// <summary> Контейнер для основного содержимого окна. </summary>
-        private GameObject _content;
+        /// <summary> Обработчик событий передачи ресурсов. </summary>
+        private Action<InventoryItem, ResourceTransferButtonType> _transferHandler;
 
-        /// <summary> Кнопка для подтверждения ремонта. </summary>
-        public UIButton BuildButton { get; private set; }
+        private Action _onBuildPressed;
 
-        /// <summary> Обработчик передачи ресурсов. </summary>
-        private Action<InventoryItem, ResourceTransferButtonType> _resourceTransferHandler;
+        private Action _onCloseRequested;
 
-        /// <summary> Инициализация. Коллбэк из UnityAPI. </summary>
-        /// <remarks> Собирает вьюшки ресурсных требований. Собирает кнопку строительства. </remarks>
-        private void Awake()
-        {
-            _requirementViews = new List<ResourceRequirementView>();
-            _content = transform.GetChild(0).gameObject;
-            BuildButton = GetComponentInChildren<UIButton>(true);
-        }
+        /// <summary> Событие, вызываемое при закрытии окна ремонта. </summary>
+        public event Action OnClose;
 
-        /// <summary> Обновление состояния окна. Коллбэк из UnityAPI. </summary>
+        #endregion
+
+        /// <summary> Обновление состояния окна ремонта. </summary>
         private void Update()
         {
             if (!_isOpen || !InputWrapper.GetButtonDown(InputButton.SwitchGameMenu)) return;
@@ -60,17 +60,7 @@ namespace FlavorfulStory.BuildingRepair
             StartCoroutine(BlockGameMenuForOneFrame());
         }
 
-        /// <summary> Закрыть окно ремонта. </summary>
-        public void Close()
-        {
-            _isOpen = false;
-            _content.SetActive(_isOpen);
-            WorldTime.Unpause();
-            InputWrapper.UnblockAllInput();
-            BuildButton.RemoveAllListeners();
-        }
-
-        /// <summary> Заблокировать кнопку переключения игрового меню на один кадр. </summary>
+        /// <summary> Заблокировать кнопку игрового меню на один кадр. </summary>
         private static IEnumerator BlockGameMenuForOneFrame()
         {
             InputWrapper.BlockInput(InputButton.SwitchGameMenu);
@@ -78,55 +68,93 @@ namespace FlavorfulStory.BuildingRepair
             InputWrapper.UnblockAllInput();
         }
 
-        /// <summary> Инициализировать обработчик передачи ресурсов. </summary>
-        /// <param name="resourceTransferHandler"> Обработчик передачи ресурсов. </param>
-        public void Initialize(Action<InventoryItem, ResourceTransferButtonType> resourceTransferHandler)
+        /// <summary> Отобразить UI ремонта для указанного объекта. </summary>
+        /// <param name="repairable"> Объект ремонта. </param>
+        public void Show(RepairStage stage, List<int> investedResources,
+            Action<InventoryItem, ResourceTransferButtonType> onTransfer,
+            Action onBuild, Action onCloseRequested)
         {
-            _resourceTransferHandler = resourceTransferHandler;
+            _transferHandler = onTransfer;
+            _onBuildPressed = onBuild;
+            _onCloseRequested = onCloseRequested;
+
+            UpdateStageUI(stage, investedResources);
+
+            _buildButton.OnClick += _onBuildPressed;
+            Open();
+        }
+
+        /// <summary> Обновить отображение требований и состояния ремонта. </summary>
+        /// <param name="stage"> Текущая стадия ремонта. </param>
+        /// <param name="investedResources"> Список вложенных ресурсов. </param>
+        public void UpdateStageUI(RepairStage stage, List<int> investedResources)
+        {
+            if (_requirementViews.Count == stage.Requirements.Count)
+            {
+                for (int i = 0; i < _requirementViews.Count; i++)
+                    _requirementViews[i].Setup(stage.Requirements[i], investedResources[i]);
+            }
+            else
+            {
+                DestroyRequirementViews();
+                SpawnRequirementViews(stage, investedResources);
+            }
+
+            _objectNameText.text = stage.BuildingName;
+            _repairCompletedText.gameObject.SetActive(false);
+            _repairCompletedText.text = $"{stage.BuildingName}'s repair completed";
+
+            _buildButton.IsInteractable = IsRepairPossible(stage, investedResources);
+        }
+
+        /// <summary> Проверка возможности завершения текущей стадии ремонта. </summary>
+        /// <param name="stage"> Стадия ремонта. </param>
+        /// <param name="investedResources"> Вложенные ресурсы. </param>
+        /// <returns> <c>true</c>, если все ресурсы вложены; иначе <c>false</c>. </returns>
+        private static bool IsRepairPossible(RepairStage stage, List<int> investedResources)
+        {
+            for (int i = 0; i < stage.Requirements.Count; i++)
+                if (investedResources[i] < stage.Requirements[i].Quantity)
+                    return false;
+
+            return true;
         }
 
         /// <summary> Открыть окно ремонта. </summary>
-        public void Open()
+        private void Open()
         {
             _isOpen = true;
-            _content.SetActive(_isOpen);
+            _content.SetActive(true);
             WorldTime.Pause();
             InputWrapper.BlockAllInput();
             InputWrapper.UnblockInput(InputButton.SwitchGameMenu);
         }
 
-        /// <summary> Установить данные для отображения в окне ремонта. </summary>
-        /// <param name="stage"> Текущая стадия ремонта. </param>
-        /// <param name="investedResources"> Список инвестированных в ремонт ресурсов. </param>
-        /// <param name="repairCompleted"> Флаг завершения ремонта. </param>
-        public void SetData(RepairStage stage, List<int> investedResources)
+        /// <summary> Закрыть окно ремонта и сбросить состояние. </summary>
+        private void Close()
         {
+            _isOpen = false;
+            _content.SetActive(false);
+            WorldTime.Unpause();
+            InputWrapper.UnblockAllInput();
+
+            if (_onBuildPressed != null)
+                _buildButton.OnClick -= _onBuildPressed;
+
             DestroyRequirementViews();
-            SpawnRequirementViews(stage.Requirements.Count);
 
-            _objectNameText.text = stage.BuildingName;
+            _transferHandler = null;
+            _onBuildPressed = null;
 
-            _repairCompletedText.gameObject.SetActive(false);
-            _repairCompletedText.text = $"{stage.BuildingName}'s repair completed";
-
-            _requirementViews.ForEach(view => view.gameObject.SetActive(true));
-
-            for (int i = 0; i < stage.Requirements.Count; i++)
-                _requirementViews[i].Setup(stage.Requirements[i], investedResources[i]);
+            _onCloseRequested?.Invoke();
+            OnClose?.Invoke();
         }
 
-        public void DisplayCompletionMessage()
-        {
-            _requirementViews.ForEach(view => view.gameObject.SetActive(false));
-            _repairCompletedText.gameObject.SetActive(true);
-            BuildButton.IsInteractable = false;
-        }
-
-        /// <summary> Удалить вьюшки ресурсных требований. </summary>
+        /// <summary> Удалить старые отображения требований ресурсов. </summary>
         private void DestroyRequirementViews()
         {
             foreach (var view in _requirementViews)
-                view.OnResourceTransferButtonClick -= _resourceTransferHandler;
+                view.OnResourceTransferButtonClick -= _transferHandler;
 
             foreach (Transform child in _requirementViewsContainer.transform)
                 Destroy(child.gameObject);
@@ -134,18 +162,26 @@ namespace FlavorfulStory.BuildingRepair
             _requirementViews.Clear();
         }
 
-        /// <summary> Заспавнить вьюшки ресурсных требований. </summary>
-        /// <param name="count"> Количество вьющек. </param>
-        private void SpawnRequirementViews(int count)
+        /// <summary> Создать отображения требований ресурсов. </summary>
+        /// <param name="stage"> Текущая стадия ремонта. </param>
+        /// <param name="investedResources"> Количество вложенных ресурсов. </param>
+        private void SpawnRequirementViews(RepairStage stage, List<int> investedResources)
         {
-            for (int i = 0; i < count; i++)
+            for (int i = 0; i < stage.Requirements.Count; i++)
             {
                 var requirementView = Instantiate(_requirementViewPrefab, _requirementViewsContainer);
-                requirementView.SetActive(false);
-                _requirementViews.Add(requirementView.GetComponent<ResourceRequirementView>());
+                requirementView.Setup(stage.Requirements[i], investedResources[i]);
+                requirementView.OnResourceTransferButtonClick += _transferHandler;
+                _requirementViews.Add(requirementView);
             }
+        }
 
-            foreach (var view in _requirementViews) view.OnResourceTransferButtonClick += _resourceTransferHandler;
+        /// <summary> Отобразить сообщение об окончании ремонта. </summary>
+        public void DisplayCompletionMessage()
+        {
+            _requirementViews.ForEach(view => view.gameObject.SetActive(false));
+            _repairCompletedText.gameObject.SetActive(true);
+            _buildButton.IsInteractable = false;
         }
     }
 }

@@ -31,14 +31,14 @@ namespace FlavorfulStory.TooltipSystem
         /// <param name="tooltip"> Объект, предоставляющий данные для тултипа. </param>
         private void SetTitleAndDescription(ITooltipable tooltip)
         {
-            _title.text = tooltip.GetTooltipTitle();
-            _description.text = tooltip.GetTooltipDescription();
+            _title.text = tooltip.TooltipTitle;
+            _description.text = tooltip.TooltipDescription;
         }
 
         /// <summary> Устанавливает позицию тултипа с учетом смещения. </summary>
         /// <param name="tooltip"> Объект, предоставляющий позицию для тултипа. </param>
         private void SetPositionWithOffset(ITooltipable tooltip) =>
-            transform.position = tooltip.GetWorldPosition() + _offset;
+            transform.position = tooltip.WorldPosition + _offset;
 
         /// <summary> Скрыть тултип. </summary>
         public void Hide() => gameObject.SetActive(false);

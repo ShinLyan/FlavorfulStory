@@ -1,6 +1,6 @@
-using System.Collections.Generic;
 using FlavorfulStory.InputSystem;
 using FlavorfulStory.SceneManagement;
+using FlavorfulStory.TimeManagement;
 using TMPro;
 using UnityEngine;
 
@@ -56,10 +56,7 @@ namespace FlavorfulStory.UI
         /// <summary> Обрабатывает ввод для переключения состояния меню (нажатие клавиши для скрытия/показа меню). </summary>
         private void HandleSwitchInput()
         {
-            if (InputWrapper.GetButtonDown(InputButton.SwitchGameMenu))
-            {
-                SwitchContent(!_content.activeSelf);
-            }
+            if (InputWrapper.GetButtonDown(InputButton.SwitchGameMenu)) SwitchContent(!_content.activeSelf);
         }
 
         /// <summary> Переключает состояние видимости меню. </summary>
@@ -70,11 +67,13 @@ namespace FlavorfulStory.UI
             {
                 InputWrapper.BlockPlayerMovement();
                 InputWrapper.BlockInput(InputButton.MouseScroll);
+                WorldTime.Pause();
             }
             else
             {
                 InputWrapper.UnblockPlayerMovement();
                 InputWrapper.UnblockInput(InputButton.MouseScroll);
+                WorldTime.Unpause();
             }
 
             _content.SetActive(isEnabled);
@@ -106,14 +105,12 @@ namespace FlavorfulStory.UI
             }
 
             for (int i = 0; i < _tabs.Length; i++)
-            {
                 if (InputWrapper.GetButtonDown(_tabs[i].InputButton))
                 {
                     SwitchContent(true);
                     SelectTab(i);
                     return;
                 }
-            }
         }
 
         /// <summary> Выбирает вкладку и скрывает текущую. </summary>
@@ -135,6 +132,6 @@ namespace FlavorfulStory.UI
         public void OnClickContinue() => SwitchContent(false);
 
         /// <summary> Обработчик нажатия кнопки возврата в главное меню. Загружает сцену главного меню. </summary>
-        public void OnClickReturnToMainMenu() => SavingWrapper.LoadSceneByName(SceneType.MainMenu.ToString());
+        public void OnClickReturnToMainMenu() => SavingWrapper.LoadSceneByName(SceneName.MainMenu.ToString());
     }
 }
