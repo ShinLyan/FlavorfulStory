@@ -9,7 +9,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 956009290553013536}
-  - component: {fileID: 1627163264890563984}
+  - component: {fileID: 3203772531352313874}
+  - component: {fileID: 5226980947587768919}
   m_Layer: 0
   m_Name: SFX
   m_TagString: Untagged
@@ -32,7 +33,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 3589294562100880256}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!82 &1627163264890563984
+--- !u!114 &3203772531352313874
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4982342538276461503}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6080f2ea5b62ac47b25178c87569822, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!82 &5226980947587768919
 AudioSource:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -44,6 +57,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: -7358544492889902423, guid: d839439dafa0c419c816f60b1365f6a9,
     type: 2}
   m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 0}
   m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
@@ -56,7 +70,7 @@ AudioSource:
   MinDistance: 1
   MaxDistance: 500
   Pan2D: 0
-  rolloffMode: 0
+  rolloffMode: 1
   BypassEffects: 0
   BypassListenerEffects: 0
   BypassReverbZones: 0
@@ -207,6 +221,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: -517958865734473334, guid: d839439dafa0c419c816f60b1365f6a9,
     type: 2}
   m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 0}
   m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
@@ -304,5 +319,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3b800a391b1bee547b6c2ce851895677, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _tracks:
-  - {fileID: 8300000, guid: 92b32e532d3574668a8b0ec8b2b4b9e1, type: 3}
+  _trackList: []

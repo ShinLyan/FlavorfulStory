@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using FlavorfulStory.InteractionSystem;
+using FlavorfulStory.Audio;
 using FlavorfulStory.InventorySystem;
 using FlavorfulStory.ObjectManagement;
 using FlavorfulStory.Player;
@@ -138,7 +139,8 @@ namespace FlavorfulStory.BuildingRepair
             _repairStageIndex++;
             _objectSwitcher.SwitchTo(_repairStageIndex);
             UpdateInteractionState();
-
+            SfxPlayer.Instance.PlayOneShot(SfxType.Build);
+            
             if (IsRepairCompleted)
             {
                 _onRepairCompleted?.Invoke();
@@ -195,7 +197,7 @@ namespace FlavorfulStory.BuildingRepair
 
         /// <summary> Структура для сохранения состояния объекта ремонта. </summary>
         [Serializable]
-        private struct BuildingRepairData
+        private struct RepairableBuildingRecord
         {
             /// <summary> Индекс текущей стадии ремонта. </summary>
             public int StageIndex;
@@ -206,7 +208,7 @@ namespace FlavorfulStory.BuildingRepair
 
         /// <summary> Сохранить состояние объекта для дальнейшего восстановления. </summary>
         /// <returns> Объект состояния для последующего восстановления. </returns>
-        public object CaptureState() => new BuildingRepairData
+        public object CaptureState() => new RepairableBuildingRecord
         {
             StageIndex = _repairStageIndex,
             InvestedResources = _investedResources
@@ -216,7 +218,7 @@ namespace FlavorfulStory.BuildingRepair
         /// <param name="state"> Сохраненное состояние для восстановления. </param>
         public void RestoreState(object state)
         {
-            if (state is not BuildingRepairData data) return;
+            if (state is not RepairableBuildingRecord data) return;
 
             _repairStageIndex = data.StageIndex;
             _investedResources = data.InvestedResources ?? new List<int>();

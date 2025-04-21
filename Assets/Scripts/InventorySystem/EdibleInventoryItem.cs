@@ -1,4 +1,5 @@
 using FlavorfulStory.Actions;
+using FlavorfulStory.Audio;
 using FlavorfulStory.Player;
 using UnityEngine;
 
@@ -12,6 +13,10 @@ namespace FlavorfulStory.InventorySystem
         /// <summary> Кнопка мыши для использования предмета. </summary>
         [field: Tooltip("Кнопка использования предмета."), SerializeField]
         public UseActionType UseActionType { get; set; }
+
+        /// <summary> Тип звуков поедания. </summary>
+        [field: Tooltip("Тип звуков поедания."), SerializeField]
+        public SfxType SfxType { get; set; }
 
         /// <summary> Съесть поедаемый предмет инвентаря. </summary>
         /// <param name="player"> Контроллер игрока. </param>
@@ -28,6 +33,7 @@ namespace FlavorfulStory.InventorySystem
         /// <summary> Съесть предмет и применить его эффект к игроку. </summary>
         public void Eat()
         {
+            SfxPlayer.Instance.PlayOneShot(SfxType);
             Debug.Log("🍎 Ем вкусную еду. Восстановил HP и энергию.");
         }
     }
