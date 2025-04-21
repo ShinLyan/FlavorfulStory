@@ -31,13 +31,13 @@ namespace FlavorfulStory.AI.WarpGraphSystem
         public LocationName ParentLocationName { get; private set; }
 
         /// <summary> Виртуальная камера. </summary>
-        private CinemachineVirtualCamera _virtualCamera;
+        private CinemachineCamera _virtualCamera;
 
         /// <summary> Определение локации портала при инициализации. </summary>
         private void Awake()
         {
             ParentLocationName = GetComponentInParent<Location>().LocationName;
-            _virtualCamera = GameObject.FindWithTag("VirtualCamera").GetComponent<CinemachineVirtualCamera>();
+            _virtualCamera = GameObject.FindWithTag("VirtualCamera").GetComponent<CinemachineCamera>();
         }
 
         /// <summary> Обработка входа игрока в триггер телепортации. </summary>
@@ -56,14 +56,13 @@ namespace FlavorfulStory.AI.WarpGraphSystem
             InputWrapper.BlockAllInput();
             yield return PersistentObject.Instance.Fader.FadeOut(Fader.FadeOutTime);
 
-            if (_virtualCamera != null) _virtualCamera.enabled = false;
+            if (_virtualCamera) _virtualCamera.enabled = false;
 
             LocationChanger.EnableLocation(ConnectedWarp.ParentLocationName);
             playerController.UpdatePosition(ConnectedWarp._spawnPoint);
 
             yield return null;
-
-            if (_virtualCamera != null) _virtualCamera.enabled = true;
+            if (_virtualCamera) _virtualCamera.enabled = true;
 
             yield return new WaitForSeconds(Fader.FadeWaitTime);
             PersistentObject.Instance.Fader.FadeIn(Fader.FadeInTime);

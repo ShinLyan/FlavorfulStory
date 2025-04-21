@@ -639,6 +639,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6741567287475702453, guid: a9114609ac4097e459c8c7e1f3d67d2b,
         type: 3}
+      propertyPath: m_Name
+      value: Virtual Camera
+      objectReference: {fileID: 0}
+    - target: {fileID: 6741567287475702453, guid: a9114609ac4097e459c8c7e1f3d67d2b,
+        type: 3}
       propertyPath: m_TagString
       value: VirtualCamera
       objectReference: {fileID: 0}
@@ -777,7 +782,9 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 8719277882945405758, guid: a9114609ac4097e459c8c7e1f3d67d2b, type: 3}
+    - {fileID: 6081307672717478430, guid: a9114609ac4097e459c8c7e1f3d67d2b, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
@@ -976,11 +983,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4751626889078054172, guid: 4f26ea1ab4ead4f879c5306f03e7abd0,
-        type: 3}
-      propertyPath: <ConnectedWarp>k__BackingField
-      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 9025911579761294241, guid: 4f26ea1ab4ead4f879c5306f03e7abd0,
         type: 3}
