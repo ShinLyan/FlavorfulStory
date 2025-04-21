@@ -58,7 +58,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine
             if (closestPoint == null || closestPoint == _currentPoint) return;
 
             _currentPoint = closestPoint;
-            if (closestPoint.Hour == currentTime.Hour && closestPoint.Minutes == currentTime.Minute)
+            if (closestPoint.Hour == (int)currentTime.Hour && closestPoint.Minutes == (int)currentTime.Minute)
                 RequestStateChange(typeof(MovementState));
         }
 
