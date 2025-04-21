@@ -4,7 +4,7 @@
     public enum AnimationType
     {
         /// <summary> Анимация сбора ресурсов. </summary>
-        Gather_interaction,
+        Gather,
 
         /// <summary> Анимация ожидания (бездействия). </summary>
         Idle,
