@@ -81,10 +81,10 @@ namespace FlavorfulStory.DialogueSystem
         {
             if (!_dialogue) return false;
 
-            if (Input.GetMouseButtonDown(1))
+            if (PlayerModel.IsPlayerInRange(transform.position) && Input.GetMouseButtonDown(1))
             {
                 BeginInteraction(controller);
-                InputWrapper.BlockAllInput();
+                controller.SetBusyState(true);
             }
 
             return true;
