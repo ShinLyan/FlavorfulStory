@@ -1,6 +1,6 @@
 using System.Collections;
-using FlavorfulStory.Control;
 using FlavorfulStory.InputSystem;
+using FlavorfulStory.Player;
 using FlavorfulStory.SceneManagement;
 using Unity.Cinemachine;
 using UnityEngine;

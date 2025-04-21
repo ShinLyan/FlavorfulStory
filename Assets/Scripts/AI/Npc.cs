@@ -9,6 +9,10 @@ namespace FlavorfulStory.AI
     [RequireComponent(typeof(NavMeshAgent), typeof(Animator))]
     public class Npc : MonoBehaviour
     {
+        /// <summary> Информация о персонаже. </summary>
+        [field: Tooltip("Информация о персонаже."), SerializeField]
+        public NpcInfo NpcInfo { get; private set; }
+
         /// <summary> Расписание NPC, определяющее его поведение и маршруты. </summary>
         [Tooltip("Расписание NPC, определяющее его поведение и маршруты."), SerializeField]
         private NpcSchedule _npcSchedule;

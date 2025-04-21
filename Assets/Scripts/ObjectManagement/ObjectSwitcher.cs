@@ -3,6 +3,7 @@ using UnityEngine;
 
 namespace FlavorfulStory.ObjectManagement
 {
+    /// <summary> Переключатель объектов. </summary>
     public class ObjectSwitcher : MonoBehaviour
     {
         /// <summary> Префабы грейдов одного объекта. </summary>

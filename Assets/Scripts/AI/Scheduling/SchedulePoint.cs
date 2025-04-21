@@ -33,6 +33,6 @@ namespace FlavorfulStory.AI.Scheduling
         /// <summary> Название анимации, которая будет воспроизводиться в данной точке. </summary>
         [field: Header("Other Settings")]
         [field: Tooltip("Название анимации, которая будет воспроизводиться в данной точке."), SerializeField]
-        public NpcAnimationClipName NpcAnimationClipName { get; private set; }
+        public AnimationType NpcAnimation { get; private set; }
     }
 }
