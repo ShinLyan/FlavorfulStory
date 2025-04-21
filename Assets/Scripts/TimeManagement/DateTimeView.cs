@@ -15,6 +15,8 @@ namespace FlavorfulStory.TimeManagement
         /// <summary> Текстовое поле отображения текущего времени. </summary>
         [SerializeField] private TMP_Text _timeText;
 
+        [SerializeField] private bool _is24HourFormat = true;
+
         /// <summary> Подписка на событие изменения времени при активации объекта. </summary>
         private void OnEnable() => WorldTime.OnTimeUpdated += SetDateTimeText;
 
@@ -26,8 +28,8 @@ namespace FlavorfulStory.TimeManagement
         private void SetDateTimeText(DateTime dateTime)
         {
             _seasonText.text = dateTime.Season.ToString();
-            _dayText.text = $"{dateTime.DayOfWeek} {dateTime.SeasonDay}";
-            _timeText.text = dateTime.TimeToString(false);
+            _dayText.text = $"{dateTime.DayOfWeek} {(int)dateTime.SeasonDay}";
+            _timeText.text = dateTime.TimeToString(_is24HourFormat);
         }
     }
 }

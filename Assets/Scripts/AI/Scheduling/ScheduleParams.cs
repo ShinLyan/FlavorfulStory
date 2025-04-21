@@ -45,7 +45,7 @@ namespace FlavorfulStory.AI.Scheduling
         /// <returns> Ближайшая точка маршрута или <c>null</c>, если подходящая точка не найдена. </returns>
         public SchedulePoint GetClosestSchedulePointInPath(DateTime currentTime)
         {
-            int currentMinutes = currentTime.Hour * 60 + currentTime.Minute;
+            int currentMinutes = (int)currentTime.Hour * 60 + (int)currentTime.Minute;
             SchedulePoint closestPoint = null;
             int minTimeDifference = int.MaxValue;
             foreach (var pathPoint in Path)
@@ -70,7 +70,7 @@ namespace FlavorfulStory.AI.Scheduling
         public bool AreConditionsSuitable(DateTime currentTime, int currentHearts, bool isRaining) =>
             IsRaining == isRaining &&
             (Hearts == 0 || currentHearts >= Hearts) &&
-            (Dates.Length == 0 || IsDateInRanges(currentTime.SeasonDay)) &&
+            (Dates.Length == 0 || IsDateInRanges((int)currentTime.SeasonDay)) &&
             (DayOfWeek == 0 || (DayOfWeek & currentTime.DayOfWeek) != 0) &&
             (Seasons == 0 || (Seasons & currentTime.Season) != 0);
 
