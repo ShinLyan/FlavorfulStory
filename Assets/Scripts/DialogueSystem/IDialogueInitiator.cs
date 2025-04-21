@@ -1,20 +1,14 @@
 ﻿namespace FlavorfulStory.DialogueSystem
 {
-    /// <summary>
-    /// 
-    /// </summary>
+    /// <summary> Интерфейс для объектов, способных инициировать диалог. </summary>
     public interface IDialogueInitiator
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="npc"></param>
-        /// <param name="dialogue"></param>
+        /// <summary> Запускает диалог с указанным NPC. </summary>
+        /// <param name="npc"> Персонаж, с которым начинается диалог. </param>
+        /// <param name="dialogue"> Диалог, который необходимо воспроизвести. </param>
         void StartDialogue(NpcSpeaker npc, Dialogue dialogue);
 
-        /// <summary>
-        /// 
-        /// </summary>
+        /// <summary> Завершает активный диалог. </summary>
         void EndDialogue();
     }
 }
