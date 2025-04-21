@@ -4,13 +4,15 @@ namespace FlavorfulStory.Lightning
 {
     /// <summary> Настройки освещения для конкретного типа погоды. </summary>
     /// <remarks> Создаваемый ассет, который можно создать через меню Unity. </remarks> 
-    [CreateAssetMenu(fileName = "WeatherLightSettings", menuName = "FlavorfulStory/WeatherLightSettings")]
+    [CreateAssetMenu(menuName = "FlavorfulStory/WeatherLightSettings")]
     public class WeatherLightSettings : ScriptableObject
     {
         /// <summary> Тип погоды, к которому применяются эти настройки освещения. </summary>
-        public WeatherType WeatherType;
-
+        [field: Tooltip("Тип погоды, к которому применяются эти настройки освещения."), SerializeField]
+        public WeatherType WeatherType { get; private set; }
+ 
         /// <summary> Настройки освещения (солнце и луна) для данного типа погоды. </summary>
-        public LightSettings LightSettings;
+        [field: Tooltip("Настройки освещения (солнце и луна) для данного типа погоды."), SerializeField]
+        public LightSettings LightSettings {get; private set;}
     }
 }

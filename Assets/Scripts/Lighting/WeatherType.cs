@@ -5,10 +5,10 @@ namespace FlavorfulStory.Lightning
     /// Каждый тип соответствует определенному состоянию окружающей среды. </remarks>
     public enum WeatherType
     {
-        /// <summary> Ясная солнечная погода (значение: 0). </summary>
-        Sun = 0,
+        /// <summary> Ясная солнечная погода. </summary>
+        Sun,
 
-        /// <summary> Дождливая погода (значение: 1). </summary>
-        Rain = 1
+        /// <summary> Дождливая погода. </summary>
+        Rain,
     }
 }

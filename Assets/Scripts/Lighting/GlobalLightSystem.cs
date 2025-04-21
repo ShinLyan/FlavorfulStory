@@ -9,6 +9,8 @@ namespace FlavorfulStory.Lightning
     /// времени суток и погодных условий. </summary>  
     public class GlobalLightSystem : MonoBehaviour
     {
+        #region Fields
+
         /// <summary> Источник света, представляющий солнце. </summary> 
         [SerializeField] private Light _sunLight;
 
@@ -51,6 +53,7 @@ namespace FlavorfulStory.Lightning
 
         private const float MoonAngleX = 30f;
 
+        #endregion
 
         /// <summary> Подписывается на событие обновления времени при активации. </summary> 
         private void OnEnable() => WorldTime.OnTimeUpdated += UpdateLighting;
@@ -77,8 +80,8 @@ namespace FlavorfulStory.Lightning
                 _currentWeatherLightSettings.SunColorGradient,
                 _currentWeatherLightSettings.SunIntensityCurve,
                 _currentWeatherLightSettings.MaxSunIntensity,
-                light => SetSunShadows(gameTime.Hour),
-                progress => RotateSun(progress),
+                _ => SetSunShadows(gameTime.Hour),
+                RotateSun,
                 _currentWeatherLightSettings.SunShadowType
             );
 
@@ -92,13 +95,13 @@ namespace FlavorfulStory.Lightning
                 _currentWeatherLightSettings.MoonColorGradient,
                 _currentWeatherLightSettings.MoonIntensityCurve,
                 _currentWeatherLightSettings.MaxMoonIntensity,
-                light => SetMoonShadows(gameTime.Hour),
-                progress => RotateMoon(progress),
+                _ => SetMoonShadows(gameTime.Hour),
+                RotateMoon,
                 _currentWeatherLightSettings.MoonShadowType
             );
         }
 
-        private void UpdateLight(
+        private static void UpdateLight(
             Light light,
             DateTime gameTime,
             bool isActiveCondition,
@@ -212,7 +215,7 @@ namespace FlavorfulStory.Lightning
         /// <param name="colorGradient"> Градиент цвета для изменения. </param>
         /// <param name="intensityCurve"> Кривая интенсивности света. </param>
         /// <param name="maxIntensity"> Максимальная интенсивность света. </param>
-        private void ColorizeLight(
+        private static void ColorizeLight(
             Light light,
             float progress,
             Gradient colorGradient,
