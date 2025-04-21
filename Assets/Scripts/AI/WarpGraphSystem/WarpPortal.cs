@@ -2,6 +2,7 @@ using System.Collections;
 using FlavorfulStory.InputSystem;
 using FlavorfulStory.Player;
 using FlavorfulStory.SceneManagement;
+using Unity.Cinemachine;
 using UnityEngine;
 
 namespace FlavorfulStory.AI.WarpGraphSystem
@@ -29,8 +30,15 @@ namespace FlavorfulStory.AI.WarpGraphSystem
         /// <summary> Имя локации, к которой принадлежит данный портал. </summary>
         public LocationName ParentLocationName { get; private set; }
 
+        /// <summary> Виртуальная камера. </summary>
+        private CinemachineCamera _virtualCamera;
+
         /// <summary> Определение локации портала при инициализации. </summary>
-        private void Awake() => ParentLocationName = GetComponentInParent<Location>().LocationName;
+        private void Awake()
+        {
+            ParentLocationName = GetComponentInParent<Location>().LocationName;
+            _virtualCamera = GameObject.FindWithTag("VirtualCamera").GetComponent<CinemachineCamera>();
+        }
 
         /// <summary> Обработка входа игрока в триггер телепортации. </summary>
         /// <param name="other"> Коллайдер объекта, вошедшего в триггер. </param>
@@ -48,8 +56,13 @@ namespace FlavorfulStory.AI.WarpGraphSystem
             InputWrapper.BlockAllInput();
             yield return PersistentObject.Instance.Fader.FadeOut(Fader.FadeOutTime);
 
+            if (_virtualCamera) _virtualCamera.enabled = false;
+
             LocationChanger.EnableLocation(ConnectedWarp.ParentLocationName);
             playerController.UpdatePosition(ConnectedWarp._spawnPoint);
+
+            yield return null;
+            if (_virtualCamera) _virtualCamera.enabled = true;
 
             yield return new WaitForSeconds(Fader.FadeWaitTime);
             PersistentObject.Instance.Fader.FadeIn(Fader.FadeInTime);
