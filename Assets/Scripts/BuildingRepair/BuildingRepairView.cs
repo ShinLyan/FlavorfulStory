@@ -39,11 +39,12 @@ namespace FlavorfulStory.BuildingRepair
         /// <summary> Открыто ли окно ремонта? </summary>
         private bool _isOpen;
 
-        /// <summary> Текущий ремонтируемый объект. </summary>
-        private BuildingRepair _currentRepairable;
-
         /// <summary> Обработчик событий передачи ресурсов. </summary>
         private Action<InventoryItem, ResourceTransferButtonType> _transferHandler;
+
+        private Action _onBuildPressed;
+
+        private Action _onCloseRequested;
 
         /// <summary> Событие, вызываемое при закрытии окна ремонта. </summary>
         public event Action OnClose;
@@ -69,23 +70,24 @@ namespace FlavorfulStory.BuildingRepair
 
         /// <summary> Отобразить UI ремонта для указанного объекта. </summary>
         /// <param name="repairable"> Объект ремонта. </param>
-        public void Show(BuildingRepair repairable)
+        public void Show(RepairStage stage, List<int> investedResources,
+            Action<InventoryItem, ResourceTransferButtonType> onTransfer,
+            Action onBuild, Action onCloseRequested)
         {
-            _currentRepairable = repairable;
-            _transferHandler = repairable.TransferResource;
+            _transferHandler = onTransfer;
+            _onBuildPressed = onBuild;
+            _onCloseRequested = onCloseRequested;
 
-            repairable.OnStageUpdated += OnStageUpdated;
-            repairable.OnRepairCompleted += DisplayCompletionMessage;
-            _buildButton.OnClick += repairable.Build;
+            UpdateStageUI(stage, investedResources);
 
-            OnStageUpdated(repairable.CurrentStage, repairable.InvestedResources);
+            _buildButton.OnClick += _onBuildPressed;
             Open();
         }
 
         /// <summary> Обновить отображение требований и состояния ремонта. </summary>
         /// <param name="stage"> Текущая стадия ремонта. </param>
         /// <param name="investedResources"> Список вложенных ресурсов. </param>
-        private void OnStageUpdated(RepairStage stage, List<int> investedResources)
+        public void UpdateStageUI(RepairStage stage, List<int> investedResources)
         {
             if (_requirementViews.Count == stage.Requirements.Count)
             {
@@ -131,18 +133,20 @@ namespace FlavorfulStory.BuildingRepair
         /// <summary> Закрыть окно ремонта и сбросить состояние. </summary>
         private void Close()
         {
-            if (_currentRepairable)
-            {
-                _currentRepairable.OnStageUpdated -= OnStageUpdated;
-                _currentRepairable.OnRepairCompleted -= DisplayCompletionMessage;
-                _buildButton.OnClick -= _currentRepairable.Build;
-                _currentRepairable = null;
-            }
-
             _isOpen = false;
             _content.SetActive(false);
             WorldTime.Unpause();
             InputWrapper.UnblockAllInput();
+
+            if (_onBuildPressed != null)
+                _buildButton.OnClick -= _onBuildPressed;
+
+            DestroyRequirementViews();
+
+            _transferHandler = null;
+            _onBuildPressed = null;
+
+            _onCloseRequested?.Invoke();
             OnClose?.Invoke();
         }
 
@@ -173,7 +177,7 @@ namespace FlavorfulStory.BuildingRepair
         }
 
         /// <summary> Отобразить сообщение об окончании ремонта. </summary>
-        private void DisplayCompletionMessage()
+        public void DisplayCompletionMessage()
         {
             _requirementViews.ForEach(view => view.gameObject.SetActive(false));
             _repairCompletedText.gameObject.SetActive(true);
