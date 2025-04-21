@@ -9,7 +9,7 @@ namespace FlavorfulStory.InputSystem
     public static class InputWrapper
     {
         /// <summary> Словарь для хранения состояний блокировки кнопок ввода. </summary>
-        public static readonly Dictionary<InputButton, bool> _allowedButtons;
+        private static readonly Dictionary<InputButton, bool> _allowedButtons;
 
         /// <summary> Инициализирует словарь разрешенных кнопок ввода. </summary>
         static InputWrapper()

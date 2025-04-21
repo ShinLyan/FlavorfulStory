@@ -1,5 +1,5 @@
 using System.Collections;
-using FlavorfulStory.Control;
+using FlavorfulStory.Player;
 using UnityEngine;
 
 namespace FlavorfulStory.Actions.Interactables
@@ -34,9 +34,9 @@ namespace FlavorfulStory.Actions.Interactables
         }
 
         /// <summary> Собрать предмет/ресурс. </summary>
-        public override void Interact(PlayerController player)
+        public override void BeginInteraction(PlayerController player)
         {
-            base.Interact(player);
+            base.BeginInteraction(player);
             StartCoroutine(EnableInteractionAfterCooldown());
         }
 
@@ -45,6 +45,7 @@ namespace FlavorfulStory.Actions.Interactables
         private IEnumerator EnableInteractionAfterCooldown()
         {
             yield return new WaitForSeconds(_harvestCooldown);
+
             IsInteractionAllowed = true;
         }
     }

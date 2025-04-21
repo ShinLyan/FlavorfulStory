@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace FlavorfulStory.AI.States
+namespace FlavorfulStory.AI
 {
     /// <summary> Информация о NPC. </summary>
     [CreateAssetMenu(menuName = "FlavorfulStory/NPC Info")]

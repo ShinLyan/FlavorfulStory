@@ -1,6 +1,6 @@
 using FlavorfulStory.Actions;
 using FlavorfulStory.Audio;
-using FlavorfulStory.Control;
+using FlavorfulStory.Player;
 using UnityEngine;
 
 namespace FlavorfulStory.InventorySystem

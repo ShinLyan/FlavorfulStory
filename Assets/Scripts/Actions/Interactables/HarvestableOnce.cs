@@ -1,5 +1,5 @@
 using System;
-using FlavorfulStory.Control;
+using FlavorfulStory.Player;
 using FlavorfulStory.ResourceContainer;
 using UnityEngine;
 
@@ -21,15 +21,15 @@ namespace FlavorfulStory.Actions.Interactables
         public event Action<IDestroyable> OnObjectDestroyed;
 
         /// <summary> Собрать ресурс. </summary>
-        public override void Interact(PlayerController player)
+        public override void BeginInteraction(PlayerController player)
         {
-            base.Interact(player);
+            base.BeginInteraction(player);
             Destroy(_destroyDelay);
         }
 
         /// <summary> Уничтожить объект. </summary>
         /// <param name="destroyDelay"> Задержка перед уничтожением. </param>
-        public void Destroy(float destroyDelay = 0)
+        public void Destroy(float destroyDelay)
         {
             IsDestroyed = true;
             OnObjectDestroyed?.Invoke(this);

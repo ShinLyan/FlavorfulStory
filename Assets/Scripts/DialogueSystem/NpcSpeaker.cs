@@ -1,8 +1,8 @@
-﻿using FlavorfulStory.Actions.Interactables;
-using FlavorfulStory.AI;
-using FlavorfulStory.AI.States;
-using FlavorfulStory.Control;
-using FlavorfulStory.Control.CursorSystem;
+﻿using FlavorfulStory.AI;
+using FlavorfulStory.CursorSystem;
+using FlavorfulStory.InputSystem;
+using FlavorfulStory.InteractionSystem;
+using FlavorfulStory.Player;
 using UnityEngine;
 
 namespace FlavorfulStory.DialogueSystem
@@ -13,25 +13,64 @@ namespace FlavorfulStory.DialogueSystem
         /// <summary> Диалог, который будет запущен при взаимодействии с NPC. </summary>
         [SerializeField] private Dialogue _dialogue;
 
+        private IDialogueInitiator _dialogueInitiator;
+
         /// <summary> Информация о NPC. </summary>
         public NpcInfo NpcInfo { get; private set; }
-
-        private PlayerController _playerController;
 
         /// <summary> Инициализация свойств класса. </summary>
         private void Awake()
         {
-            NpcInfo = GetComponent<Npc>().NpcInfo;
-            _playerController = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
-
             IsInteractionAllowed = true;
+            NpcInfo = GetComponent<Npc>().NpcInfo;
+
+            var playerObject = GameObject.FindGameObjectWithTag("Player");
+            _dialogueInitiator = playerObject.GetComponent<IDialogueInitiator>();
+
+            if (_dialogueInitiator is PlayerSpeaker playerSpeaker)
+                playerSpeaker.OnConversationEnded +=
+                    () => EndInteraction(playerObject.GetComponent<PlayerController>());
         }
+
+        #region IInteractable
+
+        public bool IsInteractionAllowed { get; private set; }
+
+        public float GetDistanceTo(Transform otherTransform) =>
+            Vector3.Distance(otherTransform.position, transform.position);
+
+        public void BeginInteraction(PlayerController player)
+        {
+            if (!IsInteractionAllowed) return;
+
+            _dialogueInitiator?.StartDialogue(this, _dialogue);
+        }
+
+        public void EndInteraction(PlayerController player) => player.SetBusyState(false);
+
+        #endregion
+
+        #region ITooltipable
+
+        /// <summary> Возвращает заголовок тултипа. </summary>
+        /// <returns> Строка с заголовком тултипа. </returns>
+        public string TooltipTitle => NpcInfo.NpcName.ToString();
+
+        /// <summary> Возвращает описание тултипа. </summary>
+        /// <returns> Строка с описанием тултипа. </returns>
+        public string TooltipDescription => "Talk";
+
+        /// <summary> Возвращает мировую позицию объекта. </summary>
+        /// <returns> Вектор позиции объекта в мировых координатах. </returns>
+        public Vector3 WorldPosition => transform.position;
+
+        #endregion
 
         #region ICursorInteractable
 
         /// <summary> Возвращает тип курсора "Диалог" при наведении на NPC. </summary>
         /// <returns> Тип курсора Dialogue. </returns>
-        public CursorType CursorType => _playerController.IsPlayerInRange(transform.position)
+        public CursorType CursorType => PlayerModel.IsPlayerInRange(transform.position)
             ? CursorType.DialogueAvailable
             : CursorType.DialogueNotAvailable;
 
@@ -45,39 +84,11 @@ namespace FlavorfulStory.DialogueSystem
             if (Input.GetMouseButtonDown(1))
             {
                 BeginInteraction(controller);
-                Interact(controller);
+                InputWrapper.BlockAllInput();
             }
 
             return true;
         }
-
-        #endregion
-
-        #region ITooltipable
-
-        public string TooltipTitle => "хер";
-
-        public string TooltipDescription => "большой";
-
-        public Vector3 WorldPosition => transform.position;
-
-        #endregion
-
-        #region IInteractable
-
-        public bool IsInteractionAllowed { get; private set; }
-
-        public float GetDistanceTo(Transform otherTransform) =>
-            Vector3.Distance(otherTransform.position, transform.position);
-
-        public void BeginInteraction(PlayerController player) { }
-
-        public void Interact(PlayerController player)
-        {
-            player.GetComponent<PlayerSpeaker>().StartDialogue(this, _dialogue);
-        }
-
-        public void EndInteraction(PlayerController player) { }
 
         #endregion
     }

@@ -1,4 +1,7 @@
-﻿using FlavorfulStory.UI;
+﻿using System;
+using System.Collections.Generic;
+using FlavorfulStory.AI;
+using FlavorfulStory.UI;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -8,100 +11,110 @@ namespace FlavorfulStory.DialogueSystem.UI
     /// <summary> Отображение диалогового окна. </summary>
     public class DialogueView : MonoBehaviour
     {
-        /// <summary> Текстовое поле для отображения текста диалога. </summary>
-        [SerializeField] private TMP_Text _dialogueText;
+        #region Fields
 
-        [Header("Speaker")] [SerializeField] private TMP_Text _speakerName;
+        /// <summary> Текстовое поле для отображения текста диалога. </summary>
+        [Tooltip("Текстовое поле для отображения текста диалога."), SerializeField]
+        private TMP_Text _dialogueText;
+
+        /// <summary> Текстовое поле для имени говорящего персонажа. </summary>
+        [Header("Speaker Info")] [Tooltip("Текстовое поле для имени говорящего персонажа."), SerializeField]
+        private TMP_Text _speakerName;
 
         /// <summary> Иконка, показывающая, что персонаж доступен для романтики. </summary>
-        [SerializeField] private Image _romanceableIcon;
+        [Tooltip("Иконка, показывающая, что персонаж доступен для романтики."), SerializeField]
+        private Image _romanceableIcon;
 
-        /// <summary> Отображение превью персонажа (например, портрет или модель). </summary>
-        [SerializeField] private GameObject _speakerPreview;
+        /// <summary> Превью персонажа (например, портрет или модель). </summary>
+        [Tooltip("Превью персонажа (например, портрет или модель)."), SerializeField]
+        private GameObject _speakerPreview;
 
-        /// <summary> Контейнер для отображения вариантов ответов игрока. </summary>
-        [Header("Choices")] [SerializeField] private Transform _choiceContainer;
+        /// <summary> Контейнер для кнопок вариантов ответа. </summary>
+        [Header("Choices")] [Tooltip("Контейнер для кнопок вариантов ответа."), SerializeField]
+        private Transform _choiceContainer;
 
         /// <summary> Префаб кнопки варианта ответа. </summary>
-        [SerializeField] private DialogueChoiceButton _choiceButtonPrefab;
+        [Tooltip("Префаб кнопки варианта ответа."), SerializeField]
+        private DialogueChoiceButton _choiceButtonPrefab;
 
         /// <summary> Кнопка для перехода к следующей реплике. </summary>
-        [Header("Next Button")] [SerializeField]
+        [Header("Other")] [Tooltip("Кнопка для перехода к следующей реплике."), SerializeField]
         private Button _nextButton;
 
         /// <summary> Объект текста кнопки Next. </summary>
-        [SerializeField] private GameObject _nextButtonPreview;
+        [Tooltip("Объект текста кнопки Next."), SerializeField]
+        private GameObject _nextButtonPreview;
 
-        /// <summary> Ссылка на компонент PlayerConversant для управления диалогом. </summary>
-        private PlayerSpeaker _playerSpeaker;
+        /// <summary> Канвас с основным игровым интерфейсом (HUD). </summary>
+        [Tooltip("Канвас с основным игровым интерфейсом (HUD)."), SerializeField]
+        private Canvas _hud;
 
-        /// <summary> Инициализация компонентов и подписка на события. </summary>
-        private void Awake()
+        /// <summary> Событие при нажатии кнопки Next. </summary>
+        public event Action OnNextClicked;
+
+        /// <summary> Событие при выборе варианта ответа. </summary>
+        public event Action<DialogueNode> OnChoiceSelected;
+
+        #endregion
+
+        /// <summary> Подписка на кнопку Next. </summary>
+        private void Awake() => _nextButton.onClick.AddListener(() => OnNextClicked?.Invoke());
+
+        /// <summary> Отображает окно диалога с переданными данными. </summary>
+        /// <param name="data"> Данные текущего диалога. </param>
+        public void ShowDialogue(DialogueData data)
         {
-            _playerSpeaker = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerSpeaker>();
-            _nextButton.onClick.AddListener(OnClickNextDialogue);
-            _playerSpeaker.OnConversationUpdated += UpdateView;
+            gameObject.SetActive(true);
+            _hud.gameObject.SetActive(false);
+
+            _dialogueText.text = data.Text;
+            SetSpeakerInfo(data.SpeakerInfo);
+
+            _nextButton.enabled = !data.IsChoosing;
+            _nextButtonPreview.SetActive(!data.IsChoosing);
+            _choiceContainer.gameObject.SetActive(data.IsChoosing);
+
+            RenderChoices(data.Choices, data.IsChoosing);
         }
 
-        /// <summary> При старте обновляем отображение. </summary>
-        private void Start() => UpdateView();
-
-        /// <summary> Обработчик нажатия на кнопку перехода к следующей реплике. </summary>
-        private void OnClickNextDialogue() => _playerSpeaker.PlayNextDialogueNode();
-
-        /// <summary> Обновить отображение в зависимости от состояния диалога. </summary>
-        private void UpdateView()
+        /// <summary> Скрывает окно диалога и восстанавливает отображение HUD. </summary>
+        public void HideDialogue()
         {
-            gameObject.SetActive(_playerSpeaker.IsDialogueActive);
-            if (!_playerSpeaker.IsDialogueActive) return;
-
-            SetSpeakerView(_playerSpeaker.CurrentNpcSpeaker);
-            _nextButton.enabled = !_playerSpeaker.IsChoosingDialogue;
-            _nextButtonPreview.SetActive(!_playerSpeaker.IsChoosingDialogue);
-            _choiceContainer.gameObject.SetActive(_playerSpeaker.IsChoosingDialogue);
-
-            if (_playerSpeaker.IsChoosingDialogue)
-                BuildChoiceList();
-            else
-                _dialogueText.text = _playerSpeaker.GetText();
+            gameObject.SetActive(false);
+            _hud.gameObject.SetActive(true);
+            ClearChoices();
         }
 
-        /// <summary> Установить отображение информации о текущем спикере. </summary>
-        /// <param name="speaker"> Спикер, информацию которого нужно отобразить. </param>
-        private void SetSpeakerView(NpcSpeaker speaker)
+        /// <summary> Устанавливает информацию о говорящем персонаже. </summary>
+        /// <param name="npc"> Информация о персонаже. </param>
+        private void SetSpeakerInfo(NpcInfo npc)
         {
-            _speakerName.text = speaker.NpcInfo.NpcName.ToString();
-            _romanceableIcon.gameObject.SetActive(speaker.NpcInfo.IsRomanceable);
-            // TODO: Модельку персонажа добавить
+            _speakerName.text = npc.NpcName.ToString();
+            _romanceableIcon.gameObject.SetActive(npc.IsRomanceable);
+            // TODO: подключить _speakerPreview (портрет/анимация)
         }
 
-        /// <summary> Построить список доступных вариантов ответа. </summary>
-        private void BuildChoiceList()
+        /// <summary> Отрисовывает кнопки выбора реплик, если активен режим выбора. </summary>
+        /// <param name="choices"> Список доступных вариантов. </param>
+        /// <param name="isChoosing"> Флаг, указывающий, выбирает ли игрок. </param>
+        private void RenderChoices(IEnumerable<DialogueNode> choices, bool isChoosing)
         {
             ClearChoices();
-            SpawnChoices();
-        }
 
-        /// <summary> Удалить старые кнопки вариантов. </summary>
-        private void ClearChoices()
-        {
-            foreach (Transform choice in _choiceContainer) Destroy(choice.gameObject);
-        }
+            if (!isChoosing || choices == null) return;
 
-        /// <summary> Создать кнопки для всех доступных вариантов ответа. </summary>
-        private void SpawnChoices()
-        {
-            foreach (var choice in _playerSpeaker.GetChoices())
+            foreach (var choice in choices)
             {
-                var choiceInstance = Instantiate(_choiceButtonPrefab, _choiceContainer);
-                choiceInstance.SetText(choice.Text);
-                var button = choiceInstance.GetComponent<UIButton>();
-                button.OnClick += () => { OnClickSelectChoice(choice); };
+                var choiceButton = Instantiate(_choiceButtonPrefab, _choiceContainer);
+                choiceButton.SetText(choice.Text);
+                choiceButton.GetComponent<UIButton>().OnClick += () => OnChoiceSelected?.Invoke(choice);
             }
         }
 
-        /// <summary> Обработчик выбора варианта ответа. </summary>
-        /// <param name="choice"> Выбранный узел диалога. </param>
-        private void OnClickSelectChoice(DialogueNode choice) => _playerSpeaker.SelectChoice(choice);
+        /// <summary> Очищает все текущие варианты ответа из UI. </summary>
+        private void ClearChoices()
+        {
+            foreach (Transform child in _choiceContainer) Destroy(child.gameObject);
+        }
     }
 }

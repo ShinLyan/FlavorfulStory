@@ -31,9 +31,5 @@ namespace FlavorfulStory.BuildingRepair
         /// <summary> Устанавливает ресурс для кнопки. </summary>
         /// <param name="resource"> Ресурс, который будет привязан к кнопке. </param>
         public void SetResource(InventoryItem resource) => _resource = resource;
-
-        /// <summary> Вызвать нажатие кнопки. </summary>
-        /// <remarks> Будет использовано при реализации навигации по кнопкам вьюшки ремонта. </remarks>
-        public void TriggerClick() => Click();
     }
 }
