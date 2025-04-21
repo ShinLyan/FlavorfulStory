@@ -28,19 +28,19 @@ namespace FlavorfulStory.Settings
         }
 
         /// <summary> Устанавливает громкость для указанного типа аудиоканала. </summary>
-        /// <param name="volumeType"> Тип громкости (Master, Music, SFX). </param>
+        /// <param name="mixerChannelType"> Тип громкости (Master, Music, SFX). </param>
         /// <param name="value"> Новое значение громкости (0.0 - 1.0). </param>
-        public static void SetVolumeFromType(VolumeType volumeType, float value)
+        public static void SetVolumeFromType(MixerChannelType mixerChannelType, float value)
         {
-            switch (volumeType)
+            switch (mixerChannelType)
             {
-                case VolumeType.Master:
+                case MixerChannelType.Master:
                     MasterVolume = value;
                     break;
-                case VolumeType.SFX:
+                case MixerChannelType.SFX:
                     SFXVolume = value;
                     break;
-                case VolumeType.Music:
+                case MixerChannelType.Music:
                     MusicVolume = value;
                     break;
             }

@@ -9,6 +9,10 @@ namespace FlavorfulStory.UI
         public event Action OnClick;
 
         /// <summary> Обработчик события клика по кнопке. Вызывает событие OnClick. </summary>
-        protected override void Click() => OnClick?.Invoke();
+        protected override void Click()
+        {
+            base.Click();
+            OnClick?.Invoke();
+        }
     }
 }

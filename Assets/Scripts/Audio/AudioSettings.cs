@@ -1,8 +1,8 @@
-using FlavorfulStory.Audio;
+using FlavorfulStory.Settings;
 using UnityEngine;
 using UnityEngine.Audio;
 
-namespace FlavorfulStory.Settings
+namespace FlavorfulStory.Audio
 {
     /// <summary> Управляет настройками громкости аудиомикшера. </summary>
     public class AudioSettings : MonoBehaviour
@@ -11,42 +11,39 @@ namespace FlavorfulStory.Settings
         [SerializeField] private AudioMixer _audioMixer;
 
         /// <summary> Устанавливает значения громкости при запуске. </summary>
-        private void Start()
-        {
-            SetDefaultValues();
-        }
+        private void Start() => SetDefaultValues();
 
         /// <summary> Устанавливает значения громкости из сохранённых настроек. </summary>
         private void SetDefaultValues()
         {
-            SetMixerValue(VolumeType.Master, GetVolumeValueFromType(VolumeType.Master));
-            SetMixerValue(VolumeType.Music, GetVolumeValueFromType(VolumeType.Music));
-            SetMixerValue(VolumeType.SFX, GetVolumeValueFromType(VolumeType.SFX));
+            SetMixerValue(MixerChannelType.Master, GetVolumeValueFromType(MixerChannelType.Master));
+            SetMixerValue(MixerChannelType.Music, GetVolumeValueFromType(MixerChannelType.Music));
+            SetMixerValue(MixerChannelType.SFX, GetVolumeValueFromType(MixerChannelType.SFX));
         }
 
         /// <summary> Устанавливает громкость указанного типа. </summary>
-        /// <param name="volumeType"> Тип громкости (Master, Music, SFX). </param>
+        /// <param name="mixerChannelType"> Тип громкости (Master, Music, SFX). </param>
         /// <param name="value"> Новое значение громкости (0.0 - 1.0). </param>
-        public void SetMixerValue(VolumeType volumeType, float value)
+        public void SetMixerValue(MixerChannelType mixerChannelType, float value)
         {
             const int MinMixerValue = -80, MixerMultiplier = 20;
             float mixerValue = value == 0 ? MinMixerValue : Mathf.Log10(value) * MixerMultiplier;
 
-            string channelName = volumeType.ToString();
+            string channelName = mixerChannelType.ToString();
             _audioMixer.SetFloat(channelName, mixerValue);
 
-            SavingSettings.SetVolumeFromType(volumeType, value);
+            SavingSettings.SetVolumeFromType(mixerChannelType, value);
         }
 
         /// <summary> Получает сохранённое значение громкости по её типу. </summary>
-        /// <param name="volumeType"> Тип громкости (Master, Music, SFX). </param>
+        /// <param name="mixerChannelType"> Тип микшера (Master, Music, SFX). </param>
         /// <returns> Возвращает сохранённое значение громкости. </returns>
-        public float GetVolumeValueFromType(VolumeType volumeType) => volumeType switch
+        public static float GetVolumeValueFromType(MixerChannelType mixerChannelType) => mixerChannelType switch
         {
-            VolumeType.Master => SavingSettings.MasterVolume,
-            VolumeType.SFX => SavingSettings.SFXVolume,
-            VolumeType.Music => SavingSettings.MusicVolume,
-            _ => 0,
+            MixerChannelType.Master => SavingSettings.MasterVolume,
+            MixerChannelType.SFX => SavingSettings.SFXVolume,
+            MixerChannelType.Music => SavingSettings.MusicVolume,
+            _ => 0
         };
     }
 }
