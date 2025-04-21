@@ -87,8 +87,10 @@ namespace FlavorfulStory.Lightning
 
             float sunProgress = Mathf.InverseLerp(DayStartTime, NightStartTime, currentTimeInHours);
             RotateSun(sunProgress);
-            ColorizeSun(sunProgress);
+            ColorizeLight(_sunLight, sunProgress, _currentWeatherLightSettings.SunColorGradient,
+                _currentWeatherLightSettings.SunIntensityCurve, _currentWeatherLightSettings.MaxSunIntensity);
         }
+
 
         /// <summary> Устанавливает параметры теней для солнца. </summary> 
         /// <param name="currentTimeInHours"> Текущее время в часах. </param>
@@ -134,16 +136,6 @@ namespace FlavorfulStory.Lightning
             _sunLight.transform.rotation = Quaternion.Euler(sunAngleX, sunAngleY, 0f);
         }
 
-        /// <summary> Изменяет цвет и интенсивность солнечного света. </summary> 
-        /// <param name="sunProgress"> Прогресс дня от 0 до 1. </param>
-        private void ColorizeSun(float sunProgress)
-        {
-            _sunLight.color = _currentWeatherLightSettings.SunColorGradient.Evaluate(sunProgress);
-            _sunLight.intensity =
-                _currentWeatherLightSettings.SunIntensityCurve.Evaluate(sunProgress) *
-                _currentWeatherLightSettings.MaxSunIntensity;
-        }
-
         /// <summary> Обновляет параметры лунного света. </summary> 
         /// <param name="gameTime"> Текущее игровое время. </param>
         private void UpdateMoon(DateTime gameTime)
@@ -160,8 +152,10 @@ namespace FlavorfulStory.Lightning
             float moonProgress = Mathf.InverseLerp(MoonStartTime, HoursInDay + 2f,
                 currentTimeInHours >= MoonStartTime ? currentTimeInHours : currentTimeInHours + HoursInDay);
             RotateMoon(moonProgress);
-            ColorizeMoon(moonProgress);
+            ColorizeLight(_moonLight, moonProgress, _currentWeatherLightSettings.MoonColorGradient,
+                _currentWeatherLightSettings.MoonIntensityCurve, _currentWeatherLightSettings.MaxMoonIntensity);
         }
+
 
         /// <summary> Устанавливает параметры теней для луны. </summary> 
         /// <param name="currentTimeInHours"> Текущее время в часах. </param>
@@ -198,14 +192,21 @@ namespace FlavorfulStory.Lightning
             _moonLight.transform.rotation = Quaternion.Euler(MoonAngleX, moonAngleY, 0f);
         }
 
-        /// <summary> Изменяет цвет и интенсивность лунного света. </summary> 
-        /// <param name="moonProgress"> Прогресс ночи от 0 до 1. </param>
-        private void ColorizeMoon(float moonProgress)
+        /// <summary> Изменяет цвет и интенсивность источника света. </summary>
+        /// <param name="light"> Источник света (солнце или луна). </param>
+        /// <param name="progress"> Прогресс дня/ночи от 0 до 1. </param>
+        /// <param name="colorGradient"> Градиент цвета для изменения. </param>
+        /// <param name="intensityCurve"> Кривая интенсивности света. </param>
+        /// <param name="maxIntensity"> Максимальная интенсивность света. </param>
+        private void ColorizeLight(
+            Light light,
+            float progress,
+            Gradient colorGradient,
+            AnimationCurve intensityCurve,
+            float maxIntensity)
         {
-            _moonLight.color = _currentWeatherLightSettings.MoonColorGradient.Evaluate(moonProgress);
-            _moonLight.intensity =
-                _currentWeatherLightSettings.MoonIntensityCurve.Evaluate(moonProgress) *
-                _currentWeatherLightSettings.MaxMoonIntensity;
+            light.color = colorGradient.Evaluate(progress);
+            light.intensity = intensityCurve.Evaluate(progress) * maxIntensity;
         }
     }
 }
