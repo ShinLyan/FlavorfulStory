@@ -13,8 +13,10 @@ namespace FlavorfulStory.DialogueSystem
     /// <summary> Компонент для управления диалогом игрока. </summary>
     public class PlayerSpeaker : MonoBehaviour, IDialogueInitiator
     {
+        #region Fields
+
         /// <summary> NPC, с которым в данный момент ведётся диалог. </summary>
-        public NpcSpeaker CurrentNpcSpeaker { get; private set; }
+        private NpcSpeaker CurrentNpcSpeaker { get; set; }
 
         /// <summary> Текущий активный диалог. </summary>
         private Dialogue _currentDialogue;
@@ -22,30 +24,51 @@ namespace FlavorfulStory.DialogueSystem
         /// <summary> Текущий активный узел диалога. </summary>
         private DialogueNode _currentNode;
 
-        /// <summary> Выбирает ли игрок в данный момент реплику? </summary>
-        public bool IsChoosingDialogue { get; private set; }
-
-        /// <summary> Идёт ли сейчас диалог. </summary>
-        public bool IsDialogueActive => _currentDialogue;
-
-        /// <summary> Событие, вызываемое при любом изменении состояния диалога (обновление текста, вариантов и т.п.). </summary>
-        public event Action OnConversationUpdated;
-
-        public event Action OnConversationEnded;
-
+        /// <summary> UI-компонент отображения диалога. </summary>
         private DialogueView _dialogueView;
 
+        /// <summary> Выбирает ли игрок в данный момент реплику? </summary>
+        private bool IsChoosingDialogue { get; set; }
+
+        /// <summary> Идёт ли сейчас диалог? </summary>
+        private bool IsDialogueActive => _currentDialogue;
+
+        /// <summary> Событие обновления состояния диалога. </summary>
+        public event Action OnConversationUpdated;
+
+        /// <summary> Событие завершения диалога. </summary>
+        public event Action OnConversationEnded;
+
+        #endregion
+
+        /// <summary> Инициализация компонента и подписка на события UI. </summary>
         private void Awake()
         {
             _dialogueView = FindFirstObjectByType<DialogueView>(FindObjectsInactive.Include);
+
+            _dialogueView.OnNextClicked += PlayNextDialogueNode;
+            _dialogueView.OnChoiceSelected += SelectChoice;
         }
 
+        /// <summary> Обработка ввода для перехода к следующей реплике. </summary>
         private void Update()
         {
             if (!IsDialogueActive || IsChoosingDialogue ||
                 !InputWrapper.GetButtonDown(InputButton.NextDialogue)) return;
 
             PlayNextDialogueNode();
+        }
+
+        /// <summary> Очистить подписки и события при уничтожении компонента. </summary>
+        private void OnDestroy()
+        {
+            if (_dialogueView)
+            {
+                _dialogueView.OnNextClicked -= PlayNextDialogueNode;
+                _dialogueView.OnChoiceSelected -= SelectChoice;
+            }
+
+            OnConversationUpdated = null;
         }
 
         #region IDialogueInitiator
@@ -56,36 +79,38 @@ namespace FlavorfulStory.DialogueSystem
         public void StartDialogue(NpcSpeaker npcSpeaker, Dialogue dialogue)
         {
             WorldTime.Pause();
+
             CurrentNpcSpeaker = npcSpeaker;
             _currentDialogue = dialogue;
             _currentNode = dialogue.RootNode;
+
             TriggerEnterAction();
-
-            _dialogueView.Initialize(this);
-            OnConversationUpdated?.Invoke();
-
+            UpdateDialogueView();
 
             StartCoroutine(EnableNextDialogueInput());
         }
 
+        /// <summary> Завершить текущий диалог. </summary>
         public void EndDialogue()
         {
+            WorldTime.Unpause();
+
             _currentDialogue = null;
             TriggerExitAction();
             CurrentNpcSpeaker = null;
             _currentNode = null;
             IsChoosingDialogue = false;
+
+            _dialogueView.HideDialogue();
+
             OnConversationUpdated?.Invoke();
             OnConversationEnded?.Invoke();
-            WorldTime.Unpause();
         }
 
         #endregion
 
         /// <summary> Разблокировка ввода для перехода к следующей реплике. </summary>
-        /// <remarks> Используется для предотвращения пропуска первой реплики диалога,
-        /// если кнопка NextDialogue была нажата в том же кадре, что и начало диалога.
-        /// Блокирует ввод на один кадр, чтобы избежать двойного срабатывания. </remarks>
+        /// <remarks> Блокирует ввод на один кадр, чтобы избежать случайного пропуска. </remarks>
         private static IEnumerator EnableNextDialogueInput()
         {
             yield return null; // Пропустить кадр, в котором был вызван StartDialogue
@@ -93,11 +118,11 @@ namespace FlavorfulStory.DialogueSystem
         }
 
         /// <summary> Получить текст текущего узла диалога. </summary>
-        /// <returns> Текст текущей реплики или пустая строка, если диалог не активен. </returns>
-        public string GetText() => _currentNode ? _currentNode.Text : string.Empty;
+        /// <returns> Текст текущей реплики или пустая строка. </returns>
+        private string GetText() => _currentNode ? _currentNode.Text : string.Empty;
 
         /// <summary> Воспроизвести следующий узел диалога. </summary>
-        public void PlayNextDialogueNode()
+        private void PlayNextDialogueNode()
         {
             if (!IsDialogueActive) return;
 
@@ -106,12 +131,13 @@ namespace FlavorfulStory.DialogueSystem
             {
                 IsChoosingDialogue = true;
                 TriggerExitAction();
+                UpdateDialogueView();
                 OnConversationUpdated?.Invoke();
                 return;
             }
 
             // Если нет дальнейших узлов — завершить диалог
-            if (!_currentDialogue.GetChildNodes(_currentNode).Any())
+            if (!HasNextDialogue())
             {
                 EndDialogue();
                 return;
@@ -122,20 +148,23 @@ namespace FlavorfulStory.DialogueSystem
             TriggerExitAction();
             _currentNode = childAINodes[Random.Range(0, childAINodes.Length)];
             TriggerEnterAction();
+
+            IsChoosingDialogue = false;
+            UpdateDialogueView();
             OnConversationUpdated?.Invoke();
         }
 
         /// <summary> Есть ли ещё доступные узлы после текущего? </summary>
-        /// <returns> True, если есть хотя бы одна дочерняя реплика. </returns>
-        public bool HasNextDialogue() => _currentDialogue.GetChildNodes(_currentNode).Any();
+        /// <returns> <c>true</c>, если есть хотя бы одна дочерняя реплика. </returns>
+        private bool HasNextDialogue() => _currentDialogue.GetChildNodes(_currentNode).Any();
 
         /// <summary> Получить список доступных для игрока вариантов ответа. </summary>
         /// <returns> Список узлов, которые представляет выбор игрока. </returns>
-        public IEnumerable<DialogueNode> GetChoices() => _currentDialogue.GetPlayerChildNodes(_currentNode);
+        private IEnumerable<DialogueNode> GetChoices() => _currentDialogue.GetPlayerChildNodes(_currentNode);
 
         /// <summary> Выбрать вариант ответа игрока. </summary>
         /// <param name="chosenNode"> Узел, выбранный игроком. </param>
-        public void SelectChoice(DialogueNode chosenNode)
+        private void SelectChoice(DialogueNode chosenNode)
         {
             _currentNode = chosenNode;
             TriggerEnterAction();
@@ -143,27 +172,37 @@ namespace FlavorfulStory.DialogueSystem
             PlayNextDialogueNode();
         }
 
-        /// <summary> Выполнить действие, назначенное при входе в текущий узел. </summary>
+        /// <summary> Обновить UI диалога в соответствии с текущим узлом. </summary>
+        private void UpdateDialogueView()
+        {
+            if (!IsDialogueActive)
+            {
+                _dialogueView.HideDialogue();
+                return;
+            }
+
+            var data = new DialogueData(GetText(), CurrentNpcSpeaker?.NpcInfo, IsChoosingDialogue, GetChoices());
+            _dialogueView.ShowDialogue(data);
+        }
+
+        /// <summary> Выполнить действие входа, назначенное текущему узлу. </summary>
         private void TriggerEnterAction()
         {
             if (_currentNode) TriggerAction(_currentNode.EnterActionName);
         }
 
-        /// <summary> Выполнить действие, назначенное при выходе из текущего узла. </summary>
+        /// <summary> Выполнить действие выхода, назначенное текущему узлу. </summary>
         private void TriggerExitAction()
         {
             if (_currentNode) TriggerAction(_currentNode.ExitActionName);
         }
 
-        /// <summary> Выполнить указанное действие для всех триггеров диалога у текущего NPC. </summary>
+        /// <summary> Выполнить указанное действие у триггеров текущего NPC. </summary>
         /// <param name="action"> Имя действия. </param>
         private void TriggerAction(string action)
         {
             if (action == string.Empty) return;
             CurrentNpcSpeaker.GetComponent<DialogueTrigger>().TriggerDialogue(action);
         }
-
-        /// <summary> При уничтожении событие отписать от подписчиков. </summary>
-        private void OnDestroy() => OnConversationUpdated = null;
     }
 }
