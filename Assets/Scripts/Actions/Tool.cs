@@ -1,6 +1,7 @@
-using FlavorfulStory.Control;
+using FlavorfulStory.Audio;
 using FlavorfulStory.InputSystem;
 using FlavorfulStory.InventorySystem;
+using FlavorfulStory.Player;
 using FlavorfulStory.ResourceContainer;
 using FlavorfulStory.Utils;
 using UnityEngine;
@@ -18,9 +19,13 @@ namespace FlavorfulStory.Actions
         [field: Tooltip("Тип инструмента."), SerializeField]
         public ToolType ToolType { get; private set; }
 
-        /// <summary> Кнопка использования предмета. </summary>
-        [field: Tooltip("Кнопка использования"), SerializeField]
-        public UseActionType UseActionType { get; set; }
+        /// <summary> Кнопка использования инструмента. </summary>
+        [field: Tooltip("Кнопка использования инструмента."), SerializeField]
+        public UseActionType UseActionType { get; private set; }
+
+        /// <summary> Тип SFX использования. </summary>
+        [field: Tooltip("Тип SFX использования."), SerializeField]
+        public SfxType SfxType { get; private set; }
 
         /// <summary> Максимальная дистанция взаимодействия инструментом. </summary>
         private const float MaxInteractionDistance = 2f;
@@ -35,7 +40,7 @@ namespace FlavorfulStory.Actions
         /// <param name="hitableLayers"> Слои, по которым будем делать удар. </param>
         public bool Use(PlayerController player, LayerMask hitableLayers)
         {
-            if (!WorldCoordinates.GetWorldCoordinatesFromScreenPoint(
+            if (!RaycastUtils.TryGetScreenPointToWorld(
                     InputWrapper.GetMousePosition(),
                     ~(1 << player.gameObject.layer),
                     out var targetPosition))

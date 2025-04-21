@@ -15,10 +15,7 @@ namespace FlavorfulStory.InventorySystem
         static ItemDatabase()
         {
             _itemDatabase = new Dictionary<string, InventoryItem>();
-
-            // Загрузка все ресурсов с типом InventoryItem по всему проекту.
-            var items = Resources.LoadAll<InventoryItem>(string.Empty);
-            foreach (var item in items)
+            foreach (var item in Resources.LoadAll<InventoryItem>(string.Empty))
             {
                 if (_itemDatabase.TryGetValue(item.ItemID, out var value))
                 {

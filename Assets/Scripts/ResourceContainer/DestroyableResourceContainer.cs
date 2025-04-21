@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using FlavorfulStory.Actions;
+using FlavorfulStory.Audio;
 using FlavorfulStory.InventorySystem.DropSystem;
 using FlavorfulStory.ObjectManagement;
 using UnityEngine;
@@ -131,12 +132,16 @@ namespace FlavorfulStory.ResourceContainer
 
         #region HitBehaviour
 
+        [field: SerializeField]
+        public SfxType SfxType { private get; set; }
+
         /// <summary> Получить удар. </summary>
         /// <param name="toolType"> Тип инструмента, которым наносится удар. </param>
         public void TakeHit(ToolType toolType)
         {
             if (IsDestroyed || !_toolsToBeHit.Contains(toolType)) return;
 
+            SfxPlayer.Instance.PlayOneShot(SfxType);
             HitsTaken++;
             if (HitsTaken >= _hitsToDestroy)
             {

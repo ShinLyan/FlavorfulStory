@@ -42,7 +42,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         {
             if (_currentPoint == null) return;
 
-            var animationClipName = _currentPoint.NpcAnimationClipName;
+            var animationClipName = _currentPoint.NpcAnimation;
             if (_currentPoint != null) PlayStateAnimation(animationClipName);
         }
 
@@ -68,9 +68,9 @@ namespace FlavorfulStory.AI.FiniteStateMachine
 
         /// <summary> Воспроизведение анимации состояния. </summary>
         /// <param name="animationStateName"> Название состояния анимации. </param>
-        private void PlayStateAnimation(NpcAnimationClipName animationStateName)
+        private void PlayStateAnimation(AnimationType animationStateName)
         {
-            if (animationStateName == NpcAnimationClipName.Idle) return;
+            if (animationStateName == AnimationType.Idle) return;
             _animator.Play(animationStateName.ToString());
         }
     }

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 
 namespace FlavorfulStory.AI
 {
@@ -6,6 +6,9 @@ namespace FlavorfulStory.AI
     [Serializable]
     public enum NpcName
     {
+        /// <summary> Дирк. </summary>
+        Dirk,
+
         /// <summary> Люксор. </summary>
         Luxor,
 
