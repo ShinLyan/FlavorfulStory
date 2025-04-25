@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace FlavorfulStory.SceneManagement
@@ -14,6 +16,19 @@ namespace FlavorfulStory.SceneManagement
         [Tooltip("Объекты, которые будут отключены при выходе игрока из локации."), SerializeField]
         private GameObject[] _objectsToDisable;
 
+        /// <summary> Является ли локация помещением. </summary>
+        [Tooltip("Является ли локация помещением."), SerializeField]
+        private bool _isRoom;
+
+        private IEnumerable<Light> _globalLights;
+
+        private void Start()
+        {
+            _globalLights = GameObject.FindGameObjectsWithTag("GlobalLight")
+                .Select(l => l.GetComponent<Light>())
+                .ToArray();
+        }
+
         /// <summary> Активирует объекты, связанные с этой локацией. </summary>
         public void Enable() => SetObjectsActive(true);
 
@@ -27,6 +42,7 @@ namespace FlavorfulStory.SceneManagement
             if (_objectsToDisable == null || _objectsToDisable.Length == 0) return;
 
             foreach (var obj in _objectsToDisable) obj.SetActive(isActive);
+            foreach (var globalLight in _globalLights) globalLight.enabled = !_isRoom;
         }
 
         /// <summary> Находится ли заданная позиция внутри границ локации? </summary>
