@@ -145,6 +145,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine
 
         private void GoToCurrentPoint()
         {
+            if (_currentPoint == null) return;
             if (_currentLocation != _currentPoint.LocationName)
                 HandleWarpTransition(_currentPoint);
             else
