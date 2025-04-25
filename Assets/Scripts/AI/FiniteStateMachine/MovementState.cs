@@ -42,6 +42,8 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         /// <summary> Текущая скорость NPC, используемая для анимации. </summary>
         private float _speed;
 
+        private Stack<SchedulePoint> _currentPath;
+
         /// <summary> Компонент Transform. </summary>
         private readonly Transform _npcTransform;
 
@@ -49,8 +51,6 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         private readonly MonoBehaviour _coroutineRunner;
 
         private readonly Vector3 _spawnPoint;
-
-        private bool _isExiting; //TODO: исправить костыль
 
         /// <summary> Хэшированное значение параметра "скорость" для анимации. </summary>
         private static readonly int _speedParameterHash = Animator.StringToHash("Speed");
@@ -78,7 +78,9 @@ namespace FlavorfulStory.AI.FiniteStateMachine
             _spawnPoint = npcTransform.position;
             _spawnLocation = GetCurrentLocationName();
             _currentLocation = _spawnLocation;
-            _isExiting = false; //TODO: исправить костыль
+            WorldTime.OnTimePaused += OnTimePaused;
+            WorldTime.OnTimeUnpaused += OnTimeUnpaused;
+            WorldTime.OnTimeUpdated += UpdateCurrentSchedulePoint;
         }
 
         /// <summary> Получить имя локации, в которой находится NPC. </summary>
@@ -93,20 +95,10 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         }
 
         /// <summary> Вызывается при входе в состояние движения. </summary>
-        public override void Enter()
-        {
-            _isExiting = false;
-            WorldTime.OnTimeUpdated += FindDestinationPoint;
-        }
+        public override void Enter() { }
 
         /// <summary> Вызывается при выходе из состояния движения. </summary>
-        public override void Exit()
-        {
-            _isExiting = true; 
-            Reset(); 
-            _isExiting = false;
-            WorldTime.OnTimeUpdated -= FindDestinationPoint;
-        }
+        public override void Exit() { StopMovementWithoutWarp(); }
 
         /// <summary> Обновляет логику состояния движения каждый кадр. </summary>
         /// <param name="deltaTime"> Время, прошедшее с последнего кадра. </param>
@@ -120,35 +112,43 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         }
 
         /// <summary> Сброс состояния в начальное состояние. </summary>
-        public override void Reset()
+        public override void Reset() { StopMovementAndWarp(); }
+
+        /// <summary> Остановка движения без телепортации. </summary>
+        private void StopMovementWithoutWarp()
         {
             StopCoroutine();
             PlayMoveAnimation(0f, 0f);
-            _currentPoint = null;
             _navMeshAgent.ResetPath();
-            if (!_isExiting) _navMeshAgent.Warp(_spawnPoint); //TODO: исправить костыль
-            _currentLocation = _spawnLocation;
         }
 
-        /// <summary> Находит ближайшую точку маршрута на основе текущего времени
-        /// и задаёт её как цель для NPC. </summary>
-        /// <param name="currentTime"> Текущее время в игре. </param>
-        private void FindDestinationPoint(DateTime currentTime)
+        /// <summary> Полный сброс с телепортацией. </summary>
+        private void StopMovementAndWarp()
         {
-            var closestPoint = _currentScheduleParams?.GetClosestSchedulePointInPath(currentTime);
-            if (closestPoint == null)
-            {
-                Debug.LogError("Ближайшая точка отсутствует!");
-                return;
-            }
+            StopMovementWithoutWarp();
+            _navMeshAgent.Warp(_spawnPoint);
+            _currentLocation = _spawnLocation;
+            _currentPoint = null;
+        }
 
-            if (_currentPoint == closestPoint) return;
+        private void UpdateCurrentSchedulePoint(DateTime currentTime)
+        {
+            if (_currentPath.Count <= 0) return;
+
+            var topElement = _currentPath.Peek();
+            if ((int)currentTime.Hour != topElement.Hour || (int)currentTime.Minute != topElement.Minutes) return;
 
             StopCoroutine();
-            _currentPoint = closestPoint;
+            _currentPoint = _currentPath.Pop();
+            GoToCurrentPoint();
+        }
 
-            if (_currentLocation != closestPoint.LocationName) HandleWarpTransition(closestPoint);
-            else _navMeshAgent.SetDestination(closestPoint.Position);
+        private void GoToCurrentPoint()
+        {
+            if (_currentLocation != _currentPoint.LocationName)
+                HandleWarpTransition(_currentPoint);
+            else
+                _navMeshAgent.SetDestination(_currentPoint.Position);
         }
 
 
@@ -206,8 +206,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine
             // когда прошел через все варпы и оказался на конечной сцене
             _navMeshAgent.SetDestination(destination.Position);
 
-            while (_navMeshAgent.remainingDistance > DistanceToReachPoint)
-                yield return null;
+            while (_navMeshAgent.remainingDistance > DistanceToReachPoint) yield return null;
         }
 
         /// <summary> Находит ближайший варп в указанной локации. </summary>
@@ -231,12 +230,24 @@ namespace FlavorfulStory.AI.FiniteStateMachine
 
         /// <summary> Установить новое расписание. </summary>
         /// <param name="scheduleParams"> Новое расписание. </param>
-        public void SetCurrentScheduleParams(ScheduleParams scheduleParams) => _currentScheduleParams = scheduleParams;
+        public void SetCurrentScheduleParams(ScheduleParams scheduleParams)
+        {
+            _currentScheduleParams = scheduleParams;
+
+            if (_currentScheduleParams == null) return;
+            _currentPath = _currentScheduleParams.GetSortedSchedulePointsStack();
+        }
 
         /// <summary> Воспроизведение анимации движения. </summary>
         /// <param name="speed"> Скорость движения. </param>
         /// <param name="dampTime"> Время сглаживания перехода анимации. </param>
         private void PlayMoveAnimation(float speed, float dampTime = 0.2f) =>
             _animator.SetFloat(_speedParameterHash, speed, dampTime, Time.deltaTime);
+
+        /// <summary> Обработчик паузы времени. </summary>
+        private void OnTimePaused() => StopMovementWithoutWarp();
+
+        /// <summary> Обработчик возобновления времени. </summary>
+        private void OnTimeUnpaused() => GoToCurrentPoint();
     }
 }
