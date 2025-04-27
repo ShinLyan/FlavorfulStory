@@ -1,4 +1,6 @@
+using System;
 using UnityEngine;
+using DayOfWeek = FlavorfulStory.TimeManagement.DayOfWeek;
 #if UNITY_EDITOR
 using FlavorfulStory.SceneManagement;
 using FlavorfulStory.TimeManagement;
@@ -145,7 +147,11 @@ namespace FlavorfulStory.AI.Scheduling
                     currentParam.Dates[i] = EditorGUILayout.Vector2IntField($"Date {i + 1}", currentParam.Dates[i]);
                 currentParam.Hearts = EditorGUILayout.IntSlider("Hearts", currentParam.Hearts, 0, 12);
                 currentParam.IsRaining = EditorGUILayout.Toggle("Raining", currentParam.IsRaining);
-                if (EditorGUI.EndChangeCheck()) EditorUtility.SetDirty(viewer.schedule);
+                if (EditorGUI.EndChangeCheck())
+                {
+                    Undo.RecordObject(viewer.schedule, "Change Schedule Parameter"); //TODO: не работает
+                    EditorUtility.SetDirty(viewer.schedule);
+                }
 
                 EditorGUILayout.Space();
                 EditorGUILayout.Space();
@@ -159,9 +165,7 @@ namespace FlavorfulStory.AI.Scheduling
                     Mathf.Max(0, currentParam.Path.Length - 1)
                 );
                 EditorGUI.EndChangeCheck();
-
-
-                // Редакт точек.
+                
                 EditorGUILayout.BeginHorizontal();
                 if (GUILayout.Button("Previous Point"))
                     if (viewer.selectedPointIndex > 0)
@@ -170,8 +174,8 @@ namespace FlavorfulStory.AI.Scheduling
                     if (viewer.selectedPointIndex < currentParam.Path.Length - 1)
                         viewer.selectedPointIndex++;
                 EditorGUILayout.EndHorizontal();
-
-                EditorGUI.BeginChangeCheck();
+                
+                EditorGUILayout.BeginHorizontal();
                 if (GUILayout.Button("Add Schedule Point"))
                 {
                     var newPath = new SchedulePoint[currentParam.Path.Length + 1];
@@ -190,9 +194,23 @@ namespace FlavorfulStory.AI.Scheduling
 
                     currentParam.Path = newPath;
                     viewer.selectedPointIndex = newPath.Length - 1;
+
+                    Undo.RecordObject(viewer.schedule, "Add Schedule Point"); //TODO: не работает
+                    EditorUtility.SetDirty(viewer.schedule);
                 }
 
-                if (EditorGUI.EndChangeCheck()) EditorUtility.SetDirty(viewer.schedule);
+                if (GUILayout.Button("Delete Last Schedule Point"))
+                    if (currentParam.Path.Length > 0)
+                    {
+                        var newPath = new SchedulePoint[currentParam.Path.Length - 1];
+                        Array.Copy(currentParam.Path, 0, newPath, 0, currentParam.Path.Length - 1);
+                        currentParam.Path = newPath;
+                        viewer.selectedPointIndex = Mathf.Clamp(viewer.selectedPointIndex, 0, newPath.Length - 1);
+                        Undo.RecordObject(viewer.schedule, "Delete Schedule Point"); //TODO: не работает
+                        EditorUtility.SetDirty(viewer.schedule);
+                    }
+
+                EditorGUILayout.EndHorizontal();
 
                 // Редактирование выбранной точки
                 if (currentParam.Path.Length > 0)
