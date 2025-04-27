@@ -39,7 +39,7 @@ namespace FlavorfulStory.InventorySystem.UI
         protected override void Initialize()
         {
             _index = transform.GetSiblingIndex();
-            _keyText.text = $"{_index + 1}";
+            _keyText.text = _index == 9 ? "0" : $"{_index + 1}";
             _defaultColor = ButtonImage.color;
         }
 
@@ -54,7 +54,7 @@ namespace FlavorfulStory.InventorySystem.UI
         {
             base.Click();
             OnSlotClicked?.Invoke(_index);
-        } 
+        }
 
         /// <summary> Выделяет данный слот. </summary>
         public void Select() => FadeToColor(_selectedColor);
