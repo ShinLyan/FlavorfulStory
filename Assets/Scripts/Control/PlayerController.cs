@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Linq;
 using FlavorfulStory.Actions;
 using FlavorfulStory.Actions.Interactables;
+using FlavorfulStory.Attributes;
 using FlavorfulStory.InputSystem;
 using FlavorfulStory.InventorySystem;
 using FlavorfulStory.InventorySystem.UI;
@@ -50,7 +50,7 @@ namespace FlavorfulStory.Control
 
         /// <summary> Время перезарядки использования инструмента. </summary>
         private const float ToolCooldown = 1.5f;
-        
+
         #endregion
 
         /// <summary> Текущий выбранный предмет из панели быстрого доступа. </summary>
@@ -58,6 +58,8 @@ namespace FlavorfulStory.Control
 
         /// <summary> Событие, вызываемое при окончании взаимодействия с объектом. </summary>
         public event Action OnInteractionEnded;
+
+        [field: SerializeField] public PlayerAttributes PlayerAttributes { get; set; }
 
         #endregion
 
@@ -105,7 +107,8 @@ namespace FlavorfulStory.Control
             if (CurrentItem is not IUsable usable || IsToolUseBlocked) return;
 
             if ((!Input.GetMouseButton(0) || usable.UseActionType != UseActionType.LeftClick) &&
-                (!Input.GetMouseButton(1) || usable.UseActionType != UseActionType.RightClick)) return;
+                (!Input.GetMouseButton(1) || usable.UseActionType != UseActionType.RightClick))
+                return;
 
             BeginInteraction(usable);
         }
@@ -125,8 +128,7 @@ namespace FlavorfulStory.Control
         /// <param name="usable"> Используемый предмет. </param>
         private void StartUsingItem(IUsable usable)
         {
-            if (!usable.Use(this, _toolHandler.HitableLayers))
-                return;
+            if (!usable.Use(this, _toolHandler.HitableLayers)) return;
 
             _toolHandler.Equip(CurrentItem as Tool);
             SetBusyState(true);

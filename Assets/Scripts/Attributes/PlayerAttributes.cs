@@ -39,12 +39,14 @@ namespace FlavorfulStory.Attributes
         /// <summary> Создаёт и инициализирует атрибуты игрока. </summary>
         private void InitializeAttributes()
         {
+            //TODO: Мб где-то внутри HealthAttribute мб не просто создавать с нуля, а подтягивать инфу с сейва
             var health = new HealthAttribute(100f);
             AddAttribute(health);
             AttributeBinder.Bind(GetAttribute<HealthAttribute>(), _healthAttributeView);
+            //TODO: где-то внутри InitializeView подтягивать инфу с сейва
             _healthAttributeView.InitializeView(health.CurrentValue, health.MaxValue);
 
-            var stamina = new StaminaAttribute(150f, 0.01f);
+            var stamina = new StaminaAttribute(150f, 1f);
             AddAttribute(stamina);
             AttributeBinder.Bind(GetAttribute<StaminaAttribute>(), _staminaAttributeView);
             _staminaAttributeView.InitializeView(stamina.CurrentValue, stamina.MaxValue);

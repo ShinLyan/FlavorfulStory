@@ -1,3 +1,4 @@
+using FlavorfulStory.Attributes;
 using FlavorfulStory.Control;
 using FlavorfulStory.InputSystem;
 using FlavorfulStory.InventorySystem;
@@ -48,9 +49,10 @@ namespace FlavorfulStory.Actions
             player.TriggerAnimation($"Use{ToolType}");
             InputWrapper.BlockPlayerMovement();
 
-            return true;
+            // TODO: Уточнить у Димы: 1, 2, 3;
+            player.PlayerAttributes.GetAttribute<HealthAttribute>().Change(-1f);
 
-            // TODO: Реализовать трату энергии игрока при использовании инструмента
+            return true;
         }
 
         /// <summary> Использовать инструмент в заданном направлении. </summary>
