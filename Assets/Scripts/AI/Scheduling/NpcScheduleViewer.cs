@@ -21,8 +21,8 @@ namespace FlavorfulStory.AI.Scheduling
         public int selectedParamIndex;
         public int selectedPointIndex;
 
-        [Header("Ground Settings")] public float groundHeight = 0.5f;  
-        public LayerMask groundMask = -1; 
+        [Header("Ground Settings")] public float groundHeight = 0.5f;
+        public LayerMask groundMask = -1;
     }
 
 #if UNITY_EDITOR
@@ -63,7 +63,7 @@ namespace FlavorfulStory.AI.Scheduling
             {
                 var pathPoint = param.Path[i];
                 var newPosition = GetSurfaceAdjustedPosition(pathPoint.Position, viewer);
-                
+
                 if (pathPoint.Position != newPosition)
                 {
                     pathPoint.Position = newPosition;
@@ -88,7 +88,7 @@ namespace FlavorfulStory.AI.Scheduling
                         realLocationName = location.LocationName;
                         break;
                     }
-                
+
                 var labelStyle = new GUIStyle(GUI.skin.label)
                 {
                     fontSize = 11,
@@ -380,8 +380,11 @@ namespace FlavorfulStory.AI.Scheduling
             {
                 if (GUILayout.Button("Add Schedule Point")) AddSchedulePoint(viewer);
 
-                if (GUILayout.Button("Delete Last Point") && currentParam.Path.Length > 0)
-                    DeleteLastSchedulePoint(viewer);
+                bool canDelete = currentParam.Path.Length > 0;
+                using (new EditorGUI.DisabledScope(!canDelete))
+                {
+                    if (GUILayout.Button("Delete Last Point")) DeleteLastSchedulePoint(viewer);
+                }
             }
             EditorGUILayout.EndHorizontal();
         }
@@ -413,17 +416,13 @@ namespace FlavorfulStory.AI.Scheduling
         {
             var currentParam = viewer.schedule.Params[viewer.selectedParamIndex];
             var newPath = new SchedulePoint[currentParam.Path.Length - 1];
-            bool canRemove = currentParam.Path.Length > 0;
 
-            using (new EditorGUI.DisabledScope(!canRemove))
-            {
-                Array.Copy(currentParam.Path, newPath, currentParam.Path.Length - 1);
+            Array.Copy(currentParam.Path, newPath, currentParam.Path.Length - 1);
 
-                Undo.RecordObject(viewer.schedule, "Delete Schedule Point");
-                currentParam.Path = newPath;
-                viewer.selectedPointIndex = Mathf.Clamp(viewer.selectedPointIndex, 0, newPath.Length - 1);
-                EditorUtility.SetDirty(viewer.schedule);
-            }
+            Undo.RecordObject(viewer.schedule, "Delete Schedule Point");
+            currentParam.Path = newPath;
+            viewer.selectedPointIndex = Mathf.Clamp(viewer.selectedPointIndex, 0, newPath.Length - 1);
+            EditorUtility.SetDirty(viewer.schedule);
         }
 
         private static void ShowSelectedPointEdit(NpcScheduleViewer viewer)
