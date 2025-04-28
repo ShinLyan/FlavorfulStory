@@ -18,10 +18,10 @@ namespace FlavorfulStory.TimeManagement
         [SerializeField] private bool _is24HourFormat = true;
 
         /// <summary> Подписка на событие изменения времени при активации объекта. </summary>
-        private void OnEnable() => WorldTime.OnTimeUpdated += SetDateTimeText;
+        private void OnEnable() => WorldTime.OnTimeTick += SetDateTimeText;
 
         /// <summary> Отписка от события изменения времени при деактивации объекта. </summary>
-        private void OnDisable() => WorldTime.OnTimeUpdated -= SetDateTimeText;
+        private void OnDisable() => WorldTime.OnTimeTick -= SetDateTimeText;
 
         /// <summary> Обновление UI в соответствии с текущим временем. </summary>
         /// <param name="dateTime"> Текущие данные о времени. </param>
