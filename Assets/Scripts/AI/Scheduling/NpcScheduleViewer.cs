@@ -180,11 +180,6 @@ namespace FlavorfulStory.AI.Scheduling
                 return;
             }
 
-            if (viewer.selectedParamIndex > viewer.schedule.Params.Length - 1)
-                viewer.selectedParamIndex = viewer.schedule.Params.Length - 1;
-
-            if (viewer.selectedPointIndex > viewer.schedule.Params[viewer.selectedParamIndex].Path.Length - 1)
-                viewer.selectedPointIndex = viewer.schedule.Params[viewer.selectedParamIndex].Path.Length - 1;
 
             HandleParameterCreation(viewer);
             if (viewer.schedule.Params.Length == 0)
@@ -192,6 +187,12 @@ namespace FlavorfulStory.AI.Scheduling
                 serializedObject.ApplyModifiedProperties();
                 return;
             }
+
+            if (viewer.selectedParamIndex > viewer.schedule.Params.Length - 1)
+                viewer.selectedParamIndex = viewer.schedule.Params.Length - 1;
+
+            if (viewer.selectedPointIndex > viewer.schedule.Params[viewer.selectedParamIndex].Path.Length - 1)
+                viewer.selectedPointIndex = viewer.schedule.Params[viewer.selectedParamIndex].Path.Length - 1;
 
             HandleParameterSelection(viewer);
             var currentParam = viewer.schedule.Params[viewer.selectedParamIndex];
