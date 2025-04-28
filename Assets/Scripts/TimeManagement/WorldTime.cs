@@ -21,6 +21,7 @@ namespace FlavorfulStory.TimeManagement
         [Tooltip("Во сколько заканчивается день."), SerializeField, Range(0, 24)]
         private int _dayEndHour;
 
+        /// <summary> Час начала ночи. </summary>
         private const int NightStartHour = 18;
 
         /// <summary> Текущее игровое время. </summary>
@@ -38,6 +39,7 @@ namespace FlavorfulStory.TimeManagement
         /// <summary> Вызывается при завершении игрового дня. </summary>
         public static Action<DateTime> OnDayEnded;
 
+        /// <summary> Вызывается при начале ночи. </summary>
         public static Action<DateTime> OnNightStarted;
 
         #endregion
@@ -90,7 +92,7 @@ namespace FlavorfulStory.TimeManagement
         public static void Unpause() => _isPaused = false;
 
         /// <summary> Получить текущее игровое время. </summary>
-        /// <returns> Текущее игрвоое время. </returns>
+        /// <returns> Текущее игровое время. </returns>
         public static DateTime GetCurrentGameTime() => _currentGameTime;
 
         #region Saving

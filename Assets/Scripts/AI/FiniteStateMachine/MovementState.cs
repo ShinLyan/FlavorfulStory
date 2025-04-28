@@ -48,8 +48,10 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         /// <summary> Проигрыватель корутин. </summary>
         private readonly MonoBehaviour _coroutineRunner;
 
+        /// <summary> Точка спавна NPC. </summary>
         private readonly Vector3 _spawnPoint;
 
+        /// <summary> Флаг, указывающий на процесс выхода из состояния. </summary>
         private bool _isExiting; //TODO: исправить костыль
 
         /// <summary> Хэшированное значение параметра "скорость" для анимации. </summary>
@@ -102,8 +104,8 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         /// <summary> Вызывается при выходе из состояния движения. </summary>
         public override void Exit()
         {
-            _isExiting = true; 
-            Reset(); 
+            _isExiting = true;
+            Reset();
             _isExiting = false;
             WorldTime.OnTimeUpdated -= FindDestinationPoint;
         }
@@ -130,8 +132,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine
             _currentLocation = _spawnLocation;
         }
 
-        /// <summary> Находит ближайшую точку маршрута на основе текущего времени
-        /// и задаёт её как цель для NPC. </summary>
+        /// <summary> Находит ближайшую точку маршрута на основе текущего времени и задаёт её как цель для NPC. </summary>
         /// <param name="currentTime"> Текущее время в игре. </param>
         private void FindDestinationPoint(DateTime currentTime)
         {
@@ -147,10 +148,11 @@ namespace FlavorfulStory.AI.FiniteStateMachine
             StopCoroutine();
             _currentPoint = closestPoint;
 
-            if (_currentLocation != closestPoint.LocationName) HandleWarpTransition(closestPoint);
-            else _navMeshAgent.SetDestination(closestPoint.Position);
+            if (_currentLocation != closestPoint.LocationName)
+                HandleWarpTransition(closestPoint);
+            else
+                _navMeshAgent.SetDestination(closestPoint.Position);
         }
-
 
         /// <summary> Проверяет, достиг ли NPC текущей точки, и переключает состояние, если это так. </summary>
         private void SwitchStateIfPointReached()
@@ -206,8 +208,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine
             // когда прошел через все варпы и оказался на конечной сцене
             _navMeshAgent.SetDestination(destination.Position);
 
-            while (_navMeshAgent.remainingDistance > DistanceToReachPoint)
-                yield return null;
+            while (_navMeshAgent.remainingDistance > DistanceToReachPoint) yield return null;
         }
 
         /// <summary> Находит ближайший варп в указанной локации. </summary>
@@ -220,7 +221,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine
             return closestWarp?.SourceWarp;
         }
 
-        /// <summary> Остановить корутину. </summary>
+        /// <summary> Остановить текущую выполняющуюся корутину перемещения. </summary>
         private void StopCoroutine()
         {
             if (_currentPathCoroutine == null) return;
@@ -229,13 +230,13 @@ namespace FlavorfulStory.AI.FiniteStateMachine
             _currentPathCoroutine = null;
         }
 
-        /// <summary> Установить новое расписание. </summary>
-        /// <param name="scheduleParams"> Новое расписание. </param>
+        /// <summary> Установить новое расписание для NPC. </summary>
+        /// <param name="scheduleParams"> Параметры нового расписания. </param>
         public void SetCurrentScheduleParams(ScheduleParams scheduleParams) => _currentScheduleParams = scheduleParams;
 
-        /// <summary> Воспроизведение анимации движения. </summary>
-        /// <param name="speed"> Скорость движения. </param>
-        /// <param name="dampTime"> Время сглаживания перехода анимации. </param>
+        /// <summary> Воспроизведение анимации движения с указанной скоростью. </summary>
+        /// <param name="speed"> Скорость движения (0-1). </param>
+        /// <param name="dampTime"> Время сглаживания перехода между анимациями. </param>
         private void PlayMoveAnimation(float speed, float dampTime = 0.2f) =>
             _animator.SetFloat(_speedParameterHash, speed, dampTime, Time.deltaTime);
     }

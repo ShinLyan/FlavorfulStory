@@ -47,10 +47,13 @@ namespace FlavorfulStory.Lightning
         /// <summary> Смещение, основанное на нормальном отображении теней. </summary>
         private const float MoonShadowNormalBias = 0.4f;
 
+        /// <summary> Начальный угол поворота луны по оси Y. </summary>
         private const float MoonAngleYStart = -45f;
 
+        /// <summary> Конечный угол поворота луны по оси Y. </summary>
         private const float MoonAngleYEnd = 45f;
 
+        /// <summary> Угол поворота луны по оси X. </summary>
         private const float MoonAngleX = 30f;
 
         #endregion
@@ -68,6 +71,8 @@ namespace FlavorfulStory.Lightning
             //TODO: добавить определение текущей погоды из стороннего скрипта
         }
 
+        /// <summary> Обновляет параметры освещения в зависимости от времени суток. </summary>
+        /// <param name="gameTime">Текущее игровое время.</param>
         private void UpdateLighting(DateTime gameTime)
         {
             UpdateLight(
@@ -101,6 +106,19 @@ namespace FlavorfulStory.Lightning
             );
         }
 
+        /// <summary> Обновляет параметры источника света. </summary>
+        /// <param name="light"> Источник света для обновления. </param>
+        /// <param name="gameTime"> Текущее игровое время. </param>
+        /// <param name="isActiveCondition"> Условие активности света. </param>
+        /// <param name="startTime"> Время начала активности. </param>
+        /// <param name="endTime"> Время окончания активности. </param>
+        /// <param name="progressOffset"> Смещение прогресса. </param>
+        /// <param name="colorGradient"> Градиент цвета света. </param>
+        /// <param name="intensityCurve"> Кривая интенсивности света. </param>
+        /// <param name="maxIntensity"> Максимальная интенсивность света. </param>
+        /// <param name="shadowSetup"> Метод настройки теней. </param>
+        /// <param name="rotationSetup"> Метод настройки вращения. </param>
+        /// <param name="shadowType"> Тип теней. </param>
         private static void UpdateLight(
             Light light,
             DateTime gameTime,
@@ -127,7 +145,6 @@ namespace FlavorfulStory.Lightning
             rotationSetup(progress);
             ColorizeLight(light, progress, colorGradient, intensityCurve, maxIntensity);
         }
-
 
         /// <summary> Устанавливает параметры теней для солнца. </summary> 
         /// <param name="currentTimeInHours"> Текущее время в часах. </param>
@@ -172,7 +189,6 @@ namespace FlavorfulStory.Lightning
 
             _sunLight.transform.rotation = Quaternion.Euler(sunAngleX, sunAngleY, 0f);
         }
-
 
         /// <summary> Устанавливает параметры теней для луны. </summary> 
         /// <param name="currentTimeInHours"> Текущее время в часах. </param>

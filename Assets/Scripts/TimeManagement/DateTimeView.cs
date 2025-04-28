@@ -15,6 +15,7 @@ namespace FlavorfulStory.TimeManagement
         /// <summary> Текстовое поле отображения текущего времени. </summary>
         [SerializeField] private TMP_Text _timeText;
 
+        /// <summary> Флаг, определяющий формат отображения времени (24-часовой или 12-часовой). </summary>
         [SerializeField] private bool _is24HourFormat = true;
 
         /// <summary> Подписка на событие изменения времени при активации объекта. </summary>

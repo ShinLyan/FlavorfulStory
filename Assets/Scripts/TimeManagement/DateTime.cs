@@ -102,6 +102,9 @@ namespace FlavorfulStory.TimeManagement
         /// <param name="totalMinutes"> Общее количество минут. </param>
         public DateTime(int totalMinutes) => _totalMinutes = totalMinutes;
 
+        /// <summary> Добавляет указанное количество минут к текущему времени. </summary>
+        /// <param name="minutes"> Количество минут для добавления. </param>
+        /// <returns> Новый объект DateTime с добавленными минутами. </returns>
         public DateTime AddMinutes(float minutes)
         {
             var newTime = this;
