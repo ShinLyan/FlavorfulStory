@@ -107,11 +107,16 @@ namespace FlavorfulStory.Player
         {
             if (_isBusy) return;
 
-            // TODO: Переделать на количество 10
-            const int ToolbarItemsCount = 9;
+            const int ToolbarItemsCount = 10;
             for (int i = 0; i < ToolbarItemsCount; i++)
-                if (Input.GetKeyDown(KeyCode.Alpha1 + i))
+            {
+                var key = i == 9 ? KeyCode.Alpha0 : KeyCode.Alpha1 + i;
+                if (Input.GetKeyDown(key))
+                {
                     _toolbar.SelectItem(i);
+                    break;
+                }
+            }
         }
 
         /// <summary> Обработка использования предмета из панели быстрого доступа. </summary>
