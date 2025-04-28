@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using DayOfWeek = FlavorfulStory.TimeManagement.DayOfWeek;
 #if UNITY_EDITOR
@@ -20,14 +21,33 @@ namespace FlavorfulStory.AI.Scheduling
         public int selectedParamIndex;
         public int selectedPointIndex;
 
-        [Header("Ground Settings")] public float groundHeight = 0.5f; // Высота над поверхностью
-        public LayerMask groundMask = -1; // Слои для поиска поверхности
+        [Header("Ground Settings")] public float groundHeight = 0.5f;  
+        public LayerMask groundMask = -1; 
     }
 
 #if UNITY_EDITOR
     [CustomEditor(typeof(NpcScheduleViewer))]
     public class NpcScheduleViewerEditor : Editor
     {
+        private static bool isInitialized;
+        private static readonly List<Location> locations = new();
+
+        private void OnEnable()
+        {
+            if (!isInitialized)
+            {
+                FindTaggedObjects();
+                isInitialized = true;
+            }
+        }
+
+        private static void FindTaggedObjects()
+        {
+            locations.Clear();
+            var allObjects = FindObjectsByType<Location>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+            locations.AddRange(allObjects);
+        }
+
         private void OnSceneGUI()
         {
             var viewer = (NpcScheduleViewer)target;
@@ -38,47 +58,51 @@ namespace FlavorfulStory.AI.Scheduling
             var param = schedule.Params[viewer.selectedParamIndex];
             if (param.Path == null || param.Path.Length == 0) return;
 
-            // Создаем стиль для меток
-            var labelStyle = new GUIStyle(GUI.skin.label)
-            {
-                fontSize = 11,
-                fontStyle = FontStyle.Bold,
-                normal = new GUIStyleState
-                {
-                    textColor = Color.black,
-                    background = Texture2D.whiteTexture
-                },
-                padding = new RectOffset(6, 6, 4, 4),
-                alignment = TextAnchor.MiddleCenter
-            };
-
-            // Draw all points and lines
+            // Рисуем точки и их соединения
             for (int i = 0; i < param.Path.Length; i++)
             {
-                var p = param.Path[i];
-
-                var newPosition = GetSurfaceAdjustedPosition(p.Position, viewer);
-
-                // Обновляем позицию точки, если она изменилась
-                if (p.Position != newPosition)
+                var pathPoint = param.Path[i];
+                var newPosition = GetSurfaceAdjustedPosition(pathPoint.Position, viewer);
+                
+                if (pathPoint.Position != newPosition)
                 {
-                    Undo.RecordObject(schedule, "Adjust Point Position");
-                    p.Position = newPosition;
+                    pathPoint.Position = newPosition;
                     EditorUtility.SetDirty(schedule);
                 }
 
-                // Draw line to next point
                 if (i < param.Path.Length - 1)
                 {
                     var next = param.Path[i + 1];
                     Handles.color = viewer.LineColor;
-                    Handles.DrawLine(p.Position, next.Position, viewer.LineThickness);
+                    Handles.DrawLine(pathPoint.Position, next.Position, viewer.LineThickness);
                 }
 
-
                 // Рисуем метку с фоном
-                var labelPosition = p.Position + Vector3.back * viewer.SphereSize;
-                string labelContent = $"{p.Hour:00}:{p.Minutes:00}\n{p.NpcAnimation}\n{p.LocationName}";
+                var labelPosition = pathPoint.Position + Vector3.forward * viewer.SphereSize;
+                string labelContent =
+                    $"{pathPoint.Hour:00}:{pathPoint.Minutes:00}\n{pathPoint.NpcAnimation}\n{pathPoint.LocationName}";
+                var realLocationName = LocationName.RockyIsland;
+                foreach (var location in locations)
+                    if (location.IsPositionInLocation(pathPoint.Position))
+                    {
+                        realLocationName = location.LocationName;
+                        break;
+                    }
+                
+                var labelStyle = new GUIStyle(GUI.skin.label)
+                {
+                    fontSize = 11,
+                    fontStyle = FontStyle.Bold,
+                    normal = new GUIStyleState
+                    {
+                        textColor = Color.black,
+                        background = realLocationName == pathPoint.LocationName
+                            ? Texture2D.whiteTexture
+                            : Texture2D.grayTexture
+                    },
+                    padding = new RectOffset(6, 6, 4, 4),
+                    alignment = TextAnchor.MiddleCenter
+                };
 
                 Handles.BeginGUI();
                 var guiPosition = HandleUtility.WorldToGUIPoint(labelPosition);
@@ -90,10 +114,11 @@ namespace FlavorfulStory.AI.Scheduling
                 Handles.EndGUI();
 
                 Handles.color = i == viewer.selectedPointIndex ? Color.green : Color.red;
-                Handles.SphereHandleCap(0, p.Position, Quaternion.identity, viewer.SphereSize, EventType.Repaint);
+                Handles.SphereHandleCap(0, pathPoint.Position, Quaternion.identity, viewer.SphereSize,
+                    EventType.Repaint);
             }
 
-            // Draw handles for selected point only
+            // Отрисовываем инструменты для перемещения точки.
             if (viewer.selectedPointIndex >= 0 && viewer.selectedPointIndex < param.Path.Length)
             {
                 var point = param.Path[viewer.selectedPointIndex];
@@ -388,12 +413,17 @@ namespace FlavorfulStory.AI.Scheduling
         {
             var currentParam = viewer.schedule.Params[viewer.selectedParamIndex];
             var newPath = new SchedulePoint[currentParam.Path.Length - 1];
-            Array.Copy(currentParam.Path, newPath, currentParam.Path.Length - 1);
+            bool canRemove = currentParam.Path.Length > 0;
 
-            Undo.RecordObject(viewer.schedule, "Delete Schedule Point");
-            currentParam.Path = newPath;
-            viewer.selectedPointIndex = Mathf.Clamp(viewer.selectedPointIndex, 0, newPath.Length - 1);
-            EditorUtility.SetDirty(viewer.schedule);
+            using (new EditorGUI.DisabledScope(!canRemove))
+            {
+                Array.Copy(currentParam.Path, newPath, currentParam.Path.Length - 1);
+
+                Undo.RecordObject(viewer.schedule, "Delete Schedule Point");
+                currentParam.Path = newPath;
+                viewer.selectedPointIndex = Mathf.Clamp(viewer.selectedPointIndex, 0, newPath.Length - 1);
+                EditorUtility.SetDirty(viewer.schedule);
+            }
         }
 
         private static void ShowSelectedPointEdit(NpcScheduleViewer viewer)
