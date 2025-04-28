@@ -13,6 +13,9 @@ namespace FlavorfulStory.TimeManagement
         [Tooltip("Сколько игровых минут проходит за реальную секунду."), SerializeField, Range(-100f, 1000f)]
         private float _timeScale = 1f;
 
+        [Tooltip("Раз в сколько игровых минут происходит тик времени."), SerializeField, Range(1, 10)]
+        private float _timeBetweenTicks = 1f;
+
         /// <summary> Час начала нового дня. </summary>
         [Header("Day/night settings")] [Tooltip("Во сколько начинается новый день."), SerializeField, Range(0, 24)]
         private int _dayStartHour;
@@ -21,14 +24,10 @@ namespace FlavorfulStory.TimeManagement
         [Tooltip("Во сколько заканчивается день."), SerializeField, Range(0, 24)]
         private int _dayEndHour;
 
-        /// <summary> Час начала ночи. </summary>
         private const int NightStartHour = 18;
 
         /// <summary> Текущее игровое время. </summary>
         private static DateTime _currentGameTime;
-
-        /// <summary> Время, прошедшее с момента последнего тика. </summary>
-        private float _elapsedTime;
 
         /// <summary> Игра на паузе? </summary>
         private static bool _isPaused;
@@ -39,8 +38,17 @@ namespace FlavorfulStory.TimeManagement
         /// <summary> Вызывается при завершении игрового дня. </summary>
         public static Action<DateTime> OnDayEnded;
 
-        /// <summary> Вызывается при начале ночи. </summary>
+        /// <summary> Вызывается при наступлении ночи. </summary>
         public static Action<DateTime> OnNightStarted;
+
+        /// <summary> Вызывается при заданном тике времени. </summary>
+        public static Action<DateTime> OnTimeTick;
+
+        /// <summary> Вызывается при паузе времени. </summary>
+        public static Action OnTimePaused;
+
+        /// <summary> Вызывается при снятии паузы времени. </summary>
+        public static Action OnTimeUnpaused;
 
         #endregion
 
@@ -48,7 +56,11 @@ namespace FlavorfulStory.TimeManagement
         private void Awake() => _currentGameTime = new DateTime(1, Season.Spring, 1, _dayStartHour, 0);
 
         /// <summary> Вызвать обновление UI при старте. </summary>
-        private void Start() => OnTimeUpdated?.Invoke(_currentGameTime);
+        private void Start()
+        {
+            OnTimeUpdated?.Invoke(_currentGameTime);
+            OnTimeTick?.Invoke(_currentGameTime);
+        }
 
         /// <summary> Обновить игровое время, если не стоит пауза. </summary>
         private void Update()
@@ -68,6 +80,9 @@ namespace FlavorfulStory.TimeManagement
                 OnDayEnded?.Invoke(_currentGameTime);
             }
 
+            if ((int)_currentGameTime.Minute % _timeBetweenTicks == 0) OnTimeTick?.Invoke(_currentGameTime);
+
+
             OnTimeUpdated?.Invoke(_currentGameTime);
         }
 
@@ -86,13 +101,21 @@ namespace FlavorfulStory.TimeManagement
         }
 
         /// <summary> Поставить игровое время на паузу. </summary>
-        public static void Pause() => _isPaused = true;
+        public static void Pause()
+        {
+            _isPaused = true;
+            OnTimePaused?.Invoke();
+        }
 
         /// <summary> Снять паузу с игрового времени. </summary>
-        public static void Unpause() => _isPaused = false;
+        public static void Unpause()
+        {
+            _isPaused = false;
+            OnTimeUnpaused?.Invoke();
+        }
 
         /// <summary> Получить текущее игровое время. </summary>
-        /// <returns> Текущее игровое время. </returns>
+        /// <returns> Текущее игрвоое время. </returns>
         public static DateTime GetCurrentGameTime() => _currentGameTime;
 
         #region Saving

@@ -24,67 +24,67 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         /// <summary> Компонент аниматора, управляющий анимациями NPC. </summary>
         private readonly Animator _animator;
 
-        /// <summary> Текущая корутина, выполняющая перемещение NPC по пути. </summary>
-        private Coroutine _currentPathCoroutine;
-
-        /// <summary> Текущая точка маршрута, к которой движется NPC. </summary>
-        private SchedulePoint _currentPoint;
-
-        /// <summary> Текущая локация. </summary>
-        private LocationName _currentLocation;
-
-        /// <summary> Локация спавна. </summary>
-        private readonly LocationName _spawnLocation;
-
-        /// <summary> Текущее расписание. </summary>  
-        private ScheduleParams _currentScheduleParams;
-
-        /// <summary> Текущая скорость NPC, используемая для анимации. </summary>
-        private float _speed;
-
-        /// <summary> Компонент Transform. </summary>
+        /// <summary> Компонент Transform NPC. </summary>
         private readonly Transform _npcTransform;
 
-        /// <summary> Проигрыватель корутин. </summary>
+        /// <summary> Компонент для запуска корутин. </summary>
         private readonly MonoBehaviour _coroutineRunner;
 
-        /// <summary> Точка спавна NPC. </summary>
-        private readonly Vector3 _spawnPoint;
+        /// <summary> Позиция спавна NPC. </summary>
+        private readonly Vector3 _spawnPosition;
 
-        /// <summary> Флаг, указывающий на процесс выхода из состояния. </summary>
-        private bool _isExiting; //TODO: исправить костыль
+        /// <summary> Локация спавна NPC. </summary>
+        private readonly LocationName _spawnLocation;
 
-        /// <summary> Хэшированное значение параметра "скорость" для анимации. </summary>
+        /// <summary> Хэш параметра скорости анимации. </summary>
         private static readonly int _speedParameterHash = Animator.StringToHash("Speed");
 
-        /// <summary> Минимальное расстояние до точки, при котором считается, что NPC достиг её. </summary>
+        /// <summary> Текущее активное расписание NPC. </summary>
+        private ScheduleParams _currentScheduleParams;
+
+        /// <summary> Стек маршрута движения по расписанию. </summary>
+        private Stack<SchedulePoint> _currentPath;
+
+        /// <summary> Текущая целевая точка маршрута. </summary>
+        private SchedulePoint _currentTargetPoint;
+
+        /// <summary> Текущая локация, в которой находится NPC. </summary>
+        private LocationName _currentLocation;
+
+        /// <summary> Текущая корутина движения по пути. </summary>
+        private Coroutine _currentPathCoroutine;
+
+        /// <summary> Минимальное расстояние до целевой точки для её достижения. </summary>
         private const float DistanceToReachPoint = 1.0f;
 
         #endregion
 
-        /// <summary> Инициализирует новое состояние движения. </summary>
-        /// <param name="navMeshAgent"> Компонент для навигации по NavMesh. </param>
+        /// <summary> Инициализация нового состояния движения. </summary>
+        /// <param name="navMeshAgent"> Компонент навигации по NavMesh. </param>
         /// <param name="warpGraph"> Граф варпов. </param>
-        /// <param name="animator"> Аниматор. </param>
-        /// <param name="npcTransform"> Компонент Transform. </param>
-        /// <param name="coroutineRunner"> Проигрыватель корутин. </param>
+        /// <param name="animator"> Аниматор персонажа. </param>
+        /// <param name="npcTransform"> Transform NPC. </param>
+        /// <param name="coroutineRunner"> Компонент для запуска корутин. </param>
         public MovementState(NavMeshAgent navMeshAgent, WarpGraph warpGraph,
             Animator animator, Transform npcTransform, MonoBehaviour coroutineRunner)
         {
             _navMeshAgent = navMeshAgent;
             _warpGraph = warpGraph;
             _animator = animator;
-            _currentScheduleParams = null;
             _npcTransform = npcTransform;
             _coroutineRunner = coroutineRunner;
-            _spawnPoint = npcTransform.position;
+
+            _spawnPosition = npcTransform.position;
             _spawnLocation = GetCurrentLocationName();
             _currentLocation = _spawnLocation;
-            _isExiting = false; //TODO: исправить костыль
+
+            WorldTime.OnTimePaused += StopMovementWithoutWarp;
+            WorldTime.OnTimeUnpaused += MoveToCurrentTarget;
+            WorldTime.OnTimeUpdated += UpdateCurrentSchedulePoint;
         }
 
-        /// <summary> Получить имя локации, в которой находится NPC. </summary>
-        /// <returns> Имя локации. </returns>
+        /// <summary> Получить название локации, в которой находится NPC. </summary>
+        /// <returns> Название текущей локации. </returns>
         private LocationName GetCurrentLocationName()
         {
             foreach (var location in Object.FindObjectsByType<Location>(FindObjectsInactive.Include,
@@ -95,81 +95,85 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         }
 
         /// <summary> Вызывается при входе в состояние движения. </summary>
-        public override void Enter()
-        {
-            _isExiting = false;
-            WorldTime.OnTimeUpdated += FindDestinationPoint;
-        }
+        public override void Enter() { }
 
         /// <summary> Вызывается при выходе из состояния движения. </summary>
-        public override void Exit()
-        {
-            _isExiting = true;
-            Reset();
-            _isExiting = false;
-            WorldTime.OnTimeUpdated -= FindDestinationPoint;
-        }
+        public override void Exit() => StopMovementWithoutWarp();
 
-        /// <summary> Обновляет логику состояния движения каждый кадр. </summary>
+        /// <summary> Обновляет состояние движения NPC каждый кадр. </summary>
         /// <param name="deltaTime"> Время, прошедшее с последнего кадра. </param>
         public override void Update(float deltaTime)
         {
-            _speed = Mathf.Clamp01(_navMeshAgent.velocity.magnitude) * 0.5f;
-            PlayMoveAnimation(_speed);
+            float speed = Mathf.Clamp01(_navMeshAgent.velocity.magnitude) * 0.5f;
+            PlayMoveAnimation(speed);
 
-            if (_currentPoint == null) return;
+            if (_currentTargetPoint == null) return;
+
             SwitchStateIfPointReached();
         }
 
-        /// <summary> Сброс состояния в начальное состояние. </summary>
-        public override void Reset()
+        /// <summary> Сброс состояния движения NPC. </summary>
+        public override void Reset() => StopMovementAndWarp();
+
+        /// <summary> Останавливает движение NPC без телепортации. </summary>
+        private void StopMovementWithoutWarp()
         {
-            StopCoroutine();
+            StopCurrentCoroutine();
             PlayMoveAnimation(0f, 0f);
-            _currentPoint = null;
             _navMeshAgent.ResetPath();
-            if (!_isExiting) _navMeshAgent.Warp(_spawnPoint); //TODO: исправить костыль
-            _currentLocation = _spawnLocation;
         }
 
-        /// <summary> Находит ближайшую точку маршрута на основе текущего времени и задаёт её как цель для NPC. </summary>
-        /// <param name="currentTime"> Текущее время в игре. </param>
-        private void FindDestinationPoint(DateTime currentTime)
+        /// <summary> Останавливает движение NPC с возвратом на точку спавна. </summary>
+        private void StopMovementAndWarp()
         {
-            var closestPoint = _currentScheduleParams?.GetClosestSchedulePointInPath(currentTime);
-            if (closestPoint == null)
-            {
-                Debug.LogError("Ближайшая точка отсутствует!");
-                return;
-            }
-
-            if (_currentPoint == closestPoint) return;
-
-            StopCoroutine();
-            _currentPoint = closestPoint;
-
-            if (_currentLocation != closestPoint.LocationName)
-                HandleWarpTransition(closestPoint);
-            else
-                _navMeshAgent.SetDestination(closestPoint.Position);
+            StopMovementWithoutWarp();
+            _navMeshAgent.Warp(_spawnPosition);
+            _currentLocation = _spawnLocation;
+            _currentTargetPoint = null;
         }
 
-        /// <summary> Проверяет, достиг ли NPC текущей точки, и переключает состояние, если это так. </summary>
+        /// <summary> Обновляет текущую целевую точку маршрута на основе времени. </summary>
+        /// <param name="currentTime"> Текущее игровое время. </param>
+        private void UpdateCurrentSchedulePoint(DateTime currentTime)
+        {
+            if (_currentPath.Count <= 0) return;
+
+            var nextPoint = _currentPath.Peek();
+            if ((int)currentTime.Hour != nextPoint.Hour || (int)currentTime.Minute != nextPoint.Minutes) return;
+
+            StopCurrentCoroutine();
+            _currentTargetPoint = _currentPath.Pop();
+            MoveToCurrentTarget();
+        }
+
+        /// <summary> Начинает движение к текущей целевой точке. </summary>
+        private void MoveToCurrentTarget()
+        {
+            if (_currentTargetPoint == null) return;
+
+            if (_currentLocation != _currentTargetPoint.LocationName)
+                StartWarpTransition(_currentTargetPoint);
+            else
+                _navMeshAgent.SetDestination(_currentTargetPoint.Position);
+        }
+
+        /// <summary> Проверяет достижение целевой точки и переключает состояние. </summary>
         private void SwitchStateIfPointReached()
         {
-            bool isInTargetLocation = _currentLocation == _currentPoint.LocationName;
+            bool isInTargetLocation = _currentLocation == _currentTargetPoint.LocationName;
             bool isCloseEnough =
-                Vector3.Distance(_currentPoint.Position, _npcTransform.position) <= DistanceToReachPoint;
+                Vector3.Distance(_currentTargetPoint.Position, _npcTransform.position) <= DistanceToReachPoint;
 
             if (isInTargetLocation && isCloseEnough) RequestStateChange(typeof(RoutineState));
         }
 
-        /// <summary> Обрабатывает переход NPC через варпы между локациями. </summary>
-        /// <param name="destination"> Целевая точка расписания. </param>
-        private void HandleWarpTransition(SchedulePoint destination)
+        /// <summary> Начинает переход через варпы к целевой локации. </summary>
+        /// <param name="destination"> Целевая точка назначения. </param>
+        private void StartWarpTransition(SchedulePoint destination)
         {
             var currentWarp = FindClosestWarpInScene(_npcTransform.position, _currentLocation);
             var targetWarp = FindClosestWarpInScene(destination.Position, destination.LocationName);
+
             if (!currentWarp || !targetWarp)
             {
                 Debug.LogError("Не удалось найти начальный или конечный варп!");
@@ -186,9 +190,9 @@ namespace FlavorfulStory.AI.FiniteStateMachine
             _currentPathCoroutine = _coroutineRunner.StartCoroutine(TraverseWarpPath(path, destination));
         }
 
-        /// <summary> Перемещает NPC по пути через варпы. </summary>
-        /// <param name="path"> Список варпов, через которые нужно пройти. </param>
-        /// <param name="destination"> Целевая точка расписания. </param>
+        /// <summary> Перемещает NPC по маршруту через варпы. </summary>
+        /// <param name="path"> Путь через варпы. </param>
+        /// <param name="destination"> Целевая точка назначения. </param>
         private IEnumerator TraverseWarpPath(List<WarpPortal> path, SchedulePoint destination)
         {
             foreach (var currentWarp in path)
@@ -200,7 +204,6 @@ namespace FlavorfulStory.AI.FiniteStateMachine
                 else
                 {
                     _navMeshAgent.SetDestination(currentWarp.transform.position);
-
                     while (_navMeshAgent.pathPending || _navMeshAgent.remainingDistance > DistanceToReachPoint)
                         yield return null;
                 }
@@ -212,17 +215,17 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         }
 
         /// <summary> Находит ближайший варп в указанной локации. </summary>
-        /// <param name="position"> Позиция для поиска ближайшего варпа. </param>
-        /// <param name="location"> Локация, в которой искать варп. </param>
-        /// <returns> Ближайший варп или null, если варп не найден. </returns>
+        /// <param name="position"> Позиция поиска. </param>
+        /// <param name="location"> Название локации. </param>
+        /// <returns> Ближайший варп или null. </returns>
         private WarpPortal FindClosestWarpInScene(Vector3 position, LocationName location)
         {
             var closestWarp = _warpGraph.FindClosestWarp(position, location);
             return closestWarp?.SourceWarp;
         }
 
-        /// <summary> Остановить текущую выполняющуюся корутину перемещения. </summary>
-        private void StopCoroutine()
+        /// <summary> Останавливает текущую активную корутину. </summary>
+        private void StopCurrentCoroutine()
         {
             if (_currentPathCoroutine == null) return;
 
@@ -230,13 +233,19 @@ namespace FlavorfulStory.AI.FiniteStateMachine
             _currentPathCoroutine = null;
         }
 
-        /// <summary> Установить новое расписание для NPC. </summary>
-        /// <param name="scheduleParams"> Параметры нового расписания. </param>
-        public void SetCurrentScheduleParams(ScheduleParams scheduleParams) => _currentScheduleParams = scheduleParams;
+        /// <summary> Устанавливает новое расписание движения. </summary>
+        /// <param name="scheduleParams"> Параметры расписания. </param>
+        public void SetCurrentScheduleParams(ScheduleParams scheduleParams)
+        {
+            _currentScheduleParams = scheduleParams;
+            if (_currentScheduleParams == null) return;
 
-        /// <summary> Воспроизведение анимации движения с указанной скоростью. </summary>
-        /// <param name="speed"> Скорость движения (0-1). </param>
-        /// <param name="dampTime"> Время сглаживания перехода между анимациями. </param>
+            _currentPath = _currentScheduleParams.GetSortedSchedulePointsStack();
+        }
+
+        /// <summary> Воспроизводит анимацию движения. </summary>
+        /// <param name="speed"> Скорость движения. </param>
+        /// <param name="dampTime"> Время сглаживания перехода анимации. </param>
         private void PlayMoveAnimation(float speed, float dampTime = 0.2f) =>
             _animator.SetFloat(_speedParameterHash, speed, dampTime, Time.deltaTime);
     }
