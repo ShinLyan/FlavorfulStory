@@ -1,6 +1,5 @@
 ﻿using FlavorfulStory.AI;
 using FlavorfulStory.CursorSystem;
-using FlavorfulStory.InputSystem;
 using FlavorfulStory.InteractionSystem;
 using FlavorfulStory.Player;
 using UnityEngine;
@@ -13,6 +12,7 @@ namespace FlavorfulStory.DialogueSystem
         /// <summary> Диалог, который будет запущен при взаимодействии с NPC. </summary>
         [SerializeField] private Dialogue _dialogue;
 
+        /// <summary> Инициатор диалога, связанный с игроком. </summary>
         private IDialogueInitiator _dialogueInitiator;
 
         /// <summary> Информация о NPC. </summary>
@@ -34,11 +34,17 @@ namespace FlavorfulStory.DialogueSystem
 
         #region IInteractable
 
+        /// <summary> Флаг, разрешено ли взаимодействие с NPC. </summary>
         public bool IsInteractionAllowed { get; private set; }
 
+        /// <summary> Вычисляет расстояние до другого трансформа. </summary>
+        /// <param name="otherTransform"> Трансформ объекта, до которого вычисляется расстояние. </param>
+        /// <returns> Расстояние между объектами. </returns>
         public float GetDistanceTo(Transform otherTransform) =>
             Vector3.Distance(otherTransform.position, transform.position);
 
+        /// <summary> Начинает взаимодействие с NPC. </summary>
+        /// <param name="player"> Контроллер игрока, инициирующий взаимодействие. </param>
         public void BeginInteraction(PlayerController player)
         {
             if (!IsInteractionAllowed) return;
@@ -46,6 +52,8 @@ namespace FlavorfulStory.DialogueSystem
             _dialogueInitiator?.StartDialogue(this, _dialogue);
         }
 
+        /// <summary> Завершает взаимодействие с NPC. </summary>
+        /// <param name="player"> Контроллер игрока, завершающий взаимодействие. </param>
         public void EndInteraction(PlayerController player) => player.SetBusyState(false);
 
         #endregion
