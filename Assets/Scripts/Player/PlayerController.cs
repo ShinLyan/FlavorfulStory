@@ -21,7 +21,7 @@ namespace FlavorfulStory.Player
         [Tooltip("Панель быстрого доступа, содержащая инвентарь игрока."), SerializeField]
         private Toolbar _toolbar;
 
-        /// <summary> Занят ли игрок? </summary>2
+        /// <summary> Занят ли игрок? </summary>
         private bool _isBusy;
 
         /// <summary> Передвижение игрока. </summary>
@@ -83,6 +83,8 @@ namespace FlavorfulStory.Player
             HandleMovementInput();
         }
 
+        /// <summary> Взаимодействие с компонентами через курсор. </summary>
+        /// <returns> True, если взаимодействие было обработано. </returns>
         private bool InteractWithComponent()
         {
             var hits = PhysicsUtils.SphereCastAllSorted(CameraUtils.GetMouseRay());
@@ -105,11 +107,16 @@ namespace FlavorfulStory.Player
         {
             if (_isBusy) return;
 
-            // TODO: Переделать на количество 10
-            const int ToolbarItemsCount = 9;
+            const int ToolbarItemsCount = 10;
             for (int i = 0; i < ToolbarItemsCount; i++)
-                if (Input.GetKeyDown(KeyCode.Alpha1 + i))
+            {
+                var key = i == 9 ? KeyCode.Alpha0 : KeyCode.Alpha1 + i;
+                if (Input.GetKeyDown(key))
+                {
                     _toolbar.SelectItem(i);
+                    break;
+                }
+            }
         }
 
         /// <summary> Обработка использования предмета из панели быстрого доступа. </summary>
@@ -124,7 +131,7 @@ namespace FlavorfulStory.Player
             BeginInteraction(usable);
         }
 
-        /// <summary> Начать взаимодйствие с предметом. </summary>
+        /// <summary> Начать взаимодействие с предметом. </summary>
         /// <param name="usable"> Используемый предмет. </param>
         private void BeginInteraction(IUsable usable)
         {
