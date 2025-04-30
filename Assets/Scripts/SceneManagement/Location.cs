@@ -15,11 +15,13 @@ namespace FlavorfulStory.SceneManagement
         private GameObject[] _objectsToDisable;
 
         /// <summary> Является ли локация помещением. </summary>
-        [Tooltip("Является ли локация помещением."), SerializeField]
+        [Tooltip("Является ли локация помещением?"), SerializeField]
         private bool _isRoom;
 
+        /// <summary> Глобальные источники освещения. </summary>
         private GameObject[] _globalLights;
 
+        /// <summary> Найти все источники освещения. </summary>
         private void Awake() => _globalLights = GameObject.FindGameObjectsWithTag("GlobalLight");
 
         /// <summary> Активирует объекты, связанные с этой локацией. </summary>
@@ -35,6 +37,9 @@ namespace FlavorfulStory.SceneManagement
             if (_objectsToDisable == null || _objectsToDisable.Length == 0) return;
 
             foreach (var obj in _objectsToDisable) obj.SetActive(isActive);
+
+            if (_globalLights == null || _objectsToDisable.Length == 0) return;
+
             foreach (var globalLight in _globalLights) globalLight.SetActive(_isRoom);
         }
 
