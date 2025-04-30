@@ -42,8 +42,10 @@ namespace FlavorfulStory.BuildingRepair
         /// <summary> Обработчик событий передачи ресурсов. </summary>
         private Action<InventoryItem, ResourceTransferButtonType> _transferHandler;
 
+        /// <summary> Обработчик нажатия кнопки постройки. </summary>
         private Action _onBuildPressed;
 
+        /// <summary> Обработчик запроса на закрытие окна. </summary>
         private Action _onCloseRequested;
 
         /// <summary> Событие, вызываемое при закрытии окна ремонта. </summary>
@@ -69,7 +71,7 @@ namespace FlavorfulStory.BuildingRepair
         }
 
         /// <summary> Отобразить UI ремонта для указанного объекта. </summary>
-        /// <param name="repairable"> Объект ремонта. </param>
+        /// <param name="stage"> Объект ремонта. </param>
         public void Show(RepairStage stage, List<int> investedResources,
             Action<InventoryItem, ResourceTransferButtonType> onTransfer,
             Action onBuild, Action onCloseRequested)
@@ -138,8 +140,7 @@ namespace FlavorfulStory.BuildingRepair
             WorldTime.Unpause();
             InputWrapper.UnblockAllInput();
 
-            if (_onBuildPressed != null)
-                _buildButton.OnClick -= _onBuildPressed;
+            if (_onBuildPressed != null) _buildButton.OnClick -= _onBuildPressed;
 
             DestroyRequirementViews();
 
@@ -153,11 +154,9 @@ namespace FlavorfulStory.BuildingRepair
         /// <summary> Удалить старые отображения требований ресурсов. </summary>
         private void DestroyRequirementViews()
         {
-            foreach (var view in _requirementViews)
-                view.OnResourceTransferButtonClick -= _transferHandler;
+            foreach (var view in _requirementViews) view.OnResourceTransferButtonClick -= _transferHandler;
 
-            foreach (Transform child in _requirementViewsContainer.transform)
-                Destroy(child.gameObject);
+            foreach (Transform child in _requirementViewsContainer.transform) Destroy(child.gameObject);
 
             _requirementViews.Clear();
         }

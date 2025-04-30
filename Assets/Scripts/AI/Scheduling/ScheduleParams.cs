@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using FlavorfulStory.TimeManagement;
 using GD.MinMaxSlider;
@@ -70,6 +71,21 @@ namespace FlavorfulStory.AI.Scheduling
             }
 
             return closestPoint;
+        }
+
+        /// <summary> Возвращает стек точек расписания, отсортированных по времени (от самого раннего к позднему). </summary>
+        public Stack<SchedulePoint> GetSortedSchedulePointsStack()
+        {
+            if (Path == null || Path.Length == 0) return new Stack<SchedulePoint>();
+
+            var sortedPoints = Path
+                .OrderBy(p => p.Hour)
+                .ThenBy(p => p.Minutes)
+                .ToArray();
+
+            Array.Reverse(sortedPoints);
+
+            return new Stack<SchedulePoint>(sortedPoints);
         }
 
         /// <summary> Удовлетворяют ли текущие условия требованиям расписания? </summary>

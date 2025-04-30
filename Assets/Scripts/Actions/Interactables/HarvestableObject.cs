@@ -15,12 +15,12 @@ namespace FlavorfulStory.Actions.Interactables
         private List<DropItem> _harvestItems;
 
         /// <summary> Название объекта, отображаемое в тултипе. </summary>
-        // TODO: Возможно надо будет выпилить и сделать нормально, более универсально
-        [SerializeField] private string _name;
+        [Tooltip("Название объекта для отображения в интерфейсе."), SerializeField]
+        private string _name;
 
         /// <summary> Описание объекта, отображаемое в тултипе. </summary>
-        // TODO: Возможно надо будет выпилить и сделать нормально, более универсально
-        [SerializeField] private string _description = "Press E, if hungry";
+        [Tooltip("Описание объекта для отображения в интерфейсе."), SerializeField]
+        private string _description = "Press E, if hungry";
 
         #region IInteractable
 
@@ -33,6 +33,8 @@ namespace FlavorfulStory.Actions.Interactables
         public float GetDistanceTo(Transform otherTransform) =>
             Vector3.Distance(transform.position, otherTransform.position);
 
+        /// <summary> Начинает взаимодействие с объектом. </summary>
+        /// <param name="player"> Контроллер игрока, который взаимодействует с объектом. </param>
         public virtual void BeginInteraction(PlayerController player)
         {
             if (!IsInteractionAllowed) return;
@@ -45,6 +47,8 @@ namespace FlavorfulStory.Actions.Interactables
                 Inventory.PlayerInventory.TryAddToFirstAvailableSlot(dropItem.ItemPrefab, dropItem.Quantity);
         }
 
+        /// <summary> Завершает взаимодействие с объектом. </summary>
+        /// <param name="player"> Контроллер игрока, который взаимодействует с объектом. </param>
         public void EndInteraction(PlayerController player) { }
 
         #endregion

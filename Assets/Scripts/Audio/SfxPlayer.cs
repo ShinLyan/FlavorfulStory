@@ -5,6 +5,7 @@ using Random = UnityEngine.Random;
 
 namespace FlavorfulStory.Audio
 {
+    /// <summary> Компонент для воспроизведения звуковых эффектов (SFX) в игре. </summary>
     [RequireComponent(typeof(AudioSource))]
     public class SfxPlayer : MonoBehaviour
     {
