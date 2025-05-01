@@ -175,12 +175,12 @@ namespace FlavorfulStory.AI.Scheduling
 
             var schedule = viewer.Schedule;
 
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("schedule"));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("Schedule"));
             EditorGUILayout.PropertyField(serializedObject.FindProperty("LineThickness"));
             EditorGUILayout.PropertyField(serializedObject.FindProperty("LineColor"));
             EditorGUILayout.PropertyField(serializedObject.FindProperty("SphereSize"));
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("groundHeight"));
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("groundMask"));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("GroundHeight"));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("GroundMask"));
             EditorGUILayout.PropertyField(serializedObject.FindProperty("NavMeshColor"));
             EditorGUILayout.Space();
             EditorGUILayout.Space();
