@@ -13,17 +13,18 @@ namespace FlavorfulStory.AI.Scheduling
 {
     public class NpcScheduleViewer : MonoBehaviour
     {
-        [Header("Npc Schedule")] public NpcSchedule schedule;
+        [Header("Npc Schedule")] public NpcSchedule Schedule;
 
         [Header("Visualisation Settings")] public float LineThickness = 5f;
         public Color LineColor = Color.yellow;
         public float SphereSize = 0.5f;
 
-        public int selectedParamIndex;
-        public int selectedPointIndex;
+        public int SelectedParamIndex;
+        public int SelectedPointIndex;
 
-        [Header("Ground Settings")] public float groundHeight = 0.5f;
-        public LayerMask groundMask = -1;
+        [Header("Ground Settings")] public float GroundHeight = 0.5f;
+
+        public LayerMask GroundMask = -1;
 
         [Header("NavMesh Settings")] public Color NavMeshColor = new(0, 0.5f, 1f, 0.2f);
     }
@@ -57,11 +58,11 @@ namespace FlavorfulStory.AI.Scheduling
             if (target == null) return;
 
             var viewer = (NpcScheduleViewer)target;
-            var schedule = viewer.schedule;
+            var schedule = viewer.Schedule;
             if (schedule == null || schedule.Params == null) return;
 
-            if (viewer.selectedParamIndex >= schedule.Params.Length) return;
-            var param = schedule.Params[viewer.selectedParamIndex];
+            if (viewer.SelectedParamIndex >= schedule.Params.Length) return;
+            var param = schedule.Params[viewer.SelectedParamIndex];
             if (param.Path == null || param.Path.Length == 0) return;
 
             DrawNavMesh(viewer);
@@ -121,15 +122,15 @@ namespace FlavorfulStory.AI.Scheduling
                 GUI.Label(rect, content, labelStyle);
                 Handles.EndGUI();
 
-                Handles.color = i == viewer.selectedPointIndex ? Color.green : Color.red;
+                Handles.color = i == viewer.SelectedPointIndex ? Color.green : Color.red;
                 Handles.SphereHandleCap(0, pathPoint.Position, Quaternion.identity, viewer.SphereSize,
                     EventType.Repaint);
             }
 
             // Отрисовываем инструменты для перемещения точки.
-            if (viewer.selectedPointIndex >= 0 && viewer.selectedPointIndex < param.Path.Length)
+            if (viewer.SelectedPointIndex >= 0 && viewer.SelectedPointIndex < param.Path.Length)
             {
-                var point = param.Path[viewer.selectedPointIndex];
+                var point = param.Path[viewer.SelectedPointIndex];
                 var pos = point.Position;
                 var rot = Quaternion.Euler(point.Rotation);
 
@@ -156,10 +157,10 @@ namespace FlavorfulStory.AI.Scheduling
         private Vector3 GetSurfaceAdjustedPosition(Vector3 position, NpcScheduleViewer viewer)
         {
             var ray = new Ray(position + Vector3.up * 50f, Vector3.down);
-            if (Physics.Raycast(ray, out var hit, 100f, viewer.groundMask))
+            if (Physics.Raycast(ray, out var hit, 100f, viewer.GroundMask))
                 return new Vector3(
                     position.x,
-                    hit.point.y + viewer.groundHeight,
+                    hit.point.y + viewer.GroundHeight,
                     position.z
                 );
             return position;
@@ -172,7 +173,7 @@ namespace FlavorfulStory.AI.Scheduling
             serializedObject.Update();
             var viewer = (NpcScheduleViewer)target;
 
-            var schedule = viewer.schedule;
+            var schedule = viewer.Schedule;
 
             EditorGUILayout.PropertyField(serializedObject.FindProperty("schedule"));
             EditorGUILayout.PropertyField(serializedObject.FindProperty("LineThickness"));
@@ -200,17 +201,17 @@ namespace FlavorfulStory.AI.Scheduling
                 return;
             }
 
-            if (viewer.selectedParamIndex > schedule.Params.Length - 1)
-                viewer.selectedParamIndex = schedule.Params.Length - 1;
+            if (viewer.SelectedParamIndex > schedule.Params.Length - 1)
+                viewer.SelectedParamIndex = schedule.Params.Length - 1;
 
-            if (viewer.selectedPointIndex > schedule.Params[viewer.selectedParamIndex].Path.Length - 1)
-                viewer.selectedPointIndex = schedule.Params[viewer.selectedParamIndex].Path.Length - 1;
+            if (viewer.SelectedPointIndex > schedule.Params[viewer.SelectedParamIndex].Path.Length - 1)
+                viewer.SelectedPointIndex = schedule.Params[viewer.SelectedParamIndex].Path.Length - 1;
 
             HandleParameterSelection(viewer);
-            var currentParam = schedule.Params[viewer.selectedParamIndex];
+            var currentParam = schedule.Params[viewer.SelectedParamIndex];
 
             EditorGUILayout.Space();
-            EditorGUILayout.LabelField($"Selected Schedule Parameters: {viewer.selectedParamIndex}",
+            EditorGUILayout.LabelField($"Selected Schedule Parameters: {viewer.SelectedParamIndex}",
                 EditorStyles.boldLabel);
 
             EditorGUI.BeginChangeCheck();
@@ -240,43 +241,43 @@ namespace FlavorfulStory.AI.Scheduling
             {
                 if (GUILayout.Button("Add New Parameter"))
                 {
-                    Undo.RecordObject(viewer.schedule, "Add Parameter");
+                    Undo.RecordObject(viewer.Schedule, "Add Parameter");
 
-                    var newParams = viewer.schedule.Params != null
-                        ? new ScheduleParams[viewer.schedule.Params.Length + 1]
+                    var newParams = viewer.Schedule.Params != null
+                        ? new ScheduleParams[viewer.Schedule.Params.Length + 1]
                         : new ScheduleParams[1];
 
-                    if (viewer.schedule.Params != null)
-                        Array.Copy(viewer.schedule.Params, newParams, viewer.schedule.Params.Length);
+                    if (viewer.Schedule.Params != null)
+                        Array.Copy(viewer.Schedule.Params, newParams, viewer.Schedule.Params.Length);
 
                     newParams[^1] = new ScheduleParams();
-                    viewer.schedule.Params = newParams;
-                    viewer.selectedParamIndex = newParams.Length - 1;
+                    viewer.Schedule.Params = newParams;
+                    viewer.SelectedParamIndex = newParams.Length - 1;
 
-                    EditorUtility.SetDirty(viewer.schedule);
+                    EditorUtility.SetDirty(viewer.Schedule);
                     SceneView.RepaintAll();
                 }
 
-                using (new EditorGUI.DisabledScope(viewer.schedule.Params == null ||
-                                                   viewer.schedule.Params.Length == 0))
+                using (new EditorGUI.DisabledScope(viewer.Schedule.Params == null ||
+                                                   viewer.Schedule.Params.Length == 0))
                 {
                     if (GUILayout.Button("Remove Last Parameter"))
                     {
-                        Undo.RecordObject(viewer.schedule, "Remove Parameter");
+                        Undo.RecordObject(viewer.Schedule, "Remove Parameter");
 
-                        if (viewer.schedule.Params.Length > 0)
+                        if (viewer.Schedule.Params.Length > 0)
                         {
-                            var newParams = new ScheduleParams[viewer.schedule.Params.Length - 1];
-                            Array.Copy(viewer.schedule.Params, newParams, newParams.Length);
-                            viewer.schedule.Params = newParams;
-                            viewer.selectedParamIndex = Mathf.Clamp(viewer.selectedParamIndex, 0, newParams.Length - 1);
+                            var newParams = new ScheduleParams[viewer.Schedule.Params.Length - 1];
+                            Array.Copy(viewer.Schedule.Params, newParams, newParams.Length);
+                            viewer.Schedule.Params = newParams;
+                            viewer.SelectedParamIndex = Mathf.Clamp(viewer.SelectedParamIndex, 0, newParams.Length - 1);
                         }
                         else
                         {
-                            viewer.schedule.Params = Array.Empty<ScheduleParams>();
+                            viewer.Schedule.Params = Array.Empty<ScheduleParams>();
                         }
 
-                        EditorUtility.SetDirty(viewer.schedule);
+                        EditorUtility.SetDirty(viewer.Schedule);
                         SceneView.RepaintAll();
                     }
                 }
@@ -287,15 +288,15 @@ namespace FlavorfulStory.AI.Scheduling
         private void HandleParameterSelection(NpcScheduleViewer viewer)
         {
             EditorGUI.BeginChangeCheck();
-            viewer.selectedParamIndex = EditorGUILayout.IntSlider(
+            viewer.SelectedParamIndex = EditorGUILayout.IntSlider(
                 "Schedule Param",
-                viewer.selectedParamIndex,
+                viewer.SelectedParamIndex,
                 0,
-                Mathf.Max(0, viewer.schedule.Params.Length - 1)
+                Mathf.Max(0, viewer.Schedule.Params.Length - 1)
             );
             if (EditorGUI.EndChangeCheck())
             {
-                viewer.selectedPointIndex = 0;
+                viewer.SelectedPointIndex = 0;
                 GUI.FocusControl(null);
             }
         }
@@ -312,7 +313,7 @@ namespace FlavorfulStory.AI.Scheduling
 
         private static void ShowDateEdit(NpcScheduleViewer viewer)
         {
-            var currentParam = viewer.schedule.Params[viewer.selectedParamIndex];
+            var currentParam = viewer.Schedule.Params[viewer.SelectedParamIndex];
             EditorGUILayout.LabelField("Dates", EditorStyles.boldLabel);
 
             var dates = currentParam.Dates ?? Array.Empty<Vector2Int>();
@@ -322,21 +323,21 @@ namespace FlavorfulStory.AI.Scheduling
 
             if (GUILayout.Button("Add Date"))
             {
-                Undo.RecordObject(viewer.schedule, "Add Date");
+                Undo.RecordObject(viewer.Schedule, "Add Date");
                 Array.Resize(ref dates, dates.Length + 1);
                 dates[^1] = new Vector2Int(1, 28);
                 currentParam.Dates = dates;
-                EditorUtility.SetDirty(viewer.schedule);
+                EditorUtility.SetDirty(viewer.Schedule);
             }
 
             using (new EditorGUI.DisabledScope(!canRemove))
             {
                 if (GUILayout.Button("Remove Last Date") && canRemove)
                 {
-                    Undo.RecordObject(viewer.schedule, "Remove Date");
+                    Undo.RecordObject(viewer.Schedule, "Remove Date");
                     Array.Resize(ref dates, dates.Length - 1);
                     currentParam.Dates = dates;
-                    EditorUtility.SetDirty(viewer.schedule);
+                    EditorUtility.SetDirty(viewer.Schedule);
                 }
             }
 
@@ -367,14 +368,14 @@ namespace FlavorfulStory.AI.Scheduling
 
         private void ShowPathManagement(NpcScheduleViewer viewer)
         {
-            var currentParam = viewer.schedule.Params[viewer.selectedParamIndex];
+            var currentParam = viewer.Schedule.Params[viewer.SelectedParamIndex];
             EditorGUILayout.Space(2);
             EditorGUILayout.LabelField($"Path Points: {currentParam.Path.Length}", EditorStyles.boldLabel);
 
             EditorGUI.BeginChangeCheck();
-            viewer.selectedPointIndex = EditorGUILayout.IntSlider(
+            viewer.SelectedPointIndex = EditorGUILayout.IntSlider(
                 "Path Point",
-                viewer.selectedPointIndex,
+                viewer.SelectedPointIndex,
                 0,
                 Mathf.Max(0, currentParam.Path.Length - 1)
             );
@@ -382,10 +383,10 @@ namespace FlavorfulStory.AI.Scheduling
 
             EditorGUILayout.BeginHorizontal();
             {
-                if (GUILayout.Button("Previous Point") && viewer.selectedPointIndex > 0) viewer.selectedPointIndex--;
+                if (GUILayout.Button("Previous Point") && viewer.SelectedPointIndex > 0) viewer.SelectedPointIndex--;
 
-                if (GUILayout.Button("Next Point") && viewer.selectedPointIndex < currentParam.Path.Length - 1)
-                    viewer.selectedPointIndex++;
+                if (GUILayout.Button("Next Point") && viewer.SelectedPointIndex < currentParam.Path.Length - 1)
+                    viewer.SelectedPointIndex++;
             }
             EditorGUILayout.EndHorizontal();
 
@@ -404,7 +405,7 @@ namespace FlavorfulStory.AI.Scheduling
 
         private void AddSchedulePoint(NpcScheduleViewer viewer)
         {
-            var currentParam = viewer.schedule.Params[viewer.selectedParamIndex];
+            var currentParam = viewer.Schedule.Params[viewer.SelectedParamIndex];
             var newPath = new SchedulePoint[currentParam.Path.Length + 1];
             currentParam.Path.CopyTo(newPath, 0);
 
@@ -419,34 +420,34 @@ namespace FlavorfulStory.AI.Scheduling
                     : Vector3.zero
             };
 
-            Undo.RecordObject(viewer.schedule, "Add Schedule Point");
+            Undo.RecordObject(viewer.Schedule, "Add Schedule Point");
             currentParam.Path = newPath;
-            viewer.selectedPointIndex = newPath.Length - 1;
-            EditorUtility.SetDirty(viewer.schedule);
+            viewer.SelectedPointIndex = newPath.Length - 1;
+            EditorUtility.SetDirty(viewer.Schedule);
         }
 
         private void DeleteLastSchedulePoint(NpcScheduleViewer viewer)
         {
-            var currentParam = viewer.schedule.Params[viewer.selectedParamIndex];
+            var currentParam = viewer.Schedule.Params[viewer.SelectedParamIndex];
             var newPath = new SchedulePoint[currentParam.Path.Length - 1];
 
             Array.Copy(currentParam.Path, newPath, currentParam.Path.Length - 1);
 
-            Undo.RecordObject(viewer.schedule, "Delete Schedule Point");
+            Undo.RecordObject(viewer.Schedule, "Delete Schedule Point");
             currentParam.Path = newPath;
-            viewer.selectedPointIndex = Mathf.Clamp(viewer.selectedPointIndex, 0, newPath.Length - 1);
-            EditorUtility.SetDirty(viewer.schedule);
+            viewer.SelectedPointIndex = Mathf.Clamp(viewer.SelectedPointIndex, 0, newPath.Length - 1);
+            EditorUtility.SetDirty(viewer.Schedule);
         }
 
         private static void ShowSelectedPointEdit(NpcScheduleViewer viewer)
         {
-            var currentParam = viewer.schedule.Params[viewer.selectedParamIndex];
+            var currentParam = viewer.Schedule.Params[viewer.SelectedParamIndex];
             if (currentParam.Path.Length == 0) return;
 
             EditorGUILayout.Space();
             EditorGUILayout.LabelField("Selected Point Settings", EditorStyles.boldLabel);
 
-            var point = currentParam.Path[viewer.selectedPointIndex];
+            var point = currentParam.Path[viewer.SelectedPointIndex];
             EditorGUI.BeginChangeCheck();
             {
                 point.Hour = EditorGUILayout.IntSlider("Hour", point.Hour, 0, 23);
@@ -454,7 +455,7 @@ namespace FlavorfulStory.AI.Scheduling
                 point.LocationName = (LocationName)EditorGUILayout.EnumPopup("Location", point.LocationName);
                 point.NpcAnimation = (AnimationType)EditorGUILayout.EnumPopup("Animation", point.NpcAnimation);
             }
-            if (EditorGUI.EndChangeCheck()) EditorUtility.SetDirty(viewer.schedule);
+            if (EditorGUI.EndChangeCheck()) EditorUtility.SetDirty(viewer.Schedule);
         }
 
         private void DrawNavMesh(NpcScheduleViewer viewer)
