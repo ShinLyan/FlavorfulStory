@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.SceneManagement;
 using DayOfWeek = FlavorfulStory.TimeManagement.DayOfWeek;
 #if UNITY_EDITOR
 using FlavorfulStory.SceneManagement;
@@ -33,23 +35,31 @@ namespace FlavorfulStory.AI.Scheduling
     [CustomEditor(typeof(NpcScheduleViewer))]
     public class NpcScheduleViewerEditor : Editor
     {
-        private static bool isInitialized;
         private static readonly List<Location> locations = new();
 
-        private void OnEnable()
+        [InitializeOnLoadMethod]
+        private static void InitOnLoad()
         {
-            if (!isInitialized)
-            {
-                FindTaggedObjects();
-                isInitialized = true;
-            }
+            EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
+            EditorSceneManager.sceneOpened += (_, _) => RefreshLocations();
         }
 
-        private static void FindTaggedObjects()
+        private static void OnPlayModeStateChanged(PlayModeStateChange state)
+        {
+            if (state is PlayModeStateChange.EnteredEditMode or PlayModeStateChange.EnteredPlayMode) RefreshLocations();
+        }
+
+        private void OnEnable() => RefreshLocations();
+
+        private static void RefreshLocations()
         {
             locations.Clear();
-            var allObjects = FindObjectsByType<Location>(FindObjectsInactive.Include, FindObjectsSortMode.None);
-            locations.AddRange(allObjects);
+
+            if (!Application.isPlaying || SceneManager.GetActiveScene().isLoaded)
+            {
+                var locs = FindObjectsByType<Location>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+                locations.AddRange(locs);
+            }
         }
 
 
