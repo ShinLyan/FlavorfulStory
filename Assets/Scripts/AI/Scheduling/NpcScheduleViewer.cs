@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 using DayOfWeek = FlavorfulStory.TimeManagement.DayOfWeek;
 #if UNITY_EDITOR
 using FlavorfulStory.SceneManagement;
@@ -23,6 +24,8 @@ namespace FlavorfulStory.AI.Scheduling
 
         [Header("Ground Settings")] public float groundHeight = 0.5f;
         public LayerMask groundMask = -1;
+
+        [Header("NavMesh Settings")] public Color NavMeshColor = new(0, 0.5f, 1f, 0.2f);
     }
 
 #if UNITY_EDITOR
@@ -48,8 +51,11 @@ namespace FlavorfulStory.AI.Scheduling
             locations.AddRange(allObjects);
         }
 
+
         private void OnSceneGUI()
         {
+            if (target == null) return;
+
             var viewer = (NpcScheduleViewer)target;
             var schedule = viewer.schedule;
             if (schedule == null || schedule.Params == null) return;
@@ -57,6 +63,8 @@ namespace FlavorfulStory.AI.Scheduling
             if (viewer.selectedParamIndex >= schedule.Params.Length) return;
             var param = schedule.Params[viewer.selectedParamIndex];
             if (param.Path == null || param.Path.Length == 0) return;
+
+            DrawNavMesh(viewer);
 
             // Рисуем точки и их соединения
             for (int i = 0; i < param.Path.Length; i++)
@@ -160,8 +168,11 @@ namespace FlavorfulStory.AI.Scheduling
 
         public override void OnInspectorGUI()
         {
+            if (target == null) return;
             serializedObject.Update();
             var viewer = (NpcScheduleViewer)target;
+
+            var schedule = viewer.schedule;
 
             EditorGUILayout.PropertyField(serializedObject.FindProperty("schedule"));
             EditorGUILayout.PropertyField(serializedObject.FindProperty("LineThickness"));
@@ -169,11 +180,12 @@ namespace FlavorfulStory.AI.Scheduling
             EditorGUILayout.PropertyField(serializedObject.FindProperty("SphereSize"));
             EditorGUILayout.PropertyField(serializedObject.FindProperty("groundHeight"));
             EditorGUILayout.PropertyField(serializedObject.FindProperty("groundMask"));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("NavMeshColor"));
             EditorGUILayout.Space();
             EditorGUILayout.Space();
             EditorGUILayout.Space();
 
-            if (viewer.schedule == null)
+            if (schedule == null)
             {
                 EditorGUILayout.HelpBox("Assign a Schedule first!", MessageType.Info);
                 serializedObject.ApplyModifiedProperties();
@@ -182,20 +194,20 @@ namespace FlavorfulStory.AI.Scheduling
 
 
             HandleParameterCreation(viewer);
-            if (viewer.schedule.Params.Length == 0)
+            if (schedule.Params.Length == 0)
             {
                 serializedObject.ApplyModifiedProperties();
                 return;
             }
 
-            if (viewer.selectedParamIndex > viewer.schedule.Params.Length - 1)
-                viewer.selectedParamIndex = viewer.schedule.Params.Length - 1;
+            if (viewer.selectedParamIndex > schedule.Params.Length - 1)
+                viewer.selectedParamIndex = schedule.Params.Length - 1;
 
-            if (viewer.selectedPointIndex > viewer.schedule.Params[viewer.selectedParamIndex].Path.Length - 1)
-                viewer.selectedPointIndex = viewer.schedule.Params[viewer.selectedParamIndex].Path.Length - 1;
+            if (viewer.selectedPointIndex > schedule.Params[viewer.selectedParamIndex].Path.Length - 1)
+                viewer.selectedPointIndex = schedule.Params[viewer.selectedParamIndex].Path.Length - 1;
 
             HandleParameterSelection(viewer);
-            var currentParam = viewer.schedule.Params[viewer.selectedParamIndex];
+            var currentParam = schedule.Params[viewer.selectedParamIndex];
 
             EditorGUILayout.Space();
             EditorGUILayout.LabelField($"Selected Schedule Parameters: {viewer.selectedParamIndex}",
@@ -211,8 +223,8 @@ namespace FlavorfulStory.AI.Scheduling
             }
             if (EditorGUI.EndChangeCheck())
             {
-                Undo.RecordObject(viewer.schedule, "Change Schedule Parameter");
-                EditorUtility.SetDirty(viewer.schedule);
+                Undo.RecordObject(schedule, "Change Schedule Parameter");
+                EditorUtility.SetDirty(schedule);
             }
 
             ShowPathManagement(viewer);
@@ -443,6 +455,21 @@ namespace FlavorfulStory.AI.Scheduling
                 point.NpcAnimation = (AnimationType)EditorGUILayout.EnumPopup("Animation", point.NpcAnimation);
             }
             if (EditorGUI.EndChangeCheck()) EditorUtility.SetDirty(viewer.schedule);
+        }
+
+        private void DrawNavMesh(NpcScheduleViewer viewer)
+        {
+            var triangulation = NavMesh.CalculateTriangulation();
+
+            Handles.color = viewer.NavMeshColor;
+            for (int i = 0; i < triangulation.indices.Length; i += 3)
+            {
+                var a = triangulation.vertices[triangulation.indices[i]];
+                var b = triangulation.vertices[triangulation.indices[i + 1]];
+                var c = triangulation.vertices[triangulation.indices[i + 2]];
+
+                Handles.DrawAAConvexPolygon(a, b, c);
+            }
         }
     }
 #endif
