@@ -16,30 +16,40 @@ namespace FlavorfulStory.AI.Scheduling
         /// <summary> Сезоны, в которые будет выполняться расписание. </summary>]
         [field: Header("Limitations")]
         [field: Tooltip("Сезоны, в которые будет выполняться расписание."), SerializeField, EnumButtons]
-        public Season Seasons { get; private set; }
+        public Season Seasons { get; set; }
 
         /// <summary> Дни недели, в которые будет выполняться расписание. </summary>
         [field: Tooltip("Дни недели, в которые будет выполняться расписание."), SerializeField]
-        public DayOfWeek DayOfWeek { get; private set; }
+        public DayOfWeek DayOfWeek { get; set; }
 
         /// <summary> Диапазоны дней месяца (1–28), в которые будет выполняться расписание. </summary>
         [field: Tooltip("Диапазоны дней месяца (1–28), в которые будет выполняться расписание."),
                 SerializeField, MinMaxSlider(1, 28)]
-        public Vector2Int[] Dates { get; private set; }
+        public Vector2Int[] Dates { get; set; }
 
         /// <summary> Минимальный уровень отношений, необходимый для выполнения расписания. </summary>
         [field: Tooltip("Минимальный уровень отношений, необходимый для выполнения расписания."),
                 Range(0, 14), SerializeField]
-        public int Hearts { get; private set; }
+        public int Hearts { get; set; }
 
         /// <summary> Должен ли идти дождь для активации расписания? </summary>
         [field: Tooltip("Должен ли идти дождь для активации расписания?"), SerializeField]
-        public bool IsRaining { get; private set; }
+        public bool IsRaining { get; set; }
 
         /// <summary> Массив точек маршрута, которые NPC должен посетить в рамках расписания. </summary>
         [field: Header("Path")]
         [field: Tooltip("Массив точек маршрута, которые NPC должен посетить в рамках расписания."), SerializeField]
-        public SchedulePoint[] Path { get; private set; }
+        public SchedulePoint[] Path { get; set; }
+
+        public ScheduleParams()
+        {
+            Seasons = new Season();
+            DayOfWeek = new DayOfWeek();
+            Dates = Array.Empty<Vector2Int>();
+            Hearts = 0;
+            IsRaining = false;
+            Path = Array.Empty<SchedulePoint>();
+        }
 
         /// <summary> Найти ближайшую точку маршрута, соответствующую текущему времени. </summary>
         /// <param name="currentTime"> Текущее игровое время. </param>
