@@ -3793,6 +3793,61 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 586987807}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &625912191
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 625912193}
+  - component: {fileID: 625912192}
+  m_Layer: 0
+  m_Name: Schedule Editor
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &625912192
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 625912191}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 45ae2c32555046ed9b00dd5da81d15e6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  schedule: {fileID: 11400000, guid: e5995a5863df2452f8a96ee1fe151214, type: 2}
+  LineThickness: 5
+  LineColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  SphereSize: 0.5
+  selectedParamIndex: 0
+  selectedPointIndex: 3
+  groundHeight: 0.5
+  groundMask:
+    serializedVersion: 2
+    m_Bits: 320
+  NavMeshColor: {r: 0, g: 0.5, b: 1, a: 0.2}
+--- !u!4 &625912193
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 625912191}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.47145316, y: 11.233169, z: -2.4313798}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &640582091
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -10294,61 +10349,6 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1334801736}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &1337590465
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1337590467}
-  - component: {fileID: 1337590466}
-  m_Layer: 0
-  m_Name: ScheduleEditor
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1337590466
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1337590465}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 45ae2c32555046ed9b00dd5da81d15e6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  schedule: {fileID: 11400000, guid: e5995a5863df2452f8a96ee1fe151214, type: 2}
-  LineThickness: 5
-  LineColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-  SphereSize: 0.5
-  selectedParamIndex: 2
-  selectedPointIndex: 3
-  groundHeight: 0.5
-  groundMask:
-    serializedVersion: 2
-    m_Bits: 320
-  NavMeshColor: {r: 0.21960784, g: 0.4156766, b: 1, a: 0.4392157}
---- !u!4 &1337590467
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1337590465}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 100.4, y: 2.3000002, z: 278.1}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1359020115
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -16473,4 +16473,4 @@ SceneRoots:
   - {fileID: 8195510124016254902}
   - {fileID: 1407106709}
   - {fileID: 1331282075}
-  - {fileID: 1337590467}
+  - {fileID: 625912193}
