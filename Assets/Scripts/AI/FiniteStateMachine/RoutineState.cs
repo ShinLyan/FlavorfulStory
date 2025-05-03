@@ -47,7 +47,11 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         }
 
         /// <summary> Обновить состояние. </summary>
-        public override void Reset() => _currentPoint = null;
+        public override void Reset()
+        {
+            _currentPoint = null;
+            _animator.Rebind();
+        }
 
         /// <summary> Проверяет, изменилось ли время, и обновляет текущую точку расписания.
         /// Переключает состояние на движение, если время совпадает с точкой. </summary>

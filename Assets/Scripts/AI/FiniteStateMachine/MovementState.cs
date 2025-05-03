@@ -121,6 +121,8 @@ namespace FlavorfulStory.AI.FiniteStateMachine
             StopCurrentCoroutine();
             PlayMoveAnimation(0f, 0f);
             _navMeshAgent.ResetPath();
+            if (_currentTargetPoint != null)
+                _navMeshAgent.transform.rotation = Quaternion.Euler(_currentTargetPoint.Rotation);
         }
 
         /// <summary> Останавливает движение NPC с возвратом на точку спавна. </summary>

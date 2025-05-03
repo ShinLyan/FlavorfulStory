@@ -10,6 +10,8 @@
         Idle,
 
         /// <summary> Анимация использования топора. </summary>
-        UseAxe
+        UseAxe,
+
+        PettingAnimal
     }
 }
