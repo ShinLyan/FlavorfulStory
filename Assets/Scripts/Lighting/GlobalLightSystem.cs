@@ -65,7 +65,7 @@ namespace FlavorfulStory.Lightning
         private void OnDisable() => WorldTime.OnTimeUpdated -= UpdateLighting;
 
         /// <summary> Инициализирует начальные настройки освещения. </summary> 
-        private void Start()
+        private void Awake() // в Awake из-за того что если в Старте, то возникает NullRefException
         {
             _currentWeatherLightSettings = _weatherLightSettings[0].LightSettings;
             //TODO: добавить определение текущей погоды из стороннего скрипта
