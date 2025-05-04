@@ -1,3 +1,4 @@
+using FlavorfulStory.Lightning;
 using UnityEngine;
 
 namespace FlavorfulStory.SceneManagement
@@ -18,11 +19,11 @@ namespace FlavorfulStory.SceneManagement
         [Tooltip("Является ли локация помещением?"), SerializeField]
         private bool _isRoom;
 
-        /// <summary> Глобальные источники освещения. </summary>
-        private GameObject[] _globalLights;
+        /// <summary> Глобальная система освещения. </summary>
+        private GlobalLightSystem _globalLightSystem;
 
         /// <summary> Найти все источники освещения. </summary>
-        private void Awake() => _globalLights = GameObject.FindGameObjectsWithTag("GlobalLight");
+        private void Awake() => _globalLightSystem = FindFirstObjectByType<GlobalLightSystem>();
 
         /// <summary> Активирует объекты, связанные с этой локацией. </summary>
         public void Enable() => SetObjectsActive(true);
@@ -38,9 +39,8 @@ namespace FlavorfulStory.SceneManagement
 
             foreach (var obj in _objectsToDisable) obj.SetActive(isActive);
 
-            if (_globalLights == null || _objectsToDisable.Length == 0) return;
-
-            foreach (var globalLight in _globalLights) globalLight.SetActive(_isRoom);
+            if (!_globalLightSystem || _objectsToDisable.Length == 0) return;
+            _globalLightSystem.gameObject.SetActive(_isRoom);
         }
 
         /// <summary> Находится ли заданная позиция внутри границ локации? </summary>
