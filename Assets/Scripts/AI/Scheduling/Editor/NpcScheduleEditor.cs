@@ -56,18 +56,19 @@ public class NpcScheduleEditor : Editor
         }
     }
 
-    /// <summary> Отрисовывает элементы в сцене: точки маршрута, линии, метки и инструменты редактирования. </summary>
+    /// <summary> Отрисовывает элементы в сцене: точки маршрута, линии между ними, метки с информацией, 
+    /// инструменты для перемещения и вращения выбранной точки. </summary>
     private void OnSceneGUI()
     {
         if (target == null) return;
 
         var viewer = (NpcScheduleDemonstrator)target;
-        
+
         var schedule = viewer.Schedule;
         if (schedule == null || schedule.Params == null) return;
 
         if (viewer.SelectedParamIndex >= schedule.Params.Length) return;
-        
+
         var param = schedule.Params[viewer.SelectedParamIndex];
         if (param.Path == null || param.Path.Length == 0) return;
 
@@ -96,7 +97,7 @@ public class NpcScheduleEditor : Editor
             var labelPosition = pathPoint.Position + Vector3.forward * viewer.SphereSize;
             string labelContent =
                 $"{pathPoint.Hour:00}:{pathPoint.Minutes:00}\n{pathPoint.NpcAnimation}\n{pathPoint.LocationName}";
-            
+
             var realLocationName = LocationName.RockyIsland;
             foreach (var location in _locations)
                 if (location.IsPositionInLocation(pathPoint.Position))
@@ -177,7 +178,11 @@ public class NpcScheduleEditor : Editor
         return position;
     }
 
-    /// <summary> Отрисовывает кастомный интерфейс инспектора для управления расписанием. </summary>
+    /// <summary> Отрисовывает кастомный интерфейс инспектора. Включает: 
+    /// - Настройки визуализации (толщину линий, цвет, размер сфер)
+    /// - Управление параметрами расписания (добавление/удаление, выбор сезонов, дней недели, дат)
+    /// - Редактирование выбранной точки маршрута (время, анимация, локация)
+    /// - Инструменты управления точками (предыдущая/следующая, добавление/удаление) </summary>
     public override void OnInspectorGUI()
     {
         if (target == null) return;
