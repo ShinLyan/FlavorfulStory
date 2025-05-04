@@ -46,7 +46,7 @@ namespace FlavorfulStory.Attributes
             //TODO: где-то внутри InitializeView подтягивать инфу с сейва
             _healthAttributeView.InitializeView(health.CurrentValue, health.MaxValue);
 
-            var stamina = new StaminaAttribute(150f, 1f);
+            var stamina = new StaminaAttribute(150f, 10f);
             AddAttribute(stamina);
             AttributeBinder.Bind(GetAttribute<StaminaAttribute>(), _staminaAttributeView);
             _staminaAttributeView.InitializeView(stamina.CurrentValue, stamina.MaxValue);

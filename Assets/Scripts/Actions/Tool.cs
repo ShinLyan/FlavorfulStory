@@ -48,9 +48,8 @@ namespace FlavorfulStory.Actions
             player.RotateTowards(targetPosition);
             player.TriggerAnimation($"Use{ToolType}");
             InputWrapper.BlockPlayerMovement();
-
-            // TODO: Уточнить у Димы: 1, 2, 3;
-            player.PlayerAttributes.GetAttribute<HealthAttribute>().Change(-1f);
+            
+            player.PlayerAttributes.GetAttribute<StaminaAttribute>().Change(-10f);
 
             return true;
         }
