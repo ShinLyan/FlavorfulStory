@@ -42,6 +42,8 @@ namespace FlavorfulStory.Control
         /// <summary> Таймер перезарядки использования инструмента. </summary>
         private float _toolCooldownTimer;
 
+        private StaminaAttribute _staminaAttribute;
+
         /// <summary> Можно ли использовать инструмент? </summary>
         private bool CanUseTool => _toolCooldownTimer <= 0f;
 
@@ -73,6 +75,9 @@ namespace FlavorfulStory.Control
             _toolHandler = GetComponent<ToolHandler>();
             _toolHandler.SetUnequipAction(() => SetBusyState(false));
         }
+
+        /// <summary> Инициализация аттрибутов. </summary>
+        private void Start() { _staminaAttribute = PlayerAttributes.GetAttribute<StaminaAttribute>(); }
 
         /// <summary> Обновление состояния игрока. </summary>
         private void Update()

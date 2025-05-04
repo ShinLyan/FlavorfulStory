@@ -36,6 +36,12 @@ namespace FlavorfulStory.Actions
         /// <param name="hitableLayers"> Слои, по которым будем делать удар. </param>
         public bool Use(PlayerController player, LayerMask hitableLayers)
         {
+            //TODO: Лукап таблцу заебашть
+            const float AxeStaminaCost = 25f;
+            var stamina = player.PlayerAttributes.GetAttribute<StaminaAttribute>();
+            if (stamina == null || stamina.CurrentValue < AxeStaminaCost)
+                return false;
+            
             if (!WorldCoordinates.GetWorldCoordinatesFromScreenPoint(
                     InputWrapper.GetMousePosition(),
                     ~(1 << player.gameObject.layer),
@@ -48,9 +54,6 @@ namespace FlavorfulStory.Actions
             player.RotateTowards(targetPosition);
             player.TriggerAnimation($"Use{ToolType}");
             InputWrapper.BlockPlayerMovement();
-
-            // TODO: Уточнить у Димы: 1, 2, 3;
-            player.PlayerAttributes.GetAttribute<HealthAttribute>().Change(-1f);
 
             return true;
         }
@@ -65,10 +68,16 @@ namespace FlavorfulStory.Actions
             var direction = (targetPosition - origin).normalized;
             var interactionCenter = origin + direction * (MaxInteractionDistance / 2);
 
+            //TODO: Тута бага. Получает удар только первый блжайшй. Плохой рейкаст сферой по ударяемым прколам!!!
             var hitColliders = Physics.OverlapSphere(interactionCenter, UseRadius, hitableLayers);
             foreach (var collider in hitColliders)
                 if (collider.transform.parent.TryGetComponent<IHitable>(out var hitable))
+                {
                     hitable.TakeHit(ToolType);
+                    const float AxeStaminaCost = 25f;
+                    player.PlayerAttributes.GetAttribute<StaminaAttribute>().Change(-AxeStaminaCost);
+                    return true;
+                }
 
             return hitColliders.Length > 0;
         }

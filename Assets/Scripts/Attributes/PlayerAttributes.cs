@@ -1,72 +1,115 @@
 ﻿using System;
 using System.Collections.Generic;
+using FlavorfulStory.Saving;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace FlavorfulStory.Attributes
 {
     /// <summary> Компонент игрока, управляющий атрибутами, их инициализацией и восстановлением. </summary>
-    public class PlayerAttributes : MonoBehaviour
+    public class PlayerAttributes : MonoBehaviour, ISaveable
     {
         /// <summary> Представление атрибута здоровья. </summary>
-        [SerializeField] private BaseAttributeView _healthAttributeView;
+        [SerializeField] private BaseAttributeView _healthView;
+
         /// <summary> Представление атрибута выносливости. </summary>
-        [SerializeField] private BaseAttributeView _staminaAttributeView;
+        [SerializeField] private BaseAttributeView _staminaView;
 
         /// <summary> Коллекция всех атрибутов, привязанных к типу. </summary>
         private readonly Dictionary<Type, IAttribute> _attributes = new();
-
-        /// <summary> Отвязывает обработчики событий при уничтожении объекта. </summary>
-        private void OnDestroy() => AttributeBinder.Unbind(GetAttribute<HealthAttribute>(), _healthAttributeView);
-
-        /// <summary> Инициализирует атрибуты при создании объекта. </summary>
-        private void Awake() => InitializeAttributes();
-
-        /// <summary> Обновляет состояние регенерации атрибутов каждый кадр. </summary>
-        private void Update() => HandleRegenTick();
-
-        /// <summary> Обрабатывает восстановление всех регенерируемых атрибутов. </summary>
-        private void HandleRegenTick()
+        
+        private AttributesData? _loadedData;
+        
+        private void Awake()
         {
-            foreach (var attribute in _attributes.Values)
+            if (_loadedData.HasValue)
             {
-                if (attribute is IRegenerableAttribute regenerableAttribute)
-                {
-                    regenerableAttribute.TickRegen(Time.deltaTime);
-                }
+                var data = _loadedData.Value;
+
+                Register(new HealthAttribute(data.HpMaxValue, data.HpCurrentValue), _healthView);
+                Register(new StaminaAttribute(data.staminaMaxValue, data.staminaCurrentValue, data.staminaRegenRate), _staminaView);
+            }
+            else
+            {
+                RegisterAttributes();
             }
         }
 
-        /// <summary> Создаёт и инициализирует атрибуты игрока. </summary>
-        private void InitializeAttributes()
+        private void Update()
         {
-            //TODO: Мб где-то внутри HealthAttribute мб не просто создавать с нуля, а подтягивать инфу с сейва
-            var health = new HealthAttribute(100f);
-            AddAttribute(health);
-            AttributeBinder.Bind(GetAttribute<HealthAttribute>(), _healthAttributeView);
-            //TODO: где-то внутри InitializeView подтягивать инфу с сейва
-            _healthAttributeView.InitializeView(health.CurrentValue, health.MaxValue);
-
-            var stamina = new StaminaAttribute(150f, 1f);
-            AddAttribute(stamina);
-            AttributeBinder.Bind(GetAttribute<StaminaAttribute>(), _staminaAttributeView);
-            _staminaAttributeView.InitializeView(stamina.CurrentValue, stamina.MaxValue);
-            stamina.SetValue(0);
+            foreach (var attribute in _attributes.Values)
+                if (attribute is IRegenerableAttribute regen)
+                    regen.TickRegen(Time.deltaTime);
         }
 
-        /// <summary> Добавляет атрибут в коллекцию. </summary>
-        /// <param name="attribute"> Атрибут для добавления. </param>
-        private void AddAttribute<T>(T attribute) where T : IAttribute
+        private void OnDestroy()
+        {
+            foreach (var attributeKVP in _attributes)
+            {
+                if (TryGetView(attributeKVP.Key, out var view))
+                    AttributeBinder.Unbind(attributeKVP.Value, view);
+            }
+        }
+
+        private void RegisterAttributes()
+        {
+            Register(new HealthAttribute(100), _healthView);
+            Register(new StaminaAttribute(150f, 1f), _staminaView);
+        }
+
+        private void Register<T>(T attribute, BaseAttributeView view) where T : IAttribute
         {
             _attributes[typeof(T)] = attribute;
+            AttributeBinder.Bind(attribute, view);
+            view.InitializeView(attribute.CurrentValue, attribute.MaxValue);
         }
 
-        /// <summary> Получает атрибут указанного типа. </summary>
-        /// <typeparam name="T"> Тип атрибута. </typeparam>
-        /// <returns> Атрибут, если найден, иначе null. </returns>
-        public T GetAttribute<T>() where T : class, IAttribute
+        public T GetAttribute<T>() where T : class, IAttribute =>
+            _attributes.TryGetValue(typeof(T), out var attribute) ? attribute as T : null;
+
+        private bool TryGetView(Type type, out BaseAttributeView view)
         {
-            _attributes.TryGetValue(typeof(T), out var attribute);
-            return attribute as T;
+            if (type == typeof(HealthAttribute))
+                view = _healthView;
+            else if (type == typeof(StaminaAttribute))
+                view = _staminaView;
+            else
+                view = null;
+
+            return view != null;
+        }
+
+        [Serializable]
+        struct AttributesData
+        {
+            public float HpCurrentValue;
+            public float HpMaxValue;
+            public float staminaCurrentValue;
+            public float staminaMaxValue;
+            public float staminaRegenRate;
+        }
+        
+        public object CaptureState()
+        {
+            var health = GetAttribute<HealthAttribute>();
+            var stamina = GetAttribute<StaminaAttribute>();
+
+            return new AttributesData
+            {
+                HpCurrentValue = health?.CurrentValue ?? 0,
+                HpMaxValue = health?.MaxValue ?? 0,
+                staminaCurrentValue = stamina?.CurrentValue ?? 0,
+                staminaMaxValue = stamina?.MaxValue ?? 0,
+                staminaRegenRate = stamina?.RegenRate ?? 0
+            };
+        }
+
+        public void RestoreState(object state)
+        {
+            if (state is AttributesData data)
+            {
+                _loadedData = data;
+            }
         }
     }
 }

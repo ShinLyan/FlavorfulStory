@@ -23,6 +23,9 @@ namespace FlavorfulStory.Attributes
         /// <param name="max"> Новое максимальное значение. </param>
         void SetMaxValue(float max);
 
+        /// <summary> Событие, вызываемое при инициализации атрибута. </summary>
+        event Action OnInitialized;
+        
         /// <summary> Событие, вызываемое при изменении текущего значения. </summary>
         event Action<float, float> OnValueChanged;
 
