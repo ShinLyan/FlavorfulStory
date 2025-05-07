@@ -121,14 +121,17 @@ public class NpcScheduleEditor : Editor
                 alignment = TextAnchor.MiddleCenter
             };
 
-            Handles.BeginGUI();
-            var guiPosition = HandleUtility.WorldToGUIPoint(labelPosition);
-            var content = new GUIContent(labelContent);
-            var size = labelStyle.CalcSize(content);
-            var rect = new Rect(guiPosition.x - size.x / 2, guiPosition.y - size.y / 2, size.x, size.y);
+            if (viewer.ShowInfoLabel)
+            {
+                Handles.BeginGUI();
+                var guiPosition = HandleUtility.WorldToGUIPoint(labelPosition);
+                var content = new GUIContent(labelContent);
+                var size = labelStyle.CalcSize(content);
+                var rect = new Rect(guiPosition.x - size.x / 2, guiPosition.y - size.y / 2, size.x, size.y);
 
-            GUI.Label(rect, content, labelStyle);
-            Handles.EndGUI();
+                GUI.Label(rect, content, labelStyle);
+                Handles.EndGUI();
+            }
 
             Handles.color = i == viewer.SelectedPointIndex ? Color.green : Color.red;
             Handles.SphereHandleCap(0, pathPoint.Position, Quaternion.identity, viewer.SphereSize,
@@ -198,6 +201,7 @@ public class NpcScheduleEditor : Editor
         EditorGUILayout.PropertyField(serializedObject.FindProperty("<LineThickness>k__BackingField"));
         EditorGUILayout.PropertyField(serializedObject.FindProperty("<LineColor>k__BackingField"));
         EditorGUILayout.PropertyField(serializedObject.FindProperty("<SphereSize>k__BackingField"));
+        EditorGUILayout.PropertyField(serializedObject.FindProperty("<ShowInfoLabel>k__BackingField"));
 
         EditorGUILayout.LabelField("Ground Settings", EditorStyles.boldLabel);
         EditorGUILayout.PropertyField(serializedObject.FindProperty("<GroundHeight>k__BackingField"));

@@ -43,7 +43,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine
             if (_currentPoint == null) return;
 
             var animationClipName = _currentPoint.NpcAnimation;
-            if (_currentPoint != null) PlayStateAnimation(animationClipName);
+            PlayStateAnimation(animationClipName);
         }
 
         /// <summary> Обновить состояние. </summary>

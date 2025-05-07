@@ -12,6 +12,8 @@
         /// <summary> Анимация использования топора. </summary>
         UseAxe,
 
-        PettingAnimal
+        PettingAnimal,
+
+        Drinking
     }
 }

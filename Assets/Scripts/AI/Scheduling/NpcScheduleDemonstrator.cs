@@ -25,6 +25,8 @@ namespace FlavorfulStory.AI.Scheduling
         [field: SerializeField]
         public float SphereSize { get; private set; }
 
+        [field: SerializeField] public bool ShowInfoLabel { get; private set; }
+
         /// <summary> Индекс выбранного параметра для редактирования. </summary>
         public int SelectedParamIndex { get; private set; }
 
