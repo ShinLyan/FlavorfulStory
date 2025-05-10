@@ -1,4 +1,5 @@
-﻿using FlavorfulStory.InputSystem;
+﻿using DG.Tweening;
+using FlavorfulStory.InputSystem;
 using FlavorfulStory.SceneManagement;
 using UnityEngine;
 
@@ -24,6 +25,7 @@ namespace FlavorfulStory.Core
             SpawnPersistentObject();
             LocationChanger.ActivatePlayerCurrentLocation();
             InputWrapper.UnblockAllInput();
+            DOTween.Init(true, true, LogBehaviour.Verbose);
         }
 
         /// <summary> Создает постоянный объект и устанавливает его сохранение между сценами. </summary>
