@@ -164,7 +164,7 @@ namespace FlavorfulStory.InventorySystem
             }
 
             ///TODO: DElete
-            _notificationManager.ShowNotification(item.Icon, $"x{number} {item.ItemName}");
+            _notificationManager.ShowNotification(item.Icon, number, item.ItemName, item.ItemName);
             ///TODO: DElete
             InventoryUpdated?.Invoke();
             return true;
