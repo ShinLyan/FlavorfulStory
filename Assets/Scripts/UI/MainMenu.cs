@@ -1,13 +1,14 @@
+using System;
 using System.Linq;
+using FlavorfulStory.SceneManagement;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
-using FlavorfulStory.SceneManagement;
 
 namespace FlavorfulStory.UI
 {
     /// <summary> UI главного меню. </summary>
-    public class MainMenuUI : MonoBehaviour
+    public class MainMenu : MonoBehaviour
     {
         /// <summary> Поля ввода, которые игрок заполняет при запуске новой игры. </summary>
         [SerializeField] private TMP_InputField[] _newGameInputFields;
@@ -46,12 +47,11 @@ namespace FlavorfulStory.UI
         {
             foreach (var inputField in _newGameInputFields)
             {
-                if (!InputFieldValidator.IsValid(inputField.text, out string warningMessage))
-                {
-                    _messageError.SetActive(true);
-                    _errorText.text = warningMessage;
-                    return false;
-                }
+                if (InputFieldValidator.IsValid(inputField.text, out string warningMessage)) continue;
+
+                _messageError.SetActive(true);
+                _errorText.text = warningMessage;
+                return false;
             }
 
             _messageError.SetActive(false);
@@ -68,12 +68,12 @@ namespace FlavorfulStory.UI
 
         /// <summary> Очистить текст во всех полях ввода. </summary>
         private void ClearInputFields() =>
-            System.Array.ForEach(_newGameInputFields, inputField => inputField.text = string.Empty);
+            Array.ForEach(_newGameInputFields, inputField => inputField.text = string.Empty);
 
         /// <summary> Продолжить ранее сохраненную игру. </summary>
         public void OnClickContinue() => PersistentObject.Instance.SavingWrapper.ContinueGame();
 
         /// <summary> Завершить работу приложения. </summary>
-        public void OnClickQuit() => Application.Quit();
+        public void OnClickExit() => Application.Quit();
     }
 }
