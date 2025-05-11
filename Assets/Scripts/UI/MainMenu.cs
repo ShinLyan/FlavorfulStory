@@ -20,17 +20,23 @@ namespace FlavorfulStory.UI
         [SerializeField] private TMP_Text _errorText;
 
         /// <summary> Кнопка продолжения игры. </summary>
-        /// <remarks> Активна при условии существующего файла сохранения. </remarks>
+        /// <remarks> Отображается при условии существующего файла сохранения. </remarks>
         [SerializeField] private Button _continueGameButton;
+
+        /// <summary> Кнопка загрузки игры. </summary>
+        /// <remarks> Отображается при условии существующего файла сохранения. </remarks>
+        [SerializeField] private Button _loadGameButton;
 
         /// <summary> Название сохраненного файла для новой игры, формируемое на основе ввода игрока. </summary>
         /// <remarks> Название формируется путем соединения строк имени игрока и названия магазина. </remarks>
         private string NewGameSaveFileName => string.Concat(_newGameInputFields.Select(field => field.text));
 
-        /// <summary> Коллбэк из UnityAPI. </summary>
-        /// <remarks> Устанавливает кнопке продолжения игры неактивное состояние,
-        /// если отсутствует файл сохранения. </remarks>
-        private void Start() => _continueGameButton.interactable = SavingWrapper.SaveFileExists;
+        /// <summary> При старте включает отображение кнопок при условии существующего файла сохранения. </summary>
+        private void Start()
+        {
+            _continueGameButton.gameObject.SetActive(SavingWrapper.SaveFileExists);
+            _loadGameButton.gameObject.SetActive(SavingWrapper.SaveFileExists);
+        }
 
         /// <summary> Обрабатывает запуск новой игры. </summary>
         /// <remarks> Проверяет корректность заполнения полей ввода и, при успехе, 
