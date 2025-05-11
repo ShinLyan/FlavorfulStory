@@ -13,12 +13,14 @@ namespace FlavorfulStory
 
         private RectTransform _rectTransform;
         private Tween _fadeTween;
+        private Tween _countTween;
         private float _startX;
 
         public string ItemID { get; private set; }
         private string _itemName;
         private int _currentAmount;
-        
+        private int _displayedAmount;
+
         public float Height => _rectTransform.rect.height;
 
         private void Awake()
@@ -33,6 +35,7 @@ namespace FlavorfulStory
             ItemID = itemId;
             _itemName = itemName;
             _currentAmount = amount;
+            _displayedAmount = amount;
             canvasGroup.alpha = 0f;
 
             UpdateMessage();
@@ -43,22 +46,20 @@ namespace FlavorfulStory
 
         public void AddAmount(int amount)
         {
+            int oldAmount = _currentAmount;
             _currentAmount += amount;
-            UpdateMessage();
-        }
 
-        public float GetStartX() => _startX;
-
-        public void SetPosition(Vector2 anchoredPosition, float duration)
-        {
-            _rectTransform
-                .DOAnchorPos(anchoredPosition, duration)
-                .SetEase(Ease.OutCubic);
+            _countTween?.Kill(); // отмена предыдущей анимации
+            _countTween = DOVirtual.Int(oldAmount, _currentAmount, 0.4f, value =>
+            {
+                _displayedAmount = value;
+                UpdateMessage();
+            });
         }
 
         private void UpdateMessage()
         {
-            message.text = $"x{_currentAmount} {_itemName}";
+            message.text = $"x{_displayedAmount} {_itemName}";
         }
 
         public void Show(float fadeDuration)
@@ -68,6 +69,15 @@ namespace FlavorfulStory
             DOTween.Sequence()
                 .Join(canvasGroup.DOFade(1f, fadeDuration))
                 .Join(_rectTransform.DOAnchorPosX(_startX, fadeDuration).SetEase(Ease.OutCubic));
+        }
+
+        public float GetStartX() => _startX;
+
+        public void SetPosition(Vector2 anchoredPosition, float duration)
+        {
+            _rectTransform
+                .DOAnchorPos(anchoredPosition, duration)
+                .SetEase(Ease.OutCubic);
         }
 
         public void MoveUp(float distance, float duration)
@@ -80,6 +90,7 @@ namespace FlavorfulStory
         public void FadeAndDestroy(float duration)
         {
             _fadeTween?.Kill();
+            _countTween?.Kill();
 
             float offscreenX = _startX + Screen.width;
 
