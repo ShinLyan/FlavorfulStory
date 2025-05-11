@@ -19,9 +19,7 @@ namespace FlavorfulStory.InventorySystem
         /// <summary> Синглтон инвентаря игрока. </summary>
         private static Inventory _playerInventory;
         
-        //TODO: Delete
-        private PickupNotificationManager _notificationManager;
-        //TODO: Delete
+        private ItemPickupNotificationManager _notificationManager;
 
         /// <summary> Синглтон инвентаря игрока. </summary>
         public static Inventory PlayerInventory =>
@@ -36,15 +34,7 @@ namespace FlavorfulStory.InventorySystem
             _slots = new InventorySlot[InventorySize];
             _playerInventory = PlayerInventory;
             
-            //TODO: Delete
-            _notificationManager = FindFirstObjectByType<PickupNotificationManager>();
-            
-            print(_notificationManager);
-        }
-
-        private void Start()
-        {
-            
+            _notificationManager = FindFirstObjectByType<ItemPickupNotificationManager>();
         }
 
         /// <summary> Есть ли место для предмета в инвентаре? </summary>
@@ -162,10 +152,9 @@ namespace FlavorfulStory.InventorySystem
                 _slots[index].Number += addAmount;
                 remainingNumber -= addAmount;
             }
-
-            ///TODO: DElete
+            
             _notificationManager.ShowNotification(item.Icon, number, item.ItemName, item.ItemName);
-            ///TODO: DElete
+            
             InventoryUpdated?.Invoke();
             return true;
         }
