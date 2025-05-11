@@ -1,13 +1,14 @@
+using System;
 using System.Linq;
+using FlavorfulStory.SceneManagement;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
-using FlavorfulStory.SceneManagement;
 
 namespace FlavorfulStory.UI
 {
     /// <summary> UI главного меню. </summary>
-    public class MainMenuUI : MonoBehaviour
+    public class MainMenu : MonoBehaviour
     {
         /// <summary> Поля ввода, которые игрок заполняет при запуске новой игры. </summary>
         [SerializeField] private TMP_InputField[] _newGameInputFields;
@@ -19,17 +20,23 @@ namespace FlavorfulStory.UI
         [SerializeField] private TMP_Text _errorText;
 
         /// <summary> Кнопка продолжения игры. </summary>
-        /// <remarks> Активна при условии существующего файла сохранения. </remarks>
+        /// <remarks> Отображается при условии существующего файла сохранения. </remarks>
         [SerializeField] private Button _continueGameButton;
+
+        /// <summary> Кнопка загрузки игры. </summary>
+        /// <remarks> Отображается при условии существующего файла сохранения. </remarks>
+        [SerializeField] private Button _loadGameButton;
 
         /// <summary> Название сохраненного файла для новой игры, формируемое на основе ввода игрока. </summary>
         /// <remarks> Название формируется путем соединения строк имени игрока и названия магазина. </remarks>
         private string NewGameSaveFileName => string.Concat(_newGameInputFields.Select(field => field.text));
 
-        /// <summary> Коллбэк из UnityAPI. </summary>
-        /// <remarks> Устанавливает кнопке продолжения игры неактивное состояние,
-        /// если отсутствует файл сохранения. </remarks>
-        private void Start() => _continueGameButton.interactable = SavingWrapper.SaveFileExists;
+        /// <summary> При старте включает отображение кнопок при условии существующего файла сохранения. </summary>
+        private void Start()
+        {
+            _continueGameButton.gameObject.SetActive(SavingWrapper.SaveFileExists);
+            _loadGameButton.gameObject.SetActive(SavingWrapper.SaveFileExists);
+        }
 
         /// <summary> Обрабатывает запуск новой игры. </summary>
         /// <remarks> Проверяет корректность заполнения полей ввода и, при успехе, 
@@ -46,12 +53,11 @@ namespace FlavorfulStory.UI
         {
             foreach (var inputField in _newGameInputFields)
             {
-                if (!InputFieldValidator.IsValid(inputField.text, out string warningMessage))
-                {
-                    _messageError.SetActive(true);
-                    _errorText.text = warningMessage;
-                    return false;
-                }
+                if (InputFieldValidator.IsValid(inputField.text, out string warningMessage)) continue;
+
+                _messageError.SetActive(true);
+                _errorText.text = warningMessage;
+                return false;
             }
 
             _messageError.SetActive(false);
@@ -68,12 +74,12 @@ namespace FlavorfulStory.UI
 
         /// <summary> Очистить текст во всех полях ввода. </summary>
         private void ClearInputFields() =>
-            System.Array.ForEach(_newGameInputFields, inputField => inputField.text = string.Empty);
+            Array.ForEach(_newGameInputFields, inputField => inputField.text = string.Empty);
 
         /// <summary> Продолжить ранее сохраненную игру. </summary>
         public void OnClickContinue() => PersistentObject.Instance.SavingWrapper.ContinueGame();
 
         /// <summary> Завершить работу приложения. </summary>
-        public void OnClickQuit() => Application.Quit();
+        public void OnClickExit() => Application.Quit();
     }
 }

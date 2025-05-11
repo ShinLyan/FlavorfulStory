@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
@@ -14,16 +15,13 @@ namespace FlavorfulStory.Saving
         /// <summary> Загрузка последней сцены. </summary>
         /// <param name="saveFile"> Название файла с сохранением. </param>
         /// <returns> Корутина, которая запускает асинхронную подгрузку сцены. </returns>
-        public static System.Collections.IEnumerator LoadLastScene(string saveFile)
+        public static IEnumerator LoadLastScene(string saveFile)
         {
-            Dictionary<string, object> state = LoadFile(saveFile);
+            var state = LoadFile(saveFile);
             if (state == null) yield break;
 
             int buildIndex = SceneManager.GetActiveScene().buildIndex;
-            if (state.ContainsKey("lastSceneBuildIndex"))
-            {
-                buildIndex = (int)state["lastSceneBuildIndex"];
-            }
+            if (state.TryGetValue("lastSceneBuildIndex", out object value)) buildIndex = (int)value;
 
             yield return SceneManager.LoadSceneAsync(buildIndex);
             RestoreState(state);
@@ -33,7 +31,7 @@ namespace FlavorfulStory.Saving
         /// <param name="saveFile"> Название файла, куда необходимо сохранить данные. </param>
         public static void Save(string saveFile)
         {
-            Dictionary<string, object> state = LoadFile(saveFile);
+            var state = LoadFile(saveFile);
             if (state == null) return;
 
             CaptureState(state);
@@ -71,7 +69,7 @@ namespace FlavorfulStory.Saving
             string path = GetPathFromSaveFile(saveFile);
             if (!File.Exists(path)) return new Dictionary<string, object>();
 
-            using (FileStream stream = File.Open(path, FileMode.Open))
+            using (var stream = File.Open(path, FileMode.Open))
             {
                 var formatter = new BinaryFormatter();
                 return formatter.Deserialize(stream) as Dictionary<string, object>;
@@ -85,7 +83,7 @@ namespace FlavorfulStory.Saving
         {
             string path = GetPathFromSaveFile(saveFile);
             print("Saving to " + path);
-            using (FileStream stream = File.Open(path, FileMode.Create))
+            using (var stream = File.Open(path, FileMode.Create))
             {
                 var formatter = new BinaryFormatter();
                 formatter.Serialize(stream, state);
@@ -96,10 +94,8 @@ namespace FlavorfulStory.Saving
         /// <param name="state"> Словарь, содержащий состояния всех объектов, которые необходимо зафиксировать. </param>
         private static void CaptureState(Dictionary<string, object> state)
         {
-            foreach (SaveableEntity saveable in FindObjectsByType<SaveableEntity>(FindObjectsSortMode.None))
-            {
+            foreach (var saveable in FindObjectsByType<SaveableEntity>(FindObjectsSortMode.None))
                 state[saveable.UniqueIdentifier] = saveable.CaptureState();
-            }
 
             state["lastSceneBuildIndex"] = SceneManager.GetActiveScene().buildIndex;
         }
@@ -110,10 +106,10 @@ namespace FlavorfulStory.Saving
         {
             if (state == null) return;
 
-            foreach (SaveableEntity saveable in FindObjectsByType<SaveableEntity>(FindObjectsSortMode.None))
+            foreach (var saveable in FindObjectsByType<SaveableEntity>(FindObjectsSortMode.None))
             {
                 string id = saveable.UniqueIdentifier;
-                if (state.ContainsKey(id)) saveable.RestoreState(state[id]);
+                if (state.TryGetValue(id, out object value)) saveable.RestoreState(value);
             }
         }
 

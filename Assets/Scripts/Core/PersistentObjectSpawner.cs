@@ -1,6 +1,4 @@
-﻿using FlavorfulStory.InputSystem;
-using FlavorfulStory.SceneManagement;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace FlavorfulStory.Core
 {
@@ -14,7 +12,7 @@ namespace FlavorfulStory.Core
         private GameObject _persistentObjectsPrefab;
 
         /// <summary> Был ли префаб уже создан? </summary>
-        private bool _hasSpawned;
+        private static bool _hasSpawned;
 
         /// <summary> Проверка и создание объекта при загрузке сцены. </summary>
         private void Awake()
@@ -22,8 +20,6 @@ namespace FlavorfulStory.Core
             if (_hasSpawned) return;
 
             SpawnPersistentObject();
-            LocationChanger.ActivatePlayerCurrentLocation();
-            InputWrapper.UnblockAllInput();
         }
 
         /// <summary> Создает постоянный объект и устанавливает его сохранение между сценами. </summary>

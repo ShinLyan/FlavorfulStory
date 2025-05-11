@@ -18,6 +18,8 @@ namespace FlavorfulStory.InventorySystem
 
         /// <summary> Синглтон инвентаря игрока. </summary>
         private static Inventory _playerInventory;
+        
+        private ItemPickupNotificationManager _notificationManager;
 
         /// <summary> Синглтон инвентаря игрока. </summary>
         public static Inventory PlayerInventory =>
@@ -31,6 +33,8 @@ namespace FlavorfulStory.InventorySystem
         {
             _slots = new InventorySlot[InventorySize];
             _playerInventory = PlayerInventory;
+            
+            _notificationManager = FindFirstObjectByType<ItemPickupNotificationManager>();
         }
 
         /// <summary> Есть ли место для предмета в инвентаре? </summary>
@@ -126,7 +130,7 @@ namespace FlavorfulStory.InventorySystem
                 _slots[slotIndex].Number += addAmount;
                 number -= addAmount;
             }
-
+            
             InventoryUpdated?.Invoke();
             return true;
         }
@@ -137,17 +141,20 @@ namespace FlavorfulStory.InventorySystem
         /// <returns> Возвращает True, если предмет можно добавить, False - в противном случае. </returns>
         public bool TryAddToFirstAvailableSlot(InventoryItem item, int number)
         {
-            while (number > 0)
+            var remainingNumber = number;
+            while (remainingNumber > 0)
             {
                 int index = FindSlot(item);
                 if (index < 0) return false;
 
-                int addAmount = Mathf.Min(number, item.StackSize - _slots[index].Number);
+                int addAmount = Mathf.Min(remainingNumber, item.StackSize - _slots[index].Number);
                 _slots[index].Item ??= item;
                 _slots[index].Number += addAmount;
-                number -= addAmount;
+                remainingNumber -= addAmount;
             }
-
+            
+            _notificationManager.ShowNotification(item.Icon, number, item.ItemName, item.ItemName);
+            
             InventoryUpdated?.Invoke();
             return true;
         }
