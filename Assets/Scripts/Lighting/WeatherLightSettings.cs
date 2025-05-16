@@ -10,9 +10,9 @@ namespace FlavorfulStory.Lightning
         /// <summary> Тип погоды, к которому применяются эти настройки освещения. </summary>
         [field: Tooltip("Тип погоды, к которому применяются эти настройки освещения."), SerializeField]
         public WeatherType WeatherType { get; private set; }
- 
+
         /// <summary> Настройки освещения (солнце и луна) для данного типа погоды. </summary>
         [field: Tooltip("Настройки освещения (солнце и луна) для данного типа погоды."), SerializeField]
-        public LightSettings LightSettings {get; private set;}
+        public LightSettings LightSettings { get; private set; }
     }
 }

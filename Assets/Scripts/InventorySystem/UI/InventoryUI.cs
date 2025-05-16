@@ -39,10 +39,7 @@ namespace FlavorfulStory.InventorySystem.UI
         /// <summary> Удаление всех существующих слотов инвентаря. </summary>
         private void DestroyAllSlots()
         {
-            foreach (Transform child in _placeToSpawnSlots)
-            {
-                Destroy(child.gameObject);
-            }
+            foreach (Transform child in _placeToSpawnSlots) Destroy(child.gameObject);
         }
 
         /// <summary> Создание новых слотов для отображения предметов инвентаря. </summary>

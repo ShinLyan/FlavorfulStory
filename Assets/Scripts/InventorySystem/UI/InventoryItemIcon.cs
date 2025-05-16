@@ -14,7 +14,7 @@ namespace FlavorfulStory.InventorySystem.UI
 
         /// <summary> Текст количества предметов. </summary>
         [SerializeField] private TMP_Text _itemNumberText;
-        
+
         /// <summary> Установить предмет инвентаря. </summary>
         /// <param name="item"> Предмет инвентаря. </param>
         /// <param name="number"> Количество предметов. </param>

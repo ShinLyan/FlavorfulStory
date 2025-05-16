@@ -19,6 +19,6 @@ namespace FlavorfulStory.InventorySystem.EquipmentSystem
         Trousers,
 
         /// <summary> Ботинки. </summary>
-        Boots,
+        Boots
     }
 }
