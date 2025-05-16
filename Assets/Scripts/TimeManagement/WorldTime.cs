@@ -27,7 +27,7 @@ namespace FlavorfulStory.TimeManagement
         private const int NightStartHour = 18;
 
         /// <summary> Текущее игровое время. </summary>
-        private static DateTime _currentGameTime;
+        public static DateTime CurrentGameTime { get; private set; }
 
         /// <summary> Игра на паузе? </summary>
         private static bool _isPaused;
@@ -53,13 +53,26 @@ namespace FlavorfulStory.TimeManagement
         #endregion
 
         /// <summary> Инициализировать начальное игровое время. </summary>
-        private void Awake() => _currentGameTime = new DateTime(1, Season.Spring, 1, _dayStartHour, 0);
+        private void Awake() => CurrentGameTime = new DateTime(1, Season.Spring, 1, _dayStartHour, 0);
 
         /// <summary> Вызвать обновление UI при старте. </summary>
         private void Start()
         {
-            OnTimeUpdated?.Invoke(_currentGameTime);
-            OnTimeTick?.Invoke(_currentGameTime);
+            OnTimeUpdated?.Invoke(CurrentGameTime);
+            OnTimeTick?.Invoke(CurrentGameTime);
+        }
+
+        private void OnDestroy()
+        {
+            CurrentGameTime = default;
+            _isPaused = false;
+
+            OnTimeUpdated = null;
+            OnDayEnded = null;
+            OnNightStarted = null;
+            OnTimeTick = null;
+            OnTimePaused = null;
+            OnTimeUnpaused = null;
         }
 
         /// <summary> Обновить игровое время, если не стоит пауза. </summary>
@@ -67,34 +80,34 @@ namespace FlavorfulStory.TimeManagement
         {
             if (_isPaused) return;
 
-            var previousTime = _currentGameTime;
+            var previousTime = CurrentGameTime;
             float gameMinutesToAdd = Time.deltaTime * _timeScale;
-            _currentGameTime = _currentGameTime.AddMinutes(gameMinutesToAdd);
+            CurrentGameTime = CurrentGameTime.AddMinutes(gameMinutesToAdd);
 
-            if (previousTime.Hour < NightStartHour && _currentGameTime.Hour >= NightStartHour)
-                OnNightStarted?.Invoke(_currentGameTime);
+            if (previousTime.Hour < NightStartHour && CurrentGameTime.Hour >= NightStartHour)
+                OnNightStarted?.Invoke(CurrentGameTime);
 
-            if (previousTime.Hour < _dayEndHour && _currentGameTime.Hour >= _dayEndHour)
+            if (previousTime.Hour < _dayEndHour && CurrentGameTime.Hour >= _dayEndHour)
             {
                 BeginNewDay();
-                OnDayEnded?.Invoke(_currentGameTime);
+                OnDayEnded?.Invoke(CurrentGameTime);
             }
 
-            if ((int)_currentGameTime.Minute % _timeBetweenTicks == 0) OnTimeTick?.Invoke(_currentGameTime);
+            if ((int)CurrentGameTime.Minute % _timeBetweenTicks == 0) OnTimeTick?.Invoke(CurrentGameTime);
 
 
-            OnTimeUpdated?.Invoke(_currentGameTime);
+            OnTimeUpdated?.Invoke(CurrentGameTime);
         }
 
         /// <summary> Обновляет время до начала нового дня в зависимости от текущего времени. </summary>
         private void BeginNewDay()
         {
-            bool isSameDay = 0f <= _currentGameTime.Hour && _currentGameTime.Hour < _dayStartHour;
+            bool isSameDay = 0f <= CurrentGameTime.Hour && CurrentGameTime.Hour < _dayStartHour;
             int dayAdjustment = isSameDay ? 0 : 1;
-            _currentGameTime = new DateTime(
-                _currentGameTime.Year,
-                _currentGameTime.Season,
-                _currentGameTime.SeasonDay + dayAdjustment,
+            CurrentGameTime = new DateTime(
+                CurrentGameTime.Year,
+                CurrentGameTime.Season,
+                CurrentGameTime.SeasonDay + dayAdjustment,
                 _dayStartHour,
                 0
             );
@@ -114,18 +127,14 @@ namespace FlavorfulStory.TimeManagement
             OnTimeUnpaused?.Invoke();
         }
 
-        /// <summary> Получить текущее игровое время. </summary>
-        /// <returns> Текущее игрвоое время. </returns>
-        public static DateTime GetCurrentGameTime() => _currentGameTime;
-
         #region Saving
 
         /// <summary> Сохраняет текущее игровое время. </summary>
-        public object CaptureState() => _currentGameTime;
+        public object CaptureState() => CurrentGameTime;
 
         /// <summary> Восстанавливает игровое время из сохранённого состояния. </summary>
         /// <param name="state"> Сохранённое значение игрового времени. </param>
-        public void RestoreState(object state) => _currentGameTime = (DateTime)state;
+        public void RestoreState(object state) => CurrentGameTime = (DateTime)state;
 
         #endregion
     }
