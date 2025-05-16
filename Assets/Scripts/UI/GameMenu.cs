@@ -61,7 +61,7 @@ namespace FlavorfulStory.UI
 
         /// <summary> Переключает состояние видимости меню. </summary>
         /// <param name="isEnabled"> Новое состояние видимости меню. </param>
-        private void SwitchContent(bool isEnabled)
+        public void SwitchContent(bool isEnabled)
         {
             if (isEnabled)
             {

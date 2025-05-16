@@ -46,7 +46,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine
             InitializeStates(animator, npcTransform, navMeshAgent, coroutineRunner);
 
             WorldTime.OnDayEnded += OnReset;
-            OnReset(WorldTime.GetCurrentGameTime());
+            OnReset(WorldTime.CurrentGameTime);
         }
 
         /// <summary> Инициализировать состояния. </summary>
