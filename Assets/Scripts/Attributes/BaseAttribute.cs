@@ -24,11 +24,9 @@ namespace FlavorfulStory.Attributes
             CurrentValue = Mathf.Clamp(CurrentValue + delta, 0, MaxValue);
             OnValueChanged?.Invoke(CurrentValue, delta);
 
-            if (CurrentValue <= 0f)
-                OnReachedZero?.Invoke();
+            if (CurrentValue <= 0f) OnReachedZero?.Invoke();
 
-            if (Mathf.Approximately(CurrentValue, MaxValue))
-                OnMaxValueChanged?.Invoke(CurrentValue, MaxValue);
+            if (Mathf.Approximately(CurrentValue, MaxValue)) OnMaxValueChanged?.Invoke(CurrentValue, MaxValue);
         }
 
         public virtual void SetValue(float value)

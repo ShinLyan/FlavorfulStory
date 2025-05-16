@@ -14,12 +14,11 @@ namespace FlavorfulStory.Attributes
             {
                 Debug.LogError($"{attribute?.GetType().Name}.{nameof(Bind)}: attribute is null or view is null");
                 return;
-            } 
-            
+            }
+
             attribute.OnValueChanged += view.HandleAttributeChange;
             attribute.OnReachedZero += view.HandleAttributeReachZero;
             attribute.OnMaxValueChanged += view.HandleAttributeMaxValueChanged;
-            
         }
 
         /// <summary> Отписывает представление от событий изменения атрибута. </summary>
@@ -31,8 +30,8 @@ namespace FlavorfulStory.Attributes
             {
                 Debug.LogError($"{attribute?.GetType().Name}.{nameof(Bind)}: attribute is null or view is null");
                 return;
-            } 
-            
+            }
+
             attribute.OnValueChanged -= view.HandleAttributeChange;
             attribute.OnReachedZero -= view.HandleAttributeReachZero;
             attribute.OnMaxValueChanged -= view.HandleAttributeMaxValueChanged;

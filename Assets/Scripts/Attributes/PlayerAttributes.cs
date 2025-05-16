@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using FlavorfulStory.Saving;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace FlavorfulStory.Attributes
 {
@@ -17,9 +16,9 @@ namespace FlavorfulStory.Attributes
 
         /// <summary> Коллекция всех атрибутов, привязанных к типу. </summary>
         private readonly Dictionary<Type, IAttribute> _attributes = new();
-        
+
         private AttributesData? _loadedData;
-        
+
         private void Awake()
         {
             if (_loadedData.HasValue)
@@ -27,7 +26,8 @@ namespace FlavorfulStory.Attributes
                 var data = _loadedData.Value;
 
                 Register(new HealthAttribute(data.HpMaxValue, data.HpCurrentValue), _healthView);
-                Register(new StaminaAttribute(data.staminaMaxValue, data.staminaCurrentValue, data.staminaRegenRate), _staminaView);
+                Register(new StaminaAttribute(data.staminaMaxValue, data.staminaCurrentValue, data.staminaRegenRate),
+                    _staminaView);
             }
             else
             {
@@ -45,10 +45,8 @@ namespace FlavorfulStory.Attributes
         private void OnDestroy()
         {
             foreach (var attributeKVP in _attributes)
-            {
                 if (TryGetView(attributeKVP.Key, out var view))
                     AttributeBinder.Unbind(attributeKVP.Value, view);
-            }
         }
 
         private void RegisterAttributes()
@@ -61,7 +59,7 @@ namespace FlavorfulStory.Attributes
         {
             _attributes[typeof(T)] = attribute;
             AttributeBinder.Bind(attribute, view);
-            view.InitializeView(attribute.CurrentValue, attribute.MaxValue);
+            view.Initialize(attribute.CurrentValue, attribute.MaxValue);
         }
 
         public T GetAttribute<T>() where T : class, IAttribute =>
@@ -79,8 +77,10 @@ namespace FlavorfulStory.Attributes
             return view != null;
         }
 
+        #region ISaveable
+
         [Serializable]
-        struct AttributesData
+        private struct AttributesData
         {
             public float HpCurrentValue;
             public float HpMaxValue;
@@ -88,7 +88,7 @@ namespace FlavorfulStory.Attributes
             public float staminaMaxValue;
             public float staminaRegenRate;
         }
-        
+
         public object CaptureState()
         {
             var health = GetAttribute<HealthAttribute>();
@@ -106,10 +106,9 @@ namespace FlavorfulStory.Attributes
 
         public void RestoreState(object state)
         {
-            if (state is AttributesData data)
-            {
-                _loadedData = data;
-            }
+            if (state is AttributesData data) _loadedData = data;
         }
+
+        #endregion
     }
 }

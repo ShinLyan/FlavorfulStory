@@ -1,4 +1,3 @@
-using System.Globalization;
 using FlavorfulStory.Attributes;
 using TMPro;
 using UnityEngine;
@@ -11,21 +10,23 @@ namespace FlavorfulStory
     {
         [Header("Inspector refs")]
         [SerializeField] private RectTransform _contentRect;
+
         [SerializeField] private Image _fillImage;
         [SerializeField] private Transform _textParent;
         [SerializeField] private TMP_Text _currentValueText;
         [SerializeField] private TMP_Text _maxValueText;
-        
+
         [Header("Settings")]
-        [SerializeField] private bool _alwaysShowValues; 
+        [SerializeField] private bool _alwaysShowValues;
+
         [SerializeField] private float _baseBarWidth = 200f;
         [SerializeField] private float _maxScaleMultiplier = 2f;
         [SerializeField] private float _minPossibleValue = 100f;
         [SerializeField] private float _maxPossibleValue = 200f;
-        
+
         private float _maxValue;
 
-        public override void InitializeView(float currentValue, float maxValue)
+        public override void Initialize(float currentValue, float maxValue)
         {
             _maxValue = maxValue;
             UpdateBarWidth(maxValue);
@@ -38,10 +39,7 @@ namespace FlavorfulStory
             UpdateCurrentValue(currentValue);
         }
 
-        public override void HandleAttributeReachZero()
-        {
-            UpdateCurrentValue(0f);
-        }
+        public override void HandleAttributeReachZero() { UpdateCurrentValue(0f); }
 
         public override void HandleAttributeMaxValueChanged(float currentValue, float maxValue)
         {
@@ -53,14 +51,12 @@ namespace FlavorfulStory
 
         public void OnPointerEnter(PointerEventData eventData)
         {
-            if (!_alwaysShowValues)
-                UpdateTextVisibility(true);
+            if (!_alwaysShowValues) UpdateTextVisibility(true);
         }
 
         public void OnPointerExit(PointerEventData eventData)
         {
-            if (!_alwaysShowValues)
-                UpdateTextVisibility(false);
+            if (!_alwaysShowValues) UpdateTextVisibility(false);
         }
 
         private void UpdateVisual(float current, float max)
@@ -92,10 +88,10 @@ namespace FlavorfulStory
             _contentRect.sizeDelta = size;
         }
 
-        protected virtual string FormatValue(float value)
+        private static string FormatValue(float value)
         {
             // Ну пздец
-            return ((int) value).ToString();
+            return ((int)value).ToString();
         }
     }
 }

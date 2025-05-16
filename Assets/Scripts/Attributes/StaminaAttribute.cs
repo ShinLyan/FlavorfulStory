@@ -13,8 +13,7 @@
 
         public void TickRegen(float deltaTime)
         {
-            if (CurrentValue < MaxValue)
-                Change(RegenRate * deltaTime);
+            if (CurrentValue < MaxValue) Change(RegenRate * deltaTime);
         }
     }
 }

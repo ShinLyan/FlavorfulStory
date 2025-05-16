@@ -21,6 +21,6 @@ namespace FlavorfulStory.Attributes
         /// <summary> Инициализирует отображение атрибута начальными значениями. </summary>
         /// <param name="currentValue"> Начальное текущее значение атрибута. </param>
         /// <param name="maxValue"> Начальное максимальное значение атрибута. </param>
-        public abstract void InitializeView(float currentValue, float maxValue);
+        public abstract void Initialize(float currentValue, float maxValue);
     }
 }

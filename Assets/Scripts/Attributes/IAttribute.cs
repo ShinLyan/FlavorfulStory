@@ -25,7 +25,7 @@ namespace FlavorfulStory.Attributes
 
         /// <summary> Событие, вызываемое при инициализации атрибута. </summary>
         event Action OnInitialized;
-        
+
         /// <summary> Событие, вызываемое при изменении текущего значения. </summary>
         event Action<float, float> OnValueChanged;
 

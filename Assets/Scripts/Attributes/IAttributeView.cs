@@ -19,6 +19,6 @@
         /// <summary> Инициализирует представление начальными значениями атрибута. </summary>
         /// <param name="currentValue"> Начальное текущее значение. </param>
         /// <param name="maxValue"> Начальное максимальное значение. </param>
-        void InitializeView(float currentValue, float maxValue);
+        void Initialize(float currentValue, float maxValue);
     }
 }
