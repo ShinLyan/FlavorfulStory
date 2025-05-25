@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 4185133068772401190}
   - component: {fileID: 1217464923912406356}
   - component: {fileID: 8789084175571030685}
+  - component: {fileID: 9100362598460386246}
   m_Layer: 6
   m_Name: Tree
   m_TagString: Untagged
@@ -85,7 +86,7 @@ MonoBehaviour:
     - ItemPrefab: {fileID: 11400000, guid: c105c0283ae6d95488d48924be055535, type: 2}
       Quantity: 15
     <RequiredHits>k__BackingField: 5
-  _destroyDelay: 4
+  _destroyDelay: 0
   _toolsToBeHit: 00000000
   <SfxType>k__BackingField: 0
 --- !u!114 &1217464923912406356
@@ -116,6 +117,19 @@ NavMeshObstacle:
   m_CarveOnlyStationary: 1
   m_Center: {x: 0, y: 0, z: 0}
   m_TimeToStationary: 0.5
+--- !u!114 &9100362598460386246
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2504854051262580730}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 953bbcb14f0a7104191d3d60861e9ba9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _effectProfile: {fileID: 11400000, guid: 64e46f6b53dc2034582adcea05022310, type: 2}
 --- !u!1001 &1885792759039754483
 PrefabInstance:
   m_ObjectHideFlags: 0

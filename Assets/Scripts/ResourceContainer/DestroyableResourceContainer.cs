@@ -12,7 +12,7 @@ namespace FlavorfulStory.ResourceContainer
 {
     /// <summary> Добываемый объект. </summary>
     /// <remarks> Реализует интерфейсы <see cref="IHitable" /> и <see cref="IDestroyable" />. </remarks>
-    [RequireComponent(typeof(ItemDropper), typeof(ObjectSwitcher))]
+    [RequireComponent(typeof(ItemDropper), typeof(ObjectSwitcher)), RequireComponent(typeof(DestructionEffectsPlayer))]
     public class DestroyableResourceContainer : MonoBehaviour, IHitable, IDestroyable
     {
         #region Fields and Properties
@@ -106,6 +106,7 @@ namespace FlavorfulStory.ResourceContainer
 
             IsDestroyed = true;
             OnObjectDestroyed?.Invoke(this);
+            GetComponent<DestructionEffectsPlayer>()?.PlayEffects();
             StartCoroutine(DestroyGameObjectAfterDelay(destroyDelay));
         }
 

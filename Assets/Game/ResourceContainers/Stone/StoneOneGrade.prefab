@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 5058554141972890885}
   - component: {fileID: 4426246605376126007}
   - component: {fileID: 3045570177280604803}
+  - component: {fileID: 3741237775266268476}
   m_Layer: 6
   m_Name: StoneOneGrade
   m_TagString: Untagged
@@ -78,7 +79,7 @@ MonoBehaviour:
     - ItemPrefab: {fileID: 11400000, guid: 3e31ae779574be343a52d151fa604692, type: 2}
       Quantity: 10
     <RequiredHits>k__BackingField: 3
-  _destroyDelay: 4
+  _destroyDelay: 0
   _toolsToBeHit: 01000000
   <SfxType>k__BackingField: 1
 --- !u!208 &3045570177280604803
@@ -97,6 +98,19 @@ NavMeshObstacle:
   m_CarveOnlyStationary: 1
   m_Center: {x: 0, y: 0, z: 0}
   m_TimeToStationary: 0.5
+--- !u!114 &3741237775266268476
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6864038402131264558}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 953bbcb14f0a7104191d3d60861e9ba9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _effectProfile: {fileID: 11400000, guid: f44d7a6c99c449f4caf0a06949f4a37e, type: 2}
 --- !u!1001 &7521414104425344330
 PrefabInstance:
   m_ObjectHideFlags: 0

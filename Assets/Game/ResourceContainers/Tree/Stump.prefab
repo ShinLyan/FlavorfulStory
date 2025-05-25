@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: -5867076748924092305}
   - component: {fileID: -8415494727045516929}
   - component: {fileID: 1883213228093231142}
+  - component: {fileID: 6937217377432528247}
   m_Layer: 6
   m_Name: Stump
   m_TagString: Untagged
@@ -78,7 +79,7 @@ MonoBehaviour:
     - ItemPrefab: {fileID: 11400000, guid: c105c0283ae6d95488d48924be055535, type: 2}
       Quantity: 5
     <RequiredHits>k__BackingField: 4
-  _destroyDelay: 4
+  _destroyDelay: 0
   _toolsToBeHit: 00000000
   <SfxType>k__BackingField: 0
 --- !u!208 &1883213228093231142
@@ -97,6 +98,19 @@ NavMeshObstacle:
   m_CarveOnlyStationary: 1
   m_Center: {x: 0.002329707, y: -0.02865146, z: -0.0002281964}
   m_TimeToStationary: 0.5
+--- !u!114 &6937217377432528247
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1844832195497820}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 953bbcb14f0a7104191d3d60861e9ba9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _effectProfile: {fileID: 11400000, guid: 64e46f6b53dc2034582adcea05022310, type: 2}
 --- !u!1001 &385246135605526905
 PrefabInstance:
   m_ObjectHideFlags: 0
