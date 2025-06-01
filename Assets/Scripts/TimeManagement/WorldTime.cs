@@ -50,6 +50,8 @@ namespace FlavorfulStory.TimeManagement
         /// <summary> Вызывается при снятии паузы времени. </summary>
         public static Action OnTimeUnpaused;
 
+        private static Action OnForceEndDay;
+
         #endregion
 
         /// <summary> Инициализировать начальное игровое время. </summary>
@@ -60,6 +62,7 @@ namespace FlavorfulStory.TimeManagement
         {
             OnTimeUpdated?.Invoke(CurrentGameTime);
             OnTimeTick?.Invoke(CurrentGameTime);
+            OnForceEndDay += BeginNewDay;
         }
 
         private void OnDestroy()
@@ -81,17 +84,13 @@ namespace FlavorfulStory.TimeManagement
             if (_isPaused) return;
 
             var previousTime = CurrentGameTime;
-            float gameMinutesToAdd = Time.deltaTime * _timeScale;
+            var gameMinutesToAdd = Time.deltaTime * _timeScale;
             CurrentGameTime = CurrentGameTime.AddMinutes(gameMinutesToAdd);
 
             if (previousTime.Hour < NightStartHour && CurrentGameTime.Hour >= NightStartHour)
                 OnNightStarted?.Invoke(CurrentGameTime);
 
-            if (previousTime.Hour < _dayEndHour && CurrentGameTime.Hour >= _dayEndHour)
-            {
-                BeginNewDay();
-                OnDayEnded?.Invoke(CurrentGameTime);
-            }
+            if (previousTime.Hour < _dayEndHour && CurrentGameTime.Hour >= _dayEndHour) BeginNewDay();
 
             if ((int)CurrentGameTime.Minute % _timeBetweenTicks == 0) OnTimeTick?.Invoke(CurrentGameTime);
 
@@ -102,8 +101,8 @@ namespace FlavorfulStory.TimeManagement
         /// <summary> Обновляет время до начала нового дня в зависимости от текущего времени. </summary>
         private void BeginNewDay()
         {
-            bool isSameDay = 0f <= CurrentGameTime.Hour && CurrentGameTime.Hour < _dayStartHour;
-            int dayAdjustment = isSameDay ? 0 : 1;
+            var isSameDay = 0f <= CurrentGameTime.Hour && CurrentGameTime.Hour < _dayStartHour;
+            var dayAdjustment = isSameDay ? 0 : 1;
             CurrentGameTime = new DateTime(
                 CurrentGameTime.Year,
                 CurrentGameTime.Season,
@@ -111,7 +110,11 @@ namespace FlavorfulStory.TimeManagement
                 _dayStartHour,
                 0
             );
+
+            OnDayEnded?.Invoke(CurrentGameTime);
         }
+
+        public static void ForceEndDay() => OnForceEndDay?.Invoke();
 
         /// <summary> Поставить игровое время на паузу. </summary>
         public static void Pause()
