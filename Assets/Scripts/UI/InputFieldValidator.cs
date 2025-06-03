@@ -49,7 +49,7 @@ namespace FlavorfulStory.UI
             };
 
             // Проверяем каждое условие
-            foreach (var (condition, errorMessage) in checks)
+            foreach ((var condition, string errorMessage) in checks)
             {
                 if (!condition()) continue;
                 warningMessage = errorMessage;

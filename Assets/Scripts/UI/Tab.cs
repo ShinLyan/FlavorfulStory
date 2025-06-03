@@ -12,7 +12,7 @@ namespace FlavorfulStory.UI
 
         /// <summary> Контент, отображаемый при активной вкладке. </summary>
         [SerializeField] private GameObject _tabContent;
-        
+
         /// <summary> Индекс вкладки в наборе вкладок. </summary>
         private int _index;
 
@@ -23,7 +23,7 @@ namespace FlavorfulStory.UI
         /// <summary> Событие, вызываемое при выборе вкладки. </summary>
         ///<remarks> Передает индекс выбранной вкладки. </remarks>
         public event Action<int> OnTabSelected;
-        
+
         /// <summary> Инициализирует обработчик события клика по кнопке вкладки. </summary>
         private void Awake()
         {

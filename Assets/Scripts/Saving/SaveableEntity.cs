@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 namespace FlavorfulStory.Saving
@@ -19,9 +21,7 @@ namespace FlavorfulStory.Saving
         {
             var state = new Dictionary<string, object>();
             foreach (var saveable in GetComponents<ISaveable>())
-            {
                 state[saveable.GetType().ToString()] = saveable.CaptureState();
-            }
             return state;
         }
 
@@ -35,14 +35,12 @@ namespace FlavorfulStory.Saving
             foreach (var saveable in GetComponents<ISaveable>())
             {
                 string typeString = saveable.GetType().ToString();
-                if (stateDict.ContainsKey(typeString))
-                {
-                    saveable.RestoreState(stateDict[typeString]);
-                }
+                if (stateDict.ContainsKey(typeString)) saveable.RestoreState(stateDict[typeString]);
             }
         }
 
         #region Setting GUID
+
 #if UNITY_EDITOR
         /// <summary> База данных GUID всех сохраняемых объектов на сцене. </summary>
         private static readonly Dictionary<string, SaveableEntity> _saveableEntityDatabase = new();
@@ -61,13 +59,14 @@ namespace FlavorfulStory.Saving
         /// <summary> Выставление GUID сущности на сцене. </summary>
         private void SetUniqueIdentifier()
         {
-            var serializedObject = new UnityEditor.SerializedObject(this);
+            var serializedObject = new SerializedObject(this);
             var property = serializedObject.FindProperty(nameof(_uniqueIdentifier));
             if (string.IsNullOrEmpty(property.stringValue) || !IsUnique(property.stringValue))
             {
-                property.stringValue = System.Guid.NewGuid().ToString();
+                property.stringValue = Guid.NewGuid().ToString();
                 serializedObject.ApplyModifiedProperties();
             }
+
             _saveableEntityDatabase[property.stringValue] = this;
         }
 
@@ -85,9 +84,11 @@ namespace FlavorfulStory.Saving
                 _saveableEntityDatabase.Remove(candidate);
                 return true;
             }
+
             return false;
         }
 #endif
+
         #endregion
     }
 }

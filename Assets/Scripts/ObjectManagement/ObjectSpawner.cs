@@ -195,8 +195,7 @@ namespace FlavorfulStory.ObjectManagement
         /// <summary> Уничтожить заспавненные объекты. </summary>
         protected void DestroySpawnedObjects()
         {
-            foreach (var spawnedObject in _spawnedObjects)
-                Destroy(spawnedObject);
+            foreach (var spawnedObject in _spawnedObjects) Destroy(spawnedObject);
 
             _spawnedObjects.Clear();
         }

@@ -69,8 +69,10 @@ namespace FlavorfulStory.InteractionSystem
         /// <summary> Обновить тултип. </summary>
         private void UpdateTooltip()
         {
-            if (_closestInteractable != null) _tooltipView.Show(_closestInteractable);
-            else _tooltipView.Hide();
+            if (_closestInteractable != null)
+                _tooltipView.Show(_closestInteractable);
+            else
+                _tooltipView.Hide();
         }
 
         /// <summary> Добавляет объект в список доступных для взаимодействия при входе в триггер. </summary>

@@ -37,7 +37,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         private readonly LocationName _spawnLocation;
 
         /// <summary> Хэш параметра скорости анимации. </summary>
-        private static readonly int _speedParameterHash = Animator.StringToHash("Speed");
+        private readonly int _speedParameterHash = Animator.StringToHash("Speed");
 
         /// <summary> Текущее активное расписание NPC. </summary>
         private ScheduleParams _currentScheduleParams;
@@ -95,7 +95,9 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         }
 
         /// <summary> Вызывается при входе в состояние движения. </summary>
-        public override void Enter() { }
+        public override void Enter()
+        {
+        }
 
         /// <summary> Вызывается при выходе из состояния движения. </summary>
         public override void Exit() => StopMovementWithoutWarp();

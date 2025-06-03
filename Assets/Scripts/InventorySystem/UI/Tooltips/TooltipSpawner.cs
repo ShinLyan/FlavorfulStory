@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 using UnityEngine.EventSystems;
 
 namespace FlavorfulStory.InventorySystem.UI.Tooltips
@@ -56,7 +57,7 @@ namespace FlavorfulStory.InventorySystem.UI.Tooltips
             _tooltipCoroutine = StartCoroutine(ShowTooltipWithDelay());
         }
 
-        private System.Collections.IEnumerator ShowTooltipWithDelay()
+        private IEnumerator ShowTooltipWithDelay()
         {
             yield return new WaitForSeconds(TooltipDelay);
 
@@ -113,7 +114,7 @@ namespace FlavorfulStory.InventorySystem.UI.Tooltips
             (true, false) => 0, // Левый нижний угол
             (false, false) => 1, // Левый верхний угол
             (false, true) => 2, // Правый верхний угол
-            (true, true) => 3, // Правый нижний угол
+            (true, true) => 3 // Правый нижний угол
         };
 
         /// <summary> Вызывается при уводе курсора с объекта UI. </summary>

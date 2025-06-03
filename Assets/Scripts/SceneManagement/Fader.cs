@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 namespace FlavorfulStory.SceneManagement
@@ -55,7 +56,7 @@ namespace FlavorfulStory.SceneManagement
         /// <summary> Процесс анимации прозрачности CanvasGroup. </summary>
         /// <param name="target"> Целевое значение прозрачности. </param>
         /// <param name="time"> Время анимации. </param>
-        private System.Collections.IEnumerator FadeRoutine(float target, float time)
+        private IEnumerator FadeRoutine(float target, float time)
         {
             _canvasGroup.blocksRaycasts = true;
             while (!Mathf.Approximately(_canvasGroup.alpha, target))

@@ -18,8 +18,7 @@ namespace FlavorfulStory.Utils
             var ray = CameraUtils.GetScreenPointRay(screenPoint);
             hitPoint = Vector3.zero;
 
-            if (!Physics.Raycast(ray, out var hit, 100f, layers & ~(1 << IgnoreLayer)))
-                return false;
+            if (!Physics.Raycast(ray, out var hit, 100f, layers & ~(1 << IgnoreLayer))) return false;
 
             hitPoint = hit.point;
             return true;

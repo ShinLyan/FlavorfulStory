@@ -1,10 +1,11 @@
+using System;
 using FlavorfulStory.InventorySystem;
 using UnityEngine;
 
 namespace FlavorfulStory.Actions
 {
     /// <summary> Данные о предмете, выпадающем при взаимодействии. </summary>
-    [System.Serializable]
+    [Serializable]
     public class DropItem
     {
         /// <summary> Префаб предмета, который будет создан. </summary>

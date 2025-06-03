@@ -33,6 +33,12 @@ namespace FlavorfulStory.InventorySystem
             _playerInventory = PlayerInventory;
         }
 
+        /// <summary> При уничтожении объекта обнулять статические поля. </summary>
+        private void OnDestroy()
+        {
+            _playerInventory = null;
+        }
+
         /// <summary> Есть ли место для предмета в инвентаре? </summary>
         public bool HasSpaceFor(InventoryItem item) => FindSlot(item) >= 0;
 

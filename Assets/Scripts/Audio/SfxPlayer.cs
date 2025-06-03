@@ -24,7 +24,6 @@ namespace FlavorfulStory.Audio
             if (!Instance)
             {
                 Instance = this;
-                DontDestroyOnLoad(gameObject);
             }
             else
             {

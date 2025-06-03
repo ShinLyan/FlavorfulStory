@@ -38,8 +38,7 @@ namespace FlavorfulStory.ObjectManagement
         /// <param name="index"> Индекс грейда. </param>
         public void SwitchTo(int index)
         {
-            for (int i = 0; i < _spawnedObjects.Count; i++)
-                _spawnedObjects[i].SetActive(i == index);
+            for (int i = 0; i < _spawnedObjects.Count; i++) _spawnedObjects[i].SetActive(i == index);
         }
     }
 }

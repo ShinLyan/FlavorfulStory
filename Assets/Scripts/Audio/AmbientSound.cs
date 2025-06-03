@@ -19,7 +19,16 @@ namespace FlavorfulStory.Audio
         private void Awake() => _source = GetComponent<AudioSource>();
 
         /// <summary> Запуск воспроизведения треков. </summary>
-        private void Start() => StartCoroutine(PlayTracks());
+        private void Start()
+        {
+            if (_trackList == null || _trackList.Count == 0)
+            {
+                Debug.LogError("Не добавлены треки");
+                return;
+            }
+
+            StartCoroutine(PlayTracks());
+        }
 
         /// <summary> Воспроизведение треков из списка в случайном порядке. </summary>
         /// <returns> Инструкции кода между блоками Yield. </returns>
@@ -35,11 +44,12 @@ namespace FlavorfulStory.Audio
                 }
             }
         }
-        
+
         /// <summary> Получить перемешанный список треков. </summary>
         /// <returns> Перемешанный список треков. </returns>
-        private IEnumerable<AudioClip> GetShuffledTrackList() => _trackList.OrderBy(_ =>  Random.Range(0, _trackList.Count));
-        
+        private IEnumerable<AudioClip> GetShuffledTrackList() =>
+            _trackList.OrderBy(_ => Random.Range(0, _trackList.Count));
+
         /// <summary> Воспроизведение указанного трека. </summary>
         /// <param name="audioClip"> Трек, который нужно воспроизвести. </param>
         private void PlayTrack(AudioClip audioClip)
