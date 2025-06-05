@@ -12,8 +12,10 @@
         /// <summary> Анимация использования топора. </summary>
         UseAxe,
 
+        /// <summary> Анимация взаимодействия с животным (глажение). </summary>
         PettingAnimal,
 
+        /// <summary> Анимация питья. </summary>
         Drinking
     }
 }
