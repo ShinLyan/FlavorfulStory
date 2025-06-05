@@ -3,6 +3,7 @@ using FlavorfulStory.InteractionSystem;
 using FlavorfulStory.InventorySystem;
 using FlavorfulStory.Player;
 using UnityEngine;
+using Zenject;
 
 namespace FlavorfulStory.Actions.Interactables
 {
@@ -21,6 +22,17 @@ namespace FlavorfulStory.Actions.Interactables
         /// <summary> Описание объекта, отображаемое в тултипе. </summary>
         [Tooltip("Описание объекта для отображения в интерфейсе."), SerializeField]
         private string _description = "Press E, if hungry";
+
+        /// <summary> Инвентарь игрока. </summary>
+        private Inventory _playerInventory;
+
+        /// <summary> Внедрение зависимости — инвентарь игрока. </summary>
+        /// <param name="inventory"> Инвентарь игрока. </param>
+        [Inject]
+        private void Construct(Inventory inventory)
+        {
+            _playerInventory = inventory;
+        }
 
         #region IInteractable
 
@@ -44,12 +56,14 @@ namespace FlavorfulStory.Actions.Interactables
             IsInteractionAllowed = false;
 
             foreach (var dropItem in _harvestItems)
-                Inventory.PlayerInventory.TryAddToFirstAvailableSlot(dropItem.ItemPrefab, dropItem.Quantity);
+                _playerInventory.TryAddToFirstAvailableSlot(dropItem.ItemPrefab, dropItem.Quantity);
         }
 
         /// <summary> Завершает взаимодействие с объектом. </summary>
         /// <param name="player"> Контроллер игрока, который взаимодействует с объектом. </param>
-        public void EndInteraction(PlayerController player) { }
+        public void EndInteraction(PlayerController player)
+        {
+        }
 
         #endregion
 

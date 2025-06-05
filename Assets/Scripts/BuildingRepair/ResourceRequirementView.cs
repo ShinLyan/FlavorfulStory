@@ -3,6 +3,7 @@ using FlavorfulStory.InventorySystem;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Zenject;
 
 namespace FlavorfulStory.BuildingRepair
 {
@@ -35,6 +36,17 @@ namespace FlavorfulStory.BuildingRepair
         /// <summary> Событие, которое вызывается при клике на одну из кнопок
         /// добавления или возврата ресурса. </summary>
         public event Action<InventoryItem, ResourceTransferButtonType> OnResourceTransferButtonClick;
+
+        /// <summary> Инвентарь игрока. </summary>
+        private Inventory _playerInventory;
+
+        /// <summary> Внедрение зависимости — инвентарь игрока. </summary>
+        /// <param name="inventory"> Инвентарь игрока. </param>
+        [Inject]
+        private void Construct(Inventory inventory)
+        {
+            _playerInventory = inventory;
+        }
 
         /// <summary> Подписаться на события при активации объекта. </summary>
         private void OnEnable()
@@ -91,9 +103,8 @@ namespace FlavorfulStory.BuildingRepair
         private void UpdateButtonsStates()
         {
             _addResourceButton.IsInteractable =
-                _investedQuantity < _requiredQuantity && Inventory.PlayerInventory.GetItemNumber(_resource) > 0;
-            _returnResourceButton.IsInteractable =
-                _investedQuantity > 0 && Inventory.PlayerInventory.HasSpaceFor(_resource);
+                _investedQuantity < _requiredQuantity && _playerInventory.GetItemNumber(_resource) > 0;
+            _returnResourceButton.IsInteractable = _investedQuantity > 0 && _playerInventory.HasSpaceFor(_resource);
         }
     }
 }

@@ -4,6 +4,7 @@ using FlavorfulStory.Player;
 using FlavorfulStory.SceneManagement;
 using Unity.Cinemachine;
 using UnityEngine;
+using Zenject;
 
 namespace FlavorfulStory.AI.WarpGraphSystem
 {
@@ -33,6 +34,17 @@ namespace FlavorfulStory.AI.WarpGraphSystem
         /// <summary> Виртуальная камера. </summary>
         private CinemachineCamera _virtualCamera;
 
+        /// <summary> Компонент затемнения экрана при переходах между сценами. </summary>
+        private Fader _fader;
+
+        /// <summary> Внедряет зависимость компонента затемнения экрана. </summary>
+        /// <param name="fader"> Компонент затемнения экрана при переходах между сценами. </param>
+        [Inject]
+        private void Construct(Fader fader)
+        {
+            _fader = fader;
+        }
+
         /// <summary> Определение локации портала при инициализации. </summary>
         private void Awake()
         {
@@ -54,7 +66,7 @@ namespace FlavorfulStory.AI.WarpGraphSystem
         private IEnumerator TeleportPlayer(PlayerController playerController)
         {
             InputWrapper.BlockAllInput();
-            yield return PersistentObject.Instance.Fader.FadeOut(Fader.FadeOutTime);
+            yield return _fader.FadeOut(Fader.FadeOutTime);
 
             if (_virtualCamera) _virtualCamera.enabled = false;
 
@@ -65,7 +77,7 @@ namespace FlavorfulStory.AI.WarpGraphSystem
             if (_virtualCamera) _virtualCamera.enabled = true;
 
             yield return new WaitForSeconds(Fader.FadeWaitTime);
-            PersistentObject.Instance.Fader.FadeIn(Fader.FadeInTime);
+            _fader.FadeIn(Fader.FadeInTime);
             InputWrapper.UnblockAllInput();
 
             LocationChanger.DisableLocation(ParentLocationName);

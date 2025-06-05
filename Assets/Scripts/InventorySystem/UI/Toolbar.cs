@@ -1,6 +1,7 @@
 using FlavorfulStory.InputSystem;
 using FlavorfulStory.Saving;
 using UnityEngine;
+using Zenject;
 
 namespace FlavorfulStory.InventorySystem.UI
 {
@@ -10,7 +11,7 @@ namespace FlavorfulStory.InventorySystem.UI
     public class Toolbar : MonoBehaviour, ISaveable
     {
         /// <summary> Массив слотов панели инструментов. </summary>
-        private ToolbarSlotUI[] _slots;
+        private ToolbarSlotView[] _slots;
 
         /// <summary> Можно ли взаимодействовать? </summary>
         private bool _isInteractable;
@@ -21,13 +22,24 @@ namespace FlavorfulStory.InventorySystem.UI
         /// <summary> Выбранный предмет. </summary>
         public InventoryItem SelectedItem => _slots[SelectedItemIndex].GetItem();
 
+        /// <summary> Инвентарь игрока. </summary>
+        private Inventory _playerInventory;
+
+        /// <summary> Внедрение зависимости — инвентарь игрока. </summary>
+        /// <param name="inventory"> Инвентарь игрока. </param>
+        [Inject]
+        private void Construct(Inventory inventory)
+        {
+            _playerInventory = inventory;
+        }
+
         /// <summary> Инициализация полей и подписка на события тулбар слотов. </summary>
         private void Awake()
         {
-            _slots = GetComponentsInChildren<ToolbarSlotUI>();
+            _slots = GetComponentsInChildren<ToolbarSlotView>();
             _isInteractable = true;
 
-            Inventory.PlayerInventory.InventoryUpdated += RedrawToolbar;
+            _playerInventory.InventoryUpdated += RedrawToolbar;
             foreach (var slot in _slots) slot.OnSlotClicked += SelectItem;
         }
 
