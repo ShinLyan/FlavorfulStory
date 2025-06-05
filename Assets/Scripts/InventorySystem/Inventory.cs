@@ -16,28 +16,11 @@ namespace FlavorfulStory.InventorySystem
         /// <summary> Предметы инвентаря. </summary>
         private InventorySlot[] _slots;
 
-        /// <summary> Синглтон инвентаря игрока. </summary>
-        private static Inventory _playerInventory;
-
-        /// <summary> Синглтон инвентаря игрока. </summary>
-        public static Inventory PlayerInventory =>
-            _playerInventory ? _playerInventory : GameObject.FindWithTag("Player").GetComponent<Inventory>();
-
         /// <summary> Событие, вызываемое при изменении инвентаря (добавление, удаление предметов). </summary>
         public event Action InventoryUpdated;
 
         /// <summary> Инициализация слотов и ссылки на инвентарь игрока. </summary>
-        private void Awake()
-        {
-            _slots = new InventorySlot[InventorySize];
-            _playerInventory = PlayerInventory;
-        }
-
-        /// <summary> При уничтожении объекта обнулять статические поля. </summary>
-        private void OnDestroy()
-        {
-            _playerInventory = null;
-        }
+        private void Awake() => _slots = new InventorySlot[InventorySize];
 
         /// <summary> Есть ли место для предмета в инвентаре? </summary>
         public bool HasSpaceFor(InventoryItem item) => FindSlot(item) >= 0;

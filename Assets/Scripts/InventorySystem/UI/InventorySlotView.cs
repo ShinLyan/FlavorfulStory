@@ -1,10 +1,11 @@
 ﻿using FlavorfulStory.InventorySystem.UI.Dragging;
 using UnityEngine;
+using Zenject;
 
 namespace FlavorfulStory.InventorySystem.UI
 {
     /// <summary> Слот инвентаря в UI. </summary>
-    public class InventorySlotUI : MonoBehaviour, IDragContainer<InventoryItem>, IItemHolder
+    public class InventorySlotView : MonoBehaviour, IDragContainer<InventoryItem>, IItemHolder
     {
         /// <summary> Инонка слота инвентаря. </summary>
         [SerializeField] private InventoryItemIcon _inventoryItemIcon;
@@ -12,39 +13,35 @@ namespace FlavorfulStory.InventorySystem.UI
         /// <summary> Индекс слота в инвентаре. </summary>
         private int _index;
 
-        /// <summary> Инвентарь. </summary>
+        /// <summary> Инвентарь, с которым связан слот. </summary>
         private Inventory _inventory;
 
-        /// <summary> Инициализация полей. </summary>
-        private void Awake()
-        {
-            _inventory = Inventory.PlayerInventory;
-        }
-
-        /// <summary> Установить значения класса. </summary>
-        /// <param name="inventory"> Инвентарь. </param>
-        /// <param name="index"> Индекс слота в инвентаре. </param>
-        public void Setup(Inventory inventory, int index)
+        /// <summary> Внедрение зависимости — инвентарь игрока. </summary>
+        /// <param name="inventory"> Инвентарь игрока. </param>
+        [Inject]
+        private void Construct(Inventory inventory)
         {
             _inventory = inventory;
+        }
+
+        /// <summary> Установить индекс слота. </summary>
+        /// <param name="index"> Индекс в инвентаре. </param>
+        public void Setup(int index)
+        {
             _index = index;
-            _inventoryItemIcon.SetItem(inventory.GetItemInSlot(index), inventory.GetNumberInSlot(index));
+            _inventoryItemIcon.SetItem(_inventory.GetItemInSlot(index), _inventory.GetNumberInSlot(index));
         }
 
         /// <summary> Получить максимально допустимое количество элементов. </summary>
         /// <remarks> Если ограничения нет, то должно быть возвращено значение Int.MaxValue. </remarks>
         /// <param name="item"> Тип элемента, который потенциально может быть добавлен. </param>
         /// <returns> Возвращает максимально допустимое количество элементов. </returns>
-        public int GetMaxAcceptableItemsNumber(InventoryItem item) =>
-            _inventory.HasSpaceFor(item) ? int.MaxValue : 0;
+        public int GetMaxAcceptableItemsNumber(InventoryItem item) => _inventory.HasSpaceFor(item) ? int.MaxValue : 0;
 
         /// <summary> Обновить UI и все данные для отображения добавления элемента в это место назначения. </summary>
         /// <param name="item">Тип элемента. </param>
         /// <param name="number">Количество элементов. </param>
-        public void AddItems(InventoryItem item, int number)
-        {
-            _inventory.TryAddItemToSlot(_index, item, number);
-        }
+        public void AddItems(InventoryItem item, int number) => _inventory.TryAddItemToSlot(_index, item, number);
 
         /// <summary> Получить предмет, который в данный момент находится в этом источнике. </summary>
         /// <returns> Возвращает предмет, который в данный момент находится в этом источнике. </returns>
@@ -57,9 +54,6 @@ namespace FlavorfulStory.InventorySystem.UI
         /// <summary> Удалить заданное количество предметов из источника. </summary>
         /// <param name="number"> Количество предметов, которое необходимо удалить. </param>
         /// <remarks> Значение number не должно превышать число, возвращаемое с помощью "GetNumber". </remarks>
-        public void RemoveItems(int number)
-        {
-            _inventory.RemoveFromSlot(_index, number);
-        }
+        public void RemoveItems(int number) => _inventory.RemoveFromSlot(_index, number);
     }
 }

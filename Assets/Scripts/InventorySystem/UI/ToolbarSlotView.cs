@@ -4,12 +4,13 @@ using FlavorfulStory.UI;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Zenject;
 
 namespace FlavorfulStory.InventorySystem.UI
 {
     /// <summary> Представляет отдельный слот на панели инструментов. </summary>
     /// <remarks> Управляет отображением предмета, обработкой нажатий и визуальной обратной связью. </remarks>
-    public class ToolbarSlotUI : CustomButton, IItemHolder
+    public class ToolbarSlotView : CustomButton, IItemHolder
     {
         /// <summary> Иконка предмета в инвентаре. </summary>
         [SerializeField] private InventoryItemIcon _icon;
@@ -34,6 +35,17 @@ namespace FlavorfulStory.InventorySystem.UI
 
         /// <summary> Событие, возникающее при клике на слот. </summary>
         public event Action<int> OnSlotClicked;
+
+        /// <summary> Инвентарь игрока. </summary>
+        private Inventory _playerInventory;
+
+        /// <summary> Внедрение зависимости — инвентарь игрока. </summary>
+        /// <param name="inventory"> Инвентарь игрока. </param>
+        [Inject]
+        private void Construct(Inventory inventory)
+        {
+            _playerInventory = inventory;
+        }
 
         /// <summary> Инициализирует слот панели инструментов. </summary>
         protected override void Initialize()
@@ -67,14 +79,12 @@ namespace FlavorfulStory.InventorySystem.UI
         }
 
         /// <summary> Обновляет отображение предмета в слоте. </summary>
-        public void Redraw() => _icon.SetItem(
-            Inventory.PlayerInventory.GetItemInSlot(_index),
-            Inventory.PlayerInventory.GetNumberInSlot(_index)
-        );
+        public void Redraw() =>
+            _icon.SetItem(_playerInventory.GetItemInSlot(_index), _playerInventory.GetNumberInSlot(_index));
 
         /// <summary> Получает предмет, находящийся в данном слоте. </summary>
         /// <returns> Предмет инвентаря в текущем слоте. </returns>
-        public InventoryItem GetItem() => Inventory.PlayerInventory.GetItemInSlot(_index);
+        public InventoryItem GetItem() => _playerInventory.GetItemInSlot(_index);
 
         /// <summary> Запускает плавное изменение цвета слота. </summary>
         /// <param name="color"> Целевой цвет. </param>
