@@ -4,31 +4,30 @@ using FlavorfulStory.Player;
 using FlavorfulStory.SceneManagement;
 using FlavorfulStory.UI;
 using UnityEngine;
+using UnityEngine.Serialization;
 
+// TODO: Актуализировать под Zenject
 namespace FlavorfulStory.TimeManagement
 {
     /// <summary> Представляет кровать, с которой игрок может взаимодействовать для завершения дня. </summary>
-    public class Bed : MonoBehaviour, IInteractable
+    public class SleepTrigger : MonoBehaviour, IInteractable
     {
-        /// <summary> Заголовок для отображения во всплывающей подсказке при наведении. </summary>
-        [field: SerializeField]
-        public string TooltipTitle { get; private set; }
-
-        /// <summary> Описание для отображения во всплывающей подсказке при наведении. </summary>
-        [field: SerializeField]
-        public string TooltipDescription { get; private set; }
-
         /// <summary> View для подтверждения действия "лечь спать". </summary>
-        [SerializeField] private ConfirmationView _confirmationView;
+        [FormerlySerializedAs("_confirmationView")] [SerializeField]
+        private ConfirmationWindowView _confirmationWindowView;
 
         /// <summary> View для отображения сводки дня. </summary>
         [SerializeField] private SummaryView _summaryView;
 
-        /// <summary> Позиция объекта в мировых координатах. </summary>
-        public Vector3 WorldPosition => transform.position;
-
-        private GameObject _currentModal;
         private PlayerController _playerController;
+
+        private const string SleepConfirmationTitle = "Лечь спать?"; // TODO: заменить на генератор/локализацию
+
+        private const string
+            SleepConfirmationDescription =
+                "Вы уверены, что хотите закончить день?"; // TODO: заменить на генератор/локализацию
+
+        private const string DefaultSummaryText = "BEST SUMMARY EVER"; // TODO: заменить на генератор/локализацию
 
         private void Awake()
         {
@@ -38,20 +37,16 @@ namespace FlavorfulStory.TimeManagement
         /// <summary> Показывает View подтверждения перед сном. </summary>
         private void ShowConfirmationView()
         {
-            _confirmationView.Setup(
-                "Лечь спать?",
-                "Вы уверены, что хотите закончить день?",
-                OnSleepConfirmed,
-                () => EndInteraction(_playerController)
-            );
-            _confirmationView.Show();
+            _confirmationWindowView.Setup(SleepConfirmationTitle, SleepConfirmationDescription,
+                OnSleepConfirmed, () => EndInteraction(_playerController));
+            _confirmationWindowView.Show();
         }
 
         /// <summary> Обрабатывает подтверждение сна. </summary>
         private void OnSleepConfirmed()
         {
             StartCoroutine(SleepRoutine());
-            _confirmationView.Hide();
+            _confirmationWindowView.Hide();
         }
 
         /// <summary> Корутина, обрабатывающая процесс сна и завершения дня. </summary>
@@ -64,9 +59,9 @@ namespace FlavorfulStory.TimeManagement
 
             _summaryView.Show();
 
-            var continuePressed = false;
+            bool continuePressed = false;
             _summaryView.OnContinuePressed = () => continuePressed = true;
-            _summaryView.SetSummary("BEST SUMMARY EVER!!!!!!");
+            _summaryView.SetSummary(DefaultSummaryText);
             yield return new WaitUntil(() => continuePressed);
 
             _summaryView.Hide();
@@ -77,7 +72,16 @@ namespace FlavorfulStory.TimeManagement
             EndInteraction(_playerController);
         }
 
-        #region IInteractable Implementation
+        #region IInteractable
+
+        /// <summary> Заголовок для отображения во всплывающей подсказке при наведении. </summary>
+        [field: SerializeField] public string TooltipTitle { get; private set; }
+
+        /// <summary> Описание для отображения во всплывающей подсказке при наведении. </summary>
+        [field: SerializeField] public string TooltipDescription { get; private set; }
+
+        /// <summary> Позиция объекта в мировых координатах. </summary>
+        public Vector3 WorldPosition => transform.position;
 
         /// <summary> Возвращает возможность взаимодействия с объектом. </summary>
         public bool IsInteractionAllowed => true;
@@ -85,10 +89,8 @@ namespace FlavorfulStory.TimeManagement
         /// <summary> Вычисляет расстояние до указанного трансформа. </summary>
         /// <param name="otherTransform"> Трансформ, до которого вычисляется расстояние. </param>
         /// <returns> Расстояние до объекта. </returns>
-        public float GetDistanceTo(Transform otherTransform)
-        {
-            return Vector3.Distance(transform.position, otherTransform.position);
-        }
+        public float GetDistanceTo(Transform otherTransform) =>
+            Vector3.Distance(transform.position, otherTransform.position);
 
         /// <summary> Начинает взаимодействие с кроватью. </summary>
         /// <param name="player"> Контроллер игрока. </param>
@@ -99,7 +101,7 @@ namespace FlavorfulStory.TimeManagement
         public void EndInteraction(PlayerController player)
         {
             player.SetBusyState(false);
-            _confirmationView.Hide();
+            _confirmationWindowView.Hide();
         }
 
         #endregion

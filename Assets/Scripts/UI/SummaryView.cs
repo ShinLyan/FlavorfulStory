@@ -21,7 +21,7 @@ namespace FlavorfulStory.UI
         /// <summary> Событие, вызываемое при нажатии кнопки продолжения. </summary>
         public Action OnContinuePressed;
 
-        /// <summary> Подписка на нажаьте кнопки. </summary>
+        /// <summary> Подписка на нажатие кнопки. </summary>
         private void Awake()
         {
             _continueButton.onClick.AddListener(() => OnContinuePressed?.Invoke());

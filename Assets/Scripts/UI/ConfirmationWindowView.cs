@@ -1,13 +1,14 @@
 ﻿using System;
 using FlavorfulStory.InputSystem;
+using FlavorfulStory.TimeManagement;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace FlavorfulStory.UI
 {
-    /// <summary> Представляет UI-компонент для отображения диалога подтверждения с кнопками "Да" и "Нет". </summary>
-    public class ConfirmationView : MonoBehaviour
+    /// <summary> Представляет UI-компонент для отображения окна подтверждения с кнопками "Да" и "Нет". </summary>
+    public class ConfirmationWindowView : MonoBehaviour
     {
         /// <summary> Основной контейнер диалога подтверждения. </summary>
         [SerializeField] private GameObject _content;
@@ -46,6 +47,7 @@ namespace FlavorfulStory.UI
         {
             _content.SetActive(true);
             InputWrapper.BlockAllInput();
+            WorldTime.Pause();
         }
 
         /// <summary> Скрывает диалог подтверждения. </summary>
@@ -53,6 +55,7 @@ namespace FlavorfulStory.UI
         {
             _content.SetActive(false);
             InputWrapper.UnblockAllInput();
+            WorldTime.Unpause();
         }
     }
 }
