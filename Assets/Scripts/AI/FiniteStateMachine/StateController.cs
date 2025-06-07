@@ -2,12 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using FlavorfulStory.AI.Scheduling;
-using FlavorfulStory.AI.WarpGraphSystem;
 using FlavorfulStory.TimeManagement;
 using UnityEngine;
-using UnityEngine.AI;
 using DateTime = FlavorfulStory.TimeManagement.DateTime;
-using Object = UnityEngine.Object;
 
 namespace FlavorfulStory.AI.FiniteStateMachine
 {
@@ -29,46 +26,34 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         /// <summary> Событие изменения текущего расписания. </summary>
         private event Action<ScheduleParams> OnCurrentScheduleParamsChanged;
 
+        private NpcMovementController _npcMovementController;
+
         #endregion
 
         /// <summary> Конструктор контроллера состояний. </summary>
         /// <param name="npcSchedule"> Набор расписаний. </param>
         /// <param name="animator"> Компонент Animator. </param>
-        /// <param name="npcTransform"> Компонент Transform. </param>
-        /// <param name="navMeshAgent"> Компонент NavMesh. </param>
-        /// <param name="coroutineRunner"> Проигрыватель корутин. </param>
-        public StateController(NpcSchedule npcSchedule, Animator animator, Transform npcTransform,
-            NavMeshAgent navMeshAgent, MonoBehaviour coroutineRunner)
+        /// <param name="npcMovementController"> Контроллер движения НПС. </param>
+        public StateController(NpcSchedule npcSchedule, Animator animator, NpcMovementController npcMovementController)
         {
             _typeToCharacterStates = new Dictionary<Type, CharacterState>();
             _sortedScheduleParams = npcSchedule.GetSortedScheduleParams();
             if (_sortedScheduleParams == null) Debug.LogError("SortedScheduleParams is null");
-            InitializeStates(animator, npcTransform, navMeshAgent, coroutineRunner);
+            InitializeStates(animator, npcMovementController);
 
+            OnCurrentScheduleParamsChanged += npcMovementController.SetCurrentScheduleParams;
             WorldTime.OnDayEnded += OnReset;
             OnReset(WorldTime.CurrentGameTime);
         }
 
         /// <summary> Инициализировать состояния. </summary>
         /// <param name="animator"> Компонент Animator. </param>
-        /// <param name="npcTransform"> Компонент Transform. </param>
-        /// <param name="navMeshAgent"> Компонент NavMesh. </param>
-        /// <param name="coroutineRunner"> Проигрыватель корутин. </param>
-        private void InitializeStates(Animator animator, Transform npcTransform,
-            NavMeshAgent navMeshAgent, MonoBehaviour coroutineRunner)
+        /// <param name="npcMovementController"> Контроллер движений НПС. </param>
+        private void InitializeStates(Animator animator, NpcMovementController npcMovementController)
         {
             var states = new CharacterState[]
             {
-                new InteractionState(),
-                new MovementState(
-                    navMeshAgent,
-                    WarpGraph.Build(
-                        Object.FindObjectsByType<WarpPortal>(FindObjectsInactive.Include, FindObjectsSortMode.None)),
-                    animator,
-                    npcTransform,
-                    coroutineRunner
-                ),
-                new RoutineState(animator),
+                new InteractionState(), new MovementState(npcMovementController), new RoutineState(animator),
                 new WaitingState()
             };
 

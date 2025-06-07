@@ -1,5 +1,6 @@
 ﻿using FlavorfulStory.AI.FiniteStateMachine;
 using FlavorfulStory.AI.Scheduling;
+using FlavorfulStory.AI.WarpGraphSystem;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -20,19 +21,36 @@ namespace FlavorfulStory.AI
         /// <summary> Контроллер состояний, управляющий переключением между состояниями NPC. </summary>
         private StateController _stateController;
 
-        /// <summary> Инициализация контроллера состояний. </summary>
+        private NpcMovementController _movementController;
+
+        private Animator _animator;
+
+        private void Awake() { _animator = GetComponent<Animator>(); }
+
+        /// <summary> Инициализация контроллера состояний и контроллера передвижения. </summary>
         private void Start()
         {
+            _movementController = new NpcMovementController(
+                GetComponent<NavMeshAgent>(),
+                WarpGraph.Build(
+                    FindObjectsByType<WarpPortal>(FindObjectsInactive.Include, FindObjectsSortMode.None)),
+                _animator,
+                transform,
+                this
+            );
+
             _stateController = new StateController(
                 _npcSchedule,
-                GetComponent<Animator>(),
-                transform,
-                GetComponent<NavMeshAgent>(),
-                this
+                _animator,
+                _movementController
             );
         }
 
         /// <summary> Обновление логики состояний каждый кадр. </summary>
-        private void Update() => _stateController.Update(Time.deltaTime);
+        private void Update()
+        {
+            _stateController.Update(Time.deltaTime);
+            _movementController.UpdateMovement();
+        }
     }
 }
