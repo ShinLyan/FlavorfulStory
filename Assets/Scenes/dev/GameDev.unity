@@ -119,6 +119,63 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &394445636 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6816381384307765852, guid: e146997ee99b8804f9d147af96d13279,
+    type: 3}
+  m_PrefabInstance: {fileID: 1981983048}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &677216752
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 677216754}
+  - component: {fileID: 677216753}
+  m_Layer: 0
+  m_Name: Weather
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &677216753
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 677216752}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7d5c725cb99a4c6397a866eff20abd84, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _weatherSettings:
+  - WeatherType: 0
+    Probability: 1
+    Particles: {fileID: 0}
+  - WeatherType: 1
+    Probability: 0.2
+    Particles: {fileID: 394445636}
+--- !u!4 &677216754
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 677216752}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -47.80472, y: 26.669552, z: -19.312988}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &895288242
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -702,6 +759,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8615130694586661768, guid: a9114609ac4097e459c8c7e1f3d67d2b,
+        type: 3}
+      propertyPath: _timeScale
+      value: 120
+      objectReference: {fileID: 0}
     - target: {fileID: 8631143195207105161, guid: a9114609ac4097e459c8c7e1f3d67d2b,
         type: 3}
       propertyPath: m_AnchorMax.y
@@ -923,6 +985,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1464755639435545410, guid: 686c47281d417f442839e3551124725a,
         type: 3}
+      propertyPath: _dailyWeatherGenerator
+      value: 
+      objectReference: {fileID: 677216753}
+    - target: {fileID: 1464755639435545410, guid: 686c47281d417f442839e3551124725a,
+        type: 3}
       propertyPath: '_weatherLightSettings.Array.data[0]'
       value: 
       objectReference: {fileID: 11400000, guid: a9db27aa3723f4cf8a58ec778ab6eebc,
@@ -1088,6 +1155,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: RainParticle
       objectReference: {fileID: 0}
+    - target: {fileID: 6816381384307765852, guid: e146997ee99b8804f9d147af96d13279,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6890179437079654668, guid: e146997ee99b8804f9d147af96d13279,
         type: 3}
       propertyPath: InitialModule.maxNumParticles
@@ -1196,3 +1268,4 @@ SceneRoots:
   - {fileID: 1407106709}
   - {fileID: 1331282075}
   - {fileID: 950797356}
+  - {fileID: 677216754}

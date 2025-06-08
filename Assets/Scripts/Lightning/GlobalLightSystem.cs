@@ -56,6 +56,10 @@ namespace FlavorfulStory.Lightning
         /// <summary> Угол поворота луны по оси X. </summary>
         private const float MoonAngleX = 30f;
 
+        [SerializeField] private DailyWeatherGenerator _dailyWeatherGenerator;
+
+        private WeatherType _currentWeather;
+
         #endregion
 
         /// <summary> Подписывается на событие обновления времени при активации. </summary> 
@@ -67,8 +71,25 @@ namespace FlavorfulStory.Lightning
         /// <summary> Инициализирует начальные настройки освещения. </summary> 
         private void Awake()
         {
-            _currentWeatherLightSettings = _weatherLightSettings[0].LightSettings;
-            //TODO: добавить определение текущей погоды из стороннего скрипта
+            // _currentWeatherLightSettings = _weatherLightSettings[0].LightSettings;
+            // //TODO: добавить определение текущей погоды из стороннего скрипта
+            _currentWeather = _dailyWeatherGenerator.GetCurrentWeatherType();
+            SetNewLightSettings();
+
+            WorldTime.OnDayEnded += OnDayEnded;
+        }
+
+        private void OnDayEnded(DateTime obj)
+        {
+            _currentWeather = _dailyWeatherGenerator.GetCurrentWeatherType();
+            SetNewLightSettings();
+        }
+
+        private void SetNewLightSettings()
+        {
+            foreach (var weather in _weatherLightSettings)
+                if (weather.WeatherType == _currentWeather)
+                    _currentWeatherLightSettings = weather.LightSettings;
         }
 
         /// <summary> Обновляет параметры освещения в зависимости от времени суток. </summary>
@@ -119,8 +140,7 @@ namespace FlavorfulStory.Lightning
         /// <param name="shadowSetup"> Метод настройки теней. </param>
         /// <param name="rotationSetup"> Метод настройки вращения. </param>
         /// <param name="shadowType"> Тип теней. </param>
-        private static void UpdateLight(
-            Light light,
+        private static void UpdateLight(Light light,
             DateTime gameTime,
             bool isActiveCondition,
             float startTime,
@@ -159,10 +179,7 @@ namespace FlavorfulStory.Lightning
                 _sunLight.shadowStrength =
                     Mathf.Lerp(_currentWeatherLightSettings.SunShadowStrength, 0f, shadowProgress);
             }
-            else
-            {
-                _sunLight.shadowStrength = _currentWeatherLightSettings.SunShadowStrength;
-            }
+            else { _sunLight.shadowStrength = _currentWeatherLightSettings.SunShadowStrength; }
         }
 
         /// <summary> Вращает солнце в зависимости от времени дня. </summary> 
@@ -211,10 +228,7 @@ namespace FlavorfulStory.Lightning
                 _moonLight.shadowStrength =
                     Mathf.Lerp(0f, _currentWeatherLightSettings.MoonShadowStrength, shadowProgress);
             }
-            else
-            {
-                _moonLight.shadowStrength = _currentWeatherLightSettings.MoonShadowStrength;
-            }
+            else { _moonLight.shadowStrength = _currentWeatherLightSettings.MoonShadowStrength; }
         }
 
         /// <summary> Вращает луну в зависимости от времени ночи. </summary> 
@@ -231,8 +245,7 @@ namespace FlavorfulStory.Lightning
         /// <param name="colorGradient"> Градиент цвета для изменения. </param>
         /// <param name="intensityCurve"> Кривая интенсивности света. </param>
         /// <param name="maxIntensity"> Максимальная интенсивность света. </param>
-        private static void ColorizeLight(
-            Light light,
+        private static void ColorizeLight(Light light,
             float progress,
             Gradient colorGradient,
             AnimationCurve intensityCurve,
