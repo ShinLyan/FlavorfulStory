@@ -9,10 +9,10 @@ namespace FlavorfulStory.Stats
     public class PlayerStats : MonoBehaviour, ISaveable
     {
         /// <summary> Представление атрибута здоровья. </summary>
-        [SerializeField] private BaseAttributeView _healthView;
+        [SerializeField] private BaseStatView _healthView;
 
         /// <summary> Представление атрибута выносливости. </summary>
-        [SerializeField] private BaseAttributeView _staminaView;
+        [SerializeField] private BaseStatView _staminaView;
 
         /// <summary> Коллекция всех статов, индексируемая по типу. </summary>
         private readonly Dictionary<Type, CharacterStat> _stats = new();
@@ -41,7 +41,7 @@ namespace FlavorfulStory.Stats
         /// <summary> Зарегистрировать стат и связать его с отображением. </summary>
         /// <param name="stat"> Объект стата. </param>
         /// <param name="view"> Элемент UI для отображения. </param>
-        private void Register<T>(CharacterStat stat, BaseAttributeView view)
+        private void Register<T>(CharacterStat stat, BaseStatView view)
         {
             _stats[typeof(T)] = stat;
 
@@ -62,7 +62,7 @@ namespace FlavorfulStory.Stats
         /// <param name="type"> Тип стата. </param>
         /// <param name="view"> Ссылка на соответствующее отображение. </param>
         /// <returns> true — если найдено соответствие. </returns>
-        private bool TryGetView(Type type, out BaseAttributeView view)
+        private bool TryGetView(Type type, out BaseStatView view)
         {
             view = type == typeof(Health) ? _healthView :
                 type == typeof(Stamina) ? _staminaView : null;

@@ -3,7 +3,7 @@
 namespace FlavorfulStory.Stats
 {
     /// <summary> Базовый класс для отображения атрибута, реализующий интерфейс IAttributeView. </summary>
-    public abstract class BaseAttributeView : MonoBehaviour, IAttributeView
+    public abstract class BaseStatView : MonoBehaviour, IAttributeView
     {
         /// <summary> Обрабатывает изменение значения атрибута. </summary>
         /// <param name="currentValue"> Текущее значение атрибута. </param>

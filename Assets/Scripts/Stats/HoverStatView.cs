@@ -6,7 +6,7 @@ using UnityEngine.UI;
 namespace FlavorfulStory.Stats
 {
     /// <summary> Отображение атрибута с визуальным прогресс-баром и подсказкой при наведении. </summary>
-    public class HoverAttributeView : BaseAttributeView, IPointerEnterHandler, IPointerExitHandler
+    public class HoverStatView : BaseStatView, IPointerEnterHandler, IPointerExitHandler
     {
         /// <summary> Контейнер полосы атрибута. </summary>
         [Header("Inspector refs")]
