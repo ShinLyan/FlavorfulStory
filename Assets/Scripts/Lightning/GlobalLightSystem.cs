@@ -56,10 +56,6 @@ namespace FlavorfulStory.Lightning
         /// <summary> Угол поворота луны по оси X. </summary>
         private const float MoonAngleX = 30f;
 
-        [SerializeField] private DailyWeatherGenerator _dailyWeatherGenerator;
-
-        private WeatherType _currentWeather;
-
         #endregion
 
         /// <summary> Подписывается на событие обновления времени при активации. </summary> 
@@ -68,27 +64,10 @@ namespace FlavorfulStory.Lightning
         /// <summary> Отписывается от события обновления времени при деактивации. </summary> 
         private void OnDisable() => WorldTime.OnTimeUpdated -= UpdateLighting;
 
-        /// <summary> Инициализирует начальные настройки освещения. </summary> 
-        private void Awake()
-        {
-            // _currentWeatherLightSettings = _weatherLightSettings[0].LightSettings;
-            // //TODO: добавить определение текущей погоды из стороннего скрипта
-            _currentWeather = _dailyWeatherGenerator.GetCurrentWeatherType();
-            SetNewLightSettings();
-
-            WorldTime.OnDayEnded += OnDayEnded;
-        }
-
-        private void OnDayEnded(DateTime obj)
-        {
-            _currentWeather = _dailyWeatherGenerator.GetCurrentWeatherType();
-            SetNewLightSettings();
-        }
-
-        private void SetNewLightSettings()
+        public void SetNewLightSettings(WeatherType newWeather)
         {
             foreach (var weather in _weatherLightSettings)
-                if (weather.WeatherType == _currentWeather)
+                if (weather.WeatherType == newWeather)
                     _currentWeatherLightSettings = weather.LightSettings;
         }
 

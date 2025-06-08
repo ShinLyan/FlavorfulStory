@@ -24,6 +24,8 @@ namespace FlavorfulStory.Lightning
 
         private readonly Dictionary<int, WeatherSettings> _dailyWeather = new();
 
+        [SerializeField] private GlobalLightSystem _globalLightSystem;
+
         private void OnEnable() => WorldTime.OnDayEnded += GenerateDailyWeather;
 
         private void OnDisable() => WorldTime.OnDayEnded -= GenerateDailyWeather;
@@ -37,7 +39,8 @@ namespace FlavorfulStory.Lightning
         {
             GenerateWeatherForDay(gameTime);
             _currentWeather = _dailyWeather[(int)gameTime.TotalDays];
-            Debug.Log(_currentWeather.WeatherType);
+            _globalLightSystem.SetNewLightSettings(_currentWeather.WeatherType);
+
             foreach (var weather in _weatherSettings)
                 if (weather.Particles)
                     weather.Particles.SetActive(false);

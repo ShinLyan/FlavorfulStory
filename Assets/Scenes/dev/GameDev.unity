@@ -156,11 +156,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _weatherSettings:
   - WeatherType: 0
-    Probability: 1
+    Probability: 0.5
     Particles: {fileID: 0}
   - WeatherType: 1
-    Probability: 0.2
+    Probability: 0.5
     Particles: {fileID: 394445636}
+  _globalLightSystem: {fileID: 1339936122}
 --- !u!4 &677216754
 Transform:
   m_ObjectHideFlags: 0
@@ -1060,6 +1061,18 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 686c47281d417f442839e3551124725a, type: 3}
+--- !u!114 &1339936122 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1464755639435545410, guid: 686c47281d417f442839e3551124725a,
+    type: 3}
+  m_PrefabInstance: {fileID: 1331282075}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 41a9d59ab73443369166ae71766d782c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1407106708
 GameObject:
   m_ObjectHideFlags: 0
