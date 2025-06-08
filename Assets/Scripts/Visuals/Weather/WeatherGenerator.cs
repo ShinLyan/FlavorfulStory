@@ -91,10 +91,10 @@ namespace FlavorfulStory.Visuals.Weather
             float randomValue = Random.value;
             float cumulativeProbability = 0f;
 
-            foreach (var wp in _weatherSettings)
+            foreach (var weatherSetting in _weatherSettings)
             {
-                cumulativeProbability += wp.Probability;
-                if (randomValue <= cumulativeProbability) return wp;
+                cumulativeProbability += weatherSetting.Probability;
+                if (randomValue <= cumulativeProbability) return weatherSetting;
             }
 
             return _weatherSettings[0];
