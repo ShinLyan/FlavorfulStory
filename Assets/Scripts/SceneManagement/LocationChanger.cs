@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Object = UnityEngine.Object;
 
 namespace FlavorfulStory.SceneManagement
 {
@@ -9,6 +11,9 @@ namespace FlavorfulStory.SceneManagement
     {
         /// <summary> Хранилище всех локаций, найденных в сцене. </summary>
         private static readonly Dictionary<LocationName, Location> _locations = new();
+
+        /// <summary> Событие, вызываемое при изменении активной локации. </summary>
+        public static Action<Location> OnLocationChanged;
 
         /// <summary> Статический конструктор — подписка на загрузку сцены. </summary>
         static LocationChanger() => SceneManager.sceneLoaded += (_, _) => InitializeLocations();
@@ -44,9 +49,11 @@ namespace FlavorfulStory.SceneManagement
         public static void EnableLocation(LocationName location)
         {
             if (_locations.TryGetValue(location, out var locationObject))
+            {
                 locationObject.Enable();
-            else
-                Debug.LogError($"Локации {location} не существует!");
+                OnLocationChanged?.Invoke(locationObject);
+            }
+            else { Debug.LogError($"Локации {location} не существует!"); }
         }
 
         /// <summary> Выключает указанную локацию. </summary>

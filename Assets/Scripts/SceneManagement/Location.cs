@@ -1,4 +1,4 @@
-using FlavorfulStory.Lightning;
+using FlavorfulStory.Visuals.Lightning;
 using UnityEngine;
 
 namespace FlavorfulStory.SceneManagement
@@ -16,8 +16,8 @@ namespace FlavorfulStory.SceneManagement
         private GameObject[] _objectsToDisable;
 
         /// <summary> Является ли локация помещением. </summary>
-        [Tooltip("Является ли локация помещением?"), SerializeField]
-        private bool _isRoom;
+        [field: Tooltip("Является ли локация помещением?"), SerializeField]
+        public bool IsRoom { get; private set; }
 
         /// <summary> Глобальная система освещения. </summary>
         private GlobalLightSystem _globalLightSystem;
@@ -40,7 +40,7 @@ namespace FlavorfulStory.SceneManagement
             foreach (var obj in _objectsToDisable) obj.SetActive(isActive);
 
             if (!_globalLightSystem || _objectsToDisable.Length == 0) return;
-            _globalLightSystem.gameObject.SetActive(_isRoom);
+            _globalLightSystem.gameObject.SetActive(IsRoom);
         }
 
         /// <summary> Находится ли заданная позиция внутри границ локации? </summary>
