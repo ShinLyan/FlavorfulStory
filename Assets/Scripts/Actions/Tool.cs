@@ -1,8 +1,8 @@
-using FlavorfulStory.Attributes;
 using FlavorfulStory.Control;
 using FlavorfulStory.InputSystem;
 using FlavorfulStory.InventorySystem;
 using FlavorfulStory.ResourceContainer;
+using FlavorfulStory.Stats;
 using FlavorfulStory.Utils;
 using UnityEngine;
 
@@ -21,7 +21,11 @@ namespace FlavorfulStory.Actions
 
         /// <summary> Кнопка использования предмета. </summary>
         [field: Tooltip("Кнопка использования"), SerializeField]
-        public UseActionType UseActionType { get; set; }
+        public UseActionType UseActionType { get; private set; }
+
+        /// <summary> Стоимость использования по выносливости. </summary>
+        [field: Tooltip("Стоимость использования по выносливости."), SerializeField]
+        public float StaminaCost { get; private set; }
 
         /// <summary> Максимальная дистанция взаимодействия инструментом. </summary>
         private const float MaxInteractionDistance = 2f;
@@ -36,12 +40,9 @@ namespace FlavorfulStory.Actions
         /// <param name="hitableLayers"> Слои, по которым будем делать удар. </param>
         public bool Use(PlayerController player, LayerMask hitableLayers)
         {
-            //TODO: Лукап таблцу заебашть
-            const float AxeStaminaCost = 25f;
-            var stamina = player.PlayerAttributes.GetAttribute<StaminaAttribute>();
-            if (stamina == null || stamina.CurrentValue < AxeStaminaCost)
-                return false;
-            
+            var stamina = player.GetComponent<PlayerStats>().GetStat<Stamina>();
+            if (stamina == null || stamina.CurrentValue < StaminaCost) return false;
+
             if (!WorldCoordinates.GetWorldCoordinatesFromScreenPoint(
                     InputWrapper.GetMousePosition(),
                     ~(1 << player.gameObject.layer),
@@ -74,8 +75,7 @@ namespace FlavorfulStory.Actions
                 if (collider.transform.parent.TryGetComponent<IHitable>(out var hitable))
                 {
                     hitable.TakeHit(ToolType);
-                    const float AxeStaminaCost = 25f;
-                    player.PlayerAttributes.GetAttribute<StaminaAttribute>().Change(-AxeStaminaCost);
+                    player.GetComponent<PlayerStats>().GetStat<Stamina>().Change(-StaminaCost);
                     return true;
                 }
 

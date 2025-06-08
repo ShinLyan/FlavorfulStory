@@ -1,7 +1,6 @@
 ﻿using System;
 using FlavorfulStory.Actions;
 using FlavorfulStory.Actions.Interactables;
-using FlavorfulStory.Attributes;
 using FlavorfulStory.InputSystem;
 using FlavorfulStory.InventorySystem;
 using FlavorfulStory.InventorySystem.UI;
@@ -42,8 +41,6 @@ namespace FlavorfulStory.Control
         /// <summary> Таймер перезарядки использования инструмента. </summary>
         private float _toolCooldownTimer;
 
-        private StaminaAttribute _staminaAttribute;
-
         /// <summary> Можно ли использовать инструмент? </summary>
         private bool CanUseTool => _toolCooldownTimer <= 0f;
 
@@ -61,8 +58,6 @@ namespace FlavorfulStory.Control
         /// <summary> Событие, вызываемое при окончании взаимодействия с объектом. </summary>
         public event Action OnInteractionEnded;
 
-        [field: SerializeField] public PlayerAttributes PlayerAttributes { get; set; }
-
         #endregion
 
         /// <summary> Инициализация компонентов. </summary>
@@ -75,9 +70,6 @@ namespace FlavorfulStory.Control
             _toolHandler = GetComponent<ToolHandler>();
             _toolHandler.SetUnequipAction(() => SetBusyState(false));
         }
-
-        /// <summary> Инициализация аттрибутов. </summary>
-        private void Start() { _staminaAttribute = PlayerAttributes.GetAttribute<StaminaAttribute>(); }
 
         /// <summary> Обновление состояния игрока. </summary>
         private void Update()

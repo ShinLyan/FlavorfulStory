@@ -1,4 +1,4 @@
-﻿namespace FlavorfulStory.Attributes
+﻿namespace FlavorfulStory.Stats
 {
     /// <summary> Интерфейс представления атрибута, обрабатывающего изменения значений. </summary>
     public interface IAttributeView

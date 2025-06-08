@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace FlavorfulStory.Attributes
+namespace FlavorfulStory.Stats
 {
     /// <summary> Базовый класс для отображения атрибута, реализующий интерфейс IAttributeView. </summary>
     public abstract class BaseAttributeView : MonoBehaviour, IAttributeView
