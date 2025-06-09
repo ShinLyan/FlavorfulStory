@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using FlavorfulStory.InteractionSystem;
 using FlavorfulStory.Audio;
+using FlavorfulStory.InteractionSystem;
 using FlavorfulStory.InventorySystem;
 using FlavorfulStory.ObjectManagement;
 using FlavorfulStory.Player;
@@ -140,7 +140,7 @@ namespace FlavorfulStory.BuildingRepair
             _objectSwitcher.SwitchTo(_repairStageIndex);
             UpdateInteractionState();
             SfxPlayer.Instance.PlayOneShot(SfxType.Build);
-            
+
             if (IsRepairCompleted)
             {
                 _onRepairCompleted?.Invoke();
@@ -156,8 +156,10 @@ namespace FlavorfulStory.BuildingRepair
         /// <param name="type"> Тип кнопки для добавления или возвращения ресурса. </param>
         private void TransferResource(InventoryItem resource, ResourceTransferButtonType type)
         {
-            if (type == ResourceTransferButtonType.Add) AddResource(resource);
-            else ReturnResource(resource);
+            if (type == ResourceTransferButtonType.Add)
+                AddResource(resource);
+            else
+                ReturnResource(resource);
 
             _onStageUpdated?.Invoke(CurrentStage, _investedResources);
         }

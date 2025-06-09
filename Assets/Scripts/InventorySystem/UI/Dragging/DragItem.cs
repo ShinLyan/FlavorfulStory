@@ -107,8 +107,8 @@ namespace FlavorfulStory.InventorySystem.UI.Dragging
         private static void SwapItems(IDragContainer<T> destination, IDragContainer<T> source)
         {
             // Сохраняем информацию о предметах и их количестве перед обменом
-            var (sourceItem, sourceNumber) = (source.GetItem(), source.GetNumber());
-            var (destinationItem, destinationNumber) = (destination.GetItem(), destination.GetNumber());
+            (var sourceItem, int sourceNumber) = (source.GetItem(), source.GetNumber());
+            (var destinationItem, int destinationNumber) = (destination.GetItem(), destination.GetNumber());
 
             // Удаляем предметы из обоих контейнеров перед обменом
             source.RemoveItems(sourceNumber);
@@ -149,12 +149,11 @@ namespace FlavorfulStory.InventorySystem.UI.Dragging
             int number = Mathf.Min(destination.GetMaxAcceptableItemsNumber(item), _source.GetNumber());
 
             // Проверяем, можно ли переместить предмет
-            if (number > 0)
-            {
-                // Удаляем предмет из исходного контейнера и добавляем в целевой
-                _source.RemoveItems(number);
-                destination.AddItems(item, number);
-            }
+            if (number <= 0) return;
+
+            // Удаляем предмет из исходного контейнера и добавляем в целевой
+            _source.RemoveItems(number);
+            destination.AddItems(item, number);
         }
 
         /// <summary> Рассчитывает количество предметов, которые необходимо вернуть в исходный контейнер. </summary>

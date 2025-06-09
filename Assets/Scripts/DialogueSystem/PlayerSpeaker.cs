@@ -54,7 +54,8 @@ namespace FlavorfulStory.DialogueSystem
         private void Update()
         {
             if (!IsDialogueActive || IsChoosingDialogue ||
-                !InputWrapper.GetButtonDown(InputButton.NextDialogue)) return;
+                !InputWrapper.GetButtonDown(InputButton.NextDialogue))
+                return;
 
             PlayNextDialogueNode();
         }

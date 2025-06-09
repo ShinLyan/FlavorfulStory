@@ -80,6 +80,9 @@ namespace FlavorfulStory.InventorySystem.PickupSystem
             RectTransform.anchoredPosition = new Vector2(OffscreenXPosition, RectTransform.anchoredPosition.y);
         }
 
+        /// <summary> Обновить текстовое сообщение с количеством и названием предмета. </summary>
+        private void UpdateMessage() => _amountMessageText.text = $"x{_displayedAmount} {_itemName}";
+
         /// <summary> Добавить количество к уже отображаемому значению и воспроизвести анимацию. </summary>
         /// <param name="amount"> Добавляемое количество. </param>
         public void AddAmount(int amount)
@@ -126,8 +129,5 @@ namespace FlavorfulStory.InventorySystem.PickupSystem
                 .Join(RectTransform.DOAnchorPosX(OffscreenXPosition, duration).SetEase(Ease.InCubic))
                 .OnComplete(() => Destroy(gameObject));
         }
-
-        /// <summary> Обновить текстовое сообщение с количеством и названием предмета. </summary>
-        private void UpdateMessage() => _amountMessageText.text = $"x{_displayedAmount} {_itemName}";
     }
 }

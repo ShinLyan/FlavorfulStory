@@ -9,6 +9,6 @@ namespace FlavorfulStory.Lightning
         Sun,
 
         /// <summary> Дождливая погода. </summary>
-        Rain,
+        Rain
     }
 }

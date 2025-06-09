@@ -14,7 +14,7 @@ namespace FlavorfulStory
 
         /// <summary> Ссылка на компонент SavingWrapper. </summary>
         public SavingWrapper SavingWrapper { get; private set; }
-        
+
         /// <summary> Инициализация Singleton. </summary>
         private void Awake()
         {

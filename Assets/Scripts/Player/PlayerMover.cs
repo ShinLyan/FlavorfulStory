@@ -32,7 +32,7 @@ namespace FlavorfulStory.Player
         private Animator _animator;
 
         /// <summary> Хэшированное значение параметра "скорость" для анимации. </summary>
-        private static readonly int _speedParameterHash = Animator.StringToHash("Speed");
+        private readonly int _speedParameterHash = Animator.StringToHash("Speed");
 
         #endregion
 

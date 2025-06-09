@@ -1,10 +1,11 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace FlavorfulStory.Saving
 {
     /// <summary> Сериализуемый Unity Vector3. </summary>
     /// <remarks> Стандартный Unity Vector3 нельзя сериализовать. Для сериализации сделана эта надстройка. </remarks>
-    [System.Serializable]
+    [Serializable]
     public class SerializableVector3
     {
         /// <summary> X координата вектора. </summary>
