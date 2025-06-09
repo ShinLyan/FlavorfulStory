@@ -106,12 +106,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Padding:
-    m_Left: 16
-    m_Right: 16
+    m_Left: 24
+    m_Right: 32
     m_Top: 0
     m_Bottom: 0
   m_ChildAlignment: 5
-  m_Spacing: 16
+  m_Spacing: 20
   m_ChildForceExpandWidth: 0
   m_ChildForceExpandHeight: 0
   m_ChildControlWidth: 1
@@ -132,7 +132,7 @@ GameObject:
   - component: {fileID: 8012821993569548483}
   - component: {fileID: 2320267615254947327}
   m_Layer: 5
-  m_Name: Icon
+  m_Name: ItemIconImage
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -227,7 +227,7 @@ GameObject:
   - component: {fileID: 2292918337874513068}
   - component: {fileID: 7275471957692411433}
   m_Layer: 5
-  m_Name: ItemNotificationPrefab
+  m_Name: PickupNotification
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -265,8 +265,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9153645b154f4b0eb3ca60f21b2f7b1b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  icon: {fileID: 8012821993569548483}
-  message: {fileID: 5944879601495477346}
+  _itemIconImage: {fileID: 8012821993569548483}
+  _amountMessageText: {fileID: 5944879601495477346}
   canvasGroup: {fileID: 7275471957692411433}
 --- !u!225 &7275471957692411433
 CanvasGroup:
@@ -293,7 +293,7 @@ GameObject:
   - component: {fileID: 5944879601495477346}
   - component: {fileID: 175004908523397496}
   m_Layer: 5
-  m_Name: Text
+  m_Name: AmountMessageText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

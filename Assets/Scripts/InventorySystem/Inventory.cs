@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using FlavorfulStory.InventorySystem.PickupSystem;
 using FlavorfulStory.Saving;
 using UnityEngine;
 
@@ -18,8 +19,9 @@ namespace FlavorfulStory.InventorySystem
 
         /// <summary> Синглтон инвентаря игрока. </summary>
         private static Inventory _playerInventory;
-        
-        private ItemPickupNotificationManager _notificationManager;
+
+        /// <summary> Менеджер уведомлений о подборе предмета. </summary>
+        private PickupNotificationManager _notificationManager;
 
         /// <summary> Синглтон инвентаря игрока. </summary>
         public static Inventory PlayerInventory =>
@@ -33,8 +35,9 @@ namespace FlavorfulStory.InventorySystem
         {
             _slots = new InventorySlot[InventorySize];
             _playerInventory = PlayerInventory;
-            
-            _notificationManager = FindFirstObjectByType<ItemPickupNotificationManager>();
+
+            // TODO: Заменить на Zenject
+            _notificationManager = FindFirstObjectByType<PickupNotificationManager>();
         }
 
         /// <summary> Есть ли место для предмета в инвентаре? </summary>
@@ -130,7 +133,7 @@ namespace FlavorfulStory.InventorySystem
                 _slots[slotIndex].Number += addAmount;
                 number -= addAmount;
             }
-            
+
             InventoryUpdated?.Invoke();
             return true;
         }
@@ -141,7 +144,7 @@ namespace FlavorfulStory.InventorySystem
         /// <returns> Возвращает True, если предмет можно добавить, False - в противном случае. </returns>
         public bool TryAddToFirstAvailableSlot(InventoryItem item, int number)
         {
-            var remainingNumber = number;
+            int remainingNumber = number;
             while (remainingNumber > 0)
             {
                 int index = FindSlot(item);
@@ -152,9 +155,9 @@ namespace FlavorfulStory.InventorySystem
                 _slots[index].Number += addAmount;
                 remainingNumber -= addAmount;
             }
-            
+
             _notificationManager.ShowNotification(item.Icon, number, item.ItemName, item.ItemName);
-            
+
             InventoryUpdated?.Invoke();
             return true;
         }
