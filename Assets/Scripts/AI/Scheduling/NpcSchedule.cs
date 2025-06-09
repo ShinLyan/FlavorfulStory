@@ -10,7 +10,7 @@ namespace FlavorfulStory.AI.Scheduling
     {
         /// <summary> Параметры расписания NPC. </summary>
         [field: Tooltip("Параметры расписания NPC."), SerializeField]
-        public ScheduleParams[] Params { get; private set; }
+        public ScheduleParams[] Params { get; set; }
 
         /// <summary> Получить отсортированные параметры расписания по текущим условиям. </summary>
         /// <remarks> Приоритеты: 1. IsRaining; 2. Max Hearts; 3. По дате; 4. По DayOfWeek; 5. По Seasons </remarks>

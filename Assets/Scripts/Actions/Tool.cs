@@ -3,6 +3,7 @@ using FlavorfulStory.InputSystem;
 using FlavorfulStory.InventorySystem;
 using FlavorfulStory.Player;
 using FlavorfulStory.ResourceContainer;
+using FlavorfulStory.Stats;
 using FlavorfulStory.Utils;
 using UnityEngine;
 
@@ -27,6 +28,10 @@ namespace FlavorfulStory.Actions
         [field: Tooltip("Тип SFX использования."), SerializeField]
         public SfxType SfxType { get; private set; }
 
+        /// <summary> Стоимость использования по выносливости. </summary>
+        [field: Tooltip("Стоимость использования по выносливости."), SerializeField]
+        public float StaminaCost { get; private set; }
+
         /// <summary> Максимальная дистанция взаимодействия инструментом. </summary>
         private const float MaxInteractionDistance = 2f;
 
@@ -46,6 +51,8 @@ namespace FlavorfulStory.Actions
                     out var targetPosition))
                 return false;
 
+            var stamina = player.GetComponent<PlayerStats>().GetStat<Stamina>();
+            if (stamina == null || stamina.CurrentValue < StaminaCost) return false;
             bool didHit = UseToolInDirection(targetPosition, player, hitableLayers);
             if (!didHit) return false;
 
@@ -54,8 +61,6 @@ namespace FlavorfulStory.Actions
             InputWrapper.BlockPlayerMovement();
 
             return true;
-
-            // TODO: Реализовать трату энергии игрока при использовании инструмента
         }
 
         /// <summary> Использовать инструмент в заданном направлении. </summary>
@@ -68,10 +73,15 @@ namespace FlavorfulStory.Actions
             var direction = (targetPosition - origin).normalized;
             var interactionCenter = origin + direction * (MaxInteractionDistance / 2);
 
+            //TODO: Тута бага. Получает удар только первый блжайшй. Плохой рейкаст сферой по ударяемым прколам!!!
             var hitColliders = Physics.OverlapSphere(interactionCenter, UseRadius, hitableLayers);
             foreach (var collider in hitColliders)
                 if (collider.transform.parent.TryGetComponent<IHitable>(out var hitable))
+                {
                     hitable.TakeHit(ToolType);
+                    player.GetComponent<PlayerStats>().GetStat<Stamina>().ChangeValue(-StaminaCost);
+                    return true;
+                }
 
             return hitColliders.Length > 0;
         }

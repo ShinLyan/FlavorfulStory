@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using FlavorfulStory.InventorySystem.PickupSystem;
 using FlavorfulStory.Saving;
 using UnityEngine;
 
@@ -16,11 +17,31 @@ namespace FlavorfulStory.InventorySystem
         /// <summary> Предметы инвентаря. </summary>
         private InventorySlot[] _slots;
 
+        /// <summary> Синглтон инвентаря игрока. </summary>
+        private static Inventory _playerInventory;
+
+        /// <summary> Менеджер уведомлений о подборе предмета. </summary>
+        private PickupNotificationManager _notificationManager;
+
+        /// <summary> Синглтон инвентаря игрока. </summary>
+        public static Inventory PlayerInventory =>
+            _playerInventory ? _playerInventory : GameObject.FindWithTag("Player").GetComponent<Inventory>();
+
         /// <summary> Событие, вызываемое при изменении инвентаря (добавление, удаление предметов). </summary>
         public event Action InventoryUpdated;
 
         /// <summary> Инициализация слотов и ссылки на инвентарь игрока. </summary>
-        private void Awake() => _slots = new InventorySlot[InventorySize];
+        private void Awake()
+        {
+            _slots = new InventorySlot[InventorySize];
+            _playerInventory = PlayerInventory;
+
+            // TODO: Заменить на Zenject
+            _notificationManager = FindFirstObjectByType<PickupNotificationManager>();
+        }
+
+        /// <summary> При уничтожении объекта обнулять статические поля. </summary>
+        private void OnDestroy() { _playerInventory = null; }
 
         /// <summary> Есть ли место для предмета в инвентаре? </summary>
         public bool HasSpaceFor(InventoryItem item) => FindSlot(item) >= 0;
@@ -126,16 +147,19 @@ namespace FlavorfulStory.InventorySystem
         /// <returns> Возвращает True, если предмет можно добавить, False - в противном случае. </returns>
         public bool TryAddToFirstAvailableSlot(InventoryItem item, int number)
         {
-            while (number > 0)
+            int remainingNumber = number;
+            while (remainingNumber > 0)
             {
                 int index = FindSlot(item);
                 if (index < 0) return false;
 
-                int addAmount = Mathf.Min(number, item.StackSize - _slots[index].Number);
+                int addAmount = Mathf.Min(remainingNumber, item.StackSize - _slots[index].Number);
                 _slots[index].Item ??= item;
                 _slots[index].Number += addAmount;
-                number -= addAmount;
+                remainingNumber -= addAmount;
             }
+
+            _notificationManager.ShowNotification(item.Icon, number, item.ItemName, item.ItemName);
 
             InventoryUpdated?.Invoke();
             return true;

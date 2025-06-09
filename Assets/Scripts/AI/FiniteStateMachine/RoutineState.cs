@@ -43,11 +43,15 @@ namespace FlavorfulStory.AI.FiniteStateMachine
             if (_currentPoint == null) return;
 
             var animationClipName = _currentPoint.NpcAnimation;
-            if (_currentPoint != null) PlayStateAnimation(animationClipName);
+            PlayStateAnimation(animationClipName);
         }
 
         /// <summary> Обновить состояние. </summary>
-        public override void Reset() => _currentPoint = null;
+        public override void Reset()
+        {
+            _currentPoint = null;
+            _animator.Rebind();
+        }
 
         /// <summary> Проверяет, изменилось ли время, и обновляет текущую точку расписания.
         /// Переключает состояние на движение, если время совпадает с точкой. </summary>
