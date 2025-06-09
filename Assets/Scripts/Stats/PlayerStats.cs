@@ -9,10 +9,10 @@ namespace FlavorfulStory.Stats
     public class PlayerStats : MonoBehaviour, ISaveable
     {
         /// <summary> Представление атрибута здоровья. </summary>
-        [SerializeField] private BaseStatView _healthView;
+        [SerializeField] private StatView _healthView;
 
         /// <summary> Представление атрибута выносливости. </summary>
-        [SerializeField] private BaseStatView _staminaView;
+        [SerializeField] private StatView _staminaView;
 
         /// <summary> Коллекция всех статов, индексируемая по типу. </summary>
         private readonly Dictionary<Type, CharacterStat> _stats = new();
@@ -22,7 +22,7 @@ namespace FlavorfulStory.Stats
         {
             if (_stats.Count != 0) return;
 
-            Register<Health>(new Health(100), _healthView);
+            Register<Health>(new Health(200), _healthView);
             Register<Stamina>(new Stamina(150), _staminaView);
         }
 
@@ -32,22 +32,21 @@ namespace FlavorfulStory.Stats
             foreach (var attributeKVP in _stats)
                 if (TryGetView(attributeKVP.Key, out var view))
                 {
-                    attributeKVP.Value.OnValueChanged -= view.HandleAttributeChange;
-                    attributeKVP.Value.OnReachedZero -= view.HandleAttributeReachZero;
-                    attributeKVP.Value.OnMaxValueChanged -= view.HandleAttributeMaxValueChanged;
+                    attributeKVP.Value.OnValueChanged -= view.UpdateCurrentValue;
+                    attributeKVP.Value.OnMaxValueChanged -= view.UpdateMaxValue;
                 }
         }
 
         /// <summary> Зарегистрировать стат и связать его с отображением. </summary>
         /// <param name="stat"> Объект стата. </param>
         /// <param name="view"> Элемент UI для отображения. </param>
-        private void Register<T>(CharacterStat stat, BaseStatView view)
+        private void Register<T>(CharacterStat stat, StatView view)
         {
             _stats[typeof(T)] = stat;
 
-            stat.OnValueChanged += view.HandleAttributeChange;
-            stat.OnReachedZero += view.HandleAttributeReachZero;
-            stat.OnMaxValueChanged += view.HandleAttributeMaxValueChanged;
+            stat.OnValueChanged += view.UpdateCurrentValue;
+            stat.OnMaxValueChanged += view.UpdateMaxValue;
+            stat.OnReachedZero += () => Debug.Log("ReachedZero");
 
             view.Initialize(stat.CurrentValue, stat.MaxValue);
         }
@@ -62,7 +61,7 @@ namespace FlavorfulStory.Stats
         /// <param name="type"> Тип стата. </param>
         /// <param name="view"> Ссылка на соответствующее отображение. </param>
         /// <returns> true — если найдено соответствие. </returns>
-        private bool TryGetView(Type type, out BaseStatView view)
+        private bool TryGetView(Type type, out StatView view)
         {
             view = type == typeof(Health) ? _healthView :
                 type == typeof(Stamina) ? _staminaView : null;
@@ -111,8 +110,8 @@ namespace FlavorfulStory.Stats
         {
             if (state is not StatsData data) return;
 
-            Register<Health>(new Health(data.HpMaxValue, data.HpCurrentValue), _healthView);
-            Register<Stamina>(new Stamina(data.StaminaMaxValue, data.StaminaCurrentValue), _staminaView);
+            Register<Health>(new Health(data.HpCurrentValue, data.HpMaxValue), _healthView);
+            Register<Stamina>(new Stamina(data.StaminaCurrentValue, data.StaminaMaxValue), _staminaView);
         }
 
         #endregion

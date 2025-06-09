@@ -10,7 +10,7 @@ namespace FlavorfulStory.TimeManagement
         #region Fields and Properties
 
         /// <summary> Общее количество минут, прошедших с начала игры. </summary>
-        private int _totalMinutes;
+        private float _totalMinutes;
 
         /// <summary> Словарь для конвертации дней недели. </summary>
         private static readonly Dictionary<DayOfWeek, DayOfWeek> DayOfWeekConvertDict = new()
@@ -37,34 +37,34 @@ namespace FlavorfulStory.TimeManagement
         private const int DaysCount = 28;
 
         /// <summary> Количество минут в одном дне. </summary>
-        private const int DayMinutes = 60 * 24;
+        private const float DayMinutes = 60f * 24f;
 
         /// <summary> Количество минут в одном сезоне. </summary>
-        private const int SeasonMinutes = DayMinutes * DaysCount;
+        private const float SeasonMinutes = DayMinutes * DaysCount;
 
         /// <summary> Получает текущий год. </summary>
-        public int Year => _totalMinutes / (SeasonMinutes * 4) + 1;
+        public float Year => _totalMinutes / (SeasonMinutes * 4) + 1;
 
         /// <summary> Получает текущий сезон. </summary>
-        public Season Season => SeasonConvertDict[(Season)(_totalMinutes % (SeasonMinutes * 4) / SeasonMinutes)];
+        public Season Season => SeasonConvertDict[(Season)((int)TotalDays % (DaysCount * 4) / DaysCount)];
 
         /// <summary> Получает день в текущем сезоне. </summary>
-        public int SeasonDay => _totalMinutes % SeasonMinutes / DayMinutes + 1;
+        public float SeasonDay => _totalMinutes % SeasonMinutes / DayMinutes + 1;
 
         /// <summary> Получает день недели. </summary>
-        public DayOfWeek DayOfWeek => DayOfWeekConvertDict[(DayOfWeek)(_totalMinutes / DayMinutes % 7 + 1)];
+        public DayOfWeek DayOfWeek => DayOfWeekConvertDict[(DayOfWeek)(int)(_totalMinutes / DayMinutes % 7 + 1)];
 
         /// <summary> Получает текущий час. </summary>
-        public int Hour => _totalMinutes % DayMinutes / 60;
+        public float Hour => _totalMinutes % DayMinutes / 60;
 
         /// <summary> Получает текущую минуту. </summary>
-        public int Minute => _totalMinutes % 60;
+        public float Minute => _totalMinutes % 60;
 
         /// <summary> Получает количество полных недель, прошедших с начала игры. </summary>
-        public int TotalWeeks => _totalMinutes / (DayMinutes * 7);
+        public float TotalWeeks => _totalMinutes / (DayMinutes * 7);
 
         /// <summary> Получает количество полных дней, прошедших с начала игры. </summary>
-        public int TotalDays => _totalMinutes / DayMinutes;
+        public float TotalDays => _totalMinutes / DayMinutes;
 
         #endregion
 
@@ -83,13 +83,34 @@ namespace FlavorfulStory.TimeManagement
                             + minute; // Минуты
         }
 
+        /// <summary> Создаёт объект игровой даты и времени. </summary>
+        /// <param name="year"> Год. </param>
+        /// <param name="season"> Сезон. </param>
+        /// <param name="day"> День в сезоне. </param>
+        /// <param name="hour"> Часы. </param>
+        /// <param name="minute"> Минуты. </param>
+        public DateTime(float year, Season season, float day, float hour, float minute)
+        {
+            _totalMinutes = (int)(year - 1) * SeasonMinutes * 4 // Годы в минутах
+                            + (int)season * SeasonMinutes // Сезоны в минутах
+                            + (int)(day - 1) * DayMinutes // Дни в минутах
+                            + (int)hour * 60 // Часы в минутах
+                            + (int)minute; // Минуты
+        }
+
         /// <summary> Создаёт объект времени, задав общее количество минут. </summary>
         /// <param name="totalMinutes"> Общее количество минут. </param>
         public DateTime(int totalMinutes) => _totalMinutes = totalMinutes;
 
         /// <summary> Добавляет указанное количество минут к текущему времени. </summary>
         /// <param name="minutes"> Количество минут для добавления. </param>
-        public void AddMinutes(int minutes) => _totalMinutes += minutes;
+        /// <returns> Новый объект DateTime с добавленными минутами. </returns>
+        public DateTime AddMinutes(float minutes)
+        {
+            var newTime = this;
+            newTime._totalMinutes += minutes;
+            return newTime;
+        }
 
         #region ToString
 
@@ -111,18 +132,18 @@ namespace FlavorfulStory.TimeManagement
             if (is24HourFormat)
             {
                 // 24-часовой формат
-                string hourString = Hour.ToString("D2");
-                string minuteString = Minute.ToString("D2");
+                string hourString = ((int)Hour).ToString("D2");
+                string minuteString = ((int)Minute).ToString("D2");
                 return $"{hourString}:{minuteString}";
             }
             else
             {
                 // 12-часовой AM/PM формат
                 string period = Hour >= 12 ? "PM" : "AM";
-                int hour12 = Hour % 12;
+                int hour12 = (int)Hour % 12;
                 if (hour12 == 0) hour12 = 12; // Если час = 0 или 12, то в 12-часовом формате это будет 12
                 string hourString = hour12.ToString("D2");
-                string minuteString = Minute.ToString("D2");
+                string minuteString = ((int)Minute).ToString("D2");
                 return $"{hourString}:{minuteString} {period}";
             }
         }

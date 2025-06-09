@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using FlavorfulStory.InputSystem;
 using FlavorfulStory.Saving;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -52,7 +53,11 @@ namespace FlavorfulStory.SceneManagement
         {
             yield return PersistentObject.Instance.Fader.FadeOut(Fader.FadeOutTime);
             yield return SceneManager.LoadSceneAsync(_firstUploadedScene.ToString());
+            Save();
             yield return PersistentObject.Instance.Fader.FadeIn(Fader.FadeInTime);
+
+            LocationChanger.ActivatePlayerCurrentLocation();
+            InputWrapper.UnblockAllInput();
         }
 
         /// <summary> Загружает последнюю сохранённую сцену. </summary>
@@ -62,6 +67,9 @@ namespace FlavorfulStory.SceneManagement
             yield return PersistentObject.Instance.Fader.FadeOut(Fader.FadeOutTime);
             yield return SavingSystem.LoadLastScene(GetCurrentSaveFileName());
             yield return PersistentObject.Instance.Fader.FadeIn(Fader.FadeInTime);
+
+            LocationChanger.ActivatePlayerCurrentLocation();
+            InputWrapper.UnblockAllInput();
         }
 
         /// <summary> Асинхронно загружает сцену по её названию. </summary>

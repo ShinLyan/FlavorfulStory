@@ -42,12 +42,16 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         {
             if (_currentPoint == null) return;
 
-            var animationClipName = _currentPoint.NpcAnimationClipName;
-            if (_currentPoint != null) PlayStateAnimation(animationClipName);
+            var animationClipName = _currentPoint.NpcAnimation;
+            PlayStateAnimation(animationClipName);
         }
 
         /// <summary> Обновить состояние. </summary>
-        public override void Reset() => _currentPoint = null;
+        public override void Reset()
+        {
+            _currentPoint = null;
+            _animator.Rebind();
+        }
 
         /// <summary> Проверяет, изменилось ли время, и обновляет текущую точку расписания.
         /// Переключает состояние на движение, если время совпадает с точкой. </summary>
@@ -58,7 +62,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine
             if (closestPoint == null || closestPoint == _currentPoint) return;
 
             _currentPoint = closestPoint;
-            if (closestPoint.Hour == currentTime.Hour && closestPoint.Minutes == currentTime.Minute)
+            if (closestPoint.Hour == (int)currentTime.Hour && closestPoint.Minutes == (int)currentTime.Minute)
                 RequestStateChange(typeof(MovementState));
         }
 
@@ -68,9 +72,9 @@ namespace FlavorfulStory.AI.FiniteStateMachine
 
         /// <summary> Воспроизведение анимации состояния. </summary>
         /// <param name="animationStateName"> Название состояния анимации. </param>
-        private void PlayStateAnimation(NpcAnimationClipName animationStateName)
+        private void PlayStateAnimation(AnimationType animationStateName)
         {
-            if (animationStateName == NpcAnimationClipName.Idle) return;
+            if (animationStateName == AnimationType.Idle) return;
             _animator.Play(animationStateName.ToString());
         }
     }

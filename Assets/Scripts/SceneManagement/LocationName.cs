@@ -11,9 +11,6 @@ namespace FlavorfulStory.SceneManagement
         Restaurant,
 
         /// <summary> Магазин. </summary>
-        Shop,
-
-        /// <summary> Лес. </summary>
-        Forest
+        Shop
     }
 }

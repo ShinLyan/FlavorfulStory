@@ -39,37 +39,25 @@ namespace FlavorfulStory.InventorySystem.UI
         protected override void Initialize()
         {
             _index = transform.GetSiblingIndex();
-            _keyText.text = $"{_index + 1}";
+            _keyText.text = _index == 9 ? "0" : $"{_index + 1}";
             _defaultColor = ButtonImage.color;
         }
 
         /// <summary> Обрабатывает начало наведения курсора на слот. </summary>
-        protected override void HoverStart()
-        {
-            _hoverImage.CrossFadeAlpha(1.0f, FadeDuration, true);
-        }
+        protected override void HoverStart() => _hoverImage.CrossFadeAlpha(1.0f, FadeDuration, true);
 
         /// <summary> Обрабатывает окончание наведения курсора на слот. </summary>
-        protected override void HoverEnd()
-        {
-            _hoverImage.CrossFadeAlpha(0.0f, FadeDuration, true);
-        }
+        protected override void HoverEnd() => _hoverImage.CrossFadeAlpha(0.0f, FadeDuration, true);
 
         /// <summary> Обрабатывает клик по слоту. </summary>
         protected override void Click()
         {
+            base.Click();
             OnSlotClicked?.Invoke(_index);
         }
 
-        protected override void OnInteractionEnabled() {}
-
-        protected override void OnInteractionDisabled() {}
-
         /// <summary> Выделяет данный слот. </summary>
-        public void Select()
-        {
-            FadeToColor(_selectedColor);
-        }
+        public void Select() => FadeToColor(_selectedColor);
 
         /// <summary> Сбрасывает выделение слота. </summary>
         public void ResetSelection()
@@ -90,10 +78,7 @@ namespace FlavorfulStory.InventorySystem.UI
 
         /// <summary> Запускает плавное изменение цвета слота. </summary>
         /// <param name="color"> Целевой цвет. </param>
-        private void FadeToColor(Color color)
-        {
-            StartCoroutine(FadeToColorCoroutine(color));
-        }
+        private void FadeToColor(Color color) => StartCoroutine(FadeToColorCoroutine(color));
 
         /// <summary> Корутина для плавного изменения цвета слота. </summary>
         /// <param name="color"> Целевой цвет. </param>

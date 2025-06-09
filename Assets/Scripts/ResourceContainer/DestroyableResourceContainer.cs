@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using FlavorfulStory.Actions;
+using FlavorfulStory.Audio;
 using FlavorfulStory.InventorySystem.DropSystem;
 using FlavorfulStory.ObjectManagement;
 using UnityEngine;
@@ -69,8 +70,7 @@ namespace FlavorfulStory.ResourceContainer
             for (int i = 0, cumulativeHits = 0; i < _stages.Count; i++)
             {
                 cumulativeHits += _stages[i].RequiredHits;
-                if (HitsTaken < cumulativeHits)
-                    return i;
+                if (HitsTaken < cumulativeHits) return i;
             }
 
             return _stages.Count - 1;
@@ -83,8 +83,7 @@ namespace FlavorfulStory.ResourceContainer
         /// <param name="hitsTaken"> Количество полученных ударов. </param>
         public void Initialize(int hitsTaken = 0)
         {
-            foreach (var stage in _stages)
-                _hitsToDestroy += stage.RequiredHits;
+            foreach (var stage in _stages) _hitsToDestroy += stage.RequiredHits;
 
             _itemDropper = GetComponent<ItemDropper>();
             _objectSwitcher = GetComponent<ObjectSwitcher>();
@@ -131,12 +130,16 @@ namespace FlavorfulStory.ResourceContainer
 
         #region HitBehaviour
 
+        [field: SerializeField]
+        public SfxType SfxType { private get; set; }
+
         /// <summary> Получить удар. </summary>
         /// <param name="toolType"> Тип инструмента, которым наносится удар. </param>
         public void TakeHit(ToolType toolType)
         {
             if (IsDestroyed || !_toolsToBeHit.Contains(toolType)) return;
 
+            SfxPlayer.Instance.PlayOneShot(SfxType);
             HitsTaken++;
             if (HitsTaken >= _hitsToDestroy)
             {

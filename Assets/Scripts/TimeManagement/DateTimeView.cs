@@ -15,19 +15,22 @@ namespace FlavorfulStory.TimeManagement
         /// <summary> Текстовое поле отображения текущего времени. </summary>
         [SerializeField] private TMP_Text _timeText;
 
+        /// <summary> Флаг, определяющий формат отображения времени (24-часовой или 12-часовой). </summary>
+        [SerializeField] private bool _is24HourFormat = true;
+
         /// <summary> Подписка на событие изменения времени при активации объекта. </summary>
-        private void OnEnable() => WorldTime.OnTimeUpdated += SetDateTimeText;
+        private void OnEnable() => WorldTime.OnTimeTick += SetDateTimeText;
 
         /// <summary> Отписка от события изменения времени при деактивации объекта. </summary>
-        private void OnDisable() => WorldTime.OnTimeUpdated -= SetDateTimeText;
+        private void OnDisable() => WorldTime.OnTimeTick -= SetDateTimeText;
 
         /// <summary> Обновление UI в соответствии с текущим временем. </summary>
         /// <param name="dateTime"> Текущие данные о времени. </param>
         private void SetDateTimeText(DateTime dateTime)
         {
             _seasonText.text = dateTime.Season.ToString();
-            _dayText.text = $"{dateTime.DayOfWeek} {dateTime.SeasonDay}";
-            _timeText.text = dateTime.TimeToString(false);
+            _dayText.text = $"{dateTime.DayOfWeek} {(int)dateTime.SeasonDay}";
+            _timeText.text = dateTime.TimeToString(_is24HourFormat);
         }
     }
 }

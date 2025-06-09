@@ -11,7 +11,7 @@ namespace FlavorfulStory.InventorySystem.PickupSystem
         private void OnTriggerEnter(Collider other)
         {
             if (!other.CompareTag("Player")) return;
-            
+
             var pickup = GetComponent<Pickup>();
             if (pickup.CanBePickedUp) pickup.PickupItem();
         }

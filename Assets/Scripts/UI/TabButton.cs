@@ -1,4 +1,5 @@
 using System;
+using FlavorfulStory.Audio;
 using TMPro;
 using UnityEngine;
 
@@ -24,20 +25,15 @@ namespace FlavorfulStory.UI
         public event Action OnClick;
 
         /// <summary> Установка цвета текста при активации компонента. </summary>
-        private void OnEnable()
-        {
-            _label.color = IsActive ? _activeLabelColor : _defaultLabelColor;
-        }
+        private void OnEnable() => _label.color = IsActive ? _activeLabelColor : _defaultLabelColor;
 
         /// <summary> Инициализация кнопки. </summary>
-        protected override void Initialize()
-        {
-            SetNameState(false);
-        }
+        protected override void Initialize() => SetNameState(false);
 
         /// <summary> Наведение курсора на кнопку. </summary>
         protected override void HoverStart()
         {
+            SfxPlayer.Instance.PlayOneShot(SfxType.UIHover);
             SetNameState(true);
         }
 
@@ -50,19 +46,14 @@ namespace FlavorfulStory.UI
         /// <summary> Клик по кнопке. </summary>
         protected override void Click()
         {
+            base.Click();
             SetNameState(true);
             OnClick?.Invoke();
         }
 
-        protected override void OnInteractionEnabled() {}
-
-        protected override void OnInteractionDisabled() {}
-
         /// <summary> Установка состояния текста (активное или стандартное). </summary>
         /// <param name="state"> Состояние текста (true - активное, false - стандартное). </param>
-        public void SetNameState(bool state)
-        {
+        public void SetNameState(bool state) =>
             _label.color = state || IsMouseOver ? _activeLabelColor : _defaultLabelColor;
-        }
     }
 }

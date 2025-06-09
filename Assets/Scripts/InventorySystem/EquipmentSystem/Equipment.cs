@@ -49,8 +49,7 @@ namespace FlavorfulStory.InventorySystem.EquipmentSystem
         public object CaptureState()
         {
             var equippedItemsForSerialization = new Dictionary<EquipmentType, string>();
-            foreach (var pair in _equippedItems)
-                equippedItemsForSerialization[pair.Key] = pair.Value.ItemID;
+            foreach (var pair in _equippedItems) equippedItemsForSerialization[pair.Key] = pair.Value.ItemID;
 
             return equippedItemsForSerialization;
         }

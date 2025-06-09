@@ -1,5 +1,6 @@
 using FlavorfulStory.InputSystem;
 using FlavorfulStory.SceneManagement;
+using FlavorfulStory.TimeManagement;
 using TMPro;
 using UnityEngine;
 
@@ -60,17 +61,19 @@ namespace FlavorfulStory.UI
 
         /// <summary> Переключает состояние видимости меню. </summary>
         /// <param name="isEnabled"> Новое состояние видимости меню. </param>
-        private void SwitchContent(bool isEnabled)
+        public void SwitchContent(bool isEnabled)
         {
             if (isEnabled)
             {
                 InputWrapper.BlockPlayerMovement();
                 InputWrapper.BlockInput(InputButton.MouseScroll);
+                WorldTime.Pause();
             }
             else
             {
                 InputWrapper.UnblockPlayerMovement();
                 InputWrapper.UnblockInput(InputButton.MouseScroll);
+                WorldTime.Unpause();
             }
 
             _content.SetActive(isEnabled);

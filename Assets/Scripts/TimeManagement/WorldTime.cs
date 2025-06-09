@@ -2,6 +2,7 @@ using System;
 using FlavorfulStory.Saving;
 using UnityEngine;
 
+// TODO: Актуализировать под Zenject
 namespace FlavorfulStory.TimeManagement
 {
     /// <summary> Управляет глобальным игровым временем, изменяя его по тикам и вызывая события. </summary>
@@ -9,28 +10,26 @@ namespace FlavorfulStory.TimeManagement
     {
         #region Fields
 
-        /// <summary> Количество игровых минут, добавляемых за один тик. </summary>
-        [Header("Tick settings")] [Tooltip("Сколько минут проходит за один тик."), SerializeField, Range(0.1f, 20f)]
-        private int _minutesPerTick = 10;
+        [Header("Time Scale")]
+        [Tooltip("Сколько игровых минут проходит за реальную секунду."), SerializeField, Range(-100f, 1000f)]
+        private float _timeScale = 1f;
 
-        /// <summary> Время в секундах между тиками. </summary>
-        [Tooltip("Сколько реального времени длится один тик."), SerializeField, Range(0.1f, 20f)]
-        private float _timeBetweenTicks = 1;
+        [Tooltip("Раз в сколько игровых минут происходит тик времени."), SerializeField, Range(1, 10)]
+        private float _timeBetweenTicks = 1f;
 
         /// <summary> Час начала нового дня. </summary>
-        [Header("Day/night settings")]
-        [Tooltip("Во сколько начинается новый день."), SerializeField, Range(0, 24)]
+        [Header("Day/night settings")] [Tooltip("Во сколько начинается новый день."), SerializeField, Range(0, 24)]
         private int _dayStartHour;
 
         /// <summary> Час окончания дня. </summary>
         [Tooltip("Во сколько заканчивается день."), SerializeField, Range(0, 24)]
         private int _dayEndHour;
 
-        /// <summary> Текущее игровое время. </summary>
-        private static DateTime _currentGameTime;
+        /// <summary> Час начала ночи. </summary>
+        private const int NightStartHour = 18;
 
-        /// <summary> Время, прошедшее с момента последнего тика. </summary>
-        private float _elapsedTime;
+        /// <summary> Текущее игровое время. </summary>
+        public static DateTime CurrentGameTime { get; private set; }
 
         /// <summary> Игра на паузе? </summary>
         private static bool _isPaused;
@@ -41,73 +40,111 @@ namespace FlavorfulStory.TimeManagement
         /// <summary> Вызывается при завершении игрового дня. </summary>
         public static Action<DateTime> OnDayEnded;
 
+        /// <summary> Вызывается при наступлении ночи. </summary>
+        public static Action<DateTime> OnNightStarted;
+
+        /// <summary> Вызывается при заданном тике времени. </summary>
+        public static Action<DateTime> OnTimeTick;
+
+        /// <summary> Вызывается при паузе времени. </summary>
+        public static Action OnTimePaused;
+
+        /// <summary> Вызывается при снятии паузы времени. </summary>
+        public static Action OnTimeUnpaused;
+
+        /// <summary> Событие, вызываемое при принудительном завершении дня. </summary>
+        private static Action OnForceEndDay;
+
         #endregion
 
-        /// <summary> Инициализировать начальное игровое время. </summary>
-        private void Awake() => _currentGameTime = new DateTime(1, Season.Spring, 1, _dayStartHour, 0);
+        /// <summary> Инициализировать начальное игровое время и подписаться на события. </summary>
+        private void Awake()
+        {
+            CurrentGameTime = new DateTime(1, Season.Spring, 1, _dayStartHour, 0);
+            OnForceEndDay += BeginNewDay;
+        }
 
-        /// <summary> Вызвать обновление UI при старте. </summary>
-        private void Start() => OnTimeUpdated?.Invoke(_currentGameTime);
+        /// <summary> Вызвать начальное обновление интерфейса. </summary>
+        private void Start()
+        {
+            OnTimeUpdated?.Invoke(CurrentGameTime);
+            OnTimeTick?.Invoke(CurrentGameTime);
+        }
 
-        /// <summary> Обновить игровое время, если не стоит пауза. </summary>
+        /// <summary> Очистить состояние и события при уничтожении объекта. </summary>
+        private void OnDestroy()
+        {
+            CurrentGameTime = default;
+            _isPaused = false;
+
+            OnTimeUpdated = null;
+            OnDayEnded = null;
+            OnNightStarted = null;
+            OnTimeTick = null;
+            OnTimePaused = null;
+            OnTimeUnpaused = null;
+        }
+
+        /// <summary> Обновить игровое время при отсутствии паузы. </summary>
         private void Update()
         {
             if (_isPaused) return;
 
-            _elapsedTime += Time.deltaTime;
-            if (_elapsedTime < _timeBetweenTicks) return;
+            var previousTime = CurrentGameTime;
+            float gameMinutesToAdd = Time.deltaTime * _timeScale;
+            CurrentGameTime = CurrentGameTime.AddMinutes(gameMinutesToAdd);
 
-            _elapsedTime = 0f;
-            IncreaseTime();
+            if (previousTime.Hour < NightStartHour && CurrentGameTime.Hour >= NightStartHour)
+                OnNightStarted?.Invoke(CurrentGameTime);
+
+            if (previousTime.Hour < _dayEndHour && CurrentGameTime.Hour >= _dayEndHour) BeginNewDay();
+
+            if ((int)CurrentGameTime.Minute % _timeBetweenTicks == 0) OnTimeTick?.Invoke(CurrentGameTime);
+
+            OnTimeUpdated?.Invoke(CurrentGameTime);
         }
 
-        /// <summary> Увеличить игровое время и проверить завершение дня. </summary>
-        private void IncreaseTime()
-        {
-            _currentGameTime.AddMinutes(_minutesPerTick);
-
-            if (_currentGameTime.Hour == _dayEndHour)
-            {
-                BeginNewDay();
-                OnDayEnded?.Invoke(_currentGameTime);
-            }
-
-            OnTimeUpdated?.Invoke(_currentGameTime);
-        }
-
-        /// <summary> Обновляет время до начала нового дня в зависимости от текущего времени. </summary>
+        /// <summary> Обновить игровое время до начала следующего дня. </summary>
         private void BeginNewDay()
         {
-            bool isSameDay = _currentGameTime.Hour < _dayStartHour;
+            bool isSameDay = 0f <= CurrentGameTime.Hour && CurrentGameTime.Hour < _dayStartHour;
             int dayAdjustment = isSameDay ? 0 : 1;
-
-            _currentGameTime = new DateTime(
-                _currentGameTime.Year,
-                _currentGameTime.Season,
-                _currentGameTime.SeasonDay + dayAdjustment,
+            CurrentGameTime = new DateTime(
+                CurrentGameTime.Year,
+                CurrentGameTime.Season,
+                CurrentGameTime.SeasonDay + dayAdjustment,
                 _dayStartHour,
                 0
             );
+
+            OnDayEnded?.Invoke(CurrentGameTime);
         }
 
+        /// <summary> Принудительно завершить текущий день. </summary>
+        public static void ForceEndDay() => OnForceEndDay?.Invoke();
+
         /// <summary> Поставить игровое время на паузу. </summary>
-        public static void Pause() => _isPaused = true;
+        public static void Pause()
+        {
+            _isPaused = true;
+            OnTimePaused?.Invoke();
+        }
 
         /// <summary> Снять паузу с игрового времени. </summary>
-        public static void Unpause() => _isPaused = false;
-
-        /// <summary> Получить текущее игровое время. </summary>
-        /// <returns> Текущее игрвоое время. </returns>
-        public static DateTime GetCurrentGameTime() => _currentGameTime;
+        public static void Unpause()
+        {
+            _isPaused = false;
+            OnTimeUnpaused?.Invoke();
+        }
 
         #region Saving
 
         /// <summary> Сохраняет текущее игровое время. </summary>
-        public object CaptureState() => _currentGameTime;
+        public object CaptureState() => CurrentGameTime;
 
         /// <summary> Восстанавливает игровое время из сохранённого состояния. </summary>
         /// <param name="state"> Сохранённое значение игрового времени. </param>
-        public void RestoreState(object state) => _currentGameTime = (DateTime)state;
+        public void RestoreState(object state) => CurrentGameTime = (DateTime)state;
 
         #endregion
     }

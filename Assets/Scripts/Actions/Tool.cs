@@ -1,6 +1,7 @@
-using FlavorfulStory.Control;
+using FlavorfulStory.Audio;
 using FlavorfulStory.InputSystem;
 using FlavorfulStory.InventorySystem;
+using FlavorfulStory.Player;
 using FlavorfulStory.ResourceContainer;
 using FlavorfulStory.Stats;
 using FlavorfulStory.Utils;
@@ -19,9 +20,13 @@ namespace FlavorfulStory.Actions
         [field: Tooltip("Тип инструмента."), SerializeField]
         public ToolType ToolType { get; private set; }
 
-        /// <summary> Кнопка использования предмета. </summary>
-        [field: Tooltip("Кнопка использования"), SerializeField]
+        /// <summary> Кнопка использования инструмента. </summary>
+        [field: Tooltip("Кнопка использования инструмента."), SerializeField]
         public UseActionType UseActionType { get; private set; }
+
+        /// <summary> Тип SFX использования. </summary>
+        [field: Tooltip("Тип SFX использования."), SerializeField]
+        public SfxType SfxType { get; private set; }
 
         /// <summary> Стоимость использования по выносливости. </summary>
         [field: Tooltip("Стоимость использования по выносливости."), SerializeField]
@@ -40,15 +45,14 @@ namespace FlavorfulStory.Actions
         /// <param name="hitableLayers"> Слои, по которым будем делать удар. </param>
         public bool Use(PlayerController player, LayerMask hitableLayers)
         {
-            var stamina = player.GetComponent<PlayerStats>().GetStat<Stamina>();
-            if (stamina == null || stamina.CurrentValue < StaminaCost) return false;
-
-            if (!WorldCoordinates.GetWorldCoordinatesFromScreenPoint(
+            if (!RaycastUtils.TryGetScreenPointToWorld(
                     InputWrapper.GetMousePosition(),
                     ~(1 << player.gameObject.layer),
                     out var targetPosition))
                 return false;
 
+            var stamina = player.GetComponent<PlayerStats>().GetStat<Stamina>();
+            if (stamina == null || stamina.CurrentValue < StaminaCost) return false;
             bool didHit = UseToolInDirection(targetPosition, player, hitableLayers);
             if (!didHit) return false;
 
@@ -75,7 +79,7 @@ namespace FlavorfulStory.Actions
                 if (collider.transform.parent.TryGetComponent<IHitable>(out var hitable))
                 {
                     hitable.TakeHit(ToolType);
-                    player.GetComponent<PlayerStats>().GetStat<Stamina>().Change(-StaminaCost);
+                    player.GetComponent<PlayerStats>().GetStat<Stamina>().ChangeValue(-StaminaCost);
                     return true;
                 }
 

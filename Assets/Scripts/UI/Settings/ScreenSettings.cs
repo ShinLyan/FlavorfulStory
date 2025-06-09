@@ -69,18 +69,16 @@ namespace FlavorfulStory.Settings
         /// <summary> Получает все доступные разрешения экрана и заполняет выпадающий список. </summary>
         private void InitializeResolutions()
         {
-            Resolution[] allResolutions = Screen.resolutions;
+            var allResolutions = Screen.resolutions;
             double maxRefreshRate = allResolutions[^1].refreshRateRatio.value;
             var uniqueResolutions = new List<string>();
 
             foreach (var resolution in allResolutions)
-            {
                 if (resolution.refreshRateRatio.value == maxRefreshRate)
                 {
                     uniqueResolutions.Add($"{resolution.width}x{resolution.height}");
                     _resolutions.Add(resolution);
                 }
-            }
 
             _resolutionDropdown.ClearOptions();
             _resolutionDropdown.AddOptions(uniqueResolutions);

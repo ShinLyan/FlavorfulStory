@@ -173,8 +173,7 @@ namespace FlavorfulStory.AI.WarpGraphSystem
         }
 
         /// <summary> Создает связи между варпами внутри одной локации. </summary>
-        private static void ConnectIntraLocationEdges(
-            Dictionary<LocationName, List<WarpPortal>> locationMap,
+        private static void ConnectIntraLocationEdges(Dictionary<LocationName, List<WarpPortal>> locationMap,
             Dictionary<WarpPortal, WarpNode> warpToNode)
         {
             foreach (var warpsInLocation in locationMap.Values)
