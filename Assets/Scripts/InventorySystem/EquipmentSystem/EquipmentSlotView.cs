@@ -1,11 +1,12 @@
 using FlavorfulStory.InventorySystem.UI;
 using FlavorfulStory.InventorySystem.UI.Dragging;
 using UnityEngine;
+using Zenject;
 
 namespace FlavorfulStory.InventorySystem.EquipmentSystem
 {
     /// <summary> Слот для отображения и управления экипировкой. </summary>
-    public class EquipmentSlotUI : MonoBehaviour, IDragContainer<InventoryItem>, IItemHolder
+    public class EquipmentSlotView : MonoBehaviour, IDragContainer<InventoryItem>, IItemHolder
     {
         /// <summary> Отображение иконки предмета экипировки. </summary>
         [SerializeField] private InventoryItemIcon _inventoryItemIcon;
@@ -13,31 +14,22 @@ namespace FlavorfulStory.InventorySystem.EquipmentSystem
         /// <summary> Тип экипировки, связанный со слотом. </summary>
         [SerializeField] private EquipmentType _equipmentType;
 
-        /// <summary> Экипированный предмет. </summary>
-        private EquipableItem _item;
-
-        /// <summary> Ссылка на систему экипировки игрока. </summary>
+        /// <summary> Экипировка игрока. </summary>
         private Equipment _equipment;
 
-        /// <summary> Инициализация ссылки на систему экипировки и подписка на обновление UI. </summary>
-        private void Awake()
-        {
-            var player = GameObject.FindGameObjectWithTag("Player");
-            _equipment = player.GetComponent<Equipment>();
-            _equipment.EquipmentUpdated += RedrawUI;
-        }
+        /// <summary> Внедрить зависимости Zenject. </summary>
+        /// <param name="equipment"> Экипировка игрока. </param>
+        [Inject]
+        private void Construct(Equipment equipment) => _equipment = equipment;
+
+        /// <summary> Подписка на обновление UI. </summary>
+        private void Awake() => _equipment.EquipmentUpdated += UpdateView;
 
         /// <summary> Первичное обновление UI экипировки. </summary>
-        private void Start()
-        {
-            RedrawUI();
-        }
+        private void Start() => UpdateView();
 
         /// <summary> Обновление отображения слота экипировки. </summary>
-        private void RedrawUI()
-        {
-            _inventoryItemIcon.SetItem(GetItem(), 1);
-        }
+        private void UpdateView() => _inventoryItemIcon.SetItem(GetItem(), 1);
 
         /// <summary> Получение максимально допустимого количества предметов, которые могут быть добавлены в слот. </summary>
         /// <param name="item"> Проверяемый предмет. </param>
@@ -45,8 +37,7 @@ namespace FlavorfulStory.InventorySystem.EquipmentSystem
         public int GetMaxAcceptableItemsNumber(InventoryItem item)
         {
             if (item is not EquipableItem equipableItem ||
-                equipableItem.AllowedEquipmentLocation != _equipmentType ||
-                GetItem() != null)
+                equipableItem.AllowedEquipmentLocation != _equipmentType || GetItem())
                 return 0;
 
             return 1;
@@ -70,9 +61,6 @@ namespace FlavorfulStory.InventorySystem.EquipmentSystem
 
         /// <summary> Удаление предмета из слота экипировки. </summary>
         /// <param name="number"> Количество удаляемых предметов (всегда 1). </param>
-        public void RemoveItems(int number)
-        {
-            _equipment.RemoveItem(_equipmentType);
-        }
+        public void RemoveItems(int number) => _equipment.RemoveItem(_equipmentType);
     }
 }

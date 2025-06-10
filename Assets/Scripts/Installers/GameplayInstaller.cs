@@ -1,9 +1,9 @@
 ﻿using FlavorfulStory.BuildingRepair;
 using FlavorfulStory.Infrastructure.Factories;
 using FlavorfulStory.InventorySystem;
+using FlavorfulStory.InventorySystem.EquipmentSystem;
 using FlavorfulStory.InventorySystem.UI;
 using UnityEngine;
-using UnityEngine.Serialization;
 using Zenject;
 
 namespace FlavorfulStory.Installers
@@ -15,7 +15,6 @@ namespace FlavorfulStory.Installers
         [SerializeField] private Inventory _playerInventory;
 
         /// <summary> Префаб отображения ячейки инвентаря. </summary>
-        [FormerlySerializedAs("_inventorySlotUIPrefab")]
         [SerializeField] private InventorySlotView _inventorySlotViewPrefab;
 
         /// <summary> Префаб отображения требования ресурса. </summary>
@@ -35,6 +34,8 @@ namespace FlavorfulStory.Installers
                 .To<ResourceRequirementViewFactory>()
                 .AsSingle()
                 .WithArguments(_requirementViewPrefab);
+
+            Container.Bind<Equipment>().FromComponentInHierarchy().AsSingle();
         }
     }
 }
