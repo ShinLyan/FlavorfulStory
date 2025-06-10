@@ -3,6 +3,7 @@ using FlavorfulStory.BuildingRepair;
 using FlavorfulStory.Infrastructure.Factories;
 using FlavorfulStory.InventorySystem;
 using FlavorfulStory.InventorySystem.EquipmentSystem;
+using FlavorfulStory.InventorySystem.PickupSystem;
 using FlavorfulStory.InventorySystem.UI;
 using FlavorfulStory.Lightning;
 using FlavorfulStory.Player;
@@ -43,6 +44,7 @@ namespace FlavorfulStory.Installers
         private void BindGameplay()
         {
             Container.Bind<Inventory>().FromInstance(_playerInventory).AsSingle();
+            Container.Bind<PickupNotificationManager>().FromComponentInHierarchy().AsSingle();
             Container.Bind<Equipment>().FromComponentInHierarchy().AsSingle();
             Container.Bind<PlayerController>().FromComponentInHierarchy().AsSingle();
         }

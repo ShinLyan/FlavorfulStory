@@ -13,22 +13,9 @@ namespace FlavorfulStory.Installers
         /// <summary> Вызывает методы для привязки зависимостей. </summary>
         public override void InstallBindings()
         {
-            BindSavingWrapper();
-            BindUI();
-        }
+            Container.Bind<SavingWrapper>().FromNewComponentOnNewGameObject()
+                .WithGameObjectName("SavingWrapper").AsSingle();
 
-        /// <summary> Привязывает компонент SavingWrapper как singleton на новом GameObject. </summary>
-        private void BindSavingWrapper()
-        {
-            Container.Bind<SavingWrapper>()
-                .FromNewComponentOnNewGameObject()
-                .WithGameObjectName("SavingWrapper")
-                .AsSingle();
-        }
-
-        /// <summary> Привязывает компонент Fader из указанного префаба как singleton. </summary>
-        private void BindUI()
-        {
             Container.Bind<Fader>().FromComponentInNewPrefab(_faderPrefab).AsSingle().NonLazy();
         }
     }

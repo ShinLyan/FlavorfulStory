@@ -3,6 +3,7 @@ using System.Linq;
 using FlavorfulStory.InventorySystem.PickupSystem;
 using FlavorfulStory.Saving;
 using UnityEngine;
+using Zenject;
 
 namespace FlavorfulStory.InventorySystem
 {
@@ -17,31 +18,22 @@ namespace FlavorfulStory.InventorySystem
         /// <summary> Предметы инвентаря. </summary>
         private InventorySlot[] _slots;
 
-        /// <summary> Синглтон инвентаря игрока. </summary>
-        private static Inventory _playerInventory;
-
         /// <summary> Менеджер уведомлений о подборе предмета. </summary>
         private PickupNotificationManager _notificationManager;
-
-        /// <summary> Синглтон инвентаря игрока. </summary>
-        public static Inventory PlayerInventory =>
-            _playerInventory ? _playerInventory : GameObject.FindWithTag("Player").GetComponent<Inventory>();
 
         /// <summary> Событие, вызываемое при изменении инвентаря (добавление, удаление предметов). </summary>
         public event Action InventoryUpdated;
 
-        /// <summary> Инициализация слотов и ссылки на инвентарь игрока. </summary>
-        private void Awake()
+        /// <summary> Внедрение зависимостей Zenject. </summary>
+        /// <param name="notificationManager"> Менеджер уведомлений о подборе предмета. </param>
+        [Inject]
+        private void Construct(PickupNotificationManager notificationManager)
         {
-            _slots = new InventorySlot[InventorySize];
-            _playerInventory = PlayerInventory;
-
-            // TODO: Заменить на Zenject
-            _notificationManager = FindFirstObjectByType<PickupNotificationManager>();
+            _notificationManager = notificationManager;
         }
 
-        /// <summary> При уничтожении объекта обнулять статические поля. </summary>
-        private void OnDestroy() { _playerInventory = null; }
+        /// <summary> Инициализация слотов и ссылки на инвентарь игрока. </summary>
+        private void Awake() => _slots = new InventorySlot[InventorySize];
 
         /// <summary> Есть ли место для предмета в инвентаре? </summary>
         public bool HasSpaceFor(InventoryItem item) => FindSlot(item) >= 0;
