@@ -30,7 +30,7 @@ namespace FlavorfulStory.SceneManagement
         /// <param name="fader"> Компонент затемнения экрана при переходах между сценами. </param>
         /// <param name="locationManager"> Менеджер локаций. </param>
         [Inject]
-        private void Construct(Fader fader, LocationManager locationManager)
+        private void Construct(Fader fader, [InjectOptional] LocationManager locationManager)
         {
             _fader = fader;
             _locationManager = locationManager;
@@ -73,7 +73,7 @@ namespace FlavorfulStory.SceneManagement
             Save();
             yield return _fader.FadeIn(Fader.FadeInTime);
 
-            _locationManager.ActivatePlayerCurrentLocation();
+            _locationManager?.ActivatePlayerCurrentLocation();
             InputWrapper.UnblockAllInput();
         }
 
@@ -85,7 +85,7 @@ namespace FlavorfulStory.SceneManagement
             yield return SavingSystem.LoadLastScene(GetCurrentSaveFileName());
             yield return _fader.FadeIn(Fader.FadeInTime);
 
-            _locationManager.ActivatePlayerCurrentLocation();
+            _locationManager?.ActivatePlayerCurrentLocation();
             InputWrapper.UnblockAllInput();
         }
 
