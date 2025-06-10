@@ -62,6 +62,8 @@ namespace FlavorfulStory.AI.FiniteStateMachine
                 new InteractionState(),
                 new MovementState(
                     navMeshAgent,
+                    
+                    // TODO: ZENJECT
                     WarpGraph.Build(
                         Object.FindObjectsByType<WarpPortal>(FindObjectsInactive.Include, FindObjectsSortMode.None)),
                     animator,

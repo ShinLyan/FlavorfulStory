@@ -19,6 +19,7 @@ namespace FlavorfulStory.Audio
         /// <summary> Инициализация ссылки на слайдер и подписка на событие изменения значения. </summary>
         private void Awake()
         {
+            // TODO: ZENJECT
             _audioSettings = FindAnyObjectByType<AudioSettings>();
             _slider = GetComponent<Slider>();
             _slider.onValueChanged.AddListener(HandleSliderChanged);

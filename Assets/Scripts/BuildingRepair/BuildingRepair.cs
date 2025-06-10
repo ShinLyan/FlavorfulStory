@@ -65,6 +65,8 @@ namespace FlavorfulStory.BuildingRepair
         private void Awake()
         {
             _objectSwitcher = GetComponent<ObjectSwitcher>();
+            
+            // TODO: ZENJECT
             _view = FindFirstObjectByType<BuildingRepairView>(FindObjectsInactive.Include);
         }
 
