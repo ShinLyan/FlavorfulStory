@@ -3,6 +3,8 @@ using FlavorfulStory.Infrastructure.Factories;
 using FlavorfulStory.InventorySystem;
 using FlavorfulStory.InventorySystem.EquipmentSystem;
 using FlavorfulStory.InventorySystem.UI;
+using FlavorfulStory.Player;
+using FlavorfulStory.UI;
 using UnityEngine;
 using Zenject;
 
@@ -20,22 +22,30 @@ namespace FlavorfulStory.Installers
         /// <summary> Префаб отображения требования ресурса. </summary>
         [SerializeField] private ResourceRequirementView _requirementViewPrefab;
 
-        /// <summary> Установить привязки зависимостей для игровых компонентов. </summary>
+        /// <summary> Выполняет установку всех зависимостей, необходимых для сцены. </summary>
         public override void InstallBindings()
         {
+            BindGameplay();
+            BindUI();
+        }
+
+        /// <summary> Установить зависимости, связанные с игровыми объектами и логикой. </summary>
+        private void BindGameplay()
+        {
             Container.Bind<Inventory>().FromInstance(_playerInventory).AsSingle();
-
-            Container.Bind<IGameFactory<InventorySlotView>>()
-                .To<InventorySlotViewFactory>()
-                .AsSingle()
-                .WithArguments(_inventorySlotViewPrefab);
-
-            Container.Bind<IGameFactory<ResourceRequirementView>>()
-                .To<ResourceRequirementViewFactory>()
-                .AsSingle()
-                .WithArguments(_requirementViewPrefab);
-
             Container.Bind<Equipment>().FromComponentInHierarchy().AsSingle();
+            Container.Bind<PlayerController>().FromComponentInHierarchy().AsSingle();
+        }
+
+        /// <summary> Установить зависимости, связанные с пользовательским интерфейсом. </summary>
+        private void BindUI()
+        {
+            Container.Bind<IGameFactory<InventorySlotView>>().To<InventorySlotViewFactory>().AsSingle()
+                .WithArguments(_inventorySlotViewPrefab);
+            Container.Bind<IGameFactory<ResourceRequirementView>>().To<ResourceRequirementViewFactory>().AsSingle()
+                .WithArguments(_requirementViewPrefab);
+            Container.Bind<ConfirmationWindowView>().FromComponentInHierarchy().AsSingle();
+            Container.Bind<SummaryView>().FromComponentInHierarchy().AsSingle();
         }
     }
 }
