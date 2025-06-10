@@ -10,9 +10,6 @@ namespace FlavorfulStory.SceneManagement
     /// <summary> Управляет сохранением, загрузкой и переключением сцен. </summary>
     public class SavingWrapper : MonoBehaviour
     {
-        /// <summary> Компонент затемнения экрана при переходах между сценами. </summary>
-        private Fader _fader;
-
         /// <summary> Название первой сцены, которая загружается при старте новой игры. </summary>
         private const SceneName FirstUploadedScene = SceneName.Game;
 
@@ -23,12 +20,20 @@ namespace FlavorfulStory.SceneManagement
         public static bool SaveFileExists => PlayerPrefs.HasKey(CurrentSaveKey) &&
                                              SavingSystem.SaveFileExists(GetCurrentSaveFileName());
 
-        /// <summary> Внедряет зависимость компонента затемнения экрана. </summary>
+        /// <summary> Компонент затемнения экрана при переходах между сценами. </summary>
+        private Fader _fader;
+
+        /// <summary> Менеджер локаций. </summary>
+        private LocationManager _locationManager;
+
+        /// <summary> Внедрение зависимостей Zenject. </summary>
         /// <param name="fader"> Компонент затемнения экрана при переходах между сценами. </param>
+        /// <param name="locationManager"> Менеджер локаций. </param>
         [Inject]
-        public void Construct(Fader fader)
+        private void Construct(Fader fader, LocationManager locationManager)
         {
             _fader = fader;
+            _locationManager = locationManager;
         }
 
         /// <summary> Продолжает последнюю сохранённую игру. </summary>
@@ -68,7 +73,7 @@ namespace FlavorfulStory.SceneManagement
             Save();
             yield return _fader.FadeIn(Fader.FadeInTime);
 
-            LocationChanger.ActivatePlayerCurrentLocation();
+            _locationManager.ActivatePlayerCurrentLocation();
             InputWrapper.UnblockAllInput();
         }
 
@@ -80,7 +85,7 @@ namespace FlavorfulStory.SceneManagement
             yield return SavingSystem.LoadLastScene(GetCurrentSaveFileName());
             yield return _fader.FadeIn(Fader.FadeInTime);
 
-            LocationChanger.ActivatePlayerCurrentLocation();
+            _locationManager.ActivatePlayerCurrentLocation();
             InputWrapper.UnblockAllInput();
         }
 
