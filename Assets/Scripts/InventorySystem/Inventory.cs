@@ -7,8 +7,7 @@ using Zenject;
 
 namespace FlavorfulStory.InventorySystem
 {
-    /// <summary> Хранение инвентаря игрока с настраиваемым количеством слотов.
-    /// Компонент должен находиться на объекте с тегом "Player". </summary>
+    /// <summary> Инвентарь игрока с настраиваемым количеством слотов. </summary>
     public class Inventory : MonoBehaviour, ISaveable
     {
         /// <summary> Количество слотов в инвентаре. </summary>

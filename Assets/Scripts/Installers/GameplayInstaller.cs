@@ -2,6 +2,7 @@
 using FlavorfulStory.BuildingRepair;
 using FlavorfulStory.Infrastructure.Factories;
 using FlavorfulStory.InventorySystem;
+using FlavorfulStory.InventorySystem.DropSystem;
 using FlavorfulStory.InventorySystem.EquipmentSystem;
 using FlavorfulStory.InventorySystem.PickupSystem;
 using FlavorfulStory.InventorySystem.UI;
@@ -47,6 +48,7 @@ namespace FlavorfulStory.Installers
             Container.Bind<PickupNotificationManager>().FromComponentInHierarchy().AsSingle();
             Container.Bind<Equipment>().FromComponentInHierarchy().AsSingle();
             Container.Bind<PlayerController>().FromComponentInHierarchy().AsSingle();
+            Container.Bind<ItemDropper>().FromComponentInHierarchy().AsSingle();
         }
 
         /// <summary> Установить зависимости, связанные с пользовательским интерфейсом. </summary>
