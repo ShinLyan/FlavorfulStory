@@ -53,22 +53,18 @@ namespace FlavorfulStory.BuildingRepair
 
         #endregion
 
-        /// <summary> Внедрение зависимости — инвентарь игрока. </summary>
+        /// <summary> Внедрение зависимостей Zenject. </summary>
         /// <param name="inventory"> Инвентарь игрока. </param>
+        /// <param name="view"> Визуальное представление ремонта зданий. </param>
         [Inject]
-        private void Construct(Inventory inventory)
+        private void Construct(Inventory inventory, BuildingRepairView view)
         {
             _playerInventory = inventory;
+            _view = view;
         }
 
         /// <summary> Инициализация компонента. </summary>
-        private void Awake()
-        {
-            _objectSwitcher = GetComponent<ObjectSwitcher>();
-            
-            // TODO: ZENJECT
-            _view = FindFirstObjectByType<BuildingRepairView>(FindObjectsInactive.Include);
-        }
+        private void Awake() => _objectSwitcher = GetComponent<ObjectSwitcher>();
 
         /// <summary> Запуск инициализации после загрузки сцены. </summary>
         private void Start()
@@ -79,8 +75,12 @@ namespace FlavorfulStory.BuildingRepair
 
         /// <summary> Инициализация списка вложенных ресурсов. </summary>
         /// <remarks> Список инвестированных ресурсов на текущей стадии будет инициализирован нулями. </remarks>
-        private void InitializeInvestedResourcesList() =>
+        private void InitializeInvestedResourcesList()
+        {
+            if (_investedResources != null) return;
+
             _investedResources = CurrentStage.Requirements.Select(_ => 0).ToList();
+        }
 
         /// <summary> Инициализация стадий ремонта. </summary>
         private void InitializeRepairStages()
@@ -237,7 +237,7 @@ namespace FlavorfulStory.BuildingRepair
             if (state is not RepairableBuildingRecord data) return;
 
             _repairStageIndex = data.StageIndex;
-            _investedResources = data.InvestedResources ?? new List<int>();
+            _investedResources = data.InvestedResources;
         }
 
         #endregion

@@ -52,6 +52,8 @@ namespace FlavorfulStory.Installers
             Container.Bind<PickupFactory>().AsSingle();
             Container.Bind<ItemDropper>().FromComponentsInHierarchy().AsCached();
             Container.Bind<PickupSpawner>().FromComponentsInHierarchy().AsCached();
+
+            Container.Bind<BuildingRepairView>().FromComponentInHierarchy().AsSingle();
         }
 
         /// <summary> Установить зависимости, связанные с пользовательским интерфейсом. </summary>
