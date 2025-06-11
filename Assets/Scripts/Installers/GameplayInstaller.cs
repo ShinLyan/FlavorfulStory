@@ -48,7 +48,10 @@ namespace FlavorfulStory.Installers
             Container.Bind<PickupNotificationManager>().FromComponentInHierarchy().AsSingle();
             Container.Bind<Equipment>().FromComponentInHierarchy().AsSingle();
             Container.Bind<PlayerController>().FromComponentInHierarchy().AsSingle();
-            Container.Bind<ItemDropper>().FromComponentInHierarchy().AsSingle();
+
+            Container.Bind<PickupFactory>().AsSingle();
+            Container.Bind<ItemDropper>().FromComponentsInHierarchy().AsCached();
+            Container.Bind<PickupSpawner>().FromComponentsInHierarchy().AsCached();
         }
 
         /// <summary> Установить зависимости, связанные с пользовательским интерфейсом. </summary>
