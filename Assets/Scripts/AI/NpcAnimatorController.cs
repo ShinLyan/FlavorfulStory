@@ -2,16 +2,34 @@
 
 namespace FlavorfulStory.AI
 {
+    /// <summary> Контроллер анимации NPC, управляющий всеми анимационными состояниями персонажа. </summary>
     public class NpcAnimatorController
     {
+        /// <summary> Компонент Animator для управления анимациями. </summary>
         private readonly Animator _animator;
+
+        /// <summary> Хэш параметра скорости для оптимизации обращения к Animator. </summary>
         private readonly int _speedHash = Animator.StringToHash("Speed");
 
+        /// <summary> Инициализирует контроллер анимации с заданным компонентом Animator. </summary>
+        /// <param name="animator"> Компонент Animator для управления анимациями NPC. </param>
         public NpcAnimatorController(Animator animator) { _animator = animator; }
 
-        public void SetSpeed(float speed, float dampTime = 0.2f)
-        {
+        /// <summary> Устанавливает скорость анимации с плавным переходом. </summary>
+        /// <param name="speed"> Значение скорости для установки. </param>
+        /// <param name="dampTime"> Время сглаживания перехода (по умолчанию 0.2 секунды). </param>
+        public void SetSpeed(float speed, float dampTime = 0.2f) =>
             _animator.SetFloat(_speedHash, speed, dampTime, Time.deltaTime);
+
+        /// <summary> Воспроизводит анимацию состояния по заданному типу анимации. </summary>
+        /// <param name="animationStateName"> Тип анимации для воспроизведения. </param>
+        public void PlayStateAnimation(AnimationType animationStateName)
+        {
+            if (animationStateName == AnimationType.Idle) return;
+            _animator.Play(animationStateName.ToString());
         }
+
+        /// <summary> Сбрасывает все параметры Animator к значениям по умолчанию. </summary>
+        public void Reset() => _animator.Rebind();
     }
 }

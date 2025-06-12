@@ -21,32 +21,43 @@ namespace FlavorfulStory.AI
         /// <summary> Контроллер состояний, управляющий переключением между состояниями NPC. </summary>
         private StateController _stateController;
 
+        /// <summary> Контроллер движения NPC для управления навигацией и перемещением. </summary>
         private NpcMovementController _movementController;
 
+        /// <summary> Компонент Animator для управления анимациями персонажа. </summary>
         private Animator _animator;
 
-        private void Awake() { _animator = GetComponent<Animator>(); }
+        /// <summary> Обработчик расписания для управления временными точками NPC. </summary>
+        private NpcScheduleHandler _npcScheduleHandler;
 
-        /// <summary> Инициализация контроллера состояний и контроллера передвижения. </summary>
+        /// <summary> Контроллер анимации NPC для воспроизведения состояний анимации. </summary>
+        private NpcAnimatorController _animatorController;
+
+        /// <summary> Выполняет инициализацию всех контроллеров и систем NPC при запуске. </summary>
         private void Start()
         {
+            _animatorController = new NpcAnimatorController(GetComponent<Animator>());
+            _npcScheduleHandler = new NpcScheduleHandler();
+
             _movementController = new NpcMovementController(
                 GetComponent<NavMeshAgent>(),
                 WarpGraph.Build(
                     FindObjectsByType<WarpPortal>(FindObjectsInactive.Include, FindObjectsSortMode.None)),
-                _animator,
                 transform,
-                this
+                this,
+                _animatorController,
+                _npcScheduleHandler
             );
 
             _stateController = new StateController(
                 _npcSchedule,
-                _animator,
-                _movementController
+                _movementController,
+                _animatorController,
+                _npcScheduleHandler
             );
         }
 
-        /// <summary> Обновление логики состояний каждый кадр. </summary>
+        /// <summary> Обновляет логику состояний и движения NPC каждый кадр. </summary>
         private void Update()
         {
             _stateController.Update(Time.deltaTime);
