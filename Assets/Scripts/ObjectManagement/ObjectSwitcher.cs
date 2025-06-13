@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using Zenject;
 
 namespace FlavorfulStory.ObjectManagement
 {
@@ -14,8 +15,16 @@ namespace FlavorfulStory.ObjectManagement
         /// <summary> Объекты на сцене, представляющие грейды разного уровня. </summary>
         private List<GameObject> _spawnedObjects;
 
+        /// <summary> DI контейнер Zenject. </summary>
+        private DiContainer _container;
+
         /// <summary> Получить количество грейдов. </summary>
         public int ObjectsCount => _objectPrefabs.Length + 1;
+
+        /// <summary> Внедрение зависимостей Zenject. </summary>
+        /// <param name="container"> DI контейнер Zenject. </param>
+        [Inject]
+        private void Construct(DiContainer container) => _container = container;
 
         /// <summary> Инициализировать все грейды. </summary>
         /// <remarks> В качестве первого грейда выступает дочерний объект под индексом 0.
@@ -27,9 +36,9 @@ namespace FlavorfulStory.ObjectManagement
             _spawnedObjects = new List<GameObject>(_objectPrefabs.Length + 1) { transform.GetChild(0).gameObject };
             foreach (var prefab in _objectPrefabs)
             {
-                var spawnedObject = Instantiate(prefab, transform, false);
-                spawnedObject.SetActive(false);
-                _spawnedObjects.Add(spawnedObject);
+                var spawned = _container.InstantiatePrefab(prefab, transform);
+                spawned.SetActive(false);
+                _spawnedObjects.Add(spawned);
             }
         }
 

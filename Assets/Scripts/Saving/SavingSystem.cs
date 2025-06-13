@@ -8,7 +8,7 @@ using UnityEngine.SceneManagement;
 namespace FlavorfulStory.Saving
 {
     /// <summary> Система сохранений. </summary>
-    public class SavingSystem : MonoBehaviour
+    public static class SavingSystem
     {
         #region Public Methods
 
@@ -82,7 +82,8 @@ namespace FlavorfulStory.Saving
         private static void SaveFile(string saveFile, object state)
         {
             string path = GetPathFromSaveFile(saveFile);
-            print("Saving to " + path);
+            Debug.Log("Saving to " + path);
+
             using (var stream = File.Open(path, FileMode.Create))
             {
                 var formatter = new BinaryFormatter();
@@ -94,7 +95,7 @@ namespace FlavorfulStory.Saving
         /// <param name="state"> Словарь, содержащий состояния всех объектов, которые необходимо зафиксировать. </param>
         private static void CaptureState(Dictionary<string, object> state)
         {
-            foreach (var saveable in FindObjectsByType<SaveableEntity>(FindObjectsSortMode.None))
+            foreach (var saveable in Object.FindObjectsByType<SaveableEntity>(FindObjectsSortMode.None))
                 state[saveable.UniqueIdentifier] = saveable.CaptureState();
 
             state["lastSceneBuildIndex"] = SceneManager.GetActiveScene().buildIndex;
@@ -106,7 +107,7 @@ namespace FlavorfulStory.Saving
         {
             if (state == null) return;
 
-            foreach (var saveable in FindObjectsByType<SaveableEntity>(FindObjectsSortMode.None))
+            foreach (var saveable in Object.FindObjectsByType<SaveableEntity>(FindObjectsSortMode.None))
             {
                 string id = saveable.UniqueIdentifier;
                 if (state.TryGetValue(id, out object value)) saveable.RestoreState(value);

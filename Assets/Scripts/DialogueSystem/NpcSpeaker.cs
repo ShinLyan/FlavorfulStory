@@ -23,7 +23,8 @@ namespace FlavorfulStory.DialogueSystem
         {
             IsInteractionAllowed = true;
             NpcInfo = GetComponent<Npc>().NpcInfo;
-
+            
+            // TODO: ZENJECT
             var playerObject = GameObject.FindGameObjectWithTag("Player");
             _dialogueInitiator = playerObject.GetComponent<IDialogueInitiator>();
 

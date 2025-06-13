@@ -5,6 +5,7 @@ using FlavorfulStory.ResourceContainer;
 using FlavorfulStory.Saving;
 using GD.MinMaxSlider;
 using UnityEngine;
+using Zenject;
 using Random = UnityEngine.Random;
 
 namespace FlavorfulStory.ObjectManagement
@@ -60,6 +61,17 @@ namespace FlavorfulStory.ObjectManagement
         /// <summary> Список всех заспавненных объектов. </summary>
         protected readonly List<GameObject> _spawnedObjects = new();
 
+        /// <summary> Контейнер зависимостей Zenject. </summary>
+        private DiContainer _container;
+
+        /// <summary> Внедрить контейнер зависимостей. </summary>
+        /// <param name="container"> Контейнер Zenject. </param>
+        [Inject]
+        private void Construct(DiContainer container)
+        {
+            _container = container;
+        }
+
         #endregion
 
         /// <summary> Запуск процесса спавна при старте сцены. </summary>
@@ -98,16 +110,15 @@ namespace FlavorfulStory.ObjectManagement
         /// <param name="data"> Дополнительные данные. </param>
         protected virtual GameObject SpawnObject(Vector3 position, float rotationY, Vector3 scale, object data = null)
         {
-            var obj = Instantiate(
-                _spawnObjectPrefab, position, Quaternion.Euler(0f, rotationY, 0f), transform
-            );
-            obj.transform.localScale = scale;
-            _spawnedObjects.Add(obj);
+            var instance = _container.InstantiatePrefab(_spawnObjectPrefab, position,
+                Quaternion.Euler(0, rotationY, 0), transform);
+            instance.transform.localScale = scale;
+            _spawnedObjects.Add(instance);
 
-            if (obj.TryGetComponent(out IDestroyable destroyable))
+            if (instance.TryGetComponent(out IDestroyable destroyable))
                 destroyable.OnObjectDestroyed += RemoveObjectFromList;
 
-            return obj;
+            return instance;
         }
 
         /// <summary> Удаляет объект из списка заспавненных объектов. </summary>
