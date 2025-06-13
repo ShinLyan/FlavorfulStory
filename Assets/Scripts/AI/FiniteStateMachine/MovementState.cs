@@ -21,8 +21,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         public override void Exit() => _movementController.Stop();
 
         /// <summary> Обновляет состояние движения каждый кадр. </summary>
-        /// <param name="deltaTime"> Время, прошедшее с последнего кадра. </param>
-        public override void Update(float deltaTime) { }
+        public override void Update() { }
 
         /// <summary> Сбрасывает состояние движения, мгновенно останавливая NPC. </summary>
         public override void Reset() => _movementController.Stop(true);
