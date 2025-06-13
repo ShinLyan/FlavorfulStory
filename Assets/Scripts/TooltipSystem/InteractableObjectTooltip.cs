@@ -12,9 +12,6 @@ namespace FlavorfulStory.TooltipSystem
         /// <summary> Поле для отображения описания тултипа. </summary>
         [SerializeField] private TMP_Text _description;
 
-        /// <summary> Смещение позиции тултипа относительно объекта. </summary>
-        [SerializeField] private Vector3 _offset;
-
         /// <summary> Инициализация тултипа. Сокрытие окна при старте игры. </summary>
         private void Start() => Hide();
 
@@ -24,7 +21,6 @@ namespace FlavorfulStory.TooltipSystem
         {
             gameObject.SetActive(true);
             SetTitleAndDescription(tooltip);
-            SetPositionWithOffset(tooltip);
         }
 
         /// <summary> Устанавливает заголовок и описание тултипа на основе данных из переданного объекта. </summary>
@@ -34,11 +30,6 @@ namespace FlavorfulStory.TooltipSystem
             _title.text = tooltip.TooltipTitle;
             _description.text = tooltip.TooltipDescription;
         }
-
-        /// <summary> Устанавливает позицию тултипа с учетом смещения. </summary>
-        /// <param name="tooltip"> Объект, предоставляющий позицию для тултипа. </param>
-        private void SetPositionWithOffset(ITooltipable tooltip) =>
-            transform.position = tooltip.WorldPosition + _offset;
 
         /// <summary> Скрыть тултип. </summary>
         public void Hide() => gameObject.SetActive(false);
