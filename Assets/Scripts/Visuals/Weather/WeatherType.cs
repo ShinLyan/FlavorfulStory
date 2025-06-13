@@ -1,4 +1,4 @@
-namespace FlavorfulStory.Lightning
+namespace FlavorfulStory.Visuals.Weather
 {
     /// <summary> Типы погодных условий в игре. </summary>
     /// <remarks> Используется для определения текущей погоды и соответствующих настроек освещения.
