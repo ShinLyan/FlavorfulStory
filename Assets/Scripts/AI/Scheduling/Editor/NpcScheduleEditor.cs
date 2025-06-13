@@ -54,6 +54,7 @@ namespace FlavorfulStory.AI.Scheduling.Editor
 
             if (Application.isPlaying && !SceneManager.GetActiveScene().isLoaded) return;
 
+            // TODO: ZENJECT
             var locs = FindObjectsByType<Location>(FindObjectsInactive.Include, FindObjectsSortMode.None);
             _locations.AddRange(locs);
         }

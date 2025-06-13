@@ -1,5 +1,6 @@
 using FlavorfulStory.Visuals.Lightning;
 using UnityEngine;
+using Zenject;
 
 namespace FlavorfulStory.SceneManagement
 {
@@ -22,8 +23,10 @@ namespace FlavorfulStory.SceneManagement
         /// <summary> Глобальная система освещения. </summary>
         private GlobalLightSystem _globalLightSystem;
 
-        /// <summary> Найти все источники освещения. </summary>
-        private void Awake() => _globalLightSystem = FindFirstObjectByType<GlobalLightSystem>();
+        /// <summary> Внедрение зависимостей Zenject. </summary>
+        /// <param name="globalLightSystem"> Глобальная система освещения.</param>
+        [Inject]
+        private void Construct(GlobalLightSystem globalLightSystem) => _globalLightSystem = globalLightSystem;
 
         /// <summary> Активирует объекты, связанные с этой локацией. </summary>
         public void Enable() => SetObjectsActive(true);

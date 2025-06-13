@@ -4,6 +4,7 @@ using FlavorfulStory.SceneManagement;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Zenject;
 
 namespace FlavorfulStory.UI
 {
@@ -27,9 +28,20 @@ namespace FlavorfulStory.UI
         /// <remarks> Отображается при условии существующего файла сохранения. </remarks>
         [SerializeField] private Button _loadGameButton;
 
+        /// <summary> Ссылка на компонент, управляющий системой сохранений. </summary>
+        private SavingWrapper _savingWrapper;
+
         /// <summary> Название сохраненного файла для новой игры, формируемое на основе ввода игрока. </summary>
         /// <remarks> Название формируется путем соединения строк имени игрока и названия магазина. </remarks>
         private string NewGameSaveFileName => string.Concat(_newGameInputFields.Select(field => field.text));
+
+        /// <summary> Внедрение зависимости компонента сохранений. </summary>
+        /// <param name="savingWrapper"> Экземпляр SavingWrapper. </param>
+        [Inject]
+        public void Construct(SavingWrapper savingWrapper)
+        {
+            _savingWrapper = savingWrapper;
+        }
 
         /// <summary> При старте включает отображение кнопок при условии существующего файла сохранения. </summary>
         private void Start()
@@ -44,7 +56,7 @@ namespace FlavorfulStory.UI
         public void OnClickNewGame()
         {
             if (!AreInputFieldsValid()) return;
-            PersistentObject.Instance.SavingWrapper.StartNewGame(NewGameSaveFileName);
+            _savingWrapper.StartNewGame(NewGameSaveFileName);
         }
 
         /// <summary> Проверяет поля ввода на корректность. </summary>
@@ -77,7 +89,7 @@ namespace FlavorfulStory.UI
             Array.ForEach(_newGameInputFields, inputField => inputField.text = string.Empty);
 
         /// <summary> Продолжить ранее сохраненную игру. </summary>
-        public void OnClickContinue() => PersistentObject.Instance.SavingWrapper.ContinueGame();
+        public void OnClickContinue() => _savingWrapper.ContinueGame();
 
         /// <summary> Завершить работу приложения. </summary>
         public void OnClickExit() => Application.Quit();
