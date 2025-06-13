@@ -1,6 +1,7 @@
 ﻿using FlavorfulStory.AI.FiniteStateMachine;
 using FlavorfulStory.AI.Scheduling;
 using FlavorfulStory.AI.WarpGraphSystem;
+using FlavorfulStory.TimeManagement;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -55,12 +56,15 @@ namespace FlavorfulStory.AI
                 _animatorController,
                 _npcScheduleHandler
             );
+
+            WorldTime.OnTimePaused += _animatorController.PauseAnimation;
+            WorldTime.OnTimeUnpaused += _animatorController.ContinueAnimation;
         }
 
         /// <summary> Обновляет логику состояний и движения NPC каждый кадр. </summary>
         private void Update()
         {
-            _stateController.Update(Time.deltaTime);
+            _stateController.Update();
             _movementController.UpdateMovement();
         }
     }

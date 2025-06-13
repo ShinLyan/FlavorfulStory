@@ -18,8 +18,11 @@ namespace FlavorfulStory.AI
         /// <summary> Устанавливает скорость анимации с плавным переходом. </summary>
         /// <param name="speed"> Значение скорости для установки. </param>
         /// <param name="dampTime"> Время сглаживания перехода (по умолчанию 0.2 секунды). </param>
-        public void SetSpeed(float speed, float dampTime = 0.2f) =>
+        public void SetSpeed(float speed, float dampTime = 0.2f)
+        {
+            if (_animator.speed == 0) return;
             _animator.SetFloat(_speedHash, speed, dampTime, Time.deltaTime);
+        }
 
         /// <summary> Воспроизводит анимацию состояния по заданному типу анимации. </summary>
         /// <param name="animationStateName"> Тип анимации для воспроизведения. </param>
@@ -28,6 +31,10 @@ namespace FlavorfulStory.AI
             if (animationStateName == AnimationType.Idle) return;
             _animator.Play(animationStateName.ToString());
         }
+
+        public void PauseAnimation() => _animator.speed = 0;
+
+        public void ContinueAnimation() => _animator.speed = 1;
 
         /// <summary> Сбрасывает все параметры Animator к значениям по умолчанию. </summary>
         public void Reset() => _animator.Rebind();

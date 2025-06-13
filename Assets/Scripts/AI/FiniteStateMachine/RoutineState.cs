@@ -13,17 +13,14 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         /// <summary> Текущая точка расписания, в которой находится NPC. </summary>
         private SchedulePoint _currentPoint;
 
-        /// <summary> Обработчик расписания NPC для управления временными точками. </summary>
-        private readonly NpcScheduleHandler _scheduleHandler;
+        private bool _isGamePaused;
 
         #endregion
 
         /// <summary> Инициализирует новое состояние рутины с заданными зависимостями. </summary>
-        /// <param name="scheduleHandler"> Обработчик расписания для управления временными точками. </param>
         /// <param name="animatorController"> Контроллер анимации для воспроизведения анимаций. </param>
-        public RoutineState(NpcScheduleHandler scheduleHandler, NpcAnimatorController animatorController)
+        public RoutineState(NpcAnimatorController animatorController)
         {
-            _scheduleHandler = scheduleHandler;
             _animatorController = animatorController;
             _currentPoint = null;
         }
@@ -35,8 +32,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         public override void Exit() => Reset();
 
         /// <summary> Обновляет логику состояния рутины каждый кадр и воспроизводит соответствующую анимацию. </summary>
-        /// <param name="deltaTime"> Время, прошедшее с последнего кадра. </param>
-        public override void Update(float deltaTime) => PlayAnimation();
+        public override void Update() => PlayAnimation();
 
         /// <summary> Сбрасывает состояние рутины к начальному состоянию. </summary>
         public override void Reset() => _animatorController.Reset();

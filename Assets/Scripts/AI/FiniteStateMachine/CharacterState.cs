@@ -15,8 +15,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         public abstract void Exit();
 
         /// <summary> Обновление логики состояния, вызываемое каждый кадр. </summary>
-        /// <param name="deltaTime"> Время, прошедшее с последнего кадра. </param>
-        public abstract void Update(float deltaTime);
+        public abstract void Update();
 
         /// <summary> Сброс состояния в начальное состояние. </summary>
         public abstract void Reset();

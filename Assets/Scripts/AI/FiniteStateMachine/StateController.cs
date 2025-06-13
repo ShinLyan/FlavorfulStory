@@ -52,7 +52,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine
             var states = new CharacterState[]
             {
                 new InteractionState(), new MovementState(movementController),
-                new RoutineState(scheduleHandler, animatorController), new WaitingState()
+                new RoutineState(animatorController), new WaitingState()
             };
 
             foreach (var state in states)
@@ -66,8 +66,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         }
 
         /// <summary> Обновляет текущее состояние персонажа каждый кадр. </summary>
-        /// <param name="deltaTime"> Время, прошедшее с последнего кадра. </param>
-        public void Update(float deltaTime) => _currentState?.Update(deltaTime);
+        public void Update() => _currentState?.Update();
 
         /// <summary> Сбрасывает систему состояний при смене дня или инициализации. </summary>
         /// <param name="currentTime"> Текущее игровое время. </param>

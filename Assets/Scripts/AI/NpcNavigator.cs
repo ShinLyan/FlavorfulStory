@@ -45,10 +45,13 @@ namespace FlavorfulStory.AI
         private SchedulePoint _currentTargetPoint;
 
         /// <summary> Флаг, указывающий, движется ли NPC в данный момент. </summary>
-        private bool _isMoving;
+        private bool _isNotMoving;
 
         /// <summary> События, вызываемое при достижении пункта назначения. </summary>
         public Action OnDestinationReached;
+
+        /// <summary> Скорость агента. </summary>
+        private Vector3 _agentSpeed;
 
         /// <summary> Инициализирует навигатор NPC с необходимыми компонентами. </summary>
         /// <param name="navMeshAgent"> Агент NavMesh для навигации. </param>
@@ -78,7 +81,8 @@ namespace FlavorfulStory.AI
             {
                 _navMeshAgent.transform.rotation = Quaternion.Euler(_currentTargetPoint.Rotation);
                 OnDestinationReached?.Invoke();
-                _isMoving = false;
+                _isNotMoving = true;
+                StopAgent();
             }
         }
 
@@ -87,7 +91,8 @@ namespace FlavorfulStory.AI
         public void MoveTo(SchedulePoint point)
         {
             _currentTargetPoint = point;
-            _isMoving = true;
+            _isNotMoving = false;
+            ResumeAgent();
 
             if (_currentLocation != point.LocationName)
                 StartWarpTransition(point);
@@ -99,7 +104,9 @@ namespace FlavorfulStory.AI
         /// <param name="warpToSpawn"> Если true, телепортирует NPC в начальную позицию. </param>
         public void Stop(bool warpToSpawn = false)
         {
-            _isMoving = false;
+            _isNotMoving = true;
+            StopAgent();
+
             if (_currentWarpCoroutine != null) _coroutineRunner.StopCoroutine(_currentWarpCoroutine);
 
             _navMeshAgent.ResetPath();
@@ -111,6 +118,22 @@ namespace FlavorfulStory.AI
                 _currentTargetPoint = null;
             }
         }
+
+
+        /// <summary> Переключатель передвижения агента. </summary>
+        /// <param name="stopAgent"> Оставновить агента. </param>
+        private void ToggleAgentMovement(bool stopAgent)
+        {
+            _navMeshAgent.isStopped = stopAgent;
+            _agentSpeed = _navMeshAgent.velocity;
+            _navMeshAgent.velocity = stopAgent ? Vector3.zero : _agentSpeed;
+        }
+
+        /// <summary> Остановить агента. </summary>
+        private void StopAgent() => ToggleAgentMovement(true);
+
+        /// <summary> Запустить агента. </summary>
+        private void ResumeAgent() => ToggleAgentMovement(false);
 
         /// <summary> Начинает процесс телепортации к целевой точке в другой локации. </summary>
         /// <param name="destination"> Целевая точка назначения. </param>
@@ -180,7 +203,7 @@ namespace FlavorfulStory.AI
         /// <param name="point"> Новая точка расписания. </param>
         public void OnSchedulePointChanged(SchedulePoint point)
         {
-            if (!_isMoving) return;
+            if (_isNotMoving) return;
 
             Stop();
             MoveTo(point);
