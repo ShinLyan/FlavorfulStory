@@ -1,5 +1,6 @@
 ﻿using FlavorfulStory.Saving;
 using UnityEngine;
+using Zenject;
 
 namespace FlavorfulStory.InventorySystem.PickupSystem
 {
@@ -14,6 +15,14 @@ namespace FlavorfulStory.InventorySystem.PickupSystem
         /// <summary> Был ли предмет собран? </summary>
         private bool _isPickedUp;
 
+        /// <summary> Фабрика для создания экземпляров предметов, доступных для подбора. </summary>
+        private PickupFactory _pickupFactory;
+
+        /// <summary> Фабрика для создания экземпляров предметов, доступных для подбора. </summary>
+        /// <param name="pickupFactory"> Фабрика для создания экземпляров предметов, доступных для подбора. </param>
+        [Inject]
+        private void Construct(PickupFactory pickupFactory) => _pickupFactory = pickupFactory;
+
         /// <summary> Создает предмет при загрузке сцены. </summary>
         private void Start()
         {
@@ -23,29 +32,8 @@ namespace FlavorfulStory.InventorySystem.PickupSystem
         /// <summary> Создает объект Pickup на сцене. </summary>
         private void SpawnPickup()
         {
-            var spawnedPickup = Spawn(_inventorySlot.Item, transform.position, _inventorySlot.Number, transform);
-            spawnedPickup.transform.localRotation = Quaternion.Euler(0, 0, 0);
-
+            _pickupFactory.Create(_inventorySlot.Item, transform.position, _inventorySlot.Number, transform);
             _isPickedUp = true;
-        }
-
-        /// <summary> Заспавнить предмет Pickup на сцене. </summary>
-        /// <param name="item"> Предмет, на основе которого будет создан Pickup. </param>
-        /// <param name="position"> Позиция спавна. </param>
-        /// <param name="number"> Количество предметов. </param>
-        /// <param name="parent"> Родитель, контейнер на сцене. </param>
-        public static Pickup Spawn(InventoryItem item, Vector3 position, int number, Transform parent = null)
-        {
-            if (!item.PickupPrefab)
-            {
-                Debug.LogError($"PickupPrefab не назначен для предмета {item.name}");
-                return null;
-            }
-
-            var pickup = Instantiate(item.PickupPrefab, parent);
-            pickup.transform.position = position;
-            pickup.Setup(item, number);
-            return pickup;
         }
 
         #region Saving

@@ -4,7 +4,7 @@ using System.Linq;
 using FlavorfulStory.InventorySystem.PickupSystem;
 using FlavorfulStory.Saving;
 using UnityEngine;
-using UnityEngine.SceneManagement;
+using Zenject;
 using Random = UnityEngine.Random;
 
 namespace FlavorfulStory.InventorySystem.DropSystem
@@ -17,8 +17,13 @@ namespace FlavorfulStory.InventorySystem.DropSystem
         /// <summary> Выброшенные предметы. </summary>
         private List<Pickup> _droppedItems = new();
 
-        /// <summary> Список прочих заспавненных предметов инвентаря. </summary>
-        private readonly List<DropRecord> _otherSceneDroppedItems = new();
+        /// <summary> Фабрика для создания экземпляров предметов, доступных для подбора. </summary>
+        private PickupFactory _pickupFactory;
+
+        /// <summary> Внедрение зависимостей Zenject. </summary>
+        /// <param name="pickupFactory"> Фабрика для создания экземпляров предметов, доступных для подбора. </param>
+        [Inject]
+        private void Construct(PickupFactory pickupFactory) => _pickupFactory = pickupFactory;
 
         /// <summary> Создание pickup в определенной позиции. </summary>
         /// <param name="item"> Предмет, который необходимо заспавнить. </param>
@@ -31,9 +36,9 @@ namespace FlavorfulStory.InventorySystem.DropSystem
         private Vector3 GetDropPosition()
         {
             const float DropOffsetRange = 2f; // Диапазон случайного смещения по осям X и Z
-            float randomOffsetX = Random.Range(-DropOffsetRange, DropOffsetRange);
-            float randomOffsetZ = Random.Range(-DropOffsetRange, DropOffsetRange);
-            return transform.position + new Vector3(randomOffsetX, 1, randomOffsetZ);
+            float offsetX = Random.Range(-DropOffsetRange, DropOffsetRange);
+            float offsetZ = Random.Range(-DropOffsetRange, DropOffsetRange);
+            return transform.position + new Vector3(offsetX, 1, offsetZ);
         }
 
         /// <summary> Заспавнить предмет Pickup на сцене. </summary>
@@ -42,7 +47,7 @@ namespace FlavorfulStory.InventorySystem.DropSystem
         /// <param name="spawnPosition"> Позиция спавна предмета. </param>
         private void SpawnPickup(InventoryItem item, int number, Vector3 spawnPosition)
         {
-            var pickup = PickupSpawner.Spawn(item, spawnPosition, number);
+            var pickup = _pickupFactory.Create(item, spawnPosition, number);
             _droppedItems.Add(pickup);
         }
 
@@ -60,9 +65,6 @@ namespace FlavorfulStory.InventorySystem.DropSystem
 
             /// <summary> Количество выпавших предметов. </summary>
             public int Quantity;
-
-            /// <summary> Индекс сцены. </summary>
-            public int SceneIndex;
         }
 
         /// <summary> Фиксация состояния объекта при сохранении. </summary>
@@ -75,11 +77,9 @@ namespace FlavorfulStory.InventorySystem.DropSystem
             {
                 ItemID = pickup.Item.ItemID,
                 Position = new SerializableVector3(pickup.transform.position),
-                Quantity = pickup.Number,
-                SceneIndex = SceneManager.GetActiveScene().buildIndex
+                Quantity = pickup.Number
             }).ToList();
 
-            droppedItemsList.AddRange(_otherSceneDroppedItems);
             return droppedItemsList;
         }
 
@@ -90,20 +90,13 @@ namespace FlavorfulStory.InventorySystem.DropSystem
         /// <param name="state"> Объект состояния, который необходимо восстановить. </param>
         public void RestoreState(object state)
         {
-            var droppedItemsList = state as List<DropRecord>;
-            int buildIndex = SceneManager.GetActiveScene().buildIndex;
-            _otherSceneDroppedItems.Clear();
-            foreach (var item in droppedItemsList)
-            {
-                if (item.SceneIndex != buildIndex)
-                {
-                    _otherSceneDroppedItems.Add(item);
-                    continue;
-                }
+            if (state is not List<DropRecord> dropRecords) return;
 
-                var pickupItem = ItemDatabase.GetItemFromID(item.ItemID);
-                int number = item.Quantity;
-                var position = item.Position.ToVector();
+            foreach (var dropRecord in dropRecords)
+            {
+                var pickupItem = ItemDatabase.GetItemFromID(dropRecord.ItemID);
+                int number = dropRecord.Quantity;
+                var position = dropRecord.Position.ToVector();
                 SpawnPickup(pickupItem, number, position);
             }
         }

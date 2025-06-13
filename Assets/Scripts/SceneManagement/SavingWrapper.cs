@@ -3,21 +3,38 @@ using FlavorfulStory.InputSystem;
 using FlavorfulStory.Saving;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Zenject;
 
 namespace FlavorfulStory.SceneManagement
 {
     /// <summary> Управляет сохранением, загрузкой и переключением сцен. </summary>
     public class SavingWrapper : MonoBehaviour
     {
-        /// <summary> Первая сцена, загружаемая после главного меню. </summary>
-        [SerializeField] private SceneName _firstUploadedScene;
+        /// <summary> Название первой сцены, которая загружается при старте новой игры. </summary>
+        private const SceneName FirstUploadedScene = SceneName.Game;
 
-        /// <summary> Ключ для хранения имени текущего сохранения в PlayerPrefs. </summary>
+        /// <summary> Ключ в PlayerPrefs, по которому хранится текущее имя файла сохранения. </summary>
         private const string CurrentSaveKey = "currentSaveName";
 
-        /// <summary> Флаг существующего файла сохранения. </summary>
+        /// <summary> Возвращает true, если существует активное имя сохранения и связанный с ним файл. </summary>
         public static bool SaveFileExists => PlayerPrefs.HasKey(CurrentSaveKey) &&
                                              SavingSystem.SaveFileExists(GetCurrentSaveFileName());
+
+        /// <summary> Компонент затемнения экрана при переходах между сценами. </summary>
+        private Fader _fader;
+
+        /// <summary> Менеджер локаций. </summary>
+        private LocationManager _locationManager;
+
+        /// <summary> Внедрение зависимостей Zenject. </summary>
+        /// <param name="fader"> Компонент затемнения экрана при переходах между сценами. </param>
+        /// <param name="locationManager"> Менеджер локаций. </param>
+        [Inject]
+        private void Construct(Fader fader, [InjectOptional] LocationManager locationManager)
+        {
+            _fader = fader;
+            _locationManager = locationManager;
+        }
 
         /// <summary> Продолжает последнюю сохранённую игру. </summary>
         /// <remarks> Вызывается из главного меню. </remarks>
@@ -51,24 +68,24 @@ namespace FlavorfulStory.SceneManagement
         /// <returns> Корутина, выполняющая загрузку первой сцены. </returns>
         private IEnumerator LoadFirstScene()
         {
-            yield return PersistentObject.Instance.Fader.FadeOut(Fader.FadeOutTime);
-            yield return SceneManager.LoadSceneAsync(_firstUploadedScene.ToString());
+            yield return _fader.FadeOut(Fader.FadeOutTime);
+            yield return SceneManager.LoadSceneAsync(FirstUploadedScene.ToString());
             Save();
-            yield return PersistentObject.Instance.Fader.FadeIn(Fader.FadeInTime);
+            yield return _fader.FadeIn(Fader.FadeInTime);
 
-            LocationChanger.ActivatePlayerCurrentLocation();
+            _locationManager?.ActivatePlayerCurrentLocation();
             InputWrapper.UnblockAllInput();
         }
 
         /// <summary> Загружает последнюю сохранённую сцену. </summary>
         /// <returns> Корутина, выполняющая загрузку последней сохранённой сцены. </returns>
-        private static IEnumerator LoadLastScene()
+        private IEnumerator LoadLastScene()
         {
-            yield return PersistentObject.Instance.Fader.FadeOut(Fader.FadeOutTime);
+            yield return _fader.FadeOut(Fader.FadeOutTime);
             yield return SavingSystem.LoadLastScene(GetCurrentSaveFileName());
-            yield return PersistentObject.Instance.Fader.FadeIn(Fader.FadeInTime);
+            yield return _fader.FadeIn(Fader.FadeInTime);
 
-            LocationChanger.ActivatePlayerCurrentLocation();
+            _locationManager?.ActivatePlayerCurrentLocation();
             InputWrapper.UnblockAllInput();
         }
 
@@ -97,20 +114,20 @@ namespace FlavorfulStory.SceneManagement
 
 #if UNITY_EDITOR
         /// <summary> Клавиша для сохранения в режиме отладки. </summary>
-        [SerializeField] private KeyCode _saveKey;
+        private const KeyCode SaveKey = KeyCode.K;
 
         /// <summary> Клавиша для загрузки в режиме отладки. </summary>
-        [SerializeField] private KeyCode _loadKey;
+        private const KeyCode LoadKey = KeyCode.L;
 
         /// <summary> Клавиша для удаления сохранения в режиме отладки. </summary>
-        [SerializeField] private KeyCode _deleteKey;
+        private const KeyCode DeleteKey = KeyCode.Delete;
 
         /// <summary> Обрабатывает ввод для сохранения, загрузки и удаления в режиме отладки. </summary>
         private void Update()
         {
-            if (Input.GetKeyDown(_saveKey)) Save();
-            if (Input.GetKeyDown(_loadKey)) Load();
-            if (Input.GetKeyDown(_deleteKey)) Delete();
+            if (Input.GetKeyDown(SaveKey)) Save();
+            if (Input.GetKeyDown(LoadKey)) Load();
+            if (Input.GetKeyDown(DeleteKey)) Delete();
         }
 #endif
 

@@ -87,6 +87,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         /// <returns> Название текущей локации. </returns>
         private LocationName GetCurrentLocationName()
         {
+            // TODO: РЕФАКТОРИНГ - ВЗЯТЬ ИЗ LOCATION MANAGER
             foreach (var location in Object.FindObjectsByType<Location>(FindObjectsInactive.Include,
                          FindObjectsSortMode.None))
                 if (location.IsPositionInLocation(_npcTransform.position))

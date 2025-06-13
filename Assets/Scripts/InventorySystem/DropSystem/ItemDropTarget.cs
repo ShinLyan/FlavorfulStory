@@ -1,16 +1,19 @@
 ﻿using FlavorfulStory.InventorySystem.UI.Dragging;
 using UnityEngine;
+using Zenject;
 
 namespace FlavorfulStory.InventorySystem.DropSystem
 {
     /// <summary> Целевой контейнер для предметов, выбрасываемых из инвентаря. </summary>
     public class ItemDropTarget : MonoBehaviour, IDragDestination<InventoryItem>
     {
-        /// <summary> Ссылка на <see cref="ItemDropper"/> игрока. </summary>
+        /// <summary> Выбрасыватель предметов. </summary>
         private ItemDropper _itemDropper;
 
-        /// <summary> Поиск и снятие с игрока компонента <see cref="ItemDropper"/>. </summary>
-        private void Awake() => _itemDropper = GameObject.FindWithTag("Player").GetComponent<ItemDropper>();
+        /// <summary> Внедренеие зависимостей Zenject. </summary>
+        /// <param name="itemDropper"> Выбрасыватель предметов. </param>
+        [Inject]
+        private void Construct(ItemDropper itemDropper) => _itemDropper = itemDropper;
 
         /// <summary> Получить максимально допустимое количество элементов,
         /// которые можно добавить в это место назначения. </summary>
