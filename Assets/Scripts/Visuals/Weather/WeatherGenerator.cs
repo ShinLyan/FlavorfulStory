@@ -3,6 +3,7 @@ using FlavorfulStory.SceneManagement;
 using FlavorfulStory.TimeManagement;
 using FlavorfulStory.Visuals.Lightning;
 using UnityEngine;
+using Zenject;
 using DateTime = FlavorfulStory.TimeManagement.DateTime;
 using Random = UnityEngine.Random;
 
@@ -18,6 +19,9 @@ namespace FlavorfulStory.Visuals.Weather
         [Header("Weather Settings")] [SerializeField]
         private WeatherSettings[] _weatherSettings;
 
+        /// <summary> Ссылка на родительский обхект партиклов. </summary>
+        [SerializeField] private GameObject _particleParent;
+
         /// <summary>Текущие активные погодные условия для сегодняшнего дня. </summary>
         private WeatherSettings _currentWeather;
 
@@ -26,23 +30,30 @@ namespace FlavorfulStory.Visuals.Weather
         private readonly Dictionary<int, WeatherSettings> _dailyWeather = new();
 
         /// <summary> Ссылка на систему глобального освещения для синхронизации погодных эффектов. </summary>
-        [SerializeField] private GlobalLightSystem _globalLightSystem;
+        private GlobalLightSystem _globalLightSystem;
 
-        /// <summary> Ссылка на родительский обхект партиклов. </summary>
-        [SerializeField] private GameObject _particleParent;
+        /// <summary> Менеджер локаций. </summary>
+        private LocationManager _locationManager;
+
+        [Inject]
+        private void Construct(LocationManager locationManager, GlobalLightSystem globalLightSystem)
+        {
+            _locationManager = locationManager;
+            _globalLightSystem = globalLightSystem;
+        }
 
         /// <summary> Подписывается на событие окончания дня для генерации погоды следующего дня. </summary>
         private void OnEnable()
         {
             WorldTime.OnDayEnded += GenerateDailyWeather;
-            LocationChanger.OnLocationChanged += ToggleParticles;
+            SubscribeToLocationEvent();
         }
 
         /// <summary> Отписывается от событий при отключении компонента. </summary>
         private void OnDisable()
         {
             WorldTime.OnDayEnded -= GenerateDailyWeather;
-            LocationChanger.OnLocationChanged -= ToggleParticles;
+            UnsubscribeFromLocationEvent();
         }
 
         /// <summary> Генерирует погоду для текущего дня при запуске. </summary>
@@ -98,6 +109,18 @@ namespace FlavorfulStory.Visuals.Weather
             }
 
             return _weatherSettings[0];
+        }
+
+        private void SubscribeToLocationEvent()
+        {
+            if (_locationManager == null) return;
+            _locationManager.OnLocationChanged += ToggleParticles;
+        }
+
+        private void UnsubscribeFromLocationEvent()
+        {
+            if (_locationManager == null) return;
+            _locationManager.OnLocationChanged -= ToggleParticles;
         }
     }
 }

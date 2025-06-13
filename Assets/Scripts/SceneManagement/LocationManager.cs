@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using FlavorfulStory.Player;
 using UnityEngine;
@@ -17,6 +18,9 @@ namespace FlavorfulStory.SceneManagement
 
         /// <summary> Словарь локаций по имени для быстрого доступа. </summary>
         private readonly Dictionary<LocationName, Location> _locationByName;
+
+        /// <summary> Событие при смене локации. </summary>
+        public event Action<Location> OnLocationChanged;
 
         /// <summary> Конструктор с внедрением зависимостей. </summary>
         /// <param name="playerController"> Контроллер игрока. </param>
@@ -54,9 +58,14 @@ namespace FlavorfulStory.SceneManagement
         public void EnableLocation(LocationName name)
         {
             if (_locationByName.TryGetValue(name, out var location))
+            {
                 location.Enable();
+                OnLocationChanged?.Invoke(location);
+            }
             else
+            {
                 Debug.LogError($"Локации {name} не существует!");
+            }
         }
 
         /// <summary> Отключить локацию по имени. </summary>
