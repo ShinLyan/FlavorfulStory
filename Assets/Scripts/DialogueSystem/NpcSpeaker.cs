@@ -16,11 +16,15 @@ namespace FlavorfulStory.DialogueSystem
         /// <summary> Инициатор диалога, связанный с игроком. </summary>
         private IDialogueInitiator _dialogueInitiator;
 
+        /// <summary> Контроллер игрока. </summary>
         private PlayerController _playerController;
 
         /// <summary> Информация о NPC. </summary>
         public NpcInfo NpcInfo { get; private set; }
 
+        /// <summary> Внедрение зависимостей Zenject. </summary>
+        /// <param name="dialogueInitiator"> Инициатор диалога, связанный с игроком. </param>
+        /// <param name="playerController"> Контроллер игрока. </param>
         [Inject]
         private void Construct(IDialogueInitiator dialogueInitiator, PlayerController playerController)
         {
@@ -55,12 +59,17 @@ namespace FlavorfulStory.DialogueSystem
         {
             if (!IsInteractionAllowed) return;
 
+            IsInteractionAllowed = false;
             _dialogueInitiator?.StartDialogue(this, _dialogue);
         }
 
         /// <summary> Завершает взаимодействие с NPC. </summary>
         /// <param name="player"> Контроллер игрока, завершающий взаимодействие. </param>
-        public void EndInteraction(PlayerController player) => player.SetBusyState(false);
+        public void EndInteraction(PlayerController player)
+        {
+            player.SetBusyState(false);
+            IsInteractionAllowed = true;
+        }
 
         #endregion
 

@@ -5,6 +5,7 @@ using FlavorfulStory.UI;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Zenject;
 
 namespace FlavorfulStory.DialogueSystem.UI
 {
@@ -30,7 +31,8 @@ namespace FlavorfulStory.DialogueSystem.UI
         private GameObject _speakerPreview;
 
         /// <summary> Контейнер для кнопок вариантов ответа. </summary>
-        [Header("Choices")] [Tooltip("Контейнер для кнопок вариантов ответа."), SerializeField]
+        [Header("Choices")]
+        [Tooltip("Контейнер для кнопок вариантов ответа."), SerializeField]
         private Transform _choiceContainer;
 
         /// <summary> Префаб кнопки варианта ответа. </summary>
@@ -38,16 +40,22 @@ namespace FlavorfulStory.DialogueSystem.UI
         private DialogueChoiceButton _choiceButtonPrefab;
 
         /// <summary> Кнопка для перехода к следующей реплике. </summary>
-        [Header("Other")] [Tooltip("Кнопка для перехода к следующей реплике."), SerializeField]
+        [Header("Other")]
+        [Tooltip("Кнопка для перехода к следующей реплике."), SerializeField]
         private Button _nextButton;
 
         /// <summary> Объект текста кнопки Next. </summary>
         [Tooltip("Объект текста кнопки Next."), SerializeField]
         private GameObject _nextButtonPreview;
 
+        /// <summary> Текущая информация об NPC. </summary>
+        private NpcInfo _currentSpeakerInfo;
+
         /// <summary> Канвас с основным игровым интерфейсом (HUD). </summary>
-        [Tooltip("Канвас с основным игровым интерфейсом (HUD)."), SerializeField]
         private Canvas _hud;
+
+        /// <summary> Отображение модели персонажа в диалогах. </summary>
+        private DialogueModelPresenter _dialogueModelPresenter;
 
         /// <summary> Событие при нажатии кнопки Next. </summary>
         public event Action OnNextClicked;
@@ -57,6 +65,16 @@ namespace FlavorfulStory.DialogueSystem.UI
 
         #endregion
 
+        /// <summary> Внедрение зависимостей Zenject. </summary>
+        /// <param name="hud"> Канвас с основным игровым интерфейсом (HUD). </param>
+        /// <param name="dialogueModelPresenter"> Отображение модели персонажа в диалогах. </param>
+        [Inject]
+        private void Construct([Inject(Id = "HUD")] Canvas hud, DialogueModelPresenter dialogueModelPresenter)
+        {
+            _hud = hud;
+            _dialogueModelPresenter = dialogueModelPresenter;
+        }
+
         /// <summary> Подписка на кнопку Next. </summary>
         private void Awake() => _nextButton.onClick.AddListener(() => OnNextClicked?.Invoke());
 
@@ -64,11 +82,15 @@ namespace FlavorfulStory.DialogueSystem.UI
         /// <param name="data"> Данные текущего диалога. </param>
         public void ShowDialogue(DialogueData data)
         {
-            gameObject.SetActive(true);
-            _hud.gameObject.SetActive(false);
+            if (!_currentSpeakerInfo || _currentSpeakerInfo != data.SpeakerInfo)
+            {
+                gameObject.SetActive(true);
+                _hud.gameObject.SetActive(false);
+                SetSpeakerInfo(data.SpeakerInfo);
+                _currentSpeakerInfo = data.SpeakerInfo;
+            }
 
             _dialogueText.text = data.Text;
-            SetSpeakerInfo(data.SpeakerInfo);
 
             _nextButton.enabled = !data.IsChoosing;
             _nextButtonPreview.SetActive(!data.IsChoosing);
@@ -82,6 +104,8 @@ namespace FlavorfulStory.DialogueSystem.UI
         {
             gameObject.SetActive(false);
             _hud.gameObject.SetActive(true);
+            _currentSpeakerInfo = null;
+            _dialogueModelPresenter.DestroyModel();
             ClearChoices();
         }
 
@@ -91,7 +115,7 @@ namespace FlavorfulStory.DialogueSystem.UI
         {
             _speakerName.text = npc.NpcName.ToString();
             _romanceableIcon.gameObject.SetActive(npc.IsRomanceable);
-            // TODO: подключить _speakerPreview (портрет/анимация)
+            _dialogueModelPresenter.ShowModel(npc.DialogueModelPrefab);
         }
 
         /// <summary> Отрисовывает кнопки выбора реплик, если активен режим выбора. </summary>
