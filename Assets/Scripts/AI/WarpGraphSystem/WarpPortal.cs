@@ -4,6 +4,7 @@ using FlavorfulStory.Player;
 using FlavorfulStory.SceneManagement;
 using Unity.Cinemachine;
 using UnityEngine;
+using Zenject;
 
 namespace FlavorfulStory.AI.WarpGraphSystem
 {
@@ -30,15 +31,29 @@ namespace FlavorfulStory.AI.WarpGraphSystem
         /// <summary> Имя локации, к которой принадлежит данный портал. </summary>
         public LocationName ParentLocationName { get; private set; }
 
+        /// <summary> Компонент затемнения экрана при переходах между сценами. </summary>
+        private Fader _fader;
+
+        /// <summary> Менеджер локаций. </summary>
+        private LocationManager _locationManager;
+
         /// <summary> Виртуальная камера. </summary>
         private CinemachineCamera _virtualCamera;
 
-        /// <summary> Определение локации портала при инициализации. </summary>
-        private void Awake()
+        /// <summary> Внедрение зависимостей Zenject. </summary>
+        /// <param name="fader"> Компонент затемнения экрана при переходах между сценами. </param>
+        /// <param name="locationManager"> Менеджер локаций. </param>
+        /// <param name="virtualCamera"> Виртуальная камера. </param>
+        [Inject]
+        private void Construct(Fader fader, LocationManager locationManager, CinemachineCamera virtualCamera)
         {
-            ParentLocationName = GetComponentInParent<Location>().LocationName;
-            _virtualCamera = GameObject.FindWithTag("VirtualCamera").GetComponent<CinemachineCamera>();
+            _fader = fader;
+            _locationManager = locationManager;
+            _virtualCamera = virtualCamera;
         }
+
+        /// <summary> Определение локации портала при инициализации. </summary>
+        private void Awake() => ParentLocationName = GetComponentInParent<Location>().LocationName;
 
         /// <summary> Обработка входа игрока в триггер телепортации. </summary>
         /// <param name="other"> Коллайдер объекта, вошедшего в триггер. </param>
@@ -54,21 +69,21 @@ namespace FlavorfulStory.AI.WarpGraphSystem
         private IEnumerator TeleportPlayer(PlayerController playerController)
         {
             InputWrapper.BlockAllInput();
-            yield return PersistentObject.Instance.Fader.FadeOut(Fader.FadeOutTime);
+            yield return _fader.FadeOut(Fader.FadeOutTime);
 
             if (_virtualCamera) _virtualCamera.enabled = false;
 
-            LocationChanger.EnableLocation(ConnectedWarp.ParentLocationName);
+            _locationManager.EnableLocation(ConnectedWarp.ParentLocationName);
             playerController.UpdatePosition(ConnectedWarp._spawnPoint);
 
             yield return null;
             if (_virtualCamera) _virtualCamera.enabled = true;
 
             yield return new WaitForSeconds(Fader.FadeWaitTime);
-            PersistentObject.Instance.Fader.FadeIn(Fader.FadeInTime);
+            _fader.FadeIn(Fader.FadeInTime);
             InputWrapper.UnblockAllInput();
 
-            LocationChanger.DisableLocation(ParentLocationName);
+            _locationManager.DisableLocation(ParentLocationName);
         }
 
 #if UNITY_EDITOR

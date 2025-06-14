@@ -5,8 +5,8 @@ using UnityEngine;
 
 namespace FlavorfulStory.InventorySystem.EquipmentSystem
 {
-    /// <summary> Управляет экипировкой игрока, позволяет добавлять, удалять и сохранять предметы экипировки. </summary>
-    /// <remarks> Скрипт предполагается размещать на объекте "Player". </remarks>
+    /// <summary> Экипировка игрока. </summary>
+    /// <remarks> Позволяет добавлять, удалять и сохранять предметы экипировки. </remarks>
     public class Equipment : MonoBehaviour, ISaveable
     {
         /// <summary> Текущее состояние экипировки, связанное со слотами. </summary>

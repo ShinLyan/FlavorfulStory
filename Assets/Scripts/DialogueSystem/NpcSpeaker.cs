@@ -1,4 +1,5 @@
-﻿using FlavorfulStory.AI;
+﻿using FlavorfulStory.Actions;
+using FlavorfulStory.AI;
 using FlavorfulStory.CursorSystem;
 using FlavorfulStory.InteractionSystem;
 using FlavorfulStory.Player;
@@ -23,7 +24,8 @@ namespace FlavorfulStory.DialogueSystem
         {
             IsInteractionAllowed = true;
             NpcInfo = GetComponent<Npc>().NpcInfo;
-
+            
+            // TODO: ZENJECT
             var playerObject = GameObject.FindGameObjectWithTag("Player");
             _dialogueInitiator = playerObject.GetComponent<IDialogueInitiator>();
 
@@ -59,18 +61,9 @@ namespace FlavorfulStory.DialogueSystem
         #endregion
 
         #region ITooltipable
-
-        /// <summary> Возвращает заголовок тултипа. </summary>
-        /// <returns> Строка с заголовком тултипа. </returns>
-        public string TooltipTitle => NpcInfo.NpcName.ToString();
-
-        /// <summary> Возвращает описание тултипа. </summary>
-        /// <returns> Строка с описанием тултипа. </returns>
-        public string TooltipDescription => "Talk";
-
-        /// <summary> Возвращает мировую позицию объекта. </summary>
-        /// <returns> Вектор позиции объекта в мировых координатах. </returns>
-        public Vector3 WorldPosition => transform.position;
+        
+        [field: SerializeField]
+        public ActionDescription ActionDescription { get; set; }
 
         #endregion
 

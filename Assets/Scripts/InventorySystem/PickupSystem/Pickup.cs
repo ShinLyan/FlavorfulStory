@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using Zenject;
 
 namespace FlavorfulStory.InventorySystem.PickupSystem
 {
@@ -11,9 +12,6 @@ namespace FlavorfulStory.InventorySystem.PickupSystem
         [SerializeField, Range(0f, 5f), Tooltip("Радиус подбора предмета.")]
         private float _pickupRadius;
 
-        /// <summary> Инвентарь игрока. </summary>
-        private Inventory _inventory;
-
         /// <summary> Предмет, который можно подобрать. </summary>
         [field: SerializeField]
         public InventoryItem Item { get; private set; }
@@ -21,15 +19,16 @@ namespace FlavorfulStory.InventorySystem.PickupSystem
         /// <summary> Количество предметов, доступных для подбора. </summary>
         public int Number { get; private set; } = 1;
 
+        /// <summary> Инвентарь игрока. </summary>
+        private Inventory _inventory;
+
         /// <summary> Указывает, может ли предмет быть подобран в текущий момент. </summary>
         public bool CanBePickedUp => _inventory.HasSpaceFor(Item);
 
-        /// <summary> Инициализация ссылки на инвентарь игрока. </summary>
-        private void Awake()
-        {
-            var player = GameObject.FindGameObjectWithTag("Player");
-            _inventory = player.GetComponent<Inventory>();
-        }
+        /// <summary> Внедрение зависимостей. </summary>
+        /// <param name="inventory"> Инвентарь игрока. </param>
+        [Inject]
+        private void Construct(Inventory inventory) => _inventory = inventory;
 
         /// <summary> Устанавливает данные для подбираемого предмета. </summary>
         /// <param name="item"> Тип предмета. </param>

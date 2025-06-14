@@ -44,6 +44,7 @@ namespace FlavorfulStory.DialogueSystem
         /// <summary> Инициализация компонента и подписка на события UI. </summary>
         private void Awake()
         {
+            // TODO: ZENJECT
             _dialogueView = FindFirstObjectByType<DialogueView>(FindObjectsInactive.Include);
 
             _dialogueView.OnNextClicked += PlayNextDialogueNode;

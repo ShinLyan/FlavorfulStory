@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using FlavorfulStory.Actions;
 using FlavorfulStory.Audio;
 using FlavorfulStory.InteractionSystem;
 using FlavorfulStory.InventorySystem;
@@ -8,6 +9,7 @@ using FlavorfulStory.ObjectManagement;
 using FlavorfulStory.Player;
 using FlavorfulStory.Saving;
 using UnityEngine;
+using Zenject;
 
 namespace FlavorfulStory.BuildingRepair
 {
@@ -47,14 +49,23 @@ namespace FlavorfulStory.BuildingRepair
         /// <summary> Событие при завершении ремонта. </summary>
         private event Action _onRepairCompleted;
 
+        /// <summary> Инвентарь игрока. </summary>
+        private Inventory _playerInventory;
+
         #endregion
 
-        /// <summary> Инициализация компонента. </summary>
-        private void Awake()
+        /// <summary> Внедрение зависимостей Zenject. </summary>
+        /// <param name="inventory"> Инвентарь игрока. </param>
+        /// <param name="view"> Визуальное представление ремонта зданий. </param>
+        [Inject]
+        private void Construct(Inventory inventory, BuildingRepairView view)
         {
-            _objectSwitcher = GetComponent<ObjectSwitcher>();
-            _view = FindFirstObjectByType<BuildingRepairView>(FindObjectsInactive.Include);
+            _playerInventory = inventory;
+            _view = view;
         }
+
+        /// <summary> Инициализация компонента. </summary>
+        private void Awake() => _objectSwitcher = GetComponent<ObjectSwitcher>();
 
         /// <summary> Запуск инициализации после загрузки сцены. </summary>
         private void Start()
@@ -65,8 +76,12 @@ namespace FlavorfulStory.BuildingRepair
 
         /// <summary> Инициализация списка вложенных ресурсов. </summary>
         /// <remarks> Список инвестированных ресурсов на текущей стадии будет инициализирован нулями. </remarks>
-        private void InitializeInvestedResourcesList() =>
+        private void InitializeInvestedResourcesList()
+        {
+            if (_investedResources != null) return;
+
             _investedResources = CurrentStage.Requirements.Select(_ => 0).ToList();
+        }
 
         /// <summary> Инициализация стадий ремонта. </summary>
         private void InitializeRepairStages()
@@ -79,22 +94,6 @@ namespace FlavorfulStory.BuildingRepair
         /// <summary> Обновить состояние возможности взаимодействия с ремонтируемым объектом. </summary>
         /// <remarks> После завершения ремонта взаимодействие становится невозможным. </remarks>
         private void UpdateInteractionState() => IsInteractionAllowed = !IsRepairCompleted;
-
-        #region ITooltipable
-
-        /// <summary> Получить название объекта для тултипа. </summary>
-        /// <returns> Название объекта для тултипа. </returns>
-        public string TooltipTitle => CurrentStage.BuildingName;
-
-        /// <summary> Получить описание объекта для тултипа. </summary>
-        /// <returns> Описание объекта для тултипа. </returns>
-        public string TooltipDescription => _buildingData.Description;
-
-        /// <summary> Получить мировую позицию объекта для взаимодействия. </summary>
-        /// <returns> Мировая позиция объекта для взаимодействия. </returns>
-        public Vector3 WorldPosition => transform.position;
-
-        #endregion
 
         #region IInteractable
 
@@ -111,13 +110,13 @@ namespace FlavorfulStory.BuildingRepair
         /// <param name="player"> Игрок, который начал взаимодействие. </param>
         public void BeginInteraction(PlayerController player)
         {
-            _onStageUpdated += _view.UpdateStageUI;
+            _onStageUpdated += _view.UpdateView;
             _onRepairCompleted += _view.DisplayCompletionMessage;
 
             _view.Show(CurrentStage, _investedResources, TransferResource, Build,
                 () =>
                 {
-                    _onStageUpdated -= _view.UpdateStageUI;
+                    _onStageUpdated -= _view.UpdateView;
                     _onRepairCompleted -= _view.DisplayCompletionMessage;
                     EndInteraction(player);
                 }
@@ -127,7 +126,10 @@ namespace FlavorfulStory.BuildingRepair
         /// <summary> Завершает взаимодействие. </summary>
         /// <param name="player"> Игрок, завершивший взаимодействие. </param>
         public void EndInteraction(PlayerController player) => player.SetBusyState(false);
-
+        
+        [field: SerializeField]
+        public ActionDescription ActionDescription { get; set; }
+        
         #endregion
 
         /// <summary> Завершить текущую стадию и перейти к следующей. </summary>
@@ -172,13 +174,13 @@ namespace FlavorfulStory.BuildingRepair
             if (index == -1) return;
 
             var requirement = CurrentStage.Requirements[index];
-            int available = Inventory.PlayerInventory.GetItemNumber(resource);
+            int available = _playerInventory.GetItemNumber(resource);
             int needed = requirement.Quantity - _investedResources[index];
             int toInvest = Mathf.Min(available, needed);
             if (toInvest <= 0) return;
 
             _investedResources[index] += toInvest;
-            Inventory.PlayerInventory.RemoveItem(resource, toInvest);
+            _playerInventory.RemoveItem(resource, toInvest);
         }
 
         /// <summary> Вернуть ресурс в инвентарь. </summary>
@@ -189,9 +191,9 @@ namespace FlavorfulStory.BuildingRepair
             if (index == -1) return;
 
             int invested = _investedResources[index];
-            if (invested <= 0 || !Inventory.PlayerInventory.HasSpaceFor(resource)) return;
+            if (invested <= 0 || !_playerInventory.HasSpaceFor(resource)) return;
 
-            Inventory.PlayerInventory.TryAddToFirstAvailableSlot(resource, invested);
+            _playerInventory.TryAddToFirstAvailableSlot(resource, invested);
             _investedResources[index] = 0;
         }
 
@@ -223,7 +225,7 @@ namespace FlavorfulStory.BuildingRepair
             if (state is not RepairableBuildingRecord data) return;
 
             _repairStageIndex = data.StageIndex;
-            _investedResources = data.InvestedResources ?? new List<int>();
+            _investedResources = data.InvestedResources;
         }
 
         #endregion

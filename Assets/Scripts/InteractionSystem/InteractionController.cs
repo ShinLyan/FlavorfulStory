@@ -6,6 +6,7 @@ using FlavorfulStory.Player;
 using FlavorfulStory.ResourceContainer;
 using FlavorfulStory.TooltipSystem;
 using UnityEngine;
+using Zenject;
 
 namespace FlavorfulStory.InteractionSystem
 {
@@ -15,7 +16,7 @@ namespace FlavorfulStory.InteractionSystem
         #region Fields and Properties
 
         /// <summary> UI-объект для отображения тултипа взаимодействия. </summary>
-        [SerializeField] private InteractableObjectTooltip _tooltipView;
+        [Inject] private readonly IActionTooltipShower _tooltipShower;
 
         /// <summary> PlayerController родительского объекта. </summary>
         private PlayerController _playerController;
@@ -70,9 +71,9 @@ namespace FlavorfulStory.InteractionSystem
         private void UpdateTooltip()
         {
             if (_closestInteractable != null)
-                _tooltipView.Show(_closestInteractable);
+                _tooltipShower.Show(_closestInteractable);
             else
-                _tooltipView.Hide();
+                _tooltipShower.Hide();
         }
 
         /// <summary> Добавляет объект в список доступных для взаимодействия при входе в триггер. </summary>

@@ -1,37 +1,51 @@
 ﻿using System.Collections;
+using FlavorfulStory.Actions;
 using FlavorfulStory.InteractionSystem;
 using FlavorfulStory.Player;
 using FlavorfulStory.SceneManagement;
 using FlavorfulStory.UI;
 using UnityEngine;
-using UnityEngine.Serialization;
+using Zenject;
 
-// TODO: Актуализировать под Zenject
 namespace FlavorfulStory.TimeManagement
 {
-    /// <summary> Представляет кровать, с которой игрок может взаимодействовать для завершения дня. </summary>
+    /// <summary> Триггер сна - кровать, с которой игрок может взаимодействовать для завершения дня. </summary>
     public class SleepTrigger : MonoBehaviour, IInteractable
     {
-        /// <summary> View для подтверждения действия "лечь спать". </summary>
-        [FormerlySerializedAs("_confirmationView")] [SerializeField]
+        /// <summary> Окно подтверждения действия. </summary>
         private ConfirmationWindowView _confirmationWindowView;
 
-        /// <summary> View для отображения сводки дня. </summary>
-        [SerializeField] private SummaryView _summaryView;
+        /// <summary> Сводка дня. </summary>
+        private SummaryView _summaryView;
 
+        /// <summary> Контроллер игрока. </summary>
         private PlayerController _playerController;
 
-        private const string SleepConfirmationTitle = "Лечь спать?"; // TODO: заменить на генератор/локализацию
+        /// <summary> Затемнение экрана при переходах между сценами. </summary>
+        private Fader _fader;
 
-        private const string
-            SleepConfirmationDescription =
-                "Вы уверены, что хотите закончить день?"; // TODO: заменить на генератор/локализацию
+        /// <summary> Заголовок окна подтверждения сна. </summary>
+        private const string SleepConfirmationTitle = "Bed"; // TODO: заменить на генератор/локализацию
 
+        /// <summary> Заголовок окна подтверждения сна. </summary>
+        private const string SleepConfirmationDescription = "Go to sleep?"; // TODO: заменить на генератор/локализацию
+
+        /// <summary> Заголовок окна подтверждения сна. </summary>
         private const string DefaultSummaryText = "BEST SUMMARY EVER"; // TODO: заменить на генератор/локализацию
 
-        private void Awake()
+        /// <summary> Внедряет зависимости через Zenject. </summary>
+        /// <param name="confirmationWindowView"> Окно подтверждения. </param>
+        /// <param name="summaryView"> Окно сводки. </param>
+        /// <param name="playerController"> Контроллер игрока. </param>
+        /// <param name="fader"> Компонент затемнения. </param>
+        [Inject]
+        private void Construct(ConfirmationWindowView confirmationWindowView, SummaryView summaryView,
+            PlayerController playerController, Fader fader)
         {
-            _playerController = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
+            _confirmationWindowView = confirmationWindowView;
+            _summaryView = summaryView;
+            _playerController = playerController;
+            _fader = fader;
         }
 
         /// <summary> Показывает View подтверждения перед сном. </summary>
@@ -49,10 +63,11 @@ namespace FlavorfulStory.TimeManagement
             _confirmationWindowView.Hide();
         }
 
-        /// <summary> Корутина, обрабатывающая процесс сна и завершения дня. </summary>
+        /// <summary> Обрабатка процесса сна и завершения дня. </summary>
+        /// <returns> Корутина, обрабатывающая процесс сна и завершения дня.</returns>
         private IEnumerator SleepRoutine()
         {
-            yield return PersistentObject.Instance.Fader.FadeOut(Fader.FadeOutTime);
+            yield return _fader.FadeOut(Fader.FadeOutTime);
 
             WorldTime.ForceEndDay();
             WorldTime.Pause();
@@ -67,22 +82,16 @@ namespace FlavorfulStory.TimeManagement
             _summaryView.Hide();
             WorldTime.Unpause();
 
-            yield return PersistentObject.Instance.Fader.FadeIn(Fader.FadeInTime);
+            yield return _fader.FadeIn(Fader.FadeInTime);
 
             EndInteraction(_playerController);
         }
 
         #region IInteractable
 
-        /// <summary> Заголовок для отображения во всплывающей подсказке при наведении. </summary>
-        [field: SerializeField] public string TooltipTitle { get; private set; }
-
-        /// <summary> Описание для отображения во всплывающей подсказке при наведении. </summary>
-        [field: SerializeField] public string TooltipDescription { get; private set; }
-
-        /// <summary> Позиция объекта в мировых координатах. </summary>
-        public Vector3 WorldPosition => transform.position;
-
+        [field: SerializeField]
+        public ActionDescription ActionDescription { get; set; }
+        
         /// <summary> Возвращает возможность взаимодействия с объектом. </summary>
         public bool IsInteractionAllowed => true;
 

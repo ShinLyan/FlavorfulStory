@@ -7,6 +7,7 @@ using FlavorfulStory.InventorySystem.UI;
 using FlavorfulStory.Utils;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using Zenject;
 
 namespace FlavorfulStory.Player
 {
@@ -53,6 +54,17 @@ namespace FlavorfulStory.Player
         private InventoryItem CurrentItem => _toolbar?.SelectedItem;
 
         #endregion
+
+        /// <summary> Инвентарь игрока. </summary>
+        private Inventory _playerInventory;
+
+        /// <summary> Внедрение зависимости — инвентарь игрока. </summary>
+        /// <param name="inventory"> Инвентарь игрока. </param>
+        [Inject]
+        private void Construct(Inventory inventory)
+        {
+            _playerInventory = inventory;
+        }
 
         /// <summary> Инициализация компонентов. </summary>
         private void Awake()
@@ -155,7 +167,7 @@ namespace FlavorfulStory.Player
         /// <summary> Съесть используемый предмет. </summary>
         private void ConsumeEdibleItem()
         {
-            Inventory.PlayerInventory.RemoveFromSlot(_toolbar.SelectedItemIndex, 1);
+            _playerInventory.RemoveFromSlot(_toolbar.SelectedItemIndex, 1);
             InputWrapper.UnblockPlayerMovement();
             SetBusyState(false);
         }
