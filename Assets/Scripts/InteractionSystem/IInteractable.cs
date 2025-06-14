@@ -6,9 +6,9 @@ namespace FlavorfulStory.InteractionSystem
 {
     /// <summary> Интерфейс для объектов, с которыми можно взаимодействовать
     /// (например, двери, предметы, NPC). </summary>
-    /// <remarks> Наследуется от <see cref="ITooltipable"/>, что позволяет отображать всплывающие
+    /// <remarks> Наследуется от <see cref="ITooltipableAction"/>, что позволяет отображать всплывающие
     /// подсказки при наведении. </remarks>
-    public interface IInteractable : ITooltipable
+    public interface IInteractable : ITooltipableAction
     {
         /// <summary> Доступно ли взаимодействие с объектом в текущий момент? </summary>
         bool IsInteractionAllowed { get; }

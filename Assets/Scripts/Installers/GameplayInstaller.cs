@@ -9,6 +9,7 @@ using FlavorfulStory.InventorySystem.UI;
 using FlavorfulStory.Lightning;
 using FlavorfulStory.Player;
 using FlavorfulStory.SceneManagement;
+using FlavorfulStory.TooltipSystem;
 using FlavorfulStory.UI;
 using Unity.Cinemachine;
 using UnityEngine;
@@ -65,6 +66,7 @@ namespace FlavorfulStory.Installers
                 .WithArguments(_requirementViewPrefab);
             Container.Bind<ConfirmationWindowView>().FromComponentInHierarchy().AsSingle();
             Container.Bind<SummaryView>().FromComponentInHierarchy().AsSingle();
+            Container.Bind<IActionTooltipShower>().To<ActionTooltipShower>().FromComponentInHierarchy().AsSingle();
         }
 
         /// <summary> Установить зависимости, связанные с не игровыми системами и логикой. </summary>
