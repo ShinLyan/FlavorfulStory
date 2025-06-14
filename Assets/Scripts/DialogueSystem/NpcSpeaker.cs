@@ -55,12 +55,17 @@ namespace FlavorfulStory.DialogueSystem
         {
             if (!IsInteractionAllowed) return;
 
+            IsInteractionAllowed = false;
             _dialogueInitiator?.StartDialogue(this, _dialogue);
         }
 
         /// <summary> Завершает взаимодействие с NPC. </summary>
         /// <param name="player"> Контроллер игрока, завершающий взаимодействие. </param>
-        public void EndInteraction(PlayerController player) => player.SetBusyState(false);
+        public void EndInteraction(PlayerController player)
+        {
+            player.SetBusyState(false);
+            IsInteractionAllowed = true;
+        }
 
         #endregion
 
