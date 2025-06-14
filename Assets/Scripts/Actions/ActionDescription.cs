@@ -3,16 +3,16 @@ using UnityEngine;
 
 namespace FlavorfulStory.Actions
 {
-    /// <summary> Структура, описывающая действие игрока по отношению к объекту. </summary>
+    /// <summary> Действие игрока по отношению к объекту. </summary>
     [Serializable]
     public struct ActionDescription
-    { 
-        /// <summary> Название сущности, с которой происходит взаимодействие. </summary>
-        [Tooltip("Название объекта, с которым происходит взаимодействие.")]
-        public string Target;
-        
+    {
         /// <summary> Название действия, что может совершить игрок. </summary>
-        [Tooltip("Название действия, совершаемого игроком.")]
-        public string Action;
+        [field: Tooltip("Название действия, совершаемого игроком."), SerializeField]
+        public string Action { get; private set; }
+
+        /// <summary> Название сущности, с которой происходит взаимодействие. </summary>
+        [field: Tooltip("Название объекта, с которым происходит взаимодействие."), SerializeField]
+        public string Target { get; private set; }
     }
 }

@@ -15,26 +15,18 @@ namespace FlavorfulStory.Actions.Interactables
         [Tooltip("Собираемые предметы."), SerializeField]
         private List<DropItem> _harvestItems;
 
-        /// <summary> Название объекта, отображаемое в тултипе. </summary>
-        [Tooltip("Название объекта для отображения в интерфейсе."), SerializeField]
-        private string _name;
-
-        /// <summary> Описание объекта, отображаемое в тултипе. </summary>
-        [Tooltip("Описание объекта для отображения в интерфейсе."), SerializeField]
-        private string _description = "Press E, if hungry";
-
         /// <summary> Инвентарь игрока. </summary>
         private Inventory _playerInventory;
 
         /// <summary> Внедрение зависимости — инвентарь игрока. </summary>
         /// <param name="inventory"> Инвентарь игрока. </param>
         [Inject]
-        private void Construct(Inventory inventory)
-        {
-            _playerInventory = inventory;
-        }
+        private void Construct(Inventory inventory) => _playerInventory = inventory;
 
         #region IInteractable
+
+        /// <summary> Действие игрока по отношению к объекту. </summary>
+        [field: SerializeField] public ActionDescription ActionDescription { get; private set; }
 
         /// <summary> Свойство возможности взаимодействия с объектом. </summary>
         public virtual bool IsInteractionAllowed { get; protected set; } = true;
@@ -61,11 +53,7 @@ namespace FlavorfulStory.Actions.Interactables
 
         /// <summary> Завершает взаимодействие с объектом. </summary>
         /// <param name="player"> Контроллер игрока, который взаимодействует с объектом. </param>
-        public void EndInteraction(PlayerController player)
-        {
-        }
-
-        [field: SerializeField] public ActionDescription ActionDescription { get; set; }
+        public void EndInteraction(PlayerController player) { }
 
         #endregion
     }

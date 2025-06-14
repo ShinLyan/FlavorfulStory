@@ -24,7 +24,7 @@ namespace FlavorfulStory.DialogueSystem
         {
             IsInteractionAllowed = true;
             NpcInfo = GetComponent<Npc>().NpcInfo;
-            
+
             // TODO: ZENJECT
             var playerObject = GameObject.FindGameObjectWithTag("Player");
             _dialogueInitiator = playerObject.GetComponent<IDialogueInitiator>();
@@ -35,6 +35,9 @@ namespace FlavorfulStory.DialogueSystem
         }
 
         #region IInteractable
+
+        /// <summary> Действие игрока по отношению к объекту. </summary>
+        [field: SerializeField] public ActionDescription ActionDescription { get; private set; }
 
         /// <summary> Флаг, разрешено ли взаимодействие с NPC. </summary>
         public bool IsInteractionAllowed { get; private set; }
@@ -57,13 +60,6 @@ namespace FlavorfulStory.DialogueSystem
         /// <summary> Завершает взаимодействие с NPC. </summary>
         /// <param name="player"> Контроллер игрока, завершающий взаимодействие. </param>
         public void EndInteraction(PlayerController player) => player.SetBusyState(false);
-
-        #endregion
-
-        #region ITooltipable
-        
-        [field: SerializeField]
-        public ActionDescription ActionDescription { get; set; }
 
         #endregion
 

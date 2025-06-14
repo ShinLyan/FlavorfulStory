@@ -89,9 +89,9 @@ namespace FlavorfulStory.TimeManagement
 
         #region IInteractable
 
-        [field: SerializeField]
-        public ActionDescription ActionDescription { get; set; }
-        
+        /// <summary> Действие игрока по отношению к объекту. </summary>
+        [field: SerializeField] public ActionDescription ActionDescription { get; private set; }
+
         /// <summary> Возвращает возможность взаимодействия с объектом. </summary>
         public bool IsInteractionAllowed => true;
 

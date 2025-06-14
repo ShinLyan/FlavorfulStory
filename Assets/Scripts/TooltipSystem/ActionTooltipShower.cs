@@ -4,14 +4,14 @@ using UnityEngine;
 
 namespace FlavorfulStory.TooltipSystem
 {
-    /// <summary> Отвечает за отображение тултипа для взаимодействуемых объектов. </summary>
-    public class InteractableObjectTooltip : MonoBehaviour, IActionTooltipShower
+    /// <summary> Отвечает за отображение тултипа для объектов взаимодействия. </summary>
+    public class ActionTooltipShower : MonoBehaviour, IActionTooltipShower
     {
         /// <summary> Поле для отображения заголовка тултипа. </summary>
         [SerializeField] private TMP_Text _actionDescription;
 
         /// <summary> Инициализация тултипа. Сокрытие окна при старте игры. </summary>
-        private void Start() => gameObject.SetActive(false);
+        private void Start() => Hide();
 
         /// <summary> Показать список возможных действий с объектом. </summary>
         /// <param name="interactable"> Объект взаимодействия. </param>
@@ -23,9 +23,10 @@ namespace FlavorfulStory.TooltipSystem
 
         /// <summary> Скрыть тултип. </summary>
         public void Hide() => gameObject.SetActive(false);
-        
+
         /// <summary> Устанавливает заголовок и описание тултипа на основе данных из переданного объекта. </summary>
         /// <param name="tooltip"> Объект, предоставляющий данные для тултипа. </param>
-        private string CreateActionDescription(ITooltipableAction tooltip) => $"{tooltip.ActionDescription.Action} {tooltip.ActionDescription.Target}";
+        private static string CreateActionDescription(ITooltipableAction tooltip) =>
+            $"{tooltip.ActionDescription.Action} {tooltip.ActionDescription.Target}";
     }
 }

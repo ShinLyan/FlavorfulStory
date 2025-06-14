@@ -15,11 +15,11 @@ namespace FlavorfulStory.InteractionSystem
     {
         #region Fields and Properties
 
-        /// <summary> UI-объект для отображения тултипа взаимодействия. </summary>
-        [Inject] private readonly IActionTooltipShower _tooltipShower;
-
         /// <summary> PlayerController родительского объекта. </summary>
         private PlayerController _playerController;
+
+        /// <summary> UI-объект для отображения тултипа взаимодействия. </summary>
+        private IActionTooltipShower _tooltipShower;
 
         /// <summary> Список объектов, доступных для взаимодействия. </summary>
         private readonly List<IInteractable> _availableInteractables = new();
@@ -38,9 +38,15 @@ namespace FlavorfulStory.InteractionSystem
 
         #endregion
 
-        /// <summary> Инициализация компонента. </summary>
-        /// <remarks> Подписка на событие OnInteractionEnded (PlayerController.cs). </remarks>
-        private void Awake() => _playerController = GetComponentInParent<PlayerController>();
+        /// <summary> Внедрение зависимостей Zenject. </summary>
+        /// <param name="playerController"> Контроллер игрока. </param>
+        /// <param name="tooltipShower"> Отображатель тултипов. </param>
+        [Inject]
+        private void Construct(PlayerController playerController, IActionTooltipShower tooltipShower)
+        {
+            _playerController = playerController;
+            _tooltipShower = tooltipShower;
+        }
 
         /// <summary> Проверяет нажатие кнопки взаимодействия и вызывает метод Interact()
         /// для ближайшего объекта. </summary>

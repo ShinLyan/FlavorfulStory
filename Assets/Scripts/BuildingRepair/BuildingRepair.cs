@@ -97,6 +97,9 @@ namespace FlavorfulStory.BuildingRepair
 
         #region IInteractable
 
+        /// <summary> Действие игрока по отношению к объекту. </summary>
+        [field: SerializeField] public ActionDescription ActionDescription { get; private set; }
+
         /// <summary> Доступно ли взаимодействие с объектом в текущий момент? </summary>
         public bool IsInteractionAllowed { get; private set; }
 
@@ -126,10 +129,7 @@ namespace FlavorfulStory.BuildingRepair
         /// <summary> Завершает взаимодействие. </summary>
         /// <param name="player"> Игрок, завершивший взаимодействие. </param>
         public void EndInteraction(PlayerController player) => player.SetBusyState(false);
-        
-        [field: SerializeField]
-        public ActionDescription ActionDescription { get; set; }
-        
+
         #endregion
 
         /// <summary> Завершить текущую стадию и перейти к следующей. </summary>

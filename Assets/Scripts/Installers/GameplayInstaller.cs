@@ -66,7 +66,7 @@ namespace FlavorfulStory.Installers
                 .WithArguments(_requirementViewPrefab);
             Container.Bind<ConfirmationWindowView>().FromComponentInHierarchy().AsSingle();
             Container.Bind<SummaryView>().FromComponentInHierarchy().AsSingle();
-            Container.Bind<IActionTooltipShower>().To<InteractableObjectTooltip>().FromComponentInHierarchy().AsSingle();
+            Container.Bind<IActionTooltipShower>().To<ActionTooltipShower>().FromComponentInHierarchy().AsSingle();
         }
 
         /// <summary> Установить зависимости, связанные с не игровыми системами и логикой. </summary>
