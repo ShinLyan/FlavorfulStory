@@ -3,6 +3,7 @@ using FlavorfulStory.CursorSystem;
 using FlavorfulStory.InteractionSystem;
 using FlavorfulStory.Player;
 using UnityEngine;
+using Zenject;
 
 namespace FlavorfulStory.DialogueSystem
 {
@@ -15,22 +16,26 @@ namespace FlavorfulStory.DialogueSystem
         /// <summary> Инициатор диалога, связанный с игроком. </summary>
         private IDialogueInitiator _dialogueInitiator;
 
+        private PlayerController _playerController;
+
         /// <summary> Информация о NPC. </summary>
         public NpcInfo NpcInfo { get; private set; }
+
+        [Inject]
+        private void Construct(IDialogueInitiator dialogueInitiator, PlayerController playerController)
+        {
+            _dialogueInitiator = dialogueInitiator;
+            _playerController = playerController;
+        }
 
         /// <summary> Инициализация свойств класса. </summary>
         private void Awake()
         {
             IsInteractionAllowed = true;
             NpcInfo = GetComponent<Npc>().NpcInfo;
-            
-            // TODO: ZENJECT
-            var playerObject = GameObject.FindGameObjectWithTag("Player");
-            _dialogueInitiator = playerObject.GetComponent<IDialogueInitiator>();
 
             if (_dialogueInitiator is PlayerSpeaker playerSpeaker)
-                playerSpeaker.OnConversationEnded +=
-                    () => EndInteraction(playerObject.GetComponent<PlayerController>());
+                playerSpeaker.OnConversationEnded += () => EndInteraction(_playerController);
         }
 
         #region IInteractable
@@ -67,7 +72,7 @@ namespace FlavorfulStory.DialogueSystem
 
         /// <summary> Возвращает описание тултипа. </summary>
         /// <returns> Строка с описанием тултипа. </returns>
-        public string TooltipDescription => "Talk";
+        public string TooltipDescription => "Speak";
 
         /// <summary> Возвращает мировую позицию объекта. </summary>
         /// <returns> Вектор позиции объекта в мировых координатах. </returns>

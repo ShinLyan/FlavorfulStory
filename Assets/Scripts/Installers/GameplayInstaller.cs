@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using FlavorfulStory.BuildingRepair;
+using FlavorfulStory.DialogueSystem;
 using FlavorfulStory.Infrastructure.Factories;
 using FlavorfulStory.InventorySystem;
 using FlavorfulStory.InventorySystem.DropSystem;
@@ -48,6 +49,8 @@ namespace FlavorfulStory.Installers
             Container.Bind<PickupNotificationManager>().FromComponentInHierarchy().AsSingle();
             Container.Bind<Equipment>().FromComponentInHierarchy().AsSingle();
             Container.Bind<PlayerController>().FromComponentInHierarchy().AsSingle();
+
+            Container.Bind<IDialogueInitiator>().To<PlayerSpeaker>().FromComponentInHierarchy().AsSingle();
 
             Container.Bind<PickupFactory>().AsSingle();
             Container.Bind<ItemDropper>().FromComponentsInHierarchy().AsCached();
