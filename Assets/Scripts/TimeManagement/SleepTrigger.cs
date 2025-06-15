@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using FlavorfulStory.Actions;
 using FlavorfulStory.InteractionSystem;
 using FlavorfulStory.Player;
 using FlavorfulStory.SceneManagement;
@@ -88,14 +89,8 @@ namespace FlavorfulStory.TimeManagement
 
         #region IInteractable
 
-        /// <summary> Заголовок для отображения во всплывающей подсказке при наведении. </summary>
-        public string TooltipTitle => "Bed";
-
-        /// <summary> Описание для отображения во всплывающей подсказке при наведении. </summary>
-        public string TooltipDescription => "!";
-
-        /// <summary> Позиция объекта в мировых координатах. </summary>
-        public Vector3 WorldPosition => transform.position;
+        /// <summary> Действие игрока по отношению к объекту. </summary>
+        [field: SerializeField] public ActionDescription ActionDescription { get; private set; }
 
         /// <summary> Возвращает возможность взаимодействия с объектом. </summary>
         public bool IsInteractionAllowed => true;

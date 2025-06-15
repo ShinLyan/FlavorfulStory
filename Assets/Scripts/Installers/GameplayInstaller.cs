@@ -11,6 +11,7 @@ using FlavorfulStory.InventorySystem.UI;
 using FlavorfulStory.Lightning;
 using FlavorfulStory.Player;
 using FlavorfulStory.SceneManagement;
+using FlavorfulStory.TooltipSystem;
 using FlavorfulStory.UI;
 using Unity.Cinemachine;
 using UnityEngine;
@@ -75,6 +76,7 @@ namespace FlavorfulStory.Installers
             Container.Bind<BuildingRepairView>().FromComponentInHierarchy().AsSingle();
             Container.Bind<DialogueView>().FromComponentInHierarchy().AsSingle();
             Container.Bind<Canvas>().WithId("HUD").FromInstance(_hudCanvas).AsSingle();
+            Container.Bind<IActionTooltipShower>().To<ActionTooltipShower>().FromComponentInHierarchy().AsSingle();
         }
 
         /// <summary> Установить зависимости, связанные с не игровыми системами и логикой. </summary>
