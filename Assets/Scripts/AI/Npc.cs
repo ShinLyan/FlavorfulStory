@@ -1,9 +1,9 @@
 ﻿using FlavorfulStory.AI.FiniteStateMachine;
 using FlavorfulStory.AI.Scheduling;
-using FlavorfulStory.AI.WarpGraphSystem;
 using FlavorfulStory.TimeManagement;
 using UnityEngine;
 using UnityEngine.AI;
+using Zenject;
 
 namespace FlavorfulStory.AI
 {
@@ -34,20 +34,29 @@ namespace FlavorfulStory.AI
         /// <summary> Контроллер анимации NPC для воспроизведения состояний анимации. </summary>
         private NpcAnimatorController _animatorController;
 
+        [Inject] private NpcMovementControllerFactory _npcMovementControllerFactory;
+
+
         /// <summary> Выполняет инициализацию всех контроллеров и систем NPC при запуске. </summary>
         private void Start()
         {
             _animatorController = new NpcAnimatorController(GetComponent<Animator>());
             _npcScheduleHandler = new NpcScheduleHandler();
 
-            _movementController = new NpcMovementController(
-                GetComponent<NavMeshAgent>(),
-                WarpGraph.Build(
-                    FindObjectsByType<WarpPortal>(FindObjectsInactive.Include, FindObjectsSortMode.None)),
+            // _movementController = new NpcMovementController(GetComponent<NavMeshAgent>(),
+            //     transform,
+            //     _animatorController,
+            //     _npcScheduleHandler,
+            //     WarpGraph.Build(FindObjectsByType<WarpPortal>(FindObjectsInactive.Include, FindObjectsSortMode.None)),
+            //     this
+            // );
+
+            Debug.Log(_npcMovementControllerFactory);
+            _movementController = _npcMovementControllerFactory.Create(GetComponent<NavMeshAgent>(),
                 transform,
-                this,
                 _animatorController,
-                _npcScheduleHandler
+                _npcScheduleHandler,
+                this
             );
 
             _stateController = new StateController(

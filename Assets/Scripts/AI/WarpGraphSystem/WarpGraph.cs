@@ -2,17 +2,31 @@ using System.Collections.Generic;
 using System.Linq;
 using FlavorfulStory.SceneManagement;
 using UnityEngine;
+using Zenject;
 
 namespace FlavorfulStory.AI.WarpGraphSystem
 {
     /// <summary> Граф варпов, представляющий связи между локациями и варпами. </summary>
-    public class WarpGraph
+    public class WarpGraph : IInitializable
     {
         /// <summary> Список всех узлов (варпов) в графе. </summary>
         private readonly List<WarpNode> _allNodes = new();
 
         /// <summary> Словарь, хранящий узлы (варпы) по локациям. </summary>
         private readonly Dictionary<LocationName, List<WarpNode>> _locationToNodes = new();
+
+
+        private List<WarpPortal> _allWarps;
+
+        [Inject] private readonly SceneContext _sceneContext;
+
+        public void Initialize()
+        {
+            _allWarps = Object.FindObjectsByType<WarpPortal>(FindObjectsInactive.Include, FindObjectsSortMode.None)
+                .ToList();
+            Build();
+        }
+
 
         /// <summary> Добавляет узел (варп) в граф. </summary>
         /// <param name="node"> Узел, который нужно добавить. </param>
@@ -77,7 +91,7 @@ namespace FlavorfulStory.AI.WarpGraphSystem
         /// <summary> Удаляет дублирующиеся локации в начале или конце пути. </summary>
         /// <param name="path"> Исходный путь для обработки. </param>
         /// <returns> Оптимизированный путь без избыточных локаций. </returns>
-        private static List<WarpPortal> TrimPath(List<WarpPortal> path)
+        private List<WarpPortal> TrimPath(List<WarpPortal> path)
         {
             if (path.Count < 2) return path;
 
@@ -94,7 +108,7 @@ namespace FlavorfulStory.AI.WarpGraphSystem
         /// <param name="path"> Словарь, содержащий связи между узлами. </param>
         /// <param name="endNode"> Конечный узел. </param>
         /// <returns> Список варпов, представляющий путь. </returns>
-        private static List<WarpPortal> ReconstructPath(Dictionary<WarpNode, WarpNode> path, WarpNode endNode)
+        private List<WarpPortal> ReconstructPath(Dictionary<WarpNode, WarpNode> path, WarpNode endNode)
         {
             var result = new List<WarpPortal>();
             var current = endNode;
@@ -126,20 +140,19 @@ namespace FlavorfulStory.AI.WarpGraphSystem
         /// <summary> Строит граф варпов на основе списка всех варпов. </summary>
         /// <param name="allWarps">Список всех варпов для построения графа.</param>
         /// <returns>Построенный граф варпов.</returns>
-        public static WarpGraph Build(IEnumerable<WarpPortal> allWarps)
+        private WarpGraph Build()
         {
-            var warps = allWarps.ToList();
-            var locationToWarps = GroupWarpsByLocation(warps);
+            var locationToWarps = GroupWarpsByLocation(_allWarps);
             var (warpToNode, graph) = CreateNodesAndMap(locationToWarps);
 
             ConnectIntraLocationEdges(locationToWarps, warpToNode);
-            ConnectInterLocationEdges(warps, warpToNode);
+            ConnectInterLocationEdges(_allWarps, warpToNode);
 
             return graph;
         }
 
         /// <summary> Группирует варпы по их родительским локациям. </summary>
-        private static Dictionary<LocationName, List<WarpPortal>> GroupWarpsByLocation(List<WarpPortal> warps)
+        private Dictionary<LocationName, List<WarpPortal>> GroupWarpsByLocation(List<WarpPortal> warps)
         {
             var locationMap = new Dictionary<LocationName, List<WarpPortal>>();
 
@@ -155,25 +168,23 @@ namespace FlavorfulStory.AI.WarpGraphSystem
         }
 
         /// <summary> Создает узлы графа и карту соответствия варпов узлам. </summary>
-        private static (Dictionary<WarpPortal, WarpNode>, WarpGraph) CreateNodesAndMap(
+        private (Dictionary<WarpPortal, WarpNode>, WarpGraph) CreateNodesAndMap(
             Dictionary<LocationName, List<WarpPortal>> locationMap)
         {
             var warpToNode = new Dictionary<WarpPortal, WarpNode>();
-            var graph = new WarpGraph();
-
             foreach (var warpsInLocation in locationMap.Values)
             foreach (var warp in warpsInLocation)
             {
                 var node = new WarpNode(warp);
                 warpToNode[warp] = node;
-                graph.AddNode(node);
+                AddNode(node);
             }
 
-            return (warpToNode, graph);
+            return (warpToNode, this);
         }
 
         /// <summary> Создает связи между варпами внутри одной локации. </summary>
-        private static void ConnectIntraLocationEdges(Dictionary<LocationName, List<WarpPortal>> locationMap,
+        private void ConnectIntraLocationEdges(Dictionary<LocationName, List<WarpPortal>> locationMap,
             Dictionary<WarpPortal, WarpNode> warpToNode)
         {
             foreach (var warpsInLocation in locationMap.Values)
@@ -183,7 +194,7 @@ namespace FlavorfulStory.AI.WarpGraphSystem
         }
 
         /// <summary> Создает связи между варпами разных локаций. </summary>
-        private static void ConnectInterLocationEdges(List<WarpPortal> warps,
+        private void ConnectInterLocationEdges(List<WarpPortal> warps,
             Dictionary<WarpPortal, WarpNode> warpToNode)
         {
             foreach (var warp in warps)

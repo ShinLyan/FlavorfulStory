@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using FlavorfulStory.AI;
+using FlavorfulStory.AI.WarpGraphSystem;
 using FlavorfulStory.BuildingRepair;
 using FlavorfulStory.Infrastructure.Factories;
 using FlavorfulStory.InventorySystem;
@@ -12,6 +14,7 @@ using FlavorfulStory.SceneManagement;
 using FlavorfulStory.UI;
 using Unity.Cinemachine;
 using UnityEngine;
+using UnityEngine.AI;
 using Zenject;
 
 namespace FlavorfulStory.Installers
@@ -33,12 +36,17 @@ namespace FlavorfulStory.Installers
         /// при переходе между локациями. </remarks>
         [SerializeField] private CinemachineCamera _teleportVirtualCamera;
 
+        [SerializeField] private GameObject _npcParent;
+
+        [SerializeField] private MonoBehaviour _monoBehaviour;
+
         /// <summary> Выполняет установку всех зависимостей, необходимых для сцены. </summary>
         public override void InstallBindings()
         {
             BindGameplay();
             BindUI();
             BindSystems();
+            BindNpc();
         }
 
         /// <summary> Установить зависимости, связанные с игровыми объектами и логикой. </summary>
@@ -78,6 +86,18 @@ namespace FlavorfulStory.Installers
             Container.BindInterfacesAndSelfTo<LocationManager>().AsSingle();
 
             Container.Bind<CinemachineCamera>().FromInstance(_teleportVirtualCamera).AsSingle();
+
+            Container.BindInterfacesAndSelfTo<WarpGraph>().AsSingle();
+        }
+
+        private void BindNpc()
+        {
+            Container.BindFactory<NavMeshAgent, Transform, MonoBehaviour, NpcNavigator, NpcNavigatorFactory>()
+                .FromFactory<NpcNavigatorFactory>();
+
+            Container
+                .BindFactory<NavMeshAgent, Transform, NpcAnimatorController, NpcScheduleHandler, MonoBehaviour,
+                    NpcMovementController, NpcMovementControllerFactory>().FromFactory<NpcMovementControllerFactory>();
         }
     }
 }

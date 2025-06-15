@@ -6,6 +6,7 @@ using FlavorfulStory.AI.WarpGraphSystem;
 using FlavorfulStory.SceneManagement;
 using UnityEngine;
 using UnityEngine.AI;
+using Zenject;
 using Object = UnityEngine.Object;
 
 namespace FlavorfulStory.AI
@@ -21,7 +22,7 @@ namespace FlavorfulStory.AI
         private readonly Transform _npcTransform;
 
         /// <summary> Граф телепортов для перемещения между локациями. </summary>
-        private readonly WarpGraph _warpGraph;
+        private WarpGraph _warpGraph;
 
         /// <summary> MonoBehaviour для запуска корутин. </summary>
         private readonly MonoBehaviour _coroutineRunner;
@@ -53,23 +54,35 @@ namespace FlavorfulStory.AI
         /// <summary> Скорость агента. </summary>
         private Vector3 _agentSpeed;
 
-        /// <summary> Инициализирует навигатор NPC с необходимыми компонентами. </summary>
-        /// <param name="navMeshAgent"> Агент NavMesh для навигации. </param>
-        /// <param name="warpGraph"> Граф телепортов для межлокационных перемещений. </param>
-        /// <param name="transform"> Transform NPC. </param>
-        /// <param name="coroutineRunner"> MonoBehaviour для запуска корутин. </param>
-        public NpcNavigator(NavMeshAgent navMeshAgent, WarpGraph warpGraph, Transform transform,
-            MonoBehaviour coroutineRunner)
+
+        public NpcNavigator(NavMeshAgent navMeshAgent, Transform transform, MonoBehaviour coroutineRunner,
+            WarpGraph warpGraph)
         {
             _navMeshAgent = navMeshAgent;
-            _warpGraph = warpGraph;
             _npcTransform = transform;
-            _coroutineRunner = coroutineRunner;
-
             _spawnPosition = transform.position;
+            _coroutineRunner = coroutineRunner;
+            _warpGraph = warpGraph;
+
             _spawnLocation = GetCurrentLocationName();
             _currentLocation = _spawnLocation;
         }
+
+        // /// <summary> Инициализирует навигатор NPC с необходимыми компонентами. </summary>
+        // /// <param name="navMeshAgent"> Агент NavMesh для навигации. </param>
+        // /// <param name="transform"> Transform NPC. </param>
+        // public NpcNavigator(NavMeshAgent navMeshAgent, Transform transform, WarpGraph warpGraph,
+        //     MonoBehaviour coroutineRunner)
+        // {
+        //     _navMeshAgent = navMeshAgent;
+        //     _npcTransform = transform;
+        //     _spawnPosition = transform.position;
+        //     _warpGraph = warpGraph;
+        //     _coroutineRunner = coroutineRunner;
+        //
+        //     _spawnLocation = GetCurrentLocationName();
+        //     _currentLocation = _spawnLocation;
+        // }
 
         /// <summary> Обновляет логику навигации каждый кадр, проверяя достижение цели. </summary>
         public void Update()

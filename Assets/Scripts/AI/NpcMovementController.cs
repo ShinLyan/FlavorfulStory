@@ -1,10 +1,10 @@
 ﻿using System;
 using FlavorfulStory.AI.FiniteStateMachine;
 using FlavorfulStory.AI.Scheduling;
-using FlavorfulStory.AI.WarpGraphSystem;
 using FlavorfulStory.TimeManagement;
 using UnityEngine;
 using UnityEngine.AI;
+using Zenject;
 
 namespace FlavorfulStory.AI
 {
@@ -27,25 +27,31 @@ namespace FlavorfulStory.AI
         /// <summary> Событие, вызываемое при достижении пункта назначения. </summary>
         public Action OnDestinationReached;
 
+        private readonly NpcNavigatorFactory _navigatorFactory;
+
         /// <summary> Инициализирует новый экземпляр контроллера движения NPC. </summary>
         /// <param name="navMeshAgent"> NavMeshAgent для навигации. </param>
-        /// <param name="warpGraph"> Граф варп-точек для навигации. </param>
         /// <param name="transform"> Transform NPC. </param>
-        /// <param name="coroutineRunner"> MonoBehaviour для запуска корутин. </param>
         /// <param name="animatorController"> Контроллер анимации NPC. </param>
         /// <param name="scheduleHandler"> Обработчик расписания NPC. </param>
         public NpcMovementController(NavMeshAgent navMeshAgent,
-            WarpGraph warpGraph,
             Transform transform,
-            MonoBehaviour coroutineRunner,
             NpcAnimatorController animatorController,
-            NpcScheduleHandler scheduleHandler)
+            NpcScheduleHandler scheduleHandler,
+            MonoBehaviour coroutineRunner,
+            NpcNavigatorFactory navigatorFactory)
         {
             _agent = navMeshAgent;
             _animatorController = animatorController;
             _scheduleHandler = scheduleHandler;
+            _navigatorFactory = navigatorFactory;
 
-            _navigator = new NpcNavigator(_agent, warpGraph, transform, coroutineRunner);
+            // _navigator = new NpcNavigator(_agent, transform, warpGraph, coroutineRunner);
+            Debug.Log(_navigatorFactory);
+            Debug.Log("123");
+            _navigator = _navigatorFactory.Create(_agent, transform, coroutineRunner);
+            // _navigator = new NpcNavigator(_agent, transform, coroutineRunner, );
+            Debug.Log("1234");
             _navigator.OnDestinationReached += () => OnDestinationReached?.Invoke();
 
             _scheduleHandler.OnSchedulePointChanged += _navigator.OnSchedulePointChanged;
@@ -53,6 +59,34 @@ namespace FlavorfulStory.AI
             WorldTime.OnTimePaused += () => Stop();
             WorldTime.OnTimeUnpaused += MoveToCurrentPoint;
         }
+
+        // /// <summary> Инициализирует новый экземпляр контроллера движения NPC. </summary>
+        // /// <param name="navMeshAgent"> NavMeshAgent для навигации. </param>
+        // /// <param name="transform"> Transform NPC. </param>
+        // /// <param name="animatorController"> Контроллер анимации NPC. </param>
+        // /// <param name="scheduleHandler"> Обработчик расписания NPC. </param>
+        // public NpcMovementController(NavMeshAgent navMeshAgent,
+        //     Transform transform,
+        //     NpcAnimatorController animatorController,
+        //     NpcScheduleHandler scheduleHandler,
+        //     WarpGraph warpGraph,
+        //     MonoBehaviour coroutineRunner)
+        // {
+        //     _agent = navMeshAgent;
+        //     _animatorController = animatorController;
+        //     _scheduleHandler = scheduleHandler;
+        //
+        //     // _navigator = new NpcNavigator(_agent, transform, warpGraph, coroutineRunner);
+        //     Debug.Log("123");
+        //     _navigator = _navigatorFactory.Create(_agent, transform, coroutineRunner);
+        //     Debug.Log("1234");
+        //     _navigator.OnDestinationReached += () => OnDestinationReached?.Invoke();
+        //
+        //     _scheduleHandler.OnSchedulePointChanged += _navigator.OnSchedulePointChanged;
+        //
+        //     WorldTime.OnTimePaused += () => Stop();
+        //     WorldTime.OnTimeUnpaused += MoveToCurrentPoint;
+        // }
 
         /// <summary> Обновляет движение NPC каждый кадр.
         /// Рассчитывает скорость анимации на основе скорости NavMeshAgent и обновляет навигатор. </summary>
