@@ -38,7 +38,7 @@ namespace FlavorfulStory.Audio
         /// <summary> Загрузить аудиоклипы. </summary>
         private void LoadSfxData()
         {
-            foreach (var resource in Resources.LoadAll<SfxData>("SFXData"))
+            foreach (var resource in Resources.LoadAll<SfxData>(string.Empty))
                 _sfxData.Add(resource.Type, new List<AudioClip>(resource.Clips));
         }
 

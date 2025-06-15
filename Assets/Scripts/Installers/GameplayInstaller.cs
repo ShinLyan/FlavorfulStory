@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using FlavorfulStory.BuildingRepair;
+using FlavorfulStory.DialogueSystem;
+using FlavorfulStory.DialogueSystem.UI;
 using FlavorfulStory.Infrastructure.Factories;
 using FlavorfulStory.InventorySystem;
 using FlavorfulStory.InventorySystem.DropSystem;
@@ -34,6 +36,9 @@ namespace FlavorfulStory.Installers
         /// при переходе между локациями. </remarks>
         [SerializeField] private CinemachineCamera _teleportVirtualCamera;
 
+        /// <summary> Канвас с основным игровым интерфейсом (HUD). </summary>
+        [SerializeField] private Canvas _hudCanvas;
+
         /// <summary> Выполняет установку всех зависимостей, необходимых для сцены. </summary>
         public override void InstallBindings()
         {
@@ -50,11 +55,13 @@ namespace FlavorfulStory.Installers
             Container.Bind<Equipment>().FromComponentInHierarchy().AsSingle();
             Container.Bind<PlayerController>().FromComponentInHierarchy().AsSingle();
 
+            Container.Bind<IDialogueInitiator>().To<PlayerSpeaker>().FromComponentInHierarchy().AsSingle();
+
             Container.Bind<PickupFactory>().AsSingle();
             Container.Bind<ItemDropper>().FromComponentsInHierarchy().AsCached();
             Container.Bind<PickupSpawner>().FromComponentsInHierarchy().AsCached();
 
-            Container.Bind<BuildingRepairView>().FromComponentInHierarchy().AsSingle();
+            Container.Bind<DialogueModelPresenter>().FromComponentInHierarchy().AsSingle();
         }
 
         /// <summary> Установить зависимости, связанные с пользовательским интерфейсом. </summary>
@@ -66,6 +73,9 @@ namespace FlavorfulStory.Installers
                 .WithArguments(_requirementViewPrefab);
             Container.Bind<ConfirmationWindowView>().FromComponentInHierarchy().AsSingle();
             Container.Bind<SummaryView>().FromComponentInHierarchy().AsSingle();
+            Container.Bind<BuildingRepairView>().FromComponentInHierarchy().AsSingle();
+            Container.Bind<DialogueView>().FromComponentInHierarchy().AsSingle();
+            Container.Bind<Canvas>().WithId("HUD").FromInstance(_hudCanvas).AsSingle();
             Container.Bind<IActionTooltipShower>().To<ActionTooltipShower>().FromComponentInHierarchy().AsSingle();
         }
 
