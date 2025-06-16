@@ -8,6 +8,7 @@ using FlavorfulStory.InventorySystem.PickupSystem;
 using FlavorfulStory.InventorySystem.UI;
 using FlavorfulStory.Lightning;
 using FlavorfulStory.Player;
+using FlavorfulStory.Saving;
 using FlavorfulStory.SceneManagement;
 using FlavorfulStory.TooltipSystem;
 using FlavorfulStory.UI;
@@ -55,6 +56,9 @@ namespace FlavorfulStory.Installers
             Container.Bind<PickupSpawner>().FromComponentsInHierarchy().AsCached();
 
             Container.Bind<BuildingRepairView>().FromComponentInHierarchy().AsSingle();
+            
+            Container.Bind<IItemDropService>().To<ItemDropService>().AsSingle();
+            Container.Bind<ISaveable>().To<ItemDropService>().FromResolve();
         }
 
         /// <summary> Установить зависимости, связанные с пользовательским интерфейсом. </summary>
