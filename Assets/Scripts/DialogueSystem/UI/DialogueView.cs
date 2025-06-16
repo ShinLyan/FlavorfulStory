@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using DG.Tweening;
 using FlavorfulStory.AI;
 using FlavorfulStory.UI;
+using FlavorfulStory.UI.Animation;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -19,7 +21,8 @@ namespace FlavorfulStory.DialogueSystem.UI
         private TMP_Text _dialogueText;
 
         /// <summary> Текстовое поле для имени говорящего персонажа. </summary>
-        [Header("Speaker Info")] [Tooltip("Текстовое поле для имени говорящего персонажа."), SerializeField]
+        [Header("Speaker Info")]
+        [Tooltip("Текстовое поле для имени говорящего персонажа."), SerializeField]
         private TMP_Text _speakerName;
 
         /// <summary> Иконка, показывающая, что персонаж доступен для романтики. </summary>
@@ -48,14 +51,24 @@ namespace FlavorfulStory.DialogueSystem.UI
         [Tooltip("Объект текста кнопки Next."), SerializeField]
         private GameObject _nextButtonPreview;
 
-        /// <summary> Текущая информация об NPC. </summary>
-        private NpcInfo _currentSpeakerInfo;
+        /// <summary> Панель диалога. </summary>
+        [Tooltip("Панель диалога."), SerializeField]
+        private RectTransform _dialoguePanel;
 
-        /// <summary> Канвас с основным игровым интерфейсом (HUD). </summary>
-        private Canvas _hud;
+        /// <summary> Аниматор для панели и модели. </summary>
+        private DialogueViewAnimator _animator;
 
         /// <summary> Отображение модели персонажа в диалогах. </summary>
         private DialogueModelPresenter _dialogueModelPresenter;
+
+        /// <summary> Компонент управления HUD затемнением. </summary>
+        private CanvasGroupFader _hudFader;
+
+        /// <summary> Текущая информация об NPC. </summary>
+        private NpcInfo _currentSpeakerInfo;
+
+        /// <summary> Активная модель персонажа. </summary>
+        private GameObject _currentModel;
 
         /// <summary> Событие при нажатии кнопки Next. </summary>
         public event Action OnNextClicked;
@@ -63,34 +76,46 @@ namespace FlavorfulStory.DialogueSystem.UI
         /// <summary> Событие при выборе варианта ответа. </summary>
         public event Action<DialogueNode> OnChoiceSelected;
 
+        /// <summary> Событие при скрытии окна диалога. </summary>
+        public event Action OnHidden;
+
         #endregion
 
         /// <summary> Внедрение зависимостей Zenject. </summary>
-        /// <param name="hud"> Канвас с основным игровым интерфейсом (HUD). </param>
+        /// <param name="hudFader"> Затемнитель интерфейса HUD. </param>
         /// <param name="dialogueModelPresenter"> Отображение модели персонажа в диалогах. </param>
         [Inject]
-        private void Construct([Inject(Id = "HUD")] Canvas hud, DialogueModelPresenter dialogueModelPresenter)
+        private void Construct([Inject(Id = "HUD")] CanvasGroupFader hudFader,
+            DialogueModelPresenter dialogueModelPresenter)
         {
-            _hud = hud;
+            _hudFader = hudFader;
             _dialogueModelPresenter = dialogueModelPresenter;
         }
 
-        /// <summary> Подписка на кнопку Next. </summary>
-        private void Awake() => _nextButton.onClick.AddListener(() => OnNextClicked?.Invoke());
+        /// <summary> Подписка на кнопку Next и инициализация аниматора. </summary>
+        private void Awake()
+        {
+            _nextButton.onClick.AddListener(() => OnNextClicked?.Invoke());
+            _animator = new DialogueViewAnimator(_dialoguePanel, _dialogueText);
+        }
 
         /// <summary> Отображает окно диалога с переданными данными. </summary>
         /// <param name="data"> Данные текущего диалога. </param>
-        public void ShowDialogue(DialogueData data)
+        public void Show(DialogueData data)
         {
             if (!_currentSpeakerInfo || _currentSpeakerInfo != data.SpeakerInfo)
             {
                 gameObject.SetActive(true);
-                _hud.gameObject.SetActive(false);
+                _hudFader.Hide();
+
+                _currentModel = _dialogueModelPresenter.InstantiateModel(data.SpeakerInfo.DialogueModelPrefab);
+                _animator.AnimateModelAppearance(_currentModel, true);
+                _animator.AnimatePanelIn();
+
                 SetSpeakerInfo(data.SpeakerInfo);
-                _currentSpeakerInfo = data.SpeakerInfo;
             }
 
-            _dialogueText.text = data.Text;
+            _animator.AnimateText(data.Text);
 
             _nextButton.enabled = !data.IsChoosing;
             _nextButtonPreview.SetActive(!data.IsChoosing);
@@ -100,22 +125,30 @@ namespace FlavorfulStory.DialogueSystem.UI
         }
 
         /// <summary> Скрывает окно диалога и восстанавливает отображение HUD. </summary>
-        public void HideDialogue()
+        public void Hide()
         {
-            gameObject.SetActive(false);
-            _hud.gameObject.SetActive(true);
-            _currentSpeakerInfo = null;
-            _dialogueModelPresenter.DestroyModel();
-            ClearChoices();
+            var modelTween = _animator.AnimateModelAppearance(_currentModel, false);
+            var panelTween = _animator.AnimatePanelOut();
+            DOTween.Sequence().Join(panelTween).Join(modelTween).OnComplete(() =>
+            {
+                _dialogueModelPresenter.ClearModel();
+                _currentModel = null;
+                gameObject.SetActive(false);
+                _hudFader.Show();
+                _currentSpeakerInfo = null;
+                ClearChoices();
+
+                OnHidden?.Invoke();
+            });
         }
 
         /// <summary> Устанавливает информацию о говорящем персонаже. </summary>
         /// <param name="npc"> Информация о персонаже. </param>
         private void SetSpeakerInfo(NpcInfo npc)
         {
+            _currentSpeakerInfo = npc;
             _speakerName.text = npc.NpcName.ToString();
             _romanceableIcon.gameObject.SetActive(npc.IsRomanceable);
-            _dialogueModelPresenter.ShowModel(npc.DialogueModelPrefab);
         }
 
         /// <summary> Отрисовывает кнопки выбора реплик, если активен режим выбора. </summary>

@@ -13,6 +13,7 @@ using FlavorfulStory.Player;
 using FlavorfulStory.SceneManagement;
 using FlavorfulStory.TooltipSystem;
 using FlavorfulStory.UI;
+using FlavorfulStory.UI.Animation;
 using Unity.Cinemachine;
 using UnityEngine;
 using Zenject;
@@ -36,8 +37,8 @@ namespace FlavorfulStory.Installers
         /// при переходе между локациями. </remarks>
         [SerializeField] private CinemachineCamera _teleportVirtualCamera;
 
-        /// <summary> Канвас с основным игровым интерфейсом (HUD). </summary>
-        [SerializeField] private Canvas _hudCanvas;
+        /// <param name="hudFader"> Затемнитель интерфейса HUD. </param>
+        [SerializeField] private CanvasGroupFader _hudFader;
 
         /// <summary> Выполняет установку всех зависимостей, необходимых для сцены. </summary>
         public override void InstallBindings()
@@ -75,8 +76,10 @@ namespace FlavorfulStory.Installers
             Container.Bind<SummaryView>().FromComponentInHierarchy().AsSingle();
             Container.Bind<BuildingRepairView>().FromComponentInHierarchy().AsSingle();
             Container.Bind<DialogueView>().FromComponentInHierarchy().AsSingle();
-            Container.Bind<Canvas>().WithId("HUD").FromInstance(_hudCanvas).AsSingle();
+
             Container.Bind<IActionTooltipShower>().To<ActionTooltipShower>().FromComponentInHierarchy().AsSingle();
+
+            Container.Bind<CanvasGroupFader>().WithId("HUD").FromInstance(_hudFader).AsSingle();
         }
 
         /// <summary> Установить зависимости, связанные с не игровыми системами и логикой. </summary>

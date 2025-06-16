@@ -34,9 +34,6 @@ namespace FlavorfulStory.DialogueSystem
         /// <summary> Идёт ли сейчас диалог? </summary>
         private bool IsDialogueActive => _currentDialogue;
 
-        /// <summary> Событие обновления состояния диалога. </summary>
-        public event Action OnConversationUpdated;
-
         /// <summary> Событие завершения диалога. </summary>
         public event Action OnConversationEnded;
 
@@ -67,13 +64,10 @@ namespace FlavorfulStory.DialogueSystem
         /// <summary> Очистить подписки и события при уничтожении компонента. </summary>
         private void OnDestroy()
         {
-            if (_dialogueView)
-            {
-                _dialogueView.OnNextClicked -= PlayNextDialogueNode;
-                _dialogueView.OnChoiceSelected -= SelectChoice;
-            }
+            if (!_dialogueView) return;
 
-            OnConversationUpdated = null;
+            _dialogueView.OnNextClicked -= PlayNextDialogueNode;
+            _dialogueView.OnChoiceSelected -= SelectChoice;
         }
 
         #region IDialogueInitiator
@@ -106,10 +100,8 @@ namespace FlavorfulStory.DialogueSystem
             _currentNode = null;
             IsChoosingDialogue = false;
 
-            _dialogueView.HideDialogue();
-
-            OnConversationUpdated?.Invoke();
-            OnConversationEnded?.Invoke();
+            _dialogueView.OnHidden += () => OnConversationEnded?.Invoke();
+            _dialogueView.Hide();
 
             // Защищаем от повторного запуска взаимодействия
             InputWrapper.BlockInput(InputButton.Interact);
@@ -147,7 +139,6 @@ namespace FlavorfulStory.DialogueSystem
                 IsChoosingDialogue = true;
                 TriggerExitAction();
                 UpdateDialogueView();
-                OnConversationUpdated?.Invoke();
                 return;
             }
 
@@ -167,7 +158,6 @@ namespace FlavorfulStory.DialogueSystem
 
             IsChoosingDialogue = false;
             UpdateDialogueView();
-            OnConversationUpdated?.Invoke();
         }
 
         /// <summary> Получить список доступных для игрока вариантов ответа. </summary>
@@ -189,12 +179,12 @@ namespace FlavorfulStory.DialogueSystem
         {
             if (!IsDialogueActive)
             {
-                _dialogueView.HideDialogue();
+                _dialogueView.Hide();
                 return;
             }
 
             var data = new DialogueData(GetText(), CurrentNpcSpeaker?.NpcInfo, IsChoosingDialogue, GetChoices());
-            _dialogueView.ShowDialogue(data);
+            _dialogueView.Show(data);
         }
 
         /// <summary> Выполнить действие входа, назначенное текущему узлу. </summary>
