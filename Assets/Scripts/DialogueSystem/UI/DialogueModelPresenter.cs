@@ -20,11 +20,10 @@ namespace FlavorfulStory.DialogueSystem.UI
         /// <summary> Создать экземпляр модели и установить ей нужный слой. </summary>
         /// <param name="modelPrefab"> Префаб модели для отображения. </param>
         /// <returns> Ссылка на созданную модель. </returns>
-        public GameObject InstantiateModel(GameObject modelPrefab)
+        public void InstantiateModel(GameObject modelPrefab)
         {
             _currentModel = Instantiate(modelPrefab, _spawnPoint);
             SetLayerRecursively(_currentModel.transform, LayerMask.NameToLayer("DialogueModel"));
-            return _currentModel;
         }
 
         /// <summary> Рекурсивно установить слой для объекта и всех его потомков. </summary>
@@ -36,7 +35,11 @@ namespace FlavorfulStory.DialogueSystem.UI
             foreach (Transform child in root) SetLayerRecursively(child, layer);
         }
 
-        /// <summary> Очистить текущую активную модель без уничтожения. </summary>
-        public void ClearModel() => _currentModel = null;
+        /// <summary> Уничтожить текущую активную модель. </summary>
+        public void DestroyModel()
+        {
+            if (_currentModel) Destroy(_currentModel.gameObject);
+            _currentModel = null;
+        }
     }
 }
