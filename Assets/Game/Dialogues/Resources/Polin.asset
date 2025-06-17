@@ -1,0 +1,219 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-7151618664348682456
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 32aa36d444184fea8fe8116a186a18de, type: 3}
+  m_Name: f03fd699-90fb-4dae-8829-9573429f079f
+  m_EditorClassIdentifier: 
+  <IsPlayerSpeaking>k__BackingField: 1
+  <Text>k__BackingField: Do you spend a lot of time in the forest?
+  <ChildNodes>k__BackingField:
+  - b2322540-3cff-43ef-9519-3f1a3fd7cbf1
+  <Rect>k__BackingField:
+    serializedVersion: 2
+    x: 250
+    y: 0
+    width: 200
+    height: 100
+  <EnterActionName>k__BackingField: 
+  <ExitActionName>k__BackingField: 
+--- !u!114 &-6071055185219614125
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 32aa36d444184fea8fe8116a186a18de, type: 3}
+  m_Name: 1f44b425-e498-4099-8dde-ef0a88e4be2c
+  m_EditorClassIdentifier: 
+  <IsPlayerSpeaking>k__BackingField: 0
+  <Text>k__BackingField: Then keep walking. The forest will speak to you if needed.
+    Those who ignore nature rarely get her favor.
+  <ChildNodes>k__BackingField: []
+  <Rect>k__BackingField:
+    serializedVersion: 2
+    x: 500
+    y: 100
+    width: 200
+    height: 100
+  <EnterActionName>k__BackingField: 
+  <ExitActionName>k__BackingField: 
+--- !u!114 &-5439297537706077486
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 32aa36d444184fea8fe8116a186a18de, type: 3}
+  m_Name: f0bf8715-9919-4d25-8c55-d2863941ed13
+  m_EditorClassIdentifier: 
+  <IsPlayerSpeaking>k__BackingField: 0
+  <Text>k__BackingField: "You're the new one. The forest doesn\u2019t take kindly
+    to haste."
+  <ChildNodes>k__BackingField:
+  - f03fd699-90fb-4dae-8829-9573429f079f
+  - 6cb7b497-0a09-4eaf-b375-ab61163269c7
+  - 4af8e627-391e-4fff-adbb-580ac479a0ca
+  <Rect>k__BackingField:
+    serializedVersion: 2
+    x: 0
+    y: 0
+    width: 200
+    height: 100
+  <EnterActionName>k__BackingField: 
+  <ExitActionName>k__BackingField: 
+--- !u!114 &-2622510441503988176
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 32aa36d444184fea8fe8116a186a18de, type: 3}
+  m_Name: b2543e2c-e16a-4e05-835c-ed8f892b7759
+  m_EditorClassIdentifier: 
+  <IsPlayerSpeaking>k__BackingField: 0
+  <Text>k__BackingField: "Grumpy is when someone complains for no reason.  \r\nI
+    speak plain. Welcome."
+  <ChildNodes>k__BackingField: []
+  <Rect>k__BackingField:
+    serializedVersion: 2
+    x: 500
+    y: 200
+    width: 200
+    height: 100
+  <EnterActionName>k__BackingField: 
+  <ExitActionName>k__BackingField: 
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2a68b60154ae481c9936879aa8e46c42, type: 3}
+  m_Name: Polin
+  m_EditorClassIdentifier: 
+  _nodes:
+  - {fileID: -5439297537706077486}
+  - {fileID: -7151618664348682456}
+  - {fileID: 6889824215155871103}
+  - {fileID: 1659229038562118222}
+  - {fileID: 3841009922958701211}
+  - {fileID: 711281152378904938}
+  - {fileID: -6071055185219614125}
+  - {fileID: -2622510441503988176}
+--- !u!114 &711281152378904938
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 32aa36d444184fea8fe8116a186a18de, type: 3}
+  m_Name: 19c54427-02b3-483c-945b-173565ece7e7
+  m_EditorClassIdentifier: 
+  <IsPlayerSpeaking>k__BackingField: 0
+  <Text>k__BackingField: Trees break less often. When one falls, at least you know
+    why.
+  <ChildNodes>k__BackingField: []
+  <Rect>k__BackingField:
+    serializedVersion: 2
+    x: 750
+    y: 0
+    width: 200
+    height: 100
+  <EnterActionName>k__BackingField: 
+  <ExitActionName>k__BackingField: 
+--- !u!114 &1659229038562118222
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 32aa36d444184fea8fe8116a186a18de, type: 3}
+  m_Name: 4af8e627-391e-4fff-adbb-580ac479a0ca
+  m_EditorClassIdentifier: 
+  <IsPlayerSpeaking>k__BackingField: 1
+  <Text>k__BackingField: Are you always this grumpy, or am I just lucky?
+  <ChildNodes>k__BackingField:
+  - b2543e2c-e16a-4e05-835c-ed8f892b7759
+  <Rect>k__BackingField:
+    serializedVersion: 2
+    x: 250
+    y: 200
+    width: 200
+    height: 100
+  <EnterActionName>k__BackingField: 
+  <ExitActionName>k__BackingField: 
+--- !u!114 &3841009922958701211
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 32aa36d444184fea8fe8116a186a18de, type: 3}
+  m_Name: b2322540-3cff-43ef-9519-3f1a3fd7cbf1
+  m_EditorClassIdentifier: 
+  <IsPlayerSpeaking>k__BackingField: 0
+  <Text>k__BackingField: Every day. Since sunrise. Trees don't chop themselves. The
+    silence there is more honest than people.
+  <ChildNodes>k__BackingField:
+  - 19c54427-02b3-483c-945b-173565ece7e7
+  <Rect>k__BackingField:
+    serializedVersion: 2
+    x: 500
+    y: 0
+    width: 200
+    height: 100
+  <EnterActionName>k__BackingField: 
+  <ExitActionName>k__BackingField: 
+--- !u!114 &6889824215155871103
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 32aa36d444184fea8fe8116a186a18de, type: 3}
+  m_Name: 6cb7b497-0a09-4eaf-b375-ab61163269c7
+  m_EditorClassIdentifier: 
+  <IsPlayerSpeaking>k__BackingField: 1
+  <Text>k__BackingField: "I don\u2019t have time for talking. Just passing through."
+  <ChildNodes>k__BackingField:
+  - 1f44b425-e498-4099-8dde-ef0a88e4be2c
+  <Rect>k__BackingField:
+    serializedVersion: 2
+    x: 250
+    y: 100
+    width: 200
+    height: 100
+  <EnterActionName>k__BackingField: 
+  <ExitActionName>k__BackingField: 

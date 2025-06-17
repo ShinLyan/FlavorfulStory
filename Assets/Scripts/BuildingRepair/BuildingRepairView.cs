@@ -58,10 +58,7 @@ namespace FlavorfulStory.BuildingRepair
         /// <summary> Внедрить фабрику создания отображений требований ресурсов. </summary>
         /// <param name="factory"> Фабрика создания отображений требований ресурсов. </param>
         [Inject]
-        private void Construct(IGameFactory<ResourceRequirementView> factory)
-        {
-            _requirementViewFactory = factory;
-        }
+        private void Construct(IGameFactory<ResourceRequirementView> factory) => _requirementViewFactory = factory;
 
         /// <summary> Инициализация кэша вьюшек, если они уже присутствуют в иерархии. </summary>
         private void Awake() => CacheInitialViews();
@@ -132,7 +129,7 @@ namespace FlavorfulStory.BuildingRepair
             _repairCompletedText.gameObject.SetActive(false);
             _repairCompletedText.text = $"{stage.BuildingName}'s repair completed";
 
-            _buildButton.IsInteractable = IsRepairPossible(stage, investedResources);
+            _buildButton.Interactable = IsRepairPossible(stage, investedResources);
         }
 
         /// <summary> Получить или создать отображение требования по индексу. </summary>
@@ -227,7 +224,7 @@ namespace FlavorfulStory.BuildingRepair
         {
             _requirementViews.ForEach(view => view.gameObject.SetActive(false));
             _repairCompletedText.gameObject.SetActive(true);
-            _buildButton.IsInteractable = false;
+            _buildButton.Interactable = false;
         }
     }
 }

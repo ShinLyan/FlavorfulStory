@@ -1,4 +1,5 @@
 ﻿using FlavorfulStory.SceneManagement;
+using FlavorfulStory.UI.Animation;
 using UnityEngine;
 using Zenject;
 
@@ -16,7 +17,7 @@ namespace FlavorfulStory.Installers
             Container.Bind<SavingWrapper>().FromNewComponentOnNewGameObject()
                 .WithGameObjectName("SavingWrapper").AsSingle();
 
-            Container.Bind<Fader>().FromComponentInNewPrefab(_faderPrefab).AsSingle().NonLazy();
+            Container.Bind<CanvasGroupFader>().FromComponentInNewPrefab(_faderPrefab).AsSingle().NonLazy();
         }
     }
 }
