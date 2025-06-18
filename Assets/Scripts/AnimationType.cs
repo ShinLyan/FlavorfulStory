@@ -16,6 +16,14 @@
         PettingAnimal,
 
         /// <summary> Анимация питья. </summary>
-        Drinking
+        Drinking,
+
+        Routine,
+
+        Special1,
+
+        Special2,
+
+        Special3
     }
 }
