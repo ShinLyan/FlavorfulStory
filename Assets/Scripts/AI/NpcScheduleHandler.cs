@@ -20,7 +20,11 @@ namespace FlavorfulStory.AI
         public event Action<SchedulePoint> OnSchedulePointChanged;
 
         /// <summary> Инициализирует новый экземпляр обработчика расписания и подписывается на события времени. </summary>
-        public NpcScheduleHandler() => WorldTime.OnTimeTick += UpdateSchedulePoint;
+        public NpcScheduleHandler()
+        {
+            WorldTime.OnTimeTick += UpdateSchedulePoint;
+            WorldTime.OnDayEnded += Reset;
+        }
 
         /// <summary> Устанавливает параметры текущего расписания для NPC. </summary>
         /// <param name="scheduleParams"> Параметры расписания для установки. </param>
@@ -56,5 +60,7 @@ namespace FlavorfulStory.AI
                 OnSchedulePointChanged?.Invoke(CurrentPoint);
             }
         }
+
+        private void Reset(DateTime time) => CurrentPoint = null;
     }
 }
