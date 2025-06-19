@@ -51,28 +51,6 @@ namespace FlavorfulStory.AI.Scheduling
             Path = Array.Empty<SchedulePoint>();
         }
 
-        /// <summary> Найти ближайшую точку маршрута, соответствующую текущему времени. </summary>
-        /// <param name="currentTime"> Текущее игровое время. </param>
-        /// <returns> Ближайшая точка маршрута или <c>null</c>, если подходящая точка не найдена. </returns>
-        public SchedulePoint GetClosestSchedulePointInPath(DateTime currentTime)
-        {
-            int currentMinutes = (int)currentTime.Hour * 60 + (int)currentTime.Minute;
-            SchedulePoint closestPoint = null;
-            int minTimeDifference = int.MaxValue;
-            foreach (var pathPoint in Path)
-            {
-                int pathPointMinutes = pathPoint.Hour * 60 + pathPoint.Minutes;
-                int timeDifference = currentMinutes - pathPointMinutes;
-
-                if (timeDifference < 0 || timeDifference >= minTimeDifference) continue;
-
-                minTimeDifference = timeDifference;
-                closestPoint = pathPoint;
-            }
-
-            return closestPoint;
-        }
-
         /// <summary> Возвращает стек точек расписания, отсортированных по времени (от самого раннего к позднему). </summary>
         public Stack<SchedulePoint> GetSortedSchedulePointsStack()
         {
