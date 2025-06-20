@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using FlavorfulStory.Actions;
+﻿using FlavorfulStory.Actions;
 using FlavorfulStory.InteractionSystem;
 using FlavorfulStory.Player;
 using FlavorfulStory.SceneManagement;
@@ -24,6 +23,8 @@ namespace FlavorfulStory.TimeManagement
         /// <summary> Затемнение экрана при переходах между сценами. </summary>
         private Fader _fader;
 
+        private DayEndManager _dayEndManager;
+
         /// <summary> Заголовок окна подтверждения сна. </summary>
         private const string SleepConfirmationTitle = "Bed"; // TODO: заменить на генератор/локализацию
 
@@ -35,17 +36,15 @@ namespace FlavorfulStory.TimeManagement
 
         /// <summary> Внедряет зависимости через Zenject. </summary>
         /// <param name="confirmationWindowView"> Окно подтверждения. </param>
-        /// <param name="summaryView"> Окно сводки. </param>
         /// <param name="playerController"> Контроллер игрока. </param>
-        /// <param name="fader"> Компонент затемнения. </param>
         [Inject]
-        private void Construct(ConfirmationWindowView confirmationWindowView, SummaryView summaryView,
-            PlayerController playerController, Fader fader)
+        private void Construct(ConfirmationWindowView confirmationWindowView,
+            DayEndManager dayEndManager,
+            PlayerController playerController)
         {
             _confirmationWindowView = confirmationWindowView;
-            _summaryView = summaryView;
             _playerController = playerController;
-            _fader = fader;
+            _dayEndManager = dayEndManager;
         }
 
         /// <summary> Показывает View подтверждения перед сном. </summary>
@@ -57,30 +56,14 @@ namespace FlavorfulStory.TimeManagement
         }
 
         /// <summary> Обрабатывает подтверждение сна. </summary>
-        private void OnSleepConfirmed() { StartCoroutine(SleepRoutine()); }
-
-        /// <summary> Обрабатка процесса сна и завершения дня. </summary>
-        /// <returns> Корутина, обрабатывающая процесс сна и завершения дня.</returns>
-        private IEnumerator SleepRoutine()
+        private void OnSleepConfirmed()
         {
-            yield return _fader.FadeOut(Fader.FadeOutTime);
+            _playerController.SetBusyState(true);
 
             WorldTime.ForceEndDay();
-            WorldTime.Pause();
-
-            _summaryView.Show();
-
-            bool continuePressed = false;
-            _summaryView.OnContinuePressed = () => continuePressed = true;
-            _summaryView.SetSummary(DefaultSummaryText);
-            yield return new WaitUntil(() => continuePressed);
-
-            _summaryView.Hide();
-            WorldTime.Unpause();
-            EndInteraction(_playerController);
-
-            yield return _fader.FadeIn(Fader.FadeInTime);
+            _dayEndManager.RequestEndDay(() => EndInteraction(_playerController));
         }
+
 
         #region IInteractable
 

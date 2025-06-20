@@ -18,21 +18,17 @@ namespace FlavorfulStory.UI
         /// <summary> Кнопка для продолжения после просмотра сводки. </summary>
         [SerializeField] private Button _continueButton;
 
+        public static readonly string DefaultSummaryText = "BEST SUMMARY EVER";
+
         /// <summary> Событие, вызываемое при нажатии кнопки продолжения. </summary>
         public Action OnContinuePressed;
 
         /// <summary> Подписка на нажатие кнопки. </summary>
-        private void Awake()
-        {
-            _continueButton.onClick.AddListener(() => OnContinuePressed?.Invoke());
-        }
+        private void Awake() { _continueButton.onClick.AddListener(() => OnContinuePressed?.Invoke()); }
 
         /// <summary> Устанавливает текст сводки. </summary>
         /// <param name="text">Текст для отображения в сводке.</param>
-        public void SetSummary(string text)
-        {
-            _summaryText.text = text;
-        }
+        public void SetSummary(string text) { _summaryText.text = text; }
 
         /// <summary> Показывает UI сводки и блокирует пользовательский ввод. </summary>
         public void Show()

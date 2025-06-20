@@ -9,6 +9,7 @@ using FlavorfulStory.InventorySystem.UI;
 using FlavorfulStory.Lightning;
 using FlavorfulStory.Player;
 using FlavorfulStory.SceneManagement;
+using FlavorfulStory.TimeManagement;
 using FlavorfulStory.TooltipSystem;
 using FlavorfulStory.UI;
 using Unity.Cinemachine;
@@ -33,6 +34,8 @@ namespace FlavorfulStory.Installers
         /// <remarks> Используется для WarpPortal, когда отключаем и включаем камеру
         /// при переходе между локациями. </remarks>
         [SerializeField] private CinemachineCamera _teleportVirtualCamera;
+
+        [SerializeField] private MonoBehaviour _monoBehaviour;
 
         /// <summary> Выполняет установку всех зависимостей, необходимых для сцены. </summary>
         public override void InstallBindings()
@@ -80,6 +83,10 @@ namespace FlavorfulStory.Installers
             Container.BindInterfacesAndSelfTo<LocationManager>().AsSingle();
 
             Container.Bind<CinemachineCamera>().FromInstance(_teleportVirtualCamera).AsSingle();
+
+
+            Container.Bind<MonoBehaviour>().FromInstance(_monoBehaviour).AsSingle();
+            Container.Bind<DayEndManager>().AsSingle();
         }
     }
 }
