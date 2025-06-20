@@ -7,7 +7,7 @@ using Zenject;
 
 namespace FlavorfulStory.TimeManagement
 {
-    public class DayEndManager : IInitializable
+    public class DayEndManager : IInitializable, IDisposable
     {
         private readonly SummaryView _summaryView;
         private readonly Fader _fader;
@@ -21,9 +21,14 @@ namespace FlavorfulStory.TimeManagement
             _summaryView = summaryView;
             _fader = fader;
             _coroutineRunner = coroutineRunner;
+            WorldTime.OnDayEnded += OnDayEnded;
         }
 
         public void Initialize() { }
+
+        public void Dispose() => WorldTime.OnDayEnded -= OnDayEnded;
+
+        private void OnDayEnded(DateTime date) => RequestEndDay(() => { });
 
         public void RequestEndDay(Action onCompleteCallback)
         {
@@ -33,9 +38,9 @@ namespace FlavorfulStory.TimeManagement
 
         private IEnumerator EndDayRoutine()
         {
-            yield return _fader.FadeOut(Fader.FadeOutTime);
-
             WorldTime.Pause();
+
+            yield return _fader.FadeOut(Fader.FadeOutTime);
 
             _summaryView.Show();
             bool continuePressed = false;

@@ -53,13 +53,12 @@ namespace FlavorfulStory.TimeManagement
             _confirmationWindowView.Setup(SleepConfirmationTitle, SleepConfirmationDescription,
                 OnSleepConfirmed, () => EndInteraction(_playerController));
             _confirmationWindowView.Show();
+            _playerController.SetBusyState(true);
         }
 
         /// <summary> Обрабатывает подтверждение сна. </summary>
         private void OnSleepConfirmed()
         {
-            _playerController.SetBusyState(true);
-
             WorldTime.ForceEndDay();
             _dayEndManager.RequestEndDay(() => EndInteraction(_playerController));
         }

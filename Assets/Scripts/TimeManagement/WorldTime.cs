@@ -97,11 +97,11 @@ namespace FlavorfulStory.TimeManagement
             if (previousTime.Hour < NightStartHour && CurrentGameTime.Hour >= NightStartHour)
                 OnNightStarted?.Invoke(CurrentGameTime);
 
-            if (previousTime.Hour < _dayEndHour && CurrentGameTime.Hour >= _dayEndHour) BeginNewDay();
-
             if ((int)CurrentGameTime.Minute % _timeBetweenTicks == 0) OnTimeTick?.Invoke(CurrentGameTime);
 
             OnTimeUpdated?.Invoke(CurrentGameTime);
+
+            if (previousTime.Hour < _dayEndHour && CurrentGameTime.Hour >= _dayEndHour) BeginNewDay();
         }
 
         /// <summary> Обновить игровое время до начала следующего дня. </summary>
@@ -118,6 +118,7 @@ namespace FlavorfulStory.TimeManagement
             );
 
             OnDayEnded?.Invoke(CurrentGameTime);
+
             // _dayEndManager.RequestEndDay(() => { });
         }
 
