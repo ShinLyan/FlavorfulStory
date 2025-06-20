@@ -57,11 +57,7 @@ namespace FlavorfulStory.TimeManagement
         }
 
         /// <summary> Обрабатывает подтверждение сна. </summary>
-        private void OnSleepConfirmed()
-        {
-            StartCoroutine(SleepRoutine());
-            _confirmationWindowView.Hide();
-        }
+        private void OnSleepConfirmed() { StartCoroutine(SleepRoutine()); }
 
         /// <summary> Обрабатка процесса сна и завершения дня. </summary>
         /// <returns> Корутина, обрабатывающая процесс сна и завершения дня.</returns>
@@ -81,16 +77,16 @@ namespace FlavorfulStory.TimeManagement
 
             _summaryView.Hide();
             WorldTime.Unpause();
+            EndInteraction(_playerController);
 
             yield return _fader.FadeIn(Fader.FadeInTime);
-
-            EndInteraction(_playerController);
         }
 
         #region IInteractable
 
         /// <summary> Действие игрока по отношению к объекту. </summary>
-        [field: SerializeField] public ActionDescription ActionDescription { get; private set; }
+        [field: SerializeField]
+        public ActionDescription ActionDescription { get; private set; }
 
         /// <summary> Возвращает возможность взаимодействия с объектом. </summary>
         public bool IsInteractionAllowed => true;
