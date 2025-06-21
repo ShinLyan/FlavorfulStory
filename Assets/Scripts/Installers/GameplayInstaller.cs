@@ -84,7 +84,7 @@ namespace FlavorfulStory.Installers
 
             Container.Bind<CinemachineCamera>().FromInstance(_teleportVirtualCamera).AsSingle();
 
-
+            Container.Bind<SleepTrigger>().FromComponentInHierarchy().AsSingle();
             Container.Bind<MonoBehaviour>().FromInstance(_monoBehaviour).AsSingle();
             Container.Bind<DayEndManager>().AsSingle();
         }

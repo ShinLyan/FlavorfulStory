@@ -61,10 +61,7 @@ namespace FlavorfulStory.Player
         /// <summary> Внедрение зависимости — инвентарь игрока. </summary>
         /// <param name="inventory"> Инвентарь игрока. </param>
         [Inject]
-        private void Construct(Inventory inventory)
-        {
-            _playerInventory = inventory;
-        }
+        private void Construct(Inventory inventory) { _playerInventory = inventory; }
 
         /// <summary> Инициализация компонентов. </summary>
         private void Awake()

@@ -59,8 +59,8 @@ namespace FlavorfulStory.TimeManagement
         /// <summary> Обрабатывает подтверждение сна. </summary>
         private void OnSleepConfirmed()
         {
+            _dayEndManager.RequestEndDay(transform, () => EndInteraction(_playerController));
             WorldTime.ForceEndDay();
-            _dayEndManager.RequestEndDay(() => EndInteraction(_playerController));
         }
 
 

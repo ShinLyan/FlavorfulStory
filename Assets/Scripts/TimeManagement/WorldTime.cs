@@ -118,8 +118,6 @@ namespace FlavorfulStory.TimeManagement
             );
 
             OnDayEnded?.Invoke(CurrentGameTime);
-
-            // _dayEndManager.RequestEndDay(() => { });
         }
 
         /// <summary> Принудительно завершить текущий день. </summary>
