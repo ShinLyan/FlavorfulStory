@@ -27,10 +27,7 @@ namespace FlavorfulStory.TimeManagement
         /// <summary> Словарь для конвертации сезонов. </summary>
         private static readonly Dictionary<Season, Season> SeasonConvertDict = new()
         {
-            { (Season)1, (Season)1 },
-            { (Season)2, (Season)2 },
-            { (Season)3, (Season)4 },
-            { (Season)4, (Season)8 }
+            { (Season)1, (Season)1 }, { (Season)2, (Season)2 }, { (Season)3, (Season)4 }, { (Season)4, (Season)8 }
         };
 
         /// <summary> Количество дней в одном сезоне. </summary>
@@ -49,10 +46,27 @@ namespace FlavorfulStory.TimeManagement
         public Season Season => SeasonConvertDict[(Season)((int)TotalDays % (DaysCount * 4) / DaysCount)];
 
         /// <summary> Получает день в текущем сезоне. </summary>
-        public float SeasonDay => _totalMinutes % SeasonMinutes / DayMinutes + 1;
+        public float SeasonDay
+        {
+            get
+            {
+                float adjustedTotalMinutes = _totalMinutes - 2 * 60;
+                if (adjustedTotalMinutes < 0) return 1;
+                return adjustedTotalMinutes % SeasonMinutes / DayMinutes + 1;
+            }
+        }
 
         /// <summary> Получает день недели. </summary>
-        public DayOfWeek DayOfWeek => DayOfWeekConvertDict[(DayOfWeek)(int)(_totalMinutes / DayMinutes % 7 + 1)];
+        public DayOfWeek DayOfWeek
+        {
+            get
+            {
+                float adjustedTotalMinutes = _totalMinutes - 2 * 60;
+                if (adjustedTotalMinutes < 0) adjustedTotalMinutes += 7 * DayMinutes; 
+                int dayOfWeekIndex = (int)(adjustedTotalMinutes / DayMinutes % 7 + 1);
+                return DayOfWeekConvertDict[(DayOfWeek)dayOfWeekIndex];
+            }
+        }
 
         /// <summary> Получает текущий час. </summary>
         public float Hour => _totalMinutes % DayMinutes / 60;
