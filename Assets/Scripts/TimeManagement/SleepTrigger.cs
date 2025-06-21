@@ -60,7 +60,7 @@ namespace FlavorfulStory.TimeManagement
         private void OnSleepConfirmed()
         {
             _dayEndManager.RequestEndDay(transform, () => EndInteraction(_playerController));
-            WorldTime.ForceEndDay();
+            WorldTime.ForceEndDay(6);
         }
 
 

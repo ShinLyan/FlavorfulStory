@@ -53,7 +53,7 @@ namespace FlavorfulStory.TimeManagement
         public static Action OnTimeUnpaused;
 
         /// <summary> Событие, вызываемое при принудительном завершении дня. </summary>
-        private static Action OnForceEndDay;
+        private static Action<int> OnForceEndDay;
 
         #endregion
 
@@ -105,7 +105,7 @@ namespace FlavorfulStory.TimeManagement
         }
 
         /// <summary> Обновить игровое время до начала следующего дня. </summary>
-        private void BeginNewDay()
+        private void BeginNewDay(int dayStartHour = 10)
         {
             bool isSameDay = 0f <= CurrentGameTime.Hour && CurrentGameTime.Hour < _dayStartHour;
             int dayAdjustment = isSameDay ? 0 : 1;
@@ -113,7 +113,7 @@ namespace FlavorfulStory.TimeManagement
                 CurrentGameTime.Year,
                 CurrentGameTime.Season,
                 CurrentGameTime.SeasonDay + dayAdjustment,
-                _dayStartHour,
+                dayStartHour,
                 0
             );
 
@@ -121,7 +121,7 @@ namespace FlavorfulStory.TimeManagement
         }
 
         /// <summary> Принудительно завершить текущий день. </summary>
-        public static void ForceEndDay() => OnForceEndDay?.Invoke();
+        public static void ForceEndDay(int dayStartHour) => OnForceEndDay?.Invoke(dayStartHour);
 
         /// <summary> Поставить игровое время на паузу. </summary>
         public static void Pause()

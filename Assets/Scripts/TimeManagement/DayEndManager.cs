@@ -4,6 +4,7 @@ using FlavorfulStory.Player;
 using FlavorfulStory.SceneManagement;
 using FlavorfulStory.Stats;
 using FlavorfulStory.UI;
+using Unity.Cinemachine;
 using UnityEngine;
 using Zenject;
 
@@ -40,6 +41,8 @@ namespace FlavorfulStory.TimeManagement
         /// <summary> Флаг, предотвращающий одновременное выполнение нескольких процессов сна. </summary>
         private bool _isProcessingSleep;
 
+        private readonly CinemachineCamera _virtualCamera;
+
         /// <summary> Конструктор DayEndManager. </summary>
         /// <param name="summaryView"> Компонент отображения сводки дня. </param>
         /// <param name="fader"> Компонент затухания экрана. </param>
@@ -52,7 +55,8 @@ namespace FlavorfulStory.TimeManagement
             MonoBehaviour coroutineRunner,
             PlayerController playerController,
             SleepTrigger sleepTrigger,
-            LocationManager locationManager)
+            LocationManager locationManager,
+            CinemachineCamera virtualCamera)
         {
             _summaryView = summaryView;
             _fader = fader;
@@ -61,6 +65,7 @@ namespace FlavorfulStory.TimeManagement
             _sleepTriggerTransform = sleepTrigger.transform;
             _locationManager = locationManager;
             _isProcessingSleep = false;
+            _virtualCamera = virtualCamera;
 
             WorldTime.OnDayEnded += OnDayEnded;
         }
@@ -84,8 +89,8 @@ namespace FlavorfulStory.TimeManagement
             _isProcessingSleep = true;
 
             _onCompleteCallback = onCompleteCallback;
-            _coroutineRunner.StartCoroutine(ResetPlayer(triggerTransform));
             _coroutineRunner.StartCoroutine(EndDayRoutine());
+            _coroutineRunner.StartCoroutine(ResetPlayer(triggerTransform));
         }
 
         /// <summary> Принудительный сон при истощении игрока (автоматическое завершение дня). </summary>
@@ -93,11 +98,12 @@ namespace FlavorfulStory.TimeManagement
         {
             if (_isProcessingSleep) return;
             _isProcessingSleep = true;
-            _coroutineRunner.StartCoroutine(ResetPlayer(_sleepTriggerTransform, true));
+
             _coroutineRunner.StartCoroutine(EndDayRoutine());
+            _coroutineRunner.StartCoroutine(ResetPlayer(_sleepTriggerTransform, true));
         }
 
-        /// <summary> Основная корутина завершения дня
+        /// <summary> Основная корутина завершения дня.
         /// Управляет последовательностью: пауза времени → затухание → сводка → продолжение. </summary>
         /// <returns> IEnumerator для корутины. </returns>
         private IEnumerator EndDayRoutine()
@@ -130,6 +136,8 @@ namespace FlavorfulStory.TimeManagement
         /// <returns>IEnumerator для корутины</returns>
         private IEnumerator ResetPlayer(Transform triggerTransform, bool exhausted = false)
         {
+            yield return new WaitForSeconds(Fader.FadeOutTime);
+
             var playerStats = _playerController.GetComponent<PlayerStats>();
 
             var health = playerStats.GetStat<Health>();
@@ -137,6 +145,7 @@ namespace FlavorfulStory.TimeManagement
 
             var stamina = playerStats.GetStat<Stamina>();
             stamina.SetValue(exhausted ? stamina.MaxValue * _staminaMultiplier : stamina.MaxValue);
+
 
             _playerController.UpdatePosition(triggerTransform);
             yield return null;
