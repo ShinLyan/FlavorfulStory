@@ -73,7 +73,6 @@ namespace FlavorfulStory.AI.WarpGraphSystem
 
             if (_virtualCamera) _virtualCamera.enabled = false;
 
-            _locationManager.EnableLocation(ConnectedWarp.ParentLocationName);
             playerController.UpdatePosition(ConnectedWarp._spawnPoint);
 
             yield return null;
@@ -84,6 +83,7 @@ namespace FlavorfulStory.AI.WarpGraphSystem
             InputWrapper.UnblockAllInput();
 
             _locationManager.DisableLocation(ParentLocationName);
+            _locationManager.EnableLocation(ConnectedWarp.ParentLocationName);
         }
 
 #if UNITY_EDITOR

@@ -18,6 +18,8 @@ namespace FlavorfulStory.UI
         /// <summary> Кнопка для продолжения после просмотра сводки. </summary>
         [SerializeField] private Button _continueButton;
 
+        [SerializeField] private GameObject _camera;
+
         public static readonly string DefaultSummaryText = "BEST SUMMARY EVER";
 
         /// <summary> Событие, вызываемое при нажатии кнопки продолжения. </summary>
@@ -34,6 +36,8 @@ namespace FlavorfulStory.UI
         public void Show()
         {
             _content.SetActive(true);
+            _camera.SetActive(true);
+
             InputWrapper.BlockAllInput();
         }
 
@@ -41,6 +45,7 @@ namespace FlavorfulStory.UI
         public void Hide()
         {
             _content.SetActive(false);
+            _camera.SetActive(false);
             InputWrapper.UnblockAllInput();
         }
     }

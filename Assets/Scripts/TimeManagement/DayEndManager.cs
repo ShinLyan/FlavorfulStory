@@ -4,7 +4,6 @@ using FlavorfulStory.Player;
 using FlavorfulStory.SceneManagement;
 using FlavorfulStory.Stats;
 using FlavorfulStory.UI;
-using Unity.Cinemachine;
 using UnityEngine;
 using Zenject;
 
@@ -30,7 +29,7 @@ namespace FlavorfulStory.TimeManagement
         private readonly PlayerController _playerController;
 
         /// <summary> Множитель восстановления выносливости при истощении (75% от максимума). </summary>
-        private const float _staminaMultiplier = 0.75f;
+        private const float StaminaMultiplier = 0.75f;
 
         /// <summary> Transform триггера сна (кровати), используется для размещения игрока при принудительном сне. </summary>
         private readonly Transform _sleepTriggerTransform;
@@ -41,7 +40,8 @@ namespace FlavorfulStory.TimeManagement
         /// <summary> Флаг, предотвращающий одновременное выполнение нескольких процессов сна. </summary>
         private bool _isProcessingSleep;
 
-        private readonly CinemachineCamera _virtualCamera;
+        private readonly GameObject _hud;
+
 
         /// <summary> Конструктор DayEndManager. </summary>
         /// <param name="summaryView"> Компонент отображения сводки дня. </param>
@@ -56,7 +56,7 @@ namespace FlavorfulStory.TimeManagement
             PlayerController playerController,
             SleepTrigger sleepTrigger,
             LocationManager locationManager,
-            CinemachineCamera virtualCamera)
+            [Inject(Id = "HUD")] GameObject hud)
         {
             _summaryView = summaryView;
             _fader = fader;
@@ -65,7 +65,7 @@ namespace FlavorfulStory.TimeManagement
             _sleepTriggerTransform = sleepTrigger.transform;
             _locationManager = locationManager;
             _isProcessingSleep = false;
-            _virtualCamera = virtualCamera;
+            _hud = hud;
 
             WorldTime.OnDayEnded += OnDayEnded;
         }
@@ -111,6 +111,7 @@ namespace FlavorfulStory.TimeManagement
             WorldTime.Pause();
 
             // TODO: худ игры скрывается
+            _hud.SetActive(false); //TODO: переделать на норм версию
 
             yield return _fader.FadeOut(Fader.FadeOutTime);
 
@@ -118,6 +119,8 @@ namespace FlavorfulStory.TimeManagement
             bool continuePressed = false;
             _summaryView.OnContinuePressed = () => continuePressed = true;
             _summaryView.SetSummary(SummaryView.DefaultSummaryText);
+
+            yield return _fader.FadeIn(Fader.FadeInTime);
             yield return new WaitUntil(() => continuePressed);
 
             _onCompleteCallback?.Invoke();
@@ -125,9 +128,11 @@ namespace FlavorfulStory.TimeManagement
             _summaryView.Hide();
             WorldTime.Unpause();
 
+            yield return _fader.FadeOut(Fader.FadeOutTime);
             yield return _fader.FadeIn(Fader.FadeInTime);
 
             _isProcessingSleep = false;
+            _hud.SetActive(true); //TODO: переделать на норм версию
         }
 
         /// <summary> Корутина сброса состояния игрока: восстановление здоровья, выносливости и позиции. </summary>
@@ -144,12 +149,12 @@ namespace FlavorfulStory.TimeManagement
             health.SetValue(health.MaxValue);
 
             var stamina = playerStats.GetStat<Stamina>();
-            stamina.SetValue(exhausted ? stamina.MaxValue * _staminaMultiplier : stamina.MaxValue);
-
+            stamina.SetValue(exhausted ? stamina.MaxValue * StaminaMultiplier : stamina.MaxValue);
 
             _playerController.UpdatePosition(triggerTransform);
             yield return null;
             _locationManager.ActivatePlayerCurrentLocation();
+            _locationManager.EnableLocation(LocationName.RockyIsland);
         }
     }
 }

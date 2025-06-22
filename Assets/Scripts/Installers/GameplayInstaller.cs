@@ -37,6 +37,8 @@ namespace FlavorfulStory.Installers
 
         [SerializeField] private MonoBehaviour _monoBehaviour;
 
+        [SerializeField] private GameObject _hudObject;
+
         /// <summary> Выполняет установку всех зависимостей, необходимых для сцены. </summary>
         public override void InstallBindings()
         {
@@ -70,6 +72,8 @@ namespace FlavorfulStory.Installers
             Container.Bind<ConfirmationWindowView>().FromComponentInHierarchy().AsSingle();
             Container.Bind<SummaryView>().FromComponentInHierarchy().AsSingle();
             Container.Bind<IActionTooltipShower>().To<ActionTooltipShower>().FromComponentInHierarchy().AsSingle();
+
+            Container.BindInstance(_hudObject).WithId("HUD");
         }
 
         /// <summary> Установить зависимости, связанные с не игровыми системами и логикой. </summary>

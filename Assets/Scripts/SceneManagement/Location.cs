@@ -43,7 +43,7 @@ namespace FlavorfulStory.SceneManagement
             foreach (var obj in _objectsToDisable) obj.SetActive(isActive);
 
             if (!_globalLightSystem || _objectsToDisable.Length == 0) return;
-            _globalLightSystem.gameObject.SetActive(_isRoom);
+            _globalLightSystem.gameObject.SetActive(!_isRoom);
         }
 
         /// <summary> Находится ли заданная позиция внутри границ локации? </summary>
