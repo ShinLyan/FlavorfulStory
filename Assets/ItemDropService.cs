@@ -8,72 +8,97 @@ using UnityEngine;
 
 namespace FlavorfulStory
 {
+    /// <summary> Сервис, отвечающий за выброс предметов из инвентаря в игровом мире. </summary>
     public class ItemDropService : IItemDropService, ISaveable
     {
+        /// <summary> Стандартная задержка перед возможностью подбора предмета. </summary>
+        private const float DefaultPickupDelay = 1.5f;
+        /// <summary> Контейнер, в котором спавнятся все выброшенные предметы. </summary>
+        private Transform _container;
+        /// <summary> Фабрика создания объектов Pickup'ов. </summary>
         private readonly PickupFactory _pickupFactory;
+        /// <summary> Список заспавненных Pickup для сохранения и очистки. </summary>
         private readonly List<Pickup> _spawnedPickups = new();
 
-        public ItemDropService(PickupFactory pickupFactory)
+        /// <summary> Конструктор сервиса выброса предметов. </summary>
+        /// <param name="pickupFactory"> Фабрика создания Pickup объектов. </param>
+        public ItemDropService(PickupFactory pickupFactory) => _pickupFactory = pickupFactory;
+        
+        /// <summary> Спавнит предмет в мире с заданным количеством и задержкой. </summary>
+        private Pickup Spawn(InventoryItem item, int quantity, Vector3 position, float pickupDelay = 1f)
         {
-            _pickupFactory = pickupFactory;
-        }
-
-        private Pickup Spawn(InventoryItem item, int quantity, Vector3 position)
-        {
-            var pickup = _pickupFactory.Create(item, position, quantity);
-            if (pickup != null)
+            if (_container == null) Debug.LogError($"{nameof(ItemDropService)}.{nameof(Spawn)}: Container is not set)");
+            
+            var pickup = _pickupFactory.Create(item, position, quantity, pickupDelay, _container);
+            if (pickup != null) 
                 _spawnedPickups.Add(pickup);
             return pickup;
         }
 
-        private void ApplyForce(Pickup pickup, Vector3 force)
+        /// <summary> Применяет силу к Rigidbody предмета, если она задана. </summary>
+        private static void ApplyForce(Pickup pickup, Vector3 force)
         {
-            var rb = pickup.GetComponent<Rigidbody>();
-            if (rb != null)
+            if (pickup.TryGetComponent(out Rigidbody rb)) 
                 rb.AddForce(force, ForceMode.Impulse);
         }
 
         #region Drop Methods
-
-        public void Drop(InventoryItem item, int quantity, Vector3 position)
+        
+        /// <inheritdoc/>
+        public void Drop(InventoryItem item, int quantity, 
+                         Vector3 position, float pickupDelay = DefaultPickupDelay)
         {
             Spawn(item, quantity, position);
-        }
-
-        public void Drop(InventoryItem item, int quantity, Vector3 position, Vector3 force)
+        } 
+        
+        /// <inheritdoc/>
+        public void Drop(InventoryItem item, int quantity, Vector3 position, 
+                         Vector3 force, float pickupDelay = DefaultPickupDelay)
         {
             var pickup = Spawn(item, quantity, position);
-            if (pickup) ApplyForce(pickup, force);
+            if (pickup != null) ApplyForce(pickup, force);
         }
 
-        public void DropFromInventory(Inventory inventory, InventoryItem item, int quantity, Vector3 position)
+        /// <inheritdoc/>
+        public void DropFromInventory(Inventory inventory, int slotIndex, Vector3 position, 
+                                      float pickupDelay = DefaultPickupDelay)
         {
-            if (inventory.GetItemNumber(item) < quantity)
+            if (!TryConsumeInventorySlot(inventory, slotIndex, out var item, out var quantity)) return;
+            Drop(item, quantity, position, pickupDelay);
+        }
+
+        /// <inheritdoc/>
+        public void DropFromInventory(Inventory inventory, int slotIndex, Vector3 position, 
+                                      Vector3 force, float pickupDelay = DefaultPickupDelay)
+        {
+            if (!TryConsumeInventorySlot(inventory, slotIndex, out var item, out var quantity)) return;
+            Drop(item, quantity, position, force, pickupDelay);
+        }
+
+        /// <summary> Извлекает предмет и его количество из слота инвентаря и удаляет его. </summary>
+        private static bool TryConsumeInventorySlot(Inventory inventory, int slotIndex, out InventoryItem item, out int quantity)
+        {
+            item = inventory.GetItemInSlot(slotIndex);
+            quantity = inventory.GetNumberInSlot(slotIndex);
+
+            if (quantity <= 0 || item == null)
             {
-                Debug.LogError($"[ItemDropService] Недостаточно предметов {item.name} для выброса.");
-                return;
+                Debug.LogError($"[ItemDropService] Slot {slotIndex} is empty.");
+                return false;
             }
 
-            inventory.RemoveItem(item, quantity);
-            Drop(item, quantity, position);
+            inventory.RemoveFromSlot(slotIndex);
+            return true;
         }
-
-        public void DropFromInventory(Inventory inventory, InventoryItem item, int quantity, Vector3 position, Vector3 force)
-        {
-            if (inventory.GetItemNumber(item) < quantity)
-            {
-                Debug.LogError($"[ItemDropService] Недостаточно предметов {item.name} для выброса.");
-                return;
-            }
-
-            inventory.RemoveItem(item, quantity);
-            Drop(item, quantity, position, force);
-        }
+        
+        /// <inheritdoc/>
+        public void SetDroppedItemsContainer(Transform container) => _container = container;
 
         #endregion
 
         #region Saving
 
+        /// <summary> Структура для сериализации информации о выброшенных предметах. </summary>
         [Serializable]
         private struct DropSaveData
         {
@@ -82,6 +107,7 @@ namespace FlavorfulStory
             public int Quantity;
         }
 
+        /// <summary> Сохраняет состояние всех выброшенных предметов. </summary>
         public object CaptureState()
         {
             _spawnedPickups.RemoveAll(p => p == null);
@@ -93,6 +119,7 @@ namespace FlavorfulStory
             }).ToList();
         }
 
+        /// <summary> Восстанавливает выброшенные предметы из сохранения. </summary>
         public void RestoreState(object state)
         {
             if (state is not List<DropSaveData> records) return;

@@ -2,7 +2,6 @@
 using FlavorfulStory.BuildingRepair;
 using FlavorfulStory.Infrastructure.Factories;
 using FlavorfulStory.InventorySystem;
-using FlavorfulStory.InventorySystem.DropSystem;
 using FlavorfulStory.InventorySystem.EquipmentSystem;
 using FlavorfulStory.InventorySystem.PickupSystem;
 using FlavorfulStory.InventorySystem.UI;
@@ -52,7 +51,6 @@ namespace FlavorfulStory.Installers
             Container.Bind<PlayerController>().FromComponentInHierarchy().AsSingle();
 
             Container.Bind<PickupFactory>().AsSingle();
-            Container.Bind<ItemDropper>().FromComponentsInHierarchy().AsCached();
             Container.Bind<PickupSpawner>().FromComponentsInHierarchy().AsCached();
 
             Container.Bind<BuildingRepairView>().FromComponentInHierarchy().AsSingle();

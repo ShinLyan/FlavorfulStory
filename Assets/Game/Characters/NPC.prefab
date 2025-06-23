@@ -256,6 +256,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _dialogue: {fileID: 0}
-  <ActionDescription>k__BackingField:
-    <Target>k__BackingField: '*NPC_NAME*'
-    <Action>k__BackingField: '*NPC_ACTION*'
+  _tooltipActions:
+  - _keyText: E
+    _actionDescription:
+      <Action>k__BackingField: '*NPC_ACTION*'
+      <Target>k__BackingField: '*NPC_NAME*'

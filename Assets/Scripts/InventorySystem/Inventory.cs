@@ -169,6 +169,15 @@ namespace FlavorfulStory.InventorySystem
 
             InventoryUpdated?.Invoke();
         }
+        
+        /// <summary>  Удалить все предметы из указанного слота. </summary>
+        /// <param name="slotIndex"> Индекс слота в инвентаре. </param>
+        public void RemoveFromSlot(int slotIndex)
+        {
+            _slots[slotIndex].Item = null;
+            _slots[slotIndex].Number = 0;
+            InventoryUpdated?.Invoke();
+        }
 
         #region Saving
 

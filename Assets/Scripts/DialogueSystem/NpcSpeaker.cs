@@ -1,8 +1,10 @@
-﻿using FlavorfulStory.Actions;
+﻿using System.Collections.Generic;
+using FlavorfulStory.Actions;
 using FlavorfulStory.AI;
 using FlavorfulStory.CursorSystem;
 using FlavorfulStory.InteractionSystem;
 using FlavorfulStory.Player;
+using FlavorfulStory.TooltipSystem;
 using UnityEngine;
 
 namespace FlavorfulStory.DialogueSystem
@@ -35,10 +37,9 @@ namespace FlavorfulStory.DialogueSystem
         }
 
         #region IInteractable
-
-        /// <summary> Действие игрока по отношению к объекту. </summary>
-        [field: SerializeField] public ActionDescription ActionDescription { get; private set; }
-
+        
+        [SerializeField] private List<TooltipActionData> _tooltipActions;
+        
         /// <summary> Флаг, разрешено ли взаимодействие с NPC. </summary>
         public bool IsInteractionAllowed { get; private set; }
 
@@ -61,6 +62,8 @@ namespace FlavorfulStory.DialogueSystem
         /// <param name="player"> Контроллер игрока, завершающий взаимодействие. </param>
         public void EndInteraction(PlayerController player) => player.SetBusyState(false);
 
+        public IEnumerable<TooltipActionData> TooltipActions => _tooltipActions;
+        
         #endregion
 
         #region ICursorInteractable

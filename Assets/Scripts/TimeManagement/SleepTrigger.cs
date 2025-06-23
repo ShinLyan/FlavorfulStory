@@ -1,5 +1,5 @@
 ﻿using System.Collections;
-using FlavorfulStory.Actions;
+using System.Collections.Generic;
 using FlavorfulStory.InteractionSystem;
 using FlavorfulStory.Player;
 using FlavorfulStory.SceneManagement;
@@ -88,10 +88,10 @@ namespace FlavorfulStory.TimeManagement
         }
 
         #region IInteractable
-
-        /// <summary> Действие игрока по отношению к объекту. </summary>
-        [field: SerializeField] public ActionDescription ActionDescription { get; private set; }
-
+        
+        /// <summary> Список возможных действий, отображаемых в тултипе. </summary>
+        [SerializeField] private List<TooltipActionData> _tooltipActions;
+        
         /// <summary> Возвращает возможность взаимодействия с объектом. </summary>
         public bool IsInteractionAllowed => true;
 
@@ -112,6 +112,9 @@ namespace FlavorfulStory.TimeManagement
             player.SetBusyState(false);
             _confirmationWindowView.Hide();
         }
+        
+        /// <summary> Публичный список возможных действий, отображаемых в тултипе. </summary>
+        public IEnumerable<TooltipActionData> TooltipActions => _tooltipActions;
 
         #endregion
     }

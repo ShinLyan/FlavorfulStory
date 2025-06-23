@@ -8,6 +8,7 @@ using FlavorfulStory.InventorySystem;
 using FlavorfulStory.ObjectManagement;
 using FlavorfulStory.Player;
 using FlavorfulStory.Saving;
+using FlavorfulStory.TooltipSystem;
 using UnityEngine;
 using Zenject;
 
@@ -21,6 +22,8 @@ namespace FlavorfulStory.BuildingRepair
     {
         #region Fields and Properties
 
+        [SerializeField] private List<TooltipActionData> _tooltipActions;
+        
         /// <summary> Данные ремонтируемого здания. </summary>
         [Tooltip("Данные ремонтируемого здания."), SerializeField]
         private RepairableBuildingData _buildingData;
@@ -97,8 +100,7 @@ namespace FlavorfulStory.BuildingRepair
 
         #region IInteractable
 
-        /// <summary> Действие игрока по отношению к объекту. </summary>
-        [field: SerializeField] public ActionDescription ActionDescription { get; private set; }
+        ///// <summary> Действие игрока по отношению к объекту. </summary>
 
         /// <summary> Доступно ли взаимодействие с объектом в текущий момент? </summary>
         public bool IsInteractionAllowed { get; private set; }
@@ -130,6 +132,8 @@ namespace FlavorfulStory.BuildingRepair
         /// <param name="player"> Игрок, завершивший взаимодействие. </param>
         public void EndInteraction(PlayerController player) => player.SetBusyState(false);
 
+        public IEnumerable<TooltipActionData> TooltipActions => _tooltipActions;
+        
         #endregion
 
         /// <summary> Завершить текущую стадию и перейти к следующей. </summary>
@@ -196,7 +200,7 @@ namespace FlavorfulStory.BuildingRepair
             _playerInventory.TryAddToFirstAvailableSlot(resource, invested);
             _investedResources[index] = 0;
         }
-
+        
         #region Saving
 
         /// <summary> Структура для сохранения состояния объекта ремонта. </summary>

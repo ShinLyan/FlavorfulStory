@@ -4,6 +4,7 @@ using FlavorfulStory.InputSystem;
 using FlavorfulStory.InteractionSystem;
 using FlavorfulStory.InventorySystem;
 using FlavorfulStory.InventorySystem.UI;
+using FlavorfulStory.TooltipSystem;
 using FlavorfulStory.Utils;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -18,6 +19,17 @@ namespace FlavorfulStory.Player
     {
         #region Fields and Properties
 
+        /// <summary> Трансформ выброса предмета. </summary>
+        ///  <remarks> Прокидывается в <see cref="IItemDropService"/>. </remarks>
+        [SerializeField] private Transform _dropPoint;
+        
+        /// <summary> Сервис выбросоа предметов. </summary>
+        [Inject] private readonly IItemDropService _itemDropService;
+
+        /// <summary> Показчик тултипов. </summary>
+        [Inject] private readonly IActionTooltipShower _tooltipShower; 
+        
+        //TODO: Перевести на Zenject;
         /// <summary> Панель быстрого доступа, содержащая инвентарь игрока. </summary>
         [Tooltip("Панель быстрого доступа, содержащая инвентарь игрока."), SerializeField]
         private Toolbar _toolbar;
@@ -131,18 +143,42 @@ namespace FlavorfulStory.Player
             }
         }
 
-        /// <summary> Обработка использования предмета из панели быстрого доступа. </summary>
+        /// <summary> Обработка доступных действий выбранного предмета из панели быстрого доступа. </summary>
         private void HandleToolbarUseInput()
         {
-            if (CurrentItem is not IUsable usable || IsToolUseBlocked) return;
+            if (CurrentItem == null ) return;
+            
+            if (CurrentItem is IUsable usable && !IsToolUseBlocked)
+            {
+                HandleCurrentItemUse(usable);
+            }
 
-            if ((!Input.GetMouseButton(0) || usable.UseActionType != UseActionType.LeftClick) &&
-                (!Input.GetMouseButton(1) || usable.UseActionType != UseActionType.RightClick))
-                return;
-
-            BeginInteraction(usable);
+            if (CurrentItem.CanBeDropped && !IsToolUseBlocked)
+            {
+                HandleCurrentItemDrop();
+            }
         }
 
+        /// <summary> Обработка использования предмета из панели быстрого доступа. </summary>
+        private void HandleCurrentItemUse(IUsable usable)
+        {
+            if ((Input.GetMouseButton(0) && usable.UseActionType == UseActionType.LeftClick) ||
+                (Input.GetMouseButton(1) && usable.UseActionType == UseActionType.RightClick))
+                BeginInteraction(usable);
+        }
+
+        /// <summary> Обработка выброса предмета из панели быстрого доступа. </summary>
+        private void HandleCurrentItemDrop()
+        {
+            const float DropItemForce = 2.5f;
+            const float PickupDelay = 1.5f;
+            if (InputWrapper.GetButtonDown(InputButton.DropCurrentItem))
+            {
+                _itemDropService.DropFromInventory(_playerInventory, _toolbar.SelectedItemIndex,
+                    _dropPoint.transform.position, _dropPoint.forward * DropItemForce, PickupDelay);
+            }
+        }
+        
         /// <summary> Начать взаимодействие с предметом. </summary>
         /// <param name="usable"> Используемый предмет. </param>
         private void BeginInteraction(IUsable usable)

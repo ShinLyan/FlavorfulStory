@@ -30,6 +30,9 @@ namespace FlavorfulStory.InteractionSystem
         /// <summary> Активный объект, с которым сейчас взаимодействуют. </summary>
         private IInteractable _activeInteractable;
 
+        /// <summary> Последний объект взаимодейтсвия, по котороому выводился тултип. </summary>
+        private IInteractable _lastTooltipSource;
+        
         /// <summary> Делегат действия, вызываемый при начале взаимодействия. </summary>
         private Action _startInteractionAction;
 
@@ -62,8 +65,13 @@ namespace FlavorfulStory.InteractionSystem
         /// <summary> Обновить ближайший интерактивный объект. </summary>
         private void UpdateClosestInteractable()
         {
-            _closestInteractable = FindClosestInteractable();
-            UpdateTooltip();
+            var newClosest = FindClosestInteractable();
+
+            if (newClosest != _closestInteractable)
+            {
+                _closestInteractable = newClosest;
+                UpdateTooltip();
+            }
         }
 
         /// <summary> Определяет ближайший объект для взаимодействия из доступных. </summary>
@@ -76,10 +84,22 @@ namespace FlavorfulStory.InteractionSystem
         /// <summary> Обновить тултип. </summary>
         private void UpdateTooltip()
         {
-            if (_closestInteractable != null)
-                _tooltipShower.Show(_closestInteractable);
-            else
-                _tooltipShower.Hide();
+            if (_lastTooltipSource != _closestInteractable)
+            {
+                if (_lastTooltipSource != null)
+                {
+                    foreach (var tooltip in _lastTooltipSource.TooltipActions)
+                        _tooltipShower.Remove(tooltip);
+                }
+
+                _lastTooltipSource = _closestInteractable;
+
+                if (_closestInteractable != null)
+                {
+                    foreach (var tooltip in _closestInteractable.TooltipActions)
+                        _tooltipShower.Add(tooltip);
+                }
+            }
         }
 
         /// <summary> Добавляет объект в список доступных для взаимодействия при входе в триггер. </summary>
