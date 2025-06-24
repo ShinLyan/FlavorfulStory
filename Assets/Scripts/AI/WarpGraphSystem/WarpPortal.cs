@@ -1,7 +1,9 @@
 using System.Collections;
+using DG.Tweening;
 using FlavorfulStory.InputSystem;
 using FlavorfulStory.Player;
 using FlavorfulStory.SceneManagement;
+using FlavorfulStory.UI.Animation;
 using Unity.Cinemachine;
 using UnityEngine;
 using Zenject;
@@ -21,7 +23,8 @@ namespace FlavorfulStory.AI.WarpGraphSystem
         public WarpPortal ConnectedWarp { get; private set; }
 
         /// <summary> Цвет соединений внутри одной локации (визуализация в редакторе). </summary>
-        [Header("Visualization")] [Tooltip("Цвет соединений внутри одной локации"), SerializeField]
+        [Header("Visualization")]
+        [Tooltip("Цвет соединений внутри одной локации"), SerializeField]
         private Color _localConnectionColor = Color.blue;
 
         /// <summary> Цвет соединений между разными локациями (визуализация в редакторе). </summary>
@@ -32,7 +35,7 @@ namespace FlavorfulStory.AI.WarpGraphSystem
         public LocationName ParentLocationName { get; private set; }
 
         /// <summary> Компонент затемнения экрана при переходах между сценами. </summary>
-        private Fader _fader;
+        private CanvasGroupFader _canvasGroupFader;
 
         /// <summary> Менеджер локаций. </summary>
         private LocationManager _locationManager;
@@ -41,13 +44,14 @@ namespace FlavorfulStory.AI.WarpGraphSystem
         private CinemachineCamera _virtualCamera;
 
         /// <summary> Внедрение зависимостей Zenject. </summary>
-        /// <param name="fader"> Компонент затемнения экрана при переходах между сценами. </param>
+        /// <param name="canvasGroupFader"> Компонент затемнения экрана при переходах между сценами. </param>
         /// <param name="locationManager"> Менеджер локаций. </param>
         /// <param name="virtualCamera"> Виртуальная камера. </param>
         [Inject]
-        private void Construct(Fader fader, LocationManager locationManager, CinemachineCamera virtualCamera)
+        private void Construct(CanvasGroupFader canvasGroupFader, LocationManager locationManager,
+            CinemachineCamera virtualCamera)
         {
-            _fader = fader;
+            _canvasGroupFader = canvasGroupFader;
             _locationManager = locationManager;
             _virtualCamera = virtualCamera;
         }
@@ -69,7 +73,7 @@ namespace FlavorfulStory.AI.WarpGraphSystem
         private IEnumerator TeleportPlayer(PlayerController playerController)
         {
             InputWrapper.BlockAllInput();
-            yield return _fader.FadeOut(Fader.FadeOutTime);
+            yield return _canvasGroupFader.Show().WaitForCompletion();
 
             if (_virtualCamera) _virtualCamera.enabled = false;
 
@@ -79,8 +83,7 @@ namespace FlavorfulStory.AI.WarpGraphSystem
             yield return null;
             if (_virtualCamera) _virtualCamera.enabled = true;
 
-            yield return new WaitForSeconds(Fader.FadeWaitTime);
-            _fader.FadeIn(Fader.FadeInTime);
+            yield return _canvasGroupFader.Hide().WaitForCompletion();
             InputWrapper.UnblockAllInput();
 
             _locationManager.DisableLocation(ParentLocationName);

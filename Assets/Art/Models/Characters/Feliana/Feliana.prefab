@@ -63,8 +63,13 @@ PrefabInstance:
       propertyPath: m_Name
       value: Feliana
       objectReference: {fileID: 0}
-    m_RemovedComponents:
-    - {fileID: 5866666021909216657, guid: f88674e4edb569f48a17d743daab50d1, type: 3}
+    - target: {fileID: 5866666021909216657, guid: f88674e4edb569f48a17d743daab50d1,
+        type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 22100000, guid: 128a19a27b3d1cd479146a9959c8eddb,
+        type: 2}
+    m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
