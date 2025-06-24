@@ -17,11 +17,12 @@ namespace FlavorfulStory.InventorySystem.PickupSystem
         /// <param name="item"> Предмет, который должен быть создан. </param>
         /// <param name="position"> Позиция появления предмета. </param>
         /// <param name="number"> Количество экземпляров предмета. </param>
+        /// <param name="pickupDelay"> Задержка (в секундах) активации  возможности подобрать предмет. </param>
         /// <param name="parent"> Родительский объект в иерархии. </param>
         /// <returns> Ссылка на созданный объект <see cref="Pickup"/>, либо <c>null</c> при ошибке. </returns>
-        public Pickup Create(InventoryItem item, Vector3 position, int number, Transform parent = null)
+        public Pickup Create(InventoryItem item, Vector3 position, int number, float pickupDelay = 1f, Transform parent = null)
         {
-            if (!item.PickupPrefab)
+            if (item == null || !item.PickupPrefab)
             {
                 Debug.LogError($"PickupPrefab не назначен для предмета {item.name}");
                 return null;
@@ -29,7 +30,7 @@ namespace FlavorfulStory.InventorySystem.PickupSystem
 
             var pickup = _container.InstantiatePrefabForComponent<Pickup>(item.PickupPrefab, position,
                 Quaternion.identity, parent);
-            pickup.Setup(item, number);
+            pickup.Setup(item, number, pickupDelay);
             return pickup;
         }
     }

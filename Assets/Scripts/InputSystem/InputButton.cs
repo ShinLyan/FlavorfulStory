@@ -43,6 +43,9 @@
         Interact,
 
         /// <summary> Позиция курсора мыши. </summary>
-        MousePosition
+        MousePosition,
+        
+        /// <summary> Выбросить текущий предмет в руках. </summary>
+        DropCurrentItem,
     }
 }

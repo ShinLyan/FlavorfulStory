@@ -11,6 +11,7 @@ namespace FlavorfulStory.Actions.Interactables
     /// <remarks> Реализует интерфейс <see cref="IInteractable" />. </remarks>
     public abstract class HarvestableObject : MonoBehaviour, IInteractable
     {
+        
         /// <summary> Собираемые предметы/ресурсы, что будут добавлены в инвентарь при взаимодействии. </summary>
         [Tooltip("Собираемые предметы."), SerializeField]
         private List<DropItem> _harvestItems;
@@ -25,9 +26,9 @@ namespace FlavorfulStory.Actions.Interactables
 
         #region IInteractable
 
-        /// <summary> Действие игрока по отношению к объекту. </summary>
-        [field: SerializeField] public ActionDescription ActionDescription { get; private set; }
-
+        /// <summary> Список описаний вохможных действий с объектом. </summary>
+        [SerializeField] private List<TooltipActionData> _tooltipActions;
+        
         /// <summary> Свойство возможности взаимодействия с объектом. </summary>
         public virtual bool IsInteractionAllowed { get; protected set; } = true;
 
@@ -55,6 +56,9 @@ namespace FlavorfulStory.Actions.Interactables
         /// <param name="player"> Контроллер игрока, который взаимодействует с объектом. </param>
         public void EndInteraction(PlayerController player) { }
 
+        /// <summary> Публичный список описаний вохможных действий с объектом. </summary>
+        public IEnumerable<TooltipActionData> TooltipActions => _tooltipActions;
+        
         #endregion
     }
 }
