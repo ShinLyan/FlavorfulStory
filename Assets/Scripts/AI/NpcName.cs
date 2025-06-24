@@ -12,16 +12,7 @@ namespace FlavorfulStory.AI
         /// <summary> Люксор. </summary>
         Luxor,
 
-        /// <summary> Полин. </summary>
-        Polin,
-
-        /// <summary> Данила. </summary>
-        Danila,
-
-        /// <summary> Илья. </summary>
-        Ilya,
-
-        /// <summary> Владимир. </summary>
-        Vladimir
+        /// <summary> Фелиана. </summary>
+        Feliana
     }
 }
