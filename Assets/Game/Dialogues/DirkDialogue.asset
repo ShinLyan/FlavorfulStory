@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: f03fd699-90fb-4dae-8829-9573429f079f
   m_EditorClassIdentifier: 
   <IsPlayerSpeaking>k__BackingField: 1
-  <Text>k__BackingField: Do you know the herbs around here well?
+  <Text>k__BackingField: Do you spend a lot of time in the forest?
   <ChildNodes>k__BackingField:
   - b2322540-3cff-43ef-9519-3f1a3fd7cbf1
   <Rect>k__BackingField:
@@ -37,13 +37,12 @@ MonoBehaviour:
   m_Name: 1f44b425-e498-4099-8dde-ef0a88e4be2c
   m_EditorClassIdentifier: 
   <IsPlayerSpeaking>k__BackingField: 0
-  <Text>k__BackingField: "The forest won\u2019t mind if you mean no harm. The path
-    will find you."
-  <ChildNodes>k__BackingField:
-  - 19c54427-02b3-483c-945b-173565ece7e7
+  <Text>k__BackingField: Then keep walking. The forest will speak to you if needed.
+    Those who ignore nature rarely get her favor.
+  <ChildNodes>k__BackingField: []
   <Rect>k__BackingField:
     serializedVersion: 2
-    x: 497
+    x: 500
     y: 100
     width: 200
     height: 100
@@ -62,7 +61,8 @@ MonoBehaviour:
   m_Name: f0bf8715-9919-4d25-8c55-d2863941ed13
   m_EditorClassIdentifier: 
   <IsPlayerSpeaking>k__BackingField: 0
-  <Text>k__BackingField: "You\u2019re new here? The forest teaches much to the patient."
+  <Text>k__BackingField: "You're the new one. The forest doesn\u2019t take kindly
+    to haste."
   <ChildNodes>k__BackingField:
   - f03fd699-90fb-4dae-8829-9573429f079f
   - 6cb7b497-0a09-4eaf-b375-ab61163269c7
@@ -88,10 +88,9 @@ MonoBehaviour:
   m_Name: b2543e2c-e16a-4e05-835c-ed8f892b7759
   m_EditorClassIdentifier: 
   <IsPlayerSpeaking>k__BackingField: 0
-  <Text>k__BackingField: Yes. The forest is the best companion. It keeps both silence
-    and answers.
-  <ChildNodes>k__BackingField:
-  - 19c54427-02b3-483c-945b-173565ece7e7
+  <Text>k__BackingField: "Grumpy is when someone complains for no reason.  \r\nI
+    speak plain. Welcome."
+  <ChildNodes>k__BackingField: []
   <Rect>k__BackingField:
     serializedVersion: 2
     x: 500
@@ -110,7 +109,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2a68b60154ae481c9936879aa8e46c42, type: 3}
-  m_Name: Feliana
+  m_Name: DirkDialogue
   m_EditorClassIdentifier: 
   _nodes:
   - {fileID: -5439297537706077486}
@@ -134,13 +133,13 @@ MonoBehaviour:
   m_Name: 19c54427-02b3-483c-945b-173565ece7e7
   m_EditorClassIdentifier: 
   <IsPlayerSpeaking>k__BackingField: 0
-  <Text>k__BackingField: 'Remember: the strength of herbs lies not in their looks,
-    but in who listens to them.'
+  <Text>k__BackingField: Trees break less often. When one falls, at least you know
+    why.
   <ChildNodes>k__BackingField: []
   <Rect>k__BackingField:
     serializedVersion: 2
-    x: 756
-    y: 98
+    x: 750
+    y: 0
     width: 200
     height: 100
   <EnterActionName>k__BackingField: 
@@ -158,7 +157,7 @@ MonoBehaviour:
   m_Name: 4af8e627-391e-4fff-adbb-580ac479a0ca
   m_EditorClassIdentifier: 
   <IsPlayerSpeaking>k__BackingField: 1
-  <Text>k__BackingField: Do you always gather herbs alone out here?
+  <Text>k__BackingField: Are you always this grumpy, or am I just lucky?
   <ChildNodes>k__BackingField:
   - b2543e2c-e16a-4e05-835c-ed8f892b7759
   <Rect>k__BackingField:
@@ -182,8 +181,8 @@ MonoBehaviour:
   m_Name: b2322540-3cff-43ef-9519-3f1a3fd7cbf1
   m_EditorClassIdentifier: 
   <IsPlayerSpeaking>k__BackingField: 0
-  <Text>k__BackingField: "Each plant is like a book. You must learn to read it. But
-    I\u2019m still learning, too."
+  <Text>k__BackingField: Every day. Since sunrise. Trees don't chop themselves. The
+    silence there is more honest than people.
   <ChildNodes>k__BackingField:
   - 19c54427-02b3-483c-945b-173565ece7e7
   <Rect>k__BackingField:
@@ -207,7 +206,7 @@ MonoBehaviour:
   m_Name: 6cb7b497-0a09-4eaf-b375-ab61163269c7
   m_EditorClassIdentifier: 
   <IsPlayerSpeaking>k__BackingField: 1
-  <Text>k__BackingField: "Just looking for my way. Don\u2019t mean to intrude."
+  <Text>k__BackingField: "I don\u2019t have time for talking. Just passing through."
   <ChildNodes>k__BackingField:
   - 1f44b425-e498-4099-8dde-ef0a88e4be2c
   <Rect>k__BackingField:
