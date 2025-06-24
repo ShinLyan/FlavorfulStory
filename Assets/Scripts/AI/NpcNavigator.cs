@@ -111,14 +111,12 @@ namespace FlavorfulStory.AI
 
             _navMeshAgent.ResetPath();
 
-            if (warpToSpawn)
-            {
-                _navMeshAgent.Warp(_spawnPosition);
-                _currentLocation = _spawnLocation;
-                _currentTargetPoint = null;
-            }
-        }
+            if (!warpToSpawn) return;
 
+            _navMeshAgent.Warp(_spawnPosition);
+            _currentLocation = _spawnLocation;
+            _currentTargetPoint = null;
+        }
 
         /// <summary> Переключатель передвижения агента. </summary>
         /// <param name="stopAgent"> Оставновить агента. </param>
@@ -190,6 +188,7 @@ namespace FlavorfulStory.AI
 
         /// <summary> Определяет текущую локацию NPC на основе его позиции. </summary>
         /// <returns> Название текущей локации. </returns>
+        // TODO: Удалить. Для игрока используется ровно такая же логика, надо оставить одну.
         private LocationName GetCurrentLocationName()
         {
             foreach (var location in Object.FindObjectsByType<Location>(FindObjectsInactive.Include,

@@ -9,16 +9,16 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         public event Action<Type> OnStateChangeRequested;
 
         /// <summary> Вызывается при входе в состояние. </summary>
-        public abstract void Enter();
+        public virtual void Enter() { }
 
         /// <summary> Вызывается при выходе из состояния. </summary>
-        public abstract void Exit();
+        public virtual void Exit() { }
 
         /// <summary> Обновление логики состояния, вызываемое каждый кадр. </summary>
-        public abstract void Update();
+        public virtual void Update() { }
 
         /// <summary> Сброс состояния в начальное состояние. </summary>
-        public abstract void Reset();
+        public virtual void Reset() { }
 
         /// <summary> Запросить смену состояния. </summary>
         /// <param name="stateType"> Тип состояния, на которое требуется перейти. </param>

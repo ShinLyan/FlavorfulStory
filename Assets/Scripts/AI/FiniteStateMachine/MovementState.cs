@@ -11,7 +11,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         public MovementState(NpcMovementController movementController)
         {
             _movementController = movementController;
-            _movementController.OnDestinationReached += HandleDestinationReached;
+            _movementController.OnDestinationReached += () => RequestStateChange(typeof(RoutineState));
         }
 
         /// <summary> Входит в состояние движения и начинает перемещение к текущей точке расписания. </summary>
@@ -20,13 +20,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         /// <summary> Выходит из состояния движения и останавливает NPC. </summary>
         public override void Exit() => _movementController.Stop();
 
-        /// <summary> Обновляет состояние движения каждый кадр. </summary>
-        public override void Update() { }
-
         /// <summary> Сбрасывает состояние движения, мгновенно останавливая NPC. </summary>
         public override void Reset() => _movementController.Stop(true);
-
-        /// <summary> Обрабатывает событие достижения пункта назначения и переключает на состояние рутины. </summary>
-        private void HandleDestinationReached() => RequestStateChange(typeof(RoutineState));
     }
 }

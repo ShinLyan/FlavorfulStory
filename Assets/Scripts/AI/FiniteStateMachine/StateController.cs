@@ -26,15 +26,15 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         /// <summary> Инициализирует новый экземпляр контроллера состояний. </summary>
         /// <param name="npcSchedule"> Расписание NPC. </param>
         /// <param name="npcMovementController"> Контроллер движения NPC. </param>
-        /// <param name="npcAnimatorController"> Контроллер анимации NPC. </param>
+        /// <param name="npcAnimationController"> Контроллер анимации NPC. </param>
         /// <param name="scheduleHandler"> Обработчик расписания NPC. </param>
         public StateController(NpcSchedule npcSchedule, NpcMovementController npcMovementController,
-            NpcAnimatorController npcAnimatorController, NpcScheduleHandler scheduleHandler)
+            NpcAnimationController npcAnimationController, NpcScheduleHandler scheduleHandler)
         {
             _typeToCharacterStates = new Dictionary<Type, CharacterState>();
 
             _sortedScheduleParams = npcSchedule.GetSortedScheduleParams();
-            InitializeStates(npcMovementController, scheduleHandler, npcAnimatorController);
+            InitializeStates(npcMovementController, scheduleHandler, npcAnimationController);
 
             OnCurrentScheduleParamsChanged += npcMovementController.SetCurrentScheduleParams;
             WorldTime.OnDayEnded += OnReset;
@@ -44,15 +44,15 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         /// <summary> Инициализирует все доступные состояния персонажа и настраивает связи между ними. </summary>
         /// <param name="movementController"> Контроллер движения для состояния движения. </param>
         /// <param name="scheduleHandler"> Обработчик расписания для связи с состояниями. </param>
-        /// <param name="animatorController"> Контроллер анимации для состояний. </param>
+        /// <param name="animationController"> Контроллер анимации для состояний. </param>
         private void InitializeStates(NpcMovementController movementController,
             NpcScheduleHandler scheduleHandler,
-            NpcAnimatorController animatorController)
+            NpcAnimationController animationController)
         {
             var states = new CharacterState[]
             {
                 new InteractionState(), new MovementState(movementController),
-                new RoutineState(animatorController), new WaitingState()
+                new RoutineState(animationController), new WaitingState()
             };
 
             foreach (var state in states)

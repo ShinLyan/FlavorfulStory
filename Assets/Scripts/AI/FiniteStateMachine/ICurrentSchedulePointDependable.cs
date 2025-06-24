@@ -8,6 +8,6 @@ namespace FlavorfulStory.AI.FiniteStateMachine
     {
         /// <summary> Устанавливает новую текущую точку расписания для объекта. </summary>
         /// <param name="newCurrentPont"> Новая текущая точка расписания. </param>
-        public void SetNewCurrentPont(SchedulePoint newCurrentPont);
+        void SetNewCurrentPont(SchedulePoint newCurrentPont);
     }
 }

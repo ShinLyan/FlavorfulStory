@@ -19,7 +19,7 @@ namespace FlavorfulStory.AI
         private readonly NpcScheduleHandler _scheduleHandler;
 
         /// <summary> Контроллер анимации NPC. </summary>
-        private readonly NpcAnimatorController _animatorController;
+        private readonly NpcAnimationController _animationController;
 
         /// <summary> Unity NavMeshAgent для навигации по NavMesh. </summary>
         private readonly NavMeshAgent _agent;
@@ -32,17 +32,17 @@ namespace FlavorfulStory.AI
         /// <param name="warpGraph"> Граф варп-точек для навигации. </param>
         /// <param name="transform"> Transform NPC. </param>
         /// <param name="coroutineRunner"> MonoBehaviour для запуска корутин. </param>
-        /// <param name="animatorController"> Контроллер анимации NPC. </param>
+        /// <param name="animationController"> Контроллер анимации NPC. </param>
         /// <param name="scheduleHandler"> Обработчик расписания NPC. </param>
         public NpcMovementController(NavMeshAgent navMeshAgent,
             WarpGraph warpGraph,
             Transform transform,
             MonoBehaviour coroutineRunner,
-            NpcAnimatorController animatorController,
+            NpcAnimationController animationController,
             NpcScheduleHandler scheduleHandler)
         {
             _agent = navMeshAgent;
-            _animatorController = animatorController;
+            _animationController = animationController;
             _scheduleHandler = scheduleHandler;
 
             _navigator = new NpcNavigator(_agent, warpGraph, transform, coroutineRunner);
@@ -59,7 +59,7 @@ namespace FlavorfulStory.AI
         public void UpdateMovement()
         {
             float speed = Mathf.Clamp01(_agent.velocity.magnitude) * 0.5f;
-            _animatorController.SetSpeed(speed);
+            _animationController.SetSpeed(speed);
             _navigator.Update();
         }
 

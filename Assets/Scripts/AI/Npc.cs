@@ -32,12 +32,12 @@ namespace FlavorfulStory.AI
         private NpcScheduleHandler _npcScheduleHandler;
 
         /// <summary> Контроллер анимации NPC для воспроизведения состояний анимации. </summary>
-        private NpcAnimatorController _animatorController;
+        private NpcAnimationController _animationController;
 
         /// <summary> Выполняет инициализацию всех контроллеров и систем NPC при запуске. </summary>
         private void Start()
         {
-            _animatorController = new NpcAnimatorController(GetComponent<Animator>());
+            _animationController = new NpcAnimationController(GetComponent<Animator>());
             _npcScheduleHandler = new NpcScheduleHandler();
 
             _movementController = new NpcMovementController(
@@ -46,19 +46,19 @@ namespace FlavorfulStory.AI
                     FindObjectsByType<WarpPortal>(FindObjectsInactive.Include, FindObjectsSortMode.None)),
                 transform,
                 this,
-                _animatorController,
+                _animationController,
                 _npcScheduleHandler
             );
 
             _stateController = new StateController(
                 _npcSchedule,
                 _movementController,
-                _animatorController,
+                _animationController,
                 _npcScheduleHandler
             );
 
-            WorldTime.OnTimePaused += _animatorController.PauseAnimation;
-            WorldTime.OnTimeUnpaused += _animatorController.ContinueAnimation;
+            WorldTime.OnTimePaused += _animationController.PauseAnimation;
+            WorldTime.OnTimeUnpaused += _animationController.ContinueAnimation;
         }
 
         /// <summary> Обновляет логику состояний и движения NPC каждый кадр. </summary>

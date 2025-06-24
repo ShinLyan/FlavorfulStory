@@ -33,19 +33,13 @@ namespace FlavorfulStory.AI
 
         /// <summary> Получает следующую точку расписания без удаления её из стека. </summary>
         /// <returns> Следующая точка расписания или null, если стек пуст. </returns>
-        private SchedulePoint GetNextSchedulePoint()
-        {
-            if (_currentPath == null || _currentPath.Count == 0) return null;
-            return _currentPath.Peek();
-        }
+        private SchedulePoint GetNextSchedulePoint() =>
+            _currentPath == null || _currentPath.Count == 0 ? null : _currentPath.Peek();
 
         /// <summary> Извлекает следующую точку расписания из стека. </summary>
         /// <returns> Следующая точка расписания или null, если стек пуст. </returns>
-        private SchedulePoint PopNextSchedulePoint()
-        {
-            if (_currentPath == null || _currentPath.Count == 0) return null;
-            return _currentPath.Pop();
-        }
+        private SchedulePoint PopNextSchedulePoint() =>
+            _currentPath == null || _currentPath.Count == 0 ? null : _currentPath.Pop();
 
         /// <summary> Обновляет текущую точку расписания при изменении игрового времени. </summary>
         /// <param name="currentTime"> Текущее игровое время. </param>
@@ -61,6 +55,8 @@ namespace FlavorfulStory.AI
             }
         }
 
+        /// <summary> Сбросить состояние. </summary>
+        /// <param name="time"> Текущее время. </param>
         private void Reset(DateTime time) => CurrentPoint = null;
     }
 }
