@@ -23,8 +23,7 @@ namespace FlavorfulStory.AI.WarpGraphSystem
         public WarpPortal ConnectedWarp { get; private set; }
 
         /// <summary> Цвет соединений внутри одной локации (визуализация в редакторе). </summary>
-        [Header("Visualization")]
-        [Tooltip("Цвет соединений внутри одной локации"), SerializeField]
+        [Header("Visualization")] [Tooltip("Цвет соединений внутри одной локации"), SerializeField]
         private Color _localConnectionColor = Color.blue;
 
         /// <summary> Цвет соединений между разными локациями (визуализация в редакторе). </summary>
@@ -77,16 +76,15 @@ namespace FlavorfulStory.AI.WarpGraphSystem
 
             if (_virtualCamera) _virtualCamera.enabled = false;
 
-            _locationManager.EnableLocation(ConnectedWarp.ParentLocationName);
             playerController.UpdatePosition(ConnectedWarp._spawnPoint);
 
             yield return null;
+
+            _locationManager.ActivatePlayerCurrentLocation();
             if (_virtualCamera) _virtualCamera.enabled = true;
 
             yield return _canvasGroupFader.Hide().WaitForCompletion();
             InputWrapper.UnblockAllInput();
-
-            _locationManager.DisableLocation(ParentLocationName);
         }
 
 #if UNITY_EDITOR
