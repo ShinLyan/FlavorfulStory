@@ -1,8 +1,10 @@
-﻿using FlavorfulStory.AI;
+﻿using FlavorfulStory.Actions;
+using FlavorfulStory.AI;
 using FlavorfulStory.CursorSystem;
 using FlavorfulStory.InteractionSystem;
 using FlavorfulStory.Player;
 using UnityEngine;
+using Zenject;
 
 namespace FlavorfulStory.DialogueSystem
 {
@@ -15,25 +17,36 @@ namespace FlavorfulStory.DialogueSystem
         /// <summary> Инициатор диалога, связанный с игроком. </summary>
         private IDialogueInitiator _dialogueInitiator;
 
+        /// <summary> Контроллер игрока. </summary>
+        private PlayerController _playerController;
+
         /// <summary> Информация о NPC. </summary>
         public NpcInfo NpcInfo { get; private set; }
+
+        /// <summary> Внедрение зависимостей Zenject. </summary>
+        /// <param name="dialogueInitiator"> Инициатор диалога, связанный с игроком. </param>
+        /// <param name="playerController"> Контроллер игрока. </param>
+        [Inject]
+        private void Construct(IDialogueInitiator dialogueInitiator, PlayerController playerController)
+        {
+            _dialogueInitiator = dialogueInitiator;
+            _playerController = playerController;
+        }
 
         /// <summary> Инициализация свойств класса. </summary>
         private void Awake()
         {
             IsInteractionAllowed = true;
             NpcInfo = GetComponent<Npc>().NpcInfo;
-            
-            // TODO: ZENJECT
-            var playerObject = GameObject.FindGameObjectWithTag("Player");
-            _dialogueInitiator = playerObject.GetComponent<IDialogueInitiator>();
 
             if (_dialogueInitiator is PlayerSpeaker playerSpeaker)
-                playerSpeaker.OnConversationEnded +=
-                    () => EndInteraction(playerObject.GetComponent<PlayerController>());
+                playerSpeaker.OnConversationEnded += () => EndInteraction(_playerController);
         }
 
         #region IInteractable
+
+        /// <summary> Действие игрока по отношению к объекту. </summary>
+        [field: SerializeField] public ActionDescription ActionDescription { get; private set; }
 
         /// <summary> Флаг, разрешено ли взаимодействие с NPC. </summary>
         public bool IsInteractionAllowed { get; private set; }
@@ -50,28 +63,17 @@ namespace FlavorfulStory.DialogueSystem
         {
             if (!IsInteractionAllowed) return;
 
+            IsInteractionAllowed = false;
             _dialogueInitiator?.StartDialogue(this, _dialogue);
         }
 
         /// <summary> Завершает взаимодействие с NPC. </summary>
         /// <param name="player"> Контроллер игрока, завершающий взаимодействие. </param>
-        public void EndInteraction(PlayerController player) => player.SetBusyState(false);
-
-        #endregion
-
-        #region ITooltipable
-
-        /// <summary> Возвращает заголовок тултипа. </summary>
-        /// <returns> Строка с заголовком тултипа. </returns>
-        public string TooltipTitle => NpcInfo.NpcName.ToString();
-
-        /// <summary> Возвращает описание тултипа. </summary>
-        /// <returns> Строка с описанием тултипа. </returns>
-        public string TooltipDescription => "Talk";
-
-        /// <summary> Возвращает мировую позицию объекта. </summary>
-        /// <returns> Вектор позиции объекта в мировых координатах. </returns>
-        public Vector3 WorldPosition => transform.position;
+        public void EndInteraction(PlayerController player)
+        {
+            player.SetBusyState(false);
+            IsInteractionAllowed = true;
+        }
 
         #endregion
 

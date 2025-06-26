@@ -1,5 +1,7 @@
 ﻿using FlavorfulStory.AI.FiniteStateMachine;
 using FlavorfulStory.AI.Scheduling;
+using FlavorfulStory.AI.WarpGraphSystem;
+using FlavorfulStory.TimeManagement;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -20,19 +22,50 @@ namespace FlavorfulStory.AI
         /// <summary> Контроллер состояний, управляющий переключением между состояниями NPC. </summary>
         private StateController _stateController;
 
-        /// <summary> Инициализация контроллера состояний. </summary>
+        /// <summary> Контроллер движения NPC для управления навигацией и перемещением. </summary>
+        private NpcMovementController _movementController;
+
+        /// <summary> Компонент Animator для управления анимациями персонажа. </summary>
+        private Animator _animator;
+
+        /// <summary> Обработчик расписания для управления временными точками NPC. </summary>
+        private NpcScheduleHandler _npcScheduleHandler;
+
+        /// <summary> Контроллер анимации NPC для воспроизведения состояний анимации. </summary>
+        private NpcAnimationController _animationController;
+
+        /// <summary> Выполняет инициализацию всех контроллеров и систем NPC при запуске. </summary>
         private void Start()
         {
+            _animationController = new NpcAnimationController(GetComponent<Animator>());
+            _npcScheduleHandler = new NpcScheduleHandler();
+
+            _movementController = new NpcMovementController(
+                GetComponent<NavMeshAgent>(),
+                WarpGraph.Build(
+                    FindObjectsByType<WarpPortal>(FindObjectsInactive.Include, FindObjectsSortMode.None)),
+                transform,
+                this,
+                _animationController,
+                _npcScheduleHandler
+            );
+
             _stateController = new StateController(
                 _npcSchedule,
-                GetComponent<Animator>(),
-                transform,
-                GetComponent<NavMeshAgent>(),
-                this
+                _movementController,
+                _animationController,
+                _npcScheduleHandler
             );
+
+            WorldTime.OnTimePaused += _animationController.PauseAnimation;
+            WorldTime.OnTimeUnpaused += _animationController.ContinueAnimation;
         }
 
-        /// <summary> Обновление логики состояний каждый кадр. </summary>
-        private void Update() => _stateController.Update(Time.deltaTime);
+        /// <summary> Обновляет логику состояний и движения NPC каждый кадр. </summary>
+        private void Update()
+        {
+            _stateController.Update();
+            _movementController.UpdateMovement();
+        }
     }
 }

@@ -1,81 +1,51 @@
 using FlavorfulStory.AI.Scheduling;
-using FlavorfulStory.TimeManagement;
-using UnityEngine;
-using DateTime = FlavorfulStory.TimeManagement.DateTime;
 
 namespace FlavorfulStory.AI.FiniteStateMachine
 {
     /// <summary> Состояние рутины NPC, в котором персонаж выполняет действия согласно расписанию. </summary>
-    public class RoutineState : CharacterState, IScheduleDependable
+    public class RoutineState : CharacterState, ICurrentSchedulePointDependable
     {
         #region Fields
 
-        /// <summary> Компонент Animator. </summary>
-        private readonly Animator _animator;
+        /// <summary> Контроллер анимации NPC для управления анимациями персонажа. </summary>
+        private readonly NpcAnimationController _animationController;
 
         /// <summary> Текущая точка расписания, в которой находится NPC. </summary>
         private SchedulePoint _currentPoint;
 
-        /// <summary> Текущее расписание. </summary>  
-        private ScheduleParams _currentScheduleParams;
-
         #endregion
 
-        /// <summary> Инициализирует новое состояние рутины. </summary>
-        public RoutineState(Animator animator) => _animator = animator;
-
-        /// <summary> Вызывается при входе в состояние рутины. Подписывается на событие изменения времени. </summary>
-        public override void Enter() => WorldTime.OnTimeUpdated += OnNewTimeTick;
-
-        /// <summary> Вызывается при выходе из состояния рутины. Отписывается от события изменения времени
-        /// и сбрасывает текущую точку. </summary>
-        public override void Exit()
+        /// <summary> Инициализирует новое состояние рутины с заданными зависимостями. </summary>
+        /// <param name="animationController"> Контроллер анимации для воспроизведения анимаций. </param>
+        public RoutineState(NpcAnimationController animationController)
         {
-            Reset();
-            WorldTime.OnTimeUpdated -= OnNewTimeTick;
+            _animationController = animationController;
+            _currentPoint = null;
         }
 
-        /// <summary> Обновляет логику состояния рутины каждый кадр.
-        /// Воспроизводит анимацию, если текущая точка задана. </summary>
-        /// <param name="deltaTime"> Время, прошедшее с последнего кадра. </param>
-        public override void Update(float deltaTime)
+        /// <summary> Выходит из состояния рутины и выполняет очистку ресурсов. </summary>
+        public override void Exit() => Reset();
+
+        /// <summary> Обновляет логику состояния рутины каждый кадр и воспроизводит соответствующую анимацию. </summary>
+        public override void Update() => PlayAnimation();
+
+        /// <summary> Сбрасывает состояние рутины к начальному состоянию. </summary>
+        public override void Reset() => _animationController.Reset();
+
+        /// <summary> Воспроизводит анимацию текущей точки расписания, если она задана. </summary>
+        private void PlayAnimation()
         {
             if (_currentPoint == null) return;
 
-            var animationClipName = _currentPoint.NpcAnimation;
-            PlayStateAnimation(animationClipName);
+            _animationController.PlayStateAnimation(_currentPoint.NpcAnimation);
         }
 
-        /// <summary> Обновить состояние. </summary>
-        public override void Reset()
+        /// <summary> Устанавливает новую текущую точку расписания и переключает состояние на движение. </summary>
+        /// <param name="newCurrentPont"> Новая текущая точка расписания. </param>
+        public void SetNewCurrentPont(SchedulePoint newCurrentPont)
         {
-            _currentPoint = null;
-            _animator.Rebind();
-        }
-
-        /// <summary> Проверяет, изменилось ли время, и обновляет текущую точку расписания.
-        /// Переключает состояние на движение, если время совпадает с точкой. </summary>
-        /// <param name="currentTime"> Текущее время в игре. </param>
-        private void OnNewTimeTick(DateTime currentTime)
-        {
-            var closestPoint = _currentScheduleParams?.GetClosestSchedulePointInPath(currentTime);
-            if (closestPoint == null || closestPoint == _currentPoint) return;
-
-            _currentPoint = closestPoint;
-            if (closestPoint.Hour == (int)currentTime.Hour && closestPoint.Minutes == (int)currentTime.Minute)
-                RequestStateChange(typeof(MovementState));
-        }
-
-        /// <summary> Установить новое расписание. </summary>
-        /// <param name="scheduleParams"> Новое расписание. </param>
-        public void SetCurrentScheduleParams(ScheduleParams scheduleParams) => _currentScheduleParams = scheduleParams;
-
-        /// <summary> Воспроизведение анимации состояния. </summary>
-        /// <param name="animationStateName"> Название состояния анимации. </param>
-        private void PlayStateAnimation(AnimationType animationStateName)
-        {
-            if (animationStateName == AnimationType.Idle) return;
-            _animator.Play(animationStateName.ToString());
+            _currentPoint = newCurrentPont;
+            RequestStateChange(typeof(MovementState));
         }
     }
 }

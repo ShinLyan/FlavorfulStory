@@ -1,8 +1,10 @@
 ﻿using System.Collections;
+using DG.Tweening;
+using FlavorfulStory.Actions;
 using FlavorfulStory.InteractionSystem;
 using FlavorfulStory.Player;
-using FlavorfulStory.SceneManagement;
 using FlavorfulStory.UI;
+using FlavorfulStory.UI.Animation;
 using UnityEngine;
 using Zenject;
 
@@ -21,7 +23,7 @@ namespace FlavorfulStory.TimeManagement
         private PlayerController _playerController;
 
         /// <summary> Затемнение экрана при переходах между сценами. </summary>
-        private Fader _fader;
+        private CanvasGroupFader _canvasGroupFader;
 
         /// <summary> Заголовок окна подтверждения сна. </summary>
         private const string SleepConfirmationTitle = "Bed"; // TODO: заменить на генератор/локализацию
@@ -36,15 +38,15 @@ namespace FlavorfulStory.TimeManagement
         /// <param name="confirmationWindowView"> Окно подтверждения. </param>
         /// <param name="summaryView"> Окно сводки. </param>
         /// <param name="playerController"> Контроллер игрока. </param>
-        /// <param name="fader"> Компонент затемнения. </param>
+        /// <param name="canvasGroupFader"> Компонент затемнения. </param>
         [Inject]
         private void Construct(ConfirmationWindowView confirmationWindowView, SummaryView summaryView,
-            PlayerController playerController, Fader fader)
+            PlayerController playerController, CanvasGroupFader canvasGroupFader)
         {
             _confirmationWindowView = confirmationWindowView;
             _summaryView = summaryView;
             _playerController = playerController;
-            _fader = fader;
+            _canvasGroupFader = canvasGroupFader;
         }
 
         /// <summary> Показывает View подтверждения перед сном. </summary>
@@ -66,7 +68,7 @@ namespace FlavorfulStory.TimeManagement
         /// <returns> Корутина, обрабатывающая процесс сна и завершения дня.</returns>
         private IEnumerator SleepRoutine()
         {
-            yield return _fader.FadeOut(Fader.FadeOutTime);
+            yield return _canvasGroupFader.Show().WaitForCompletion();
 
             WorldTime.ForceEndDay();
             WorldTime.Pause();
@@ -81,21 +83,15 @@ namespace FlavorfulStory.TimeManagement
             _summaryView.Hide();
             WorldTime.Unpause();
 
-            yield return _fader.FadeIn(Fader.FadeInTime);
+            yield return _canvasGroupFader.Hide().WaitForCompletion();
 
             EndInteraction(_playerController);
         }
 
         #region IInteractable
 
-        /// <summary> Заголовок для отображения во всплывающей подсказке при наведении. </summary>
-        public string TooltipTitle => "Bed";
-
-        /// <summary> Описание для отображения во всплывающей подсказке при наведении. </summary>
-        public string TooltipDescription => "!";
-
-        /// <summary> Позиция объекта в мировых координатах. </summary>
-        public Vector3 WorldPosition => transform.position;
+        /// <summary> Действие игрока по отношению к объекту. </summary>
+        [field: SerializeField] public ActionDescription ActionDescription { get; private set; }
 
         /// <summary> Возвращает возможность взаимодействия с объектом. </summary>
         public bool IsInteractionAllowed => true;

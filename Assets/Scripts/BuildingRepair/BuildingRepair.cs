@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using FlavorfulStory.Actions;
 using FlavorfulStory.Audio;
 using FlavorfulStory.InteractionSystem;
 using FlavorfulStory.InventorySystem;
@@ -94,23 +95,10 @@ namespace FlavorfulStory.BuildingRepair
         /// <remarks> После завершения ремонта взаимодействие становится невозможным. </remarks>
         private void UpdateInteractionState() => IsInteractionAllowed = !IsRepairCompleted;
 
-        #region ITooltipable
-
-        /// <summary> Получить название объекта для тултипа. </summary>
-        /// <returns> Название объекта для тултипа. </returns>
-        public string TooltipTitle => CurrentStage.BuildingName;
-
-        /// <summary> Получить описание объекта для тултипа. </summary>
-        /// <returns> Описание объекта для тултипа. </returns>
-        public string TooltipDescription => _buildingData.Description;
-
-        /// <summary> Получить мировую позицию объекта для взаимодействия. </summary>
-        /// <returns> Мировая позиция объекта для взаимодействия. </returns>
-        public Vector3 WorldPosition => transform.position;
-
-        #endregion
-
         #region IInteractable
+
+        /// <summary> Действие игрока по отношению к объекту. </summary>
+        [field: SerializeField] public ActionDescription ActionDescription { get; private set; }
 
         /// <summary> Доступно ли взаимодействие с объектом в текущий момент? </summary>
         public bool IsInteractionAllowed { get; private set; }
