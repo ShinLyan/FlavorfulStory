@@ -1,8 +1,10 @@
-﻿using FlavorfulStory.Actions;
+using FlavorfulStory.Actions;
+using System.Collections;
+using DG.Tweening;
 using FlavorfulStory.InteractionSystem;
 using FlavorfulStory.Player;
-using FlavorfulStory.SceneManagement;
 using FlavorfulStory.UI;
+using FlavorfulStory.UI.Animation;
 using UnityEngine;
 using Zenject;
 
@@ -21,7 +23,7 @@ namespace FlavorfulStory.TimeManagement
         private PlayerController _playerController;
 
         /// <summary> Затемнение экрана при переходах между сценами. </summary>
-        private Fader _fader;
+        private CanvasGroupFader _canvasGroupFader;
 
         private DayEndManager _dayEndManager;
 
@@ -37,14 +39,15 @@ namespace FlavorfulStory.TimeManagement
         /// <summary> Внедряет зависимости через Zenject. </summary>
         /// <param name="confirmationWindowView"> Окно подтверждения. </param>
         /// <param name="playerController"> Контроллер игрока. </param>
+        /// <param name="canvasGroupFader"> Компонент затемнения. </param>
         [Inject]
-        private void Construct(ConfirmationWindowView confirmationWindowView,
-            DayEndManager dayEndManager,
-            PlayerController playerController)
+        private void Construct(ConfirmationWindowView confirmationWindowView, SummaryView summaryView,
+            PlayerController playerController, CanvasGroupFader canvasGroupFader)
         {
             _confirmationWindowView = confirmationWindowView;
             _playerController = playerController;
             _dayEndManager = dayEndManager;
+            _canvasGroupFader = canvasGroupFader;
         }
 
         /// <summary> Показывает View подтверждения перед сном. </summary>
@@ -67,8 +70,7 @@ namespace FlavorfulStory.TimeManagement
         #region IInteractable
 
         /// <summary> Действие игрока по отношению к объекту. </summary>
-        [field: SerializeField]
-        public ActionDescription ActionDescription { get; private set; }
+        [field: SerializeField] public ActionDescription ActionDescription { get; private set; }
 
         /// <summary> Возвращает возможность взаимодействия с объектом. </summary>
         public bool IsInteractionAllowed => true;

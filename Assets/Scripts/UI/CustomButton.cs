@@ -1,3 +1,4 @@
+using System;
 using FlavorfulStory.Audio;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -23,16 +24,16 @@ namespace FlavorfulStory.UI
         private readonly Color _interactionEnabledColor = Color.white;
 
         /// <summary> Доступна ли кнопка для взаимодействия? </summary>
-        private bool _isInteractable;
+        private bool _interactable;
 
         /// <summary> Доступна ли кнопка для взаимодействия? </summary>
-        public bool IsInteractable
+        public bool Interactable
         {
-            get => _isInteractable;
+            get => _interactable;
             set
             {
-                _isInteractable = value;
-                if (_isInteractable)
+                _interactable = value;
+                if (_interactable)
                 {
                     if (!ButtonImage) ButtonImage = GetComponent<Image>();
                     ButtonImage.CrossFadeColor(_interactionEnabledColor, 0.01f, true, false);
@@ -49,13 +50,16 @@ namespace FlavorfulStory.UI
             }
         }
 
+        /// <summary> Событие, которое вызывается при клике по кнопке. </summary>
+        public event Action OnClick;
+
         /// <summary> Сброс состояния наведения при деактивации компонента. </summary>
         private void OnDisable() => IsMouseOver = false;
 
         /// <summary> Инициализация кнопки, получение компонента <see cref="Image"/>. </summary>
         protected virtual void Awake()
         {
-            _isInteractable = true;
+            _interactable = true;
             ButtonImage = GetComponent<Image>();
             Initialize();
         }
@@ -70,7 +74,11 @@ namespace FlavorfulStory.UI
         protected virtual void HoverEnd() { }
 
         /// <summary> Действие при клике на кнопку. </summary>
-        protected virtual void Click() => SfxPlayer.Instance.PlayOneShot(SfxType.UIClick);
+        protected virtual void Click()
+        {
+            OnClick?.Invoke();
+            SfxPlayer.Instance.PlayOneShot(SfxType.UIClick);
+        }
 
         /// <summary> Вызывается при включении взаимодействия. </summary>
         protected virtual void OnInteractionEnabled() { }
@@ -82,7 +90,7 @@ namespace FlavorfulStory.UI
         /// <param name="eventData"> Данные события клика. </param>
         public void OnPointerClick(PointerEventData eventData)
         {
-            if (!IsInteractable) return;
+            if (!Interactable) return;
 
             Click();
         }
@@ -91,7 +99,7 @@ namespace FlavorfulStory.UI
         /// <param name="eventData"> Данные события наведения. </param>
         public void OnPointerEnter(PointerEventData eventData)
         {
-            if (!IsInteractable) return;
+            if (!Interactable) return;
 
             IsMouseOver = true;
             HoverStart();
@@ -101,7 +109,7 @@ namespace FlavorfulStory.UI
         /// <param name="eventData"> Данные события ухода курсора. </param>
         public void OnPointerExit(PointerEventData eventData)
         {
-            if (!IsInteractable) return;
+            if (!Interactable) return;
 
             IsMouseOver = false;
             HoverEnd();
