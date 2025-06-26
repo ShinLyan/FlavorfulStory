@@ -1,9 +1,12 @@
 ﻿using System;
-using System.Collections;
+using System.Threading;
+using Cysharp.Threading.Tasks;
+using DG.Tweening;
 using FlavorfulStory.Player;
 using FlavorfulStory.SceneManagement;
 using FlavorfulStory.Stats;
 using FlavorfulStory.UI;
+using FlavorfulStory.UI.Animation;
 using UnityEngine;
 using Zenject;
 
@@ -16,16 +19,10 @@ namespace FlavorfulStory.TimeManagement
         /// <summary> Компонент для отображения сводки дня с возможностью продолжения игры. </summary>
         private readonly SummaryView _summaryView;
 
-        /// <summary> Компонент для создания эффектов затухания/появления экрана. </summary>
-        private readonly Fader _fader;
-
         /// <summary> Колбэк, вызываемый после завершения процесса окончания дня. </summary>
         private Action _onCompleteCallback;
 
-        /// <summary> MonoBehaviour для запуска корутин (так как DayEndManager не наследуется от MonoBehaviour). </summary>
-        private readonly MonoBehaviour _coroutineRunner;
-
-        /// <summary> Контроллер игрока для управления его позицией и получения компонентов. </summary>
+        /// <summary> Контроллер игрока для управления его позицией и получением компонентов. </summary>
         private readonly PlayerController _playerController;
 
         /// <summary> Множитель восстановления выносливости при истощении (75% от максимума). </summary>
@@ -40,45 +37,47 @@ namespace FlavorfulStory.TimeManagement
         /// <summary> Флаг, предотвращающий одновременное выполнение нескольких процессов сна. </summary>
         private bool _isProcessingSleep;
 
-        private readonly GameObject _hud;
+        /// <summary> Затемнение экрана при переходах между сценами. </summary>
+        private readonly CanvasGroupFader _canvasGroupFader;
 
+        private readonly CancellationTokenSource _cts;
 
         /// <summary> Конструктор DayEndManager. </summary>
         /// <param name="summaryView"> Компонент отображения сводки дня. </param>
-        /// <param name="fader"> Компонент затухания экрана. </param>
-        /// <param name="coroutineRunner"> MonoBehaviour для запуска корутин. </param>
         /// <param name="playerController">Контроллер игрока. </param>
         /// <param name="sleepTrigger"> Триггер сна (кровать). </param>
         /// <param name="locationManager"> Менеджер локаций. </param>
         public DayEndManager(SummaryView summaryView,
-            Fader fader,
-            MonoBehaviour coroutineRunner,
             PlayerController playerController,
-            SleepTrigger sleepTrigger,
+            SleepTrigger sleepTriggerTransform,
             LocationManager locationManager,
-            [Inject(Id = "HUD")] GameObject hud)
+            CanvasGroupFader canvasGroupFader)
         {
             _summaryView = summaryView;
-            _fader = fader;
-            _coroutineRunner = coroutineRunner;
             _playerController = playerController;
-            _sleepTriggerTransform = sleepTrigger.transform;
+            _sleepTriggerTransform = sleepTriggerTransform.transform;
             _locationManager = locationManager;
+            _canvasGroupFader = canvasGroupFader;
             _isProcessingSleep = false;
-            _hud = hud;
 
             WorldTime.OnDayEnded += OnDayEnded;
+            _cts = new CancellationTokenSource();
         }
 
         /// <summary> Инициализация компонента (реализация IInitializable). </summary>
         public void Initialize() { }
 
         /// <summary> Освобождение ресурсов и отписка от событий (реализация IDisposable). </summary>
-        public void Dispose() => WorldTime.OnDayEnded -= OnDayEnded;
+        public void Dispose()
+        {
+            WorldTime.OnDayEnded -= OnDayEnded;
+            _cts?.Cancel();
+            _cts?.Dispose();
+        }
 
         /// <summary> Обработчик события окончания дня из системы времени. </summary>
         /// <param name="date"> Дата окончившегося дня. </param>
-        private void OnDayEnded(DateTime date) => ExhaustedSleep();
+        private void OnDayEnded(DateTime date) => ExhaustedSleep().Forget();
 
         /// <summary> Запрос на завершение дня по инициативе игрока (взаимодействие с кроватью). </summary>
         /// <param name="triggerTransform"> Transform объекта-триггера (кровати). </param>
@@ -89,59 +88,58 @@ namespace FlavorfulStory.TimeManagement
             _isProcessingSleep = true;
 
             _onCompleteCallback = onCompleteCallback;
-            _coroutineRunner.StartCoroutine(EndDayRoutine());
-            _coroutineRunner.StartCoroutine(ResetPlayer(triggerTransform));
+            EndDayRoutine().Forget();
+            ResetPlayer(triggerTransform).Forget();
         }
 
         /// <summary> Принудительный сон при истощении игрока (автоматическое завершение дня). </summary>
-        private void ExhaustedSleep()
+        private async UniTaskVoid ExhaustedSleep()
         {
             if (_isProcessingSleep) return;
             _isProcessingSleep = true;
 
-            _coroutineRunner.StartCoroutine(EndDayRoutine());
-            _coroutineRunner.StartCoroutine(ResetPlayer(_sleepTriggerTransform, true));
+            await UniTask.WhenAll(
+                EndDayRoutine(),
+                ResetPlayer(_sleepTriggerTransform, true)
+            );
         }
 
         /// <summary> Основная корутина завершения дня.
         /// Управляет последовательностью: пауза времени → затухание → сводка → продолжение. </summary>
-        /// <returns> IEnumerator для корутины. </returns>
-        private IEnumerator EndDayRoutine()
+        private async UniTask EndDayRoutine()
         {
             WorldTime.Pause();
 
             // TODO: худ игры скрывается
-            _hud.SetActive(false); //TODO: переделать на норм версию
-
-            yield return _fader.FadeOut(Fader.FadeOutTime);
+            // _hud.SetActive(false); //TODO: переделать на норм версию
+            await _canvasGroupFader.Hide().AsyncWaitForCompletion().AsUniTask().AttachExternalCancellation(_cts.Token);
 
             _summaryView.Show();
             bool continuePressed = false;
             _summaryView.OnContinuePressed = () => continuePressed = true;
             _summaryView.SetSummary(SummaryView.DefaultSummaryText);
 
-            yield return _fader.FadeIn(Fader.FadeInTime);
-            yield return new WaitUntil(() => continuePressed);
+            await _canvasGroupFader.Show().AsyncWaitForCompletion().AsUniTask().AttachExternalCancellation(_cts.Token);
+            await UniTask.WaitUntil(() => continuePressed, cancellationToken: _cts.Token);
 
             _onCompleteCallback?.Invoke();
 
             _summaryView.Hide();
             WorldTime.Unpause();
 
-            yield return _fader.FadeOut(Fader.FadeOutTime);
-            yield return _fader.FadeIn(Fader.FadeInTime);
+            await _canvasGroupFader.Hide().AsyncWaitForCompletion().AsUniTask().AttachExternalCancellation(_cts.Token);
+            await _canvasGroupFader.Show().AsyncWaitForCompletion().AsUniTask().AttachExternalCancellation(_cts.Token);
 
             _isProcessingSleep = false;
-            _hud.SetActive(true); //TODO: переделать на норм версию
+            // _hud.SetActive(true); //TODO: переделать на норм версию
         }
 
-        /// <summary> Корутина сброса состояния игрока: восстановление здоровья, выносливости и позиции. </summary>
+        /// <summary> Сброс состояния игрока: восстановление здоровья, выносливости и позиции. </summary>
         /// <param name="triggerTransform"> Transform позиции для размещения игрока. </param>
         /// <param name="exhausted"> Флаг истощения (влияет на восстановление выносливости). </param>
-        /// <returns>IEnumerator для корутины</returns>
-        private IEnumerator ResetPlayer(Transform triggerTransform, bool exhausted = false)
+        private async UniTask ResetPlayer(Transform triggerTransform, bool exhausted = false)
         {
-            yield return new WaitForSeconds(Fader.FadeOutTime);
+            await _canvasGroupFader.Hide().AsyncWaitForCompletion().AsUniTask().AttachExternalCancellation(_cts.Token);
 
             var playerStats = _playerController.GetComponent<PlayerStats>();
 
@@ -152,7 +150,7 @@ namespace FlavorfulStory.TimeManagement
             stamina.SetValue(exhausted ? stamina.MaxValue * StaminaMultiplier : stamina.MaxValue);
 
             _playerController.UpdatePosition(triggerTransform);
-            yield return null;
+            await UniTask.Yield(_cts.Token);
             _locationManager.ActivatePlayerCurrentLocation();
             _locationManager.EnableLocation(LocationName.RockyIsland);
         }

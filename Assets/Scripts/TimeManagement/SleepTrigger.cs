@@ -1,10 +1,7 @@
 using FlavorfulStory.Actions;
-using System.Collections;
-using DG.Tweening;
 using FlavorfulStory.InteractionSystem;
 using FlavorfulStory.Player;
 using FlavorfulStory.UI;
-using FlavorfulStory.UI.Animation;
 using UnityEngine;
 using Zenject;
 
@@ -16,14 +13,8 @@ namespace FlavorfulStory.TimeManagement
         /// <summary> Окно подтверждения действия. </summary>
         private ConfirmationWindowView _confirmationWindowView;
 
-        /// <summary> Сводка дня. </summary>
-        private SummaryView _summaryView;
-
         /// <summary> Контроллер игрока. </summary>
         private PlayerController _playerController;
-
-        /// <summary> Затемнение экрана при переходах между сценами. </summary>
-        private CanvasGroupFader _canvasGroupFader;
 
         private DayEndManager _dayEndManager;
 
@@ -38,16 +29,14 @@ namespace FlavorfulStory.TimeManagement
 
         /// <summary> Внедряет зависимости через Zenject. </summary>
         /// <param name="confirmationWindowView"> Окно подтверждения. </param>
-        /// <param name="playerController"> Контроллер игрока. </param>
-        /// <param name="canvasGroupFader"> Компонент затемнения. </param>
+        /// <param name="playerController"> Контроллер игрока. </param>\
         [Inject]
-        private void Construct(ConfirmationWindowView confirmationWindowView, SummaryView summaryView,
-            PlayerController playerController, CanvasGroupFader canvasGroupFader)
+        private void Construct(ConfirmationWindowView confirmationWindowView,
+            PlayerController playerController, DayEndManager dayEndManager)
         {
             _confirmationWindowView = confirmationWindowView;
             _playerController = playerController;
             _dayEndManager = dayEndManager;
-            _canvasGroupFader = canvasGroupFader;
         }
 
         /// <summary> Показывает View подтверждения перед сном. </summary>
@@ -70,7 +59,8 @@ namespace FlavorfulStory.TimeManagement
         #region IInteractable
 
         /// <summary> Действие игрока по отношению к объекту. </summary>
-        [field: SerializeField] public ActionDescription ActionDescription { get; private set; }
+        [field: SerializeField]
+        public ActionDescription ActionDescription { get; private set; }
 
         /// <summary> Возвращает возможность взаимодействия с объектом. </summary>
         public bool IsInteractionAllowed => true;
