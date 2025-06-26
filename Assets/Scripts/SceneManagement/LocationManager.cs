@@ -46,11 +46,14 @@ namespace FlavorfulStory.SceneManagement
         public void ActivatePlayerCurrentLocation()
         {
             var playerPosition = _playerController.transform.position;
+            var locationToEnable = _locations[0];
             foreach (var location in _locations)
                 if (location.IsPositionInLocation(playerPosition))
-                    location.Enable();
+                    locationToEnable = location;
                 else
                     location.Disable();
+
+            locationToEnable.Enable();
         }
 
         /// <summary> Включить локацию по имени. </summary>
