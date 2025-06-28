@@ -17,7 +17,7 @@ namespace FlavorfulStory.UI.Animation
         private const float FadeInDuration = 0.4f;
 
         /// <summary> Длительность исчезновения. </summary>
-        private const float FadeOutDuration = 0.3f;
+        private const float FadeOutDuration = 0.2f;
 
         /// <summary> Инициализация компонента. </summary>
         private void Awake() => _canvasGroup = GetComponent<CanvasGroup>();

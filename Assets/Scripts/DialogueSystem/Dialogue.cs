@@ -45,8 +45,6 @@ namespace FlavorfulStory.DialogueSystem
             foreach (string childId in parentNode.ChildNodes)
                 if (_nodeLookup.TryGetValue(childId, out var childNode))
                     yield return childNode;
-                else
-                    Debug.LogError($"[DIALOGUE] → Missing child in lookup: {childId}");
         }
 
         /// <summary> Получить дочерние узлы, в которых говорит игрок. </summary>

@@ -54,11 +54,12 @@ namespace FlavorfulStory.DialogueSystem
         /// <summary> Обработка ввода для перехода к следующей реплике. </summary>
         private void Update()
         {
+            // TODO: УДАЛИТЬ КОГДА ПЕРЕПИШЕМ НА НОВЫЙ INTERACT SYSTEM
             if (!IsDialogueActive || IsChoosingDialogue ||
                 !InputWrapper.GetButtonDown(InputButton.NextDialogue))
                 return;
 
-            PlayNextDialogueNode();
+            _dialogueView.CompleteOrProceed();
         }
 
         /// <summary> Очистить подписки и события при уничтожении компонента. </summary>
@@ -124,10 +125,6 @@ namespace FlavorfulStory.DialogueSystem
             InputWrapper.UnblockInput(InputButton.Interact);
         }
 
-        /// <summary> Получить текст текущего узла диалога. </summary>
-        /// <returns> Текст текущей реплики или пустая строка. </returns>
-        private string GetText() => _currentNode ? _currentNode.Text : string.Empty;
-
         /// <summary> Воспроизвести следующий узел диалога. </summary>
         private void PlayNextDialogueNode()
         {
@@ -183,7 +180,8 @@ namespace FlavorfulStory.DialogueSystem
                 return;
             }
 
-            var data = new DialogueData(GetText(), CurrentNpcSpeaker?.NpcInfo, IsChoosingDialogue, GetChoices());
+            var data = new DialogueData(_currentNode.Text, CurrentNpcSpeaker?.NpcInfo, IsChoosingDialogue,
+                GetChoices());
             _dialogueView.Show(data);
         }
 

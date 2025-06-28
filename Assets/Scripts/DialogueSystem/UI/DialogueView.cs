@@ -66,6 +66,9 @@ namespace FlavorfulStory.DialogueSystem.UI
         /// <summary> Текущая информация об NPC. </summary>
         private NpcInfo _currentSpeakerInfo;
 
+        /// <summary> Текущая анимация текста. </summary>
+        private Tween _textTween;
+
         /// <summary> Событие при нажатии кнопки Next. </summary>
         public event Action OnNextClicked;
 
@@ -91,28 +94,41 @@ namespace FlavorfulStory.DialogueSystem.UI
         /// <summary> Подписка на кнопку Next и инициализация аниматора. </summary>
         private void Awake()
         {
-            _nextButton.onClick.AddListener(() => OnNextClicked?.Invoke());
             _animator = new DialogueViewAnimator(_dialoguePanel, _choiceContainer, _dialogueText, _speakerPreview);
+            _nextButton.onClick.AddListener(CompleteOrProceed);
+            _dialogueText.text = string.Empty;
+        }
+
+        /// <summary> Если текст печатается — мгновенно показать его полностью,
+        /// иначе перейти к следующей реплике. </summary>
+        public void CompleteOrProceed()
+        {
+            if (_textTween != null && _textTween.IsActive() && _textTween.IsPlaying())
+                _textTween.Complete();
+            else
+                OnNextClicked?.Invoke();
         }
 
         /// <summary> Отображает окно диалога с переданными данными. </summary>
         /// <param name="data"> Данные текущего диалога. </param>
-        public void Show(DialogueData data)
+        public async void Show(DialogueData data)
         {
             if (!_currentSpeakerInfo || _currentSpeakerInfo != data.SpeakerInfo)
             {
-                SetSpeakerInfo(data.SpeakerInfo);
+                await _hudFader.Hide().AsyncWaitForCompletion();
+
                 gameObject.SetActive(true);
                 _animator.AnimateEntrance();
-                _hudFader.Hide();
+                SetSpeakerInfo(data.SpeakerInfo);
             }
 
-            _animator.AnimateText(data.Text);
             _nextButton.enabled = !data.IsChoosing;
             _nextButtonPreview.SetActive(!data.IsChoosing);
             _choiceContainer.gameObject.SetActive(data.IsChoosing);
-
-            RenderChoices(data.Choices, data.IsChoosing);
+            if (data.IsChoosing)
+                RenderChoices(data.Choices, data.IsChoosing);
+            else
+                _textTween = await _animator.FadeOutAndAnimateNewText(data.Text);
         }
 
         /// <summary> Скрывает окно диалога и восстанавливает отображение HUD. </summary>
@@ -122,6 +138,7 @@ namespace FlavorfulStory.DialogueSystem.UI
             gameObject.SetActive(false);
             _hudFader.Show();
             _currentSpeakerInfo = null;
+            _dialogueText.text = string.Empty;
             ClearChoices();
             OnHidden?.Invoke();
         });
@@ -165,7 +182,6 @@ namespace FlavorfulStory.DialogueSystem.UI
 
             foreach (var button in buttons) button.Interactable = true;
         }
-
 
         /// <summary> Очищает все текущие варианты ответа из UI. </summary>
         private void ClearChoices()
