@@ -26,7 +26,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6421678460121703608}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -159.09975}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -247,6 +247,7 @@ GameObject:
   - component: {fileID: 2929401510263928169}
   - component: {fileID: 2318194042286699216}
   - component: {fileID: 4352690513910526773}
+  - component: {fileID: 8547622817436187750}
   m_Layer: 5
   m_Name: DialogueChoiceButton
   m_TagString: Untagged
@@ -274,7 +275,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 539.92993, y: 84.16}
+  m_SizeDelta: {x: 540, y: 84}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2249741622734145479
 CanvasRenderer:
@@ -369,6 +370,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _choiceText: {fileID: 6292684807048553627}
   _hoverImage: {fileID: 2754511099345630890}
+--- !u!225 &8547622817436187750
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7649064257411364876}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &9032482165270501613
 GameObject:
   m_ObjectHideFlags: 0
