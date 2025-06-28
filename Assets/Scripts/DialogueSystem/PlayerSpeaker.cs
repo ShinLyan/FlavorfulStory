@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using FlavorfulStory.DialogueSystem.UI;
@@ -87,7 +86,7 @@ namespace FlavorfulStory.DialogueSystem
             TriggerEnterAction();
             UpdateDialogueView();
 
-            StartCoroutine(EnableNextDialogueInput());
+            InputWrapper.UnblockInputNextFrame(InputButton.NextDialogue, InputButton.SkipDialogue);
         }
 
         /// <summary> Завершить текущий диалог. </summary>
@@ -106,24 +105,10 @@ namespace FlavorfulStory.DialogueSystem
 
             // Защищаем от повторного запуска взаимодействия
             InputWrapper.BlockInput(InputButton.Interact);
-            StartCoroutine(UnblockInteractNextFrame());
+            InputWrapper.UnblockInputNextFrame(InputButton.Interact);
         }
 
         #endregion
-
-        // TODO: УДАЛИТЬ, ВЫНЕСТИ В INPUTWRAPPER
-        private static IEnumerator EnableNextDialogueInput()
-        {
-            yield return null; // Пропустить кадр, в котором был вызван StartDialogue
-            InputWrapper.UnblockInput(new[] { InputButton.NextDialogue, InputButton.SkipDialogue });
-        }
-
-        // TODO: УДАЛИТЬ, ВЫНЕСТИ В INPUTWRAPPER
-        private IEnumerator UnblockInteractNextFrame()
-        {
-            yield return null;
-            InputWrapper.UnblockInput(InputButton.Interact);
-        }
 
         /// <summary> Воспроизвести следующий узел диалога. </summary>
         private void PlayNextDialogueNode()

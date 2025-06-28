@@ -50,8 +50,8 @@ namespace FlavorfulStory.UI
             }
         }
 
-        /// <summary> Событие, которое вызывается при клике по кнопке. </summary>
-        public event Action OnClick;
+        /// <summary> Действие, которое вызывается при клике по кнопке. </summary>
+        public Action OnClick;
 
         /// <summary> Сброс состояния наведения при деактивации компонента. </summary>
         private void OnDisable() => IsMouseOver = false;

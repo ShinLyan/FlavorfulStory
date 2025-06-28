@@ -69,6 +69,9 @@ namespace FlavorfulStory.DialogueSystem.UI
         /// <summary> Текущая анимация текста. </summary>
         private Tween _textTween;
 
+        /// <summary> Список кнопок с ответами. </summary>
+        private readonly List<DialogueChoiceButton> _choiceButtons = new();
+
         /// <summary> Событие при нажатии кнопки Next. </summary>
         public event Action OnNextClicked;
 
@@ -97,6 +100,21 @@ namespace FlavorfulStory.DialogueSystem.UI
             _animator = new DialogueViewAnimator(_dialoguePanel, _choiceContainer, _dialogueText, _speakerPreview);
             _nextButton.onClick.AddListener(CompleteOrProceed);
             _dialogueText.text = string.Empty;
+            CacheInitialChoiceButtons();
+        }
+
+        /// <summary> Кэширует уже созданные на сцене кнопки вариантов ответа,
+        /// чтобы переиспользовать их вместо уничтожения/создания. </summary>
+        private void CacheInitialChoiceButtons()
+        {
+            foreach (Transform child in _choiceContainer)
+            {
+                var button = child.GetComponent<DialogueChoiceButton>();
+                if (!button || _choiceButtons.Contains(button)) continue;
+
+                button.gameObject.SetActive(false);
+                _choiceButtons.Add(button);
+            }
         }
 
         /// <summary> Если текст печатается — мгновенно показать его полностью,
@@ -125,8 +143,9 @@ namespace FlavorfulStory.DialogueSystem.UI
             _nextButton.enabled = !data.IsChoosing;
             _nextButtonPreview.SetActive(!data.IsChoosing);
             _choiceContainer.gameObject.SetActive(data.IsChoosing);
+
             if (data.IsChoosing)
-                RenderChoices(data.Choices, data.IsChoosing);
+                RenderChoices(data.Choices);
             else
                 _textTween = await _animator.FadeOutAndAnimateNewText(data.Text);
         }
@@ -139,9 +158,15 @@ namespace FlavorfulStory.DialogueSystem.UI
             _hudFader.Show();
             _currentSpeakerInfo = null;
             _dialogueText.text = string.Empty;
-            ClearChoices();
+            DisableChoices();
             OnHidden?.Invoke();
         });
+
+        /// <summary> Очищает все текущие варианты ответа из UI. </summary>
+        private void DisableChoices()
+        {
+            foreach (var button in _choiceButtons) button.gameObject.SetActive(false);
+        }
 
         /// <summary> Устанавливает информацию о говорящем персонаже. </summary>
         /// <param name="npc"> Информация о персонаже. </param>
@@ -156,38 +181,51 @@ namespace FlavorfulStory.DialogueSystem.UI
 
         /// <summary> Отрисовывает кнопки выбора реплик, если активен режим выбора. </summary>
         /// <param name="choices"> Список доступных вариантов. </param>
-        /// <param name="isChoosing"> Флаг, указывающий, выбирает ли игрок. </param>
-        private async void RenderChoices(IEnumerable<DialogueNode> choices, bool isChoosing)
+        private async void RenderChoices(IEnumerable<DialogueNode> choices)
         {
-            ClearChoices();
-
-            if (!isChoosing || choices == null) return;
-
-            var buttons = new List<DialogueChoiceButton>();
-
+            int index = 0;
             foreach (var choice in choices)
             {
-                var choiceButton = Instantiate(_choiceButtonPrefab, _choiceContainer);
-                choiceButton.SetText(choice.Text);
-                choiceButton.Interactable = false;
-                choiceButton.OnClick += async () =>
+                DialogueChoiceButton button;
+                if (index < _choiceButtons.Count)
                 {
-                    await DialogueViewAnimator.AnimateChoiceSelection(choiceButton, buttons);
+                    button = _choiceButtons[index];
+                }
+                else
+                {
+                    button = Instantiate(_choiceButtonPrefab, _choiceContainer);
+                    _choiceButtons.Add(button);
+                }
+
+                ResetChoiceButtonState(button);
+                button.SetText(choice.Text);
+                button.OnClick = async () =>
+                {
+                    await DialogueViewAnimator.AnimateChoiceSelection(button, _choiceButtons);
                     OnChoiceSelected?.Invoke(choice);
                 };
-                buttons.Add(choiceButton);
+
+                index++;
             }
+
+            // Деактивировать лишние кнопки, если их больше, чем текущих вариантов
+            for (int i = index; i < _choiceButtons.Count; i++) _choiceButtons[i].gameObject.SetActive(false);
 
             await _animator.AnimateChoicesContainer();
 
-            foreach (var button in buttons) button.Interactable = true;
+            // Включаем интерактивность после анимации
+            for (int i = 0; i < index; i++) _choiceButtons[i].Interactable = true;
         }
 
-        /// <summary> Очищает все текущие варианты ответа из UI. </summary>
-        private void ClearChoices()
+        /// <summary> Сбрасывает состояние кнопки выбора перед повторным использованием. </summary>
+        /// <param name="button"> Кнопка выбора. </param>
+        private static void ResetChoiceButtonState(DialogueChoiceButton button)
         {
-            // TODO: REFACTOR ЧЕРЕЗ ФАБРИКУ
-            foreach (Transform child in _choiceContainer) Destroy(child.gameObject);
+            var canvasGroup = button.GetComponent<CanvasGroup>();
+            if (canvasGroup) canvasGroup.alpha = 1f;
+
+            button.Interactable = false;
+            button.gameObject.SetActive(true);
         }
     }
 }
