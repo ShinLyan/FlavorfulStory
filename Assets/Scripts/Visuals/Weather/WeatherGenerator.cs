@@ -65,7 +65,7 @@ namespace FlavorfulStory.Visuals.Weather
         {
             if (!_particleParent) return;
 
-            _particleParent.SetActive(location.IsRoom == false);
+            _particleParent.SetActive(!location.IsRoom);
         }
 
 

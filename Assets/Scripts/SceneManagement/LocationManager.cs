@@ -53,7 +53,7 @@ namespace FlavorfulStory.SceneManagement
                 else
                     location.Disable();
 
-            locationToEnable.Enable();
+            EnableLocation(locationToEnable.LocationName);
         }
 
         /// <summary> Включить локацию по имени. </summary>
