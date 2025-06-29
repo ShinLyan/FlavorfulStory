@@ -25,14 +25,15 @@ namespace FlavorfulStory.CraftingSystem
     }
 
     [Serializable]
-    public class RecipeIngredient
+    //TODO: Почему это + RecipeOutput. Зачем разные имена.
+    public struct RecipeIngredient
     {
         public InventoryItem item;
         public int amount;
     }
 
     [Serializable]
-    public class RecipeOutput
+    public struct RecipeOutput
     {
         public InventoryItem item;
         public int amount;

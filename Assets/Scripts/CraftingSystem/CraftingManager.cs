@@ -6,12 +6,12 @@ namespace FlavorfulStory.CraftingSystem
     public static class CraftingManager
     {
         private static Dictionary<string, CraftRecipe> _recipes;
-
+        
         [RuntimeInitializeOnLoadMethod]
         private static void Init()
         {
             _recipes = new();
-            foreach (var recipe in Resources.LoadAll<CraftRecipe>("CraftingRecipes"))
+            foreach (var recipe in Resources.LoadAll<CraftRecipe>(string.Empty))
             {
                 if (recipe == null || _recipes.ContainsKey(recipe.name))
                     continue;
