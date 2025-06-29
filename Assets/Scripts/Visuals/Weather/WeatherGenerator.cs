@@ -75,7 +75,7 @@ namespace FlavorfulStory.Visuals.Weather
         private void GenerateDailyWeather(DateTime gameTime)
         {
             GenerateWeatherForDay(gameTime);
-            _currentWeather = _dailyWeather[(int)gameTime.TotalDays];
+            _currentWeather = _dailyWeather[gameTime.TotalDays];
             _globalLightSystem.SetNewLightSettings(_currentWeather.WeatherType);
 
             foreach (var weather in _weatherSettings)
@@ -90,14 +90,14 @@ namespace FlavorfulStory.Visuals.Weather
         /// <param name="date"> Дата для генерации погоды. </param>
         private void GenerateWeatherForDay(DateTime date)
         {
-            int newDate = (int)date.TotalDays;
-            _dailyWeather.TryAdd(newDate, GenerateRandomWeather());
+            int newDate = date.TotalDays;
+            _dailyWeather.TryAdd(newDate, GenerateWeatherIfDayEven());
         }
 
         /// <summary> Генерирует случайную погоду на основе вероятностей в настройках.
         /// Использует взвешенную случайную выборку для создания разнообразных погодных условий. </summary>
         /// <returns> Случайно выбранные настройки погоды согласно заданным вероятностям. </returns>
-        private WeatherSettings GenerateRandomWeather()
+        private WeatherSettings GenerateRandomWeather() //TODO: будет какая-то особенная вероятностная формула.
         {
             float randomValue = Random.value;
             float cumulativeProbability = 0f;
@@ -108,6 +108,12 @@ namespace FlavorfulStory.Visuals.Weather
                 if (randomValue <= cumulativeProbability) return weatherSetting;
             }
 
+            return _weatherSettings[0];
+        }
+
+        private WeatherSettings GenerateWeatherIfDayEven()
+        {
+            if (WorldTime.CurrentGameTime.TotalDays % 2 != 0) return _weatherSettings[1];
             return _weatherSettings[0];
         }
 

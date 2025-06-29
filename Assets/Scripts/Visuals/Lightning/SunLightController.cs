@@ -22,7 +22,7 @@ namespace FlavorfulStory.Visuals.Lightning
         private const float OffShadowsHour = 17.5f;
 
         /// <summary> Минимальное смещение теней для предотвращения артефактов рендеринга. </summary>
-        private const float MinimalShadowBias = 0.01f;
+        private const float MinimalShadowBias = 0.5f;
 
         /// <summary> Текущий час для внутренних расчетов контроллера. </summary>
         private float _currentHour;
@@ -66,7 +66,10 @@ namespace FlavorfulStory.Visuals.Lightning
                         float shadowProgress = Mathf.InverseLerp(OffShadowsHour, EndTime, _currentHour);
                         light.shadowStrength = Mathf.Lerp(settings.SunShadowStrength, 0f, shadowProgress);
                     }
-                    else { light.shadowStrength = settings.SunShadowStrength; }
+                    else
+                    {
+                        light.shadowStrength = settings.SunShadowStrength;
+                    }
                 },
                 RotationStrategy = progress =>
                 {
