@@ -57,15 +57,9 @@ namespace FlavorfulStory.SceneManagement
         public void EnableLocation(LocationName name)
         {
             if (_locationByName.TryGetValue(name, out var location))
-            {
                 location.Enable();
-                Debug.Log(location.LocationName);
-            }
-
             else
-            {
                 Debug.LogError($"Локации {name} не существует!");
-            }
         }
 
         /// <summary> Отключить локацию по имени. </summary>

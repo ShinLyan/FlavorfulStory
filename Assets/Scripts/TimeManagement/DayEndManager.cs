@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using FlavorfulStory.Player;
@@ -7,6 +6,7 @@ using FlavorfulStory.SceneManagement;
 using FlavorfulStory.Stats;
 using FlavorfulStory.UI;
 using FlavorfulStory.UI.Animation;
+using Unity.Cinemachine;
 using UnityEngine;
 using Zenject;
 
@@ -38,9 +38,11 @@ namespace FlavorfulStory.TimeManagement
         private bool _isProcessingSleep;
 
         /// <summary> Затемнение экрана при переходах между сценами. </summary>
-        private readonly CanvasGroupFader _canvasGroupFader;
+        private readonly CanvasGroupFader _fader;
 
-        private readonly CancellationTokenSource _cts;
+        private readonly CanvasGroupFader _hudFader;
+
+        private readonly CinemachineCamera _virtualCamera;
 
         /// <summary> Конструктор DayEndManager. </summary>
         /// <param name="summaryView"> Компонент отображения сводки дня. </param>
@@ -49,31 +51,29 @@ namespace FlavorfulStory.TimeManagement
         /// <param name="locationManager"> Менеджер локаций. </param>
         public DayEndManager(SummaryView summaryView,
             PlayerController playerController,
-            SleepTrigger sleepTriggerTransform,
+            SleepTrigger sleepTrigger,
             LocationManager locationManager,
-            CanvasGroupFader canvasGroupFader)
+            CanvasGroupFader fader,
+            [Inject(Id = "HUD")] CanvasGroupFader hudFader,
+            CinemachineCamera virtualCamera)
         {
             _summaryView = summaryView;
             _playerController = playerController;
-            _sleepTriggerTransform = sleepTriggerTransform.transform;
+            _sleepTriggerTransform = sleepTrigger.transform;
             _locationManager = locationManager;
-            _canvasGroupFader = canvasGroupFader;
+            _fader = fader;
+            _hudFader = hudFader;
+            _virtualCamera = virtualCamera;
             _isProcessingSleep = false;
 
             WorldTime.OnDayEnded += OnDayEnded;
-            _cts = new CancellationTokenSource();
         }
 
         /// <summary> Инициализация компонента (реализация IInitializable). </summary>
         public void Initialize() { }
 
         /// <summary> Освобождение ресурсов и отписка от событий (реализация IDisposable). </summary>
-        public void Dispose()
-        {
-            WorldTime.OnDayEnded -= OnDayEnded;
-            _cts?.Cancel();
-            _cts?.Dispose();
-        }
+        public void Dispose() { WorldTime.OnDayEnded -= OnDayEnded; }
 
         /// <summary> Обработчик события окончания дня из системы времени. </summary>
         /// <param name="date"> Дата окончившегося дня. </param>
@@ -82,14 +82,14 @@ namespace FlavorfulStory.TimeManagement
         /// <summary> Запрос на завершение дня по инициативе игрока (взаимодействие с кроватью). </summary>
         /// <param name="triggerTransform"> Transform объекта-триггера (кровати). </param>
         /// <param name="onCompleteCallback"> Колбэк, вызываемый после завершения процесса. </param>
-        public void RequestEndDay(Transform triggerTransform, Action onCompleteCallback)
+        public async UniTaskVoid RequestEndDay(Transform triggerTransform, Action onCompleteCallback)
         {
             if (_isProcessingSleep) return;
             _isProcessingSleep = true;
 
             _onCompleteCallback = onCompleteCallback;
-            EndDayRoutine().Forget();
-            ResetPlayer(triggerTransform).Forget();
+            await EndDayRoutine();
+            await ResetPlayer(triggerTransform);
         }
 
         /// <summary> Принудительный сон при истощении игрока (автоматическое завершение дня). </summary>
@@ -98,10 +98,10 @@ namespace FlavorfulStory.TimeManagement
             if (_isProcessingSleep) return;
             _isProcessingSleep = true;
 
-            await UniTask.WhenAll(
-                EndDayRoutine(),
-                ResetPlayer(_sleepTriggerTransform, true)
-            );
+            _hudFader.Hide();
+            await EndDayRoutine();
+            await ResetPlayer(_sleepTriggerTransform, true);
+            _hudFader.Show();
         }
 
         /// <summary> Основная корутина завершения дня.
@@ -110,28 +110,25 @@ namespace FlavorfulStory.TimeManagement
         {
             WorldTime.Pause();
 
-            // TODO: худ игры скрывается
-            // _hud.SetActive(false); //TODO: переделать на норм версию
-            await _canvasGroupFader.Hide().AsyncWaitForCompletion().AsUniTask().AttachExternalCancellation(_cts.Token);
-
+            await _fader.Show().AsyncWaitForCompletion();
+            await ResetCamera();
             _summaryView.Show();
+
             bool continuePressed = false;
             _summaryView.OnContinuePressed = () => continuePressed = true;
             _summaryView.SetSummary(SummaryView.DefaultSummaryText);
 
-            await _canvasGroupFader.Show().AsyncWaitForCompletion().AsUniTask().AttachExternalCancellation(_cts.Token);
-            await UniTask.WaitUntil(() => continuePressed, cancellationToken: _cts.Token);
+            await _fader.Hide().AsyncWaitForCompletion();
 
-            _onCompleteCallback?.Invoke();
+            await UniTask.WaitUntil(() => continuePressed);
 
+            await _fader.Show().AsyncWaitForCompletion();
             _summaryView.Hide();
-            WorldTime.Unpause();
-
-            await _canvasGroupFader.Hide().AsyncWaitForCompletion().AsUniTask().AttachExternalCancellation(_cts.Token);
-            await _canvasGroupFader.Show().AsyncWaitForCompletion().AsUniTask().AttachExternalCancellation(_cts.Token);
+            await ResetCamera();
 
             _isProcessingSleep = false;
-            // _hud.SetActive(true); //TODO: переделать на норм версию
+            WorldTime.Unpause();
+            _onCompleteCallback?.Invoke();
         }
 
         /// <summary> Сброс состояния игрока: восстановление здоровья, выносливости и позиции. </summary>
@@ -139,8 +136,6 @@ namespace FlavorfulStory.TimeManagement
         /// <param name="exhausted"> Флаг истощения (влияет на восстановление выносливости). </param>
         private async UniTask ResetPlayer(Transform triggerTransform, bool exhausted = false)
         {
-            await _canvasGroupFader.Hide().AsyncWaitForCompletion().AsUniTask().AttachExternalCancellation(_cts.Token);
-
             var playerStats = _playerController.GetComponent<PlayerStats>();
 
             var health = playerStats.GetStat<Health>();
@@ -150,9 +145,21 @@ namespace FlavorfulStory.TimeManagement
             stamina.SetValue(exhausted ? stamina.MaxValue * StaminaMultiplier : stamina.MaxValue);
 
             _playerController.UpdatePosition(triggerTransform);
-            await UniTask.Yield(_cts.Token);
+            await UniTask.Yield();
             _locationManager.ActivatePlayerCurrentLocation();
             _locationManager.EnableLocation(LocationName.RockyIsland);
+
+            await _fader.Hide().AsyncWaitForCompletion();
+        }
+
+        private async UniTask ResetCamera() //TODO: remake, dont work
+        {
+            if (_virtualCamera != null)
+            {
+                _virtualCamera.enabled = false;
+                await UniTask.Yield();
+                _virtualCamera.enabled = true;
+            }
         }
     }
 }

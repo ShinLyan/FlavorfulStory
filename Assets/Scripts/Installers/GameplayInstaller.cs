@@ -65,7 +65,6 @@ namespace FlavorfulStory.Installers
 
             Container.Bind<DialogueModelPresenter>().FromComponentInHierarchy().AsSingle();
 
-            Container.Bind<DayEndManager>().AsSingle();
             Container.Bind<SleepTrigger>().FromComponentInHierarchy().AsSingle();
         }
 
@@ -97,6 +96,8 @@ namespace FlavorfulStory.Installers
             Container.BindInterfacesAndSelfTo<LocationManager>().AsSingle();
 
             Container.Bind<CinemachineCamera>().FromInstance(_teleportVirtualCamera).AsSingle();
+
+            Container.Bind<DayEndManager>().AsSingle();
         }
     }
 }

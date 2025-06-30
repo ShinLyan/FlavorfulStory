@@ -2,6 +2,7 @@ using FlavorfulStory.Actions;
 using FlavorfulStory.InteractionSystem;
 using FlavorfulStory.Player;
 using FlavorfulStory.UI;
+using FlavorfulStory.UI.Animation;
 using UnityEngine;
 using Zenject;
 
@@ -27,23 +28,31 @@ namespace FlavorfulStory.TimeManagement
         /// <summary> Заголовок окна подтверждения сна. </summary>
         private const string DefaultSummaryText = "BEST SUMMARY EVER"; // TODO: заменить на генератор/локализацию
 
+        private CanvasGroupFader _hudFader;
+
         /// <summary> Внедряет зависимости через Zenject. </summary>
         /// <param name="confirmationWindowView"> Окно подтверждения. </param>
         /// <param name="playerController"> Контроллер игрока. </param>\
         [Inject]
         private void Construct(ConfirmationWindowView confirmationWindowView,
-            PlayerController playerController, DayEndManager dayEndManager)
+            PlayerController playerController, DayEndManager dayEndManager,
+            [Inject(Id = "HUD")] CanvasGroupFader hudFader)
         {
             _confirmationWindowView = confirmationWindowView;
             _playerController = playerController;
             _dayEndManager = dayEndManager;
+            _hudFader = hudFader;
         }
 
         /// <summary> Показывает View подтверждения перед сном. </summary>
         private void ShowConfirmationView()
         {
             _confirmationWindowView.Setup(SleepConfirmationTitle, SleepConfirmationDescription,
-                OnSleepConfirmed, () => EndInteraction(_playerController));
+                OnSleepConfirmed, () =>
+                {
+                    EndInteraction(_playerController);
+                    _confirmationWindowView.Hide();
+                });
             _confirmationWindowView.Show();
             _playerController.SetBusyState(true);
         }
@@ -51,7 +60,8 @@ namespace FlavorfulStory.TimeManagement
         /// <summary> Обрабатывает подтверждение сна. </summary>
         private void OnSleepConfirmed()
         {
-            _dayEndManager.RequestEndDay(transform, () => EndInteraction(_playerController));
+            _dayEndManager.RequestEndDay(transform, () => EndInteraction(_playerController)).Forget();
+            _confirmationWindowView.Hide();
             WorldTime.ForceEndDay(6);
         }
 
@@ -73,14 +83,18 @@ namespace FlavorfulStory.TimeManagement
 
         /// <summary> Начинает взаимодействие с кроватью. </summary>
         /// <param name="player"> Контроллер игрока. </param>
-        public void BeginInteraction(PlayerController player) => ShowConfirmationView();
+        public void BeginInteraction(PlayerController player)
+        {
+            ShowConfirmationView();
+            _hudFader.Hide();
+        }
 
         /// <summary> Завершает взаимодействие с кроватью. </summary>
         /// <param name="player"> Контроллер игрока. </param>
         public void EndInteraction(PlayerController player)
         {
             player.SetBusyState(false);
-            _confirmationWindowView.Hide();
+            _hudFader.Show();
         }
 
         #endregion

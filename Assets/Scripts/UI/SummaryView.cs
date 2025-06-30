@@ -37,7 +37,6 @@ namespace FlavorfulStory.UI
         {
             _content.SetActive(true);
             _camera.SetActive(true);
-
             InputWrapper.BlockAllInput();
         }
 
