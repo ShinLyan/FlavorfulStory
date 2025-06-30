@@ -18,8 +18,10 @@ namespace FlavorfulStory.UI
         /// <summary> Кнопка для продолжения после просмотра сводки. </summary>
         [SerializeField] private Button _continueButton;
 
+        /// <summary> Камера, используемая для отображения сводки (активируется при показе UI). </summary>
         [SerializeField] private GameObject _camera;
 
+        /// <summary> Текст сводки по умолчанию, отображается при отсутствии специального контента. </summary>
         public static readonly string DefaultSummaryText = "BEST SUMMARY EVER";
 
         /// <summary> Событие, вызываемое при нажатии кнопки продолжения. </summary>

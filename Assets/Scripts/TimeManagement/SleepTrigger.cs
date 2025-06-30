@@ -17,6 +17,7 @@ namespace FlavorfulStory.TimeManagement
         /// <summary> Контроллер игрока. </summary>
         private PlayerController _playerController;
 
+        /// <summary> Менеджер завершения дня, управляющий процессом сна и переходом между днями. </summary>
         private DayEndManager _dayEndManager;
 
         /// <summary> Заголовок окна подтверждения сна. </summary>
@@ -28,11 +29,14 @@ namespace FlavorfulStory.TimeManagement
         /// <summary> Заголовок окна подтверждения сна. </summary>
         private const string DefaultSummaryText = "BEST SUMMARY EVER"; // TODO: заменить на генератор/локализацию
 
+        /// <summary> Компонент затемнения HUD интерфейса во время взаимодействия с кроватью. </summary>
         private CanvasGroupFader _hudFader;
 
         /// <summary> Внедряет зависимости через Zenject. </summary>
         /// <param name="confirmationWindowView"> Окно подтверждения. </param>
-        /// <param name="playerController"> Контроллер игрока. </param>\
+        /// <param name="playerController"> Контроллер игрока. </param>
+        /// <param name="dayEndManager"> Менеджер завершения дня. </param>
+        /// <param name="hudFader"> Компонент затемнения HUD интерфейса. </param>
         [Inject]
         private void Construct(ConfirmationWindowView confirmationWindowView,
             PlayerController playerController, DayEndManager dayEndManager,

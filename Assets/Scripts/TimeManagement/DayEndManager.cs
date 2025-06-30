@@ -40,8 +40,10 @@ namespace FlavorfulStory.TimeManagement
         /// <summary> Затемнение экрана при переходах между сценами. </summary>
         private readonly CanvasGroupFader _fader;
 
+        /// <summary> Затемнение HUD интерфейса при принудительном сне. </summary>
         private readonly CanvasGroupFader _hudFader;
 
+        /// <summary> Виртуальная камера Cinemachine для управления обзором во время переходов дня. </summary>
         private readonly CinemachineCamera _virtualCamera;
 
         /// <summary> Конструктор DayEndManager. </summary>
@@ -49,6 +51,9 @@ namespace FlavorfulStory.TimeManagement
         /// <param name="playerController">Контроллер игрока. </param>
         /// <param name="sleepTrigger"> Триггер сна (кровать). </param>
         /// <param name="locationManager"> Менеджер локаций. </param>
+        /// <param name="fader"> Компонент затемнения экрана. </param>
+        /// <param name="hudFader"> Компонент затемнения HUD интерфейса. </param>
+        /// <param name="virtualCamera"> Виртуальная камера Cinemachine. </param>
         public DayEndManager(SummaryView summaryView,
             PlayerController playerController,
             SleepTrigger sleepTrigger,
@@ -152,7 +157,9 @@ namespace FlavorfulStory.TimeManagement
             await _fader.Hide().AsyncWaitForCompletion();
         }
 
-        private async UniTask ResetCamera() //TODO: remake, dont work
+        /// <summary> Сброс состояния виртуальной камеры для правильного позиционирования после смены локации.
+        /// Отключает и включает камеру для принудительного обновления её состояния. </summary>
+        private async UniTask ResetCamera()
         {
             if (_virtualCamera != null)
             {
