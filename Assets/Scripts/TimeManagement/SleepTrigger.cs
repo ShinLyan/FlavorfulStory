@@ -1,5 +1,3 @@
-﻿using System.Collections;
-using DG.Tweening;
 using FlavorfulStory.Actions;
 using FlavorfulStory.InteractionSystem;
 using FlavorfulStory.Player;
@@ -16,14 +14,11 @@ namespace FlavorfulStory.TimeManagement
         /// <summary> Окно подтверждения действия. </summary>
         private ConfirmationWindowView _confirmationWindowView;
 
-        /// <summary> Сводка дня. </summary>
-        private SummaryView _summaryView;
-
         /// <summary> Контроллер игрока. </summary>
         private PlayerController _playerController;
 
-        /// <summary> Затемнение экрана при переходах между сценами. </summary>
-        private CanvasGroupFader _canvasGroupFader;
+        /// <summary> Менеджер завершения дня, управляющий процессом сна и переходом между днями. </summary>
+        private DayEndManager _dayEndManager;
 
         /// <summary> Заголовок окна подтверждения сна. </summary>
         private const string SleepConfirmationTitle = "Bed"; // TODO: заменить на генератор/локализацию
@@ -34,64 +29,52 @@ namespace FlavorfulStory.TimeManagement
         /// <summary> Заголовок окна подтверждения сна. </summary>
         private const string DefaultSummaryText = "BEST SUMMARY EVER"; // TODO: заменить на генератор/локализацию
 
+        /// <summary> Компонент затемнения HUD интерфейса во время взаимодействия с кроватью. </summary>
+        private CanvasGroupFader _hudFader;
+
         /// <summary> Внедряет зависимости через Zenject. </summary>
         /// <param name="confirmationWindowView"> Окно подтверждения. </param>
-        /// <param name="summaryView"> Окно сводки. </param>
         /// <param name="playerController"> Контроллер игрока. </param>
-        /// <param name="canvasGroupFader"> Компонент затемнения. </param>
+        /// <param name="dayEndManager"> Менеджер завершения дня. </param>
+        /// <param name="hudFader"> Компонент затемнения HUD интерфейса. </param>
         [Inject]
-        private void Construct(ConfirmationWindowView confirmationWindowView, SummaryView summaryView,
-            PlayerController playerController, CanvasGroupFader canvasGroupFader)
+        private void Construct(ConfirmationWindowView confirmationWindowView,
+            PlayerController playerController, DayEndManager dayEndManager,
+            [Inject(Id = "HUD")] CanvasGroupFader hudFader)
         {
             _confirmationWindowView = confirmationWindowView;
-            _summaryView = summaryView;
             _playerController = playerController;
-            _canvasGroupFader = canvasGroupFader;
+            _dayEndManager = dayEndManager;
+            _hudFader = hudFader;
         }
 
         /// <summary> Показывает View подтверждения перед сном. </summary>
         private void ShowConfirmationView()
         {
             _confirmationWindowView.Setup(SleepConfirmationTitle, SleepConfirmationDescription,
-                OnSleepConfirmed, () => EndInteraction(_playerController));
+                OnSleepConfirmed, () =>
+                {
+                    EndInteraction(_playerController);
+                    _confirmationWindowView.Hide();
+                });
             _confirmationWindowView.Show();
+            _playerController.SetBusyState(true);
         }
 
         /// <summary> Обрабатывает подтверждение сна. </summary>
         private void OnSleepConfirmed()
         {
-            StartCoroutine(SleepRoutine());
+            _dayEndManager.RequestEndDay(transform, () => EndInteraction(_playerController)).Forget();
             _confirmationWindowView.Hide();
+            WorldTime.ForceEndDay(6);
         }
 
-        /// <summary> Обрабатка процесса сна и завершения дня. </summary>
-        /// <returns> Корутина, обрабатывающая процесс сна и завершения дня.</returns>
-        private IEnumerator SleepRoutine()
-        {
-            yield return _canvasGroupFader.Show().WaitForCompletion();
-
-            WorldTime.ForceEndDay();
-            WorldTime.Pause();
-
-            _summaryView.Show();
-
-            bool continuePressed = false;
-            _summaryView.OnContinuePressed = () => continuePressed = true;
-            _summaryView.SetSummary(DefaultSummaryText);
-            yield return new WaitUntil(() => continuePressed);
-
-            _summaryView.Hide();
-            WorldTime.Unpause();
-
-            yield return _canvasGroupFader.Hide().WaitForCompletion();
-
-            EndInteraction(_playerController);
-        }
 
         #region IInteractable
 
         /// <summary> Действие игрока по отношению к объекту. </summary>
-        [field: SerializeField] public ActionDescription ActionDescription { get; private set; }
+        [field: SerializeField]
+        public ActionDescription ActionDescription { get; private set; }
 
         /// <summary> Возвращает возможность взаимодействия с объектом. </summary>
         public bool IsInteractionAllowed => true;
@@ -104,14 +87,18 @@ namespace FlavorfulStory.TimeManagement
 
         /// <summary> Начинает взаимодействие с кроватью. </summary>
         /// <param name="player"> Контроллер игрока. </param>
-        public void BeginInteraction(PlayerController player) => ShowConfirmationView();
+        public void BeginInteraction(PlayerController player)
+        {
+            ShowConfirmationView();
+            _hudFader.Hide();
+        }
 
         /// <summary> Завершает взаимодействие с кроватью. </summary>
         /// <param name="player"> Контроллер игрока. </param>
         public void EndInteraction(PlayerController player)
         {
             player.SetBusyState(false);
-            _confirmationWindowView.Hide();
+            _hudFader.Show();
         }
 
         #endregion
