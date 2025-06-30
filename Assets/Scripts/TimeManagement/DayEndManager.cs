@@ -111,6 +111,7 @@ namespace FlavorfulStory.TimeManagement
             WorldTime.Pause();
 
             await _fader.Show().AsyncWaitForCompletion();
+            _locationManager.EnableLocation(LocationName.RockyIsland); //TODO: включить свет на сцене
             await ResetCamera();
             _summaryView.Show();
 
@@ -147,7 +148,6 @@ namespace FlavorfulStory.TimeManagement
             _playerController.UpdatePosition(triggerTransform);
             await UniTask.Yield();
             _locationManager.ActivatePlayerCurrentLocation();
-            _locationManager.EnableLocation(LocationName.RockyIsland);
 
             await _fader.Hide().AsyncWaitForCompletion();
         }
