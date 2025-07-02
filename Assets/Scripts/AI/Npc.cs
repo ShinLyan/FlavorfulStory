@@ -50,7 +50,6 @@ namespace FlavorfulStory.AI
                 WarpGraph.Build(
                     FindObjectsByType<WarpPortal>(FindObjectsInactive.Include, FindObjectsSortMode.None)),
                 transform,
-                this,
                 _animationController,
                 _npcScheduleHandler
             );

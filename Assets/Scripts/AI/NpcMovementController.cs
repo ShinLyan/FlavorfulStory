@@ -30,13 +30,11 @@ namespace FlavorfulStory.AI
         /// <param name="navMeshAgent"> NavMeshAgent для навигации. </param>
         /// <param name="warpGraph"> Граф варп-точек для навигации. </param>
         /// <param name="transform"> Transform NPC. </param>
-        /// <param name="coroutineRunner"> MonoBehaviour для запуска корутин. </param>
         /// <param name="animationController"> Контроллер анимации NPC. </param>
         /// <param name="scheduleHandler"> Обработчик расписания NPC. </param>
         public NpcMovementController(NavMeshAgent navMeshAgent,
             WarpGraph warpGraph,
             Transform transform,
-            MonoBehaviour coroutineRunner,
             NpcAnimationController animationController,
             NpcScheduleHandler scheduleHandler)
         {
@@ -44,7 +42,7 @@ namespace FlavorfulStory.AI
             _animationController = animationController;
             _scheduleHandler = scheduleHandler;
 
-            _navigator = new NpcNavigator(_agent, warpGraph, transform, coroutineRunner);
+            _navigator = new NpcNavigator(_agent, warpGraph, transform);
             _navigator.OnDestinationReached += () => OnDestinationReached?.Invoke();
 
             _scheduleHandler.OnSchedulePointChanged += _navigator.OnSchedulePointChanged;
