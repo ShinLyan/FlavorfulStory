@@ -23,11 +23,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine
             _currentPoint = null;
         }
 
-        /// <summary> Выходит из состояния рутины и выполняет очистку ресурсов. </summary>
-        public override void Exit() => Reset();
-
-        /// <summary> Обновляет логику состояния рутины каждый кадр и воспроизводит соответствующую анимацию. </summary>
-        public override void Update() => PlayAnimation();
+        public override void Enter() => PlayAnimation();
 
         /// <summary> Сбрасывает состояние рутины к начальному состоянию. </summary>
         public override void Reset() => _animationController.Reset();
@@ -37,15 +33,11 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         {
             if (_currentPoint == null) return;
 
-            _animationController.PlayStateAnimation(_currentPoint.NpcAnimation);
+            _animationController.TriggerAnimation(_currentPoint.NpcAnimation);
         }
 
         /// <summary> Устанавливает новую текущую точку расписания и переключает состояние на движение. </summary>
         /// <param name="newCurrentPont"> Новая текущая точка расписания. </param>
-        public void SetNewCurrentPont(SchedulePoint newCurrentPont)
-        {
-            _currentPoint = newCurrentPont;
-            RequestStateChange(typeof(MovementState));
-        }
+        public void SetNewCurrentPoint(SchedulePoint newCurrentPont) => _currentPoint = newCurrentPont;
     }
 }
