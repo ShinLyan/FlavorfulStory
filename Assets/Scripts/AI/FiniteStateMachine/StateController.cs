@@ -79,7 +79,12 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         private void OnSchedulePointChanged(SchedulePoint newPoint)
         {
             if (_currentState is WaitingState) return;
-            SetState(typeof(MovementState));
+
+            if (_currentState is MovementState)
+                _currentState.Enter();
+            else
+                SetState(typeof(MovementState));
+
             _animationController.TriggerAnimation(AnimationType.Locomotion);
         }
 
