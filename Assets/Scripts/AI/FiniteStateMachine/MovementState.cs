@@ -8,6 +8,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         /// <summary> Контроллер движения NPC для управления навигацией. </summary>
         private readonly NpcMovementController _movementController;
 
+        /// <summary> Флаг, указывающий, находится ли персонаж в данный момент в состоянии движения. </summary>
         private bool _isInState;
 
         /// <summary> Инициализирует новое состояние движения с заданным контроллером движения. </summary>
@@ -38,11 +39,13 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         /// <summary> Сбрасывает состояние движения, мгновенно останавливая NPC. </summary>
         public override void Reset() => _movementController.Stop(true);
 
+        /// <summary> Останавливает движение NPC при паузе игрового времени, если персонаж находится в состоянии движения. </summary>
         private void StopMovementOnPause()
         {
             if (_isInState) _movementController.Stop();
         }
 
+        /// <summary> Возобновляет движение NPC при снятии паузы игрового времени, если персонаж находится в состоянии движения. </summary>
         private void ContinueMovementOnUnpause()
         {
             if (_isInState) _movementController.MoveToCurrentPoint();

@@ -25,6 +25,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         /// <summary> Событие, вызываемое при изменении текущих параметров расписания. </summary>
         private event Action<ScheduleParams> OnCurrentScheduleParamsChanged;
 
+        /// <summary> Контроллер анимации NPC для управления анимационными состояниями. </summary>
         private readonly NpcAnimationController _animationController;
 
         /// <summary> Инициализирует новый экземпляр контроллера состояний. </summary>
@@ -32,6 +33,8 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         /// <param name="npcMovementController"> Контроллер движения NPC. </param>
         /// <param name="npcAnimationController"> Контроллер анимации NPC. </param>
         /// <param name="scheduleHandler"> Обработчик расписания NPC. </param>
+        /// <param name="playerController"> Контроллер игрока для взаимодействия. </param>
+        /// <param name="npcTransform"> Transform NPC для определения позиции. </param>
         public StateController(NpcSchedule npcSchedule, NpcMovementController npcMovementController,
             NpcAnimationController npcAnimationController, NpcScheduleHandler scheduleHandler,
             PlayerController playerController, Transform npcTransform)
@@ -52,6 +55,8 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         /// <param name="movementController"> Контроллер движения для состояния движения. </param>
         /// <param name="scheduleHandler"> Обработчик расписания для связи с состояниями. </param>
         /// <param name="animationController"> Контроллер анимации для состояний. </param>
+        /// <param name="playerController"> Контроллер игрока для состояния ожидания. </param>
+        /// <param name="npcTransform"> Transform NPC для передачи в состояния. </param>
         private void InitializeStates(NpcMovementController movementController,
             NpcScheduleHandler scheduleHandler,
             NpcAnimationController animationController,
@@ -76,6 +81,8 @@ namespace FlavorfulStory.AI.FiniteStateMachine
             scheduleHandler.OnSchedulePointChanged += OnSchedulePointChanged;
         }
 
+        /// <summary> Обрабатывает изменение точки расписания и переключает состояние на движение если необходимо. </summary>
+        /// <param name="newPoint"> Новая точка расписания. </param>
         private void OnSchedulePointChanged(SchedulePoint newPoint)
         {
             if (_currentState is WaitingState) return;
@@ -130,15 +137,19 @@ namespace FlavorfulStory.AI.FiniteStateMachine
             _currentState?.Enter();
         }
 
+        /// <summary> Вызывается при входе игрока в триггер NPC. Переводит NPC в состояние ожидания. </summary>
+        /// <param name="other"> Коллайдер, вошедший в триггер. </param>
         public void OnTriggerEntered(Collider other)
         {
             SetState(typeof(WaitingState));
             _animationController.TriggerAnimation(AnimationType.Idle);
         }
 
+        /// <summary> Вызывается при выходе игрока из триггера NPC. Переводит NPC в состояние движения. </summary>
+        /// <param name="other"> Коллайдер, вышедший из триггера. </param>
         public void OnTriggerExited(Collider other)
         {
-            SetState(typeof(MovementState)); //TODO: Если нпс стоит афк без точки, то он не пойдет если взаимодействовал с ним до появления точки
+            SetState(typeof(MovementState));
             _animationController.TriggerAnimation(AnimationType.Locomotion);
         }
     }
