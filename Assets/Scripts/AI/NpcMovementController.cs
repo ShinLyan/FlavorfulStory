@@ -2,7 +2,6 @@
 using FlavorfulStory.AI.FiniteStateMachine;
 using FlavorfulStory.AI.Scheduling;
 using FlavorfulStory.AI.WarpGraphSystem;
-using FlavorfulStory.TimeManagement;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -49,9 +48,6 @@ namespace FlavorfulStory.AI
             _navigator.OnDestinationReached += () => OnDestinationReached?.Invoke();
 
             _scheduleHandler.OnSchedulePointChanged += _navigator.OnSchedulePointChanged;
-
-            WorldTime.OnTimePaused += () => Stop();
-            WorldTime.OnTimeUnpaused += MoveToCurrentPoint;
         }
 
         /// <summary> Обновляет движение NPC каждый кадр.

@@ -1,3 +1,5 @@
+using FlavorfulStory.TimeManagement;
+
 namespace FlavorfulStory.AI.FiniteStateMachine
 {
     /// <summary> Состояние движения персонажа, отвечающее за перемещение NPC к назначенным точкам. </summary>
@@ -6,21 +8,44 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         /// <summary> Контроллер движения NPC для управления навигацией. </summary>
         private readonly NpcMovementController _movementController;
 
+        private bool _isInState;
+
         /// <summary> Инициализирует новое состояние движения с заданным контроллером движения. </summary>
         /// <param name="movementController"> Контроллер движения для управления перемещением NPC. </param>
         public MovementState(NpcMovementController movementController)
         {
             _movementController = movementController;
             _movementController.OnDestinationReached += () => RequestStateChange(typeof(RoutineState));
+
+            WorldTime.OnTimePaused += StopMovementOnPause;
+            WorldTime.OnTimeUnpaused += ContinueMovementOnUnpause;
         }
 
         /// <summary> Входит в состояние движения и начинает перемещение к текущей точке расписания. </summary>
-        public override void Enter() => _movementController.MoveToCurrentPoint();
+        public override void Enter()
+        {
+            _movementController.MoveToCurrentPoint();
+            _isInState = true;
+        }
 
         /// <summary> Выходит из состояния движения и останавливает NPC. </summary>
-        public override void Exit() => _movementController.Stop();
+        public override void Exit()
+        {
+            _movementController.Stop();
+            _isInState = false;
+        }
 
         /// <summary> Сбрасывает состояние движения, мгновенно останавливая NPC. </summary>
         public override void Reset() => _movementController.Stop(true);
+
+        private void StopMovementOnPause()
+        {
+            if (_isInState) _movementController.Stop();
+        }
+
+        private void ContinueMovementOnUnpause()
+        {
+            if (_isInState) _movementController.MoveToCurrentPoint();
+        }
     }
 }
