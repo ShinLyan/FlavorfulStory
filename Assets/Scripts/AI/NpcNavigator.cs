@@ -77,7 +77,8 @@ namespace FlavorfulStory.AI
             if (_currentTargetPoint == null) return;
 
             if (_currentLocation == _currentTargetPoint.LocationName &&
-                Vector3.Distance(_npcTransform.position, _currentTargetPoint.Position) <= _arrivalDistance)
+                Vector3.Distance(_npcTransform.position, _currentTargetPoint.Position) <= _arrivalDistance &&
+                !_isNotMoving)
             {
                 _navMeshAgent.transform.rotation = Quaternion.Euler(_currentTargetPoint.Rotation);
                 OnDestinationReached?.Invoke();

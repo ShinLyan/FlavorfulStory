@@ -1,14 +1,16 @@
 ﻿using FlavorfulStory.AI.FiniteStateMachine;
 using FlavorfulStory.AI.Scheduling;
 using FlavorfulStory.AI.WarpGraphSystem;
+using FlavorfulStory.Player;
 using FlavorfulStory.TimeManagement;
 using UnityEngine;
 using UnityEngine.AI;
+using Zenject;
 
 namespace FlavorfulStory.AI
 {
     /// <summary> Контроллер NPC, управляющий состояниями и поведением персонажа. </summary>
-    [RequireComponent(typeof(NavMeshAgent), typeof(Animator))]
+    [RequireComponent(typeof(NavMeshAgent), typeof(Animator), typeof(NpcCollisionHandler))]
     public class Npc : MonoBehaviour
     {
         /// <summary> Информация о персонаже. </summary>
@@ -25,14 +27,17 @@ namespace FlavorfulStory.AI
         /// <summary> Контроллер движения NPC для управления навигацией и перемещением. </summary>
         private NpcMovementController _movementController;
 
-        /// <summary> Компонент Animator для управления анимациями персонажа. </summary>
-        private Animator _animator;
-
         /// <summary> Обработчик расписания для управления временными точками NPC. </summary>
         private NpcScheduleHandler _npcScheduleHandler;
 
         /// <summary> Контроллер анимации NPC для воспроизведения состояний анимации. </summary>
         private NpcAnimationController _animationController;
+
+        private NpcCollisionHandler _collisionHandler;
+
+        [Inject] private PlayerController _playerController;
+
+        private void Awake() { _collisionHandler = GetComponent<NpcCollisionHandler>(); }
 
         /// <summary> Выполняет инициализацию всех контроллеров и систем NPC при запуске. </summary>
         private void Start()
@@ -54,8 +59,12 @@ namespace FlavorfulStory.AI
                 _npcSchedule,
                 _movementController,
                 _animationController,
-                _npcScheduleHandler
+                _npcScheduleHandler,
+                _playerController,
+                transform
             );
+
+            _collisionHandler.Initialize(_stateController);
 
             WorldTime.OnTimePaused += _animationController.PauseAnimation;
             WorldTime.OnTimeUnpaused += _animationController.ContinueAnimation;

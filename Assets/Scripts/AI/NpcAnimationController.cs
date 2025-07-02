@@ -33,6 +33,19 @@ namespace FlavorfulStory.AI
             _animator.Play(animationStateName.ToString());
         }
 
+        /// <summary> Запустить анимацию. </summary>
+        /// <param name="animationType"> Тип проигрываемой анимации.</param>
+        public void TriggerAnimation(AnimationType animationType)
+        {
+            string animationName = animationType.ToString();
+            _animator.SetTrigger(Animator.StringToHash(animationName));
+        }
+
+        /// <summary> Запустить анимацию. </summary>
+        /// <param name="animationName"> Тип проигрываемой анимации.</param>
+        public void TriggerAnimation(string animationName) =>
+            _animator.SetTrigger(Animator.StringToHash(animationName));
+
         /// <summary> Остановить анимацию. </summary>
         public void PauseAnimation() => _animator.speed = 0;
 
