@@ -7,8 +7,8 @@ namespace FlavorfulStory.InventorySystem.UI
     /// <summary> Слот инвентаря в UI. </summary>
     public class InventorySlotView : MonoBehaviour, IDragContainer<InventoryItem>, IItemHolder
     {
-        /// <summary> Инонка слота инвентаря. </summary>
-        [SerializeField] private InventoryItemIcon _inventoryItemIcon;
+        /// <summary> Отображение стака предмета. </summary>
+        [SerializeField] private ItemStackView _itemStackView;
 
         /// <summary> Индекс слота в инвентаре. </summary>
         private int _index;
@@ -19,17 +19,15 @@ namespace FlavorfulStory.InventorySystem.UI
         /// <summary> Внедрение зависимости — инвентарь игрока. </summary>
         /// <param name="inventory"> Инвентарь игрока. </param>
         [Inject]
-        private void Construct(Inventory inventory) { _inventory = inventory; }
+        private void Construct(Inventory inventory) => _inventory = inventory;
 
         /// <summary> Установить индекс слота. </summary>
         /// <param name="index"> Индекс в инвентаре. </param>
         public void Setup(int index)
         {
             _index = index;
-            _inventoryItemIcon.SetItem(_inventory.GetItemInSlot(index), _inventory.GetNumberInSlot(index));
+            _itemStackView.UpdateView(_inventory.GetItemInSlot(index), _inventory.GetNumberInSlot(index));
         }
-
-        public void Setup(InventoryItem inventoryItem, int number) => _inventoryItemIcon.SetItem(inventoryItem, number);
 
         /// <summary> Получить максимально допустимое количество элементов. </summary>
         /// <remarks> Если ограничения нет, то должно быть возвращено значение Int.MaxValue. </remarks>

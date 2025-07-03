@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using FlavorfulStory.InventorySystem.UI;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -25,13 +24,13 @@ namespace FlavorfulStory.QuestSystem
         [SerializeField] private Transform _objectivesContainer;
 
         /// <summary> Префаб для отображения одной цели квеста. </summary>
-        [SerializeField] private ObjectiveView _objectivePrefab;
+        [SerializeField] private QuestObjectiveView _questObjectivePrefab;
 
         /// <summary> Контейнер для наград квеста. </summary>
         [SerializeField] private Transform _rewardsContainer;
 
-        /// <summary> Префаб для отображения одной награды. </summary>
-        [SerializeField] private InventorySlotView _rewardPrefab;
+        /// <summary> Префаб для отображения награды. </summary>
+        [SerializeField] private QuestRewardSlotView _rewardPrefab;
 
         [SerializeField] private GameObject _noQuest;
 
@@ -75,7 +74,7 @@ namespace FlavorfulStory.QuestSystem
         {
             foreach (var objective in questStatus.Quest.Objectives)
             {
-                var instance = Instantiate(_objectivePrefab, _objectivesContainer);
+                var instance = Instantiate(_questObjectivePrefab, _objectivesContainer);
                 instance.Setup(objective.Description, questStatus.IsObjectiveComplete(objective.Reference));
             }
         }
@@ -85,8 +84,7 @@ namespace FlavorfulStory.QuestSystem
             foreach (var reward in rewards)
             {
                 var instance = Instantiate(_rewardPrefab, _rewardsContainer);
-                instance.Setup(reward.Item, reward.Number);
-                // instance.
+                instance.UpdateView(reward.Item, reward.Number);
             }
         }
     }
