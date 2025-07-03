@@ -12,8 +12,8 @@ namespace FlavorfulStory.InventorySystem.UI
     /// <remarks> Управляет отображением предмета, обработкой нажатий и визуальной обратной связью. </remarks>
     public class ToolbarSlotView : CustomButton, IItemHolder
     {
-        /// <summary> Иконка предмета в инвентаре. </summary>
-        [SerializeField] private InventoryItemIcon _icon;
+        /// <summary> Отображение стака предмета. </summary>
+        [SerializeField] private ItemStackView _itemStackView;
 
         /// <summary> Текстовое поле для отображения клавиши быстрого доступа. </summary>
         [SerializeField] private TMP_Text _keyText;
@@ -42,10 +42,7 @@ namespace FlavorfulStory.InventorySystem.UI
         /// <summary> Внедрение зависимости — инвентарь игрока. </summary>
         /// <param name="inventory"> Инвентарь игрока. </param>
         [Inject]
-        private void Construct(Inventory inventory)
-        {
-            _playerInventory = inventory;
-        }
+        private void Construct(Inventory inventory) { _playerInventory = inventory; }
 
         /// <summary> Инициализирует слот панели инструментов. </summary>
         protected override void Initialize()
@@ -80,7 +77,7 @@ namespace FlavorfulStory.InventorySystem.UI
 
         /// <summary> Обновляет отображение предмета в слоте. </summary>
         public void Redraw() =>
-            _icon.SetItem(_playerInventory.GetItemInSlot(_index), _playerInventory.GetNumberInSlot(_index));
+            _itemStackView.UpdateView(_playerInventory.GetItemInSlot(_index), _playerInventory.GetNumberInSlot(_index));
 
         /// <summary> Получает предмет, находящийся в данном слоте. </summary>
         /// <returns> Предмет инвентаря в текущем слоте. </returns>
