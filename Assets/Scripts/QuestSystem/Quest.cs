@@ -1,4 +1,6 @@
-﻿using FlavorfulStory.AI;
+﻿using System.Collections.Generic;
+using System.Linq;
+using FlavorfulStory.AI;
 using UnityEngine;
 
 namespace FlavorfulStory.QuestSystem
@@ -7,6 +9,9 @@ namespace FlavorfulStory.QuestSystem
     [CreateAssetMenu(menuName = "FlavorfulStory/Quest")]
     public class Quest : ScriptableObject
     {
+        /// <summary> NPC, который выдал квест. </summary>
+        [field: SerializeField] public NpcInfo QuestGiver { get; private set; }
+
         /// <summary> Название квеста. </summary>
         [field: SerializeField] public string QuestName { get; private set; }
 
@@ -17,9 +22,36 @@ namespace FlavorfulStory.QuestSystem
         [field: SerializeField] public string QuestType { get; private set; }
 
         /// <summary> Список целей квеста. </summary>
-        [field: SerializeField] public string[] Objectives { get; private set; }
+        [SerializeField] private List<QuestObjective> _objectives;
 
-        /// <summary> NPC, который выдал квест. </summary>
-        [field: SerializeField] public NpcInfo QuestGiver { get; private set; }
+        public IEnumerable<QuestObjective> Objectives => _objectives;
+
+
+        [SerializeField] private List<QuestReward> _rewards;
+        public IEnumerable<QuestReward> Rewards => _rewards;
+
+
+        private static Quest[] _cachedQuests;
+
+        private static Quest[] CachedQuests
+        {
+            get
+            {
+                if (_cachedQuests != null) return _cachedQuests;
+
+                _cachedQuests = Resources.LoadAll<Quest>(string.Empty);
+#if UNITY_EDITOR
+                Debug.Log($"[Quest] Cached {_cachedQuests.Length} quests.");
+#endif
+
+                return _cachedQuests;
+            }
+        }
+
+        public bool HasObjective(string objectiveReference) =>
+            Objectives.Any(objective => objective.Reference == objectiveReference);
+
+        public static Quest GetByName(string questName) =>
+            CachedQuests.FirstOrDefault(quest => quest.QuestName == questName);
     }
 }

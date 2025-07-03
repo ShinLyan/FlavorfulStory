@@ -12,7 +12,7 @@ namespace FlavorfulStory.QuestSystem
         private IGameFactory<QuestListButton> _questListButtonFactory;
 
         /// <summary> Список всех квестов игрока. </summary>
-        private QuestList _questList;
+        private QuestList _questList; // TODO: переделать так, чтобы VIEW про модель не знала
 
         /// <summary> Список созданных кнопок квестов. </summary>
         private readonly List<QuestListButton> _questListButtons = new();
@@ -27,10 +27,21 @@ namespace FlavorfulStory.QuestSystem
             _questList = questList;
         }
 
-        /// <summary> Создаёт кнопки для всех квестов игрока и выбирает первую кнопку по умолчанию. </summary>
-        private void Start()
+        private void Awake() => _questList.OnQuestListUpdated += UpdateView;
+
+        private void Start() => UpdateView();
+
+        private void OnEnable()
         {
-            foreach (Transform child in transform) Destroy(child.gameObject);
+            // Автоматически выбираем первый квест, если есть хотя бы один
+            if (_questListButtons.Count > 0) _questListButtons[0].Select();
+        }
+
+        // TODO: Крч как-то нужно оптимизировать эту хрень. Проверять, был ли квест до этого, если да,
+        // то ничего не делаем, если нет, то добавляем, если закончился квест, то удалить
+        private void UpdateView()
+        {
+            foreach (Transform child in transform) Destroy(child.gameObject); // TODO: Переделать на ObjectPool
 
             foreach (var status in _questList.QuestStatuses)
             {
@@ -39,9 +50,6 @@ namespace FlavorfulStory.QuestSystem
                 instance.OnClick = () => OnQuestButtonClicked(instance);
                 _questListButtons.Add(instance);
             }
-
-            // Автоматически выбираем первый квест, если есть хотя бы один
-            if (_questListButtons.Count > 0) _questListButtons[0].Select();
         }
 
         /// <summary> Обрабатывает нажатие на кнопку квеста, делая её неактивной, а остальные — активными. </summary>

@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 117c81b660034043a189d64323bfafe8, type: 3}
+  m_Name: TestQuest
+  m_EditorClassIdentifier: 
+  <QuestGiver>k__BackingField: {fileID: 11400000, guid: f86a80addd769f448ac4dfb94a1f4690,
+    type: 2}
+  <QuestName>k__BackingField: Test Quest
+  <QuestDescription>k__BackingField: Description Test Quest
+  <QuestType>k__BackingField: 
+  _objectives:
+  - <Reference>k__BackingField: 1
+    <Description>k__BackingField: 1 Descr
+  - <Reference>k__BackingField: 2
+    <Description>k__BackingField: 2 Descr
+  - <Reference>k__BackingField: 3
+    <Description>k__BackingField: 3 Descr
+  _rewards:
+  - <Number>k__BackingField: 0
+    <Item>k__BackingField: {fileID: 11400000, guid: bce861ac3c00da94b92e70c22de74b57,
+      type: 2}
+  - <Number>k__BackingField: 20
+    <Item>k__BackingField: {fileID: 11400000, guid: 3e31ae779574be343a52d151fa604692,
+      type: 2}

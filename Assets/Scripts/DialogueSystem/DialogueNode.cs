@@ -22,9 +22,13 @@ namespace FlavorfulStory.DialogueSystem
         [field: SerializeField] public Rect Rect { get; private set; } = new(0, 0, 200, 100);
 
         /// <summary> Имя действия, вызываемого при входе в этот узел. </summary>
+        // TODO: возможно в будущем нужно будет сделать так, чтобы это был типизироавнное событие,
+        // которое можно через Enum выбрать, например, проигрывание эмоции и т.д.
         [field: SerializeField] public string EnterActionName { get; private set; }
 
         /// <summary> Имя действия, вызываемого при выходе из этого узла. </summary>
+        // TODO: возможно в будущем нужно будет сделать так, чтобы это был типизироавнное событие,
+        // которое можно через Enum выбрать, например, выдача квеста, выдача предмета и т.д.
         [field: SerializeField] public string ExitActionName { get; private set; }
 
 #if UNITY_EDITOR

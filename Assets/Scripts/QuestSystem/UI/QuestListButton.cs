@@ -54,7 +54,7 @@ namespace FlavorfulStory.QuestSystem
         public void Select()
         {
             Interactable = false;
-            _questDescriptionView.Setup(_questStatus);
+            _questDescriptionView.UpdateView(_questStatus);
         }
     }
 }

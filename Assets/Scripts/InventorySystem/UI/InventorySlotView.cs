@@ -19,10 +19,7 @@ namespace FlavorfulStory.InventorySystem.UI
         /// <summary> Внедрение зависимости — инвентарь игрока. </summary>
         /// <param name="inventory"> Инвентарь игрока. </param>
         [Inject]
-        private void Construct(Inventory inventory)
-        {
-            _inventory = inventory;
-        }
+        private void Construct(Inventory inventory) { _inventory = inventory; }
 
         /// <summary> Установить индекс слота. </summary>
         /// <param name="index"> Индекс в инвентаре. </param>
@@ -31,6 +28,8 @@ namespace FlavorfulStory.InventorySystem.UI
             _index = index;
             _inventoryItemIcon.SetItem(_inventory.GetItemInSlot(index), _inventory.GetNumberInSlot(index));
         }
+
+        public void Setup(InventoryItem inventoryItem, int number) => _inventoryItemIcon.SetItem(inventoryItem, number);
 
         /// <summary> Получить максимально допустимое количество элементов. </summary>
         /// <remarks> Если ограничения нет, то должно быть возвращено значение Int.MaxValue. </remarks>
