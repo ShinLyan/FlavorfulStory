@@ -10,6 +10,7 @@ using FlavorfulStory.InventorySystem.PickupSystem;
 using FlavorfulStory.InventorySystem.UI;
 using FlavorfulStory.Lightning;
 using FlavorfulStory.Player;
+using FlavorfulStory.QuestSystem;
 using FlavorfulStory.SceneManagement;
 using FlavorfulStory.TooltipSystem;
 using FlavorfulStory.UI;
@@ -32,57 +33,76 @@ namespace FlavorfulStory.Installers
         /// <summary> Префаб отображения требования ресурса. </summary>
         [SerializeField] private ResourceRequirementView _requirementViewPrefab;
 
-        /// <summary> Виртуальная камера при телепорте. </summary>
-        /// <remarks> Используется для WarpPortal, когда отключаем и включаем камеру
-        /// при переходе между локациями. </remarks>
+        /// <summary> Префаб кнопки в списке квестов. </summary>
+        [SerializeField] private QuestListButton _questListButtonPrefab;
+
+        /// <summary> Виртуальная камера при телепорте (используется для переходов между локациями). </summary>
         [SerializeField] private CinemachineCamera _teleportVirtualCamera;
 
-        /// <param name="hudFader"> Затемнитель интерфейса HUD. </param>
+        /// <summary> Затемнитель интерфейса HUD. </summary>
         [SerializeField] private CanvasGroupFader _hudFader;
 
         /// <summary> Выполняет установку всех зависимостей, необходимых для сцены. </summary>
         public override void InstallBindings()
         {
-            BindGameplay();
+            BindPlayer();
+            BindInventory();
+            BindDialogue();
+            BindQuests();
             BindUI();
             BindSystems();
         }
 
-        /// <summary> Установить зависимости, связанные с игровыми объектами и логикой. </summary>
-        private void BindGameplay()
+        /// <summary> Установить зависимости, связанные с игроком. </summary>
+        private void BindPlayer()
+        {
+            Container.Bind<PlayerController>().FromComponentInHierarchy().AsSingle();
+            Container.Bind<Equipment>().FromComponentInHierarchy().AsSingle();
+        }
+
+        /// <summary> Установить зависимости, связанные с инвентарем. </summary>
+        private void BindInventory()
         {
             Container.Bind<Inventory>().FromInstance(_playerInventory).AsSingle();
             Container.Bind<PickupNotificationManager>().FromComponentInHierarchy().AsSingle();
-            Container.Bind<Equipment>().FromComponentInHierarchy().AsSingle();
-            Container.Bind<PlayerController>().FromComponentInHierarchy().AsSingle();
-
-            Container.Bind<IDialogueInitiator>().To<PlayerSpeaker>().FromComponentInHierarchy().AsSingle();
-
             Container.Bind<PickupFactory>().AsSingle();
             Container.Bind<ItemDropper>().FromComponentsInHierarchy().AsCached();
             Container.Bind<PickupSpawner>().FromComponentsInHierarchy().AsCached();
 
+            Container.Bind<IGameFactory<InventorySlotView>>().To<InventorySlotViewFactory>().AsSingle()
+                .WithArguments(_inventorySlotViewPrefab);
+            Container.Bind<IGameFactory<ResourceRequirementView>>().To<ResourceRequirementViewFactory>().AsSingle()
+                .WithArguments(_requirementViewPrefab);
+        }
+
+        /// <summary> Установить зависимости, связанные с системой диалогов. </summary>
+        private void BindDialogue()
+        {
+            Container.Bind<IDialogueInitiator>().To<PlayerSpeaker>().FromComponentInHierarchy().AsSingle();
             Container.Bind<DialogueModelPresenter>().FromComponentInHierarchy().AsSingle();
+            Container.Bind<DialogueView>().FromComponentInHierarchy().AsSingle();
+        }
+
+        /// <summary> Установить зависимости, связанные с системой квестов. </summary>
+        private void BindQuests()
+        {
+            Container.Bind<QuestList>().FromComponentInHierarchy().AsSingle();
+            Container.Bind<IGameFactory<QuestListButton>>().To<QuestListButtonFactory>().AsSingle()
+                .WithArguments(_questListButtonPrefab);
+            Container.Bind<QuestDescriptionView>().FromComponentInHierarchy().AsSingle();
         }
 
         /// <summary> Установить зависимости, связанные с пользовательским интерфейсом. </summary>
         private void BindUI()
         {
-            Container.Bind<IGameFactory<InventorySlotView>>().To<InventorySlotViewFactory>().AsSingle()
-                .WithArguments(_inventorySlotViewPrefab);
-            Container.Bind<IGameFactory<ResourceRequirementView>>().To<ResourceRequirementViewFactory>().AsSingle()
-                .WithArguments(_requirementViewPrefab);
             Container.Bind<ConfirmationWindowView>().FromComponentInHierarchy().AsSingle();
             Container.Bind<SummaryView>().FromComponentInHierarchy().AsSingle();
             Container.Bind<BuildingRepairView>().FromComponentInHierarchy().AsSingle();
-            Container.Bind<DialogueView>().FromComponentInHierarchy().AsSingle();
-
             Container.Bind<IActionTooltipShower>().To<ActionTooltipShower>().FromComponentInHierarchy().AsSingle();
-
             Container.Bind<CanvasGroupFader>().WithId("HUD").FromInstance(_hudFader).AsSingle();
         }
 
-        /// <summary> Установить зависимости, связанные с не игровыми системами и логикой. </summary>
+        /// <summary> Установить зависимости, связанные с системами и логикой. </summary>
         private void BindSystems()
         {
             Container.Bind<GlobalLightSystem>().FromComponentInHierarchy().AsSingle();
