@@ -3,11 +3,14 @@ using Zenject;
 
 namespace FlavorfulStory.QuestSystem
 {
-    // TODO: Обобщить с QuestGiver. НУ или с похожими действиями
+    /// <summary> Компонент для завершения цели квеста, например, при выполнении определенного действия. </summary>
+    // TODO: Обобщить с QuestGiver или похожими действиями.
     public class QuestCompletion : MonoBehaviour
     {
+        /// <summary> Квест, к которому относится завершаемая цель. </summary>
         [SerializeField] private Quest _quest;
 
+        /// <summary> Ссылка на завершаемую цель. </summary>
         [SerializeField] private string _objective;
 
         /// <summary> Список всех квестов игрока. </summary>
@@ -18,9 +21,11 @@ namespace FlavorfulStory.QuestSystem
         [Inject]
         private void Construct(QuestList questList) => _questList = questList;
 
+        /// <summary> Завершает указанную цель квеста в списке активных квестов игрока. </summary>
         public void CompleteObjective()
         {
-            // if (_questList.HasQuest(new QuestStatus(_quest))) 
+            // TODO: Добавить проверку на наличие квеста в списке, если потребуется:
+            // if (_questList.HasQuest(new QuestStatus(_quest))) ...
             _questList.CompleteObjective(_quest, _objective);
         }
     }

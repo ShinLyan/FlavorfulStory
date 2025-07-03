@@ -24,10 +24,8 @@ namespace FlavorfulStory.QuestSystem
         /// <summary> Внедрение зависимостей через Zenject. </summary>
         /// <param name="questDescriptionView"> Представление описания квеста. </param>
         [Inject]
-        private void Construct(QuestDescriptionView questDescriptionView)
-        {
+        private void Construct(QuestDescriptionView questDescriptionView) =>
             _questDescriptionView = questDescriptionView;
-        }
 
         /// <summary> Настраивает кнопку с данными квеста. </summary>
         /// <param name="questStatus"> Статус квеста для отображения. </param>

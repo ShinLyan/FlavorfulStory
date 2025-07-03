@@ -24,15 +24,19 @@ namespace FlavorfulStory.QuestSystem
         /// <summary> Список целей квеста. </summary>
         [SerializeField] private List<QuestObjective> _objectives;
 
+        /// <summary> Коллекция целей квеста (только для чтения). </summary>
         public IEnumerable<QuestObjective> Objectives => _objectives;
 
-
+        /// <summary> Список наград за выполнение квеста. </summary>
         [SerializeField] private List<QuestReward> _rewards;
+
+        /// <summary> Коллекция наград за квест (только для чтения). </summary>
         public IEnumerable<QuestReward> Rewards => _rewards;
 
-
+        /// <summary> Кэш всех загруженных квестов. </summary>
         private static Quest[] _cachedQuests;
 
+        /// <summary> Ленивая загрузка и кэширование всех квестов из ресурсов. </summary>
         private static Quest[] CachedQuests
         {
             get
@@ -40,17 +44,19 @@ namespace FlavorfulStory.QuestSystem
                 if (_cachedQuests != null) return _cachedQuests;
 
                 _cachedQuests = Resources.LoadAll<Quest>(string.Empty);
-#if UNITY_EDITOR
-                Debug.Log($"[Quest] Cached {_cachedQuests.Length} quests.");
-#endif
-
                 return _cachedQuests;
             }
         }
 
+        /// <summary> Проверяет, содержит ли квест цель с указанной ссылкой. </summary>
+        /// <param name="objectiveReference"> Ссылка на цель. </param>
+        /// <returns> True, если цель найдена; иначе — false. </returns>
         public bool HasObjective(string objectiveReference) =>
             Objectives.Any(objective => objective.Reference == objectiveReference);
 
+        /// <summary> Находит квест по его названию. </summary>
+        /// <param name="questName"> Название квеста. </param>
+        /// <returns> Найденный квест или null, если не найден. </returns>
         public static Quest GetByName(string questName) =>
             CachedQuests.FirstOrDefault(quest => quest.QuestName == questName);
     }

@@ -32,6 +32,7 @@ namespace FlavorfulStory.QuestSystem
         /// <summary> Префаб для отображения награды. </summary>
         [SerializeField] private QuestRewardSlotView _rewardPrefab;
 
+        /// <summary> Элемент, отображаемый при отсутствии выбранного квеста. </summary>
         [SerializeField] private GameObject _noQuest;
 
         /// <summary> Очищает отображение при инициализации. </summary>
@@ -45,8 +46,7 @@ namespace FlavorfulStory.QuestSystem
         /// <param name="questStatus"> Статус квеста для отображения. </param>
         public void UpdateView(QuestStatus questStatus)
         {
-            // TODO: Сделать проверку.
-            // Может возникнуть ситуация, когда все квесты выполнились и нужно будет такое показывать
+            // TODO: Сделать проверку. Может возникнуть ситуация, когда все квесты выполнились, и нужно будет такое показывать
             _noQuest.SetActive(false);
 
             ClearView();
@@ -62,6 +62,8 @@ namespace FlavorfulStory.QuestSystem
             foreach (Transform child in _rewardsContainer) Destroy(child.gameObject);
         }
 
+        /// <summary> Устанавливает тексты с основной информацией о квесте. </summary>
+        /// <param name="quest"> Квест для отображения. </param>
         private void SetupQuestTexts(Quest quest)
         {
             _questNameText.text = quest.QuestName;
@@ -70,6 +72,8 @@ namespace FlavorfulStory.QuestSystem
             _descriptionText.text = quest.QuestDescription;
         }
 
+        /// <summary> Создает и отображает цели квеста. </summary>
+        /// <param name="questStatus"> Статус квеста с прогрессом целей. </param>
         private void SetupObjectives(QuestStatus questStatus)
         {
             foreach (var objective in questStatus.Quest.Objectives)
@@ -79,6 +83,8 @@ namespace FlavorfulStory.QuestSystem
             }
         }
 
+        /// <summary> Создает и отображает награды за квест. </summary>
+        /// <param name="rewards"> Список наград. </param>
         private void SetupRewards(IEnumerable<QuestReward> rewards)
         {
             foreach (var reward in rewards)

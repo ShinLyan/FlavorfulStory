@@ -27,20 +27,23 @@ namespace FlavorfulStory.QuestSystem
             _questList = questList;
         }
 
+        /// <summary> Подписывается на обновление списка квестов при инициализации. </summary>
         private void Awake() => _questList.OnQuestListUpdated += UpdateView;
 
+        /// <summary> Заполняет список кнопок при старте. </summary>
         private void Start() => UpdateView();
 
+        /// <summary> При активации окна автоматически выбирает первую кнопку квеста, если она есть. </summary>
         private void OnEnable()
         {
-            // Автоматически выбираем первый квест, если есть хотя бы один
             if (_questListButtons.Count > 0) _questListButtons[0].Select();
         }
 
-        // TODO: Крч как-то нужно оптимизировать эту хрень. Проверять, был ли квест до этого, если да,
-        // то ничего не делаем, если нет, то добавляем, если закончился квест, то удалить
+        /// <summary> Обновляет список кнопок квестов, пересоздавая их на основе текущих данных. </summary>
         private void UpdateView()
         {
+            // TODO: Крч как-то нужно оптимизировать эту хрень. Проверять, был ли квест до этого, если да,
+            // то ничего не делаем, если нет, то добавляем, если закончился квест, то удалить
             foreach (Transform child in transform) Destroy(child.gameObject); // TODO: Переделать на ObjectPool
 
             foreach (var status in _questList.QuestStatuses)
