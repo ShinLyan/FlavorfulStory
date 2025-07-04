@@ -1,3 +1,4 @@
+using FlavorfulStory.AI.InteractableNpc;
 using FlavorfulStory.TimeManagement;
 
 namespace FlavorfulStory.AI.FiniteStateMachine
@@ -6,14 +7,14 @@ namespace FlavorfulStory.AI.FiniteStateMachine
     public class MovementState : CharacterState
     {
         /// <summary> Контроллер движения NPC для управления навигацией. </summary>
-        private readonly NpcMovementController _movementController;
+        private readonly InteractableNpcMovementController _movementController;
 
         /// <summary> Флаг, указывающий, находится ли персонаж в данный момент в состоянии движения. </summary>
         private bool _isInState;
 
         /// <summary> Инициализирует новое состояние движения с заданным контроллером движения. </summary>
         /// <param name="movementController"> Контроллер движения для управления перемещением NPC. </param>
-        public MovementState(NpcMovementController movementController)
+        public MovementState(InteractableNpcMovementController movementController)
         {
             _movementController = movementController;
             _movementController.OnDestinationReached += () => RequestStateChange(typeof(RoutineState));
@@ -25,7 +26,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         /// <summary> Входит в состояние движения и начинает перемещение к текущей точке расписания. </summary>
         public override void Enter()
         {
-            _movementController.MoveToCurrentPoint();
+            _movementController.MoveToPoint();
             _isInState = true;
         }
 
@@ -48,7 +49,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         /// <summary> Возобновляет движение NPC при снятии паузы игрового времени, если персонаж находится в состоянии движения. </summary>
         private void ContinueMovementOnUnpause()
         {
-            if (_isInState) _movementController.MoveToCurrentPoint();
+            if (_isInState) _movementController.MoveToPoint();
         }
     }
 }

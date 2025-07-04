@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using FlavorfulStory.AI.FiniteStateMachine;
 using FlavorfulStory.AI.Scheduling;
 using FlavorfulStory.TimeManagement;
+using UnityEngine;
 using DateTime = FlavorfulStory.TimeManagement.DateTime;
 
-namespace FlavorfulStory.AI
+namespace FlavorfulStory.AI.InteractableNpc
 {
     /// <summary> Обработчик расписания NPC, который управляет временными точками расписания персонажа. </summary>
     public class NpcScheduleHandler : IScheduleDependable
@@ -50,6 +51,7 @@ namespace FlavorfulStory.AI
 
             if ((int)currentTime.Hour == nextSchedulePoint.Hour && (int)currentTime.Minute == nextSchedulePoint.Minutes)
             {
+                Debug.Log("123");
                 CurrentPoint = PopNextSchedulePoint();
                 OnSchedulePointChanged?.Invoke(CurrentPoint);
             }

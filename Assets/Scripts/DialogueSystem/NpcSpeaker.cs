@@ -1,5 +1,6 @@
 ﻿using FlavorfulStory.Actions;
 using FlavorfulStory.AI;
+using FlavorfulStory.AI.BaseNpc;
 using FlavorfulStory.CursorSystem;
 using FlavorfulStory.InteractionSystem;
 using FlavorfulStory.Player;
@@ -46,7 +47,8 @@ namespace FlavorfulStory.DialogueSystem
         #region IInteractable
 
         /// <summary> Действие игрока по отношению к объекту. </summary>
-        [field: SerializeField] public ActionDescription ActionDescription { get; private set; }
+        [field: SerializeField]
+        public ActionDescription ActionDescription { get; private set; }
 
         /// <summary> Флаг, разрешено ли взаимодействие с NPC. </summary>
         public bool IsInteractionAllowed { get; private set; }
