@@ -28,6 +28,8 @@ namespace FlavorfulStory.AI.BaseNpc
             _animationController = npcAnimationController;
         }
 
+        /// <summary> Выполняет полную инициализацию контроллера состояний. </summary>
+        /// <remarks> Инициализирует состояния, подписывается на события и сбрасывает систему к начальному состоянию. </remarks>
         protected void Initialize()
         {
             InitializeStates();
@@ -36,8 +38,8 @@ namespace FlavorfulStory.AI.BaseNpc
         }
 
         /// <summary> Инициализирует все доступные состояния персонажа и настраивает связи между ними. </summary>
+        /// <remarks> Должен быть реализован в наследниках. </remarks>
         protected abstract void InitializeStates();
-
 
         /// <summary> Обновляет текущее состояние персонажа каждый кадр. </summary>
         public void Update()
@@ -54,9 +56,13 @@ namespace FlavorfulStory.AI.BaseNpc
             ResetStates();
         }
 
+        /// <summary> Выполняет действия перед сбросом состояний. </summary>
+        /// <param name="currentTime"> Текущее игровое время. </param>
+        /// <remarks> Может быть переопределен в наследниках для дополнительной логики. </remarks>
         protected virtual void OnPreReset(DateTime currentTime) { }
 
         /// <summary> Сбрасывает все состояния к начальному и устанавливает состояние рутины. </summary>
+        /// <remarks> Может быть переопределен в наследниках для специфической логики сброса. </remarks>
         protected virtual void ResetStates() { }
 
         /// <summary> Устанавливает новое состояние персонажа по типу. </summary>
@@ -70,6 +76,8 @@ namespace FlavorfulStory.AI.BaseNpc
             _currentState?.Enter();
         }
 
+        /// <summary> Подписывается на события системы времени. </summary>
+        /// <remarks> Может быть переопределен в наследниках для дополнительных подписок. </remarks>
         protected virtual void SubscribeToEvents() => WorldTime.OnDayEnded += OnReset;
     }
 }

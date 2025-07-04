@@ -13,11 +13,12 @@ namespace FlavorfulStory.AI.BaseNpc
         private readonly NpcAnimationController _animationController;
 
         /// <summary> Unity NavMeshAgent для навигации по NavMesh. </summary>
-        protected readonly NavMeshAgent _agent;
+        private readonly NavMeshAgent _agent;
 
         /// <summary> Событие, вызываемое при достижении пункта назначения. </summary>
         public Action OnDestinationReached;
 
+        /// <summary> Навигатор для управления перемещением NPC. </summary>
         protected readonly INpcNavigator _navigator;
 
         /// <summary> Инициализирует новый экземпляр контроллера движения NPC. </summary>
@@ -25,7 +26,7 @@ namespace FlavorfulStory.AI.BaseNpc
         /// <param name="warpGraph"> Граф варп-точек для навигации. </param>
         /// <param name="transform"> Transform NPC. </param>
         /// <param name="animationController"> Контроллер анимации NPC. </param>
-        public NpcMovementController(NavMeshAgent navMeshAgent,
+        protected NpcMovementController(NavMeshAgent navMeshAgent,
             WarpGraph warpGraph,
             Transform transform,
             NpcAnimationController animationController)
@@ -35,9 +36,11 @@ namespace FlavorfulStory.AI.BaseNpc
             _navigator = CreateNavigator(_agent, warpGraph, transform);
         }
 
-        /// <summary>
-        /// Фабричный метод для создания навигатора — может быть переопределён в потомке.
-        /// </summary>
+        /// <summary> Фабричный метод для создания навигатора — может быть переопределён в потомке. </summary>
+        /// <param name="agent"> NavMeshAgent для навигации. </param>
+        /// <param name="graph"> Граф варп-точек. </param>
+        /// <param name="transform"> Transform NPC. </param>
+        /// <returns> Новый экземпляр навигатора. </returns>
         protected virtual INpcNavigator CreateNavigator(NavMeshAgent agent, WarpGraph graph, Transform transform)
         {
             return new NpcNavigator(agent, graph, transform);
@@ -52,8 +55,9 @@ namespace FlavorfulStory.AI.BaseNpc
             _navigator.Update();
         }
 
+        /// <summary> Перемещает NPC к указанной точке. </summary>
+        /// <remarks> Должен быть реализован в наследниках. </remarks>
         public abstract void MoveToPoint();
-
 
         /// <summary> Останавливает движение NPC. </summary>
         /// <param name="warp"> Если true, NPC мгновенно телепортируется в пункт назначения. </param>

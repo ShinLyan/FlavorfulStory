@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace FlavorfulStory.AI
+namespace FlavorfulStory.AI.BaseNpc
 {
     /// <summary> Контроллер анимации NPC, управляющий всеми анимационными состояниями персонажа. </summary>
     public class NpcAnimationController

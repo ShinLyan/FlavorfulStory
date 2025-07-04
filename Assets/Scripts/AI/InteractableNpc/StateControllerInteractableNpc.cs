@@ -14,17 +14,22 @@ namespace FlavorfulStory.AI.InteractableNpc
     /// управляющий переходами между различными состояниями персонажа. </summary>
     public class StateControllerInteractableNpc : StateController, ICharacterCollisionHandler
     {
+        /// <summary> Обработчик расписания NPC </summary>
         private readonly NpcScheduleHandler _scheduleHandler;
 
         /// <summary> Событие, вызываемое при изменении текущих параметров расписания. </summary>
         private event Action<ScheduleParams> OnCurrentScheduleParamsChanged;
 
+        /// <summary> Отсортированные параметры расписания для быстрого поиска подходящего. </summary>
         private readonly IEnumerable<ScheduleParams> _sortedScheduleParams;
 
+        /// <summary> Контроллер движения для интерактивного NPC. </summary>
         private readonly InteractableNpcMovementController _npcMovementController;
 
+        /// <summary> Контроллер игрока для взаимодействия. </summary>
         private readonly PlayerController _playerController;
 
+        /// <summary> Transform NPC для определения позиции. </summary>
         private readonly Transform _npcTransform;
 
         /// <summary> Инициализирует новый экземпляр контроллера состояний. </summary>
@@ -48,6 +53,7 @@ namespace FlavorfulStory.AI.InteractableNpc
             Initialize();
         }
 
+        /// <summary> Подписывается на события системы времени и расписания. </summary>
         protected override void SubscribeToEvents()
         {
             base.SubscribeToEvents();
@@ -55,6 +61,8 @@ namespace FlavorfulStory.AI.InteractableNpc
             OnCurrentScheduleParamsChanged += _scheduleHandler.SetCurrentScheduleParams;
         }
 
+        /// <summary> Инициализирует все состояния для интерактивного NPC. </summary>
+        /// <remarks> Создает состояния взаимодействия, движения, рутины и ожидания, настраивает связи между ними. </remarks>
         protected override void InitializeStates()
         {
             var states = new CharacterState[]
@@ -89,12 +97,15 @@ namespace FlavorfulStory.AI.InteractableNpc
             _animationController.TriggerAnimation(AnimationType.Locomotion);
         }
 
+        /// <summary> Сбрасывает все состояния и устанавливает состояние рутины. </summary>
         protected override void ResetStates()
         {
             foreach (var state in _typeToCharacterStates.Values) state.Reset();
             SetState(typeof(RoutineState));
         }
 
+        /// <summary> Выполняет приоритизацию расписания перед сбросом состояний. </summary>
+        /// <param name="currentTime"> Текущее игровое время. </param>
         protected override void OnPreReset(DateTime currentTime) => PrioritizeSchedule(currentTime);
 
         /// <summary> Определяет приоритетное расписание на основе текущих условий игры. </summary>
