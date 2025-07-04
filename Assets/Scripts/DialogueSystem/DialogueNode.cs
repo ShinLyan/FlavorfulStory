@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using FlavorfulStory.Core;
 using UnityEditor;
 using UnityEngine;
 
@@ -30,6 +31,9 @@ namespace FlavorfulStory.DialogueSystem
         // TODO: возможно в будущем нужно будет сделать так, чтобы это был типизироавнное событие,
         // которое можно через Enum выбрать, например, выдача квеста, выдача предмета и т.д.
         [field: SerializeField] public string ExitActionName { get; private set; }
+
+        /// <summary> Условие, при котором этот узел будет доступен для перехода. </summary>
+        [SerializeField] private Condition _condition;
 
 #if UNITY_EDITOR
         /// <summary> Установить новую позицию узла в редакторе. </summary>
@@ -75,7 +79,7 @@ namespace FlavorfulStory.DialogueSystem
         }
 
         /// <summary> Установить, говорит ли в этом узле игрок. </summary>
-        /// <param name="isPlayerSpeaking"> `true`, если говорит игрок; иначе `false`. </param>
+        /// <param name="isPlayerSpeaking"> True, если говорит игрок; иначе false. </param>
         public void SetPlayerSpeaking(bool isPlayerSpeaking)
         {
             Undo.RecordObject(this, "Change Dialogue Speaker");
@@ -83,5 +87,9 @@ namespace FlavorfulStory.DialogueSystem
             EditorUtility.SetDirty(this);
         }
 #endif
+        /// <summary> Проверяет выполнение условий для перехода в этот узел. </summary>
+        /// <param name="evaluators"> Список объектов, реализующих интерфейс IPredicateEvaluator. </param>
+        /// <returns> True, если условие выполняется; иначе — false. </returns>
+        public bool CheckCondition(IEnumerable<IPredicateEvaluator> evaluators) => _condition.Check(evaluators);
     }
 }

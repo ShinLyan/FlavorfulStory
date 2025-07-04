@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace FlavorfulStory.QuestSystem
 {
@@ -10,7 +11,7 @@ namespace FlavorfulStory.QuestSystem
         public Quest Quest { get; }
 
         /// <summary> Флаг, указывающий, что квест завершен (пока всегда true). </summary>
-        public bool IsComplete => true;
+        public bool IsComplete => Quest.Objectives.All(objective => _completedObjectives.Contains(objective.Reference));
 
         /// <summary> Список выполненных целей квеста. </summary>
         private readonly List<string> _completedObjectives;

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using FlavorfulStory.Core;
 using FlavorfulStory.InventorySystem;
 using FlavorfulStory.InventorySystem.DropSystem;
 using FlavorfulStory.Saving;
@@ -10,7 +11,7 @@ using Zenject;
 namespace FlavorfulStory.QuestSystem
 {
     /// <summary> Хранит список активных квестов игрока. </summary>
-    public class QuestList : MonoBehaviour, ISaveable
+    public class QuestList : MonoBehaviour, IPredicateEvaluator, ISaveable
     {
         /// <summary> Список статусов всех квестов игрока. </summary>
         private readonly List<QuestStatus> _questStatuses = new();
@@ -41,17 +42,17 @@ namespace FlavorfulStory.QuestSystem
         /// <param name="quest"> Квест для добавления. </param>
         public void AddQuest(Quest quest)
         {
-            var questStatus = new QuestStatus(quest);
-            if (HasQuest(questStatus)) return;
+            if (HasQuest(quest)) return;
 
+            var questStatus = new QuestStatus(quest);
             _questStatuses.Add(questStatus);
             OnQuestListUpdated?.Invoke();
         }
 
         /// <summary> Проверяет, есть ли уже этот квест в списке. </summary>
-        /// <param name="questStatus"> Статус квеста для проверки. </param>
+        /// <param name="quest"> Квест для проверки. </param>
         /// <returns> True, если квест уже есть в списке, иначе false. </returns>
-        public bool HasQuest(QuestStatus questStatus) => _questStatuses.Contains(questStatus);
+        public bool HasQuest(Quest quest) => GetQuestStatus(quest) != null;
 
         /// <summary> Отмечает цель квеста как выполненную и выдает награду, если квест завершен. </summary>
         /// <param name="quest"> Квест, в котором нужно отметить цель. </param>
@@ -59,8 +60,10 @@ namespace FlavorfulStory.QuestSystem
         public void CompleteObjective(Quest quest, string objective)
         {
             var questStatus = GetQuestStatus(quest);
-            questStatus?.CompleteObjective(objective);
-            if (questStatus != null && questStatus.IsComplete) GiveReward(quest);
+            if (questStatus == null) return;
+
+            questStatus.CompleteObjective(objective);
+            if (questStatus.IsComplete) GiveReward(quest);
         }
 
         /// <summary> Получает статус указанного квеста из списка. </summary>
@@ -85,7 +88,8 @@ namespace FlavorfulStory.QuestSystem
 
         /// <summary> Сохраняет текущее состояние списка квестов. </summary>
         /// <returns> Сериализованное состояние квестов. </returns>
-        public object CaptureState() => _questStatuses.Select(questStatus => questStatus.CaptureState()).ToList();
+        public object CaptureState() =>
+            _questStatuses.Select(questStatus => questStatus.CaptureState()).ToList();
 
         /// <summary> Восстанавливает список квестов из сохраненного состояния. </summary>
         /// <param name="state"> Сохраненное состояние. </param>
@@ -96,6 +100,22 @@ namespace FlavorfulStory.QuestSystem
             _questStatuses.Clear();
             foreach (object objectState in stateList) _questStatuses.Add(new QuestStatus(objectState));
         }
+
+        #endregion
+
+        #region IPredicateEvaluator
+
+        /// <summary> Оценивает заданный предикат с параметрами. </summary>
+        /// <param name="predicate"> Имя предиката для проверки. </param>
+        /// <param name="parameters"> Массив параметров для предиката. </param>
+        /// <returns> True, если условие выполнено; false, если не выполнено;
+        /// null, если предикат не поддерживается. </returns>
+        public bool? Evaluate(string predicate, string[] parameters) => predicate switch
+        {
+            "HasQuest" => HasQuest(Quest.GetByName(parameters[0])),
+            "CompletedQuest" => GetQuestStatus(Quest.GetByName(parameters[0]))?.IsComplete,
+            _ => null
+        };
 
         #endregion
     }

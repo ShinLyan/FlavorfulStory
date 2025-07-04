@@ -9,8 +9,7 @@ namespace FlavorfulStory.QuestSystem
     public class QuestReward
     {
         /// <summary> Количество выдаваемых предметов. </summary>
-        [field: SerializeField, Range(1f, 1000f)]
-        public int Number { get; private set; }
+        [field: SerializeField, Min(1f)] public int Number { get; private set; }
 
         /// <summary> Предмет, который выдается в качестве награды. </summary>
         [field: SerializeField] public InventoryItem Item { get; private set; }

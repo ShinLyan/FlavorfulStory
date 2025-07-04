@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using FlavorfulStory.Core;
 using FlavorfulStory.DialogueSystem.UI;
 using FlavorfulStory.InputSystem;
 using FlavorfulStory.TimeManagement;
@@ -115,7 +116,7 @@ namespace FlavorfulStory.DialogueSystem
         {
             if (!IsDialogueActive) return;
 
-            var playerChoices = _currentDialogue.GetPlayerChildNodes(_currentNode).ToList();
+            var playerChoices = FilterOnCondition(_currentDialogue.GetPlayerChildNodes(_currentNode)).ToList();
             if (playerChoices.Any())
             {
                 IsChoosingDialogue = true;
@@ -124,14 +125,14 @@ namespace FlavorfulStory.DialogueSystem
                 return;
             }
 
-            var allChildren = _currentDialogue.GetChildNodes(_currentNode).ToList();
+            var allChildren = FilterOnCondition(_currentDialogue.GetChildNodes(_currentNode)).ToList();
             if (!allChildren.Any())
             {
                 EndDialogue();
                 return;
             }
 
-            var npcChoices = _currentDialogue.GetNpcChildNodes(_currentNode).ToList();
+            var npcChoices = FilterOnCondition(_currentDialogue.GetNpcChildNodes(_currentNode)).ToList();
             var nextNode = npcChoices[Random.Range(0, npcChoices.Count)];
 
             TriggerExitAction();
@@ -142,9 +143,20 @@ namespace FlavorfulStory.DialogueSystem
             UpdateDialogueView();
         }
 
+        /// <summary> Отфильтровать узлы диалога на основе выполнения условий. </summary>
+        /// <param name="inputNodes"> Список узлов для фильтрации. </param>
+        /// <returns> Список узлов, условия которых выполнены. </returns>
+        private IEnumerable<DialogueNode> FilterOnCondition(IEnumerable<DialogueNode> inputNodes) =>
+            inputNodes.Where(node => node.CheckCondition(GetEvaluators()));
+
+        /// <summary> Получить список всех компонентов-предикатов для оценки условий. </summary>
+        /// <returns> Коллекция компонентов, реализующих IPredicateEvaluator. </returns>
+        private IEnumerable<IPredicateEvaluator> GetEvaluators() => GetComponents<IPredicateEvaluator>();
+
         /// <summary> Получить список доступных для игрока вариантов ответа. </summary>
         /// <returns> Список узлов, которые представляет выбор игрока. </returns>
-        private IEnumerable<DialogueNode> GetChoices() => _currentDialogue.GetPlayerChildNodes(_currentNode);
+        private IEnumerable<DialogueNode> GetChoices() =>
+            FilterOnCondition(_currentDialogue.GetPlayerChildNodes(_currentNode));
 
         /// <summary> Выбрать вариант ответа игрока. </summary>
         /// <param name="chosenNode"> Узел, выбранный игроком. </param>
