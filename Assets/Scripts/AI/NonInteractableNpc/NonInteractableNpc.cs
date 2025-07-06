@@ -19,11 +19,9 @@ namespace FlavorfulStory.AI.NonInteractableNpc
 
         protected override StateController CreateStateController()
         {
-            return new StateControllerNonInteractableNpc(
+            return new NonInteractableNpcStateController(
                 _movementController as NonInteractableNpcMovementController,
-                _animationController,
-                _playerController,
-                transform
+                _animationController
             );
         }
     }

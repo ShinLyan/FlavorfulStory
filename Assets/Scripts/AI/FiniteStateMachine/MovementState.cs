@@ -1,4 +1,4 @@
-using FlavorfulStory.AI.InteractableNpc;
+using FlavorfulStory.AI.BaseNpc;
 using FlavorfulStory.TimeManagement;
 
 namespace FlavorfulStory.AI.FiniteStateMachine
@@ -7,14 +7,14 @@ namespace FlavorfulStory.AI.FiniteStateMachine
     public class MovementState : CharacterState
     {
         /// <summary> Контроллер движения NPC для управления навигацией. </summary>
-        private readonly InteractableNpcMovementController _movementController;
+        private readonly NpcMovementController _movementController;
 
         /// <summary> Флаг, указывающий, находится ли персонаж в данный момент в состоянии движения. </summary>
         private bool _isInState;
 
         /// <summary> Инициализирует новое состояние движения с заданным контроллером движения. </summary>
         /// <param name="movementController"> Контроллер движения для управления перемещением NPC. </param>
-        public MovementState(InteractableNpcMovementController movementController)
+        public MovementState(NpcMovementController movementController)
         {
             _movementController = movementController;
             _movementController.OnDestinationReached += () => RequestStateChange(typeof(RoutineState));

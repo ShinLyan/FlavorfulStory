@@ -1,6 +1,6 @@
 ﻿using FlavorfulStory.Actions;
 using FlavorfulStory.AI;
-using FlavorfulStory.AI.BaseNpc;
+using FlavorfulStory.AI.InteractableNpc;
 using FlavorfulStory.CursorSystem;
 using FlavorfulStory.InteractionSystem;
 using FlavorfulStory.Player;
@@ -38,7 +38,7 @@ namespace FlavorfulStory.DialogueSystem
         private void Awake()
         {
             IsInteractionAllowed = true;
-            NpcInfo = GetComponent<Npc>().NpcInfo;
+            NpcInfo = GetComponent<InteractableNpc>().NpcInfo;
 
             if (_dialogueInitiator is PlayerSpeaker playerSpeaker)
                 playerSpeaker.OnConversationEnded += () => EndInteraction(_playerController);

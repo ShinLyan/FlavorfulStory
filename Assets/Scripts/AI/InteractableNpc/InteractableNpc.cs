@@ -1,4 +1,5 @@
 ﻿using FlavorfulStory.AI.BaseNpc;
+using FlavorfulStory.AI.Scheduling;
 using FlavorfulStory.AI.WarpGraphSystem;
 using UnityEngine;
 using UnityEngine.AI;
@@ -10,6 +11,14 @@ namespace FlavorfulStory.AI.InteractableNpc
     [RequireComponent(typeof(NpcCollisionHandler))]
     public class InteractableNpc : Npc
     {
+        /// <summary> Информация о персонаже. </summary>
+        [field: SerializeField]
+        public NpcInfo NpcInfo { get; private set; }
+
+        /// <summary> Расписание NPC, определяющее его поведение и маршруты. </summary>
+        [Tooltip("Расписание NPC, определяющее его поведение и маршруты."), SerializeField]
+        protected NpcSchedule _npcSchedule;
+
         /// <summary> Обработчик столкновений для взаимодействия с игроком. </summary>
         private NpcCollisionHandler _collisionHandler;
 

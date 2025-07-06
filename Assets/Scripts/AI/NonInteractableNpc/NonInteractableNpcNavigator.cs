@@ -17,14 +17,15 @@ namespace FlavorfulStory.AI.NonInteractableNpc
 
         public void MoveTo(Location location)
         {
+            var point = location.GetRandomPointOnNavMesh();
             // _currentTargetPoint = point; //TODO: Use Location instead of SchedulePoint
-            // _isNotMoving = false;
-            // ResumeAgent();
-            //
+            _isNotMoving = false;
+            ResumeAgent();
+
             // if (_currentLocation != point.LocationName)
             //     StartWarpTransition(point);
             // else
-            //     _navMeshAgent.SetDestination(point.Position);
+            _navMeshAgent.SetDestination(point);
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using FlavorfulStory.AI.BaseNpc;
 using FlavorfulStory.AI.WarpGraphSystem;
+using FlavorfulStory.SceneManagement;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -27,7 +28,19 @@ namespace FlavorfulStory.AI.NonInteractableNpc
 
         public override void MoveToPoint()
         {
-            // if (_scheduleHandler.CurrentPoint != null) _nonInteractableNavigator.MoveTo(_scheduleHandler.CurrentPoint); // TODO: Implement movement logic for NonInteractableNpc
+            _nonInteractableNavigator.MoveTo(GetCurrentLocation());
+            // TODO: Implement movement logic for NonInteractableNpc
+        }
+
+        private Location GetCurrentLocation() //TODO: убрать это
+        {
+            foreach (var location in Object.FindObjectsByType<Location>(FindObjectsInactive.Include,
+                         FindObjectsSortMode.None))
+                if (location.IsPositionInLocation(_npcTransform.position))
+                    return location;
+
+            Debug.LogWarning("No current location found for NonInteractableNpcMovementController.");
+            return null;
         }
     }
 }

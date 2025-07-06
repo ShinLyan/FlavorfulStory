@@ -1,5 +1,7 @@
 using FlavorfulStory.Lightning;
+using Unity.AI.Navigation;
 using UnityEngine;
+using UnityEngine.AI;
 using Zenject;
 
 namespace FlavorfulStory.SceneManagement
@@ -28,6 +30,8 @@ namespace FlavorfulStory.SceneManagement
         [Inject]
         private void Construct(GlobalLightSystem globalLightSystem) => _globalLightSystem = globalLightSystem;
 
+        [SerializeField] private NavMeshSurface _navMeshSurface;
+
         /// <summary> Активирует объекты, связанные с этой локацией. </summary>
         public void Enable() => SetObjectsActive(true);
 
@@ -51,5 +55,57 @@ namespace FlavorfulStory.SceneManagement
         /// <returns> <c>true</c>, если позиция внутри локации; иначе — <c>false</c>. </returns>
         public bool IsPositionInLocation(Vector3 position) =>
             TryGetComponent(out Collider component) && component.bounds.Contains(position);
+
+
+        public Vector3 GetRandomPointInSurfaceBounds()
+        {
+            Bounds surfaceBounds = _navMeshSurface.navMeshData.sourceBounds;
+
+            for (int i = 0; i < 20; i++)
+            {
+                Vector3 randomPoint = new Vector3(
+                    Random.Range(surfaceBounds.min.x, surfaceBounds.max.x),
+                    surfaceBounds.center.y,
+                    Random.Range(surfaceBounds.min.z, surfaceBounds.max.z)
+                );
+
+                if (NavMesh.SamplePosition(randomPoint, out NavMeshHit hit, 2f, NavMesh.AllAreas)) return hit.position;
+            }
+
+            return Vector3.zero;
+        }
+
+        public Vector3 GetRandomPointOnNavMesh(int maxAttempts = 20)
+        {
+            Bounds searchBounds;
+
+            if (_navMeshSurface != null)
+            {
+                searchBounds = new Bounds(_navMeshSurface.transform.position, _navMeshSurface.size);
+            }
+            else if (TryGetComponent(out Collider col))
+            {
+                searchBounds = col.bounds;
+            }
+            else
+            {
+                Debug.LogWarning("Нет NavMeshSurface и Collider для определения границ.");
+                return Vector3.zero;
+            }
+
+            for (int i = 0; i < maxAttempts; i++)
+            {
+                Vector3 randomPoint = new Vector3(
+                    Random.Range(searchBounds.min.x, searchBounds.max.x),
+                    searchBounds.center.y,
+                    Random.Range(searchBounds.min.z, searchBounds.max.z)
+                );
+
+                if (NavMesh.SamplePosition(randomPoint, out NavMeshHit hit, 2f, NavMesh.AllAreas)) return hit.position;
+            }
+
+            Debug.LogWarning("Не удалось найти точку на NavMesh.");
+            return Vector3.zero;
+        }
     }
 }

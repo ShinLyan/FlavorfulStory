@@ -1,5 +1,4 @@
-﻿using FlavorfulStory.AI.Scheduling;
-using FlavorfulStory.Player;
+﻿using FlavorfulStory.Player;
 using FlavorfulStory.TimeManagement;
 using UnityEngine;
 using UnityEngine.AI;
@@ -12,14 +11,6 @@ namespace FlavorfulStory.AI.BaseNpc
     [RequireComponent(typeof(NavMeshAgent), typeof(Animator))]
     public abstract class Npc : MonoBehaviour
     {
-        /// <summary> Информация о персонаже. </summary>
-        [field: SerializeField]
-        public NpcInfo NpcInfo { get; private set; }
-
-        /// <summary> Расписание NPC, определяющее его поведение и маршруты. </summary>
-        [Tooltip("Расписание NPC, определяющее его поведение и маршруты."), SerializeField]
-        protected NpcSchedule _npcSchedule;
-
         /// <summary> Контроллер состояний, управляющий переключением между состояниями NPC. </summary>
         protected StateController _stateController;
 

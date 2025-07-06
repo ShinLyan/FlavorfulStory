@@ -1,30 +1,23 @@
 ﻿using FlavorfulStory.AI.BaseNpc;
 using FlavorfulStory.AI.FiniteStateMachine;
-using FlavorfulStory.Player;
 using UnityEngine;
 
 namespace FlavorfulStory.AI.NonInteractableNpc
 {
     /// <summary> Контроллер состояний конечного автомата NPC,
     /// управляющий переходами между различными состояниями персонажа. </summary>
-    public class StateControllerNonInteractableNpc : StateController
+    public class NonInteractableNpcStateController : StateController
     {
         private readonly NonInteractableNpcMovementController _npcMovementController;
-
-        private readonly Transform _npcTransform;
 
         /// <summary> Инициализирует новый экземпляр контроллера состояний. </summary>
         /// <param name="npcMovementController"> Контроллер движения NPC. </param>
         /// <param name="npcAnimationController"> Контроллер анимации NPC. </param>
-        /// <param name="playerController"> Контроллер игрока для взаимодействия. </param>
-        /// <param name="npcTransform"> Transform NPC для определения позиции. </param>
-        public StateControllerNonInteractableNpc(NonInteractableNpcMovementController npcMovementController,
-            NpcAnimationController npcAnimationController,
-            PlayerController playerController, Transform npcTransform)
+        public NonInteractableNpcStateController(NonInteractableNpcMovementController npcMovementController,
+            NpcAnimationController npcAnimationController)
             : base(npcAnimationController)
         {
             _npcMovementController = npcMovementController;
-            _npcTransform = npcTransform;
             Initialize();
         }
 
@@ -41,6 +34,14 @@ namespace FlavorfulStory.AI.NonInteractableNpc
                 state.OnStateChangeRequested += SetState;
             }
         }
+
+        public override void Update()
+        {
+            base.Update();
+            if (Input.GetKeyDown(KeyCode.Space)) Test();
+        }
+
+        private void Test() { _currentState.Enter(); } //TODO: remove this test method
 
         protected override void ResetStates()
         {

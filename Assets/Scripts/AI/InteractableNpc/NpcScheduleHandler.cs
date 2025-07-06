@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using FlavorfulStory.AI.FiniteStateMachine;
 using FlavorfulStory.AI.Scheduling;
 using FlavorfulStory.TimeManagement;
-using UnityEngine;
 using DateTime = FlavorfulStory.TimeManagement.DateTime;
 
 namespace FlavorfulStory.AI.InteractableNpc
@@ -51,7 +50,6 @@ namespace FlavorfulStory.AI.InteractableNpc
 
             if ((int)currentTime.Hour == nextSchedulePoint.Hour && (int)currentTime.Minute == nextSchedulePoint.Minutes)
             {
-                Debug.Log("123");
                 CurrentPoint = PopNextSchedulePoint();
                 OnSchedulePointChanged?.Invoke(CurrentPoint);
             }

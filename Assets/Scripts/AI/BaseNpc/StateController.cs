@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using FlavorfulStory.AI.FiniteStateMachine;
 using FlavorfulStory.TimeManagement;
-using UnityEngine;
 using DateTime = FlavorfulStory.TimeManagement.DateTime;
 
 namespace FlavorfulStory.AI.BaseNpc
@@ -42,11 +41,8 @@ namespace FlavorfulStory.AI.BaseNpc
         protected abstract void InitializeStates();
 
         /// <summary> Обновляет текущее состояние персонажа каждый кадр. </summary>
-        public void Update()
-        {
-            _currentState?.Update();
-            Debug.Log(_currentState);
-        }
+        public virtual void Update() => _currentState?.Update();
+
 
         /// <summary> Сбрасывает систему состояний при смене дня или инициализации. </summary>
         /// <param name="currentTime"> Текущее игровое время. </param>

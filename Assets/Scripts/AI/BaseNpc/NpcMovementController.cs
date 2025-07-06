@@ -21,6 +21,8 @@ namespace FlavorfulStory.AI.BaseNpc
         /// <summary> Навигатор для управления перемещением NPC. </summary>
         protected readonly INpcNavigator _navigator;
 
+        protected Transform _npcTransform;
+
         /// <summary> Инициализирует новый экземпляр контроллера движения NPC. </summary>
         /// <param name="navMeshAgent"> NavMeshAgent для навигации. </param>
         /// <param name="warpGraph"> Граф варп-точек для навигации. </param>
@@ -31,9 +33,10 @@ namespace FlavorfulStory.AI.BaseNpc
             Transform transform,
             NpcAnimationController animationController)
         {
+            _npcTransform = transform;
             _agent = navMeshAgent;
             _animationController = animationController;
-            _navigator = CreateNavigator(_agent, warpGraph, transform);
+            _navigator = CreateNavigator(_agent, warpGraph, _npcTransform);
         }
 
         /// <summary> Фабричный метод для создания навигатора — может быть переопределён в потомке. </summary>
