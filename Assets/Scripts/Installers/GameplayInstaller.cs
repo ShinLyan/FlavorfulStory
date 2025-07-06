@@ -11,6 +11,7 @@ using FlavorfulStory.InventorySystem.UI;
 using FlavorfulStory.Lightning;
 using FlavorfulStory.Player;
 using FlavorfulStory.QuestSystem;
+using FlavorfulStory.QuestSystem.Objectives;
 using FlavorfulStory.SceneManagement;
 using FlavorfulStory.TooltipSystem;
 using FlavorfulStory.UI;
@@ -90,6 +91,7 @@ namespace FlavorfulStory.Installers
             Container.Bind<IGameFactory<QuestListButton>>().To<QuestListButtonFactory>().AsSingle()
                 .WithArguments(_questListButtonPrefab);
             Container.Bind<QuestDescriptionView>().FromComponentInHierarchy().AsSingle();
+            Container.Bind<ObjectiveProgressService>().AsSingle().NonLazy();
         }
 
         /// <summary> Установить зависимости, связанные с пользовательским интерфейсом. </summary>

@@ -1,4 +1,6 @@
 ﻿using System;
+using FlavorfulStory.QuestSystem.Objectives;
+using FlavorfulStory.QuestSystem.Objectives.Params;
 using UnityEngine;
 
 namespace FlavorfulStory.QuestSystem
@@ -11,6 +13,11 @@ namespace FlavorfulStory.QuestSystem
         [field: SerializeField] public string Reference { get; private set; }
 
         /// <summary> Описание цели квеста, отображаемое игроку. </summary>
-        [field: SerializeField] public string Description { get; private set; }
+        [field: SerializeField, TextArea(2, 4)]
+        public string Description { get; private set; }
+
+        [field: SerializeField] public ObjectiveType Type { get; private set; }
+
+        [field: SerializeReference] public ObjectiveParamsBase Params { get; private set; }
     }
 }

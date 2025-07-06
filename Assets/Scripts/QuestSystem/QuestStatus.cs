@@ -1,20 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 namespace FlavorfulStory.QuestSystem
 {
     /// <summary> Статус квеста для отслеживания его прогресса игроком. </summary>
+    [Serializable]
     public class QuestStatus
     {
         /// <summary> Ссылка на квест, к которому относится этот статус. </summary>
-        public Quest Quest { get; }
+        [field: SerializeField] public Quest Quest { get; private set; }
+
+        /// <summary> Список выполненных целей квеста. </summary>
+        [SerializeField] private List<string> _completedObjectives;
 
         /// <summary> Флаг, указывающий, что квест завершен (пока всегда true). </summary>
         public bool IsComplete => Quest.Objectives.All(objective => _completedObjectives.Contains(objective.Reference));
-
-        /// <summary> Список выполненных целей квеста. </summary>
-        private readonly List<string> _completedObjectives;
 
         /// <summary> Конструктор для создания нового статуса квеста. </summary>
         /// <param name="quest"> Квест, для которого создается статус. </param>

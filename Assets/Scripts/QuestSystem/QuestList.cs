@@ -14,7 +14,7 @@ namespace FlavorfulStory.QuestSystem
     public class QuestList : MonoBehaviour, IPredicateEvaluator, ISaveable
     {
         /// <summary> Список статусов всех квестов игрока. </summary>
-        private readonly List<QuestStatus> _questStatuses = new();
+        [SerializeField] private List<QuestStatus> _questStatuses;
 
         /// <summary> Событие, вызываемое при обновлении списка квестов. </summary>
         public event Action OnQuestListUpdated;
@@ -47,6 +47,9 @@ namespace FlavorfulStory.QuestSystem
             var questStatus = new QuestStatus(quest);
             _questStatuses.Add(questStatus);
             OnQuestListUpdated?.Invoke();
+
+            // TODO: Заменить на нормальную логику NotificationManager
+            FindFirstObjectByType<QuestNotificationView>(FindObjectsInactive.Include).Show(quest.QuestName);
         }
 
         /// <summary> Проверяет, есть ли уже этот квест в списке. </summary>
@@ -63,7 +66,20 @@ namespace FlavorfulStory.QuestSystem
             if (questStatus == null) return;
 
             questStatus.CompleteObjective(objective);
-            if (questStatus.IsComplete) GiveReward(quest);
+            if (questStatus.IsComplete) CompleteQuest(quest);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="questStatus"></param>
+        /// <param name="objective"></param>
+        public void CompleteObjective(QuestStatus questStatus, QuestObjective objective)
+        {
+            if (questStatus == null || objective == null) return;
+
+            questStatus.CompleteObjective(objective.Reference);
+            if (questStatus.IsComplete) CompleteQuest(questStatus.Quest);
         }
 
         /// <summary> Получает статус указанного квеста из списка. </summary>
@@ -72,11 +88,17 @@ namespace FlavorfulStory.QuestSystem
         private QuestStatus GetQuestStatus(Quest quest) =>
             _questStatuses.FirstOrDefault(questStatus => questStatus.Quest == quest);
 
-        /// <summary> Выдает награды за завершение квеста: добавляет в инвентарь или дропает на землю. </summary>
-        /// <param name="quest"> Завершенный квест. </param>
-        private void GiveReward(Quest quest)
+        private void CompleteQuest(Quest quest)
         {
-            foreach (var reward in quest.Rewards)
+            //
+            GiveReward(quest.Rewards);
+        }
+
+        /// <summary> Выдает награды за завершение квеста: добавляет в инвентарь или дропает на землю. </summary>
+        /// <param name="rewards"> Награды за завершение квеста. </param>
+        private void GiveReward(IEnumerable<QuestReward> rewards)
+        {
+            foreach (var reward in rewards)
             {
                 bool isSuccess = _inventory.TryAddToFirstAvailableSlot(reward.Item, reward.Number);
                 // TODO: Переделать на новый itemdropper

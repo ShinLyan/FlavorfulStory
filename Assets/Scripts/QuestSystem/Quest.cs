@@ -10,25 +10,31 @@ namespace FlavorfulStory.QuestSystem
     public class Quest : ScriptableObject
     {
         /// <summary> NPC, который выдал квест. </summary>
-        [field: SerializeField] public NpcInfo QuestGiver { get; private set; }
+        [field: Tooltip("NPC, который выдал квест."), SerializeField]
+        public NpcInfo QuestGiver { get; private set; }
 
         /// <summary> Название квеста. </summary>
-        [field: SerializeField] public string QuestName { get; private set; }
+        [field: Tooltip("Название квеста."), SerializeField]
+        public string QuestName { get; private set; }
 
         /// <summary> Описание квеста. </summary>
-        [field: SerializeField] public string QuestDescription { get; private set; }
+        [field: Tooltip("Описание квеста."), SerializeField, TextArea(5, 10)]
+        public string QuestDescription { get; private set; }
 
-        /// <summary> Тип квеста: General / Personal / Daily / Weekly / Completed. </summary>
-        [field: SerializeField] public string QuestType { get; private set; }
+        /// <summary> Тип квеста. </summary>
+        [field: Tooltip("Тип квеста."), SerializeField]
+        public QuestType QuestType { get; private set; }
 
         /// <summary> Список целей квеста. </summary>
-        [SerializeField] private List<QuestObjective> _objectives;
+        [Tooltip("Список целей квеста."), SerializeField]
+        private List<QuestObjective> _objectives;
 
         /// <summary> Коллекция целей квеста (только для чтения). </summary>
         public IEnumerable<QuestObjective> Objectives => _objectives;
 
         /// <summary> Список наград за выполнение квеста. </summary>
-        [SerializeField] private List<QuestReward> _rewards;
+        [Tooltip("Список наград за выполнение квеста."), SerializeField]
+        private List<QuestReward> _rewards;
 
         /// <summary> Коллекция наград за квест (только для чтения). </summary>
         public IEnumerable<QuestReward> Rewards => _rewards;
