@@ -1,6 +1,5 @@
 ﻿using FlavorfulStory.AI.BaseNpc;
 using FlavorfulStory.AI.WarpGraphSystem;
-using FlavorfulStory.SceneManagement;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -10,6 +9,8 @@ namespace FlavorfulStory.AI.NonInteractableNpc
     {
         private readonly NonInteractableNpcNavigator _nonInteractableNavigator;
 
+        private Vector3? _currentPoint;
+
         public NonInteractableNpcMovementController(NavMeshAgent navMeshAgent,
             WarpGraph warpGraph,
             Transform transform,
@@ -17,6 +18,7 @@ namespace FlavorfulStory.AI.NonInteractableNpc
             : base(navMeshAgent, warpGraph, transform, animationController)
         {
             _nonInteractableNavigator = (NonInteractableNpcNavigator)_navigator;
+            _currentPoint = null;
 
             _nonInteractableNavigator.OnDestinationReached += () => OnDestinationReached?.Invoke();
         }
@@ -28,19 +30,20 @@ namespace FlavorfulStory.AI.NonInteractableNpc
 
         public override void MoveToPoint()
         {
-            _nonInteractableNavigator.MoveTo(GetCurrentLocation());
-            // TODO: Implement movement logic for NonInteractableNpc
+            // _nonInteractableNavigator.MoveTo(GetCurrentLocation()); //TODO: Переделать метод
         }
 
-        private Location GetCurrentLocation() //TODO: убрать это
-        {
-            foreach (var location in Object.FindObjectsByType<Location>(FindObjectsInactive.Include,
-                         FindObjectsSortMode.None))
-                if (location.IsPositionInLocation(_npcTransform.position))
-                    return location;
+        public void SetPoint(Vector3 newPoint) => _currentPoint = newPoint;
 
-            Debug.LogWarning("No current location found for NonInteractableNpcMovementController.");
-            return null;
-        }
+        // private Location GetCurrentLocation() //TODO: убрать это
+        // {
+        //     foreach (var location in Object.FindObjectsByType<Location>(FindObjectsInactive.Include,
+        //                  FindObjectsSortMode.None))
+        //         if (location.IsPositionInLocation(_npcTransform.position))
+        //             return location;
+        //
+        //     Debug.LogWarning("No current location found for NonInteractableNpcMovementController.");
+        //     return null;
+        // }
     }
 }
