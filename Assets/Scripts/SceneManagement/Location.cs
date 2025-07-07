@@ -57,24 +57,6 @@ namespace FlavorfulStory.SceneManagement
             TryGetComponent(out Collider component) && component.bounds.Contains(position);
 
 
-        public Vector3 GetRandomPointInSurfaceBounds()
-        {
-            Bounds surfaceBounds = _navMeshSurface.navMeshData.sourceBounds;
-
-            for (int i = 0; i < 20; i++)
-            {
-                Vector3 randomPoint = new Vector3(
-                    Random.Range(surfaceBounds.min.x, surfaceBounds.max.x),
-                    surfaceBounds.center.y,
-                    Random.Range(surfaceBounds.min.z, surfaceBounds.max.z)
-                );
-
-                if (NavMesh.SamplePosition(randomPoint, out NavMeshHit hit, 2f, NavMesh.AllAreas)) return hit.position;
-            }
-
-            return Vector3.zero;
-        }
-
         public Vector3 GetRandomPointOnNavMesh(int maxAttempts = 20)
         {
             Bounds searchBounds;

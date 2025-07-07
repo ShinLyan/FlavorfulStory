@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace FlavorfulStory.SceneManagement.ShopLocation
 {
@@ -12,14 +14,18 @@ namespace FlavorfulStory.SceneManagement.ShopLocation
 
         [SerializeField] private Furniture[] _furnitures;
 
-        public Furniture[] GetAvailableFurniture()
-        {
-            return _furnitures; //TODO: реализовать метод
-        }
+        public Furniture GetAvailableFurniture() => (Furniture)GetAvailableObjects(_furnitures);
 
-        public Shelf[] GetAvailableShelves()
+        public Shelf GetAvailableShelf() => (Shelf)GetAvailableObjects(_shelves);
+
+        private ShopObject GetAvailableObjects(ShopObject[] objects)
         {
-            return _shelves; //TODO: реализовать метод
+            var availableObjects = new List<ShopObject>();
+            foreach (var obj in objects)
+                if (!obj.IsOccupied)
+                    availableObjects.Add(obj);
+
+            return availableObjects[Random.Range(0, availableObjects.Count)];
         }
     }
 }

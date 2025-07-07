@@ -8,6 +8,10 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         /// <summary> Событие, вызываемое для запроса перехода к другому состоянию. </summary>
         public event Action<Type> OnStateChangeRequested;
 
+        protected StateContext Context { get; private set; }
+
+        public void SetContext(StateContext context) => Context = context;
+
         /// <summary> Вызывается при входе в состояние. </summary>
         public virtual void Enter() { }
 
@@ -23,5 +27,8 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         /// <summary> Запросить смену состояния. </summary>
         /// <param name="stateType"> Тип состояния, на которое требуется перейти. </param>
         protected void RequestStateChange(Type stateType) => OnStateChangeRequested?.Invoke(stateType);
+
+        /// <summary> Проверяет, завершено ли состояние. </summary>
+        public virtual bool IsComplete() => false;
     }
 }

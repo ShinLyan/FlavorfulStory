@@ -75,5 +75,9 @@ namespace FlavorfulStory.AI.BaseNpc
         /// <summary> Подписывается на события системы времени. </summary>
         /// <remarks> Может быть переопределен в наследниках для дополнительных подписок. </remarks>
         protected virtual void SubscribeToEvents() => WorldTime.OnDayEnded += OnReset;
+
+        public virtual void StartSequence(IEnumerable<CharacterState> states) { }
+
+        public virtual void ReturnFromSequence() { }
     }
 }

@@ -1,6 +1,5 @@
 using FlavorfulStory.AI.NonInteractableNpc;
 using FlavorfulStory.SceneManagement.ShopLocation;
-using UnityEngine;
 
 namespace FlavorfulStory.AI.FiniteStateMachine.InShopStates
 {
@@ -18,8 +17,9 @@ namespace FlavorfulStory.AI.FiniteStateMachine.InShopStates
 
         public override void Enter()
         {
-            var availableFurniture = _shopLocation.GetAvailableFurniture();
-            var furniture = availableFurniture[Random.Range(0, availableFurniture.Length)];
+            var furniture = _shopLocation.GetAvailableFurniture();
+            Context?.Set("SelectedFurniture", furniture);
+
             var point = furniture.GetAccessiblePoint();
             _movementController.SetPoint(point);
         }
