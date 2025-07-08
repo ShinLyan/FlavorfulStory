@@ -1,12 +1,12 @@
 ﻿using FlavorfulStory.AI.BaseNpc;
+using FlavorfulStory.AI.Scheduling;
 using FlavorfulStory.AI.WarpGraphSystem;
-using FlavorfulStory.SceneManagement;
 using UnityEngine;
 using UnityEngine.AI;
 
 namespace FlavorfulStory.AI.NonInteractableNpc
 {
-    public class NonInteractableNpcNavigator : NpcNavigator, INpcNavigatorMover<Location>
+    public class NonInteractableNpcNavigator : NpcNavigator, INpcNavigatorMover<SchedulePoint>
     {
         public NonInteractableNpcNavigator(NavMeshAgent navMeshAgent,
             WarpGraph warpGraph,
@@ -15,17 +15,29 @@ namespace FlavorfulStory.AI.NonInteractableNpc
         {
         }
 
-        public void MoveTo(Location location)
+        public void MoveTo(SchedulePoint point)
         {
-            var point = location.GetRandomPointOnNavMesh();
-            // _currentTargetPoint = point; //TODO: Use Location instead of SchedulePoint
+            _currentTargetPoint = point;
             _isNotMoving = false;
             ResumeAgent();
 
-            // if (_currentLocation != point.LocationName)
-            //     StartWarpTransition(point);
-            // else
-            _navMeshAgent.SetDestination(point);
+            if (_currentLocation != point.LocationName)
+                StartWarpTransition(point);
+            else
+                _navMeshAgent.SetDestination(point.Position);
         }
+
+        // public void MoveTo(Vector3 point) //TODO: подумать над тем как это сделать
+        // {
+        //     // var point = location.GetRandomPointOnNavMesh();
+        //     _currentTargetPoint = point;
+        //     _isNotMoving = false;
+        //     ResumeAgent();
+        //
+        //     // if (_currentLocation != point.LocationName)
+        //     //     StartWarpTransition(point);
+        //     // else
+        //     _navMeshAgent.SetDestination(point);
+        // }
     }
 }

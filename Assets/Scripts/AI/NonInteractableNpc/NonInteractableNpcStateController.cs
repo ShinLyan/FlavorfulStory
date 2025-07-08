@@ -1,10 +1,11 @@
-﻿using System.Collections.Generic;
-using FlavorfulStory.Actions;
+﻿using FlavorfulStory.Actions;
 using FlavorfulStory.AI.BaseNpc;
 using FlavorfulStory.AI.FiniteStateMachine;
 using FlavorfulStory.AI.FiniteStateMachine.InShopStates;
+using FlavorfulStory.Player;
 using FlavorfulStory.SceneManagement;
 using FlavorfulStory.SceneManagement.ShopLocation;
+using UnityEngine;
 using AnimationState = FlavorfulStory.AI.FiniteStateMachine.InShopStates.AnimationState;
 
 namespace FlavorfulStory.AI.NonInteractableNpc
@@ -24,11 +25,15 @@ namespace FlavorfulStory.AI.NonInteractableNpc
         private PaymentState _paymentState;
         private RandomPointPickerState _randomPointPickerState;
         private ShelfPickerState _shelfPickerState;
+        private WaitingState _waitingState;
 
         private SequenceState _randomPointSequence;
         private SequenceState _furnitureSequence;
         private SequenceState _buyItemSequence;
         private SequenceState _refuseItemSequence;
+
+        private readonly PlayerController _playerController;
+        private readonly Transform _npcTransform;
 
         /// <summary> Инициализирует новый экземпляр контроллера состояний. </summary>
         /// <param name="npcMovementController"> Контроллер движения NPC. </param>
@@ -38,12 +43,17 @@ namespace FlavorfulStory.AI.NonInteractableNpc
         public NonInteractableNpcStateController(NonInteractableNpcMovementController npcMovementController,
             LocationManager locationManager,
             NpcAnimationController npcAnimationController,
-            ItemHandler itemHandler)
+            ItemHandler itemHandler,
+            PlayerController playerController, Transform npcTransform)
             : base(npcAnimationController)
         {
             _npcMovementController = npcMovementController;
             _locationManager = locationManager;
             _itemHandler = itemHandler;
+
+            _playerController = playerController;
+            _npcTransform = npcTransform;
+
             Initialize();
         }
 
@@ -59,32 +69,36 @@ namespace FlavorfulStory.AI.NonInteractableNpc
             _paymentState = new PaymentState();
             _randomPointPickerState = new RandomPointPickerState(_npcMovementController, shopLocation);
             _shelfPickerState = new ShelfPickerState(_npcMovementController, shopLocation);
+            _waitingState = new WaitingState(_playerController, _npcTransform);
 
             _randomPointSequence = new SequenceState(this,
                 new CharacterState[] { _randomPointPickerState, _movementState, _animationState });
+            _typeToCharacterStates.Add("_randomPointSequence", _randomPointSequence);
 
             _furnitureSequence = new SequenceState(this,
                 new CharacterState[] { _furniturePickerState, _movementState, _animationState });
+            _typeToCharacterStates.Add("_furnitureSequence", _furnitureSequence);
 
             _buyItemSequence = new SequenceState(this,
                 new CharacterState[]
                 {
                     _shelfPickerState, _movementState, _itemPickerState, _movementState, _paymentState
                 });
+            _typeToCharacterStates.Add("_buyItemSequence", _buyItemSequence);
 
             _refuseItemSequence = new SequenceState(this,
                 new CharacterState[] { _shelfPickerState, _movementState, _animationState });
+            _typeToCharacterStates.Add("_refuseItemSequence", _refuseItemSequence);
 
             var states = new CharacterState[]
             {
                 _movementState, _animationState, _furniturePickerState, _itemPickerState, _paymentState,
-                _randomPointPickerState, _shelfPickerState, _randomPointSequence, _furnitureSequence,
-                _buyItemSequence, _refuseItemSequence
+                _randomPointPickerState, _shelfPickerState, _waitingState
             };
 
             foreach (var state in states)
             {
-                _typeToCharacterStates.Add(state.GetType(), state);
+                _typeToCharacterStates.Add(state.GetType().ToString(), state);
                 state.OnStateChangeRequested += SetState;
             }
         }
@@ -92,20 +106,20 @@ namespace FlavorfulStory.AI.NonInteractableNpc
         protected override void ResetStates()
         {
             foreach (var state in _typeToCharacterStates.Values) state.Reset();
-            SetState(typeof(MovementState)); //TODO: think about initial state
+            SetState(typeof(WaitingState).ToString()); //TODO: think about initial state
         }
 
         /// <summary> Запускает последовательность состояний. </summary>
-        public override void StartSequence(IEnumerable<CharacterState> states)
+        public override void StartSequence(string sequenceName)
         {
-            var sequence = new SequenceState(this, states);
             // _stateStack.Push(_currentState); //TODO: rework
-            SetState(sequence.GetType());
+            SetState(sequenceName);
         }
 
         /// <summary> Возвращает управление после завершения последовательности. </summary>
         public override void ReturnFromSequence()
         {
+            SetState(typeof(WaitingState).ToString());
             // if (_stateStack.Count > 0)
             // {
             //     var previousState = _stateStack.Pop(); // TODO: rework
@@ -114,6 +128,25 @@ namespace FlavorfulStory.AI.NonInteractableNpc
         }
 
 
-        public override void Update() { base.Update(); }
+        public override void Update()
+        {
+            base.Update();
+            if (Input.GetKeyDown(KeyCode.Space)) StartRandomSequence();
+        }
+
+        private readonly string[] _availableSequences =
+        {
+            "_randomPointSequence", "_furnitureSequence", "_buyItemSequence", "_refuseItemSequence"
+        };
+
+        private void StartRandomSequence()
+        {
+            int randomIndex = Random.Range(0, _availableSequences.Length);
+            string randomSequence = _availableSequences[randomIndex];
+
+            Debug.Log("==================================");
+            Debug.Log(_npcTransform.name + " Starting random sequence: " + randomSequence);
+            StartSequence(randomSequence);
+        }
     }
 }

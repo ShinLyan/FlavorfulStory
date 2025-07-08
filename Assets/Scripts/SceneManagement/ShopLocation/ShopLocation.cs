@@ -1,11 +1,9 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
 namespace FlavorfulStory.SceneManagement.ShopLocation
 {
-    [Serializable]
     public class ShopLocation : Location
     {
         [field: SerializeField] public CashDesk CashDesk { get; private set; }

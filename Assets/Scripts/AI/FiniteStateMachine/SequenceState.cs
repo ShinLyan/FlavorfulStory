@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using FlavorfulStory.AI.BaseNpc;
 
 namespace FlavorfulStory.AI.FiniteStateMachine
@@ -7,34 +6,33 @@ namespace FlavorfulStory.AI.FiniteStateMachine
     /// <summary> Состояние, которое выполняет последовательность других состояний. </summary>
     public class SequenceState : CharacterState
     {
-        private readonly Queue<CharacterState> _statesQueue;
         private CharacterState _currentState;
         private readonly StateController _stateController;
+        private int _currentStateIndex;
+        private readonly List<CharacterState> _states;
 
         public SequenceState(StateController stateController, IEnumerable<CharacterState> states)
         {
             _stateController = stateController;
-            _statesQueue = new Queue<CharacterState>(states);
+            _states = new List<CharacterState>(states);
+            _currentStateIndex = 0;
         }
 
         public override void Enter()
         {
-            if (_statesQueue.Count == 0)
+            if (_currentStateIndex == _states.Count - 1)
             {
-                Exit();
+                Back();
                 return;
             }
 
-            _currentState = _statesQueue.Dequeue();
+            _currentState = _states[_currentStateIndex];
             _currentState.SetContext(Context);
             _currentState.OnStateChangeRequested += OnSubStateChangeRequested;
             _currentState.Enter();
         }
 
-        private void OnSubStateChangeRequested(Type type)
-        {
-            // Игнорируем запросы на смену состояния от подсостояний
-        }
+        private void OnSubStateChangeRequested(string type) { }
 
         public override void Update()
         {
@@ -42,35 +40,30 @@ namespace FlavorfulStory.AI.FiniteStateMachine
 
             _currentState.Update();
 
-            if (_currentState.IsComplete()) //TODO: добавить IsComplete во все состояния
+            if (_currentState.IsComplete())
             {
                 _currentState.Exit();
                 _currentState.OnStateChangeRequested -= OnSubStateChangeRequested;
 
-                if (_statesQueue.Count == 0)
+                if (_currentStateIndex == _states.Count - 1)
                 {
-                    Exit();
+                    Back();
                     return;
                 }
 
-                _currentState = _statesQueue.Dequeue();
+                _currentStateIndex += 1;
+
+                _currentState = _states[_currentStateIndex];
                 _currentState.SetContext(Context);
                 _currentState.OnStateChangeRequested += OnSubStateChangeRequested;
                 _currentState.Enter();
             }
         }
 
-        public override void Exit()
+        private void Back()
         {
-            if (_currentState != null)
-            {
-                _currentState.Exit();
-                _currentState.OnStateChangeRequested -= OnSubStateChangeRequested;
-            }
-
+            _currentStateIndex = 0;
             _stateController.ReturnFromSequence();
         }
-
-        public override void Reset() { }
     }
 }

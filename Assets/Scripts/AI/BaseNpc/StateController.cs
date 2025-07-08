@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using FlavorfulStory.AI.FiniteStateMachine;
 using FlavorfulStory.TimeManagement;
@@ -14,7 +13,7 @@ namespace FlavorfulStory.AI.BaseNpc
         protected CharacterState _currentState;
 
         /// <summary> Словарь для быстрого доступа к состояниям по их типу. </summary>
-        protected readonly Dictionary<Type, CharacterState> _typeToCharacterStates;
+        protected readonly Dictionary<string, CharacterState> _typeToCharacterStates;
 
         /// <summary> Контроллер анимации NPC для управления анимационными состояниями. </summary>
         protected readonly NpcAnimationController _animationController;
@@ -23,7 +22,7 @@ namespace FlavorfulStory.AI.BaseNpc
         /// <param name="npcAnimationController"> Контроллер анимации NPC. </param>
         protected StateController(NpcAnimationController npcAnimationController)
         {
-            _typeToCharacterStates = new Dictionary<Type, CharacterState>();
+            _typeToCharacterStates = new Dictionary<string, CharacterState>();
             _animationController = npcAnimationController;
         }
 
@@ -63,7 +62,7 @@ namespace FlavorfulStory.AI.BaseNpc
 
         /// <summary> Устанавливает новое состояние персонажа по типу. </summary>
         /// <param name="type"> Тип состояния для установки. </param>
-        protected void SetState(Type type)
+        protected void SetState(string type)
         {
             if (!_typeToCharacterStates.TryGetValue(type, out var next) || _currentState == next) return;
 
@@ -76,7 +75,7 @@ namespace FlavorfulStory.AI.BaseNpc
         /// <remarks> Может быть переопределен в наследниках для дополнительных подписок. </remarks>
         protected virtual void SubscribeToEvents() => WorldTime.OnDayEnded += OnReset;
 
-        public virtual void StartSequence(IEnumerable<CharacterState> states) { }
+        public virtual void StartSequence(string sequenceName) { }
 
         public virtual void ReturnFromSequence() { }
     }

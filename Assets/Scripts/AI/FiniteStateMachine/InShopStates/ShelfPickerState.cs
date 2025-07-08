@@ -1,4 +1,6 @@
 using FlavorfulStory.AI.NonInteractableNpc;
+using FlavorfulStory.AI.Scheduling;
+using FlavorfulStory.SceneManagement;
 using FlavorfulStory.SceneManagement.ShopLocation;
 
 namespace FlavorfulStory.AI.FiniteStateMachine.InShopStates
@@ -17,13 +19,19 @@ namespace FlavorfulStory.AI.FiniteStateMachine.InShopStates
 
         public override void Enter()
         {
+            base.Enter();
             var availableShelf = _shopLocation.GetAvailableShelf();
             Context?.Set("SelectedShelf", availableShelf);
 
-            var point = availableShelf.GetAccessiblePoint();
-            _movementController.SetPoint(point);
+            var pointVector = availableShelf.GetAccessiblePoint();
 
-            RequestStateChange(GetType());
+            var point = new SchedulePoint(); //TODO: rework
+            point.Position = pointVector;
+            point.LocationName = LocationName.NewShop;
+
+            _movementController.SetPoint(point);
         }
+
+        public override bool IsComplete() => true;
     }
 }

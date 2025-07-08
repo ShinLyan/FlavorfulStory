@@ -12,12 +12,19 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         /// <summary> Флаг, указывающий, находится ли персонаж в данный момент в состоянии движения. </summary>
         private bool _isInState;
 
+        private bool _isComplete;
+
         /// <summary> Инициализирует новое состояние движения с заданным контроллером движения. </summary>
         /// <param name="movementController"> Контроллер движения для управления перемещением NPC. </param>
         public MovementState(NpcMovementController movementController)
         {
+            _isComplete = false;
             _movementController = movementController;
-            _movementController.OnDestinationReached += () => RequestStateChange(typeof(RoutineState));
+            _movementController.OnDestinationReached += () =>
+            {
+                _isComplete = true;
+                RequestStateChange(typeof(RoutineState));
+            };
 
             WorldTime.OnTimePaused += StopMovementOnPause;
             WorldTime.OnTimeUnpaused += ContinueMovementOnUnpause;
@@ -26,6 +33,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         /// <summary> Входит в состояние движения и начинает перемещение к текущей точке расписания. </summary>
         public override void Enter()
         {
+            base.Enter();
             _movementController.MoveToPoint();
             _isInState = true;
         }
@@ -35,6 +43,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         {
             _movementController.Stop();
             _isInState = false;
+            _isComplete = false;
         }
 
         /// <summary> Сбрасывает состояние движения, мгновенно останавливая NPC. </summary>
@@ -51,5 +60,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         {
             if (_isInState) _movementController.MoveToPoint();
         }
+
+        public override bool IsComplete() => _isComplete;
     }
 }

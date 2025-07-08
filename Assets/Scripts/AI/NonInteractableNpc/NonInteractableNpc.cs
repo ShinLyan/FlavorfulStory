@@ -33,7 +33,8 @@ namespace FlavorfulStory.AI.NonInteractableNpc
                 _movementController as NonInteractableNpcMovementController,
                 _locationManager,
                 _animationController,
-                _itemHandler
+                _itemHandler,
+                _playerController, transform
             );
         }
     }

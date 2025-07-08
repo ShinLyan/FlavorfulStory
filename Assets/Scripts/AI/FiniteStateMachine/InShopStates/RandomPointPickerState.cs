@@ -1,4 +1,6 @@
 using FlavorfulStory.AI.NonInteractableNpc;
+using FlavorfulStory.AI.Scheduling;
+using FlavorfulStory.SceneManagement;
 using FlavorfulStory.SceneManagement.ShopLocation;
 using UnityEngine;
 
@@ -19,14 +21,25 @@ namespace FlavorfulStory.AI.FiniteStateMachine.InShopStates
 
         public override void Enter()
         {
-            var point = _shopLocation.GetRandomPointOnNavMesh(); //TODO: реворк метод
+            base.Enter();
+            var pointVector = _shopLocation.GetRandomPointOnNavMesh(); //TODO: реворк метод
 
-            if (IsPointAvailable(point))
+            if (IsPointAvailable(pointVector))
+            {
+                var point = new SchedulePoint(); //TODO: rework
+                point.Position = pointVector;
+                point.LocationName = LocationName.NewShop;
+
                 _movementController.SetPoint(point);
+            }
             else
+            {
                 Enter();
+            }
         }
 
         private bool IsPointAvailable(Vector3 point) { return true; } //TODO: реализовать метод
+
+        public override bool IsComplete() => true;
     }
 }

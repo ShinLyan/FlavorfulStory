@@ -1,4 +1,5 @@
 ﻿using FlavorfulStory.AI.BaseNpc;
+using FlavorfulStory.AI.Scheduling;
 using FlavorfulStory.AI.WarpGraphSystem;
 using UnityEngine;
 using UnityEngine.AI;
@@ -9,7 +10,8 @@ namespace FlavorfulStory.AI.NonInteractableNpc
     {
         private readonly NonInteractableNpcNavigator _nonInteractableNavigator;
 
-        private Vector3? _currentPoint;
+        // private Vector3 _currentPoint;
+        private SchedulePoint _currentPoint;
 
         public NonInteractableNpcMovementController(NavMeshAgent navMeshAgent,
             WarpGraph warpGraph,
@@ -18,7 +20,6 @@ namespace FlavorfulStory.AI.NonInteractableNpc
             : base(navMeshAgent, warpGraph, transform, animationController)
         {
             _nonInteractableNavigator = (NonInteractableNpcNavigator)_navigator;
-            _currentPoint = null;
 
             _nonInteractableNavigator.OnDestinationReached += () => OnDestinationReached?.Invoke();
         }
@@ -28,12 +29,10 @@ namespace FlavorfulStory.AI.NonInteractableNpc
             return new NonInteractableNpcNavigator(agent, graph, transform);
         }
 
-        public override void MoveToPoint()
-        {
-            // _nonInteractableNavigator.MoveTo(GetCurrentLocation()); //TODO: Переделать метод
-        }
+        public override void MoveToPoint() { _nonInteractableNavigator.MoveTo(_currentPoint); }
 
-        public void SetPoint(Vector3 newPoint) => _currentPoint = newPoint;
+        // public void SetPoint(Vector3 newPoint) => _currentPoint = newPoint; //TODO: подумать
+        public void SetPoint(SchedulePoint newPoint) => _currentPoint = newPoint;
 
         // private Location GetCurrentLocation() //TODO: убрать это
         // {

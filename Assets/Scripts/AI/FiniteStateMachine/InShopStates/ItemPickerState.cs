@@ -1,5 +1,7 @@
 using FlavorfulStory.Actions;
 using FlavorfulStory.AI.NonInteractableNpc;
+using FlavorfulStory.AI.Scheduling;
+using FlavorfulStory.SceneManagement;
 using FlavorfulStory.SceneManagement.ShopLocation;
 using UnityEngine;
 
@@ -23,26 +25,26 @@ namespace FlavorfulStory.AI.FiniteStateMachine.InShopStates
 
         public override void Enter()
         {
+            base.Enter();
             if (Context != null && Context.TryGet<Shelf>("SelectedShelf", out var shelf))
             {
                 // var item = shelf.Items[Random.Range(0, shelf.Items.Count)]; //TODO
                 // _itemHandler.EquipItem(item);
-
-                var point = _shopLocation.CashDesk.GetAccessiblePoint();
-                _movementController.SetPoint(point);
-                RequestStateChange(GetType());
             }
             else
             {
                 Debug.LogError("Shelf not found in context!");
-                RequestStateChange(GetType());
             }
 
-            // shelf = Context.TryGet<Shelf>("Shelf") //TODO
-            // item = shelf.Items[Random.Range(0, helf.Items.Count)]
-            // _itemHandler.EquipItem(item);
-            // point = _shopLocation.CashDesk.GetAccessiblePoint();
-            // _movementController.SetPoint(point);
+            var pointVector = _shopLocation.CashDesk.GetAccessiblePoint();
+
+            var point = new SchedulePoint(); //TODO: rework
+            point.Position = pointVector;
+            point.LocationName = LocationName.NewShop;
+
+            _movementController.SetPoint(point);
         }
+
+        public override bool IsComplete() => true;
     }
 }

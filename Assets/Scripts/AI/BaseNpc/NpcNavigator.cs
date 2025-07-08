@@ -35,7 +35,7 @@ namespace FlavorfulStory.AI.BaseNpc
         private readonly WarpGraph _warpGraph;
 
         /// <summary> Дистанция, на которой считается что цель достигнута. </summary>
-        private const float ArrivalDistance = 1.0f;
+        private const float ArrivalDistance = 0.5f;
 
         /// <summary> Позиция спавна NPC. </summary>
         private readonly Vector3 _spawnPosition;

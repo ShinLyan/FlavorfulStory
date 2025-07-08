@@ -73,7 +73,7 @@ namespace FlavorfulStory.AI.InteractableNpc
 
             foreach (var state in states)
             {
-                _typeToCharacterStates.Add(state.GetType(), state);
+                _typeToCharacterStates.Add(state.GetType().ToString(), state);
                 state.OnStateChangeRequested += SetState;
 
                 if (state is ICurrentSchedulePointDependable dependable)
@@ -92,7 +92,7 @@ namespace FlavorfulStory.AI.InteractableNpc
             if (_currentState is MovementState)
                 _currentState.Enter();
             else
-                SetState(typeof(MovementState));
+                SetState(typeof(MovementState).ToString());
 
             _animationController.TriggerAnimation(AnimationType.Locomotion);
         }
@@ -101,7 +101,7 @@ namespace FlavorfulStory.AI.InteractableNpc
         protected override void ResetStates()
         {
             foreach (var state in _typeToCharacterStates.Values) state.Reset();
-            SetState(typeof(RoutineState));
+            SetState(typeof(RoutineState).ToString());
         }
 
         /// <summary> Выполняет приоритизацию расписания перед сбросом состояний. </summary>
@@ -125,7 +125,7 @@ namespace FlavorfulStory.AI.InteractableNpc
         /// <param name="other"> Коллайдер, вошедший в триггер. </param>
         public void OnTriggerEntered(Collider other)
         {
-            SetState(typeof(WaitingState));
+            SetState(typeof(WaitingState).ToString());
             _animationController.TriggerAnimation(AnimationType.Idle);
         }
 
@@ -133,7 +133,7 @@ namespace FlavorfulStory.AI.InteractableNpc
         /// <param name="other"> Коллайдер, вышедший из триггера. </param>
         public void OnTriggerExited(Collider other)
         {
-            SetState(typeof(MovementState));
+            SetState(typeof(MovementState).ToString());
             _animationController.TriggerAnimation(AnimationType.Locomotion);
         }
     }

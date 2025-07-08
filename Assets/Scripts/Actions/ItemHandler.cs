@@ -1,8 +1,9 @@
 using FlavorfulStory.InventorySystem;
+using UnityEngine;
 
 namespace FlavorfulStory.Actions
 {
-    public class ItemHandler
+    public class ItemHandler : MonoBehaviour
     {
         public void EquipItem(InventoryItem item)
         {
