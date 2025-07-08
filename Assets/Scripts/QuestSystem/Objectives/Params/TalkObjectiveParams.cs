@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using FlavorfulStory.AI;
 using FlavorfulStory.DialogueSystem;
 using UnityEngine;
@@ -16,22 +15,15 @@ namespace FlavorfulStory.QuestSystem.Objectives.Params
         /// <summary> Диалог, который должен быть использован в разговоре. </summary>
         [field: SerializeField] public Dialogue Dialogue { get; private set; }
 
-        /// <summary> Проверяет выполнение условия разговора и завершает цель, если оно выполнено. </summary>
-        /// <param name="questStatus"> Статус квеста. </param>
+        /// <summary> Проверяет, соответствует ли разговор нужному NPC и диалогу. </summary>
+        /// <param name="status"> Статус квеста. </param>
         /// <param name="context"> Контекст выполнения цели. </param>
-        /// <param name="eventData"> Данные события, содержащие имя NPC и диалог. </param>
-        public override void CheckAndComplete(QuestStatus questStatus, ObjectiveExecutionContext context,
-            object eventData = null)
+        /// <param name="eventData"> Событие, содержащее имя NPC и диалог. </param>
+        /// <returns> True, если цель выполнена. </returns>
+        protected override bool ShouldComplete(QuestStatus status, ObjectiveExecutionContext context, object eventData)
         {
-            if (eventData is not (NpcName npcName, Dialogue dialogue)) return;
-
-            if (npcName != NpcName || dialogue != Dialogue) return;
-
-            var objective = questStatus.Quest.Objectives.FirstOrDefault(o => o.Params == this);
-            if (objective != null)
-                context.QuestList.CompleteObjective(questStatus, objective);
-            else
-                Debug.LogError($"Objective не найдено для Params {this} в квесте {questStatus.Quest.QuestName}!");
+            if (eventData is not (NpcName npcName, Dialogue dialogue)) return false;
+            return npcName == NpcName && dialogue == Dialogue;
         }
     }
 }

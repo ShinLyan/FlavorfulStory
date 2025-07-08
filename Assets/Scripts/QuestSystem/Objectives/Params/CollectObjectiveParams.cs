@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using FlavorfulStory.InventorySystem;
 using UnityEngine;
 
@@ -17,23 +16,15 @@ namespace FlavorfulStory.QuestSystem.Objectives.Params
         [field: Tooltip("Требуемое количество предметов."), SerializeField, Min(1f)]
         public int RequiredAmount { get; private set; } = 1;
 
-        /// <summary> Проверяет выполнение условия сбора и завершает цель, если условие выполнено. </summary>
-        /// <param name="questStatus"> Статус квеста. </param>
+        /// <summary> Проверяет, собрано ли нужное количество предметов. </summary>
+        /// <param name="status"> Статус квеста. </param>
         /// <param name="context"> Контекст выполнения цели. </param>
-        /// <param name="eventData"> Предмет инвентаря. </param>
-        public override void CheckAndComplete(QuestStatus questStatus, ObjectiveExecutionContext context,
-            object eventData = null)
+        /// <param name="eventData"> Событие, содержащее собранный предмет. </param>
+        /// <returns> True, если цель выполнена. </returns>
+        protected override bool ShouldComplete(QuestStatus status, ObjectiveExecutionContext context, object eventData)
         {
-            if (eventData is InventoryItem item && item != InventoryItem) return;
-
-            int count = context.Inventory.GetItemNumber(InventoryItem);
-            if (count < RequiredAmount) return;
-
-            var objective = questStatus.Quest.Objectives.FirstOrDefault(o => o.Params == this);
-            if (objective != null)
-                context.QuestList.CompleteObjective(questStatus, objective);
-            else
-                Debug.LogError($"Objective не найдено для Params {this} в квесте {questStatus.Quest.QuestName}!");
+            if (eventData is InventoryItem item && item != InventoryItem) return false;
+            return context.Inventory.GetItemNumber(InventoryItem) >= RequiredAmount;
         }
     }
 }
