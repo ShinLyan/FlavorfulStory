@@ -15,8 +15,11 @@ namespace FlavorfulStory.QuestSystem
         /// <summary> Список выполненных целей квеста. </summary>
         [SerializeField] private List<string> _completedObjectives;
 
-        /// <summary> Флаг, указывающий, что квест завершен (пока всегда true). </summary>
+        /// <summary> Квест завершен? </summary>
         public bool IsComplete => Quest.Objectives.All(objective => _completedObjectives.Contains(objective.Reference));
+
+        /// <summary> Награды были получены? </summary>
+        public bool IsRewardGiven { get; private set; }
 
         /// <summary> Конструктор для создания нового статуса квеста. </summary>
         /// <param name="quest"> Квест, для которого создается статус. </param>
@@ -35,6 +38,9 @@ namespace FlavorfulStory.QuestSystem
             Quest = Quest.GetByName(state.QuestName);
             _completedObjectives = state.CompletedObjectives;
         }
+
+        /// <summary> Пометить, что награды получены. </summary>
+        public void MarkRewardGiven() => IsRewardGiven = true;
 
         /// <summary> Проверяет, завершена ли указанная цель. </summary>
         /// <param name="objective"> Название цели. </param>

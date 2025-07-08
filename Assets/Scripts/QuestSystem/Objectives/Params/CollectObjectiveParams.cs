@@ -20,8 +20,12 @@ namespace FlavorfulStory.QuestSystem.Objectives.Params
         /// <summary> Проверяет выполнение условия сбора и завершает цель, если условие выполнено. </summary>
         /// <param name="questStatus"> Статус квеста. </param>
         /// <param name="context"> Контекст выполнения цели. </param>
-        public override void CheckAndComplete(QuestStatus questStatus, ObjectiveExecutionContext context)
+        /// <param name="eventData"> Предмет инвентаря. </param>
+        public override void CheckAndComplete(QuestStatus questStatus, ObjectiveExecutionContext context,
+            object eventData = null)
         {
+            if (eventData is InventoryItem item && item != InventoryItem) return;
+
             int count = context.Inventory.GetItemNumber(InventoryItem);
             if (count < RequiredAmount) return;
 

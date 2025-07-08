@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using FlavorfulStory.AI;
 using FlavorfulStory.Core;
 using FlavorfulStory.DialogueSystem.UI;
 using FlavorfulStory.InputSystem;
@@ -11,13 +12,13 @@ using Random = UnityEngine.Random;
 
 namespace FlavorfulStory.DialogueSystem
 {
-    /// <summary> Компонент для управления диалогом игрока. </summary>
-    public class PlayerSpeaker : MonoBehaviour, IDialogueInitiator
+    /// <summary> Компонент диалогов игрока. </summary>
+    public class PlayerSpeaker : MonoBehaviour
     {
         #region Fields
 
         /// <summary> NPC, с которым в данный момент ведётся диалог. </summary>
-        private NpcSpeaker CurrentNpcSpeaker { get; set; }
+        private NpcSpeaker _currentNpcSpeaker;
 
         /// <summary> Текущий активный диалог. </summary>
         private Dialogue _currentDialogue;
@@ -35,7 +36,7 @@ namespace FlavorfulStory.DialogueSystem
         private bool IsDialogueActive => _currentDialogue;
 
         /// <summary> Событие завершения диалога. </summary>
-        public event Action OnConversationEnded;
+        public event Action<NpcName, Dialogue> OnDialogueCompleted;
 
         #endregion
 
@@ -80,7 +81,7 @@ namespace FlavorfulStory.DialogueSystem
         {
             WorldTime.Pause();
 
-            CurrentNpcSpeaker = npcSpeaker;
+            _currentNpcSpeaker = npcSpeaker;
             _currentDialogue = dialogue;
             _currentNode = dialogue.RootNode;
 
@@ -94,15 +95,15 @@ namespace FlavorfulStory.DialogueSystem
         public void EndDialogue()
         {
             WorldTime.Unpause();
-
-            _currentDialogue = null;
             TriggerExitAction();
-            CurrentNpcSpeaker = null;
+
+            OnDialogueCompleted?.Invoke(_currentNpcSpeaker.NpcInfo.NpcName, _currentDialogue);
+            _dialogueView.Hide();
+
+            _currentNpcSpeaker = null;
+            _currentDialogue = null;
             _currentNode = null;
             IsChoosingDialogue = false;
-
-            _dialogueView.OnHidden += () => OnConversationEnded?.Invoke();
-            _dialogueView.Hide();
 
             // Защищаем от повторного запуска взаимодействия
             InputWrapper.BlockInput(InputButton.Interact);
@@ -171,13 +172,7 @@ namespace FlavorfulStory.DialogueSystem
         /// <summary> Обновить UI диалога в соответствии с текущим узлом. </summary>
         private void UpdateDialogueView()
         {
-            if (!IsDialogueActive)
-            {
-                _dialogueView.Hide();
-                return;
-            }
-
-            var data = new DialogueData(_currentNode.Text, CurrentNpcSpeaker?.NpcInfo, IsChoosingDialogue,
+            var data = new DialogueData(_currentNode.Text, _currentNpcSpeaker?.NpcInfo, IsChoosingDialogue,
                 GetChoices());
             _dialogueView.Show(data);
         }
@@ -199,7 +194,7 @@ namespace FlavorfulStory.DialogueSystem
         private void TriggerAction(string action)
         {
             if (action == string.Empty) return;
-            CurrentNpcSpeaker.GetComponent<DialogueTrigger>().TriggerDialogue(action);
+            _currentNpcSpeaker.GetComponent<DialogueTrigger>().TriggerDialogue(action);
         }
     }
 }

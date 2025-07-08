@@ -79,7 +79,7 @@ namespace FlavorfulStory.Installers
         /// <summary> Установить зависимости, связанные с системой диалогов. </summary>
         private void BindDialogue()
         {
-            Container.Bind<IDialogueInitiator>().To<PlayerSpeaker>().FromComponentInHierarchy().AsSingle();
+            Container.Bind<PlayerSpeaker>().FromComponentInHierarchy().AsSingle();
             Container.Bind<DialogueModelPresenter>().FromComponentInHierarchy().AsSingle();
             Container.Bind<DialogueView>().FromComponentInHierarchy().AsSingle();
         }

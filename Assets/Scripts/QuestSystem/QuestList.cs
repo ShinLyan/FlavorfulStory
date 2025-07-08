@@ -13,6 +13,7 @@ namespace FlavorfulStory.QuestSystem
     /// <summary> Хранит список активных квестов игрока. </summary>
     public class QuestList : MonoBehaviour, IPredicateEvaluator, ISaveable
     {
+        // TODO: Нужно выполненные квесты отсюда переносить в отдельный список, т.к. при проверках на срабатывание триггеров, проходятся по всем квестам
         /// <summary> Список статусов всех квестов игрока. </summary>
         [SerializeField] private List<QuestStatus> _questStatuses;
 
@@ -58,28 +59,17 @@ namespace FlavorfulStory.QuestSystem
         public bool HasQuest(Quest quest) => GetQuestStatus(quest) != null;
 
         /// <summary> Отмечает цель квеста как выполненную и выдает награду, если квест завершен. </summary>
-        /// <param name="quest"> Квест, в котором нужно отметить цель. </param>
+        /// <param name="questStatus"> Квест, в котором нужно отметить цель. </param>
         /// <param name="objective"> Ссылка на выполненную цель. </param>
-        public void CompleteObjective(Quest quest, string objective)
-        {
-            var questStatus = GetQuestStatus(quest);
-            if (questStatus == null) return;
-
-            questStatus.CompleteObjective(objective);
-            if (questStatus.IsComplete) CompleteQuest(quest);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="questStatus"></param>
-        /// <param name="objective"></param>
         public void CompleteObjective(QuestStatus questStatus, QuestObjective objective)
         {
-            if (questStatus == null || objective == null) return;
+            if (questStatus == null || objective == null ||
+                questStatus.IsObjectiveComplete(objective.Reference))
+                return;
 
             questStatus.CompleteObjective(objective.Reference);
-            if (questStatus.IsComplete) CompleteQuest(questStatus.Quest);
+
+            if (questStatus.IsComplete && !questStatus.IsRewardGiven) CompleteQuest(questStatus);
         }
 
         /// <summary> Получает статус указанного квеста из списка. </summary>
@@ -88,10 +78,12 @@ namespace FlavorfulStory.QuestSystem
         private QuestStatus GetQuestStatus(Quest quest) =>
             _questStatuses.FirstOrDefault(questStatus => questStatus.Quest == quest);
 
-        private void CompleteQuest(Quest quest)
+        private void CompleteQuest(QuestStatus questStatus)
         {
-            //
-            GiveReward(quest.Rewards);
+            Debug.Log($"Complete Quest {questStatus.Quest.QuestName}");
+
+            questStatus.MarkRewardGiven();
+            GiveReward(questStatus.Quest.Rewards);
         }
 
         /// <summary> Выдает награды за завершение квеста: добавляет в инвентарь или дропает на землю. </summary>
