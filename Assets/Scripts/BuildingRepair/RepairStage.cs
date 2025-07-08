@@ -14,6 +14,6 @@ namespace FlavorfulStory.BuildingRepair
 
         /// <summary> Ресурсные требования для выполнения стадии ремонта. </summary>
         [field: Tooltip("Ресурсные требования для выполнения стадии ремонта."), SerializeField]
-        public List<ResourceRequirement> Requirements { get; private set; }
+        public List<ItemRequirement> Requirements { get; private set; }
     }
 }

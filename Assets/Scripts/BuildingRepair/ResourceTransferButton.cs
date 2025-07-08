@@ -24,7 +24,6 @@ namespace FlavorfulStory.BuildingRepair
         {
             base.Click();
             OnClick?.Invoke(_resource, _buttonType);
-            SfxPlayer.Instance.PlayOneShot(SfxType.Eat);
         }
 
 

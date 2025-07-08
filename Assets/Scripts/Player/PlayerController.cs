@@ -99,16 +99,19 @@ namespace FlavorfulStory.Player
         /// <returns> True, если взаимодействие было обработано. </returns>
         private bool InteractWithComponent()
         {
-            var hits = PhysicsUtils.SphereCastAllSorted(CameraUtils.GetMouseRay());
-            foreach (var hit in hits)
+            if (PhysicsUtils.SphereCastAllSortedNonAlloc(CameraUtils.GetMouseRay(), out var hits) > 0)
             {
-                var cursorInteractables = hit.transform.GetComponents<ICursorInteractable>();
-                foreach (var cursorInteractable in cursorInteractables)
-                    if (cursorInteractable.TryInteractWithCursor(this))
-                    {
-                        CursorController.SetCursor(cursorInteractable.CursorType);
-                        return true;
-                    }
+                foreach (var hit in hits)
+                {
+                    if (hit.collider == null) break; // словили мусор из буффера
+                    var cursorInteractables = hit.transform.GetComponents<ICursorInteractable>();
+                    foreach (var cursorInteractable in cursorInteractables)
+                        if (cursorInteractable.TryInteractWithCursor(this))
+                        {
+                            CursorController.SetCursor(cursorInteractable.CursorType);
+                            return true;
+                        }
+                }
             }
 
             return false;
