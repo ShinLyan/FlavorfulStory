@@ -1,4 +1,5 @@
 ﻿using FlavorfulStory.AI;
+using FlavorfulStory.BuildingRepair;
 using FlavorfulStory.DialogueSystem;
 using FlavorfulStory.InventorySystem;
 using FlavorfulStory.QuestSystem.Objectives.Params;
@@ -23,6 +24,7 @@ namespace FlavorfulStory.QuestSystem.Objectives
             inventory.ItemCollected += OnItemCollected;
             playerSpeaker.OnDialogueCompleted += OnDialogueCompleted;
             WorldTime.OnDayEnded += OnDayEnded;
+            RepairableBuilding.OnRepairCompleted += OnRepairCompleted;
         }
 
         /// <summary> Обработчик события сбора предмета. </summary>
@@ -38,6 +40,11 @@ namespace FlavorfulStory.QuestSystem.Objectives
         /// <summary> Обработчик события завершения дня. </summary>
         /// <param name="dateTime"> Игровое время. </param>
         private void OnDayEnded(DateTime dateTime) => CheckProgressForParamsType<SleepObjectiveParams>(dateTime);
+
+        /// <summary> Обработчик события завершения ремонта здания. </summary>
+        /// <param name="repairableBuildingType"> Тип ремонтируемого здания. </param>
+        private void OnRepairCompleted(RepairableBuildingType repairableBuildingType) =>
+            CheckProgressForParamsType<RepairObjectiveParams>(repairableBuildingType);
 
         /// <summary> Проверяет выполнение всех целей, использующих указанный тип параметров. </summary>
         /// <typeparam name="TParams"> Тип параметров цели. </typeparam>

@@ -11,7 +11,8 @@ namespace FlavorfulStory.QuestSystem.Objectives.Params
         {
             { ObjectiveType.Have, typeof(HaveObjectiveParams) },
             { ObjectiveType.Talk, typeof(TalkObjectiveParams) },
-            { ObjectiveType.Sleep, typeof(SleepObjectiveParams) }
+            { ObjectiveType.Sleep, typeof(SleepObjectiveParams) },
+            { ObjectiveType.Repair, typeof(RepairObjectiveParams) }
         };
     }
 }

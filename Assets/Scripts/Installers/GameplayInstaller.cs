@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using FlavorfulStory.BuildingRepair;
+using FlavorfulStory.BuildingRepair.UI;
 using FlavorfulStory.DialogueSystem;
 using FlavorfulStory.DialogueSystem.UI;
 using FlavorfulStory.Infrastructure.Factories;
@@ -37,7 +37,7 @@ namespace FlavorfulStory.Installers
 
         /// <summary> Префаб кнопки в списке квестов. </summary>
         [SerializeField] private QuestListButton _questListButtonPrefab;
-        
+
         /// <summary> Виртуальная камера при телепорте. </summary>
         /// <remarks> Используется для WarpPortal, когда отключаем и включаем камеру
         /// при переходе между локациями. </remarks>
@@ -102,7 +102,7 @@ namespace FlavorfulStory.Installers
         {
             Container.Bind<ConfirmationWindowView>().FromComponentInHierarchy().AsSingle();
             Container.Bind<SummaryView>().FromComponentInHierarchy().AsSingle();
-            Container.Bind<BuildingRepairView>().FromComponentInHierarchy().AsSingle();
+            Container.Bind<RepairableBuildingView>().FromComponentInHierarchy().AsSingle();
             Container.Bind<IActionTooltipShower>().To<ActionTooltipShower>().FromComponentInHierarchy().AsSingle();
             Container.Bind<CanvasGroupFader>().WithId("HUD").FromInstance(_hudFader).AsSingle();
         }

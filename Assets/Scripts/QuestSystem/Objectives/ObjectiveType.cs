@@ -9,12 +9,14 @@
         Talk,
 
         /// <summary> Поспать. </summary>
-        Sleep
+        Sleep,
+
+        /// <summary> Отремонтировать здание. </summary>
+        Repair
 
         // Craft,          // Скрафтить
         // Deliver,        // Принести
         // Remove,         // Удалить
-        // Repair,         // Отремонтировать
         // Kill,           // Убить
         // Reach,          // Дойти
         // Place,          // Разместить товар
