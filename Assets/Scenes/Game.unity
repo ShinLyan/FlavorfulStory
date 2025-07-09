@@ -120,9 +120,9 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!1 &570972558 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 2258748825388630826, guid: a9114609ac4097e459c8c7e1f3d67d2b,
+--- !u!198 &570972561 stripped
+ParticleSystem:
+  m_CorrespondingSourceObject: {fileID: 2188401316080140410, guid: a9114609ac4097e459c8c7e1f3d67d2b,
     type: 3}
   m_PrefabInstance: {fileID: 895288242}
   m_PrefabAsset: {fileID: 0}
@@ -1033,17 +1033,17 @@ PrefabInstance:
     - target: {fileID: 4847369762703888537, guid: c5c5cf5a342838d4d8519aec83ee8006,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -47.80472
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4847369762703888537, guid: c5c5cf5a342838d4d8519aec83ee8006,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 26.669552
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4847369762703888537, guid: c5c5cf5a342838d4d8519aec83ee8006,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: -19.312988
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4847369762703888537, guid: c5c5cf5a342838d4d8519aec83ee8006,
         type: 3}
@@ -1092,9 +1092,9 @@ PrefabInstance:
       objectReference: {fileID: 918152623}
     - target: {fileID: 7572364593481823560, guid: c5c5cf5a342838d4d8519aec83ee8006,
         type: 3}
-      propertyPath: _weatherSettings.Array.data[1].ParticleObject
+      propertyPath: _weatherSettings.Array.data[1].<ParticleObject>k__BackingField
       value: 
-      objectReference: {fileID: 570972558}
+      objectReference: {fileID: 570972561}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

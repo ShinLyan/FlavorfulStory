@@ -4,103 +4,93 @@ using FlavorfulStory.TimeManagement;
 using FlavorfulStory.Visuals.Lightning;
 using UnityEngine;
 using Zenject;
-using DateTime = FlavorfulStory.TimeManagement.DateTime;
-using Random = UnityEngine.Random;
 
 namespace FlavorfulStory.Visuals.Weather
 {
-    /// <summary>Генератор погоды, управляющий ежедневной генерацией погодных условий и их влиянием на освещение.
-    /// Использует вероятностную систему для создания разнообразных погодных условий и синхронизации
-    /// с системой глобального освещения. </summary>
+    /// <summary> Генератор погоды, управляющий погодой и их влиянием на освещение. </summary>
     public class WeatherGenerator : MonoBehaviour
     {
-        /// <summary>Массив настроек погоды с их вероятностями появления.
-        /// Каждый элемент содержит тип погоды, вероятность и связанные эффекты.</summary>
-        [Header("Weather Settings")] [SerializeField]
+        /// <summary> Массив настроек погоды с их вероятностями появления. </summary>
+        [SerializeField]
         private WeatherSettings[] _weatherSettings;
 
-        /// <summary> Ссылка на родительский обхект партиклов. </summary>
+        /// <summary> Родительский объект партиклов. </summary>
         [SerializeField] private GameObject _particleParent;
 
-        /// <summary>Текущие активные погодные условия для сегодняшнего дня. </summary>
+        /// <summary> Текущие активные погодные условия для сегодняшнего дня. </summary>
         private WeatherSettings _currentWeather;
 
-        /// <summary> Кэш сгенерированной погоды по дням для обеспечения консистентности.
-        /// Ключ - номер дня, значение - настройки погоды для этого дня. </summary>
-        private readonly Dictionary<int, WeatherSettings> _dailyWeather = new();
+        /// <summary> Словарь, связывающий дни с конкретными погодными условиями. </summary>
+        private readonly Dictionary<int, WeatherSettings> _weatherByDay = new();
 
-        /// <summary> Ссылка на систему глобального освещения для синхронизации погодных эффектов. </summary>
+        /// <summary> Система глобального освещения. </summary>
         private GlobalLightSystem _globalLightSystem;
 
         /// <summary> Менеджер локаций. </summary>
         private LocationManager _locationManager;
 
+        /// <summary> Внедряет зависимости Zenject. </summary>
+        /// <param name="globalLightSystem"> Система глобального освещения. </param>
+        /// <param name="locationManager"> Менеджер локаций. </param>
         [Inject]
-        private void Construct(LocationManager locationManager, GlobalLightSystem globalLightSystem)
+        private void Construct(GlobalLightSystem globalLightSystem, LocationManager locationManager)
         {
-            _locationManager = locationManager;
             _globalLightSystem = globalLightSystem;
+            _locationManager = locationManager;
         }
 
-        /// <summary> Подписывается на событие окончания дня для генерации погоды следующего дня. </summary>
-        private void OnEnable()
+        /// <summary> Подписывается на события. </summary>
+        private void Awake()
         {
-            WorldTime.OnDayEnded += GenerateDailyWeather;
-            SubscribeToLocationEvent();
+            _locationManager.OnLocationChanged += UpdateParticleVisibility;
+            WorldTime.OnDayEnded += ApplyWeatherForDay;
         }
 
-        /// <summary> Отписывается от событий при отключении компонента. </summary>
-        private void OnDisable()
+        /// <summary> Применяет погоду сразу после старта сцены. </summary>
+        private void Start() => ApplyWeatherForDay(WorldTime.CurrentGameTime);
+
+        /// <summary> Отписывается от событий при уничтожении компонента. </summary>
+        private void OnDestroy()
         {
-            WorldTime.OnDayEnded -= GenerateDailyWeather;
-            UnsubscribeFromLocationEvent();
+            WorldTime.OnDayEnded -= ApplyWeatherForDay;
+            _locationManager.OnLocationChanged -= UpdateParticleVisibility;
         }
 
-        /// <summary> Генерирует погоду для текущего дня при запуске. </summary>
-        private void Awake() => GenerateDailyWeather(WorldTime.CurrentGameTime);
-
-        /// <summary> Включатель партиклов. </summary>
-        /// <param name="location"> Локация, в которой находится игрок. </param>
-        private void ToggleParticles(Location location)
+        /// <summary> Применяет погоду на конкретный день, генерируя её при необходимости. </summary>
+        /// <param name="dateTime"> Дата текущего дня. </param>
+        private void ApplyWeatherForDay(DateTime dateTime)
         {
-            if (!_particleParent) return;
+            int day = dateTime.TotalDays;
+            if (!_weatherByDay.ContainsKey(day)) _weatherByDay[day] = GenerateRandomWeather();
 
-            _particleParent.SetActive(!location.IsRoom);
+            _currentWeather = _weatherByDay[day];
+
+            _globalLightSystem.SetLightSettings(_currentWeather.WeatherType);
+            UpdateWeatherParticles();
         }
 
-        /// <summary> Генерирует и активирует погоду для указанного дня.
-        /// Обновляет систему освещения и управляет видимостью погодных эффектов. </summary>
-        /// <param name="gameTime"> Игровое время для генерации погоды. </param>
-        private void GenerateDailyWeather(DateTime gameTime)
+        /// <summary> Активирует или отключает партиклы в зависимости от текущей погоды. </summary>
+        private void UpdateWeatherParticles()
         {
-            GenerateWeatherForDay(gameTime);
-            _currentWeather = _dailyWeather[gameTime.TotalDays];
-            _globalLightSystem.SetNewLightSettings(_currentWeather.WeatherType);
-
             foreach (var weather in _weatherSettings)
                 if (weather.ParticleObject)
-                    weather.ParticleObject.SetActive(false);
-
-            if (_currentWeather.ParticleObject) _currentWeather.ParticleObject.SetActive(true);
+                    weather.ParticleObject.gameObject.SetActive(weather == _currentWeather);
         }
 
-        /// <summary> Генерирует погодные условия для конкретного дня, если они еще не существуют.
-        /// Использует кэширование для обеспечения консистентности погоды в течение дня. </summary>
-        /// <param name="date"> Дата для генерации погоды. </param>
-        private void GenerateWeatherForDay(DateTime date)
+        /// <summary> Включает или отключает партиклы в зависимости от помещения. </summary>
+        /// <param name="location"> Локация, в которой находится игрок. </param>
+        private void UpdateParticleVisibility(Location location)
         {
-            int newDate = date.TotalDays;
-            _dailyWeather.TryAdd(newDate, GenerateWeatherIfDayEven());
+            if (_particleParent) _particleParent.SetActive(!location.IsRoom);
         }
 
-        /// <summary> Генерирует случайную погоду на основе вероятностей в настройках.
-        /// Использует взвешенную случайную выборку для создания разнообразных погодных условий. </summary>
+        /// <summary> Генерирует случайную погоду на основе вероятностей в настройках. </summary>
+        /// <remarks> Использует взвешенную случайную выборку для создания разнообразных погодных условий. </remarks>
         /// <returns> Случайно выбранные настройки погоды согласно заданным вероятностям. </returns>
-        private WeatherSettings GenerateRandomWeather() //TODO: будет какая-то особенная вероятностная формула.
+        private WeatherSettings GenerateRandomWeather()
         {
             float randomValue = Random.value;
             float cumulativeProbability = 0f;
-
             foreach (var weatherSetting in _weatherSettings)
             {
                 cumulativeProbability += weatherSetting.Probability;
@@ -108,24 +98,6 @@ namespace FlavorfulStory.Visuals.Weather
             }
 
             return _weatherSettings[0];
-        }
-
-        private WeatherSettings GenerateWeatherIfDayEven()
-        {
-            if (WorldTime.CurrentGameTime.TotalDays % 2 != 0) return _weatherSettings[1];
-            return _weatherSettings[0];
-        }
-
-        private void SubscribeToLocationEvent()
-        {
-            if (_locationManager == null) return;
-            _locationManager.OnLocationChanged += ToggleParticles;
-        }
-
-        private void UnsubscribeFromLocationEvent()
-        {
-            if (_locationManager == null) return;
-            _locationManager.OnLocationChanged -= ToggleParticles;
         }
     }
 }

@@ -25,7 +25,6 @@ namespace FlavorfulStory.Visuals.Lightning
         /// <summary>  Смещение нормалей для теней луны (0.4). </summary>
         private const float MoonShadowNormalBias = 0.4f;
 
-
         /// <summary> Час начала появления луны на небе (18:00). </summary>
         private const float MoonStartHour = 18f;
 
@@ -38,15 +37,14 @@ namespace FlavorfulStory.Visuals.Lightning
         /// <summary> Текущий час для внутренних расчетов контроллера. </summary>
         private float _currentHour;
 
-        /// <summary>
-        /// Определяет, активна ли луна в указанное время. Луна активна с 17:00 до 6:00 (включая переход через полночь).
-        /// </summary>
+        /// <summary> Определяет, активна ли луна в указанное время.
+        /// Луна активна с 17:00 до 6:00 (включая переход через полночь). </summary>
         /// <param name="time"> Текущее игровое время для проверки. </param>
         /// <returns> True, если луна должна быть активной; иначе false. </returns>
         public bool IsActive(DateTime time)
         {
             _currentHour = time.Hour;
-            return time.Hour >= 17f || time.Hour < 6f;
+            return time.Hour is >= 17f or < 6f;
         }
 
         /// <summary> Вычисляет прогресс лунного цикла от появления до исчезновения.
@@ -78,19 +76,28 @@ namespace FlavorfulStory.Visuals.Lightning
                 MaxIntensity = settings.MaxMoonIntensity,
                 ShadowType = settings.MoonShadowType,
                 ShadowStrength = settings.MoonShadowStrength,
-                ShadowStrategy = progress =>
+                ShadowStrategy = _ =>
                 {
                     light.shadowNormalBias = MoonShadowNormalBias;
 
-                    if (_currentHour >= DayStartHour && _currentHour < MoonStartHour) { light.shadowStrength = 0f; }
-                    else if (_currentHour >= MoonStartHour && _currentHour < MoonFullIntensityStartHour)
+                    switch (_currentHour)
                     {
-                        float shadowProgress =
-                            Mathf.InverseLerp(MoonStartHour, MoonFullIntensityStartHour, _currentHour);
-                        light.shadowStrength = Mathf.Lerp(0f, settings.MoonShadowStrength, shadowProgress);
+                        case >= DayStartHour and < MoonStartHour:
+                            light.shadowStrength = 0f;
+                            break;
+                        case >= MoonStartHour and < MoonFullIntensityStartHour:
+                        {
+                            float shadowProgress =
+                                Mathf.InverseLerp(MoonStartHour, MoonFullIntensityStartHour, _currentHour);
+                            light.shadowStrength = Mathf.Lerp(0f, settings.MoonShadowStrength, shadowProgress);
+                            break;
+                        }
+                        default:
+                            light.shadowStrength = settings.MoonShadowStrength;
+                            break;
                     }
-                    else { light.shadowStrength = settings.MoonShadowStrength; }
                 },
+
                 RotationStrategy = progress =>
                 {
                     float angleY = Mathf.Lerp(MoonAngleYStart, MoonAngleYEnd, progress);

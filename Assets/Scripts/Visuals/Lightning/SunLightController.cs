@@ -3,10 +3,8 @@ using UnityEngine;
 
 namespace FlavorfulStory.Visuals.Lightning
 {
-    /// <summary>
-    /// Контроллер солнечного света, управляющий поведением солнца в течение дневного цикла.
-    /// Реализует логику активации, позиционирования и настройки теней для солнечного освещения.
-    /// </summary>
+    /// <summary> Контроллер солнечного света, управляющий поведением солнца в течение дневного цикла.
+    /// Реализует логику активации, позиционирования и настройки теней для солнечного освещения. </summary>
     public class SunLightController : ILightController
     {
         /// <summary> Время начала активности солнца (6:00 утра). </summary>
@@ -33,7 +31,7 @@ namespace FlavorfulStory.Visuals.Lightning
         public bool IsActive(DateTime time)
         {
             _currentHour = time.Hour;
-            return _currentHour >= StartTime && _currentHour < EndTime;
+            return _currentHour is >= StartTime and < EndTime;
         }
 
         /// <summary> Вычисляет прогресс солнечного цикла от восхода до заката. </summary>

@@ -6,9 +6,14 @@ namespace FlavorfulStory.Visuals.Weather
     public enum WeatherType
     {
         /// <summary> Ясная солнечная погода. </summary>
-        Sun,
+        Clear,
 
         /// <summary> Дождливая погода. </summary>
-        Rain
+        Rainy
+
+        // Cloudy, // Облачно
+        // Stormy, // Гроза
+        // Snowy, // Снег
+        // Foggy // Туман
     }
 }

@@ -1,7 +1,6 @@
 using FlavorfulStory.TimeManagement;
 using FlavorfulStory.Visuals.Weather;
 using UnityEngine;
-using DateTime = FlavorfulStory.TimeManagement.DateTime;
 
 namespace FlavorfulStory.Visuals.Lightning
 {
@@ -41,11 +40,11 @@ namespace FlavorfulStory.Visuals.Lightning
         private void OnDisable() => WorldTime.OnTimeUpdated -= UpdateLighting;
 
         /// <summary> Устанавливает новые настройки освещения в соответствии с указанным типом погоды. </summary>
-        /// <param name="newWeather"> Новый тип погоды для применения соответствующих настроек освещения. </param>
-        public void SetNewLightSettings(WeatherType newWeather)
+        /// <param name="weatherType"> Тип погоды для применения соответствующих настроек освещения. </param>
+        public void SetLightSettings(WeatherType weatherType)
         {
             foreach (var weather in _weatherLightSettings)
-                if (weather.WeatherType == newWeather)
+                if (weather.WeatherType == weatherType)
                     _currentWeatherLightSettings = weather.LightSettings;
         }
 
@@ -58,9 +57,8 @@ namespace FlavorfulStory.Visuals.Lightning
             ApplyLighting(_moonController, _moonLight, gameTime);
         }
 
-        /// <summary>
-        /// Применяет настройки освещения к указанному источнику света с использованием соответствующего контроллера.
-        /// </summary>
+        /// <summary> Применяет настройки освещения к указанному источнику света
+        /// с использованием соответствующего контроллера. </summary>
         /// <param name="controller"> Контроллер света (солнца или луны). </param>
         /// <param name="lightSource"> Источник света для настройки. </param>
         /// <param name="time"> Текущее время для расчета параметров освещения. </param>
@@ -70,8 +68,7 @@ namespace FlavorfulStory.Visuals.Lightning
 
             bool isActive = controller.IsActive(time);
             float progress = controller.CalculateProgress(time);
-            LightConfig config = controller.CreateLightConfig(time, lightSource, _currentWeatherLightSettings);
-
+            var config = controller.CreateLightConfig(time, lightSource, _currentWeatherLightSettings);
             UpdateLight(config, progress, isActive);
         }
 
