@@ -97,7 +97,7 @@ namespace FlavorfulStory.Installers
 
             Container.Bind<CinemachineCamera>().FromInstance(_teleportVirtualCamera).AsSingle();
 
-            Container.Bind<DayEndManager>().AsSingle();
+            Container.BindInterfacesAndSelfTo<DayEndManager>().AsSingle();
         }
     }
 }

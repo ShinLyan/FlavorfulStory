@@ -3,7 +3,6 @@ using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using FlavorfulStory.Player;
 using FlavorfulStory.SceneManagement;
-using FlavorfulStory.Stats;
 using FlavorfulStory.UI;
 using FlavorfulStory.UI.Animation;
 using Unity.Cinemachine;
@@ -25,11 +24,8 @@ namespace FlavorfulStory.TimeManagement
         /// <summary> Контроллер игрока для управления его позицией и получением компонентов. </summary>
         private readonly PlayerController _playerController;
 
-        /// <summary> Множитель восстановления выносливости при истощении (75% от максимума). </summary>
-        private const float StaminaMultiplier = 0.75f;
-
-        /// <summary> Transform триггера сна (кровати), используется для размещения игрока при принудительном сне. </summary>
-        private readonly Transform _sleepTriggerTransform;
+        /// <summary> Позиция триггера сна (кровати), используется для размещения игрока при принудительном сне. </summary>
+        private readonly Vector3 _sleepTriggerPosition;
 
         /// <summary> Менеджер локаций для активации текущей локации игрока после сна. </summary>
         private readonly LocationManager _locationManager;
@@ -54,48 +50,29 @@ namespace FlavorfulStory.TimeManagement
         /// <param name="fader"> Компонент затемнения экрана. </param>
         /// <param name="hudFader"> Компонент затемнения HUD интерфейса. </param>
         /// <param name="virtualCamera"> Виртуальная камера Cinemachine. </param>
-        public DayEndManager(SummaryView summaryView,
-            PlayerController playerController,
-            SleepTrigger sleepTrigger,
-            LocationManager locationManager,
-            CanvasGroupFader fader,
-            [Inject(Id = "HUD")] CanvasGroupFader hudFader,
+        public DayEndManager(SummaryView summaryView, PlayerController playerController, SleepTrigger sleepTrigger,
+            LocationManager locationManager, CanvasGroupFader fader, [Inject(Id = "HUD")] CanvasGroupFader hudFader,
             CinemachineCamera virtualCamera)
         {
             _summaryView = summaryView;
             _playerController = playerController;
-            _sleepTriggerTransform = sleepTrigger.transform;
+            _sleepTriggerPosition = sleepTrigger.transform.position;
             _locationManager = locationManager;
             _fader = fader;
             _hudFader = hudFader;
             _virtualCamera = virtualCamera;
             _isProcessingSleep = false;
-
-            WorldTime.OnDayEnded += OnDayEnded;
         }
 
         /// <summary> Инициализация компонента (реализация IInitializable). </summary>
-        public void Initialize() { }
+        public void Initialize() => WorldTime.OnDayEnded += OnDayEnded;
 
         /// <summary> Освобождение ресурсов и отписка от событий (реализация IDisposable). </summary>
-        public void Dispose() { WorldTime.OnDayEnded -= OnDayEnded; }
+        public void Dispose() => WorldTime.OnDayEnded -= OnDayEnded;
 
         /// <summary> Обработчик события окончания дня из системы времени. </summary>
         /// <param name="date"> Дата окончившегося дня. </param>
         private void OnDayEnded(DateTime date) => ExhaustedSleep().Forget();
-
-        /// <summary> Запрос на завершение дня по инициативе игрока (взаимодействие с кроватью). </summary>
-        /// <param name="triggerTransform"> Transform объекта-триггера (кровати). </param>
-        /// <param name="onCompleteCallback"> Колбэк, вызываемый после завершения процесса. </param>
-        public async UniTaskVoid RequestEndDay(Transform triggerTransform, Action onCompleteCallback)
-        {
-            if (_isProcessingSleep) return;
-            _isProcessingSleep = true;
-
-            _onCompleteCallback = onCompleteCallback;
-            await EndDayRoutine();
-            await ResetPlayer(triggerTransform);
-        }
 
         /// <summary> Принудительный сон при истощении игрока (автоматическое завершение дня). </summary>
         private async UniTaskVoid ExhaustedSleep()
@@ -105,8 +82,23 @@ namespace FlavorfulStory.TimeManagement
 
             _hudFader.Hide();
             await EndDayRoutine();
-            await ResetPlayer(_sleepTriggerTransform, true);
+            await RestorePlayerState(_sleepTriggerPosition, true);
             _hudFader.Show();
+        }
+
+        /// <summary> Запрос на завершение дня по инициативе игрока (взаимодействие с кроватью). </summary>
+        /// <param name="triggerTransform"> Transform объекта-триггера (кровати). </param>
+        /// <param name="onCompleteCallback"> Колбэк, вызываемый после завершения процесса. </param>
+        public async UniTaskVoid RequestEndDay(Action onCompleteCallback)
+        {
+            if (_isProcessingSleep) return;
+            _isProcessingSleep = true;
+
+            WorldTime.BeginNewDay(6);
+
+            _onCompleteCallback = onCompleteCallback;
+            await EndDayRoutine();
+            await RestorePlayerState(_sleepTriggerPosition);
         }
 
         /// <summary> Основная корутина завершения дня.
@@ -116,7 +108,7 @@ namespace FlavorfulStory.TimeManagement
             WorldTime.Pause();
 
             await _fader.Show().AsyncWaitForCompletion();
-            _locationManager.EnableLocation(LocationName.RockyIsland); //TODO: включить свет на сцене
+            _locationManager.EnableLocation(LocationName.RockyIsland);
             await ResetCamera();
             _summaryView.Show();
 
@@ -138,19 +130,13 @@ namespace FlavorfulStory.TimeManagement
         }
 
         /// <summary> Сброс состояния игрока: восстановление здоровья, выносливости и позиции. </summary>
-        /// <param name="triggerTransform"> Transform позиции для размещения игрока. </param>
-        /// <param name="exhausted"> Флаг истощения (влияет на восстановление выносливости). </param>
-        private async UniTask ResetPlayer(Transform triggerTransform, bool exhausted = false)
+        /// <param name="targetPosition"> Позиция цели для спавна. </param>
+        /// <param name="isExhausted"> Флаг истощения (влияет на восстановление выносливости). </param>
+        private async UniTask RestorePlayerState(Vector3 targetPosition, bool isExhausted = false)
         {
-            var playerStats = _playerController.GetComponent<PlayerStats>();
+            _playerController.RestoreStatsAfterSleep(isExhausted);
+            _playerController.SetPosition(targetPosition);
 
-            var health = playerStats.GetStat<Health>();
-            health.SetValue(health.MaxValue);
-
-            var stamina = playerStats.GetStat<Stamina>();
-            stamina.SetValue(exhausted ? stamina.MaxValue * StaminaMultiplier : stamina.MaxValue);
-
-            _playerController.UpdatePosition(triggerTransform);
             await UniTask.Yield();
             _locationManager.UpdateActiveLocation();
 

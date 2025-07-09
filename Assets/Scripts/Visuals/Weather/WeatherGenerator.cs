@@ -52,8 +52,8 @@ namespace FlavorfulStory.Visuals.Weather
         /// <summary> Отписывается от событий при уничтожении компонента. </summary>
         private void OnDestroy()
         {
-            WorldTime.OnDayEnded -= ApplyWeatherForDay;
             _locationManager.OnLocationChanged -= UpdateParticleVisibility;
+            WorldTime.OnDayEnded -= ApplyWeatherForDay;
         }
 
         /// <summary> Применяет погоду на конкретный день, генерируя её при необходимости. </summary>
