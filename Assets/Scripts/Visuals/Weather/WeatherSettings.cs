@@ -1,4 +1,5 @@
 ﻿using System;
+using FlavorfulStory.EditorTools.Attributes;
 using UnityEngine;
 
 namespace FlavorfulStory.Visuals.Weather
@@ -16,7 +17,8 @@ namespace FlavorfulStory.Visuals.Weather
         /// <summary> Вероятность появления данного типа погоды (от 0 до 1). </summary>
         /// <remarks> Используется в алгоритме взвешенной случайной выборки для генерации погоды.
         /// Сумма всех вероятностей в массиве настроек должна быть равна 1.0. </remarks>
-        [field: Tooltip("Вероятность появления данного типа погоды (от 0 до 1)."), SerializeField, Range(0f, 1f)]
+        [field: Tooltip("Вероятность появления данного типа погоды (от 0 до 1)."), SerializeField,
+                SteppedRange(0f, 1f, 0.1f)]
         public float Probability { get; private set; }
 
         /// <summary> Объект с системой частиц для эффектов погоды. </summary>
