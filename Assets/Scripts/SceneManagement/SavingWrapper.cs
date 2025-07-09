@@ -79,7 +79,7 @@ namespace FlavorfulStory.SceneManagement
             yield return fadeTween.WaitForCompletion();
 
             _canvasGroupFader.Hide();
-            _locationManager?.ActivatePlayerCurrentLocation();
+            _locationManager?.UpdateActiveLocation();
             InputWrapper.UnblockAllInput();
         }
 
@@ -95,7 +95,7 @@ namespace FlavorfulStory.SceneManagement
 
             _canvasGroupFader.Hide(); // убрать затемнение
 
-            _locationManager?.ActivatePlayerCurrentLocation();
+            _locationManager?.UpdateActiveLocation();
             InputWrapper.UnblockAllInput();
         }
 

@@ -23,7 +23,8 @@ namespace FlavorfulStory.AI.WarpGraphSystem
         public WarpPortal ConnectedWarp { get; private set; }
 
         /// <summary> Цвет соединений внутри одной локации (визуализация в редакторе). </summary>
-        [Header("Visualization")] [Tooltip("Цвет соединений внутри одной локации"), SerializeField]
+        [Header("Visualization")]
+        [Tooltip("Цвет соединений внутри одной локации"), SerializeField]
         private Color _localConnectionColor = Color.blue;
 
         /// <summary> Цвет соединений между разными локациями (визуализация в редакторе). </summary>
@@ -62,9 +63,9 @@ namespace FlavorfulStory.AI.WarpGraphSystem
         /// <param name="other"> Коллайдер объекта, вошедшего в триггер. </param>
         private void OnTriggerEnter(Collider other)
         {
-            if (!other.CompareTag("Player")) return;
+            if (!other.CompareTag("Player") || !other.TryGetComponent(out PlayerController playerController)) return;
 
-            StartCoroutine(TeleportPlayer(other.GetComponent<PlayerController>()));
+            StartCoroutine(TeleportPlayer(playerController));
         }
 
         /// <summary> Корутин телепортации игрока с управлением фейдами и сменой локаций. </summary>
@@ -80,7 +81,7 @@ namespace FlavorfulStory.AI.WarpGraphSystem
 
             yield return null;
 
-            _locationManager.ActivatePlayerCurrentLocation();
+            _locationManager.UpdateActiveLocation();
             if (_virtualCamera) _virtualCamera.enabled = true;
 
             yield return _canvasGroupFader.Hide().WaitForCompletion();

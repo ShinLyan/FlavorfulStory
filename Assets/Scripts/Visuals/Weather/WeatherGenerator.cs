@@ -68,7 +68,6 @@ namespace FlavorfulStory.Visuals.Weather
             _particleParent.SetActive(!location.IsRoom);
         }
 
-
         /// <summary> Генерирует и активирует погоду для указанного дня.
         /// Обновляет систему освещения и управляет видимостью погодных эффектов. </summary>
         /// <param name="gameTime"> Игровое время для генерации погоды. </param>
