@@ -152,7 +152,7 @@ namespace FlavorfulStory.TimeManagement
 
             _playerController.UpdatePosition(triggerTransform);
             await UniTask.Yield();
-            _locationManager.ActivatePlayerCurrentLocation();
+            _locationManager.UpdateActiveLocation();
 
             await _fader.Hide().AsyncWaitForCompletion();
         }
@@ -161,7 +161,7 @@ namespace FlavorfulStory.TimeManagement
         /// Отключает и включает камеру для принудительного обновления её состояния. </summary>
         private async UniTask ResetCamera()
         {
-            if (_virtualCamera != null)
+            if (_virtualCamera)
             {
                 _virtualCamera.enabled = false;
                 await UniTask.Yield();

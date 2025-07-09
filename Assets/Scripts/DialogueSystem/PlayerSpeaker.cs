@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using FlavorfulStory.DialogueSystem.UI;
@@ -54,11 +53,12 @@ namespace FlavorfulStory.DialogueSystem
         /// <summary> Обработка ввода для перехода к следующей реплике. </summary>
         private void Update()
         {
+            // TODO: УДАЛИТЬ КОГДА ПЕРЕПИШЕМ НА НОВЫЙ INTERACT SYSTEM
             if (!IsDialogueActive || IsChoosingDialogue ||
                 !InputWrapper.GetButtonDown(InputButton.NextDialogue))
                 return;
 
-            PlayNextDialogueNode();
+            _dialogueView.CompleteOrProceed();
         }
 
         /// <summary> Очистить подписки и события при уничтожении компонента. </summary>
@@ -86,7 +86,7 @@ namespace FlavorfulStory.DialogueSystem
             TriggerEnterAction();
             UpdateDialogueView();
 
-            StartCoroutine(EnableNextDialogueInput());
+            InputWrapper.UnblockInputNextFrame(InputButton.NextDialogue, InputButton.SkipDialogue);
         }
 
         /// <summary> Завершить текущий диалог. </summary>
@@ -105,28 +105,10 @@ namespace FlavorfulStory.DialogueSystem
 
             // Защищаем от повторного запуска взаимодействия
             InputWrapper.BlockInput(InputButton.Interact);
-            StartCoroutine(UnblockInteractNextFrame());
+            InputWrapper.UnblockInputNextFrame(InputButton.Interact);
         }
 
         #endregion
-
-        // TODO: УДАЛИТЬ, ВЫНЕСТИ В INPUTWRAPPER
-        private static IEnumerator EnableNextDialogueInput()
-        {
-            yield return null; // Пропустить кадр, в котором был вызван StartDialogue
-            InputWrapper.UnblockInput(new[] { InputButton.NextDialogue, InputButton.SkipDialogue });
-        }
-
-        // TODO: УДАЛИТЬ, ВЫНЕСТИ В INPUTWRAPPER
-        private IEnumerator UnblockInteractNextFrame()
-        {
-            yield return null;
-            InputWrapper.UnblockInput(InputButton.Interact);
-        }
-
-        /// <summary> Получить текст текущего узла диалога. </summary>
-        /// <returns> Текст текущей реплики или пустая строка. </returns>
-        private string GetText() => _currentNode ? _currentNode.Text : string.Empty;
 
         /// <summary> Воспроизвести следующий узел диалога. </summary>
         private void PlayNextDialogueNode()
@@ -183,7 +165,8 @@ namespace FlavorfulStory.DialogueSystem
                 return;
             }
 
-            var data = new DialogueData(GetText(), CurrentNpcSpeaker?.NpcInfo, IsChoosingDialogue, GetChoices());
+            var data = new DialogueData(_currentNode.Text, CurrentNpcSpeaker?.NpcInfo, IsChoosingDialogue,
+                GetChoices());
             _dialogueView.Show(data);
         }
 

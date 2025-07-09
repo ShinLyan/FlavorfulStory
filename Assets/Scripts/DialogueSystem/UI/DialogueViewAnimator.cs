@@ -33,21 +33,6 @@ namespace FlavorfulStory.DialogueSystem.UI
         /// <summary> Исходная позиция превью. </summary>
         private readonly Vector2 _previewOriginalPosition;
 
-        /// <summary> Длительность анимации панели. </summary>
-        private const float PanelTransitionDuration = 0.7f;
-
-        /// <summary> Смещение панели вниз при скрытии. </summary>
-        private const float HiddenPanelYOffset = 400f;
-
-        /// <summary> Длительность появления текста. </summary>
-        private const float TextRevealDuration = 0.6f;
-
-        /// <summary> Длительность анимации превью. </summary>
-        private const float PreviewTransitionDuration = 0.7f;
-
-        /// <summary> Смещение превью по X при анимации. </summary>
-        private const float PreviewSlideOffsetX = 60f;
-
         #endregion
 
         /// <summary> Конструктор. Кэширует компоненты, сохраняет состояния, рассчитывает позиции. </summary>
@@ -58,6 +43,9 @@ namespace FlavorfulStory.DialogueSystem.UI
         public DialogueViewAnimator(RectTransform panel, RectTransform choiceContainer, TMP_Text dialogueText,
             RawImage characterPreview)
         {
+            // Смещение панели вниз при скрытии.
+            const float HiddenPanelYOffset = 400f;
+
             _panel = panel;
             _choiceContainer = choiceContainer;
             _dialogueText = dialogueText;
@@ -80,24 +68,13 @@ namespace FlavorfulStory.DialogueSystem.UI
             .Join(AnimatePreview(false))
             .Join(AnimatePanel(false));
 
-        /// <summary> Анимирует постепенное появление текста. </summary>
-        /// <param name="fullText"> Полный текст реплики. </param>
-        /// <returns> Tween с анимацией текста. </returns>
-        public Tween AnimateText(string fullText)
-        {
-            _dialogueText.text = fullText;
-            _dialogueText.maxVisibleCharacters = 0;
-
-            return DOTween.To(() => _dialogueText.maxVisibleCharacters,
-                x => _dialogueText.maxVisibleCharacters = x,
-                fullText.Length, TextRevealDuration).SetEase(Ease.Linear);
-        }
-
         /// <summary> Анимация появления или скрытия панели. </summary>
         /// <param name="isAppearing"> true — показать, false — скрыть. </param>
         /// <returns> Tween движения панели. </returns>
         private Tween AnimatePanel(bool isAppearing)
         {
+            const float PanelTransitionDuration = 0.7f;
+
             var fromPosition = isAppearing ? _hiddenPanelPosition : _visiblePanelPosition;
             var toPosition = isAppearing ? _visiblePanelPosition : _hiddenPanelPosition;
             var easeType = isAppearing ? Ease.OutCubic : Ease.InCubic;
@@ -111,6 +88,9 @@ namespace FlavorfulStory.DialogueSystem.UI
         /// <returns> Tween движения и прозрачности превью. </returns>
         private Tween AnimatePreview(bool isAppearing)
         {
+            const float PreviewTransitionDuration = 0.7f;
+            const float PreviewSlideOffsetX = 60f;
+
             var offset = new Vector2(PreviewSlideOffsetX, 0f);
             var rect = _characterPreview.rectTransform;
 
@@ -181,6 +161,33 @@ namespace FlavorfulStory.DialogueSystem.UI
                 await selectedCanvasGroup.DOFade(0f, fadeDuration).AsyncWaitForCompletion();
             else
                 selectedButton.gameObject.SetActive(false);
+        }
+
+        /// <summary> Затушить текущий текст и начать печатать новый. </summary>
+        /// <param name="newText"> Текст для новой реплики. </param>
+        /// <returns> UniTask завершения цепочки анимаций. </returns>
+        public async UniTask<Tween> FadeOutAndAnimateNewText(string newText)
+        {
+            const float FadeDuration = 0.4f;
+            await _dialogueText.DOFade(0f, FadeDuration).SetEase(Ease.OutSine).AsyncWaitForCompletion();
+
+            _dialogueText.color = new Color(_dialogueText.color.r, _dialogueText.color.g, _dialogueText.color.b, 1f);
+            return AnimateText(newText);
+        }
+
+        /// <summary> Анимирует постепенное появление текста. </summary>
+        /// <param name="fullText"> Полный текст реплики. </param>
+        /// <returns> Tween с анимацией текста. </returns>
+        private Tween AnimateText(string fullText)
+        {
+            const float TextRevealDuration = 0.6f;
+
+            _dialogueText.text = fullText;
+            _dialogueText.maxVisibleCharacters = 0;
+
+            return DOTween.To(() => _dialogueText.maxVisibleCharacters,
+                x => _dialogueText.maxVisibleCharacters = x,
+                fullText.Length, TextRevealDuration).SetEase(Ease.Linear);
         }
     }
 }

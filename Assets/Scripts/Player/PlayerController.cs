@@ -226,7 +226,7 @@ namespace FlavorfulStory.Player
         public void UpdatePosition(Transform newTransform)
         {
             _playerMover.SetPosition(newTransform.position);
-            _playerMover.SetLookRotation(newTransform.position);
+            _playerMover.SetLookRotation(newTransform.forward);
         }
     }
 }

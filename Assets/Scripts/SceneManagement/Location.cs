@@ -1,6 +1,4 @@
-using FlavorfulStory.Lightning;
 using UnityEngine;
-using Zenject;
 
 namespace FlavorfulStory.SceneManagement
 {
@@ -17,33 +15,16 @@ namespace FlavorfulStory.SceneManagement
         private GameObject[] _objectsToDisable;
 
         /// <summary> Является ли локация помещением. </summary>
-        [Tooltip("Является ли локация помещением?"), SerializeField]
-        private bool _isRoom;
-
-        /// <summary> Глобальная система освещения. </summary>
-        private GlobalLightSystem _globalLightSystem;
-
-        /// <summary> Внедрение зависимостей Zenject. </summary>
-        /// <param name="globalLightSystem"> Глобальная система освещения.</param>
-        [Inject]
-        private void Construct(GlobalLightSystem globalLightSystem) => _globalLightSystem = globalLightSystem;
-
-        /// <summary> Активирует объекты, связанные с этой локацией. </summary>
-        public void Enable() => SetObjectsActive(true);
-
-        /// <summary> Деактивирует объекты, связанные с этой локацией. </summary>
-        public void Disable() => SetObjectsActive(false);
+        [field: Tooltip("Является ли локация помещением?"), SerializeField]
+        public bool IsRoom { get; private set; }
 
         /// <summary> Устанавливает активное состояние всех объектов из списка. </summary>
         /// <param name="isActive"> <c>true</c> — включить объекты; <c>false</c> — отключить. </param>
-        private void SetObjectsActive(bool isActive)
+        public void SetActive(bool isActive)
         {
             if (_objectsToDisable == null || _objectsToDisable.Length == 0) return;
 
-            foreach (var obj in _objectsToDisable) obj.SetActive(isActive);
-
-            if (!_globalLightSystem || _objectsToDisable.Length == 0) return;
-            _globalLightSystem.gameObject.SetActive(!_isRoom);
+            foreach (var objectToDisable in _objectsToDisable) objectToDisable.SetActive(isActive);
         }
 
         /// <summary> Находится ли заданная позиция внутри границ локации? </summary>
