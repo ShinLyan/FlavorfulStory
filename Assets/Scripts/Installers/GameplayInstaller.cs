@@ -8,14 +8,15 @@ using FlavorfulStory.InventorySystem.DropSystem;
 using FlavorfulStory.InventorySystem.EquipmentSystem;
 using FlavorfulStory.InventorySystem.PickupSystem;
 using FlavorfulStory.InventorySystem.UI;
-using FlavorfulStory.Lightning;
 using FlavorfulStory.Player;
 using FlavorfulStory.QuestSystem;
 using FlavorfulStory.QuestSystem.Objectives;
 using FlavorfulStory.SceneManagement;
+using FlavorfulStory.TimeManagement;
 using FlavorfulStory.TooltipSystem;
 using FlavorfulStory.UI;
 using FlavorfulStory.UI.Animation;
+using FlavorfulStory.Visuals.Lightning;
 using Unity.Cinemachine;
 using UnityEngine;
 using Zenject;
@@ -36,8 +37,10 @@ namespace FlavorfulStory.Installers
 
         /// <summary> Префаб кнопки в списке квестов. </summary>
         [SerializeField] private QuestListButton _questListButtonPrefab;
-
-        /// <summary> Виртуальная камера при телепорте (используется для переходов между локациями). </summary>
+        
+        /// <summary> Виртуальная камера при телепорте. </summary>
+        /// <remarks> Используется для WarpPortal, когда отключаем и включаем камеру
+        /// при переходе между локациями. </remarks>
         [SerializeField] private CinemachineCamera _teleportVirtualCamera;
 
         /// <summary> Затемнитель интерфейса HUD. </summary>
@@ -115,6 +118,10 @@ namespace FlavorfulStory.Installers
             Container.BindInterfacesAndSelfTo<LocationManager>().AsSingle();
 
             Container.Bind<CinemachineCamera>().FromInstance(_teleportVirtualCamera).AsSingle();
+
+            Container.Bind<SleepTrigger>().FromComponentInHierarchy().AsSingle();
+
+            Container.BindInterfacesAndSelfTo<DayEndManager>().AsSingle();
         }
     }
 }

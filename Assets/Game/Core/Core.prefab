@@ -112,6 +112,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 362184840723869398}
+  - {fileID: 1325671413888474927}
   m_Father: {fileID: 8584269290858216682}
   m_LocalEulerAnglesHint: {x: 30, y: 0, z: 0}
 --- !u!20 &2255949176479217407
@@ -1080,6 +1081,80 @@ MonoBehaviour:
     type: 3}
   _teleportVirtualCamera: {fileID: 4946193149449626535}
   _hudFader: {fileID: 1126134009967392751}
+--- !u!1001 &4129396411845187436
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 6602437388469038716}
+    m_Modifications:
+    - target: {fileID: 3110627284906166339, guid: 7a11b5bd4c7494f45838567b4c86147c,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3110627284906166339, guid: 7a11b5bd4c7494f45838567b4c86147c,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3110627284906166339, guid: 7a11b5bd4c7494f45838567b4c86147c,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3110627284906166339, guid: 7a11b5bd4c7494f45838567b4c86147c,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3110627284906166339, guid: 7a11b5bd4c7494f45838567b4c86147c,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3110627284906166339, guid: 7a11b5bd4c7494f45838567b4c86147c,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3110627284906166339, guid: 7a11b5bd4c7494f45838567b4c86147c,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3110627284906166339, guid: 7a11b5bd4c7494f45838567b4c86147c,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3110627284906166339, guid: 7a11b5bd4c7494f45838567b4c86147c,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3110627284906166339, guid: 7a11b5bd4c7494f45838567b4c86147c,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7000868091951676919, guid: 7a11b5bd4c7494f45838567b4c86147c,
+        type: 3}
+      propertyPath: m_Name
+      value: Particles
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 7a11b5bd4c7494f45838567b4c86147c, type: 3}
+--- !u!4 &1325671413888474927 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 3110627284906166339, guid: 7a11b5bd4c7494f45838567b4c86147c,
+    type: 3}
+  m_PrefabInstance: {fileID: 4129396411845187436}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &7682600933491884201
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2158,6 +2233,21 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4544168784680154611, guid: 4e1a882cf6478374d9807f6984c80055,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4658745977082487477, guid: 4e1a882cf6478374d9807f6984c80055,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4658745977082487477, guid: 4e1a882cf6478374d9807f6984c80055,
+        type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4658745977082487477, guid: 4e1a882cf6478374d9807f6984c80055,
         type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
