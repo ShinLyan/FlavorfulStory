@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 namespace FlavorfulStory.UI
 {
-    /// <summary> UI-компонент для отображения сводки или результатов с возможностью продолжения. </summary>
+    /// <summary> Отображение сводки дня. </summary>
     public class SummaryView : MonoBehaviour
     {
         /// <summary> Основной контейнер UI сводки. </summary>
@@ -22,17 +22,17 @@ namespace FlavorfulStory.UI
         [SerializeField] private GameObject _camera;
 
         /// <summary> Текст сводки по умолчанию, отображается при отсутствии специального контента. </summary>
-        public static readonly string DefaultSummaryText = "BEST SUMMARY EVER";
+        public const string DefaultSummaryText = "BEST SUMMARY EVER";
 
         /// <summary> Событие, вызываемое при нажатии кнопки продолжения. </summary>
         public Action OnContinuePressed;
 
         /// <summary> Подписка на нажатие кнопки. </summary>
-        private void Awake() { _continueButton.onClick.AddListener(() => OnContinuePressed?.Invoke()); }
+        private void Awake() => _continueButton.onClick.AddListener(() => OnContinuePressed?.Invoke());
 
         /// <summary> Устанавливает текст сводки. </summary>
         /// <param name="text">Текст для отображения в сводке.</param>
-        public void SetSummary(string text) { _summaryText.text = text; }
+        public void SetSummary(string text) => _summaryText.text = text;
 
         /// <summary> Показывает UI сводки и блокирует пользовательский ввод. </summary>
         public void Show()

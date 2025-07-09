@@ -20,7 +20,8 @@ namespace FlavorfulStory.DialogueSystem.UI
         private TMP_Text _dialogueText;
 
         /// <summary> Текстовое поле для имени говорящего персонажа. </summary>
-        [Header("Speaker Info")] [Tooltip("Текстовое поле для имени говорящего персонажа."), SerializeField]
+        [Header("Speaker Info")]
+        [Tooltip("Текстовое поле для имени говорящего персонажа."), SerializeField]
         private TMP_Text _speakerName;
 
         /// <summary> Иконка, показывающая, что персонаж доступен для романтики. </summary>
@@ -32,7 +33,8 @@ namespace FlavorfulStory.DialogueSystem.UI
         private RawImage _speakerPreview;
 
         /// <summary> Контейнер для кнопок вариантов ответа. </summary>
-        [Header("Choices")] [Tooltip("Контейнер для кнопок вариантов ответа."), SerializeField]
+        [Header("Choices")]
+        [Tooltip("Контейнер для кнопок вариантов ответа."), SerializeField]
         private RectTransform _choiceContainer;
 
         /// <summary> Префаб кнопки варианта ответа. </summary>
@@ -40,7 +42,8 @@ namespace FlavorfulStory.DialogueSystem.UI
         private DialogueChoiceButton _choiceButtonPrefab;
 
         /// <summary> Кнопка для перехода к следующей реплике. </summary>
-        [Header("Other")] [Tooltip("Кнопка для перехода к следующей реплике."), SerializeField]
+        [Header("Other")]
+        [Tooltip("Кнопка для перехода к следующей реплике."), SerializeField]
         private Button _nextButton;
 
         /// <summary> Объект текста кнопки Next. </summary>

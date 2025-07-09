@@ -52,6 +52,7 @@ namespace FlavorfulStory.TimeManagement
             {
                 float adjustedTotalMinutes = _totalMinutes - 2 * 60;
                 if (adjustedTotalMinutes < 0) return 1;
+
                 return adjustedTotalMinutes % SeasonMinutes / DayMinutes + 1;
             }
         }
@@ -62,7 +63,8 @@ namespace FlavorfulStory.TimeManagement
             get
             {
                 float adjustedTotalMinutes = _totalMinutes - 2 * 60;
-                if (adjustedTotalMinutes < 0) adjustedTotalMinutes += 7 * DayMinutes; 
+                if (adjustedTotalMinutes < 0) adjustedTotalMinutes += 7 * DayMinutes;
+
                 int dayOfWeekIndex = (int)(adjustedTotalMinutes / DayMinutes % 7 + 1);
                 return DayOfWeekConvertDict[(DayOfWeek)dayOfWeekIndex];
             }

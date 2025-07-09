@@ -1,4 +1,5 @@
 using System;
+using FlavorfulStory.EditorTools.Attributes;
 using FlavorfulStory.Saving;
 using UnityEngine;
 
@@ -10,12 +11,10 @@ namespace FlavorfulStory.TimeManagement
     {
         #region Fields
 
+        /// <summary> Сколько игровых минут проходит за реальную секунду. </summary>
         [Header("Time Scale")]
-        [Tooltip("Сколько игровых минут проходит за реальную секунду."), SerializeField, Range(-100f, 1000f)]
+        [Tooltip("Сколько игровых минут проходит за реальную секунду."), SerializeField, SteppedRange(-100f, 100f, 5f)]
         private float _timeScale = 1f;
-
-        [Tooltip("Раз в сколько игровых минут происходит тик времени."), SerializeField, Range(1, 10)]
-        private float _timeBetweenTicks = 1f;
 
         /// <summary> Час начала нового дня. </summary>
         [Header("Day/night settings")] [Tooltip("Во сколько начинается новый день."), SerializeField, Range(0, 24)]
@@ -34,6 +33,9 @@ namespace FlavorfulStory.TimeManagement
         /// <summary> Игра на паузе? </summary>
         private static bool _isPaused;
 
+        /// <summary> Раз в сколько игровых минут происходит тик времени. </summary>
+        private const float TimeBetweenTicks = 5f;
+        
         /// <summary> Вызывается при изменении игрового времени. </summary>
         public static Action<DateTime> OnTimeUpdated;
 
@@ -97,7 +99,7 @@ namespace FlavorfulStory.TimeManagement
             if (previousTime.Hour < NightStartHour && CurrentGameTime.Hour >= NightStartHour)
                 OnNightStarted?.Invoke(CurrentGameTime);
 
-            if ((int)CurrentGameTime.Minute % _timeBetweenTicks == 0) OnTimeTick?.Invoke(CurrentGameTime);
+            if ((int)CurrentGameTime.Minute % TimeBetweenTicks == 0) OnTimeTick?.Invoke(CurrentGameTime);
 
             OnTimeUpdated?.Invoke(CurrentGameTime);
 
