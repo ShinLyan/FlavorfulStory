@@ -2,10 +2,22 @@
 {
     public enum ObjectiveType
     {
-        /// <summary> Собрать / получить указанное количество предметов. </summary>
-        Collect,
+        /// <summary> Иметь указанное количество предметов. </summary>
+        Have,
 
         /// <summary> Поговорить с NPC. </summary>
-        Talk
+        Talk,
+
+        /// <summary> Поспать. </summary>
+        Sleep
+
+        // Craft,          // Скрафтить
+        // Deliver,        // Принести
+        // Remove,         // Удалить
+        // Repair,         // Отремонтировать
+        // Kill,           // Убить
+        // Reach,          // Дойти
+        // Place,          // Разместить товар
+        // Use             // Использовать колокольчик
     }
 }

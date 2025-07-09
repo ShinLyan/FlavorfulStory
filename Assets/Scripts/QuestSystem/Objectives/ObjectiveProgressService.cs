@@ -2,6 +2,7 @@
 using FlavorfulStory.DialogueSystem;
 using FlavorfulStory.InventorySystem;
 using FlavorfulStory.QuestSystem.Objectives.Params;
+using FlavorfulStory.TimeManagement;
 
 namespace FlavorfulStory.QuestSystem.Objectives
 {
@@ -21,17 +22,22 @@ namespace FlavorfulStory.QuestSystem.Objectives
 
             inventory.ItemCollected += OnItemCollected;
             playerSpeaker.OnDialogueCompleted += OnDialogueCompleted;
+            WorldTime.OnDayEnded += OnDayEnded;
         }
 
         /// <summary> Обработчик события сбора предмета. </summary>
         /// <param name="item"> Собранный предмет. </param>
-        private void OnItemCollected(InventoryItem item) => CheckProgressForParamsType<CollectObjectiveParams>(item);
+        private void OnItemCollected(InventoryItem item) => CheckProgressForParamsType<HaveObjectiveParams>(item);
 
         /// <summary> Обработчик завершения диалога — завершает взаимодействие с NPC. </summary>
         /// <param name="npcName"> Имя NPC. </param>
         /// <param name="dialogue"> Диалог, который завершился. </param>
         private void OnDialogueCompleted(NpcName npcName, Dialogue dialogue) =>
             CheckProgressForParamsType<TalkObjectiveParams>((npcName, dialogue));
+
+        /// <summary> Обработчик события завершения дня. </summary>
+        /// <param name="dateTime"> Игровое время. </param>
+        private void OnDayEnded(DateTime dateTime) => CheckProgressForParamsType<SleepObjectiveParams>(dateTime);
 
         /// <summary> Проверяет выполнение всех целей, использующих указанный тип параметров. </summary>
         /// <typeparam name="TParams"> Тип параметров цели. </typeparam>

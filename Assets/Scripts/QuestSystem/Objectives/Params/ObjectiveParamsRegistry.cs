@@ -9,8 +9,9 @@ namespace FlavorfulStory.QuestSystem.Objectives.Params
         /// <summary> Словарь, сопоставляющий тип цели и соответствующий класс параметров. </summary>
         public static readonly Dictionary<ObjectiveType, Type> Mapping = new()
         {
-            { ObjectiveType.Collect, typeof(CollectObjectiveParams) },
-            { ObjectiveType.Talk, typeof(TalkObjectiveParams) }
+            { ObjectiveType.Have, typeof(HaveObjectiveParams) },
+            { ObjectiveType.Talk, typeof(TalkObjectiveParams) },
+            { ObjectiveType.Sleep, typeof(SleepObjectiveParams) }
         };
     }
 }

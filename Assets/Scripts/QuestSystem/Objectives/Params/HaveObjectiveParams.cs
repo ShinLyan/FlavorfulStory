@@ -4,9 +4,9 @@ using UnityEngine;
 
 namespace FlavorfulStory.QuestSystem.Objectives.Params
 {
-    /// <summary> Параметры цели на сбор определённого количества предметов. </summary>
+    /// <summary> Параметры цели на то, чтобы иметь в инвентаре определённое количество предметов. </summary>
     [Serializable]
-    public class CollectObjectiveParams : ObjectiveParamsBase
+    public class HaveObjectiveParams : ObjectiveParamsBase
     {
         /// <summary> Предмет, который требуется собрать. </summary>
         [field: Tooltip("Предмет, который требуется собрать."), SerializeField]

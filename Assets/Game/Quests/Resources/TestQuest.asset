@@ -25,7 +25,7 @@ MonoBehaviour:
       \u0441 \u0445\u043B\u0435\u0431\u043E\u043F\u043D\u044F"
     <Type>k__BackingField: 0
     <Params>k__BackingField:
-      rid: 6018952194235564207
+      rid: 6018952270281179288
   - <Reference>k__BackingField: 1b80e2a5-c3c0-45b0-b15b-0f94d2270ffa
     <Description>k__BackingField: "\u041D\u0430\u0439\u0442\u0438 \u0424\u0435\u043B\u0438\u0430\u043D\u0443
       \u0438 \u043F\u043E\u0433\u043E\u0432\u043E\u0440\u0438\u0442\u044C \u0441
@@ -33,6 +33,11 @@ MonoBehaviour:
     <Type>k__BackingField: 1
     <Params>k__BackingField:
       rid: 6018952246387802207
+  - <Reference>k__BackingField: a4a2efb5-64f7-4605-8a5d-b479395e6f6c
+    <Description>k__BackingField: "\u041F\u043E\u0441\u043F\u0430\u0442\u044C"
+    <Type>k__BackingField: 2
+    <Params>k__BackingField:
+      rid: 6018952270281179280
   _rewards:
   - <Number>k__BackingField: 1
     <Item>k__BackingField: {fileID: 11400000, guid: bce861ac3c00da94b92e70c22de74b57,
@@ -43,13 +48,6 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
-    - rid: 6018952194235564207
-      type: {class: CollectObjectiveParams, ns: FlavorfulStory.QuestSystem.Objectives.Params,
-        asm: Assembly-CSharp}
-      data:
-        <InventoryItem>k__BackingField: {fileID: 11400000, guid: eb8c35d6d90a84043af17703c99e22f3,
-          type: 2}
-        <RequiredAmount>k__BackingField: 4
     - rid: 6018952246387802207
       type: {class: TalkObjectiveParams, ns: FlavorfulStory.QuestSystem.Objectives.Params,
         asm: Assembly-CSharp}
@@ -57,3 +55,14 @@ MonoBehaviour:
         <NpcName>k__BackingField: 2
         <Dialogue>k__BackingField: {fileID: 11400000, guid: e19edbfd6cf7b664b96f333367a29864,
           type: 2}
+    - rid: 6018952270281179280
+      type: {class: SleepObjectiveParams, ns: FlavorfulStory.QuestSystem.Objectives.Params,
+        asm: Assembly-CSharp}
+      data: 
+    - rid: 6018952270281179288
+      type: {class: HaveObjectiveParams, ns: FlavorfulStory.QuestSystem.Objectives.Params,
+        asm: Assembly-CSharp}
+      data:
+        <InventoryItem>k__BackingField: {fileID: 11400000, guid: eb8c35d6d90a84043af17703c99e22f3,
+          type: 2}
+        <RequiredAmount>k__BackingField: 4
