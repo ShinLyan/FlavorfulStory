@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace FlavorfulStory.Lightning
+namespace FlavorfulStory.Visuals.Lightning
 {
     /// <summary> Класс настроек освещения, содержащий параметры для солнца и луны. </summary>
     [Serializable]
