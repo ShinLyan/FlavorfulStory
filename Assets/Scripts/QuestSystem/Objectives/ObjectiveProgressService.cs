@@ -54,7 +54,10 @@ namespace FlavorfulStory.QuestSystem.Objectives
             foreach (var questStatus in _context.QuestList.QuestStatuses)
             foreach (var objective in questStatus.Quest.Objectives)
                 if (objective.Params is TParams paramsInstance)
+                {
                     paramsInstance.CheckAndComplete(questStatus, _context, eventData);
+                    break; // Если в одном этапе есть два одинаковых Objective
+                }
         }
     }
 }
