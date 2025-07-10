@@ -80,6 +80,7 @@ namespace FlavorfulStory.Installers
             Container.Bind<IActionTooltipShower>().To<ActionTooltipShower>().FromComponentInHierarchy().AsSingle();
 
             Container.Bind<CanvasGroupFader>().WithId("HUD").FromInstance(_hudFader).AsSingle();
+            Container.Bind<CraftingWindow>().FromComponentInHierarchy().AsSingle();
         }
 
         /// <summary> Установить зависимости, связанные с не игровыми системами и логикой. </summary>

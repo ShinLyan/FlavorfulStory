@@ -9,7 +9,7 @@ namespace FlavorfulStory
 
         private void Start()
         {
-            _craftingWindow.Setup(CraftingRecipeProvider.GetAllRecipes());
+            //_craftingWindow.Setup(CraftingRecipeProvider.GetAllRecipes());
         }
     }
 }
