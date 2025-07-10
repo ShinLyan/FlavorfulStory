@@ -1,4 +1,5 @@
 using System;
+using UnityEngine;
 
 namespace FlavorfulStory.AI.FiniteStateMachine
 {
@@ -13,16 +14,10 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         public void SetContext(StateContext context) => Context = context;
 
         /// <summary> Вызывается при входе в состояние. </summary>
-        public virtual void Enter()
-        {
-            // Debug.Log("Entering state: " + GetType().Name);
-        }
+        public virtual void Enter() { Debug.Log("Entering state: " + GetType().Name); }
 
         /// <summary> Вызывается при выходе из состояния. </summary>
-        public virtual void Exit()
-        {
-            // Debug.Log("Exiting state: " + GetType().Name);
-        }
+        public virtual void Exit() { Debug.Log("Exiting state: " + GetType().Name); }
 
         /// <summary> Обновление логики состояния, вызываемое каждый кадр. </summary>
         public virtual void Update() { }

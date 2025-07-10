@@ -8,22 +8,42 @@ namespace FlavorfulStory.SceneManagement.ShopLocation
     {
         [field: SerializeField] public CashDesk CashDesk { get; private set; }
 
-        [SerializeField] private Shelf[] _shelves;
+        [SerializeField] private ShopObject[] _shelves;
 
-        [SerializeField] private Furniture[] _furnitures;
+        [SerializeField] private ShopObject[] _furnitures;
 
-        public Furniture GetAvailableFurniture() => (Furniture)GetAvailableObjects(_furnitures);
+        public Furniture GetAvailableFurniture() => (Furniture)GetRandomObject(_furnitures);
 
-        public Shelf GetAvailableShelf() => (Shelf)GetAvailableObjects(_shelves);
+        public Shelf GetAvailableShelf() => (Shelf)GetRandomObject(_shelves);
 
-        private ShopObject GetAvailableObjects(ShopObject[] objects)
+        private ShopObject[] GetAvailableObjects(ShopObject[] objects)
         {
             var availableObjects = new List<ShopObject>();
             foreach (var obj in objects)
                 if (!obj.IsOccupied)
                     availableObjects.Add(obj);
 
-            return availableObjects[Random.Range(0, availableObjects.Count)];
+            return availableObjects.ToArray();
+        }
+
+        private ShopObject GetRandomObject(ShopObject[] objects)
+        {
+            var availableObjects = GetAvailableObjects(objects);
+            return availableObjects[Random.Range(0, availableObjects.Length)];
+        }
+
+
+        public bool AreAvailableShelvesEmpty()
+        {
+            var shelves = GetAvailableObjects(_shelves);
+            // TODO: Реализация проверки, есть ли на полках товары
+            return shelves.Length == 0;
+        }
+
+        public bool AreAllFurnitureOccupied()
+        {
+            var furnitures = GetAvailableObjects(_furnitures);
+            return furnitures.Length == 0;
         }
     }
 }

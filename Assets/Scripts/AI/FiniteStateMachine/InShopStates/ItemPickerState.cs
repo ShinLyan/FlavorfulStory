@@ -27,14 +27,11 @@ namespace FlavorfulStory.AI.FiniteStateMachine.InShopStates
         {
             base.Enter();
             if (Context != null && Context.TryGet<Shelf>("SelectedShelf", out var shelf))
-            {
                 // var item = shelf.Items[Random.Range(0, shelf.Items.Count)]; //TODO
                 // _itemHandler.EquipItem(item);
-            }
+                shelf.SetOccupied(false);
             else
-            {
                 Debug.LogError("Shelf not found in context!");
-            }
 
             var pointVector = _shopLocation.CashDesk.GetAccessiblePoint();
 

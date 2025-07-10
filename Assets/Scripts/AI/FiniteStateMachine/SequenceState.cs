@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using FlavorfulStory.AI.BaseNpc;
-using UnityEngine;
 
 namespace FlavorfulStory.AI.FiniteStateMachine
 {
@@ -11,6 +11,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         private readonly StateController _stateController;
         private int _currentStateIndex;
         private readonly List<CharacterState> _states;
+        public event Action OnSequenceEnded;
 
         public SequenceState(StateController stateController, IEnumerable<CharacterState> states)
         {
@@ -28,7 +29,6 @@ namespace FlavorfulStory.AI.FiniteStateMachine
             }
 
             SetContext(new StateContext());
-            Debug.Log("CONTEXT: " + Context);
 
             _currentState = _states[_currentStateIndex];
             _currentState.SetContext(Context);
@@ -68,7 +68,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         private void Back()
         {
             _currentStateIndex = 0;
-            _stateController.ReturnFromSequence();
+            OnSequenceEnded?.Invoke();
         }
     }
 }

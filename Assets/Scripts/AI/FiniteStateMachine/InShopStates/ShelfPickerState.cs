@@ -21,6 +21,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine.InShopStates
         {
             base.Enter();
             var availableShelf = _shopLocation.GetAvailableShelf();
+            availableShelf.SetOccupied(true);
             Context?.Set("SelectedShelf", availableShelf);
 
             var pointVector = availableShelf.GetAccessiblePoint();

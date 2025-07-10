@@ -1,7 +1,10 @@
-﻿using FlavorfulStory.Actions;
+﻿using System.Collections.Generic;
+using System.Linq;
+using FlavorfulStory.Actions;
 using FlavorfulStory.AI.BaseNpc;
 using FlavorfulStory.AI.FiniteStateMachine;
 using FlavorfulStory.AI.FiniteStateMachine.InShopStates;
+using FlavorfulStory.AI.Scheduling;
 using FlavorfulStory.Player;
 using FlavorfulStory.SceneManagement;
 using FlavorfulStory.SceneManagement.ShopLocation;
@@ -61,34 +64,8 @@ namespace FlavorfulStory.AI.NonInteractableNpc
         {
             var shopLocation = (ShopLocation)_locationManager.GetLocationByName(LocationName.NewShop);
 
-            _movementState = new MovementState(_npcMovementController);
-            _animationState = new AnimationState();
-            _furniturePickerState = new FurniturePickerState(_npcMovementController, shopLocation);
-            _itemPickerState =
-                new ItemPickerState(_npcMovementController, shopLocation, _itemHandler);
-            _paymentState = new PaymentState();
-            _randomPointPickerState = new RandomPointPickerState(_npcMovementController, shopLocation);
-            _shelfPickerState = new ShelfPickerState(_npcMovementController, shopLocation);
-            _waitingState = new WaitingState(_playerController, _npcTransform);
-
-            _randomPointSequence = new SequenceState(this,
-                new CharacterState[] { _randomPointPickerState, _movementState, _animationState });
-            _typeToCharacterStates.Add("_randomPointSequence", _randomPointSequence);
-
-            _furnitureSequence = new SequenceState(this,
-                new CharacterState[] { _furniturePickerState, _movementState, _animationState });
-            _typeToCharacterStates.Add("_furnitureSequence", _furnitureSequence);
-
-            _buyItemSequence = new SequenceState(this,
-                new CharacterState[]
-                {
-                    _shelfPickerState, _movementState, _itemPickerState, _movementState, _paymentState
-                });
-            _typeToCharacterStates.Add("_buyItemSequence", _buyItemSequence);
-
-            _refuseItemSequence = new SequenceState(this,
-                new CharacterState[] { _shelfPickerState, _movementState, _animationState });
-            _typeToCharacterStates.Add("_refuseItemSequence", _refuseItemSequence);
+            CreateStates(shopLocation);
+            CreateSequences();
 
             var states = new CharacterState[]
             {
@@ -103,29 +80,55 @@ namespace FlavorfulStory.AI.NonInteractableNpc
             }
         }
 
+        private void CreateStates(ShopLocation shopLocation)
+        {
+            _movementState = new MovementState(_npcMovementController);
+            _animationState = new AnimationState();
+            _furniturePickerState = new FurniturePickerState(_npcMovementController, shopLocation);
+            _itemPickerState =
+                new ItemPickerState(_npcMovementController, shopLocation, _itemHandler);
+            _paymentState = new PaymentState();
+            _randomPointPickerState = new RandomPointPickerState(_npcMovementController, shopLocation);
+            _shelfPickerState = new ShelfPickerState(_npcMovementController, shopLocation);
+            _waitingState = new WaitingState(_playerController, _npcTransform);
+        }
+
+        private void CreateSequences()
+        {
+            _randomPointSequence = new SequenceState(this,
+                new CharacterState[] { _randomPointPickerState, _movementState, _animationState });
+
+            _furnitureSequence = new SequenceState(this,
+                new CharacterState[] { _furniturePickerState, _movementState, _animationState });
+
+            _buyItemSequence = new SequenceState(this,
+                new CharacterState[]
+                {
+                    _shelfPickerState, _movementState, _itemPickerState, _movementState, _paymentState
+                });
+
+            _refuseItemSequence = new SequenceState(this,
+                new CharacterState[] { _shelfPickerState, _movementState, _animationState });
+
+            _typeToCharacterStates.Add("_randomPointSequence", _randomPointSequence);
+            _typeToCharacterStates.Add("_furnitureSequence", _furnitureSequence);
+            _typeToCharacterStates.Add("_buyItemSequence", _buyItemSequence);
+            _typeToCharacterStates.Add("_refuseItemSequence", _refuseItemSequence);
+
+            _buyItemSequence.OnSequenceEnded += HandleAfterPurchaseTransition;
+            _refuseItemSequence.OnSequenceEnded += StartRandomSequence;
+            _randomPointSequence.OnSequenceEnded += StartRandomSequence;
+            _furnitureSequence.OnSequenceEnded += StartRandomSequence;
+        }
+
         protected override void ResetStates()
         {
             foreach (var state in _typeToCharacterStates.Values) state.Reset();
             SetState(typeof(WaitingState).ToString()); //TODO: think about initial state
         }
 
-        /// <summary> Запускает последовательность состояний. </summary>
-        public override void StartSequence(string sequenceName)
-        {
-            // _stateStack.Push(_currentState); //TODO: rework
-            SetState(sequenceName);
-        }
-
         /// <summary> Возвращает управление после завершения последовательности. </summary>
-        public override void ReturnFromSequence()
-        {
-            SetState(typeof(WaitingState).ToString());
-            // if (_stateStack.Count > 0)
-            // {
-            //     var previousState = _stateStack.Pop(); // TODO: rework
-            //     SetState(previousState.GetType());
-            // }
-        }
+        public override void ReturnFromSequence() { SetState(typeof(WaitingState).ToString()); }
 
 
         public override void Update()
@@ -141,12 +144,62 @@ namespace FlavorfulStory.AI.NonInteractableNpc
 
         private void StartRandomSequence()
         {
-            int randomIndex = Random.Range(0, _availableSequences.Length);
-            string randomSequence = _availableSequences[randomIndex];
+            // string selectedSequence = CalculateNextSequence();
+            SetState("_buyItemSequence");
+        }
 
-            // Debug.Log("==================================");
-            // Debug.Log(_npcTransform.name + " Starting random sequence: " + randomSequence);
-            StartSequence("_buyItemSequence");
+        private string CalculateNextSequence()
+        {
+            var shopLocation = (ShopLocation)_locationManager.GetLocationByName(LocationName.NewShop);
+
+            bool areShelvesAvailable = !shopLocation.AreAvailableShelvesEmpty();
+            bool areFurnitureAvailable = !shopLocation.AreAllFurnitureOccupied();
+
+            var availableOptions = new List<(string sequence, float weight)>();
+
+            if (areShelvesAvailable)
+            {
+                availableOptions.Add(("_buyItemSequence", (float)(50 * 0.67)));
+                availableOptions.Add(("_refuseItemSequence", (float)(50 * 0.33)));
+            }
+
+            if (areFurnitureAvailable) availableOptions.Add(("_furnitureSequence", 25f));
+
+            availableOptions.Add(("_randomPointSequence", 25f));
+
+            if (availableOptions.Count == 0) return typeof(WaitingState).ToString();
+
+            float totalWeight = availableOptions.Sum(x => x.weight);
+            float randomValue = Random.Range(0f, totalWeight);
+            float currentWeight = 0f;
+
+            foreach (var option in availableOptions)
+            {
+                currentWeight += option.weight;
+                if (randomValue <= currentWeight) return option.sequence;
+            }
+
+            return availableOptions.Last().sequence;
+        }
+
+        private void HandleAfterPurchaseTransition()
+        {
+            var shopLocation = (ShopLocation)_locationManager.GetLocationByName(LocationName.NewShop);
+            bool isFurnitureAvailable = !shopLocation.AreAllFurnitureOccupied();
+
+            if (isFurnitureAvailable && Random.Range(0, 2) == 0)
+            {
+                SetState("_furnitureSequence");
+            }
+            else
+            {
+                var point = new SchedulePoint(); //TODO: rework
+                point.Position = _playerController.transform.position;
+                point.LocationName = LocationName.RockyIsland;
+
+                _npcMovementController.SetPoint(point);
+                SetState(typeof(MovementState).ToString());
+            }
         }
     }
 }

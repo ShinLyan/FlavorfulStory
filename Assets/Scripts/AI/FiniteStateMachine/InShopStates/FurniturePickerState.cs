@@ -21,6 +21,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine.InShopStates
         {
             base.Enter();
             var furniture = _shopLocation.GetAvailableFurniture();
+            furniture.SetOccupied(true);
             Context?.Set("SelectedFurniture", furniture);
 
             var pointVector = furniture.GetAccessiblePoint();
@@ -30,6 +31,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine.InShopStates
             point.LocationName = LocationName.NewShop;
 
             _movementController.SetPoint(point);
+            _movementController.OnDestinationReached += () => furniture.SetOccupied(false);
         }
 
         public override bool IsComplete() => true;
