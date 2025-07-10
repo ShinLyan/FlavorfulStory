@@ -5,7 +5,7 @@ using UnityEngine;
 namespace FlavorfulStory.AI.Scheduling
 {
     /// <summary> Расписание NPC. </summary>
-    [CreateAssetMenu(menuName = "FlavorfulStory/NPC Schedule")]
+    [CreateAssetMenu(menuName = "FlavorfulStory/NPC/Schedule")]
     public class NpcSchedule : ScriptableObject
     {
         /// <summary> Параметры расписания NPC. </summary>

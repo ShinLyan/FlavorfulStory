@@ -3,7 +3,7 @@
 namespace FlavorfulStory.AI
 {
     /// <summary> Информация о NPC. </summary>
-    [CreateAssetMenu(menuName = "FlavorfulStory/NPC Info")]
+    [CreateAssetMenu(menuName = "FlavorfulStory/NPC/Info")]
     public class NpcInfo : ScriptableObject
     {
         /// <summary> Имя NPC (используется в игровых системах и интерфейсе). </summary>
