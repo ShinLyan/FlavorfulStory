@@ -8,7 +8,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         /// <summary> Событие, вызываемое для запроса перехода к другому состоянию. </summary>
         public event Action<string> OnStateChangeRequested;
 
-        protected StateContext Context { get; private set; }
+        public StateContext Context { get; protected set; }
 
         public void SetContext(StateContext context) => Context = context;
 

@@ -144,9 +144,9 @@ namespace FlavorfulStory.AI.NonInteractableNpc
             int randomIndex = Random.Range(0, _availableSequences.Length);
             string randomSequence = _availableSequences[randomIndex];
 
-            Debug.Log("==================================");
-            Debug.Log(_npcTransform.name + " Starting random sequence: " + randomSequence);
-            StartSequence(randomSequence);
+            // Debug.Log("==================================");
+            // Debug.Log(_npcTransform.name + " Starting random sequence: " + randomSequence);
+            StartSequence("_buyItemSequence");
         }
     }
 }

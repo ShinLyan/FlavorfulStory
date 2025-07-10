@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using FlavorfulStory.AI.BaseNpc;
+using UnityEngine;
 
 namespace FlavorfulStory.AI.FiniteStateMachine
 {
@@ -26,6 +27,9 @@ namespace FlavorfulStory.AI.FiniteStateMachine
                 return;
             }
 
+            SetContext(new StateContext());
+            Debug.Log("CONTEXT: " + Context);
+
             _currentState = _states[_currentStateIndex];
             _currentState.SetContext(Context);
             _currentState.OnStateChangeRequested += OnSubStateChangeRequested;
@@ -42,6 +46,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine
 
             if (_currentState.IsComplete())
             {
+                Context = _currentState.Context;
                 _currentState.Exit();
                 _currentState.OnStateChangeRequested -= OnSubStateChangeRequested;
 

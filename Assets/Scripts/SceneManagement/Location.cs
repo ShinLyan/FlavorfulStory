@@ -1,4 +1,6 @@
+using Unity.AI.Navigation;
 using UnityEngine;
+using UnityEngine.AI;
 
 namespace FlavorfulStory.SceneManagement
 {
@@ -17,6 +19,8 @@ namespace FlavorfulStory.SceneManagement
         /// <summary> Является ли локация помещением. </summary>
         [field: Tooltip("Является ли локация помещением?"), SerializeField]
         public bool IsRoom { get; private set; }
+
+        [SerializeField] private NavMeshSurface _navMeshSurface;
 
         /// <summary> Устанавливает активное состояние всех объектов из списка. </summary>
         /// <param name="isActive"> <c>true</c> — включить объекты; <c>false</c> — отключить. </param>
