@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -80,11 +81,21 @@ namespace FlavorfulStory.QuestSystem
         /// <param name="questStatus"> Статус квеста с прогрессом целей. </param>
         private void SetupObjectives(QuestStatus questStatus)
         {
-            foreach (var objective in questStatus.CurrentObjectives)
-            {
-                var instance = Instantiate(_questObjectivePrefab, _objectivesContainer);
-                instance.Setup(objective.Description, questStatus.IsObjectiveComplete(objective));
-            }
+            var stages = questStatus.Quest.Stages.ToList();
+            int lastVisibleStageIndex = questStatus.IsComplete
+                ? stages.Count - 1
+                : questStatus.CurrentStageIndex;
+
+            // Обходим от текущего этапа вниз до самого первого
+            for (int stageIndex = lastVisibleStageIndex; stageIndex >= 0; stageIndex--)
+                foreach (var objective in stages[stageIndex].Objectives)
+                {
+                    var instance = Instantiate(_questObjectivePrefab, _objectivesContainer);
+
+                    bool isCompleted = questStatus.IsStageComplete(stageIndex) ||
+                                       questStatus.IsObjectiveComplete(objective);
+                    instance.Setup(objective.Description, isCompleted);
+                }
         }
 
         /// <summary> Создает и отображает награды за квест. </summary>
