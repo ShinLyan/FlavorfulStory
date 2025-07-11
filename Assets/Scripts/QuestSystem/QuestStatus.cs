@@ -19,7 +19,7 @@ namespace FlavorfulStory.QuestSystem
         private List<QuestStage> _stages;
 
         /// <summary> Индекс текущего этапа квеста. </summary>
-        private int CurrentStageIndex { get; set; }
+        public int CurrentStageIndex { get; set; }
 
         /// <summary> Текущие цели из активного этапа квеста. </summary>
         public IEnumerable<QuestObjective> CurrentObjectives
@@ -42,8 +42,7 @@ namespace FlavorfulStory.QuestSystem
         public QuestStatus(Quest quest)
         {
             Quest = quest;
-            _completedObjectives = new List<QuestObjective>();
-            _stages = Quest.Stages.ToList();
+            Initialize();
             CurrentStageIndex = 0;
         }
 
@@ -54,9 +53,17 @@ namespace FlavorfulStory.QuestSystem
             if (objectState is not QuestStatusRecord state) return;
 
             Quest = Quest.GetByName(state.QuestName);
-            _completedObjectives = new List<QuestObjective>();
-            _stages = Quest.Stages.ToList();
+            Initialize();
             CurrentStageIndex = state.CurrentStageIndex;
+        }
+
+        /// <summary> Инициализация состояния статуса квеста. </summary>
+        /// <remarks> Нужна для того, чтобы заданные статусы через Inspector
+        /// в QuestList были проинициализированы. </remarks>
+        public void Initialize()
+        {
+            _completedObjectives ??= new List<QuestObjective>();
+            _stages ??= Quest.Stages.ToList();
         }
 
         /// <summary> Пометить, что награды получены. </summary>
@@ -75,9 +82,13 @@ namespace FlavorfulStory.QuestSystem
 
             _completedObjectives.Add(objective);
 
-            // Если все цели текущего этапа выполнены — переход к следующему
-            if (_stages[CurrentStageIndex].IsComplete(_completedObjectives)) CurrentStageIndex++;
+            if (IsStageComplete(CurrentStageIndex)) CurrentStageIndex++;
         }
+
+        /// <summary> Этап квеста по индексу пройден? </summary>
+        /// <param name="stageIndex"> Индекс этапа квеста. </param>
+        /// <returns> <c>true</c> - этап квеста пройден, <c>false</c> - в противном случае. </returns>
+        public bool IsStageComplete(int stageIndex) => _stages[stageIndex].IsComplete(_completedObjectives);
 
         /// <summary> Структура для сериализации состояния статуса квеста. </summary>
         [Serializable]

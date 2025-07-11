@@ -39,6 +39,12 @@ namespace FlavorfulStory.QuestSystem
             _itemDropper = itemDropper;
         }
 
+        /// <summary> Инициализируем статусы квестов, которые были заданы через Inspector. </summary>
+        private void Awake()
+        {
+            foreach (var questStatus in _questStatuses) questStatus.Initialize();
+        }
+
         /// <summary> Добавляет квест в активный список, если он еще не был добавлен. </summary>
         /// <param name="quest"> Квест для добавления. </param>
         public void AddQuest(Quest quest)
