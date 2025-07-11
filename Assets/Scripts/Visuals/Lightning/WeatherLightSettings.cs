@@ -1,6 +1,7 @@
+using FlavorfulStory.Visuals.Weather;
 using UnityEngine;
 
-namespace FlavorfulStory.Lightning
+namespace FlavorfulStory.Visuals.Lightning
 {
     /// <summary> Настройки освещения для конкретного типа погоды. </summary>
     /// <remarks> Создаваемый ассет, который можно создать через меню Unity. </remarks> 

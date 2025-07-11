@@ -63,9 +63,9 @@ namespace FlavorfulStory.AI.WarpGraphSystem
         /// <param name="other"> Коллайдер объекта, вошедшего в триггер. </param>
         private void OnTriggerEnter(Collider other)
         {
-            if (!other.CompareTag("Player")) return;
+            if (!other.CompareTag("Player") || !other.TryGetComponent(out PlayerController playerController)) return;
 
-            StartCoroutine(TeleportPlayer(other.GetComponent<PlayerController>()));
+            StartCoroutine(TeleportPlayer(playerController));
         }
 
         /// <summary> Корутин телепортации игрока с управлением фейдами и сменой локаций. </summary>
@@ -77,16 +77,15 @@ namespace FlavorfulStory.AI.WarpGraphSystem
 
             if (_virtualCamera) _virtualCamera.enabled = false;
 
-            _locationManager.EnableLocation(ConnectedWarp.ParentLocationName);
             playerController.UpdatePosition(ConnectedWarp._spawnPoint);
 
             yield return null;
+
+            _locationManager.UpdateActiveLocation();
             if (_virtualCamera) _virtualCamera.enabled = true;
 
             yield return _canvasGroupFader.Hide().WaitForCompletion();
             InputWrapper.UnblockAllInput();
-
-            _locationManager.DisableLocation(ParentLocationName);
         }
 
 #if UNITY_EDITOR

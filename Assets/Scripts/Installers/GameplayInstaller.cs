@@ -9,12 +9,13 @@ using FlavorfulStory.InventorySystem.DropSystem;
 using FlavorfulStory.InventorySystem.EquipmentSystem;
 using FlavorfulStory.InventorySystem.PickupSystem;
 using FlavorfulStory.InventorySystem.UI;
-using FlavorfulStory.Lightning;
 using FlavorfulStory.Player;
 using FlavorfulStory.SceneManagement;
+using FlavorfulStory.TimeManagement;
 using FlavorfulStory.TooltipSystem;
 using FlavorfulStory.UI;
 using FlavorfulStory.UI.Animation;
+using FlavorfulStory.Visuals.Lightning;
 using Unity.Cinemachine;
 using UnityEngine;
 using Zenject;
@@ -64,6 +65,8 @@ namespace FlavorfulStory.Installers
             Container.Bind<PickupSpawner>().FromComponentsInHierarchy().AsCached();
 
             Container.Bind<DialogueModelPresenter>().FromComponentInHierarchy().AsSingle();
+
+            Container.Bind<SleepTrigger>().FromComponentInHierarchy().AsSingle();
         }
 
         /// <summary> Установить зависимости, связанные с пользовательским интерфейсом. </summary>
@@ -95,6 +98,8 @@ namespace FlavorfulStory.Installers
             Container.BindInterfacesAndSelfTo<LocationManager>().AsSingle();
 
             Container.Bind<CinemachineCamera>().FromInstance(_teleportVirtualCamera).AsSingle();
+
+            Container.BindInterfacesAndSelfTo<DayEndManager>().AsSingle();
         }
     }
 }
