@@ -1,8 +1,8 @@
 ﻿using System;
-using FlavorfulStory.InventorySystem;
 using UnityEngine;
+using FlavorfulStory.Crafting;
 
-namespace FlavorfulStory.BuildingRepair
+namespace FlavorfulStory.InventorySystem
 {
     //TODO: Вынести из неймспейса BuildingRepair в более логичное место.
     /// <summary> Структура, определяющая требование предметов. </summary>

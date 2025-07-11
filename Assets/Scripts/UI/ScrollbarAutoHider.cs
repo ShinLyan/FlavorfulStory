@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace FlavorfulStory
+namespace FlavorfulStory.UI
 {
     /// <summary> Автоматически скрывает скроллбар, если контент полностью помещается в окне. </summary>
     [RequireComponent(typeof(ScrollRect))]

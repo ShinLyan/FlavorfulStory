@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using FlavorfulStory.BuildingRepair;
+using FlavorfulStory.Crafting;
 using FlavorfulStory.DialogueSystem;
 using FlavorfulStory.DialogueSystem.UI;
 using FlavorfulStory.Infrastructure.Factories;

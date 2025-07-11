@@ -1,15 +1,15 @@
 using System.Collections.Generic;
 using System.Linq;
-using FlavorfulStory.InventorySystem;
 using UnityEngine;
+using FlavorfulStory.InventorySystem;
 
-namespace FlavorfulStory
+namespace FlavorfulStory.Crafting
 {
-    //TODO: Дубляж логики с ItemDatabase.cs. Обсудить с Вовой создание generiс варианта или в целом лукап-таблицы
+    /// <summary> Предоставляет доступ к базе данных рецептов крафта. </summary>
     public static class CraftingRecipeProvider
     {
         /// <summary> Словарь рецептов. </summary>
-        /// <remarks> Хранит пары (GUID, предмет). </remarks>
+        /// <remarks> Хранит пары (GUID, рецепт). </remarks>
         private static readonly Dictionary<string, CraftingRecipe> _recipeDatabase;
 
         /// <summary> Инициализирует базу данных предметов. </summary>

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using FlavorfulStory.InventorySystem;
 using UnityEngine;
 
 namespace FlavorfulStory.BuildingRepair
