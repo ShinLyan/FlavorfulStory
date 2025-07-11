@@ -148,7 +148,7 @@ namespace FlavorfulStory.BuildingRepair
         /// <param name="view"> Отображение требования. </param>
         /// <param name="requirement"> Требование ресурса. </param>
         /// <param name="invested"> Количество вложенного ресурса. </param>
-        private void UpdateRequirementView(ResourceRequirementView view, ResourceRequirement requirement, int invested)
+        private void UpdateRequirementView(ResourceRequirementView view, ItemRequirement requirement, int invested)
         {
             view.gameObject.SetActive(true);
             view.Setup(requirement, invested);

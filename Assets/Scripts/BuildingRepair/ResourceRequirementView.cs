@@ -62,7 +62,7 @@ namespace FlavorfulStory.BuildingRepair
         /// <summary> Установить ресурс для текущего элемента. </summary>
         /// <param name="requirement"> Ресурсное требование. </param>
         /// <param name="investedNumber"> Количество вложенного ресурса в процесс ремонта. </param>
-        public void Setup(ResourceRequirement requirement, int investedNumber)
+        public void Setup(ItemRequirement requirement, int investedNumber)
         {
             if (!requirement.Item)
             {
