@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using FlavorfulStory.Core;
 using FlavorfulStory.InventorySystem.PickupSystem;
 using FlavorfulStory.Saving;
 using UnityEngine;
@@ -8,7 +9,7 @@ using Zenject;
 namespace FlavorfulStory.InventorySystem
 {
     /// <summary> Инвентарь игрока с настраиваемым количеством слотов. </summary>
-    public class Inventory : MonoBehaviour, ISaveable
+    public class Inventory : MonoBehaviour, IPredicateEvaluator, ISaveable
     {
         /// <summary> Количество слотов в инвентаре. </summary>
         [field: Tooltip("Количество слотов в инвентаре."), SerializeField]
@@ -23,13 +24,14 @@ namespace FlavorfulStory.InventorySystem
         /// <summary> Событие, вызываемое при изменении инвентаря (добавление, удаление предметов). </summary>
         public event Action InventoryUpdated;
 
+        /// <summary> Событие при сборе предмета. Передает сам предмет. </summary>
+        public event Action<InventoryItem> ItemCollected;
+
         /// <summary> Внедрение зависимостей Zenject. </summary>
         /// <param name="notificationManager"> Менеджер уведомлений о подборе предмета. </param>
         [Inject]
-        private void Construct(PickupNotificationManager notificationManager)
-        {
+        private void Construct(PickupNotificationManager notificationManager) =>
             _notificationManager = notificationManager;
-        }
 
         /// <summary> Инициализация слотов и ссылки на инвентарь игрока. </summary>
         private void Awake() => _slots = new InventorySlot[InventorySize];
@@ -150,8 +152,10 @@ namespace FlavorfulStory.InventorySystem
                 remainingNumber -= addAmount;
             }
 
+            // TODO: ПЕРЕДЕЛАТЬ НА EVENT. Inventory не должен знать о _notificationManager
             _notificationManager.ShowNotification(item.Icon, number, item.ItemName, item.ItemName);
 
+            ItemCollected?.Invoke(item);
             InventoryUpdated?.Invoke();
             return true;
         }
@@ -214,6 +218,21 @@ namespace FlavorfulStory.InventorySystem
 
             InventoryUpdated?.Invoke();
         }
+
+        #endregion
+
+        #region IPredicateEvaluator
+
+        /// <summary> Оценивает заданный предикат с параметрами. </summary>
+        /// <param name="predicate"> Имя предиката для проверки. </param>
+        /// <param name="parameters"> Массив параметров для предиката. </param>
+        /// <returns> True, если условие выполнено; false, если не выполнено;
+        /// null, если предикат не поддерживается. </returns>
+        public bool? Evaluate(string predicate, string[] parameters) => predicate switch
+        {
+            "HasInventoryItem" => HasItem(ItemDatabase.GetItemFromID(parameters[0])),
+            _ => null
+        };
 
         #endregion
     }

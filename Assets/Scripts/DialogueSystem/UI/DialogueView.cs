@@ -78,9 +78,6 @@ namespace FlavorfulStory.DialogueSystem.UI
         /// <summary> Событие при выборе варианта ответа. </summary>
         public event Action<DialogueNode> OnChoiceSelected;
 
-        /// <summary> Событие при скрытии окна диалога. </summary>
-        public event Action OnHidden;
-
         #endregion
 
         /// <summary> Внедрение зависимостей Zenject. </summary>
@@ -159,7 +156,6 @@ namespace FlavorfulStory.DialogueSystem.UI
             _currentSpeakerInfo = null;
             _dialogueText.text = string.Empty;
             DisableChoices();
-            OnHidden?.Invoke();
         });
 
         /// <summary> Очищает все текущие варианты ответа из UI. </summary>
