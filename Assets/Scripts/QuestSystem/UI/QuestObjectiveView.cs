@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace FlavorfulStory.QuestSystem
 {
-    /// <summary> Отображение одного задания/цели в UI квеста. </summary>
+    /// <summary> Отображение цели квеста. </summary>
     public class QuestObjectiveView : MonoBehaviour
     {
         /// <summary> Текстовое поле для описания цели. </summary>
@@ -24,6 +24,7 @@ namespace FlavorfulStory.QuestSystem
         public void Setup(string objective, bool isObjectiveComplete)
         {
             _objectiveText.text = objective;
+            _objectiveText.fontStyle = isObjectiveComplete ? FontStyles.Strikethrough : FontStyles.Normal;
             _isComplete = isObjectiveComplete;
             _iconOn.SetActive(isObjectiveComplete);
         }
