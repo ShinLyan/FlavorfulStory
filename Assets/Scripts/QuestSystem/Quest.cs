@@ -25,12 +25,12 @@ namespace FlavorfulStory.QuestSystem
         [field: Tooltip("Тип квеста."), SerializeField]
         public QuestType QuestType { get; private set; }
 
-        /// <summary> Список целей квеста. </summary>
-        [Tooltip("Список целей квеста."), SerializeField]
-        private List<QuestObjective> _objectives;
+        /// <summary> Этапы квеста. </summary>
+        [field: Tooltip("Этапы квеста."), SerializeField]
+        private List<QuestStage> _stages;
 
-        /// <summary> Коллекция целей квеста (только для чтения). </summary>
-        public IEnumerable<QuestObjective> Objectives => _objectives;
+        /// <summary> Этапы квеста (только для чтения). </summary>
+        public IEnumerable<QuestStage> Stages => _stages;
 
         /// <summary> Список наград за выполнение квеста. </summary>
         [Tooltip("Список наград за выполнение квеста."), SerializeField]
@@ -53,12 +53,6 @@ namespace FlavorfulStory.QuestSystem
                 return _cachedQuests;
             }
         }
-
-        /// <summary> Проверяет, содержит ли квест цель с указанной ссылкой. </summary>
-        /// <param name="objectiveReference"> Ссылка на цель. </param>
-        /// <returns> True, если цель найдена; иначе — false. </returns>
-        public bool HasObjective(string objectiveReference) =>
-            Objectives.Any(objective => objective.Reference == objectiveReference);
 
         /// <summary> Находит квест по его названию. </summary>
         /// <param name="questName"> Название квеста. </param>

@@ -9,14 +9,30 @@ namespace FlavorfulStory.QuestSystem
     [Serializable]
     public class QuestStatus
     {
-        /// <summary> Ссылка на квест, к которому относится этот статус. </summary>
+        /// <summary> Квест, к которому относится этот статус. </summary>
         [field: SerializeField] public Quest Quest { get; private set; }
 
         /// <summary> Список выполненных целей квеста. </summary>
-        [SerializeField] private List<string> _completedObjectives;
+        [SerializeField] private List<QuestObjective> _completedObjectives;
+
+        /// <summary> Список всех этапов квеста. </summary>
+        private List<QuestStage> _stages;
+
+        /// <summary> Индекс текущего этапа квеста. </summary>
+        private int CurrentStageIndex { get; set; }
+
+        /// <summary> Текущие цели из активного этапа квеста. </summary>
+        public IEnumerable<QuestObjective> CurrentObjectives
+        {
+            get
+            {
+                _stages ??= Quest.Stages.ToList();
+                return IsComplete ? Array.Empty<QuestObjective>() : _stages[CurrentStageIndex].Objectives;
+            }
+        }
 
         /// <summary> Квест завершен? </summary>
-        public bool IsComplete => Quest.Objectives.All(objective => _completedObjectives.Contains(objective.Reference));
+        public bool IsComplete => CurrentStageIndex >= _stages.Count;
 
         /// <summary> Награды были получены? </summary>
         public bool IsRewardGiven { get; private set; }
@@ -26,7 +42,9 @@ namespace FlavorfulStory.QuestSystem
         public QuestStatus(Quest quest)
         {
             Quest = quest;
-            _completedObjectives = new List<string>();
+            _completedObjectives = new List<QuestObjective>();
+            _stages = Quest.Stages.ToList();
+            CurrentStageIndex = 0;
         }
 
         /// <summary> Восстанавливает статус квеста из сохраненного состояния. </summary>
@@ -36,7 +54,9 @@ namespace FlavorfulStory.QuestSystem
             if (objectState is not QuestStatusRecord state) return;
 
             Quest = Quest.GetByName(state.QuestName);
-            _completedObjectives = state.CompletedObjectives;
+            _completedObjectives = new List<QuestObjective>();
+            _stages = Quest.Stages.ToList();
+            CurrentStageIndex = state.CurrentStageIndex;
         }
 
         /// <summary> Пометить, что награды получены. </summary>
@@ -45,13 +65,18 @@ namespace FlavorfulStory.QuestSystem
         /// <summary> Проверяет, завершена ли указанная цель. </summary>
         /// <param name="objective"> Название цели. </param>
         /// <returns> True, если цель завершена; иначе — false. </returns>
-        public bool IsObjectiveComplete(string objective) => _completedObjectives.Contains(objective);
+        public bool IsObjectiveComplete(QuestObjective objective) => _completedObjectives.Contains(objective);
 
         /// <summary> Завершает указанную цель квеста. </summary>
-        /// <param name="objective"> Название цели. </param>
-        public void CompleteObjective(string objective)
+        /// <param name="objective"> Цель квеста. </param>
+        public void CompleteObjective(QuestObjective objective)
         {
-            if (Quest.HasObjective(objective)) _completedObjectives.Add(objective);
+            if (IsObjectiveComplete(objective)) return;
+
+            _completedObjectives.Add(objective);
+
+            // Если все цели текущего этапа выполнены — переход к следующему
+            if (_stages[CurrentStageIndex].IsComplete(_completedObjectives)) CurrentStageIndex++;
         }
 
         /// <summary> Структура для сериализации состояния статуса квеста. </summary>
@@ -61,8 +86,10 @@ namespace FlavorfulStory.QuestSystem
             /// <summary> Имя квеста для восстановления ссылки. </summary>
             public string QuestName;
 
+            public int CurrentStageIndex;
+
             /// <summary> Список выполненных целей. </summary>
-            public List<string> CompletedObjectives;
+            public List<QuestObjective> CompletedObjectives;
         }
 
         /// <summary> Сохраняет текущее состояние квеста для сериализации. </summary>
@@ -70,6 +97,7 @@ namespace FlavorfulStory.QuestSystem
         public object CaptureState() => new QuestStatusRecord
         {
             QuestName = Quest.QuestName,
+            CurrentStageIndex = CurrentStageIndex,
             CompletedObjectives = _completedObjectives
         };
     }

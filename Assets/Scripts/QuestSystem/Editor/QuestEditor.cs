@@ -8,195 +8,230 @@ using UnityEngine;
 
 namespace FlavorfulStory.QuestSystem.Editor
 {
-    /// <summary> Кастомный инспектор для квестов. Позволяет удобно редактировать цели и награды квеста. </summary>
+    /// <summary> Кастомный инспектор для редактирования квестов с этапами и целями. </summary>
     [CustomEditor(typeof(Quest))]
     public class QuestEditor : UnityEditor.Editor
     {
-        /// <summary> Сериализованное свойство списка целей. </summary>
-        private SerializedProperty _objectivesProperty;
+        /// <summary> Сериализованное свойство списка этапов. </summary>
+        private SerializedProperty _stagesProperty;
 
         /// <summary> Сериализованное свойство списка наград. </summary>
         private SerializedProperty _rewardsProperty;
 
-        /// <summary> ReorderableList для целей квеста. </summary>
-        private ReorderableList _objectivesList;
+        /// <summary> ReorderableList для этапов квеста. </summary>
+        private ReorderableList _stagesList;
 
-        /// <summary> Словарь состояния свёрнутости целей. </summary>
-        private readonly Dictionary<int, bool> _objectiveFoldouts = new();
+        /// <summary> Кешированные списки целей по каждому этапу. </summary>
+        private readonly Dictionary<int, ReorderableList> _objectivesLists = new();
 
-        /// <summary> Вызывается при включении инспектора. Инициализирует ссылки и список целей. </summary>
+        /// <summary> Состояния свёрнутости целей по индексу этапа и цели. </summary>
+        private readonly Dictionary<(int, int), bool> _objectiveFoldouts = new();
+
+        /// <summary> Инициализация ссылок и списков при открытии инспектора. </summary>
         private void OnEnable()
         {
-            _objectivesProperty = serializedObject.FindProperty("_objectives");
+            _stagesProperty = serializedObject.FindProperty("_stages");
             _rewardsProperty = serializedObject.FindProperty("_rewards");
-            SetupObjectivesReorderableList();
+            SetupStagesList();
         }
 
-        /// <summary> Основной метод отрисовки инспектора. </summary>
+        /// <summary> Основной метод отрисовки кастомного инспектора. </summary>
         public override void OnInspectorGUI()
         {
             serializedObject.Update();
 
-            DrawMainQuestFields();
-
-            EditorGUILayout.Space(10);
-            EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
-
-            _objectivesList.DoLayoutList();
-
-            EditorGUILayout.Space(10);
-            EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
-
-            DrawRewardsSection();
-
-            serializedObject.ApplyModifiedProperties();
-        }
-
-        /// <summary> Настраивает reorderable list для целей квеста. </summary>
-        private void SetupObjectivesReorderableList()
-        {
-            _objectivesList = new ReorderableList(serializedObject, _objectivesProperty, true, true, true, true)
-            {
-                drawHeaderCallback = rect => EditorGUI.LabelField(rect, "Objectives", EditorStyles.boldLabel),
-                drawElementCallback = DrawObjectiveElement,
-                elementHeightCallback = CalculateObjectiveHeight,
-                onAddCallback = list => AddObjective()
-            };
-        }
-
-        /// <summary> Отрисовывает поля основной информации о квесте. </summary>
-        private void DrawMainQuestFields()
-        {
             DrawSerializedField("<QuestGiver>k__BackingField");
             DrawSerializedField("<QuestName>k__BackingField");
             DrawSerializedField("<QuestDescription>k__BackingField");
             DrawSerializedField("<QuestType>k__BackingField");
+
+            EditorGUILayout.Space(10);
+            _stagesList.DoLayoutList();
+
+            EditorGUILayout.Space(10);
+            EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
+            EditorGUILayout.PropertyField(_rewardsProperty, true);
+
+            serializedObject.ApplyModifiedProperties();
         }
 
-        /// <summary> Отрисовывает SerializedProperty по имени. </summary>
-        /// <param name="propertyName"> Имя сериализованного свойства. </param>
+        /// <summary> Создаёт ReorderableList для этапов и настраивает отрисовку. </summary>
+        private void SetupStagesList()
+        {
+            _stagesList = new ReorderableList(serializedObject, _stagesProperty, true, true, true, true)
+            {
+                drawHeaderCallback = rect => EditorGUI.LabelField(rect, "Quest Stages"),
+
+                drawElementCallback = (rect, index, active, focused) =>
+                {
+                    if (index >= _stagesProperty.arraySize) return;
+
+                    var stageProp = _stagesProperty.GetArrayElementAtIndex(index);
+                    var objectivesProp = stageProp.FindPropertyRelative("_objectives");
+
+                    if (!_objectivesLists.ContainsKey(index))
+                        _objectivesLists[index] = SetupObjectivesList(objectivesProp, index);
+
+                    var stageLabelRect = new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight);
+                    EditorGUI.HelpBox(stageLabelRect, $"Stage {index + 1}", MessageType.None);
+
+                    rect.y += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
+
+                    if (!_objectivesLists.TryGetValue(index, out var list)) return;
+
+                    float height = list.GetHeight();
+                    var listRect = new Rect(rect.x, rect.y, rect.width, height);
+                    list.DoList(listRect);
+                },
+
+                elementHeightCallback = index =>
+                {
+                    if (_objectivesLists.TryGetValue(index, out var list))
+                        return EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing +
+                               list.GetHeight();
+
+                    var stageProp = _stagesProperty.GetArrayElementAtIndex(index);
+                    var objectivesProp = stageProp.FindPropertyRelative("_objectives");
+                    _objectivesLists[index] = SetupObjectivesList(objectivesProp, index);
+
+                    return EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing +
+                           _objectivesLists[index].GetHeight();
+                },
+
+                onAddCallback = list =>
+                {
+                    _stagesProperty.InsertArrayElementAtIndex(_stagesProperty.arraySize);
+                    serializedObject.ApplyModifiedProperties();
+                }
+            };
+        }
+
+        /// <summary> Создаёт ReorderableList для целей одного этапа. </summary>
+        /// <param name="objectivesProp"> Сериализованное свойство списка целей. </param>
+        /// <param name="stageIndex"> Индекс этапа. </param>
+        /// <returns> Настроенный ReorderableList. </returns>
+        private ReorderableList SetupObjectivesList(SerializedProperty objectivesProp, int stageIndex)
+        {
+            var list = new ReorderableList(objectivesProp.serializedObject, objectivesProp, true, true, true, true)
+            {
+                drawHeaderCallback = rect => EditorGUI.LabelField(rect, "Objectives"),
+
+                drawElementCallback = (rect, index, active, focused) =>
+                {
+                    var objectiveProp = objectivesProp.GetArrayElementAtIndex(index);
+                    var (desc, type, @params) = GetObjectiveProperties(objectiveProp);
+
+                    float spacing = EditorGUIUtility.standardVerticalSpacing;
+                    float line = EditorGUIUtility.singleLineHeight;
+                    var foldoutKey = (stageIndex, index);
+
+                    _objectiveFoldouts.TryAdd(foldoutKey, true);
+                    _objectiveFoldouts[foldoutKey] = EditorGUI.Foldout(
+                        new Rect(rect.x, rect.y, rect.width, line),
+                        _objectiveFoldouts[foldoutKey], $"Objective {index + 1}", true);
+
+                    if (!_objectiveFoldouts[foldoutKey]) return;
+
+                    rect.y += line + spacing;
+
+                    float descHeight = EditorGUI.GetPropertyHeight(desc, true);
+                    EditorGUI.PropertyField(new Rect(rect.x, rect.y, rect.width, descHeight), desc, true);
+                    rect.y += descHeight + spacing;
+
+                    float typeHeight = EditorGUI.GetPropertyHeight(type, true);
+                    EditorGUI.BeginChangeCheck();
+                    EditorGUI.PropertyField(new Rect(rect.x, rect.y, rect.width, typeHeight), type, true);
+                    if (EditorGUI.EndChangeCheck()) UpdateObjectiveParams(type, @params);
+                    rect.y += typeHeight + spacing;
+
+                    if (@params?.managedReferenceValue != null)
+                        DrawParamsFields(new Rect(rect.x, rect.y, rect.width, 1000), @params);
+                },
+
+                elementHeightCallback = index =>
+                {
+                    var key = (stageIndex, index);
+                    if (!_objectiveFoldouts.TryGetValue(key, out bool expanded) || !expanded)
+                        return EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
+
+                    var objectiveProp = objectivesProp.GetArrayElementAtIndex(index);
+                    var (desc, type, @params) = GetObjectiveProperties(objectiveProp);
+
+                    float height = EditorGUIUtility.singleLineHeight +
+                                   EditorGUI.GetPropertyHeight(desc, true) +
+                                   EditorGUI.GetPropertyHeight(type, true) +
+                                   EditorGUIUtility.standardVerticalSpacing * 4;
+
+                    if (@params?.managedReferenceValue != null) height += CalculateParamsHeight(@params);
+
+                    return height;
+                },
+
+                onAddCallback = list =>
+                {
+                    objectivesProp.InsertArrayElementAtIndex(objectivesProp.arraySize);
+                    var newObj = objectivesProp.GetArrayElementAtIndex(objectivesProp.arraySize - 1);
+                    InitializeNewObjective(newObj);
+                }
+            };
+
+            return list;
+        }
+
+        /// <summary> Отрисовывает сериализованное поле по имени. </summary>
+        /// <param name="propertyName"> Имя сериализованного поля. </param>
         private void DrawSerializedField(string propertyName)
         {
-            var property = serializedObject.FindProperty(propertyName);
-            if (property != null) EditorGUILayout.PropertyField(property);
+            var prop = serializedObject.FindProperty(propertyName);
+            if (prop != null) EditorGUILayout.PropertyField(prop);
         }
 
-        /// <summary> Отрисовывает элемент цели в списке. </summary>
-        /// <param name="rect"> Прямоугольник для отрисовки. </param>
-        /// <param name="index"> Индекс цели. </param>
-        /// <param name="isActive"> Является ли элемент активным. </param>
-        /// <param name="isFocused"> Имеет ли элемент фокус. </param>
-        private void DrawObjectiveElement(Rect rect, int index, bool isActive, bool isFocused)
-        {
-            var objectiveProp = _objectivesProperty.GetArrayElementAtIndex(index);
-            var (descriptionProp, typeProp, paramsProp) = GetObjectiveProperties(objectiveProp);
-
-            rect.y += 2;
-            float spacing = EditorGUIUtility.standardVerticalSpacing;
-
-            _objectiveFoldouts.TryAdd(index, true);
-            _objectiveFoldouts[index] = EditorGUI.Foldout(
-                new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight),
-                _objectiveFoldouts[index], $"Objective {index + 1}", true);
-
-            rect.y += EditorGUIUtility.singleLineHeight + spacing;
-
-            if (!_objectiveFoldouts[index]) return;
-
-            float descHeight = EditorGUI.GetPropertyHeight(descriptionProp, true);
-            EditorGUI.PropertyField(new Rect(rect.x, rect.y, rect.width, descHeight), descriptionProp, true);
-
-            rect.y += descHeight + spacing;
-
-            float typeHeight = EditorGUI.GetPropertyHeight(typeProp, true);
-            EditorGUI.BeginChangeCheck();
-            EditorGUI.PropertyField(new Rect(rect.x, rect.y, rect.width, typeHeight), typeProp, true);
-            if (EditorGUI.EndChangeCheck()) UpdateObjectiveParams(typeProp, paramsProp);
-
-            rect.y += typeHeight + spacing;
-
-            if (paramsProp?.managedReferenceValue != null) DrawParamsFields(rect, paramsProp);
-        }
-
-        /// <summary> Вычисляет высоту элемента цели для корректного отображения. </summary>
-        /// <param name="index"> Индекс цели. </param>
-        /// <returns> Высота элемента в пикселях. </returns>
-        private float CalculateObjectiveHeight(int index)
-        {
-            if (_objectiveFoldouts.TryGetValue(index, out bool expanded) && !expanded)
-                return EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
-
-            var objectiveProp = _objectivesProperty.GetArrayElementAtIndex(index);
-            var (descriptionProp, typeProp, paramsProp) = GetObjectiveProperties(objectiveProp);
-
-            float height = EditorGUIUtility.singleLineHeight + // foldout
-                           EditorGUI.GetPropertyHeight(descriptionProp, true) +
-                           EditorGUI.GetPropertyHeight(typeProp, true) +
-                           EditorGUIUtility.standardVerticalSpacing * 4;
-
-            if (paramsProp?.managedReferenceValue != null) height += CalculateParamsHeight(paramsProp);
-
-            return height;
-        }
-
-        /// <summary> Добавляет новую цель в список целей. </summary>
-        private void AddObjective()
-        {
-            _objectivesProperty.InsertArrayElementAtIndex(_objectivesProperty.arraySize);
-            var newObjective = _objectivesProperty.GetArrayElementAtIndex(_objectivesProperty.arraySize - 1);
-            InitializeNewObjective(newObjective);
-        }
-
-        /// <summary> Отрисовывает секцию наград в инспекторе. </summary>
-        private void DrawRewardsSection() => EditorGUILayout.PropertyField(_rewardsProperty, true);
-
-        /// <summary> Получает сериализованные свойства цели. </summary>
-        /// <param name="objectiveProp"> Сериализованная цель. </param>
-        /// <returns> Кортеж с Description, Type и Params свойствами. </returns>
-        private static (SerializedProperty description, SerializedProperty type, SerializedProperty @params)
+        /// <summary> Получает свойства описания, типа и параметров из цели. </summary>
+        /// <param name="objectiveProp"> Сериализованное свойство цели. </param>
+        /// <returns> Кортеж с Description, Type и Params. </returns>
+        private static (SerializedProperty desc, SerializedProperty type, SerializedProperty @params)
             GetObjectiveProperties(SerializedProperty objectiveProp)
         {
-            var descriptionProp = objectiveProp.FindPropertyRelative("<Description>k__BackingField");
-            var typeProp = objectiveProp.FindPropertyRelative("<Type>k__BackingField");
-            var paramsProp = objectiveProp.FindPropertyRelative("<Params>k__BackingField");
-            return (descriptionProp, typeProp, paramsProp);
+            var desc = objectiveProp.FindPropertyRelative("<Description>k__BackingField");
+            var type = objectiveProp.FindPropertyRelative("<Type>k__BackingField");
+            var @params = objectiveProp.FindPropertyRelative("<Params>k__BackingField");
+            return (desc, type, @params);
         }
 
-        /// <summary> Инициализирует новую цель при добавлении. </summary>
-        /// <param name="objectiveProp"> Сериализованная цель. </param>
+        /// <summary> Инициализирует новую цель при добавлении в список. </summary>
+        /// <param name="objectiveProp"> Сериализованное свойство цели. </param>
         private void InitializeNewObjective(SerializedProperty objectiveProp)
         {
             var referenceProp = objectiveProp.FindPropertyRelative("<Reference>k__BackingField");
-            var (descriptionProp, typeProp, paramsProp) = GetObjectiveProperties(objectiveProp);
+            var (desc, type, @params) = GetObjectiveProperties(objectiveProp);
 
             referenceProp.stringValue = Guid.NewGuid().ToString();
-            descriptionProp.stringValue = string.Empty;
-            typeProp.enumValueIndex = 0;
+            desc.stringValue = string.Empty;
+            type.enumValueIndex = 0;
 
-            UpdateObjectiveParams(typeProp, paramsProp);
+            UpdateObjectiveParams(type, @params);
         }
 
-        /// <summary> Обновляет параметры цели при изменении её типа. </summary>
-        /// <param name="typeProp"> SerializedProperty типа цели. </param>
-        /// <param name="paramsProp"> SerializedProperty параметров цели. </param>
+        /// <summary> Обновляет параметры цели при смене её типа. </summary>
+        /// <param name="typeProp"> Сериализованное свойство типа. </param>
+        /// <param name="paramsProp"> Сериализованное свойство параметров. </param>
         private void UpdateObjectiveParams(SerializedProperty typeProp, SerializedProperty paramsProp)
         {
             var selectedType = (ObjectiveType)typeProp.enumValueIndex;
-
             paramsProp.managedReferenceValue =
-                ObjectiveParamsRegistry.Mapping.TryGetValue(selectedType, out var paramsType)
-                    ? Activator.CreateInstance(paramsType)
+                ObjectiveParamsRegistry.Mapping.TryGetValue(selectedType, out var paramType)
+                    ? Activator.CreateInstance(paramType)
                     : null;
 
             serializedObject.ApplyModifiedProperties();
         }
 
-        /// <summary> Отрисовывает поля параметров цели. </summary>
-        /// <param name="rect"> Прямоугольник для отрисовки. </param>
-        /// <param name="paramsProp"> SerializedProperty параметров. </param>
+        /// <summary> Отрисовывает все дочерние поля параметров цели. </summary>
+        /// <param name="rect"> Область отрисовки. </param>
+        /// <param name="paramsProp"> Сериализованное свойство параметров. </param>
         private static void DrawParamsFields(Rect rect, SerializedProperty paramsProp)
         {
-            if (paramsProp is not { hasVisibleChildren: true }) return;
+            if (!paramsProp.hasVisibleChildren) return;
 
             var current = paramsProp.Copy();
             var end = current.GetEndProperty();
@@ -214,9 +249,9 @@ namespace FlavorfulStory.QuestSystem.Editor
             }
         }
 
-        /// <summary> Вычисляет общую высоту для всех параметров цели. </summary>
-        /// <param name="paramsProp"> SerializedProperty параметров. </param>
-        /// <returns> Общая высота параметров. </returns>
+        /// <summary> Вычисляет общую высоту отрисовки параметров цели. </summary>
+        /// <param name="paramsProp"> Сериализованное свойство параметров. </param>
+        /// <returns> Общая высота в пикселях. </returns>
         private static float CalculateParamsHeight(SerializedProperty paramsProp)
         {
             var current = paramsProp.Copy();

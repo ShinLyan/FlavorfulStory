@@ -17,11 +17,10 @@ namespace FlavorfulStory.QuestSystem.Objectives.Params
         public int RequiredAmount { get; private set; } = 1;
 
         /// <summary> Проверяет, собрано ли нужное количество предметов. </summary>
-        /// <param name="status"> Статус квеста. </param>
         /// <param name="context"> Контекст выполнения цели. </param>
         /// <param name="eventData"> Событие, содержащее собранный предмет. </param>
         /// <returns> True, если цель выполнена. </returns>
-        protected override bool ShouldComplete(QuestStatus status, ObjectiveExecutionContext context, object eventData)
+        protected override bool ShouldComplete(ObjectiveExecutionContext context, object eventData)
         {
             if (eventData is InventoryItem item && item != InventoryItem) return false;
             return context.Inventory.GetItemNumber(InventoryItem) >= RequiredAmount;

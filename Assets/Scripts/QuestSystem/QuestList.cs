@@ -64,10 +64,10 @@ namespace FlavorfulStory.QuestSystem
         public void CompleteObjective(QuestStatus questStatus, QuestObjective objective)
         {
             if (questStatus == null || objective == null ||
-                questStatus.IsObjectiveComplete(objective.Reference))
+                !questStatus.CurrentObjectives.Contains(objective))
                 return;
 
-            questStatus.CompleteObjective(objective.Reference);
+            questStatus.CompleteObjective(objective);
 
             if (questStatus.IsComplete && !questStatus.IsRewardGiven) CompleteQuest(questStatus);
         }

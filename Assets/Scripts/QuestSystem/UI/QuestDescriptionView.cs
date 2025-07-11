@@ -8,6 +8,8 @@ namespace FlavorfulStory.QuestSystem
     /// <summary> Представление описания выбранного квеста в UI. </summary>
     public class QuestDescriptionView : MonoBehaviour
     {
+        #region Fields
+
         /// <summary> Текстовое поле с названием квеста. </summary>
         [SerializeField] private TMP_Text _questNameText;
 
@@ -34,6 +36,8 @@ namespace FlavorfulStory.QuestSystem
 
         /// <summary> Элемент, отображаемый при отсутствии выбранного квеста. </summary>
         [SerializeField] private GameObject _noQuest;
+
+        #endregion
 
         /// <summary> Очищает отображение при инициализации. </summary>
         private void Awake()
@@ -76,10 +80,10 @@ namespace FlavorfulStory.QuestSystem
         /// <param name="questStatus"> Статус квеста с прогрессом целей. </param>
         private void SetupObjectives(QuestStatus questStatus)
         {
-            foreach (var objective in questStatus.Quest.Objectives)
+            foreach (var objective in questStatus.CurrentObjectives)
             {
                 var instance = Instantiate(_questObjectivePrefab, _objectivesContainer);
-                instance.Setup(objective.Description, questStatus.IsObjectiveComplete(objective.Reference));
+                instance.Setup(objective.Description, questStatus.IsObjectiveComplete(objective));
             }
         }
 

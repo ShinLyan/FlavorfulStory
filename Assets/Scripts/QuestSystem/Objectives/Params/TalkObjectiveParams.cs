@@ -16,11 +16,10 @@ namespace FlavorfulStory.QuestSystem.Objectives.Params
         [field: SerializeField] public Dialogue Dialogue { get; private set; }
 
         /// <summary> Проверяет, соответствует ли разговор нужному NPC и диалогу. </summary>
-        /// <param name="status"> Статус квеста. </param>
         /// <param name="context"> Контекст выполнения цели. </param>
         /// <param name="eventData"> Событие, содержащее имя NPC и диалог. </param>
         /// <returns> True, если цель выполнена. </returns>
-        protected override bool ShouldComplete(QuestStatus status, ObjectiveExecutionContext context, object eventData)
+        protected override bool ShouldComplete(ObjectiveExecutionContext context, object eventData)
         {
             if (eventData is not (NpcName npcName, Dialogue dialogue)) return false;
             return npcName == NpcName && dialogue == Dialogue;

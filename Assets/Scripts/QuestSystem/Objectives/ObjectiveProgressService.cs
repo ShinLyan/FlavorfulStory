@@ -52,7 +52,7 @@ namespace FlavorfulStory.QuestSystem.Objectives
             where TParams : ObjectiveParamsBase
         {
             foreach (var questStatus in _context.QuestList.QuestStatuses)
-            foreach (var objective in questStatus.Quest.Objectives)
+            foreach (var objective in questStatus.CurrentObjectives)
                 if (objective.Params is TParams paramsInstance)
                 {
                     paramsInstance.CheckAndComplete(questStatus, _context, eventData);

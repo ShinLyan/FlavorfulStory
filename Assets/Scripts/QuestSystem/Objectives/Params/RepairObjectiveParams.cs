@@ -11,11 +11,10 @@ namespace FlavorfulStory.QuestSystem.Objectives.Params
         public RepairableBuildingType Type { get; private set; }
 
         /// <summary> Проверяет, соответствует ли отремонтированное здание заданному типу. </summary>
-        /// <param name="status"> Статус квеста. </param>
         /// <param name="context"> Контекст выполнения цели. </param>
         /// <param name="eventData"> Тип отремонтированного здания. </param>
         /// <returns> True, если тип здания совпадает с требуемым. </returns>
-        protected override bool ShouldComplete(QuestStatus status, ObjectiveExecutionContext context, object eventData)
+        protected override bool ShouldComplete(ObjectiveExecutionContext context, object eventData)
         {
             if (eventData is not RepairableBuildingType repairableBuildingType) return false;
             return repairableBuildingType == Type;
