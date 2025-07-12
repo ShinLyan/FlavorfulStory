@@ -21,14 +21,18 @@ namespace FlavorfulStory.AI.FiniteStateMachine.InShopStates
         {
             base.Enter();
             var availableShelf = _shopLocation.GetAvailableShelf();
+
+            if (!availableShelf) return;
+
             availableShelf.SetOccupied(true);
             Context?.Set("SelectedShelf", availableShelf);
 
-            var pointVector = availableShelf.GetAccessiblePoint();
+            var freePoint = availableShelf.GetAccessiblePoint();
 
             var point = new SchedulePoint(); //TODO: rework
-            point.Position = pointVector;
+            point.Position = freePoint.position;
             point.LocationName = LocationName.NewShop;
+            point.Rotation = freePoint.rotation.eulerAngles;
 
             _movementController.SetPoint(point);
         }

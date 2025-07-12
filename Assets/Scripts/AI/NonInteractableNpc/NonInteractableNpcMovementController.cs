@@ -21,7 +21,11 @@ namespace FlavorfulStory.AI.NonInteractableNpc
         {
             _nonInteractableNavigator = (NonInteractableNpcNavigator)_navigator;
 
-            _nonInteractableNavigator.OnDestinationReached += () => OnDestinationReached?.Invoke();
+            _nonInteractableNavigator.OnDestinationReached += () =>
+            {
+                OnDestinationReached?.Invoke();
+                OnDestinationReached = null;
+            };
         }
 
         protected override INpcNavigator CreateNavigator(NavMeshAgent agent, WarpGraph graph, Transform transform)

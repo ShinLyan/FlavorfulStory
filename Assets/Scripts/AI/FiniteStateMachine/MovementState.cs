@@ -20,14 +20,16 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         {
             _isComplete = false;
             _movementController = movementController;
-            _movementController.OnDestinationReached += () =>
-            {
-                _isComplete = true;
-                RequestStateChange(typeof(RoutineState));
-            };
+
 
             WorldTime.OnTimePaused += StopMovementOnPause;
             WorldTime.OnTimeUnpaused += ContinueMovementOnUnpause;
+        }
+
+        private void OnCompleteMovement()
+        {
+            _isComplete = true;
+            RequestStateChange(typeof(RoutineState));
         }
 
         /// <summary> Входит в состояние движения и начинает перемещение к текущей точке расписания. </summary>
@@ -36,6 +38,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine
             base.Enter();
             _movementController.MoveToPoint();
             _isInState = true;
+            _movementController.OnDestinationReached += OnCompleteMovement;
         }
 
         /// <summary> Выходит из состояния движения и останавливает NPC. </summary>
@@ -44,6 +47,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine
             _movementController.Stop();
             _isInState = false;
             _isComplete = false;
+            _movementController.OnDestinationReached -= OnCompleteMovement;
         }
 
         /// <summary> Сбрасывает состояние движения, мгновенно останавливая NPC. </summary>

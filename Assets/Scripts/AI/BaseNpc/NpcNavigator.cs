@@ -35,7 +35,7 @@ namespace FlavorfulStory.AI.BaseNpc
         private readonly WarpGraph _warpGraph;
 
         /// <summary> Дистанция, на которой считается что цель достигнута. </summary>
-        private const float ArrivalDistance = 1f;
+        private const float ArrivalDistance = 0.5f;
 
         /// <summary> Позиция спавна NPC. </summary>
         private readonly Vector3 _spawnPosition;
@@ -79,7 +79,7 @@ namespace FlavorfulStory.AI.BaseNpc
 
             if (_currentLocation == _currentTargetPoint.LocationName &&
                 Vector3.Distance(_npcTransform.position, _currentTargetPoint.Position) <= ArrivalDistance &&
-                !_isNotMoving)
+                !_isNotMoving) //TODO сделать преворку расстояния на проекции, а не просто расстояние между 2 точками в пространстве
             {
                 _navMeshAgent.transform.rotation = Quaternion.Euler(_currentTargetPoint.Rotation);
                 OnDestinationReached?.Invoke();

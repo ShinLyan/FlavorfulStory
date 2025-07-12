@@ -53,7 +53,7 @@ namespace FlavorfulStory.AI.InteractableNpc
         /// <returns> Новый экземпляр StateControllerInteractableNpc. </returns>
         protected override StateController CreateStateController()
         {
-            return new StateControllerInteractableNpc(
+            return new InteractableNpcStateController(
                 _npcSchedule,
                 _movementController as InteractableNpcMovementController,
                 _animationController,

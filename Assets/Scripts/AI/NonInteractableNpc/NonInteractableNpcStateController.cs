@@ -29,6 +29,7 @@ namespace FlavorfulStory.AI.NonInteractableNpc
         private RandomPointPickerState _randomPointPickerState;
         private ShelfPickerState _shelfPickerState;
         private WaitingState _waitingState;
+        private RefuseItemState _refuseItemState;
 
         private SequenceState _randomPointSequence;
         private SequenceState _furnitureSequence;
@@ -75,7 +76,7 @@ namespace FlavorfulStory.AI.NonInteractableNpc
 
             foreach (var state in states)
             {
-                _typeToCharacterStates.Add(state.GetType().ToString(), state);
+                _nameToCharacterStates.Add(state.GetType().ToString(), state);
                 state.OnStateChangeRequested += SetState;
             }
         }
@@ -87,10 +88,11 @@ namespace FlavorfulStory.AI.NonInteractableNpc
             _furniturePickerState = new FurniturePickerState(_npcMovementController, shopLocation);
             _itemPickerState =
                 new ItemPickerState(_npcMovementController, shopLocation, _itemHandler);
-            _paymentState = new PaymentState();
+            _paymentState = new PaymentState(shopLocation, _itemHandler);
             _randomPointPickerState = new RandomPointPickerState(_npcMovementController, shopLocation);
             _shelfPickerState = new ShelfPickerState(_npcMovementController, shopLocation);
             _waitingState = new WaitingState(_playerController, _npcTransform);
+            _refuseItemState = new RefuseItemState(shopLocation);
         }
 
         private void CreateSequences()
@@ -104,16 +106,17 @@ namespace FlavorfulStory.AI.NonInteractableNpc
             _buyItemSequence = new SequenceState(this,
                 new CharacterState[]
                 {
-                    _shelfPickerState, _movementState, _itemPickerState, _movementState, _paymentState
+                    _shelfPickerState, _movementState, _animationState, _itemPickerState, _movementState,
+                    _animationState, _paymentState
                 });
 
             _refuseItemSequence = new SequenceState(this,
-                new CharacterState[] { _shelfPickerState, _movementState, _animationState });
+                new CharacterState[] { _shelfPickerState, _movementState, _refuseItemState, _animationState });
 
-            _typeToCharacterStates.Add("_randomPointSequence", _randomPointSequence);
-            _typeToCharacterStates.Add("_furnitureSequence", _furnitureSequence);
-            _typeToCharacterStates.Add("_buyItemSequence", _buyItemSequence);
-            _typeToCharacterStates.Add("_refuseItemSequence", _refuseItemSequence);
+            _nameToCharacterStates.Add("_randomPointSequence", _randomPointSequence);
+            _nameToCharacterStates.Add("_furnitureSequence", _furnitureSequence);
+            _nameToCharacterStates.Add("_buyItemSequence", _buyItemSequence);
+            _nameToCharacterStates.Add("_refuseItemSequence", _refuseItemSequence);
 
             _buyItemSequence.OnSequenceEnded += HandleAfterPurchaseTransition;
             _refuseItemSequence.OnSequenceEnded += StartRandomSequence;
@@ -123,7 +126,7 @@ namespace FlavorfulStory.AI.NonInteractableNpc
 
         protected override void ResetStates()
         {
-            foreach (var state in _typeToCharacterStates.Values) state.Reset();
+            foreach (var state in _nameToCharacterStates.Values) state.Reset();
             SetState(typeof(WaitingState).ToString()); //TODO: think about initial state
         }
 
@@ -144,8 +147,8 @@ namespace FlavorfulStory.AI.NonInteractableNpc
 
         private void StartRandomSequence()
         {
-            // string selectedSequence = CalculateNextSequence();
-            SetState("_buyItemSequence");
+            string selectedSequence = CalculateNextSequence();
+            SetState(selectedSequence);
         }
 
         private string CalculateNextSequence()
@@ -167,6 +170,9 @@ namespace FlavorfulStory.AI.NonInteractableNpc
 
             availableOptions.Add(("_randomPointSequence", 25f));
 
+            // Debug.Log(availableOptions.Count + " available options for NPC: " +
+            //           string.Join(", ", availableOptions.Select(x => x.sequence))
+            //           + " NPC name: " + _npcTransform.name);
             if (availableOptions.Count == 0) return typeof(WaitingState).ToString();
 
             float totalWeight = availableOptions.Sum(x => x.weight);

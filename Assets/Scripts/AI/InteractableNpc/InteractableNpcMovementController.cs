@@ -30,11 +30,7 @@ namespace FlavorfulStory.AI.InteractableNpc
             _scheduleHandler = scheduleHandler;
             _interactableNavigator = (InteractableNpcNavigator)_navigator;
 
-            _interactableNavigator.OnDestinationReached += () =>
-            {
-                Debug.Log("Destination reached!");
-                OnDestinationReached?.Invoke();
-            };
+            _interactableNavigator.OnDestinationReached += () => OnDestinationReached?.Invoke();
             _scheduleHandler.OnSchedulePointChanged += _interactableNavigator.OnSchedulePointChanged;
         }
 

@@ -12,7 +12,7 @@ namespace FlavorfulStory.AI.InteractableNpc
 {
     /// <summary> Контроллер состояний конечного автомата NPC,
     /// управляющий переходами между различными состояниями персонажа. </summary>
-    public class StateControllerInteractableNpc : StateController, ICharacterCollisionHandler
+    public class InteractableNpcStateController : StateController, ICharacterCollisionHandler
     {
         /// <summary> Обработчик расписания NPC </summary>
         private readonly NpcScheduleHandler _scheduleHandler;
@@ -39,7 +39,7 @@ namespace FlavorfulStory.AI.InteractableNpc
         /// <param name="scheduleHandler"> Обработчик расписания NPC. </param>
         /// <param name="playerController"> Контроллер игрока для взаимодействия. </param>
         /// <param name="npcTransform"> Transform NPC для определения позиции. </param>
-        public StateControllerInteractableNpc(NpcSchedule npcSchedule,
+        public InteractableNpcStateController(NpcSchedule npcSchedule,
             InteractableNpcMovementController npcMovementController,
             NpcAnimationController npcAnimationController, NpcScheduleHandler scheduleHandler,
             PlayerController playerController, Transform npcTransform)
@@ -73,7 +73,7 @@ namespace FlavorfulStory.AI.InteractableNpc
 
             foreach (var state in states)
             {
-                _typeToCharacterStates.Add(state.GetType().ToString(), state);
+                _nameToCharacterStates.Add(state.GetType().ToString(), state);
                 state.OnStateChangeRequested += SetState;
 
                 if (state is ICurrentSchedulePointDependable dependable)
@@ -100,7 +100,7 @@ namespace FlavorfulStory.AI.InteractableNpc
         /// <summary> Сбрасывает все состояния и устанавливает состояние рутины. </summary>
         protected override void ResetStates()
         {
-            foreach (var state in _typeToCharacterStates.Values) state.Reset();
+            foreach (var state in _nameToCharacterStates.Values) state.Reset();
             SetState(typeof(RoutineState).ToString());
         }
 

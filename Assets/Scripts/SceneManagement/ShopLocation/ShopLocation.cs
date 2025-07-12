@@ -16,7 +16,7 @@ namespace FlavorfulStory.SceneManagement.ShopLocation
 
         public Shelf GetAvailableShelf() => (Shelf)GetRandomObject(_shelves);
 
-        private ShopObject[] GetAvailableObjects(ShopObject[] objects)
+        private static ShopObject[] GetAvailableObjects(ShopObject[] objects)
         {
             var availableObjects = new List<ShopObject>();
             foreach (var obj in objects)
@@ -26,9 +26,12 @@ namespace FlavorfulStory.SceneManagement.ShopLocation
             return availableObjects.ToArray();
         }
 
-        private ShopObject GetRandomObject(ShopObject[] objects)
+        private static ShopObject GetRandomObject(ShopObject[] objects)
         {
             var availableObjects = GetAvailableObjects(objects);
+
+            if (availableObjects.Length == 0) return null;
+
             return availableObjects[Random.Range(0, availableObjects.Length)];
         }
 
