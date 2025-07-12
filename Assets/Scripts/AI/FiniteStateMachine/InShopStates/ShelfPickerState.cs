@@ -29,7 +29,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine.InShopStates
 
             var freePoint = availableShelf.GetAccessiblePoint();
 
-            var point = new SchedulePoint(); //TODO: rework
+            var point = new SchedulePoint(); //TODO: переделать после удаление WarpGraph
             point.Position = freePoint.position;
             point.LocationName = LocationName.NewShop;
             point.Rotation = freePoint.rotation.eulerAngles;

@@ -48,5 +48,38 @@ namespace FlavorfulStory.SceneManagement.ShopLocation
             var furnitures = GetAvailableObjects(_furnitures);
             return furnitures.Length == 0;
         }
+
+        public override Vector3 GetRandomPointOnNavMesh(int maxAttempts = 20)
+        {
+            for (int i = 0; i < maxAttempts; i++)
+            {
+                var position = base.GetRandomPointOnNavMesh(maxAttempts);
+                if (position == Vector3.zero) continue;
+
+                bool isValidPosition = true;
+                float minDistance = 3f;
+
+                foreach (var shelf in _shelves)
+                    if (Vector3.Distance(position, shelf.transform.position) < minDistance)
+                    {
+                        isValidPosition = false;
+                        break;
+                    }
+
+                if (!isValidPosition) continue;
+
+                foreach (var furniture in _furnitures)
+                    if (Vector3.Distance(position, furniture.transform.position) < minDistance)
+                    {
+                        isValidPosition = false;
+                        break;
+                    }
+
+                if (isValidPosition) return position;
+            }
+
+            Debug.Log("HUI");
+            return Vector3.zero;
+        }
     }
 }

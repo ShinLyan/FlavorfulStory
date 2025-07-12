@@ -39,6 +39,8 @@ namespace FlavorfulStory.AI.NonInteractableNpc
         private readonly PlayerController _playerController;
         private readonly Transform _npcTransform;
 
+        private bool _hadVisitedFurnitureAfterPurchase;
+
         /// <summary> Инициализирует новый экземпляр контроллера состояний. </summary>
         /// <param name="npcMovementController"> Контроллер движения NPC. </param>
         /// <param name="locationManager"> Менеджер локаций. </param>
@@ -54,9 +56,10 @@ namespace FlavorfulStory.AI.NonInteractableNpc
             _npcMovementController = npcMovementController;
             _locationManager = locationManager;
             _itemHandler = itemHandler;
-
             _playerController = playerController;
             _npcTransform = npcTransform;
+
+            _hadVisitedFurnitureAfterPurchase = false;
 
             Initialize();
         }
@@ -119,9 +122,9 @@ namespace FlavorfulStory.AI.NonInteractableNpc
             _nameToCharacterStates.Add("_refuseItemSequence", _refuseItemSequence);
 
             _buyItemSequence.OnSequenceEnded += HandleAfterPurchaseTransition;
+            _furnitureSequence.OnSequenceEnded += HandleAfterFurnitureSequence;
             _refuseItemSequence.OnSequenceEnded += StartRandomSequence;
             _randomPointSequence.OnSequenceEnded += StartRandomSequence;
-            _furnitureSequence.OnSequenceEnded += StartRandomSequence;
         }
 
         protected override void ResetStates()
@@ -140,11 +143,6 @@ namespace FlavorfulStory.AI.NonInteractableNpc
             if (Input.GetKeyDown(KeyCode.Space)) StartRandomSequence();
         }
 
-        private readonly string[] _availableSequences =
-        {
-            "_randomPointSequence", "_furnitureSequence", "_buyItemSequence", "_refuseItemSequence"
-        };
-
         private void StartRandomSequence()
         {
             string selectedSequence = CalculateNextSequence();
@@ -158,7 +156,7 @@ namespace FlavorfulStory.AI.NonInteractableNpc
             bool areShelvesAvailable = !shopLocation.AreAvailableShelvesEmpty();
             bool areFurnitureAvailable = !shopLocation.AreAllFurnitureOccupied();
 
-            var availableOptions = new List<(string sequence, float weight)>();
+            var availableOptions = new List<(string sequenceName, float weight)>();
 
             if (areShelvesAvailable)
             {
@@ -170,9 +168,6 @@ namespace FlavorfulStory.AI.NonInteractableNpc
 
             availableOptions.Add(("_randomPointSequence", 25f));
 
-            // Debug.Log(availableOptions.Count + " available options for NPC: " +
-            //           string.Join(", ", availableOptions.Select(x => x.sequence))
-            //           + " NPC name: " + _npcTransform.name);
             if (availableOptions.Count == 0) return typeof(WaitingState).ToString();
 
             float totalWeight = availableOptions.Sum(x => x.weight);
@@ -182,10 +177,10 @@ namespace FlavorfulStory.AI.NonInteractableNpc
             foreach (var option in availableOptions)
             {
                 currentWeight += option.weight;
-                if (randomValue <= currentWeight) return option.sequence;
+                if (randomValue <= currentWeight) return option.sequenceName;
             }
 
-            return availableOptions.Last().sequence;
+            return availableOptions.Last().sequenceName;
         }
 
         private void HandleAfterPurchaseTransition()
@@ -193,19 +188,29 @@ namespace FlavorfulStory.AI.NonInteractableNpc
             var shopLocation = (ShopLocation)_locationManager.GetLocationByName(LocationName.NewShop);
             bool isFurnitureAvailable = !shopLocation.AreAllFurnitureOccupied();
 
-            if (isFurnitureAvailable && Random.Range(0, 2) == 0)
+            if (isFurnitureAvailable && Random.Range(0, 2) == 0 && !_hadVisitedFurnitureAfterPurchase)
             {
+                _hadVisitedFurnitureAfterPurchase = true;
                 SetState("_furnitureSequence");
             }
             else
             {
-                var point = new SchedulePoint(); //TODO: rework
+                //TODO: отправить в точку деспавна
+                var point = new SchedulePoint(); //TODO: переделать после удаление WarpGraph
                 point.Position = _playerController.transform.position;
                 point.LocationName = LocationName.RockyIsland;
 
                 _npcMovementController.SetPoint(point);
                 SetState(typeof(MovementState).ToString());
             }
+        }
+
+        private void HandleAfterFurnitureSequence()
+        {
+            if (_hadVisitedFurnitureAfterPurchase)
+                HandleAfterPurchaseTransition();
+            else
+                StartRandomSequence();
         }
     }
 }

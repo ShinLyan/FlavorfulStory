@@ -42,19 +42,18 @@ namespace FlavorfulStory.SceneManagement.ShopLocation
             if (point) _accessPointsAvailability[point] = false;
         }
 
-        protected override void OnDrawGizmos()
+        protected override void OnDrawGizmosSelected()
         {
-            base.OnDrawGizmos(); // Базовая визуализация из ShopObject
+            base.OnDrawGizmosSelected();
 
             if (_accessiblePositions == null) return;
 
-            // Создаем стиль для текста один раз
             GUIStyle labelStyle = new GUIStyle
             {
                 fontSize = _labelFontSize,
                 normal = new GUIStyleState { textColor = Color.white },
                 alignment = TextAnchor.MiddleCenter,
-                richText = true // Для возможности использования цветного текста
+                richText = true
             };
 
             foreach (var point in _accessiblePositions)

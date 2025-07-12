@@ -38,11 +38,11 @@ namespace FlavorfulStory.SceneManagement
             TryGetComponent(out Collider component) && component.bounds.Contains(position);
 
 
-        public Vector3 GetRandomPointOnNavMesh(int maxAttempts = 20)
+        public virtual Vector3 GetRandomPointOnNavMesh(int maxAttempts = 20)
         {
             Bounds searchBounds;
 
-            if (_navMeshSurface != null)
+            if (_navMeshSurface)
             {
                 searchBounds = new Bounds(_navMeshSurface.transform.position, _navMeshSurface.size);
             }
@@ -52,9 +52,10 @@ namespace FlavorfulStory.SceneManagement
             }
             else
             {
-                Debug.LogWarning("Нет NavMeshSurface и Collider для определения границ.");
+                Debug.LogWarning("Не удалось найти точку на NavMesh.");
                 return Vector3.zero;
             }
+
 
             for (int i = 0; i < maxAttempts; i++)
             {

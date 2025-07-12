@@ -22,23 +22,15 @@ namespace FlavorfulStory.AI.FiniteStateMachine.InShopStates
         public override void Enter()
         {
             base.Enter();
-            var pointVector = _shopLocation.GetRandomPointOnNavMesh(); //TODO: реворк метод
+            var pointVector = _shopLocation.GetRandomPointOnNavMesh();
 
-            if (IsPointAvailable(pointVector))
-            {
-                var point = new SchedulePoint(); //TODO: rework
-                point.Position = pointVector;
-                point.LocationName = LocationName.NewShop;
+            var point = new SchedulePoint(); //TODO: переделать после удаление WarpGraph
+            point.Position = pointVector;
+            point.LocationName = LocationName.NewShop;
+            point.Rotation = Quaternion.Euler(0, Random.Range(0f, 360f), 0).eulerAngles;
 
-                _movementController.SetPoint(point);
-            }
-            else
-            {
-                Enter();
-            }
+            _movementController.SetPoint(point);
         }
-
-        private bool IsPointAvailable(Vector3 point) { return true; } //TODO: реализовать метод
 
         public override bool IsComplete() => true;
     }
