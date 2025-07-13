@@ -178,11 +178,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 8472433202357826936, guid: 91f9e2800c30f8240a67da56fe5fe0dc,
-        type: 3}
-      propertyPath: m_Enabled
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 8999188196258589257, guid: 91f9e2800c30f8240a67da56fe5fe0dc,
         type: 3}
       propertyPath: <Item>k__BackingField
@@ -196,11 +191,7 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 2048564860643537458}
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 3052585347083124877, guid: 91f9e2800c30f8240a67da56fe5fe0dc,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 3417001010600893512}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 91f9e2800c30f8240a67da56fe5fe0dc, type: 3}
 --- !u!4 &446296622280530955 stripped
 Transform:
@@ -208,36 +199,3 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 7837786957152123561}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &5087272648297036324 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 3052585347083124877, guid: 91f9e2800c30f8240a67da56fe5fe0dc,
-    type: 3}
-  m_PrefabInstance: {fileID: 7837786957152123561}
-  m_PrefabAsset: {fileID: 0}
---- !u!54 &3417001010600893512
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5087272648297036324}
-  serializedVersion: 4
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 1
-  m_IsKinematic: 0
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 1

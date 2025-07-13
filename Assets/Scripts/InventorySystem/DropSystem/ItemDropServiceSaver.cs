@@ -5,7 +5,6 @@ using Zenject;
 
 namespace FlavorfulStory
 {
-    //TODO: Все инструменты сделать физичными при дропе.
     /// <summary> Компонент, сохраняющий и восстанавливающий состояние выброшенных предметов. </summary>
     /// <remarks> Устанавливает контейнер для дропа и делегирует сохранение `ItemDropService`. </remarks>
     public class ItemDropServiceSaver : MonoBehaviour, ISaveable
