@@ -2,14 +2,13 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using FlavorfulStory.InputSystem;
-using FlavorfulStory.InventorySystem;
-using FlavorfulStory.TimeManagement;
-using FlavorfulStory.UI;
-using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 using Zenject;
+using FlavorfulStory.InventorySystem;
+using FlavorfulStory.TimeManagement;
+using FlavorfulStory.InputSystem;
 
 namespace FlavorfulStory.Crafting
 {
@@ -112,7 +111,7 @@ namespace FlavorfulStory.Crafting
 
             SetupViews(_recipeData.ToList());
             UpdateRecipeViews();
-
+            
             _craftButton.onClick.RemoveAllListeners();
             _craftButton.onClick.AddListener(TryStartCrafting);
         }
@@ -172,8 +171,10 @@ namespace FlavorfulStory.Crafting
                 if (i >= recipeData.Count()) continue;
 
                 var recipe = recipeData.ElementAt(i);
-                recipeView.Setup(recipe.IsLocked, recipe.Sprite, () => ChooseRecipe(recipe));
+                recipeView.Setup(recipe.RecipeID, () => ChooseRecipe(recipe));
             }
+            
+            if (recipeData.Count > 0) ChooseRecipe(recipeData.First());
         }
 
         /// <summary> Настраивает отображение требований к текущему рецепту. </summary>
@@ -192,8 +193,8 @@ namespace FlavorfulStory.Crafting
                 (int available, int required) = states[input.Item];
                 bool hasEnough = available >= required;
 
-                string reqText = hasEnough ? $"{available}" : $"{available}/{required}";
-                view.Setup(input.Item.Icon, input.Item.ItemName, reqText, hasEnough);
+                string reqText = $"{available}/{required}";
+                view.Setup(input.Item.ItemID, reqText, hasEnough);
             }
         }
 

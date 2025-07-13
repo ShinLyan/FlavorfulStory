@@ -1,10 +1,10 @@
+using UnityEngine;
+using Zenject;
 using FlavorfulStory.Actions;
 using FlavorfulStory.InputSystem;
 using FlavorfulStory.InteractionSystem;
 using FlavorfulStory.InventorySystem;
 using FlavorfulStory.Player;
-using UnityEngine;
-using Zenject;
 
 namespace FlavorfulStory.Crafting
 {
@@ -17,21 +17,15 @@ namespace FlavorfulStory.Crafting
         /// <summary> Инвентарь игрока, участвующий в крафте. </summary>
         private Inventory _playerInventory;
 
-        /// <summary>
-        /// 
-        /// </summary>
+        /// <summary> Описание действия, отображаемого при наведении на объект. </summary>
         [field: SerializeField] public ActionDescription ActionDescription { get; private set; }
 
-        /// <summary>
-        /// 
-        /// </summary>
+        /// <summary> Разрешено ли сейчас взаимодействие с крафт-станцией. </summary>
         public bool IsInteractionAllowed { get; private set; } = true;
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="craftingWindow"></param>
-        /// <param name="playerInventory"></param>
+        /// <summary> Внедряет зависимости окна крафта и инвентаря игрока. </summary>
+        /// <param name="craftingWindow"> Окно крафта. </param>
+        /// <param name="playerInventory"> Инвентарь игрока. </param>
         [Inject]
         private void Construct(CraftingWindow craftingWindow, Inventory playerInventory)
         {
@@ -39,18 +33,14 @@ namespace FlavorfulStory.Crafting
             _playerInventory = playerInventory;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="otherTransform"></param>
-        /// <returns></returns>
+        /// <summary> Возвращает расстояние до игрока. </summary>
+        /// <param name="otherTransform"> Трансформ игрока. </param>
+        /// <returns> Расстояние до игрока в метрах. </returns>
         public float GetDistanceTo(Transform otherTransform)
             => Vector3.Distance(otherTransform.position, transform.position);
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="player"></param>
+        /// <summary> Запускает взаимодействие игрока с крафт-станцией. </summary>
+        /// <param name="player"> Контроллер игрока. </param>
         public void BeginInteraction(PlayerController player)
         {
             _craftingWindow.Setup(
@@ -63,10 +53,8 @@ namespace FlavorfulStory.Crafting
             InputWrapper.UnblockInput(InputButton.SwitchGameMenu);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="player"></param>
+        /// <summary> Завершает взаимодействие с крафт-станцией. </summary>
+        /// <param name="player"> Контроллер игрока. </param>
         public void EndInteraction(PlayerController player) { player.SetBusyState(false); }
 
         /// <summary> Обрабатывает событие запроса крафта. </summary>

@@ -1,14 +1,14 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
+using UnityEngine;
+using Zenject;
 using FlavorfulStory.Infrastructure.Factories;
 using FlavorfulStory.InputSystem;
 using FlavorfulStory.InventorySystem;
 using FlavorfulStory.TimeManagement;
 using FlavorfulStory.UI;
-using TMPro;
-using UnityEngine;
-using Zenject;
 
 namespace FlavorfulStory.BuildingRepair
 {
@@ -33,7 +33,7 @@ namespace FlavorfulStory.BuildingRepair
         [SerializeField] private UIButton _buildButton;
 
         /// <summary> Список отображений требований ресурсов. </summary>
-        private readonly List<ResourceRequirementView> _requirementViews = new();
+        private readonly List<ItemRequirementView> _requirementViews = new();
 
         /// <summary> Открыто ли окно ремонта? </summary>
         private bool _isOpen;
@@ -51,14 +51,14 @@ namespace FlavorfulStory.BuildingRepair
         public event Action OnClose;
 
         /// <summary> Фабрика создания отображений требований ресурсов. </summary>
-        private IGameFactory<ResourceRequirementView> _requirementViewFactory;
+        private IGameFactory<ItemRequirementView> _requirementViewFactory;
 
         #endregion
 
         /// <summary> Внедрить фабрику создания отображений требований ресурсов. </summary>
         /// <param name="factory"> Фабрика создания отображений требований ресурсов. </param>
         [Inject]
-        private void Construct(IGameFactory<ResourceRequirementView> factory) => _requirementViewFactory = factory;
+        private void Construct(IGameFactory<ItemRequirementView> factory) => _requirementViewFactory = factory;
 
         /// <summary> Инициализация кэша вьюшек, если они уже присутствуют в иерархии. </summary>
         private void Awake() => CacheInitialViews();
@@ -68,7 +68,7 @@ namespace FlavorfulStory.BuildingRepair
         {
             foreach (Transform child in _requirementViewsContainer)
             {
-                var view = child.GetComponent<ResourceRequirementView>();
+                var view = child.GetComponent<ItemRequirementView>();
                 if (!view || _requirementViews.Contains(view)) continue;
 
                 view.gameObject.SetActive(false);
@@ -135,7 +135,7 @@ namespace FlavorfulStory.BuildingRepair
         /// <summary> Получить или создать отображение требования по индексу. </summary>
         /// <param name="index"> Индекс требования. </param>
         /// <returns> Отображение требования ресурса. </returns>
-        private ResourceRequirementView EnsureRequirementView(int index)
+        private ItemRequirementView EnsureRequirementView(int index)
         {
             if (index < _requirementViews.Count) return _requirementViews[index];
 
@@ -148,7 +148,7 @@ namespace FlavorfulStory.BuildingRepair
         /// <param name="view"> Отображение требования. </param>
         /// <param name="requirement"> Требование ресурса. </param>
         /// <param name="invested"> Количество вложенного ресурса. </param>
-        private void UpdateRequirementView(ResourceRequirementView view, ItemRequirement requirement, int invested)
+        private void UpdateRequirementView(ItemRequirementView view, ItemRequirement requirement, int invested)
         {
             view.gameObject.SetActive(true);
             view.Setup(requirement, invested);

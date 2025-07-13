@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
-using FlavorfulStory.InventorySystem;
 using UnityEngine;
+using FlavorfulStory.InventorySystem;
 
 namespace FlavorfulStory.Crafting
 {
@@ -37,7 +37,7 @@ namespace FlavorfulStory.Crafting
         /// <summary> Получить экземпляр предмета инвентаря по ID. </summary>
         /// <param name="recipeID"> ID предмета инвентаря. </param>
         /// <returns> Экземпляр <see cref="InventoryItem"/>, соответствующий ID. </returns>
-        public static CraftingRecipe GetItemFromID(string recipeID)
+        public static CraftingRecipe GetRecipeFromID(string recipeID)
         {
             if (recipeID == null || !_recipeDatabase.TryGetValue(recipeID, out var recipe)) return null;
             return recipe;

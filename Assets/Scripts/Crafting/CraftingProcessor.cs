@@ -1,7 +1,7 @@
 ﻿using System;
+using UnityEngine;
 using Cysharp.Threading.Tasks;
 using FlavorfulStory.InventorySystem;
-using UnityEngine;
 
 namespace FlavorfulStory.Crafting
 {

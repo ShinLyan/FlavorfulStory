@@ -1,15 +1,15 @@
 using System;
-using FlavorfulStory.InventorySystem;
-using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 using Zenject;
+using FlavorfulStory.InventorySystem;
 
 namespace FlavorfulStory.BuildingRepair
 {
     /// <summary> Отображение информации о требуемых ресурсах для текущей стадии ремонта. </summary>
     /// <remarks> Управляет визуализацией и взаимодействием с кнопками добавления и возврата ресурса. </remarks>
-    public class ResourceRequirementView : MonoBehaviour
+    public class ItemRequirementView : MonoBehaviour
     {
         /// <summary> Иконка ресурса, отображаемая на панели. </summary>
         [SerializeField] private Image _resourceIcon;

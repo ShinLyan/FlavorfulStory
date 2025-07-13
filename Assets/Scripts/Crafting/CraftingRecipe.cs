@@ -1,6 +1,6 @@
 using System.Collections.Generic;
-using FlavorfulStory.InventorySystem;
 using UnityEngine;
+using FlavorfulStory.InventorySystem;
 
 namespace FlavorfulStory.Crafting
 {
@@ -18,6 +18,11 @@ namespace FlavorfulStory.Crafting
         /// <summary> Отображаемое имя рецепта. </summary>
         [field: Tooltip("Отображаемое название рецепта."), SerializeField]
         public string RecipeName { get; private set; }
+        
+        //TODO: А я говорил, что описание не надо удалять!!!
+        /// <summary> Отображаемое имя рецепта. </summary>
+        [field: Tooltip("Отображаемое название рецепта."), SerializeField]
+        public string Description { get; private set; }
 
         /// <summary> Длительность крафта в секундах. </summary>
         [field: Tooltip("Длительность крафта."), SerializeField]
