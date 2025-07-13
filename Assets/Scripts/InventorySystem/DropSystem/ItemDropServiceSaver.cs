@@ -1,4 +1,5 @@
-﻿using FlavorfulStory.Saving;
+﻿using FlavorfulStory.InventorySystem.DropSystem;
+using FlavorfulStory.Saving;
 using UnityEngine;
 using Zenject;
 
@@ -19,7 +20,7 @@ namespace FlavorfulStory
         {
             _dropService = dropService as ISaveable;
             dropService.SetDroppedItemsContainer(transform);
-        } 
+        }
 
         /// <summary> Сохраняет состояние всех выброшенных предметов. </summary>
         public object CaptureState() => _dropService?.CaptureState();

@@ -1,7 +1,7 @@
 using System;
 using FlavorfulStory.Actions;
 
-namespace FlavorfulStory
+namespace FlavorfulStory.TooltipSystem
 {
     /// <summary> Содержит данные для отображения действия в тултипе, включая клавишу и описание действия. </summary>
     public class TooltipActionData

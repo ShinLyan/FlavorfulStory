@@ -1,7 +1,7 @@
 ﻿using TMPro;
 using UnityEngine;
 
-namespace FlavorfulStory.InventorySystem.TooltipSystem
+namespace FlavorfulStory.TooltipSystem
 {
     /// <summary> Отображает всплывающую подсказку для предмета. </summary>
     public class ItemTooltip : MonoBehaviour

@@ -3,6 +3,7 @@ using FlavorfulStory.AI;
 using FlavorfulStory.CursorSystem;
 using FlavorfulStory.InteractionSystem;
 using FlavorfulStory.Player;
+using FlavorfulStory.TooltipSystem;
 using UnityEngine;
 
 namespace FlavorfulStory.DialogueSystem

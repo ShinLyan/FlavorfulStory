@@ -30,7 +30,7 @@ namespace FlavorfulStory.InteractionSystem
         /// <summary> Активный объект, с которым сейчас взаимодействуют. </summary>
         private IInteractable _activeInteractable;
 
-        /// <summary> Последний объект взаимодейтсвия, по котороому выводился тултип. </summary>
+        /// <summary> Последний объект взаимодействия, по которому выводился тултип. </summary>
         private IInteractable _lastTooltipSource;
 
         /// <summary> Делегат действия, вызываемый при начале взаимодействия. </summary>

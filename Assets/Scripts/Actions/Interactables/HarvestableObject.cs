@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using FlavorfulStory.InteractionSystem;
 using FlavorfulStory.InventorySystem;
 using FlavorfulStory.Player;
+using FlavorfulStory.TooltipSystem;
 using UnityEngine;
 using Zenject;
 

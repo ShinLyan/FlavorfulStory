@@ -8,6 +8,7 @@ using FlavorfulStory.InventorySystem;
 using FlavorfulStory.ObjectManagement;
 using FlavorfulStory.Player;
 using FlavorfulStory.Saving;
+using FlavorfulStory.TooltipSystem;
 using UnityEngine;
 using Zenject;
 

@@ -3,6 +3,7 @@ using FlavorfulStory.Actions;
 using FlavorfulStory.InteractionSystem;
 using FlavorfulStory.Player;
 using FlavorfulStory.SceneManagement;
+using FlavorfulStory.TooltipSystem;
 using FlavorfulStory.UI;
 using UnityEngine;
 using Zenject;

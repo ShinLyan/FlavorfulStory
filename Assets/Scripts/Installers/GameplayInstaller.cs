@@ -2,6 +2,7 @@
 using FlavorfulStory.BuildingRepair;
 using FlavorfulStory.Infrastructure.Factories;
 using FlavorfulStory.InventorySystem;
+using FlavorfulStory.InventorySystem.DropSystem;
 using FlavorfulStory.InventorySystem.EquipmentSystem;
 using FlavorfulStory.InventorySystem.PickupSystem;
 using FlavorfulStory.InventorySystem.UI;
@@ -54,7 +55,7 @@ namespace FlavorfulStory.Installers
             Container.Bind<PickupSpawner>().FromComponentsInHierarchy().AsCached();
 
             Container.Bind<BuildingRepairView>().FromComponentInHierarchy().AsSingle();
-            
+
             Container.Bind<IItemDropService>().To<ItemDropService>().AsSingle();
             Container.Bind<ISaveable>().To<ItemDropService>().FromResolve();
         }
@@ -69,6 +70,8 @@ namespace FlavorfulStory.Installers
             Container.Bind<ConfirmationWindowView>().FromComponentInHierarchy().AsSingle();
             Container.Bind<SummaryView>().FromComponentInHierarchy().AsSingle();
             Container.Bind<IActionTooltipShower>().To<ActionTooltipShower>().FromComponentInHierarchy().AsSingle();
+
+            Container.Bind<Toolbar>().FromComponentInHierarchy().AsSingle();
         }
 
         /// <summary> Установить зависимости, связанные с не игровыми системами и логикой. </summary>
