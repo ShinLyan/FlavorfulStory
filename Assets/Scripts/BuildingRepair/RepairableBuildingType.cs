@@ -1,7 +1,7 @@
 ﻿namespace FlavorfulStory.BuildingRepair
 {
-    /// <summary> Тип ремонтируемого здания. </summary>
-    public enum RepairableBuildingType
+    /// <summary> Название ремонтируемого здания. </summary>
+    public enum RepairableBuildingName
     {
         Stall
 

@@ -22,14 +22,10 @@ namespace FlavorfulStory.QuestSystem
         public int CurrentStageIndex { get; set; }
 
         /// <summary> Текущие цели из активного этапа квеста. </summary>
-        public IEnumerable<QuestObjective> CurrentObjectives
-        {
-            get
-            {
-                _stages ??= Quest.Stages.ToList();
-                return IsComplete ? Array.Empty<QuestObjective>() : _stages[CurrentStageIndex].Objectives;
-            }
-        }
+        public IEnumerable<QuestObjective> CurrentObjectives =>
+            CurrentStageIndex >= 0 && CurrentStageIndex < _stages.Count
+                ? _stages[CurrentStageIndex].Objectives
+                : Enumerable.Empty<QuestObjective>();
 
         /// <summary> Квест завершен? </summary>
         public bool IsComplete => CurrentStageIndex >= _stages.Count;
@@ -58,8 +54,7 @@ namespace FlavorfulStory.QuestSystem
         }
 
         /// <summary> Инициализация состояния статуса квеста. </summary>
-        /// <remarks> Нужна для того, чтобы заданные статусы через Inspector
-        /// в QuestList были проинициализированы. </remarks>
+        /// <remarks> Нужна для того, чтобы заданные статусы через Inspector были проинициализированы. </remarks>
         public void Initialize()
         {
             _completedObjectives ??= new List<QuestObjective>();
@@ -71,18 +66,37 @@ namespace FlavorfulStory.QuestSystem
 
         /// <summary> Проверяет, завершена ли указанная цель. </summary>
         /// <param name="objective"> Название цели. </param>
-        /// <returns> True, если цель завершена; иначе — false. </returns>
+        /// <returns> <c>true</c>, если цель завершена; иначе — <c>false</c>. </returns>
         public bool IsObjectiveComplete(QuestObjective objective) => _completedObjectives.Contains(objective);
 
         /// <summary> Завершает указанную цель квеста. </summary>
         /// <param name="objective"> Цель квеста. </param>
-        public void CompleteObjective(QuestObjective objective)
+        /// <param name="context"> Контекст выполнения квеста. </param>
+        public void CompleteObjective(QuestObjective objective, QuestExecutionContext context)
         {
             if (IsObjectiveComplete(objective)) return;
 
             _completedObjectives.Add(objective);
 
-            if (IsStageComplete(CurrentStageIndex)) CurrentStageIndex++;
+            if (IsStageComplete(CurrentStageIndex)) CompleteStage(context);
+        }
+
+        /// <summary> Завершает текущий этап и запускает его действия. </summary>
+        /// <param name="context"> Контекст выполнения квеста. </param>
+        private void CompleteStage(QuestExecutionContext context)
+        {
+            ExecuteStageActions(CurrentStageIndex, context);
+            CurrentStageIndex++;
+        }
+
+        /// <summary> Выполняет все действия, связанные с завершением этапа. </summary>
+        /// <param name="stageIndex"> Индекс этапа. </param>
+        /// <param name="context"> Контекст выполнения квеста. </param>
+        private void ExecuteStageActions(int stageIndex, QuestExecutionContext context)
+        {
+            if (stageIndex < 0 || stageIndex >= _stages.Count) return;
+
+            foreach (var action in _stages[stageIndex].OnStageCompleteActions) action.Execute(context);
         }
 
         /// <summary> Этап квеста по индексу пройден? </summary>

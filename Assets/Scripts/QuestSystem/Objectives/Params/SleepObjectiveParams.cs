@@ -7,7 +7,7 @@
         /// <param name="context"> Контекст выполнения цели. </param>
         /// <param name="eventData"> Данные события (не используются). </param>
         /// <returns> True — цель выполняется без условий. </returns>
-        protected override bool ShouldComplete(ObjectiveExecutionContext context, object eventData)
+        protected override bool ShouldComplete(QuestExecutionContext context, object eventData)
             => true;
     }
 }

@@ -20,7 +20,7 @@ namespace FlavorfulStory.QuestSystem.Objectives.Params
         /// <param name="context"> Контекст выполнения цели. </param>
         /// <param name="eventData"> Событие, содержащее собранный предмет. </param>
         /// <returns> True, если цель выполнена. </returns>
-        protected override bool ShouldComplete(ObjectiveExecutionContext context, object eventData)
+        protected override bool ShouldComplete(QuestExecutionContext context, object eventData)
         {
             if (eventData is InventoryItem item && item != InventoryItem) return false;
             return context.Inventory.GetItemNumber(InventoryItem) >= RequiredAmount;

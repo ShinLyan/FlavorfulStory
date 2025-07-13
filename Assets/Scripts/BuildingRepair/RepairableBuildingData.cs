@@ -7,9 +7,9 @@ namespace FlavorfulStory.BuildingRepair
     [CreateAssetMenu(menuName = "FlavorfulStory/Repairable Building Data")]
     public class RepairableBuildingData : ScriptableObject
     {
-        /// <summary> Тип ремонтируемого здания. </summary>
-        [field: Tooltip("Тип ремонтируемого здания."), SerializeField]
-        public RepairableBuildingType Type { get; private set; }
+        /// <summary> Название ремонтируемого здания. </summary>
+        [field: Tooltip("Название ремонтируемого здания."), SerializeField]
+        public RepairableBuildingName Name { get; private set; }
 
         /// <summary> Стадии ремонта здания. </summary>
         [field: Tooltip("Стадии ремонта здания."), SerializeField]

@@ -220,8 +220,8 @@ namespace FlavorfulStory.BuildingRepair.UI
         }
 
         /// <summary> Отобразить сообщение об окончании ремонта. </summary>
-        /// <param name="type"> Тип ремонтируемого здания. </param>
-        public void DisplayCompletionMessage(RepairableBuildingType type)
+        /// <param name="name"> Тип ремонтируемого здания. </param>
+        public void DisplayCompletionMessage(RepairableBuildingName name)
         {
             _requirementViews.ForEach(view => view.gameObject.SetActive(false));
             _repairCompletedText.gameObject.SetActive(true);

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using FlavorfulStory.QuestSystem.TriggerActions;
 using UnityEngine;
 
 namespace FlavorfulStory.QuestSystem
@@ -13,7 +14,14 @@ namespace FlavorfulStory.QuestSystem
         [Tooltip("Список целей квеста."), SerializeField]
         private List<QuestObjective> _objectives;
 
-        /// <summary> Цели квеста (только для чтения). </summary>
+        /// <summary> Действия, выполняемые после завершения этого этапа. </summary>
+        [Tooltip("Действия, выполняемые после завершения этого этапа."), SerializeReference]
+        private List<QuestTriggerAction> _onStageCompleteActions;
+
+        /// <summary> Коллекция действий, запускаемых после завершения этапа. </summary>
+        public IEnumerable<QuestTriggerAction> OnStageCompleteActions => _onStageCompleteActions;
+
+        /// <summary> Цели текущей стадии квеста (только для чтения). </summary>
         public IEnumerable<QuestObjective> Objectives => _objectives;
 
         /// <summary> Проверяет, выполнены ли все цели этой стадии. </summary>

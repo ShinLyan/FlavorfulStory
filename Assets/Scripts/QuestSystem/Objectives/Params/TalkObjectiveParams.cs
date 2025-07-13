@@ -19,7 +19,7 @@ namespace FlavorfulStory.QuestSystem.Objectives.Params
         /// <param name="context"> Контекст выполнения цели. </param>
         /// <param name="eventData"> Событие, содержащее имя NPC и диалог. </param>
         /// <returns> True, если цель выполнена. </returns>
-        protected override bool ShouldComplete(ObjectiveExecutionContext context, object eventData)
+        protected override bool ShouldComplete(QuestExecutionContext context, object eventData)
         {
             if (eventData is not (NpcName npcName, Dialogue dialogue)) return false;
             return npcName == NpcName && dialogue == Dialogue;

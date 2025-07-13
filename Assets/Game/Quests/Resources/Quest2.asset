@@ -1,0 +1,45 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 117c81b660034043a189d64323bfafe8, type: 3}
+  m_Name: Quest2
+  m_EditorClassIdentifier: 
+  <QuestGiver>k__BackingField: {fileID: 11400000, guid: 25fd17a8e9a873d4cae336c566f88dd9,
+    type: 2}
+  <QuestName>k__BackingField: Woodcutter Dirk
+  <QuestDescription>k__BackingField: 'Description Home, sweet home Description Home,
+    sweet home Description Home, sweet home Description Home, sweet home Description
+    Home, sweet home Description Home, sweet home '
+  <QuestType>k__BackingField: 0
+  _stages:
+  - _objectives:
+    - <Reference>k__BackingField: a24aede6-1098-4816-ab3f-6531bfebe282
+      <Description>k__BackingField: "\u041D\u0430\u0439\u0442\u0438 \u0414\u0438\u0440\u043A\u0430
+        \u0438 \u043F\u043E\u0433\u043E\u0432\u043E\u0440\u0438\u0442\u044C \u0441
+        \u043D\u0438\u043C"
+      <Type>k__BackingField: 1
+      <Params>k__BackingField:
+        rid: 6018952306055708870
+    _onStageCompleteActions: []
+  _rewards:
+  - <Number>k__BackingField: 20
+    <Item>k__BackingField: {fileID: 11400000, guid: 3e31ae779574be343a52d151fa604692,
+      type: 2}
+  references:
+    version: 2
+    RefIds:
+    - rid: 6018952306055708870
+      type: {class: TalkObjectiveParams, ns: FlavorfulStory.QuestSystem.Objectives.Params,
+        asm: Assembly-CSharp}
+      data:
+        <NpcName>k__BackingField: 0
+        <Dialogue>k__BackingField: {fileID: 11400000, guid: 9e5424065cee3bd4893b828eeb63d49c,
+          type: 2}

@@ -26,6 +26,7 @@ MonoBehaviour:
       <Type>k__BackingField: 2
       <Params>k__BackingField:
         rid: 6018952284085420130
+    _onStageCompleteActions: []
   - _objectives:
     - <Reference>k__BackingField: 551ce762-2246-47d3-8f00-26448e5ad37f
       <Description>k__BackingField: "\u041D\u0430\u0439\u0442\u0438 \u0424\u0435\u043B\u0438\u0430\u043D\u0443
@@ -34,6 +35,8 @@ MonoBehaviour:
       <Type>k__BackingField: 1
       <Params>k__BackingField:
         rid: 6018952284085420132
+    _onStageCompleteActions:
+    - rid: 6018952352656261120
   - _objectives:
     - <Reference>k__BackingField: a687dcdc-7495-49d2-b170-9a67743c8992
       <Description>k__BackingField: "\u0417\u0430\u0432\u0435\u0440\u0448\u0438\u0442\u044C
@@ -41,13 +44,15 @@ MonoBehaviour:
       <Type>k__BackingField: 3
       <Params>k__BackingField:
         rid: 6018952284085420134
+    _onStageCompleteActions: []
   - _objectives:
     - <Reference>k__BackingField: a687dcdc-7495-49d2-b170-9a67743c8992
       <Description>k__BackingField: "\u041F\u043E\u0433\u043E\u0432\u043E\u0440\u0438\u0442\u044C
         \u0441 \u0424\u0435\u043B\u0438\u0430\u043D\u043E\u0439"
       <Type>k__BackingField: 1
       <Params>k__BackingField:
-        rid: 6018952284085420135
+        rid: 6018952341788819535
+    _onStageCompleteActions: []
   _rewards:
   - <Number>k__BackingField: 1
     <Item>k__BackingField: {fileID: 11400000, guid: bce861ac3c00da94b92e70c22de74b57,
@@ -73,11 +78,16 @@ MonoBehaviour:
       type: {class: RepairObjectiveParams, ns: FlavorfulStory.QuestSystem.Objectives.Params,
         asm: Assembly-CSharp}
       data:
-        <Type>k__BackingField: 0
-    - rid: 6018952284085420135
+        <Name>k__BackingField: 0
+    - rid: 6018952341788819535
       type: {class: TalkObjectiveParams, ns: FlavorfulStory.QuestSystem.Objectives.Params,
         asm: Assembly-CSharp}
       data:
         <NpcName>k__BackingField: 2
         <Dialogue>k__BackingField: {fileID: 11400000, guid: e19edbfd6cf7b664b96f333367a29864,
           type: 2}
+    - rid: 6018952352656261120
+      type: {class: GiveQuestAction, ns: FlavorfulStory.QuestSystem.TriggerActions,
+        asm: Assembly-CSharp}
+      data:
+        _questToGive: {fileID: 11400000, guid: b14442f73ae174141881dccc00ad90a2, type: 2}

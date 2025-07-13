@@ -94,7 +94,9 @@ namespace FlavorfulStory.Installers
             Container.Bind<IGameFactory<QuestListButton>>().To<QuestListButtonFactory>().AsSingle()
                 .WithArguments(_questListButtonPrefab);
             Container.Bind<QuestDescriptionView>().FromComponentInHierarchy().AsSingle();
-            Container.Bind<ObjectiveProgressService>().AsSingle().NonLazy();
+
+            Container.BindInterfacesAndSelfTo<ObjectiveProgressService>().AsSingle().NonLazy();
+            Container.Bind<QuestExecutionContext>().AsSingle();
         }
 
         /// <summary> Установить зависимости, связанные с пользовательским интерфейсом. </summary>

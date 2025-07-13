@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using FlavorfulStory.Core;
-using FlavorfulStory.InventorySystem;
 using FlavorfulStory.InventorySystem.DropSystem;
 using FlavorfulStory.Saving;
 using UnityEngine;
@@ -23,19 +22,19 @@ namespace FlavorfulStory.QuestSystem
         /// <summary> Перечисление всех статусов квестов. </summary>
         public IEnumerable<QuestStatus> QuestStatuses => _questStatuses;
 
-        /// <summary> Инвентарь игрока. </summary>
-        private Inventory _inventory;
+        /// <summary> Контекст выполнения квестов. </summary>
+        private QuestExecutionContext _context;
 
         /// <summary> Компонент для выбрасывания предметов, если нет места в инвентаре. </summary>
         private ItemDropper _itemDropper;
 
         /// <summary> Внедряет зависимости через Zenject. </summary>
-        /// <param name="inventory"> Инвентарь игрока. </param>
+        /// <param name="questExecutionContext"> Контекст выполнения квестов. </param>
         /// <param name="itemDropper"> Компонент для дропа предметов. </param>
         [Inject]
-        private void Construct(Inventory inventory, ItemDropper itemDropper)
+        private void Construct(QuestExecutionContext questExecutionContext, ItemDropper itemDropper)
         {
-            _inventory = inventory;
+            _context = questExecutionContext;
             _itemDropper = itemDropper;
         }
 
@@ -64,8 +63,8 @@ namespace FlavorfulStory.QuestSystem
         /// <returns> True, если квест уже есть в списке, иначе false. </returns>
         public bool HasQuest(Quest quest) => GetQuestStatus(quest) != null;
 
-        /// <summary> Отмечает цель квеста как выполненную и выдает награду, если квест завершен. </summary>
-        /// <param name="questStatus"> Квест, в котором нужно отметить цель. </param>
+        /// <summary> Отмечает цель квеста как выполненную и завершает квест, если он полностью выполнен. </summary>
+        /// <param name="questStatus"> Статус квеста. </param>
         /// <param name="objective"> Ссылка на выполненную цель. </param>
         public void CompleteObjective(QuestStatus questStatus, QuestObjective objective)
         {
@@ -73,7 +72,7 @@ namespace FlavorfulStory.QuestSystem
                 !questStatus.CurrentObjectives.Contains(objective))
                 return;
 
-            questStatus.CompleteObjective(objective);
+            questStatus.CompleteObjective(objective, _context);
 
             if (questStatus.IsComplete && !questStatus.IsRewardGiven) CompleteQuest(questStatus);
         }
@@ -98,7 +97,7 @@ namespace FlavorfulStory.QuestSystem
         {
             foreach (var reward in rewards)
             {
-                bool isSuccess = _inventory.TryAddToFirstAvailableSlot(reward.Item, reward.Number);
+                bool isSuccess = _context.Inventory.TryAddToFirstAvailableSlot(reward.Item, reward.Number);
                 // TODO: Переделать на новый itemdropper
                 if (!isSuccess) _itemDropper.DropItem(reward.Item, reward.Number);
             }

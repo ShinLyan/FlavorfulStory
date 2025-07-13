@@ -3,6 +3,8 @@ using Zenject;
 
 namespace FlavorfulStory.QuestSystem
 {
+    // TODO: Возможно нужно удалить, если нигде не будет использоваться.
+    // Раньше использовался для проигрывания через диалог
     /// <summary> Компонент, представляющий NPC или объект, который выдает квест игроку. </summary>
     public class QuestGiver : MonoBehaviour
     {

@@ -48,7 +48,7 @@ namespace FlavorfulStory.BuildingRepair
         private event Action<RepairStage, List<int>> _onStageUpdated;
 
         /// <summary> Событие при завершении ремонта. </summary>
-        public static event Action<RepairableBuildingType> OnRepairCompleted;
+        public static event Action<RepairableBuildingName> OnRepairCompleted;
 
         /// <summary> Инвентарь игрока. </summary>
         private Inventory _playerInventory;
@@ -146,7 +146,7 @@ namespace FlavorfulStory.BuildingRepair
 
             if (IsRepairCompleted)
             {
-                OnRepairCompleted?.Invoke(_buildingData.Type);
+                OnRepairCompleted?.Invoke(_buildingData.Name);
                 return;
             }
 

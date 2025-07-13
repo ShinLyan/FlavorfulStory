@@ -45,6 +45,7 @@ namespace FlavorfulStory.QuestSystem
             // TODO: Крч как-то нужно оптимизировать эту хрень. Проверять, был ли квест до этого, если да,
             // то ничего не делаем, если нет, то добавляем, если закончился квест, то удалить
             foreach (Transform child in transform) Destroy(child.gameObject); // TODO: Переделать на ObjectPool
+            _questListButtons.Clear();
 
             foreach (var status in _questList.QuestStatuses)
             {
