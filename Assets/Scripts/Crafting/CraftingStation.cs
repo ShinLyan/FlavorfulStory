@@ -1,10 +1,10 @@
-using UnityEngine;
-using Zenject;
 using FlavorfulStory.Actions;
 using FlavorfulStory.InputSystem;
 using FlavorfulStory.InteractionSystem;
 using FlavorfulStory.InventorySystem;
 using FlavorfulStory.Player;
+using UnityEngine;
+using Zenject;
 
 namespace FlavorfulStory.Crafting
 {
@@ -12,34 +12,63 @@ namespace FlavorfulStory.Crafting
     public class CraftingStation : MonoBehaviour, IInteractable
     {
         /// <summary> Окно крафта, отображаемое при взаимодействии. </summary>
-        [Inject] private readonly CraftingWindow _craftingWindow;
+        private CraftingWindow _craftingWindow;
+
         /// <summary> Инвентарь игрока, участвующий в крафте. </summary>
-        [Inject] private readonly Inventory _playerInventory;
-        
+        private Inventory _playerInventory;
+
+        /// <summary>
+        /// 
+        /// </summary>
         [field: SerializeField] public ActionDescription ActionDescription { get; private set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
         public bool IsInteractionAllowed { get; private set; } = true;
-        
-        
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="craftingWindow"></param>
+        /// <param name="playerInventory"></param>
+        [Inject]
+        private void Construct(CraftingWindow craftingWindow, Inventory playerInventory)
+        {
+            _craftingWindow = craftingWindow;
+            _playerInventory = playerInventory;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="otherTransform"></param>
+        /// <returns></returns>
         public float GetDistanceTo(Transform otherTransform)
             => Vector3.Distance(otherTransform.position, transform.position);
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="player"></param>
         public void BeginInteraction(PlayerController player)
         {
             _craftingWindow.Setup(
-                CraftingRecipeProvider.GetAllRecipes(), 
+                CraftingRecipeProvider.GetAllRecipes(),
                 OnCraftRequested,
                 () => EndInteraction(player)
-                );
-            
+            );
+
             _craftingWindow.Open();
             InputWrapper.UnblockInput(InputButton.SwitchGameMenu);
         }
 
-        public void EndInteraction(PlayerController player)
-        {
-            player.SetBusyState(false);
-        }
-        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="player"></param>
+        public void EndInteraction(PlayerController player) { player.SetBusyState(false); }
+
         /// <summary> Обрабатывает событие запроса крафта. </summary>
         /// <param name="recipe"> Выбранный рецепт. </param>
         /// <param name="count"> Количество создаваемых наборов. </param>

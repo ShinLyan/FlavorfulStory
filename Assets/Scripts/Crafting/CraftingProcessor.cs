@@ -13,7 +13,8 @@ namespace FlavorfulStory.Crafting
         /// <param name="count"> Количество создаваемых наборов. </param>
         /// <param name="inventory"> Инвентарь игрока. </param>
         /// <param name="onComplete"> Действие по завершении крафта. </param>
-        public static async UniTask ExecuteRecipe(CraftingRecipe recipe, int count, Inventory inventory, Action onComplete)
+        public static async UniTask ExecuteRecipe(CraftingRecipe recipe, int count, Inventory inventory,
+            Action onComplete)
         {
             if (CanCraft(recipe, count, inventory) != CraftingResult.Success)
             {
@@ -24,14 +25,13 @@ namespace FlavorfulStory.Crafting
             RemoveRequiredItems(recipe, count, inventory);
 
             float duration = recipe.Duration * count;
-            if (duration > 0)
-                await UniTask.Delay(TimeSpan.FromSeconds(duration));
+            if (duration > 0) await UniTask.Delay(TimeSpan.FromSeconds(duration));
 
             AddCraftedItemsToInventory(recipe, count, inventory);
 
             onComplete?.Invoke();
         }
-        
+
         /// <summary> Проверяет, возможно ли выполнение рецепта. </summary>
         /// <param name="recipe"> Рецепт крафта. </param>
         /// <param name="count"> Количество создаваемых наборов. </param>
@@ -39,15 +39,13 @@ namespace FlavorfulStory.Crafting
         /// <returns> <see cref="CraftingResult"/>: результат проверки крафта. </returns>
         public static CraftingResult CanCraft(CraftingRecipe recipe, int count, Inventory inventory)
         {
-            if (!PlayerHasEnoughItems(recipe, count, inventory))
-                return CraftingResult.NotEnoughResources;
+            if (!PlayerHasEnoughItems(recipe, count, inventory)) return CraftingResult.NotEnoughResources;
 
-            if (!PlayerHasSpaceForCraftedItems(recipe, count, inventory))
-                return CraftingResult.NotEnoughSpace;
+            if (!PlayerHasSpaceForCraftedItems(recipe, count, inventory)) return CraftingResult.NotEnoughSpace;
 
             return CraftingResult.Success;
         }
-        
+
         /// <summary> Удаляет требуемые предметы из инвентаря. </summary>
         /// <param name="recipe"> Рецепт крафта. </param>
         /// <param name="count"> Количество создаваемых наборов. </param>
@@ -60,7 +58,7 @@ namespace FlavorfulStory.Crafting
                 inventory.RemoveItem(input.Item, totalAmount);
             }
         }
-        
+
         /// <summary> Добавляет готовые предметы в инвентарь или логирует предупреждение при нехватке места. </summary>
         /// <param name="recipe"> Рецепт крафта. </param>
         /// <param name="count"> Количество создаваемых наборов. </param>
@@ -71,13 +69,11 @@ namespace FlavorfulStory.Crafting
             {
                 int totalAmount = output.Quantity * count;
                 if (!inventory.TryAddToFirstAvailableSlot(output.Item, totalAmount))
-                {
                     // TODO: IItemDropService.Drop(_dropPoint, output.Item, totalAmount);
                     Debug.LogWarning($"Not enough space for crafted item: {output.Item.ItemName}, {totalAmount}");
-                }
             }
         }
-        
+
         /// <summary> Проверяет, есть ли в инвентаре все необходимые ресурсы. </summary>
         /// <param name="recipe"> Рецепт крафта. </param>
         /// <param name="count"> Количество создаваемых наборов. </param>
@@ -88,12 +84,12 @@ namespace FlavorfulStory.Crafting
             foreach (var itemRequirement in recipe.InputItems)
             {
                 int requiredAmount = itemRequirement.Quantity * count;
-                if (inventory.GetItemNumber(itemRequirement.Item) < requiredAmount)
-                    return false;
+                if (inventory.GetItemNumber(itemRequirement.Item) < requiredAmount) return false;
             }
+
             return true;
         }
-        
+
         /// <summary> Проверяет, есть ли в инвентаре место для результатов крафта. </summary>
         /// <param name="recipe"> Рецепт крафта. </param>
         /// <param name="count"> Количество создаваемых наборов. </param>
@@ -106,11 +102,9 @@ namespace FlavorfulStory.Crafting
             foreach (var output in recipe.OutputItems)
             {
                 int totalAmount = output.Quantity * count;
-                if (!inventory.HasSpaceFor(output.Item, totalAmount))
-                {
-                    return false;
-                }
+                if (!inventory.HasSpaceFor(output.Item, totalAmount)) return false;
             }
+
             return true;
         }
     }

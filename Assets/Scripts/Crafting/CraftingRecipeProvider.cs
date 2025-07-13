@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 using FlavorfulStory.InventorySystem;
+using UnityEngine;
 
 namespace FlavorfulStory.Crafting
 {
@@ -16,7 +16,7 @@ namespace FlavorfulStory.Crafting
         /// <remarks> Загружает все предметы из папки Resources. </remarks>
         static CraftingRecipeProvider()
         {
-            _recipeDatabase = new();
+            _recipeDatabase = new Dictionary<string, CraftingRecipe>();
             foreach (var recipe in Resources.LoadAll<CraftingRecipe>(string.Empty))
             {
                 if (_recipeDatabase.TryGetValue(recipe.RecipeID, out var value))

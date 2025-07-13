@@ -2,67 +2,86 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
-using UnityEngine.UI;
-using TMPro;
-using Zenject;
 using FlavorfulStory.InputSystem;
 using FlavorfulStory.InventorySystem;
 using FlavorfulStory.TimeManagement;
 using FlavorfulStory.UI;
+using TMPro;
+using UnityEngine;
+using UnityEngine.UI;
+using Zenject;
 
 namespace FlavorfulStory.Crafting
 {
     /// <summary> Окно крафта, отображающее рецепты, требования и управление процессом. </summary>
     public class CraftingWindow : MonoBehaviour
     {
-        [Header("Recipe Previews")]
         /// <summary> Поле для ввода имени рецепта (фильтр). </summary>
+        [Header("Recipe Previews")]
         [SerializeField] private TMP_InputField _recipeNameInput;
+
         /// <summary> Переключатель отображения заблокированных рецептов. </summary>
         [SerializeField] private Toggle _lockedRecipesToggle;
+
         /// <summary> Текст, отображающийся при отсутствии найденных рецептов. </summary>
         [SerializeField] private TMP_Text _noRecipesFoundText;
-        [Header("Recipe Info")]
+
         /// <summary> Изображение текущего выбранного рецепта. </summary>
+        [Header("Recipe Info")]
         [SerializeField] private Image _currentRecipeImage;
+
         /// <summary> Текст с названием текущего рецепта. </summary>
         [SerializeField] private TMP_Text _recipeName;
-        [Header("Right Footer")]
+
         /// <summary> Кнопка увеличения количества создаваемых наборов. </summary>
+        [Header("Right Footer")]
         [SerializeField] private Button _increaseCraftCountButton;
+
         /// <summary> Кнопка уменьшения количества создаваемых наборов. </summary>
         [SerializeField] private Button _decreaseCraftCountButton;
+
         /// <summary> Текст с текущим количеством создаваемых наборов. </summary>
         [SerializeField] private TMP_Text _craftCountText;
+
         /// <summary> Кнопка запуска крафта. </summary>
         [SerializeField] private Button _craftButton;
-        
+
         /// <summary> Список вьюх требований к крафту. </summary>
         private List<CraftRequirementView> _requirementViews;
+
         /// <summary> Список вьюх рецептов. </summary>
         private List<CraftRecipeView> _recipeViews;
+
         /// <summary> Данные доступных рецептов. </summary>
         private IEnumerable<CraftingRecipe> _recipeData;
+
         /// <summary> Текущий выбранный рецепт. </summary>
         private CraftingRecipe _currentRecipe;
+
         /// <summary> Станция крафта, связанная с этим окном. </summary>
         private CraftingStation _craftingStation;
+
         /// <summary> Делегат, вызываемый при закрытии окна. </summary>
         private Action _onCloseRequested;
+
         /// <summary> Инвентарь игрока. </summary>
         private Inventory _playerInventory;
+
         /// <summary> Было ли окно уже инициализировано. </summary>
         private bool _initialized;
+
         /// <summary> Делегат, вызываемый при начале крафта. </summary>
         private Action<CraftingRecipe, int> _onCraftRequested;
+
         /// <summary> Отображается ли окно сейчас. </summary>
         private bool _isOpen;
+
         /// <summary> Показывать ли заблокированные рецепты. </summary>
         private bool _showLockedRecipes;
+
         /// <summary> Текущее выбранное количество создаваемых наборов. </summary>
         private int _craftCount = 1;
-        
+
         /// <summary> Внедряет инвентарь игрока через Zenject. </summary>
         /// <param name="inventory"> Инвентарь игрока. </param>
         [Inject]
@@ -83,16 +102,14 @@ namespace FlavorfulStory.Crafting
         /// <param name="recipeData"> Список рецептов. </param>
         /// <param name="onCraftRequested"> Делегат на запуск крафта. </param>
         /// <param name="onCloseRequested"> Делегат на закрытие окна. </param>
-        public void Setup(
-            IEnumerable<CraftingRecipe> recipeData,
-            Action<CraftingRecipe, int> onCraftRequested,
+        public void Setup(IEnumerable<CraftingRecipe> recipeData, Action<CraftingRecipe, int> onCraftRequested,
             Action onCloseRequested)
         {
             Initialize();
             _recipeData = recipeData;
             _onCraftRequested = onCraftRequested;
             _onCloseRequested = onCloseRequested;
-    
+
             SetupViews(_recipeData.ToList());
             UpdateRecipeViews();
 
@@ -101,30 +118,28 @@ namespace FlavorfulStory.Crafting
         }
 
         /// <summary> Обновляет список отображаемых рецептов с учетом фильтра и состояния. </summary>
-        public void UpdateRecipeViews()
+        private void UpdateRecipeViews()
         {
-            var recipeNamePrefix = _recipeNameInput.text.Trim();
+            string recipeNamePrefix = _recipeNameInput.text.Trim();
 
             var query = _recipeData
-                .Where(recipe => _showLockedRecipes || !recipe.Locked);
-       
+                .Where(recipe => _showLockedRecipes || !recipe.IsLocked);
+
             if (!string.IsNullOrEmpty(recipeNamePrefix))
-            {
                 query = query.Where(r => r.RecipeName.StartsWith(recipeNamePrefix, StringComparison.OrdinalIgnoreCase));
-            }
-            
+
             var filtered = query
-                .OrderBy(recipe => recipe.Locked)
+                .OrderBy(recipe => recipe.IsLocked)
                 .ThenBy(recipe => recipe.RecipeName)
                 .ToList();
 
             SetupViews(filtered);
             _noRecipesFoundText.gameObject.SetActive(filtered.Count == 0);
         }
-        
+
         /// <summary> Обновляет отображение текущего рецепта после завершения крафта. </summary>
         public void OnCraftCompleted() => UpdateCraftInfo();
-        
+
         /// <summary> Инициализирует элементы окна, если это ещё не было сделано. </summary>
         private void Initialize()
         {
@@ -141,7 +156,7 @@ namespace FlavorfulStory.Crafting
 
             _initialized = true;
         }
-        
+
         /// <summary> Настраивает представления рецептов. </summary>
         /// <param name="recipeData"> Список рецептов. </param>
         private void SetupViews(List<CraftingRecipe> recipeData)
@@ -153,14 +168,14 @@ namespace FlavorfulStory.Crafting
                     recipeView.Enable();
                 else
                     recipeView.Disable();
-                
+
                 if (i >= recipeData.Count()) continue;
-                
+
                 var recipe = recipeData.ElementAt(i);
-                recipeView.Setup(recipe.Locked, recipe.Sprite, () => ChooseRecipe(recipe));
+                recipeView.Setup(recipe.IsLocked, recipe.Sprite, () => ChooseRecipe(recipe));
             }
         }
-        
+
         /// <summary> Настраивает отображение требований к текущему рецепту. </summary>
         private void SetupRequirements()
         {
@@ -174,27 +189,27 @@ namespace FlavorfulStory.Crafting
                 if (i >= _currentRecipe.InputItems.Count) continue;
 
                 var input = _currentRecipe.InputItems[i];
-                var (available, required) = states[input.Item];
+                (int available, int required) = states[input.Item];
                 bool hasEnough = available >= required;
 
                 string reqText = hasEnough ? $"{available}" : $"{available}/{required}";
                 view.Setup(input.Item.Icon, input.Item.ItemName, reqText, hasEnough);
             }
         }
-        
+
         /// <summary> Обновляет отображение текущего рецепта и его состояния. </summary>
         private void UpdateCraftInfo()
         {
             _currentRecipeImage.sprite = _currentRecipe.Sprite;
             _recipeName.text = _currentRecipe.RecipeName;
             SetupRequirements();
-            _craftButton.interactable = 
+            _craftButton.interactable =
                 CraftingProcessor.CanCraft(_currentRecipe, _craftCount, _playerInventory) == CraftingResult.Success;
         }
-        
+
         /// <summary> Обновляет текст количества создаваемых предметов. </summary>
         private void UpdateCraftCountText() => _craftCountText.text = _craftCount.ToString();
-        
+
         /// <summary> Пытается запустить крафт текущего рецепта. </summary>
         private void TryStartCrafting()
         {
@@ -212,7 +227,6 @@ namespace FlavorfulStory.Crafting
             UpdateCraftInfo();
         }
 
-        //Опа, нихуя... Кортеж типа!
         /// <summary> Вычисляет доступное и требуемое количество для каждого ресурса. </summary>
         /// <returns> Словарь ресурсов с информацией. </returns>
         private Dictionary<InventoryItem, (int available, int required)> CalculateItemStates()
@@ -243,6 +257,7 @@ namespace FlavorfulStory.Crafting
             Initialize();
             _isOpen = true;
             gameObject.SetActive(true);
+            WorldTime.Pause();
             UpdateCraftCountText();
         }
 
@@ -255,7 +270,7 @@ namespace FlavorfulStory.Crafting
             InputWrapper.UnblockAllInput();
             _onCloseRequested?.Invoke();
         }
-        
+
         /// <summary> Блокирует кнопку меню на один кадр. </summary>
         /// <returns> Корутина для задержки. </returns>
         private static IEnumerator BlockGameMenuForOneFrame()
@@ -264,7 +279,7 @@ namespace FlavorfulStory.Crafting
             yield return null;
             InputWrapper.UnblockAllInput();
         }
-        
+
         /// <summary> Увеличивает количество создаваемых наборов. </summary>
         private void IncreaseCraftCount()
         {
@@ -272,7 +287,7 @@ namespace FlavorfulStory.Crafting
             UpdateCraftCountText();
             UpdateCraftInfo();
         }
-        
+
         /// <summary> Уменьшает количество создаваемых наборов. </summary>
         private void DecreaseCraftCount()
         {
