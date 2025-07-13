@@ -20,7 +20,7 @@ namespace FlavorfulStory.ResourceContainer
         #region Fields and Properties
 
         [Inject] private readonly IItemDropService _itemDropService;
-        
+
         /// <summary> Список стадий. </summary>
         [Tooltip("Список стадий."), SerializeField]
         private List<Stage> _stages;
@@ -32,7 +32,7 @@ namespace FlavorfulStory.ResourceContainer
         /// <summary> Тип инструмента, необходимого для разрушения. </summary>
         [Tooltip("Тип инструмента, необходимого для разрушения."), SerializeField]
         private ToolType[] _toolsToBeHit;
-        
+
         /// <summary> Переключатель грейдов. </summary>
         private ObjectSwitcher _objectSwitcher;
 
@@ -85,7 +85,7 @@ namespace FlavorfulStory.ResourceContainer
         public void Initialize(int hitsTaken = 0)
         {
             foreach (var stage in _stages) _hitsToDestroy += stage.RequiredHits;
-            
+
             _objectSwitcher = GetComponent<ObjectSwitcher>();
 
             if (_objectSwitcher.ObjectsCount != _stages.Count)
@@ -123,11 +123,14 @@ namespace FlavorfulStory.ResourceContainer
         private void DropResourcesForCurrentGrade()
         {
             const float ResourceDropForce = 5f;
-            
+
             foreach (var item in _stages[_currentGradeIndex].Items)
-                _itemDropService.Drop(item.ItemPrefab, item.Quantity, GetDropPosition(), Vector3.up * ResourceDropForce);
+                _itemDropService.Drop(item.ItemPrefab, item.Quantity, GetDropPosition(),
+                    Vector3.up * ResourceDropForce);
         }
-        
+
+        /// <summary> Получить позицию дропа. </summary>
+        /// <returns> Позиция дропа. </returns>
         private Vector3 GetDropPosition()
         {
             const float DropOffsetRange = 2f; // Диапазон случайного смещения по осям X и Z

@@ -2,24 +2,25 @@
 
 namespace FlavorfulStory.InventorySystem.DropSystem
 {
-    //TODO: сделать ревизию pickupDelay и force. Мб Зашить жесткие значения.
     /// <summary> Интерфейс сервиса выброса предметов в игровой мир. </summary>
     public interface IItemDropService
     {
-        /// <summary> Выбросить предмет в указанную позицию с задержкой на подбор. </summary>
-        void Drop(InventoryItem item, int quantity, Vector3 position, float pickupDelay = 1f);
+        /// <summary> Выбрасывает предмет в мир в указанной позиции с опциональной силой. </summary>
+        /// <param name="item"> Предмет для выбрасывания. </param>
+        /// <param name="quantity"> Количество выбрасываемого предмета. </param>
+        /// <param name="position"> Позиция появления предмета. </param>
+        /// <param name="force"> Применяемая сила (например, для отталкивания). </param>
+        void Drop(InventoryItem item, int quantity, Vector3 position, Vector3? force = null);
 
-        /// <summary> Выбросить предмет с силой (например, при броске) и задержкой. </summary>
-        void Drop(InventoryItem item, int quantity, Vector3 position, Vector3 force, float pickupDelay = 1f);
+        /// <summary> Выбрасывает предмет из конкретного слота инвентаря. </summary>
+        /// <param name="inventory"> Инвентарь игрока. </param>
+        /// <param name="slotIndex"> Индекс слота, из которого берется предмет. </param>
+        /// <param name="position"> Позиция появления предмета. </param>
+        /// <param name="force"> Применяемая сила (необязательно). </param>
+        void DropFromInventory(Inventory inventory, int slotIndex, Vector3 position, Vector3? force = null);
 
-        /// <summary> Выбросить предмет из указанного слота инвентаря. </summary>
-        void DropFromInventory(Inventory inventory, int slotIndex, Vector3 position, float pickupDelay = 1f);
-
-        /// <summary> Выбросить предмет из инвентаря с применением силы. </summary>
-        void DropFromInventory(Inventory inventory, int slotIndex, Vector3 position, Vector3 force,
-            float pickupDelay = 1f);
-
-        /// <summary> Установить родительский объект (контейнер) для всех выброшенных предметов. </summary>
+        /// <summary> Устанавливает контейнер, в котором будут размещаться выброшенные предметы. </summary>
+        /// <param name="container"> Объект-контейнер на сцене. </param>
         void SetDroppedItemsContainer(Transform container);
     }
 }

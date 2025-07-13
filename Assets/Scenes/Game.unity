@@ -827,64 +827,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1164389004
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1164389005}
-  - component: {fileID: 1164389006}
-  - component: {fileID: 1164389007}
-  m_Layer: 0
-  m_Name: ItemDropSaver
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1164389005
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1164389004}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1164389006
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1164389004}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3deb9cfb883439a4d9da32368c0a55b4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _uniqueIdentifier: 31f7b95c-9074-4ca5-a073-2280ee5aeb12
---- !u!114 &1164389007
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1164389004}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5e955f23cd9d4ca6be78e2256388630f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &1282845395
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -893,11 +835,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1407106709}
     m_Modifications:
-    - target: {fileID: 1981188202499589719, guid: ce24d4a198b4c7748b5d9d8f1aaa3a22,
-        type: 3}
-      propertyPath: m_Radius
-      value: 0.1
-      objectReference: {fileID: 0}
     - target: {fileID: 7922225790736311418, guid: ce24d4a198b4c7748b5d9d8f1aaa3a22,
         type: 3}
       propertyPath: m_Name
@@ -959,36 +896,6 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 11400000, guid: 9e5424065cee3bd4893b828eeb63d49c,
         type: 2}
-    - target: {fileID: 9091369089458898834, guid: ce24d4a198b4c7748b5d9d8f1aaa3a22,
-        type: 3}
-      propertyPath: <ActionDescription>k__BackingField.Title
-      value: Dirk
-      objectReference: {fileID: 0}
-    - target: {fileID: 9091369089458898834, guid: ce24d4a198b4c7748b5d9d8f1aaa3a22,
-        type: 3}
-      propertyPath: <ActionDescription>k__BackingField.Target
-      value: Dirk
-      objectReference: {fileID: 0}
-    - target: {fileID: 9091369089458898834, guid: ce24d4a198b4c7748b5d9d8f1aaa3a22,
-        type: 3}
-      propertyPath: <ActionDescription>k__BackingField.<Action>k__BackingField
-      value: Talk to
-      objectReference: {fileID: 0}
-    - target: {fileID: 9091369089458898834, guid: ce24d4a198b4c7748b5d9d8f1aaa3a22,
-        type: 3}
-      propertyPath: <ActionDescription>k__BackingField.<Target>k__BackingField
-      value: Dirk
-      objectReference: {fileID: 0}
-    - target: {fileID: 9091369089458898834, guid: ce24d4a198b4c7748b5d9d8f1aaa3a22,
-        type: 3}
-      propertyPath: _tooltipActions.Array.data[0]._actionDescription.<Action>k__BackingField
-      value: Talk to
-      objectReference: {fileID: 0}
-    - target: {fileID: 9091369089458898834, guid: ce24d4a198b4c7748b5d9d8f1aaa3a22,
-        type: 3}
-      propertyPath: _tooltipActions.Array.data[0]._actionDescription.<Target>k__BackingField
-      value: Dirk
-      objectReference: {fileID: 0}
     - target: {fileID: 9216231004728534982, guid: ce24d4a198b4c7748b5d9d8f1aaa3a22,
         type: 3}
       propertyPath: _npcSchedule
@@ -1189,4 +1096,3 @@ SceneRoots:
   - {fileID: 1407106709}
   - {fileID: 1331282075}
   - {fileID: 950797356}
-  - {fileID: 1164389005}

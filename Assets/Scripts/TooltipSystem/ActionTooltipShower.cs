@@ -34,7 +34,8 @@ namespace FlavorfulStory.TooltipSystem
             gameObject.SetActive(false);
         }
 
-        /// <inheritdoc/>
+        /// <summary> Добавляет действие во всплывающую подсказку. </summary>
+        /// <param name="action"> Данные действия (клавиша + описание). </param>
         public void Add(TooltipActionData action)
         {
             if (_activeTooltips.Contains(action)) return;
@@ -43,7 +44,8 @@ namespace FlavorfulStory.TooltipSystem
             RefreshTooltipViews();
         }
 
-        /// <inheritdoc/>
+        /// <summary> Удаляет действие из тултипа. </summary>
+        /// <param name="action"> Данные действия, которые нужно удалить. </param>
         public void Remove(TooltipActionData action)
         {
             if (_activeTooltips.Remove(action)) RefreshTooltipViews();

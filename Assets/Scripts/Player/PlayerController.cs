@@ -167,7 +167,7 @@ namespace FlavorfulStory.Player
             const float PickupDelay = 1.5f;
             if (InputWrapper.GetButtonDown(InputButton.DropCurrentItem))
                 _itemDropService.DropFromInventory(_playerInventory, _toolbar.SelectedItemIndex,
-                    _dropPoint.transform.position, _dropPoint.forward * DropItemForce, PickupDelay);
+                    _dropPoint.transform.position, _dropPoint.forward * DropItemForce);
         }
 
         /// <summary> Начать взаимодействие с предметом. </summary>
