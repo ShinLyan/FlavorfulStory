@@ -1,5 +1,6 @@
 ﻿namespace FlavorfulStory.QuestSystem.Objectives
 {
+    /// <summary> Тип цели квеста. </summary>
     public enum ObjectiveType
     {
         /// <summary> Иметь указанное количество предметов. </summary>

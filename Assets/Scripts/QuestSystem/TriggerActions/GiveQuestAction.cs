@@ -1,8 +1,10 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace FlavorfulStory.QuestSystem.TriggerActions
 {
     /// <summary> Действие, выдающее игроку указанный квест. </summary>
+    [Serializable]
     public class GiveQuestAction : QuestTriggerAction
     {
         /// <summary> Квест, который нужно выдать. </summary>

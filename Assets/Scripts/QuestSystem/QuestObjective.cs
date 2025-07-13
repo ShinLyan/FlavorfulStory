@@ -13,11 +13,14 @@ namespace FlavorfulStory.QuestSystem
         [field: SerializeField] public string Reference { get; private set; }
 
         /// <summary> Описание цели квеста, отображаемое игроку. </summary>
-        [field: SerializeField, TextArea(2, 4)]
+        [field: Tooltip("Описание цели квеста, отображаемое игроку."), SerializeField, TextArea(2, 4)]
         public string Description { get; private set; }
 
-        [field: SerializeField] public ObjectiveType Type { get; private set; }
+        /// <summary> Тип цели квеста. </summary>
+        [field: Tooltip("Тип цели квеста."), SerializeField]
+        public ObjectiveType Type { get; private set; }
 
+        /// <summary> Параметры цели квеста. </summary>
         [field: SerializeReference] public ObjectiveParamsBase Params { get; private set; }
     }
 }
