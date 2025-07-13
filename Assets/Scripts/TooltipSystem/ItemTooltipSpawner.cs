@@ -1,7 +1,9 @@
-﻿using FlavorfulStory.InventorySystem.UI.Tooltips;
+﻿using FlavorfulStory.InventorySystem;
+using FlavorfulStory.InventorySystem.TooltipSystem;
+using FlavorfulStory.InventorySystem.UI.Tooltips;
 using UnityEngine;
 
-namespace FlavorfulStory.InventorySystem.TooltipSystem
+namespace FlavorfulStory.TooltipSystem
 {
     /// <summary> Помещается в слот UI инвентаря для отображения тултипа предмета. </summary>
     [RequireComponent(typeof(IItemHolder))]

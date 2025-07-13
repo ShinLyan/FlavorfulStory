@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using FlavorfulStory.BuildingRepair;
+using FlavorfulStory.Crafting;
 using FlavorfulStory.DialogueSystem;
 using FlavorfulStory.DialogueSystem.UI;
 using FlavorfulStory.Infrastructure.Factories;
@@ -31,7 +32,7 @@ namespace FlavorfulStory.Installers
         [SerializeField] private InventorySlotView _inventorySlotViewPrefab;
 
         /// <summary> Префаб отображения требования ресурса. </summary>
-        [SerializeField] private ResourceRequirementView _requirementViewPrefab;
+        [SerializeField] private ItemRequirementView _requirementViewPrefab;
 
         /// <summary> Виртуальная камера при телепорте. </summary>
         /// <remarks> Используется для WarpPortal, когда отключаем и включаем камеру
@@ -73,7 +74,7 @@ namespace FlavorfulStory.Installers
         {
             Container.Bind<IGameFactory<InventorySlotView>>().To<InventorySlotViewFactory>().AsSingle()
                 .WithArguments(_inventorySlotViewPrefab);
-            Container.Bind<IGameFactory<ResourceRequirementView>>().To<ResourceRequirementViewFactory>().AsSingle()
+            Container.Bind<IGameFactory<ItemRequirementView>>().To<ResourceRequirementViewFactory>().AsSingle()
                 .WithArguments(_requirementViewPrefab);
             Container.Bind<ConfirmationWindowView>().FromComponentInHierarchy().AsSingle();
             Container.Bind<SummaryView>().FromComponentInHierarchy().AsSingle();
@@ -83,6 +84,7 @@ namespace FlavorfulStory.Installers
             Container.Bind<IActionTooltipShower>().To<ActionTooltipShower>().FromComponentInHierarchy().AsSingle();
 
             Container.Bind<CanvasGroupFader>().WithId("HUD").FromInstance(_hudFader).AsSingle();
+            Container.Bind<CraftingWindow>().FromComponentInHierarchy().AsSingle();
         }
 
         /// <summary> Установить зависимости, связанные с не игровыми системами и логикой. </summary>

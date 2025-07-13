@@ -77,7 +77,7 @@ namespace FlavorfulStory.InventorySystem.UI.Tooltips
         }
 
         /// <summary> Позиционировать тултип относительно объекта, на который наведен курсор. </summary>
-        /// <remarks> В зависимости от расположения объекта относительно центра экрана
+        /// <remarks> В зависимости от расположения объекта относитель`но центра экрана
         /// тултип корректируется, чтобы не выходить за границы экрана. </remarks>
         private void PositionTooltip()
         {
@@ -93,8 +93,8 @@ namespace FlavorfulStory.InventorySystem.UI.Tooltips
             GetComponent<RectTransform>().GetWorldCorners(slotCorners);
 
             // Определяем местоположение относительно середины экрана.
-            bool below = transform.position.y > Screen.height / 2;
-            bool right = transform.position.x < Screen.width / 2;
+            bool below = transform.position.y > Screen.height / 2f;
+            bool right = transform.position.x < Screen.width / 2f;
 
             // Выбираем индекс угла текущего объекта (слота) и тултипа.
             int slotCornerIndex = GetCornerIndex(below, right);

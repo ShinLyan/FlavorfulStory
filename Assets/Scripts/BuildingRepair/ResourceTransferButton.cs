@@ -1,5 +1,4 @@
 using System;
-using FlavorfulStory.Audio;
 using FlavorfulStory.InventorySystem;
 using FlavorfulStory.UI;
 using UnityEngine;
@@ -24,7 +23,6 @@ namespace FlavorfulStory.BuildingRepair
         {
             base.Click();
             OnClick?.Invoke(_resource, _buttonType);
-            SfxPlayer.Instance.PlayOneShot(SfxType.Eat);
         }
 
 
