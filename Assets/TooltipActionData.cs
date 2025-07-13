@@ -1,44 +1,43 @@
 using System;
 using FlavorfulStory.Actions;
-using UnityEngine;
 
 namespace FlavorfulStory
 {
     /// <summary> Содержит данные для отображения действия в тултипе, включая клавишу и описание действия. </summary>
-    [Serializable]
     public class TooltipActionData
     {
-        /// <summary> Текст клавиши действия (например, "G"). </summary>
-        [SerializeField] private string _keyText;
-    
-        /// <summary> Описание действия (что делает и над чем выполняется). </summary>
-        [SerializeField] private ActionDescription _actionDescription;
+        /// <summary> Текст клавиши действия, отображаемый в тултипе (например, "E"). </summary>
+        public string KeyText { get; }
 
-        /// <summary> Текст клавиши действия. </summary>
-        public string KeyText => _keyText;
-        /// <summary> Описание действия. </summary>
-        public ActionDescription ActionDescription => _actionDescription;
-        
-        public TooltipActionData(string keyText, string action, string target)
+        /// <summary> Тип действия, которое выполняется. </summary>
+        public ActionType Action { get; }
+
+        /// <summary> Название объекта, над которым выполняется действие. </summary>
+        public string Target { get; }
+
+        /// <summary> Конструктор, инициализирующий данные для тултипа. </summary>
+        /// <param name="keyText"> Текст клавиши действия, отображаемый в тултипе (например, "E"). </param>
+        /// <param name="action"> Тип действия, которое выполняется. </param>
+        /// <param name="target"> Название объекта, над которым выполняется действие. </param>
+        public TooltipActionData(string keyText, ActionType action, string target)
         {
-            _keyText = keyText;
-            _actionDescription = new ActionDescription { Action = action, Target = target };
+            KeyText = keyText;
+            Action = action;
+            Target = target;
         }
-        
+
         /// <summary> Проверяет равенство двух TooltipActionData по содержимому. </summary>
+        /// <param name="obj"> Объект для сравнения. </param>
+        /// <returns> True, если объекты эквивалентны; иначе — false. </returns>
         public override bool Equals(object obj)
         {
             if (obj is not TooltipActionData other) return false;
-            return KeyText == other.KeyText &&
-                   ActionDescription.Action == other.ActionDescription.Action &&
-                   ActionDescription.Target == other.ActionDescription.Target;
+            return KeyText == other.KeyText && Action == other.Action && Target == other.Target;
         }
 
         /// <summary> Генерирует хэш-код на основе полей. </summary>
-        /// <remarks> Необходимо для сравнения и прооверки на равенство. </remarks>
-        public override int GetHashCode()
-        {
-            return HashCode.Combine(KeyText, ActionDescription.Action, ActionDescription.Target);
-        }
+        /// <returns> Хэш-код объекта. </returns>
+        /// <remarks> Необходимо для сравнения и проверки на равенство. </remarks>
+        public override int GetHashCode() => HashCode.Combine(KeyText, Action, Target);
     }
 }

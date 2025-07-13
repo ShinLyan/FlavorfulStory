@@ -32,7 +32,7 @@ namespace FlavorfulStory.InteractionSystem
 
         /// <summary> Последний объект взаимодейтсвия, по котороому выводился тултип. </summary>
         private IInteractable _lastTooltipSource;
-        
+
         /// <summary> Делегат действия, вызываемый при начале взаимодействия. </summary>
         private Action _startInteractionAction;
 
@@ -66,12 +66,10 @@ namespace FlavorfulStory.InteractionSystem
         private void UpdateClosestInteractable()
         {
             var newClosest = FindClosestInteractable();
+            if (newClosest == _closestInteractable) return;
 
-            if (newClosest != _closestInteractable)
-            {
-                _closestInteractable = newClosest;
-                UpdateTooltip();
-            }
+            _closestInteractable = newClosest;
+            UpdateTooltip();
         }
 
         /// <summary> Определяет ближайший объект для взаимодействия из доступных. </summary>
@@ -84,22 +82,13 @@ namespace FlavorfulStory.InteractionSystem
         /// <summary> Обновить тултип. </summary>
         private void UpdateTooltip()
         {
-            if (_lastTooltipSource != _closestInteractable)
-            {
-                if (_lastTooltipSource != null)
-                {
-                    foreach (var tooltip in _lastTooltipSource.TooltipActions)
-                        _tooltipShower.Remove(tooltip);
-                }
+            if (_lastTooltipSource == _closestInteractable) return;
 
-                _lastTooltipSource = _closestInteractable;
+            if (_lastTooltipSource != null) _tooltipShower.Remove(_lastTooltipSource.TooltipAction);
 
-                if (_closestInteractable != null)
-                {
-                    foreach (var tooltip in _closestInteractable.TooltipActions)
-                        _tooltipShower.Add(tooltip);
-                }
-            }
+            _lastTooltipSource = _closestInteractable;
+
+            if (_closestInteractable != null) _tooltipShower.Add(_closestInteractable.TooltipAction);
         }
 
         /// <summary> Добавляет объект в список доступных для взаимодействия при входе в триггер. </summary>

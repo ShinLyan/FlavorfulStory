@@ -1,5 +1,5 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
+using FlavorfulStory.Actions;
 using FlavorfulStory.InteractionSystem;
 using FlavorfulStory.Player;
 using FlavorfulStory.SceneManagement;
@@ -88,10 +88,10 @@ namespace FlavorfulStory.TimeManagement
         }
 
         #region IInteractable
-        
-        /// <summary> Список возможных действий, отображаемых в тултипе. </summary>
-        [SerializeField] private List<TooltipActionData> _tooltipActions;
-        
+
+        /// <summary> Описание действия с объектом. </summary>
+        public TooltipActionData TooltipAction => new("E", ActionType.Sleep, "to Bed");
+
         /// <summary> Возвращает возможность взаимодействия с объектом. </summary>
         public bool IsInteractionAllowed => true;
 
@@ -112,9 +112,6 @@ namespace FlavorfulStory.TimeManagement
             player.SetBusyState(false);
             _confirmationWindowView.Hide();
         }
-        
-        /// <summary> Публичный список возможных действий, отображаемых в тултипе. </summary>
-        public IEnumerable<TooltipActionData> TooltipActions => _tooltipActions;
 
         #endregion
     }

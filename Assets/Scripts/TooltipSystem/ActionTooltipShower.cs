@@ -9,24 +9,26 @@ namespace FlavorfulStory.TooltipSystem
     {
         /// <summary> Префаб отдельной строчки действия в тултипе. </summary>
         [SerializeField] private TooltipActionView _tooltipActionPrefab;
+
         /// <summary> Родительский трансформ, куда помещаются UI-элементы действий. </summary>
         [SerializeField] private Transform _parentTransform;
-        
+
         /// <summary> Пул для переиспользуемых элементов тултипа. </summary>
         private ObjectPool<TooltipActionView> _pool;
-        
+
         /// <summary> Список активных (отображаемых) действий. </summary>
         private readonly List<TooltipActionData> _activeTooltips = new();
+
         /// <summary> Список UI-элементов, созданных и отображённых на экране. </summary>
         private readonly List<TooltipActionView> _spawnedViews = new();
-        
+
         /// <summary> Инициализация пула и скрытие тултипа при запуске. </summary>
         private void Start()
         {
             _pool = new ObjectPool<TooltipActionView>(
-                createFunc: () => Instantiate(_tooltipActionPrefab, _parentTransform),
-                initFunc: t => t.Show(),
-                deInitFunc: t => t.Hide()
+                () => Instantiate(_tooltipActionPrefab, _parentTransform),
+                tooltipActionView => tooltipActionView.Show(),
+                tooltipActionView => tooltipActionView.Hide()
             );
 
             gameObject.SetActive(false);
@@ -44,25 +46,16 @@ namespace FlavorfulStory.TooltipSystem
         /// <inheritdoc/>
         public void Remove(TooltipActionData action)
         {
-            if (_activeTooltips.Remove(action))
-                RefreshTooltipViews();
-        }
-
-        /// <inheritdoc/>
-        public void Clear()
-        {
-            _activeTooltips.Clear();
-            RefreshTooltipViews();
+            if (_activeTooltips.Remove(action)) RefreshTooltipViews();
         }
 
         /// <summary> Обновляет отображение: скрывает старые и отображает актуальные действия. </summary>
         private void RefreshTooltipViews()
         {
-            foreach (var view in _spawnedViews)
-                _pool.Release(view);
+            foreach (var view in _spawnedViews) _pool.Release(view);
 
             _spawnedViews.Clear();
-            
+
             if (_activeTooltips.Count == 0)
             {
                 gameObject.SetActive(false);
@@ -83,6 +76,6 @@ namespace FlavorfulStory.TooltipSystem
         /// <param name="tooltip"> Структура данных действия. </param>
         /// <returns> Строка формата: "Harvest Bread". </returns>
         private static string CreateActionDescription(TooltipActionData tooltip) =>
-            $"{tooltip.ActionDescription.Action} {tooltip.ActionDescription.Target}";
+            $"{tooltip.Action} {tooltip.Target}";
     }
 }

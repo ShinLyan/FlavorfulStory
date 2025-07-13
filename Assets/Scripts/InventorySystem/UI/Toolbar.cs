@@ -1,3 +1,4 @@
+using FlavorfulStory.Actions;
 using FlavorfulStory.InputSystem;
 using FlavorfulStory.Saving;
 using FlavorfulStory.TooltipSystem;
@@ -13,7 +14,7 @@ namespace FlavorfulStory.InventorySystem.UI
     {
         /// <summary> Последний предмет, по коотороому показываем тултип. </summary>
         private InventoryItem _lastTooltipItem;
-        
+
         /// <summary> Массив слотов панели инструментов. </summary>
         private ToolbarSlotView[] _slots;
 
@@ -28,6 +29,7 @@ namespace FlavorfulStory.InventorySystem.UI
 
         /// <summary> Инвентарь игрока. </summary>
         private Inventory _playerInventory;
+
         /// <summary> Показчик тултипов. </summary>
         private IActionTooltipShower _tooltipShower;
 
@@ -65,7 +67,7 @@ namespace FlavorfulStory.InventorySystem.UI
         /// <summary> Установить состояние взаимодействия. </summary>
         /// <param name="state"> Состояние взаимодействия. </param>
         public void SetInteractableState(bool state) => _isInteractable = state;
-        
+
         /// <summary> Сбрасывает состояние выделения всех слотов панели инструментов. </summary>
         private void ResetToolbar()
         {
@@ -81,15 +83,15 @@ namespace FlavorfulStory.InventorySystem.UI
             _slots[SelectedItemIndex].ResetSelection();
             SelectedItemIndex = index;
             _slots[SelectedItemIndex].Select();
-            
+
             ShowItemTooltip();
         }
-        
+
         /// <summary> Обновляет визуальное представление всех слотов панели инструментов. </summary>
         private void RedrawToolbar()
         {
             foreach (var slot in _slots) slot.Redraw();
-            
+
             ShowItemTooltip();
         }
 
@@ -107,17 +109,16 @@ namespace FlavorfulStory.InventorySystem.UI
         /// <summary> Показать тултип для выбранного предмета. </summary>
         private void ShowItemTooltip()
         {
-            if (_lastTooltipItem != null && _lastTooltipItem.CanBeDropped)
+            if (_lastTooltipItem && _lastTooltipItem.CanBeDropped)
             {
-                var oldTooltip = new TooltipActionData("G", "Drop", _lastTooltipItem.ItemName);
+                var oldTooltip = new TooltipActionData("G", ActionType.Drop, _lastTooltipItem.ItemName);
                 _tooltipShower.Remove(oldTooltip);
             }
 
             var item = SelectedItem;
-
-            if (item != null && item.CanBeDropped)
+            if (item && item.CanBeDropped)
             {
-                var newTooltip = new TooltipActionData("G", "Drop", item.ItemName);
+                var newTooltip = new TooltipActionData("G", ActionType.Drop, item.ItemName);
                 _tooltipShower.Add(newTooltip);
                 _lastTooltipItem = item;
             }
@@ -126,7 +127,7 @@ namespace FlavorfulStory.InventorySystem.UI
                 _lastTooltipItem = null;
             }
         }
-        
+
         #region Saving
 
         /// <summary> Сохраняет текущее состояние выбранного индекса. </summary>

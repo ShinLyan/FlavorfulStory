@@ -1,13 +1,14 @@
-﻿using System.Collections.Generic;
-using FlavorfulStory.Player;
+﻿using FlavorfulStory.Player;
 using UnityEngine;
 
 namespace FlavorfulStory.InteractionSystem
 {
-    /// <summary> Интерфейс для объектов, с которыми можно взаимодействовать
-    /// (например, двери, предметы, NPC). </summary>
+    /// <summary> Интерфейс для объектов, с которыми можно взаимодействовать. </summary>
     public interface IInteractable
     {
+        /// <summary> Действие для отображения в тултипе. </summary>
+        TooltipActionData TooltipAction { get; }
+
         /// <summary> Доступно ли взаимодействие с объектом в текущий момент? </summary>
         bool IsInteractionAllowed { get; }
 
@@ -25,8 +26,5 @@ namespace FlavorfulStory.InteractionSystem
         /// <param name="player"> Игрок, завершивший взаимодействие. </param>
         /// <remarks> Например, закрытие UI, сброс состояний, завершение анимаций. </remarks>
         void EndInteraction(PlayerController player);
-        
-        /// <summary> Коллекция действий для отображения в тултипе. </summary>
-        IEnumerable<TooltipActionData> TooltipActions { get; }
     }
 }

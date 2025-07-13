@@ -6,10 +6,9 @@ namespace FlavorfulStory.TooltipSystem
         /// <summary> Добавляет действие во всплывающую подсказку. </summary>
         /// <param name="action"> Данные действия (клавиша + описание). </param>
         void Add(TooltipActionData action);
+
         /// <summary> Удаляет действие из тултипа. </summary>
         /// <param name="action"> Данные действия, которые нужно удалить. </param>
         void Remove(TooltipActionData action);
-        /// <summary> Очищает все отображаемые действия. </summary>
-        void Clear();
     }
 }
