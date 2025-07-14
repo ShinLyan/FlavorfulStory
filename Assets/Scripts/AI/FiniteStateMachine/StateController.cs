@@ -2,76 +2,57 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using FlavorfulStory.AI.Scheduling;
-using FlavorfulStory.AI.WarpGraphSystem;
 using FlavorfulStory.TimeManagement;
-using UnityEngine;
-using UnityEngine.AI;
 using DateTime = FlavorfulStory.TimeManagement.DateTime;
-using Object = UnityEngine.Object;
 
 namespace FlavorfulStory.AI.FiniteStateMachine
 {
-    /// <summary> Контроллер состояний, управляющий переключением между состояниями персонажа. </summary>
+    /// <summary> Контроллер состояний конечного автомата NPC,
+    /// управляющий переходами между различными состояниями персонажа. </summary>
     public class StateController
     {
-        #region Fields and Properties
-
-        /// <summary> Текущее состояние персонажа. </summary>
+        /// <summary> Текущее активное состояние персонажа. </summary>
         private CharacterState _currentState;
 
-        /// <summary> Словарь, хранящий все возможные состояния персонажа, где ключ — тип состояния,
-        /// а значение — экземпляр состояния. </summary>
+        /// <summary> Словарь для быстрого доступа к состояниям по их типу. </summary>
         private readonly Dictionary<Type, CharacterState> _typeToCharacterStates;
 
-        /// <summary> Расписания, отсортированные по приоритетам. </summary>
+        /// <summary> Отсортированные параметры расписания персонажа. </summary>
         private readonly IEnumerable<ScheduleParams> _sortedScheduleParams;
 
-        /// <summary> Событие изменения текущего расписания. </summary>
+        /// <summary> Событие, вызываемое при изменении текущих параметров расписания. </summary>
         private event Action<ScheduleParams> OnCurrentScheduleParamsChanged;
 
-        #endregion
-
-        /// <summary> Конструктор контроллера состояний. </summary>
-        /// <param name="npcSchedule"> Набор расписаний. </param>
-        /// <param name="animator"> Компонент Animator. </param>
-        /// <param name="npcTransform"> Компонент Transform. </param>
-        /// <param name="navMeshAgent"> Компонент NavMesh. </param>
-        /// <param name="coroutineRunner"> Проигрыватель корутин. </param>
-        public StateController(NpcSchedule npcSchedule, Animator animator, Transform npcTransform,
-            NavMeshAgent navMeshAgent, MonoBehaviour coroutineRunner)
+        /// <summary> Инициализирует новый экземпляр контроллера состояний. </summary>
+        /// <param name="npcSchedule"> Расписание NPC. </param>
+        /// <param name="npcMovementController"> Контроллер движения NPC. </param>
+        /// <param name="npcAnimationController"> Контроллер анимации NPC. </param>
+        /// <param name="scheduleHandler"> Обработчик расписания NPC. </param>
+        public StateController(NpcSchedule npcSchedule, NpcMovementController npcMovementController,
+            NpcAnimationController npcAnimationController, NpcScheduleHandler scheduleHandler)
         {
             _typeToCharacterStates = new Dictionary<Type, CharacterState>();
-            _sortedScheduleParams = npcSchedule.GetSortedScheduleParams();
-            if (_sortedScheduleParams == null) Debug.LogError("SortedScheduleParams is null");
-            InitializeStates(animator, npcTransform, navMeshAgent, coroutineRunner);
 
+            _sortedScheduleParams = npcSchedule.GetSortedScheduleParams();
+            InitializeStates(npcMovementController, scheduleHandler, npcAnimationController);
+
+            OnCurrentScheduleParamsChanged += npcMovementController.SetCurrentScheduleParams;
             WorldTime.OnDayEnded += OnReset;
             OnReset(WorldTime.CurrentGameTime);
         }
 
-        /// <summary> Инициализировать состояния. </summary>
-        /// <param name="animator"> Компонент Animator. </param>
-        /// <param name="npcTransform"> Компонент Transform. </param>
-        /// <param name="navMeshAgent"> Компонент NavMesh. </param>
-        /// <param name="coroutineRunner"> Проигрыватель корутин. </param>
-        private void InitializeStates(Animator animator, Transform npcTransform,
-            NavMeshAgent navMeshAgent, MonoBehaviour coroutineRunner)
+        /// <summary> Инициализирует все доступные состояния персонажа и настраивает связи между ними. </summary>
+        /// <param name="movementController"> Контроллер движения для состояния движения. </param>
+        /// <param name="scheduleHandler"> Обработчик расписания для связи с состояниями. </param>
+        /// <param name="animationController"> Контроллер анимации для состояний. </param>
+        private void InitializeStates(NpcMovementController movementController,
+            NpcScheduleHandler scheduleHandler,
+            NpcAnimationController animationController)
         {
             var states = new CharacterState[]
             {
-                new InteractionState(),
-                new MovementState(
-                    navMeshAgent,
-                    
-                    // TODO: ZENJECT
-                    WarpGraph.Build(
-                        Object.FindObjectsByType<WarpPortal>(FindObjectsInactive.Include, FindObjectsSortMode.None)),
-                    animator,
-                    npcTransform,
-                    coroutineRunner
-                ),
-                new RoutineState(animator),
-                new WaitingState()
+                new InteractionState(), new MovementState(movementController),
+                new RoutineState(animationController), new WaitingState()
             };
 
             foreach (var state in states)
@@ -79,58 +60,50 @@ namespace FlavorfulStory.AI.FiniteStateMachine
                 _typeToCharacterStates.Add(state.GetType(), state);
                 state.OnStateChangeRequested += SetState;
 
-                if (state is IScheduleDependable dependable)
-                    OnCurrentScheduleParamsChanged += dependable.SetCurrentScheduleParams;
+                if (state is ICurrentSchedulePointDependable dependable)
+                    scheduleHandler.OnSchedulePointChanged += dependable.SetNewCurrentPont;
             }
         }
 
-        /// <summary> Обновляет логику текущего состояния. </summary>
-        /// <param name="deltaTime"> Время в секундах, прошедшее с последнего кадра. </param>
-        public void Update(float deltaTime) => _currentState?.Update(deltaTime);
+        /// <summary> Обновляет текущее состояние персонажа каждый кадр. </summary>
+        public void Update() => _currentState?.Update();
 
-        /// <summary> Обновление состояния NPC. </summary>
-        /// <param name="currentTime"> Текущее время. </param>
+        /// <summary> Сбрасывает систему состояний при смене дня или инициализации. </summary>
+        /// <param name="currentTime"> Текущее игровое время. </param>
         private void OnReset(DateTime currentTime)
         {
             PrioritizeSchedule(currentTime);
             ResetStates();
         }
 
-        /// <summary> Приоритизировать расписание. </summary>
-        /// <param name="currentTime"> Текущее время. </param>
+        /// <summary> Определяет приоритетное расписание на основе текущих условий игры. </summary>
+        /// <param name="currentTime"> Текущее игровое время. </param>
         private void PrioritizeSchedule(DateTime currentTime)
         {
-            bool isRaining = IsWeatherRainyNow();
-            int hearts = GetCurrentRelationshipHearts();
-            var suitableSchedule = _sortedScheduleParams
-                .FirstOrDefault(param => param.AreConditionsSuitable(currentTime, hearts, isRaining));
+            bool isRaining = false; // TODO
+            int hearts = 0; // TODO
 
-            OnCurrentScheduleParamsChanged?.Invoke(suitableSchedule);
+            var suitable = _sortedScheduleParams.FirstOrDefault(param =>
+                param.AreConditionsSuitable(currentTime, hearts, isRaining));
+
+            OnCurrentScheduleParamsChanged?.Invoke(suitable);
         }
 
-        /// <summary> Получить текущее количество "сердец" (уровень отношений с NPC). </summary>
-        /// <returns> Текущее количество "сердец" (уровень отношений с NPC). </returns>
-        private int GetCurrentRelationshipHearts() => 0; // TODO: поменять на получение текущих отношений с данным нпс
-
-        /// <summary> Сейчас дождливая погода? </summary>
-        /// <returns> <c>true</c>, если дождливая, <c>false</c>, если ясная.</returns>
-        private bool IsWeatherRainyNow() => false; //TODO: поменять на получение текущей погоды из спец. скрипта
-
-        /// <summary> Обновить состояния. </summary>
+        /// <summary> Сбрасывает все состояния к начальному и устанавливает состояние рутины. </summary>
         private void ResetStates()
         {
             foreach (var state in _typeToCharacterStates.Values) state.Reset();
             SetState(typeof(RoutineState));
         }
 
-        /// <summary> Установить текущее состояние. </summary>
-        /// <param name="stateType"> Состояние, которое нужно установить. </param>
-        private void SetState(Type stateType)
+        /// <summary> Устанавливает новое состояние персонажа по типу. </summary>
+        /// <param name="type"> Тип состояния для установки. </param>
+        private void SetState(Type type)
         {
-            if (!_typeToCharacterStates.TryGetValue(stateType, out var newState) || _currentState == newState) return;
+            if (!_typeToCharacterStates.TryGetValue(type, out var next) || _currentState == next) return;
 
             _currentState?.Exit();
-            _currentState = newState;
+            _currentState = next;
             _currentState?.Enter();
         }
     }

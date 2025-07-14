@@ -27,10 +27,7 @@ namespace FlavorfulStory.TimeManagement
         /// <summary> Словарь для конвертации сезонов. </summary>
         private static readonly Dictionary<Season, Season> SeasonConvertDict = new()
         {
-            { (Season)1, (Season)1 },
-            { (Season)2, (Season)2 },
-            { (Season)3, (Season)4 },
-            { (Season)4, (Season)8 }
+            { (Season)1, (Season)1 }, { (Season)2, (Season)2 }, { (Season)3, (Season)4 }, { (Season)4, (Season)8 }
         };
 
         /// <summary> Количество дней в одном сезоне. </summary>
@@ -46,13 +43,32 @@ namespace FlavorfulStory.TimeManagement
         public float Year => _totalMinutes / (SeasonMinutes * 4) + 1;
 
         /// <summary> Получает текущий сезон. </summary>
-        public Season Season => SeasonConvertDict[(Season)((int)TotalDays % (DaysCount * 4) / DaysCount)];
+        public Season Season => SeasonConvertDict[(Season)(TotalDays % (DaysCount * 4) / DaysCount)];
 
         /// <summary> Получает день в текущем сезоне. </summary>
-        public float SeasonDay => _totalMinutes % SeasonMinutes / DayMinutes + 1;
+        public float SeasonDay
+        {
+            get
+            {
+                float adjustedTotalMinutes = _totalMinutes - 2 * 60;
+                if (adjustedTotalMinutes < 0) return 1;
+
+                return adjustedTotalMinutes % SeasonMinutes / DayMinutes + 1;
+            }
+        }
 
         /// <summary> Получает день недели. </summary>
-        public DayOfWeek DayOfWeek => DayOfWeekConvertDict[(DayOfWeek)(int)(_totalMinutes / DayMinutes % 7 + 1)];
+        public DayOfWeek DayOfWeek
+        {
+            get
+            {
+                float adjustedTotalMinutes = _totalMinutes - 2 * 60;
+                if (adjustedTotalMinutes < 0) adjustedTotalMinutes += 7 * DayMinutes;
+
+                int dayOfWeekIndex = (int)(adjustedTotalMinutes / DayMinutes % 7 + 1);
+                return DayOfWeekConvertDict[(DayOfWeek)dayOfWeekIndex];
+            }
+        }
 
         /// <summary> Получает текущий час. </summary>
         public float Hour => _totalMinutes % DayMinutes / 60;
@@ -61,10 +77,10 @@ namespace FlavorfulStory.TimeManagement
         public float Minute => _totalMinutes % 60;
 
         /// <summary> Получает количество полных недель, прошедших с начала игры. </summary>
-        public float TotalWeeks => _totalMinutes / (DayMinutes * 7);
+        public int TotalWeeks => (int)(_totalMinutes / (DayMinutes * 7));
 
         /// <summary> Получает количество полных дней, прошедших с начала игры. </summary>
-        public float TotalDays => _totalMinutes / DayMinutes;
+        public int TotalDays => (int)(_totalMinutes / DayMinutes);
 
         #endregion
 

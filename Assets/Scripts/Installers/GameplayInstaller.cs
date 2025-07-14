@@ -1,17 +1,21 @@
 ﻿using System.Collections.Generic;
 using FlavorfulStory.BuildingRepair;
+using FlavorfulStory.DialogueSystem;
+using FlavorfulStory.DialogueSystem.UI;
 using FlavorfulStory.Infrastructure.Factories;
 using FlavorfulStory.InventorySystem;
 using FlavorfulStory.InventorySystem.DropSystem;
 using FlavorfulStory.InventorySystem.EquipmentSystem;
 using FlavorfulStory.InventorySystem.PickupSystem;
 using FlavorfulStory.InventorySystem.UI;
-using FlavorfulStory.Lightning;
 using FlavorfulStory.Player;
 using FlavorfulStory.Saving;
 using FlavorfulStory.SceneManagement;
+using FlavorfulStory.TimeManagement;
 using FlavorfulStory.TooltipSystem;
 using FlavorfulStory.UI;
+using FlavorfulStory.UI.Animation;
+using FlavorfulStory.Visuals.Lightning;
 using Unity.Cinemachine;
 using UnityEngine;
 using Zenject;
@@ -35,6 +39,9 @@ namespace FlavorfulStory.Installers
         /// при переходе между локациями. </remarks>
         [SerializeField] private CinemachineCamera _teleportVirtualCamera;
 
+        /// <param name="hudFader"> Затемнитель интерфейса HUD. </param>
+        [SerializeField] private CanvasGroupFader _hudFader;
+
         /// <summary> Выполняет установку всех зависимостей, необходимых для сцены. </summary>
         public override void InstallBindings()
         {
@@ -51,11 +58,14 @@ namespace FlavorfulStory.Installers
             Container.Bind<Equipment>().FromComponentInHierarchy().AsSingle();
             Container.Bind<PlayerController>().FromComponentInHierarchy().AsSingle();
 
+            Container.Bind<IDialogueInitiator>().To<PlayerSpeaker>().FromComponentInHierarchy().AsSingle();
+
             Container.Bind<PickupFactory>().AsSingle();
             Container.Bind<PickupSpawner>().FromComponentsInHierarchy().AsCached();
 
-            Container.Bind<BuildingRepairView>().FromComponentInHierarchy().AsSingle();
+            Container.Bind<DialogueModelPresenter>().FromComponentInHierarchy().AsSingle();
 
+            Container.Bind<SleepTrigger>().FromComponentInHierarchy().AsSingle();
             Container.Bind<IItemDropService>().To<ItemDropService>().AsSingle();
             Container.Bind<ISaveable>().To<ItemDropService>().FromResolve();
         }
@@ -69,9 +79,14 @@ namespace FlavorfulStory.Installers
                 .WithArguments(_requirementViewPrefab);
             Container.Bind<ConfirmationWindowView>().FromComponentInHierarchy().AsSingle();
             Container.Bind<SummaryView>().FromComponentInHierarchy().AsSingle();
+            Container.Bind<BuildingRepairView>().FromComponentInHierarchy().AsSingle();
+            Container.Bind<DialogueView>().FromComponentInHierarchy().AsSingle();
+
             Container.Bind<IActionTooltipShower>().To<ActionTooltipShower>().FromComponentInHierarchy().AsSingle();
 
             Container.Bind<Toolbar>().FromComponentInHierarchy().AsSingle();
+
+            Container.Bind<CanvasGroupFader>().WithId("HUD").FromInstance(_hudFader).AsSingle();
         }
 
         /// <summary> Установить зависимости, связанные с не игровыми системами и логикой. </summary>
@@ -85,6 +100,8 @@ namespace FlavorfulStory.Installers
             Container.BindInterfacesAndSelfTo<LocationManager>().AsSingle();
 
             Container.Bind<CinemachineCamera>().FromInstance(_teleportVirtualCamera).AsSingle();
+
+            Container.BindInterfacesAndSelfTo<DayEndManager>().AsSingle();
         }
     }
 }

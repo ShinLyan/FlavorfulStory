@@ -5,6 +5,7 @@ using FlavorfulStory.InteractionSystem;
 using FlavorfulStory.InventorySystem;
 using FlavorfulStory.InventorySystem.DropSystem;
 using FlavorfulStory.InventorySystem.UI;
+using FlavorfulStory.Stats;
 using FlavorfulStory.Utils;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -15,6 +16,7 @@ namespace FlavorfulStory.Player
     /// <summary> Контроллер игрока, отвечающий за управление,
     /// использование предметов и взаимодействие с окружением. </summary>
     [RequireComponent(typeof(PlayerMover), typeof(Animator), typeof(ToolHandler))]
+    [RequireComponent(typeof(PlayerStats))]
     public class PlayerController : MonoBehaviour
     {
         #region Fields and Properties
@@ -31,6 +33,9 @@ namespace FlavorfulStory.Player
 
         /// <summary> Сервис выброса предметов. </summary>
         private IItemDropService _itemDropService;
+
+        /// <summary> Статы игрока. </summary>
+        private PlayerStats _playerStats;
 
         /// <summary> Занят ли игрок? </summary>
         private bool _isBusy;
@@ -80,6 +85,7 @@ namespace FlavorfulStory.Player
         /// <summary> Инициализация компонентов. </summary>
         private void Awake()
         {
+            _playerStats = GetComponent<PlayerStats>();
             _playerMover = GetComponent<PlayerMover>();
             _animator = GetComponent<Animator>();
             _interactionController = GetComponentInChildren<InteractionController>();
@@ -255,8 +261,23 @@ namespace FlavorfulStory.Player
         /// <param name="newTransform"> Новый трансформ игрока. </param>
         public void UpdatePosition(Transform newTransform)
         {
-            _playerMover.SetPosition(newTransform.position);
-            _playerMover.SetLookRotation(newTransform.position);
+            SetPosition(newTransform.position);
+            _playerMover.SetLookRotation(newTransform.forward);
+        }
+
+        public void SetPosition(Vector3 newPosition) => _playerMover.SetPosition(newPosition);
+
+        /// <summary> Восстановить статы игрока после сна. </summary>
+        /// <param name="isExhausted"> Истощенный сон или нет? </param>
+        public void RestoreStatsAfterSleep(bool isExhausted = false)
+        {
+            const float StaminaRestoreMultiplier = 0.75f;
+
+            var health = _playerStats.GetStat<Health>();
+            health.RestoreFull();
+
+            var stamina = _playerStats.GetStat<Stamina>();
+            stamina.RestorePercent(isExhausted ? StaminaRestoreMultiplier : 1f);
         }
     }
 }

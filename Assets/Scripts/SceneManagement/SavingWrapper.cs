@@ -1,6 +1,8 @@
 ﻿using System.Collections;
+using DG.Tweening;
 using FlavorfulStory.InputSystem;
 using FlavorfulStory.Saving;
+using FlavorfulStory.UI.Animation;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Zenject;
@@ -21,18 +23,18 @@ namespace FlavorfulStory.SceneManagement
                                              SavingSystem.SaveFileExists(GetCurrentSaveFileName());
 
         /// <summary> Компонент затемнения экрана при переходах между сценами. </summary>
-        private Fader _fader;
+        private CanvasGroupFader _canvasGroupFader;
 
         /// <summary> Менеджер локаций. </summary>
         private LocationManager _locationManager;
 
         /// <summary> Внедрение зависимостей Zenject. </summary>
-        /// <param name="fader"> Компонент затемнения экрана при переходах между сценами. </param>
+        /// <param name="canvasGroupFader"> Компонент затемнения экрана при переходах между сценами. </param>
         /// <param name="locationManager"> Менеджер локаций. </param>
         [Inject]
-        private void Construct(Fader fader, [InjectOptional] LocationManager locationManager)
+        private void Construct(CanvasGroupFader canvasGroupFader, [InjectOptional] LocationManager locationManager)
         {
-            _fader = fader;
+            _canvasGroupFader = canvasGroupFader;
             _locationManager = locationManager;
         }
 
@@ -68,12 +70,16 @@ namespace FlavorfulStory.SceneManagement
         /// <returns> Корутина, выполняющая загрузку первой сцены. </returns>
         private IEnumerator LoadFirstScene()
         {
-            yield return _fader.FadeOut(Fader.FadeOutTime);
-            yield return SceneManager.LoadSceneAsync(FirstUploadedScene.ToString());
-            Save();
-            yield return _fader.FadeIn(Fader.FadeInTime);
+            var fadeTween = _canvasGroupFader.Show();
+            var sceneLoad = SceneManager.LoadSceneAsync(FirstUploadedScene.ToString());
 
-            _locationManager?.ActivatePlayerCurrentLocation();
+            yield return sceneLoad;
+            Save();
+
+            yield return fadeTween.WaitForCompletion();
+
+            _canvasGroupFader.Hide();
+            _locationManager?.UpdateActiveLocation();
             InputWrapper.UnblockAllInput();
         }
 
@@ -81,11 +87,15 @@ namespace FlavorfulStory.SceneManagement
         /// <returns> Корутина, выполняющая загрузку последней сохранённой сцены. </returns>
         private IEnumerator LoadLastScene()
         {
-            yield return _fader.FadeOut(Fader.FadeOutTime);
-            yield return SavingSystem.LoadLastScene(GetCurrentSaveFileName());
-            yield return _fader.FadeIn(Fader.FadeInTime);
+            var fadeTween = _canvasGroupFader.Show(); // затемнение
+            var loadScene = SavingSystem.LoadLastScene(GetCurrentSaveFileName());
 
-            _locationManager?.ActivatePlayerCurrentLocation();
+            yield return loadScene;
+            yield return fadeTween.WaitForCompletion(); // дождаться окончания фейда
+
+            _canvasGroupFader.Hide(); // убрать затемнение
+
+            _locationManager?.UpdateActiveLocation();
             InputWrapper.UnblockAllInput();
         }
 

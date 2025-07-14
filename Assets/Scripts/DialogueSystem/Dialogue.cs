@@ -22,6 +22,9 @@ namespace FlavorfulStory.DialogueSystem
         /// <summary> Корневой узел диалога (первый узел в списке). </summary>
         public DialogueNode RootNode => _nodes[0];
 
+        /// <summary> При включении пересоздаем словарь узлов. </summary>
+        private void OnEnable() => RebuildNodeLookup();
+
         /// <summary> Пересоздать словарь узлов при изменении ScriptableObject в редакторе. </summary>
         private void OnValidate() => RebuildNodeLookup();
 
@@ -62,8 +65,12 @@ namespace FlavorfulStory.DialogueSystem
         public void CreateNode(DialogueNode parentNode)
         {
             var newNode = CreateDialogueNode(parentNode);
+
+#if UNITY_EDITOR
             Undo.RegisterCreatedObjectUndo(newNode, "Created Dialogue Node");
             Undo.RecordObject(this, "Added Dialogue Node");
+#endif
+
             AddNode(newNode);
         }
 
