@@ -25,17 +25,19 @@ namespace FlavorfulStory.QuestSystem
         /// <summary> Контекст выполнения квестов. </summary>
         private QuestExecutionContext _context;
 
-        /// <summary> Компонент для выбрасывания предметов, если нет места в инвентаре. </summary>
-        private ItemDropper _itemDropper;
+        /// <summary>
+        /// 
+        /// </summary>
+        private IItemDropService _itemDropService;
 
         /// <summary> Внедряет зависимости через Zenject. </summary>
         /// <param name="questExecutionContext"> Контекст выполнения квестов. </param>
-        /// <param name="itemDropper"> Компонент для дропа предметов. </param>
+        /// <param name="itemDropService"></param>
         [Inject]
-        private void Construct(QuestExecutionContext questExecutionContext, ItemDropper itemDropper)
+        private void Construct(QuestExecutionContext questExecutionContext, IItemDropService itemDropService)
         {
             _context = questExecutionContext;
-            _itemDropper = itemDropper;
+            _itemDropService = itemDropService;
         }
 
         /// <summary> Инициализируем статусы квестов, которые были заданы через Inspector. </summary>
@@ -98,8 +100,7 @@ namespace FlavorfulStory.QuestSystem
             foreach (var reward in rewards)
             {
                 bool isSuccess = _context.Inventory.TryAddToFirstAvailableSlot(reward.Item, reward.Number);
-                // TODO: Переделать на новый itemdropper
-                if (!isSuccess) _itemDropper.DropItem(reward.Item, reward.Number);
+                if (!isSuccess) _itemDropService.Drop(reward.Item, reward.Number, transform.position);
             }
         }
 

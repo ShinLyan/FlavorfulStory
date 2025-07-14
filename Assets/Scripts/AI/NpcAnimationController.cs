@@ -25,12 +25,12 @@ namespace FlavorfulStory.AI
             _animator.SetFloat(_speedHash, speed, dampTime, Time.deltaTime);
         }
 
-        /// <summary> Воспроизводит анимацию состояния по заданному типу анимации. </summary>
-        /// <param name="animationStateName"> Тип анимации для воспроизведения. </param>
-        public void PlayStateAnimation(AnimationType animationStateName)
+        /// <summary> Запустить анимацию. </summary>
+        /// <param name="animationType"> Тип проигрываемой анимации.</param>
+        public void TriggerAnimation(AnimationType animationType)
         {
-            if (animationStateName == AnimationType.Idle) return;
-            _animator.Play(animationStateName.ToString());
+            string animationName = animationType.ToString();
+            _animator.SetTrigger(Animator.StringToHash(animationName));
         }
 
         /// <summary> Остановить анимацию. </summary>

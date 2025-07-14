@@ -41,6 +41,10 @@ namespace FlavorfulStory.InventorySystem
         [field: Tooltip("Вместимость одного стака. "), SerializeField]
         public int StackSize { get; private set; } = 99;
 
+        /// <summary> Можно ли выкинуть этот предмет из инвентаря? </summary>
+        [field: Tooltip("Можно ли выбросить этот предмет из инвентаря?"), SerializeField]
+        public bool CanBeDropped { get; private set; } = true;
+        
         #endregion
 
         #region ISerializationCallbackReceiver

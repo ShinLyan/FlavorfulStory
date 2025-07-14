@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using FlavorfulStory.InteractionSystem;
 using FlavorfulStory.InventorySystem;
 using FlavorfulStory.Player;
+using FlavorfulStory.TooltipSystem;
 using UnityEngine;
 using Zenject;
 
@@ -25,8 +26,8 @@ namespace FlavorfulStory.Actions.Interactables
 
         #region IInteractable
 
-        /// <summary> Действие игрока по отношению к объекту. </summary>
-        [field: SerializeField] public ActionDescription ActionDescription { get; private set; }
+        /// <summary> Описание действия с объектом. </summary>
+        public TooltipActionData TooltipAction => new("E", ActionType.Gather, _harvestItems[0].ItemPrefab.ItemName);
 
         /// <summary> Свойство возможности взаимодействия с объектом. </summary>
         public virtual bool IsInteractionAllowed { get; protected set; } = true;

@@ -9,6 +9,9 @@
         /// <summary> Анимация ожидания (бездействия). </summary>
         Idle,
 
+        /// <summary> Анимация передвижения персонажа. </summary>
+        Locomotion,
+
         /// <summary> Анимация использования топора. </summary>
         UseAxe,
 

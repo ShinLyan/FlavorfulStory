@@ -9,14 +9,13 @@ using FlavorfulStory.InventorySystem;
 using FlavorfulStory.ObjectManagement;
 using FlavorfulStory.Player;
 using FlavorfulStory.Saving;
+using FlavorfulStory.TooltipSystem;
 using UnityEngine;
 using Zenject;
 
 namespace FlavorfulStory.BuildingRepair
 {
     /// <summary> Ремонтируемое здание. </summary>
-    /// <remarks> Управляет стадиями ремонта, состоянием объектов,
-    /// взаимодействием с ресурсами и сохранением прогресса. </remarks>
     [RequireComponent(typeof(ObjectSwitcher))]
     public class RepairableBuilding : MonoBehaviour, IInteractable, ISaveable
     {
@@ -98,8 +97,9 @@ namespace FlavorfulStory.BuildingRepair
 
         #region IInteractable
 
-        /// <summary> Действие игрока по отношению к объекту. </summary>
-        [field: SerializeField] public ActionDescription ActionDescription { get; private set; }
+        /// <summary> Описание действия с объектом. </summary>
+        public TooltipActionData TooltipAction =>
+            new("E", ActionType.Build, _buildingData.Stages[_repairStageIndex].BuildingName);
 
         /// <summary> Доступно ли взаимодействие с объектом в текущий момент? </summary>
         public bool IsInteractionAllowed { get; private set; }

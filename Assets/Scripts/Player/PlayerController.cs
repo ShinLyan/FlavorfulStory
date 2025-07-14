@@ -3,6 +3,7 @@ using FlavorfulStory.CursorSystem;
 using FlavorfulStory.InputSystem;
 using FlavorfulStory.InteractionSystem;
 using FlavorfulStory.InventorySystem;
+using FlavorfulStory.InventorySystem.DropSystem;
 using FlavorfulStory.InventorySystem.UI;
 using FlavorfulStory.Stats;
 using FlavorfulStory.Utils;
@@ -20,9 +21,21 @@ namespace FlavorfulStory.Player
     {
         #region Fields and Properties
 
-        /// <summary> Панель быстрого доступа, содержащая инвентарь игрока. </summary>
-        [Tooltip("Панель быстрого доступа, содержащая инвентарь игрока."), SerializeField]
+        /// <summary> Трансформ выброса предмета. </summary>
+        /// <remarks> Прокидывается в <see cref="IItemDropService"/>. </remarks>
+        [SerializeField] private Transform _dropPoint;
+
+        /// <summary> Инвентарь игрока. </summary>
+        private Inventory _playerInventory;
+
+        /// <summary> Панель быстрого доступа. </summary>
         private Toolbar _toolbar;
+
+        /// <summary> Сервис выброса предметов. </summary>
+        private IItemDropService _itemDropService;
+
+        /// <summary> Статы игрока. </summary>
+        private PlayerStats _playerStats;
 
         /// <summary> Занят ли игрок? </summary>
         private bool _isBusy;
@@ -57,16 +70,17 @@ namespace FlavorfulStory.Player
 
         #endregion
 
-        /// <summary> Инвентарь игрока. </summary>
-        private Inventory _playerInventory;
-
-        /// <summary> Статы игрока. </summary>
-        private PlayerStats _playerStats;
-
         /// <summary> Внедрение зависимости — инвентарь игрока. </summary>
         /// <param name="inventory"> Инвентарь игрока. </param>
+        /// <param name="toolbar"> </param>
+        /// <param name="itemDropService"> Сервис выброса предметов в игровой мир. </param>
         [Inject]
-        private void Construct(Inventory inventory) => _playerInventory = inventory;
+        private void Construct(Inventory inventory, Toolbar toolbar, IItemDropService itemDropService)
+        {
+            _playerInventory = inventory;
+            _toolbar = toolbar;
+            _itemDropService = itemDropService;
+        }
 
         /// <summary> Инициализация компонентов. </summary>
         private void Awake()
@@ -134,16 +148,32 @@ namespace FlavorfulStory.Player
             }
         }
 
-        /// <summary> Обработка использования предмета из панели быстрого доступа. </summary>
+        /// <summary> Обработка доступных действий выбранного предмета из панели быстрого доступа. </summary>
         private void HandleToolbarUseInput()
         {
-            if (CurrentItem is not IUsable usable || IsToolUseBlocked) return;
+            if (CurrentItem == null) return;
 
-            if ((!Input.GetMouseButton(0) || usable.UseActionType != UseActionType.LeftClick) &&
-                (!Input.GetMouseButton(1) || usable.UseActionType != UseActionType.RightClick))
-                return;
+            if (CurrentItem is IUsable usable && !IsToolUseBlocked) HandleCurrentItemUse(usable);
 
-            BeginInteraction(usable);
+            if (CurrentItem.CanBeDropped && !IsToolUseBlocked) HandleCurrentItemDrop();
+        }
+
+        /// <summary> Обработка использования предмета из панели быстрого доступа. </summary>
+        private void HandleCurrentItemUse(IUsable usable)
+        {
+            if ((Input.GetMouseButton(0) && usable.UseActionType == UseActionType.LeftClick) ||
+                (Input.GetMouseButton(1) && usable.UseActionType == UseActionType.RightClick))
+                BeginInteraction(usable);
+        }
+
+        /// <summary> Обработка выброса предмета из панели быстрого доступа. </summary>
+        private void HandleCurrentItemDrop()
+        {
+            const float DropItemForce = 2.5f;
+            const float PickupDelay = 1.5f;
+            if (InputWrapper.GetButtonDown(InputButton.DropCurrentItem))
+                _itemDropService.DropFromInventory(_playerInventory, _toolbar.SelectedItemIndex,
+                    _dropPoint.transform.position, _dropPoint.forward * DropItemForce);
         }
 
         /// <summary> Начать взаимодействие с предметом. </summary>
