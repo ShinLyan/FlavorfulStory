@@ -32,11 +32,8 @@ namespace FlavorfulStory.AI
         /// <param name="transform"> Transform NPC. </param>
         /// <param name="animationController"> Контроллер анимации NPC. </param>
         /// <param name="scheduleHandler"> Обработчик расписания NPC. </param>
-        public NpcMovementController(NavMeshAgent navMeshAgent,
-            WarpGraph warpGraph,
-            Transform transform,
-            NpcAnimationController animationController,
-            NpcScheduleHandler scheduleHandler)
+        public NpcMovementController(NavMeshAgent navMeshAgent, WarpGraph warpGraph, Transform transform,
+            NpcAnimationController animationController, NpcScheduleHandler scheduleHandler)
         {
             _agent = navMeshAgent;
             _animationController = animationController;

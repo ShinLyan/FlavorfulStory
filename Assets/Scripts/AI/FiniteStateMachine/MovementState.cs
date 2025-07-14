@@ -8,7 +8,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         /// <summary> Контроллер движения NPC для управления навигацией. </summary>
         private readonly NpcMovementController _movementController;
 
-        /// <summary> Флаг, указывающий, находится ли персонаж в данный момент в состоянии движения. </summary>
+        /// <summary> Находится ли персонаж в данный момент в состоянии движения? </summary>
         private bool _isInState;
 
         /// <summary> Инициализирует новое состояние движения с заданным контроллером движения. </summary>
