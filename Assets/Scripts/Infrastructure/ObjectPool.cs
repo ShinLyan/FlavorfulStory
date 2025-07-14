@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace FlavorfulStory.Utils
+namespace FlavorfulStory.Infrastructure
 {
     /// <summary> Обобщённый пул объектов. </summary>
     public class ObjectPool<T> : IDisposable
