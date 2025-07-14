@@ -1,6 +1,7 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using FlavorfulStory.AI.Scheduling;
 using FlavorfulStory.AI.WarpGraphSystem;
 using FlavorfulStory.SceneManagement;
@@ -23,17 +24,11 @@ namespace FlavorfulStory.AI
         /// <summary> Граф телепортов для перемещения между локациями. </summary>
         private readonly WarpGraph _warpGraph;
 
-        /// <summary> MonoBehaviour для запуска корутин. </summary>
-        private readonly MonoBehaviour _coroutineRunner;
-
-        /// <summary> Текущая корутина телепортации. </summary>
-        private Coroutine _currentWarpCoroutine;
-
         /// <summary> Текущая локация, в которой находится NPC. </summary>
         private LocationName _currentLocation;
 
         /// <summary> Дистанция, на которой считается, что NPC достиг цели. </summary>
-        private readonly float _arrivalDistance = 1.0f;
+        private const float ArrivalDistance = 1.0f;
 
         /// <summary> Начальная позиция NPC при создании. </summary>
         private readonly Vector3 _spawnPosition;
@@ -53,18 +48,18 @@ namespace FlavorfulStory.AI
         /// <summary> Скорость агента. </summary>
         private Vector3 _agentSpeed;
 
+        /// <summary> Токен отмены для телепортации между локациями. </summary>
+        private CancellationTokenSource _warpCts;
+
         /// <summary> Инициализирует навигатор NPC с необходимыми компонентами. </summary>
         /// <param name="navMeshAgent"> Агент NavMesh для навигации. </param>
         /// <param name="warpGraph"> Граф телепортов для межлокационных перемещений. </param>
         /// <param name="transform"> Transform NPC. </param>
-        /// <param name="coroutineRunner"> MonoBehaviour для запуска корутин. </param>
-        public NpcNavigator(NavMeshAgent navMeshAgent, WarpGraph warpGraph, Transform transform,
-            MonoBehaviour coroutineRunner)
+        public NpcNavigator(NavMeshAgent navMeshAgent, WarpGraph warpGraph, Transform transform)
         {
             _navMeshAgent = navMeshAgent;
             _warpGraph = warpGraph;
             _npcTransform = transform;
-            _coroutineRunner = coroutineRunner;
 
             _spawnPosition = transform.position;
             _spawnLocation = GetCurrentLocationName();
@@ -77,7 +72,8 @@ namespace FlavorfulStory.AI
             if (_currentTargetPoint == null) return;
 
             if (_currentLocation == _currentTargetPoint.LocationName &&
-                Vector3.Distance(_npcTransform.position, _currentTargetPoint.Position) <= _arrivalDistance)
+                Vector3.Distance(_npcTransform.position, _currentTargetPoint.Position) <= ArrivalDistance &&
+                !_isNotMoving)
             {
                 _navMeshAgent.transform.rotation = Quaternion.Euler(_currentTargetPoint.Rotation);
                 OnDestinationReached?.Invoke();
@@ -107,7 +103,9 @@ namespace FlavorfulStory.AI
             _isNotMoving = true;
             StopAgent();
 
-            if (_currentWarpCoroutine != null) _coroutineRunner.StopCoroutine(_currentWarpCoroutine);
+            _warpCts?.Cancel();
+            _warpCts?.Dispose();
+            _warpCts = null;
 
             _navMeshAgent.ResetPath();
 
@@ -119,7 +117,7 @@ namespace FlavorfulStory.AI
         }
 
         /// <summary> Переключатель передвижения агента. </summary>
-        /// <param name="stopAgent"> Оставновить агента. </param>
+        /// <param name="stopAgent"> Остановить агента. </param>
         private void ToggleAgentMovement(bool stopAgent)
         {
             _navMeshAgent.isStopped = stopAgent;
@@ -153,16 +151,23 @@ namespace FlavorfulStory.AI
                 return;
             }
 
-            _currentWarpCoroutine = _coroutineRunner.StartCoroutine(WarpRoutine(path, destination));
+            _warpCts?.Cancel();
+            _warpCts?.Dispose();
+            _warpCts = new CancellationTokenSource();
+
+            WarpRoutine(path, destination, _warpCts.Token).Forget();
         }
 
-        /// <summary> Корутина для выполнения последовательности телепортаций по заданному пути. </summary>
-        /// <param name="path"> Список телепортов для прохождения. </param>
-        /// <param name="destination"> Финальная точка назначения. </param>
-        /// <returns> Итератор корутины. </returns>
-        private IEnumerator WarpRoutine(List<WarpPortal> path, SchedulePoint destination)
+        /// <summary> Асинхронная корутина, выполняющая перемещение через последовательность порталов. </summary>
+        /// <param name="path"> Список порталов, образующих кратчайший путь между локациями. </param>
+        /// <param name="destination"> Конечная цель — позиция в новой локации. </param>
+        /// <param name="token"> Токен отмены для прерывания операции. </param>
+        private async UniTask WarpRoutine(List<WarpPortal> path, SchedulePoint destination, CancellationToken token)
         {
             foreach (var warp in path)
+            {
+                token.ThrowIfCancellationRequested();
+
                 if (warp.ParentLocationName != _currentLocation)
                 {
                     _navMeshAgent.Warp(warp.transform.position);
@@ -171,12 +176,20 @@ namespace FlavorfulStory.AI
                 else
                 {
                     _navMeshAgent.SetDestination(warp.transform.position);
-                    while (_navMeshAgent.pathPending || _navMeshAgent.remainingDistance > _arrivalDistance)
-                        yield return null;
+                    while (_navMeshAgent.pathPending || _navMeshAgent.remainingDistance > ArrivalDistance)
+                    {
+                        token.ThrowIfCancellationRequested();
+                        await UniTask.Yield(PlayerLoopTiming.Update, token);
+                    }
                 }
+            }
 
             _navMeshAgent.SetDestination(destination.Position);
-            while (_navMeshAgent.remainingDistance > _arrivalDistance) yield return null;
+            while (_navMeshAgent.remainingDistance > ArrivalDistance)
+            {
+                token.ThrowIfCancellationRequested();
+                await UniTask.Yield(PlayerLoopTiming.Update, token);
+            }
         }
 
         /// <summary> Находит ближайший телепорт к заданной позиции в указанной локации. </summary>
