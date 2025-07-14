@@ -1,5 +1,36 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &1484695308054374914
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6451101912280040336}
+  m_Layer: 7
+  m_Name: DropPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6451101912280040336
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1484695308054374914}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 1.5, z: 0.5}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4994206146913357757}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &3112144153974705329
 GameObject:
   m_ObjectHideFlags: 0
@@ -66,7 +97,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 56725fc63c93a8240a4146a5ea94263e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _tooltipView: {fileID: 0}
 --- !u!1 &4003194979463022117
 GameObject:
   m_ObjectHideFlags: 0
@@ -118,7 +148,6 @@ GameObject:
   - component: {fileID: 4019628444039715841}
   - component: {fileID: 7966854098110225172}
   - component: {fileID: 6837695027290735531}
-  - component: {fileID: 8764958242865914222}
   - component: {fileID: 5731089188578584039}
   - component: {fileID: 5005547192605697951}
   m_Layer: 7
@@ -144,6 +173,7 @@ Transform:
   - {fileID: 8102079258463795558}
   - {fileID: 919130667148951083}
   - {fileID: 8982573050181053363}
+  - {fileID: 6451101912280040336}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!95 &3655937164596301170
@@ -251,7 +281,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1145b8b55abc9ea41babe498fff3dc6a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _toolbar: {fileID: 0}
+  _dropPoint: {fileID: 6451101912280040336}
 --- !u!114 &8919005537160863767
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -301,18 +331,6 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 28b05270719298a47b95a560f280b928, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &8764958242865914222
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5075500785383677502}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0c3a970a862f6824fbdca652389c28ac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!114 &5731089188578584039
@@ -481,7 +499,9 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 96.331
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 2402657525030816104, guid: d9be4cc8383b02943ab2192167e21cc3, type: 3}
+    - {fileID: 2654290665227357476, guid: d9be4cc8383b02943ab2192167e21cc3, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
@@ -735,7 +755,9 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 7739757792642953653, guid: 8f662c7c217f34c4ca4aa8b95d9efda1, type: 3}
+    - {fileID: 5383770426756641599, guid: 8f662c7c217f34c4ca4aa8b95d9efda1, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []

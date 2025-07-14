@@ -1,5 +1,5 @@
-using FlavorfulStory.InteractionSystem;
-using TMPro;
+using System.Collections.Generic;
+using FlavorfulStory.Utils;
 using UnityEngine;
 
 namespace FlavorfulStory.TooltipSystem
@@ -7,26 +7,77 @@ namespace FlavorfulStory.TooltipSystem
     /// <summary> Отвечает за отображение тултипа для объектов взаимодействия. </summary>
     public class ActionTooltipShower : MonoBehaviour, IActionTooltipShower
     {
-        /// <summary> Поле для отображения заголовка тултипа. </summary>
-        [SerializeField] private TMP_Text _actionDescription;
+        /// <summary> Префаб отдельной строчки действия в тултипе. </summary>
+        [SerializeField] private TooltipActionView _tooltipActionPrefab;
 
-        /// <summary> Инициализация тултипа. Сокрытие окна при старте игры. </summary>
-        private void Start() => Hide();
+        /// <summary> Родительский трансформ, куда помещаются UI-элементы действий. </summary>
+        [SerializeField] private Transform _parentTransform;
 
-        /// <summary> Показать список возможных действий с объектом. </summary>
-        /// <param name="interactable"> Объект взаимодействия. </param>
-        public void Show(IInteractable interactable)
+        /// <summary> Пул для переиспользуемых элементов тултипа. </summary>
+        private ObjectPool<TooltipActionView> _pool;
+
+        /// <summary> Список активных (отображаемых) действий. </summary>
+        private readonly List<TooltipActionData> _activeTooltips = new();
+
+        /// <summary> Список UI-элементов, созданных и отображённых на экране. </summary>
+        private readonly List<TooltipActionView> _spawnedViews = new();
+
+        /// <summary> Инициализация пула и скрытие тултипа при запуске. </summary>
+        private void Start()
         {
-            gameObject.SetActive(true);
-            _actionDescription.text = CreateActionDescription(interactable);
+            _pool = new ObjectPool<TooltipActionView>(
+                () => Instantiate(_tooltipActionPrefab, _parentTransform),
+                tooltipActionView => tooltipActionView.Show(),
+                tooltipActionView => tooltipActionView.Hide()
+            );
+
+            gameObject.SetActive(false);
         }
 
-        /// <summary> Скрыть тултип. </summary>
-        public void Hide() => gameObject.SetActive(false);
+        /// <summary> Добавляет действие во всплывающую подсказку. </summary>
+        /// <param name="action"> Данные действия (клавиша + описание). </param>
+        public void Add(TooltipActionData action)
+        {
+            if (_activeTooltips.Contains(action)) return;
 
-        /// <summary> Устанавливает заголовок и описание тултипа на основе данных из переданного объекта. </summary>
-        /// <param name="tooltip"> Объект, предоставляющий данные для тултипа. </param>
-        private static string CreateActionDescription(ITooltipableAction tooltip) =>
-            $"{tooltip.ActionDescription.Action} {tooltip.ActionDescription.Target}";
+            _activeTooltips.Add(action);
+            RefreshTooltipViews();
+        }
+
+        /// <summary> Удаляет действие из тултипа. </summary>
+        /// <param name="action"> Данные действия, которые нужно удалить. </param>
+        public void Remove(TooltipActionData action)
+        {
+            if (_activeTooltips.Remove(action)) RefreshTooltipViews();
+        }
+
+        /// <summary> Обновляет отображение: скрывает старые и отображает актуальные действия. </summary>
+        private void RefreshTooltipViews()
+        {
+            foreach (var view in _spawnedViews) _pool.Release(view);
+
+            _spawnedViews.Clear();
+
+            if (_activeTooltips.Count == 0)
+            {
+                gameObject.SetActive(false);
+                return;
+            }
+
+            gameObject.SetActive(true);
+
+            foreach (var action in _activeTooltips)
+            {
+                var view = _pool.Get();
+                view.Setup(action.KeyText, CreateActionDescription(action));
+                _spawnedViews.Add(view);
+            }
+        }
+
+        /// <summary> Формирует финальный текст действия, объединяя глагол и цель. </summary>
+        /// <param name="tooltip"> Структура данных действия. </param>
+        /// <returns> Строка формата: "Harvest Bread". </returns>
+        private static string CreateActionDescription(TooltipActionData tooltip) =>
+            $"{tooltip.Action} {tooltip.Target}";
     }
 }

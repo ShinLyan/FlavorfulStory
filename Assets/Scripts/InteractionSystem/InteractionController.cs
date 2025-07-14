@@ -30,6 +30,9 @@ namespace FlavorfulStory.InteractionSystem
         /// <summary> Активный объект, с которым сейчас взаимодействуют. </summary>
         private IInteractable _activeInteractable;
 
+        /// <summary> Последний объект взаимодействия, по которому выводился тултип. </summary>
+        private IInteractable _lastTooltipSource;
+
         /// <summary> Делегат действия, вызываемый при начале взаимодействия. </summary>
         private Action _startInteractionAction;
 
@@ -62,7 +65,10 @@ namespace FlavorfulStory.InteractionSystem
         /// <summary> Обновить ближайший интерактивный объект. </summary>
         private void UpdateClosestInteractable()
         {
-            _closestInteractable = FindClosestInteractable();
+            var newClosest = FindClosestInteractable();
+            if (newClosest == _closestInteractable) return;
+
+            _closestInteractable = newClosest;
             UpdateTooltip();
         }
 
@@ -76,10 +82,13 @@ namespace FlavorfulStory.InteractionSystem
         /// <summary> Обновить тултип. </summary>
         private void UpdateTooltip()
         {
-            if (_closestInteractable != null)
-                _tooltipShower.Show(_closestInteractable);
-            else
-                _tooltipShower.Hide();
+            if (_lastTooltipSource == _closestInteractable) return;
+
+            if (_lastTooltipSource != null) _tooltipShower.Remove(_lastTooltipSource.TooltipAction);
+
+            _lastTooltipSource = _closestInteractable;
+
+            if (_closestInteractable != null) _tooltipShower.Add(_closestInteractable.TooltipAction);
         }
 
         /// <summary> Добавляет объект в список доступных для взаимодействия при входе в триггер. </summary>

@@ -9,6 +9,7 @@ using FlavorfulStory.InventorySystem.EquipmentSystem;
 using FlavorfulStory.InventorySystem.PickupSystem;
 using FlavorfulStory.InventorySystem.UI;
 using FlavorfulStory.Player;
+using FlavorfulStory.Saving;
 using FlavorfulStory.SceneManagement;
 using FlavorfulStory.TimeManagement;
 using FlavorfulStory.TooltipSystem;
@@ -60,12 +61,13 @@ namespace FlavorfulStory.Installers
             Container.Bind<IDialogueInitiator>().To<PlayerSpeaker>().FromComponentInHierarchy().AsSingle();
 
             Container.Bind<PickupFactory>().AsSingle();
-            Container.Bind<ItemDropper>().FromComponentsInHierarchy().AsCached();
             Container.Bind<PickupSpawner>().FromComponentsInHierarchy().AsCached();
 
             Container.Bind<DialogueModelPresenter>().FromComponentInHierarchy().AsSingle();
 
             Container.Bind<SleepTrigger>().FromComponentInHierarchy().AsSingle();
+            Container.Bind<IItemDropService>().To<ItemDropService>().AsSingle();
+            Container.Bind<ISaveable>().To<ItemDropService>().FromResolve();
         }
 
         /// <summary> Установить зависимости, связанные с пользовательским интерфейсом. </summary>
@@ -81,6 +83,8 @@ namespace FlavorfulStory.Installers
             Container.Bind<DialogueView>().FromComponentInHierarchy().AsSingle();
 
             Container.Bind<IActionTooltipShower>().To<ActionTooltipShower>().FromComponentInHierarchy().AsSingle();
+
+            Container.Bind<Toolbar>().FromComponentInHierarchy().AsSingle();
 
             Container.Bind<CanvasGroupFader>().WithId("HUD").FromInstance(_hudFader).AsSingle();
         }
