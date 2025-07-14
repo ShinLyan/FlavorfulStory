@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using FlavorfulStory.Infrastructure;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -35,24 +36,72 @@ namespace FlavorfulStory.QuestSystem
         /// <summary> Префаб для отображения награды. </summary>
         [SerializeField] private QuestRewardSlotView _rewardPrefab;
 
-        /// <summary> Элемент, отображаемый при отсутствии выбранного квеста. </summary>
-        [SerializeField] private GameObject _noQuest;
+        /// <summary> Пул для повторного использования элементов целей квеста. </summary>
+        private ObjectPool<QuestObjectiveView> _objectivePool;
+
+        /// <summary> Пул для повторного использования слотов наград квеста. </summary>
+        private ObjectPool<QuestRewardSlotView> _rewardPool;
+
+        /// <summary> Активные элементы целей, отображаемые в данный момент. </summary>
+        private readonly List<QuestObjectiveView> _activeObjectives = new();
+
+        /// <summary> Активные элементы наград, отображаемые в данный момент. </summary>
+        private readonly List<QuestRewardSlotView> _activeRewards = new();
 
         #endregion
 
-        /// <summary> Очищает отображение при инициализации. </summary>
+        /// <summary> Инициализирует пулы для целей и наград квеста, регистрирует уже существующие элементы, 
+        /// очищает представление и деактивирует объект до первого обновления UI. </summary>
         private void Awake()
         {
-            _noQuest.SetActive(true);
+            _objectivePool = new ObjectPool<QuestObjectiveView>(
+                () => Instantiate(_questObjectivePrefab, _objectivesContainer),
+                view =>
+                {
+                    view.gameObject.SetActive(true);
+                    view.transform.SetParent(_objectivesContainer, false);
+                },
+                view => view.gameObject.SetActive(false)
+            );
+
+            _rewardPool = new ObjectPool<QuestRewardSlotView>(
+                () => Instantiate(_rewardPrefab, _rewardsContainer),
+                view =>
+                {
+                    view.gameObject.SetActive(true);
+                    view.transform.SetParent(_rewardsContainer, false);
+                },
+                view => view.gameObject.SetActive(false)
+            );
+
+            RegisterExistingViews(_objectivesContainer, _objectivePool);
+            RegisterExistingViews(_rewardsContainer, _rewardPool);
+
             ClearView();
+
+            gameObject.SetActive(false);
+        }
+
+        /// <summary> Регистрирует уже существующие дочерние элементы в переданном контейнере
+        /// как неактивные и добавляет их в пул. </summary>
+        /// <typeparam name="T"> Тип компонента, который нужно зарегистрировать. </typeparam>
+        /// <param name="parent"> Родительский трансформ, содержащий компоненты. </param>
+        /// <param name="pool"> Пул объектов, в который добавляются компоненты. </param>
+        private static void RegisterExistingViews<T>(Transform parent, ObjectPool<T> pool) where T : Component
+        {
+            foreach (Transform child in parent)
+                if (child.TryGetComponent<T>(out var component))
+                {
+                    component.gameObject.SetActive(false);
+                    pool.Release(component);
+                }
         }
 
         /// <summary> Настраивает отображение информации о квесте на основе его состояния. </summary>
         /// <param name="questStatus"> Статус квеста для отображения. </param>
         public void UpdateView(QuestStatus questStatus)
         {
-            // TODO: Сделать проверку. Может возникнуть ситуация, когда все квесты выполнились, и нужно будет такое показывать
-            _noQuest.SetActive(false);
+            gameObject.SetActive(true);
 
             ClearView();
             SetupQuestTexts(questStatus.Quest);
@@ -63,8 +112,11 @@ namespace FlavorfulStory.QuestSystem
         /// <summary> Очищает контейнеры целей и наград от предыдущего контента. </summary>
         private void ClearView()
         {
-            foreach (Transform child in _objectivesContainer) Destroy(child.gameObject);
-            foreach (Transform child in _rewardsContainer) Destroy(child.gameObject);
+            foreach (var objective in _activeObjectives) _objectivePool.Release(objective);
+            _activeObjectives.Clear();
+
+            foreach (var reward in _activeRewards) _rewardPool.Release(reward);
+            _activeRewards.Clear();
         }
 
         /// <summary> Устанавливает тексты с основной информацией о квесте. </summary>
@@ -90,11 +142,11 @@ namespace FlavorfulStory.QuestSystem
             for (int stageIndex = lastVisibleStageIndex; stageIndex >= 0; stageIndex--)
                 foreach (var objective in stages[stageIndex].Objectives)
                 {
-                    var instance = Instantiate(_questObjectivePrefab, _objectivesContainer);
-
+                    var instance = _objectivePool.Get();
                     bool isCompleted = questStatus.IsStageComplete(stageIndex) ||
                                        questStatus.IsObjectiveComplete(objective);
                     instance.Setup(objective.Description, isCompleted);
+                    _activeObjectives.Add(instance);
                 }
         }
 
@@ -104,8 +156,9 @@ namespace FlavorfulStory.QuestSystem
         {
             foreach (var reward in rewards)
             {
-                var instance = Instantiate(_rewardPrefab, _rewardsContainer);
+                var instance = _rewardPool.Get();
                 instance.UpdateView(reward.Item, reward.Number);
+                _activeRewards.Add(instance);
             }
         }
     }

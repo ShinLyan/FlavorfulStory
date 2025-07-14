@@ -88,6 +88,7 @@ namespace FlavorfulStory.Installers
         private void BindQuests()
         {
             Container.Bind<QuestList>().FromComponentInHierarchy().AsSingle();
+            Container.Bind<IQuestList>().To<QuestList>().FromResolve();
             Container.Bind<IGameFactory<QuestListButton>>().To<QuestListButtonFactory>().AsSingle()
                 .WithArguments(_questListButtonPrefab);
             Container.Bind<QuestDescriptionView>().FromComponentInHierarchy().AsSingle();

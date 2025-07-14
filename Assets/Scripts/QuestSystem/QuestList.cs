@@ -10,7 +10,7 @@ using Zenject;
 namespace FlavorfulStory.QuestSystem
 {
     /// <summary> Хранит список активных квестов игрока. </summary>
-    public class QuestList : MonoBehaviour, IPredicateEvaluator, ISaveable
+    public class QuestList : MonoBehaviour, IQuestList, IPredicateEvaluator, ISaveable
     {
         // TODO: Нужно выполненные квесты отсюда переносить в отдельный список, т.к. при проверках на срабатывание триггеров, проходятся по всем квестам
         /// <summary> Список статусов всех квестов игрока. </summary>
@@ -25,14 +25,12 @@ namespace FlavorfulStory.QuestSystem
         /// <summary> Контекст выполнения квестов. </summary>
         private QuestExecutionContext _context;
 
-        /// <summary>
-        /// 
-        /// </summary>
+        /// <summary> Сервис выброса предметов в игровой мир. </summary>
         private IItemDropService _itemDropService;
 
         /// <summary> Внедряет зависимости через Zenject. </summary>
         /// <param name="questExecutionContext"> Контекст выполнения квестов. </param>
-        /// <param name="itemDropService"></param>
+        /// <param name="itemDropService"> Сервис выброса предметов в игровой мир. </param>
         [Inject]
         private void Construct(QuestExecutionContext questExecutionContext, IItemDropService itemDropService)
         {
