@@ -24,6 +24,9 @@ namespace FlavorfulStory.AI
         /// <summary> Максимальное количество одновременно активных NPC. </summary>
         [SerializeField] private int _maxTotalCharacters = 10;
 
+        /// <summary> Трансформ, к которому будут привязаны созданные NPC. </summary>
+        [SerializeField] private Transform _parentTransform;
+
         /// <summary> Список активных NPC на сцене. </summary>
         private readonly List<NonInteractableNpc.NonInteractableNpc> _activeCharacters = new();
 
@@ -80,7 +83,7 @@ namespace FlavorfulStory.AI
                 randomPrefab,
                 npcSpawnPoint.GetRandomPosition(),
                 Quaternion.identity,
-                null);
+                _parentTransform);
 
             _activeCharacters.Add(npc);
 
