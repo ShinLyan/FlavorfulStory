@@ -48,9 +48,7 @@ namespace FlavorfulStory.QuestSystem
         {
             if (objectState is not QuestStatusRecord state) return;
 
-            Quest = Quest.GetByName(state.QuestName);
-            Initialize();
-            CurrentStageIndex = state.CurrentStageIndex;
+            RestoreState(state);
         }
 
         /// <summary> Инициализация состояния статуса квеста. </summary>
@@ -104,6 +102,8 @@ namespace FlavorfulStory.QuestSystem
         /// <returns> <c>true</c> - этап квеста пройден, <c>false</c> - в противном случае. </returns>
         public bool IsStageComplete(int stageIndex) => _stages[stageIndex].IsComplete(_completedObjectives);
 
+        #region Saving
+
         /// <summary> Структура для сериализации состояния статуса квеста. </summary>
         [Serializable]
         private class QuestStatusRecord
@@ -114,7 +114,7 @@ namespace FlavorfulStory.QuestSystem
             public int CurrentStageIndex;
 
             /// <summary> Список выполненных целей. </summary>
-            public List<QuestObjective> CompletedObjectives;
+            public List<string> CompletedObjectiveReferences;
         }
 
         /// <summary> Сохраняет текущее состояние квеста для сериализации. </summary>
@@ -123,7 +123,22 @@ namespace FlavorfulStory.QuestSystem
         {
             QuestName = Quest.QuestName,
             CurrentStageIndex = CurrentStageIndex,
-            CompletedObjectives = _completedObjectives
+            CompletedObjectiveReferences = _completedObjectives.Select(objective => objective.Reference).ToList()
         };
+
+        /// <summary> Восстанавливает данные о статусе квеста из сохраненного состояния. </summary>
+        /// <param name="state"> Сохраненные данные. </param>
+        private void RestoreState(QuestStatusRecord state)
+        {
+            Quest = Quest.GetByName(state.QuestName);
+            Initialize();
+            CurrentStageIndex = state.CurrentStageIndex;
+            _completedObjectives = Quest.Stages
+                .SelectMany(stage => stage.Objectives)
+                .Where(objective => state.CompletedObjectiveReferences.Contains(objective.Reference))
+                .ToList();
+        }
+
+        #endregion
     }
 }

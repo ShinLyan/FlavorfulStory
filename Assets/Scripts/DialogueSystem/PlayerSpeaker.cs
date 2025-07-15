@@ -117,7 +117,8 @@ namespace FlavorfulStory.DialogueSystem
         {
             if (!IsDialogueActive) return;
 
-            var playerChoices = FilterOnCondition(_currentDialogue.GetPlayerChildNodes(_currentNode)).ToList();
+            // var playerChoices = FilterOnCondition(_currentDialogue.GetPlayerChildNodes(_currentNode)).ToList();
+            var playerChoices = _currentDialogue.GetPlayerChildNodes(_currentNode);
             if (playerChoices.Any())
             {
                 IsChoosingDialogue = true;
@@ -126,14 +127,16 @@ namespace FlavorfulStory.DialogueSystem
                 return;
             }
 
-            var allChildren = FilterOnCondition(_currentDialogue.GetChildNodes(_currentNode)).ToList();
+            // var allChildren = FilterOnCondition(_currentDialogue.GetChildNodes(_currentNode)).ToList();
+            var allChildren = _currentDialogue.GetChildNodes(_currentNode);
             if (!allChildren.Any())
             {
                 EndDialogue();
                 return;
             }
 
-            var npcChoices = FilterOnCondition(_currentDialogue.GetNpcChildNodes(_currentNode)).ToList();
+            // var npcChoices = FilterOnCondition(_currentDialogue.GetNpcChildNodes(_currentNode)).ToList();
+            var npcChoices = _currentDialogue.GetNpcChildNodes(_currentNode).ToList();
             var nextNode = npcChoices[Random.Range(0, npcChoices.Count)];
 
             TriggerExitAction();
@@ -156,8 +159,8 @@ namespace FlavorfulStory.DialogueSystem
 
         /// <summary> Получить список доступных для игрока вариантов ответа. </summary>
         /// <returns> Список узлов, которые представляет выбор игрока. </returns>
-        private IEnumerable<DialogueNode> GetChoices() =>
-            FilterOnCondition(_currentDialogue.GetPlayerChildNodes(_currentNode));
+        private IEnumerable<DialogueNode> GetChoices() => _currentDialogue.GetPlayerChildNodes(_currentNode);
+        // FilterOnCondition(_currentDialogue.GetPlayerChildNodes(_currentNode));
 
         /// <summary> Выбрать вариант ответа игрока. </summary>
         /// <param name="chosenNode"> Узел, выбранный игроком. </param>
