@@ -1,6 +1,9 @@
-﻿namespace FlavorfulStory.QuestSystem.Objectives.Params
+﻿using System;
+
+namespace FlavorfulStory.QuestSystem.Objectives.Params
 {
     /// <summary> Параметры цели на сон — цель завершается автоматически при завершении дня. </summary>
+    [Serializable]
     public class SleepObjectiveParams : ObjectiveParamsBase
     {
         /// <summary> Условие всегда возвращает true — цель считается выполненной при любом вызове. </summary>

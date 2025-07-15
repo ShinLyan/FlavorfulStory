@@ -1,9 +1,11 @@
-﻿using FlavorfulStory.BuildingRepair;
+﻿using System;
+using FlavorfulStory.BuildingRepair;
 using UnityEngine;
 
 namespace FlavorfulStory.QuestSystem.Objectives.Params
 {
     /// <summary> Параметры цели на ремонт здания определённого типа. </summary>
+    [Serializable]
     public class RepairObjectiveParams : ObjectiveParamsBase
     {
         /// <summary> Тип ремонтируемого здания. </summary>

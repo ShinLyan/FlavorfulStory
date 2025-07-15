@@ -1,8 +1,10 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 
 namespace FlavorfulStory.QuestSystem.Objectives.Params
 {
     /// <summary> Базовый класс параметров цели квеста. </summary>
+    [Serializable]
     public abstract class ObjectiveParamsBase
     {
         /// <summary> Проверяет выполнение цели и помечает её завершённой, если условия соблюдены. </summary>

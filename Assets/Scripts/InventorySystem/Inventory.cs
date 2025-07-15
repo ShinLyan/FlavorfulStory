@@ -36,6 +36,10 @@ namespace FlavorfulStory.InventorySystem
         /// <summary> Инициализация слотов и ссылки на инвентарь игрока. </summary>
         private void Awake() => _slots = new InventorySlot[InventorySize];
 
+        /// <summary> При старте вызываем событие обновление инвентаря. </summary>
+        /// <remarks> После восстановления состояния нужно разослать событие. </remarks>
+        private void Start() => InventoryUpdated?.Invoke();
+
         /// <summary> Есть ли место для предмета в инвентаре? </summary>
         public bool HasSpaceFor(InventoryItem item) => FindSlot(item) >= 0;
 
@@ -233,8 +237,6 @@ namespace FlavorfulStory.InventorySystem
                 _slots[i].Item = ItemDatabase.GetItemFromID(slotRecords[i].ItemID);
                 _slots[i].Number = slotRecords[i].Number;
             }
-
-            InventoryUpdated?.Invoke();
         }
 
         #endregion

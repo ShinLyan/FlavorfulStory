@@ -37,20 +37,20 @@ namespace FlavorfulStory.BuildingRepair
         /// <summary> Представление интерфейса ремонта здания. </summary>
         private RepairableBuildingView _view;
 
+        /// <summary> Завершен ли ремонт здания? </summary>
+        private bool _isRepairCompleted;
+
+        /// <summary> Инвентарь игрока. </summary>
+        private Inventory _playerInventory;
+
         /// <summary> Текущая стадия ремонта. </summary>
         private RepairStage CurrentStage => _buildingData.Stages[_repairStageIndex];
-
-        /// <summary> Завершен ли ремонт здания? </summary>
-        private bool IsRepairCompleted => _repairStageIndex >= _buildingData.Stages.Count;
 
         /// <summary> Событие при обновлении стадии ремонта. </summary>
         private event Action<RepairStage, List<int>> _onStageUpdated;
 
         /// <summary> Событие при завершении ремонта. </summary>
         public static event Action<RepairableBuildingName> OnRepairCompleted;
-
-        /// <summary> Инвентарь игрока. </summary>
-        private Inventory _playerInventory;
 
         #endregion
 
@@ -86,23 +86,20 @@ namespace FlavorfulStory.BuildingRepair
         /// <summary> Инициализация стадий ремонта. </summary>
         private void InitializeRepairStages()
         {
-            UpdateInteractionState();
             _objectSwitcher.Initialize();
-            _objectSwitcher.SwitchTo(_repairStageIndex);
-        }
 
-        /// <summary> Обновить состояние возможности взаимодействия с ремонтируемым объектом. </summary>
-        /// <remarks> После завершения ремонта взаимодействие становится невозможным. </remarks>
-        private void UpdateInteractionState() => IsInteractionAllowed = !IsRepairCompleted;
+            // На случай системы сохранения
+            int index = _isRepairCompleted ? _repairStageIndex + 1 : _repairStageIndex;
+            _objectSwitcher.SwitchTo(index);
+        }
 
         #region IInteractable
 
         /// <summary> Описание действия с объектом. </summary>
-        public TooltipActionData TooltipAction =>
-            new("E", ActionType.Build, _buildingData.Stages[_repairStageIndex].BuildingName);
+        public TooltipActionData TooltipAction => new("E", ActionType.Build, CurrentStage.BuildingName);
 
         /// <summary> Доступно ли взаимодействие с объектом в текущий момент? </summary>
-        public bool IsInteractionAllowed { get; private set; }
+        public bool IsInteractionAllowed => !_isRepairCompleted;
 
         /// <summary> Получить расстояние до указанного объекта. </summary>
         /// <param name="otherTransform"> Трансформ объекта, до которого нужно получить расстояние. </param>
@@ -137,18 +134,19 @@ namespace FlavorfulStory.BuildingRepair
         /// <remarks> Переходит к следующей стадии ремонта, если все ресурсы добавлены. </remarks>
         private void Build()
         {
-            if (IsRepairCompleted) return;
+            if (_isRepairCompleted) return;
 
-            _repairStageIndex++;
-            _objectSwitcher.SwitchTo(_repairStageIndex);
-            UpdateInteractionState();
-            SfxPlayer.Instance.PlayOneShot(SfxType.Build);
-
-            if (IsRepairCompleted)
+            if (_repairStageIndex + 1 >= _buildingData.Stages.Count)
             {
+                _isRepairCompleted = true;
+                _objectSwitcher.SwitchTo(_repairStageIndex + 1);
                 OnRepairCompleted?.Invoke(_buildingData.Name);
                 return;
             }
+
+            _repairStageIndex++;
+            _objectSwitcher.SwitchTo(_repairStageIndex);
+            SfxPlayer.Instance.PlayOneShot(SfxType.Build);
 
             InitializeInvestedResourcesList();
             _onStageUpdated?.Invoke(CurrentStage, _investedResources);
@@ -207,6 +205,9 @@ namespace FlavorfulStory.BuildingRepair
             /// <summary> Индекс текущей стадии ремонта. </summary>
             public int StageIndex;
 
+            /// <summary> Завершён ли ремонт? </summary>
+            public bool IsRepairCompleted;
+
             /// <summary> Количество вложенных ресурсов для текущей стадии ремонта. </summary>
             public List<int> InvestedResources;
         }
@@ -216,6 +217,7 @@ namespace FlavorfulStory.BuildingRepair
         public object CaptureState() => new RepairableBuildingRecord
         {
             StageIndex = _repairStageIndex,
+            IsRepairCompleted = _isRepairCompleted,
             InvestedResources = _investedResources
         };
 
@@ -226,6 +228,7 @@ namespace FlavorfulStory.BuildingRepair
             if (state is not RepairableBuildingRecord data) return;
 
             _repairStageIndex = data.StageIndex;
+            _isRepairCompleted = data.IsRepairCompleted;
             _investedResources = data.InvestedResources;
         }
 
