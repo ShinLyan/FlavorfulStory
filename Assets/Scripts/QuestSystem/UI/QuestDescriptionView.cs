@@ -143,6 +143,7 @@ namespace FlavorfulStory.QuestSystem
                 foreach (var objective in stages[stageIndex].Objectives)
                 {
                     var instance = _objectivePool.Get();
+                    instance.transform.SetAsLastSibling();
                     bool isCompleted = questStatus.IsStageComplete(stageIndex) ||
                                        questStatus.IsObjectiveComplete(objective);
                     instance.Setup(objective.Description, isCompleted);
@@ -157,6 +158,7 @@ namespace FlavorfulStory.QuestSystem
             foreach (var reward in rewards)
             {
                 var instance = _rewardPool.Get();
+                instance.transform.SetAsLastSibling();
                 instance.UpdateView(reward.Item, reward.Number);
                 _activeRewards.Add(instance);
             }

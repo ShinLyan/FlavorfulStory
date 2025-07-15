@@ -1,0 +1,96 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 117c81b660034043a189d64323bfafe8, type: 3}
+  m_Name: HomeSweetHome
+  m_EditorClassIdentifier: 
+  <QuestGiver>k__BackingField: {fileID: 11400000, guid: f86a80addd769f448ac4dfb94a1f4690,
+    type: 2}
+  <QuestName>k__BackingField: Home, sweet home
+  <QuestDescription>k__BackingField: You've arrived in a new countryside village,
+    greeted by a local named Feliana. She shows you an old shop that now belongs
+    to you. First, take a rest. Then, it's time to start the renovation and rebuild
+    your life from scratch.
+  <QuestType>k__BackingField: 0
+  _stages:
+  - _objectives:
+    - <Reference>k__BackingField: 9135ae32-d522-4d11-aa8d-dc7b0221c44b
+      <Description>k__BackingField: Get some sleep
+      <Type>k__BackingField: 2
+      <Params>k__BackingField:
+        rid: 6018952284085420130
+    _onStageCompleteActions: []
+  - _objectives:
+    - <Reference>k__BackingField: 551ce762-2246-47d3-8f00-26448e5ad37f
+      <Description>k__BackingField: Find Feliana and talk to her
+      <Type>k__BackingField: 1
+      <Params>k__BackingField:
+        rid: 6018952284085420132
+    _onStageCompleteActions:
+    - rid: 6018952352656261120
+    - rid: 6018952398241005702
+  - _objectives:
+    - <Reference>k__BackingField: a687dcdc-7495-49d2-b170-9a67743c8992
+      <Description>k__BackingField: Complete the shop renovation
+      <Type>k__BackingField: 3
+      <Params>k__BackingField:
+        rid: 6018952284085420134
+    _onStageCompleteActions: []
+  - _objectives:
+    - <Reference>k__BackingField: a687dcdc-7495-49d2-b170-9a67743c8992
+      <Description>k__BackingField: Talk to Feliana again
+      <Type>k__BackingField: 1
+      <Params>k__BackingField:
+        rid: 6018952341788819535
+    _onStageCompleteActions: []
+  _rewards:
+  - <Number>k__BackingField: 1
+    <Item>k__BackingField: {fileID: 11400000, guid: bce861ac3c00da94b92e70c22de74b57,
+      type: 2}
+  - <Number>k__BackingField: 20
+    <Item>k__BackingField: {fileID: 11400000, guid: 3e31ae779574be343a52d151fa604692,
+      type: 2}
+  references:
+    version: 2
+    RefIds:
+    - rid: 6018952284085420130
+      type: {class: SleepObjectiveParams, ns: FlavorfulStory.QuestSystem.Objectives.Params,
+        asm: Assembly-CSharp}
+      data: 
+    - rid: 6018952284085420132
+      type: {class: TalkObjectiveParams, ns: FlavorfulStory.QuestSystem.Objectives.Params,
+        asm: Assembly-CSharp}
+      data:
+        <NpcName>k__BackingField: 2
+        <Dialogue>k__BackingField: {fileID: 11400000, guid: f9d23c5ede99bd446b02fba0572f7e89,
+          type: 2}
+    - rid: 6018952284085420134
+      type: {class: RepairObjectiveParams, ns: FlavorfulStory.QuestSystem.Objectives.Params,
+        asm: Assembly-CSharp}
+      data:
+        <Name>k__BackingField: 0
+    - rid: 6018952341788819535
+      type: {class: TalkObjectiveParams, ns: FlavorfulStory.QuestSystem.Objectives.Params,
+        asm: Assembly-CSharp}
+      data:
+        <NpcName>k__BackingField: 2
+        <Dialogue>k__BackingField: {fileID: 11400000, guid: e19edbfd6cf7b664b96f333367a29864,
+          type: 2}
+    - rid: 6018952352656261120
+      type: {class: GiveQuestAction, ns: FlavorfulStory.QuestSystem.TriggerActions,
+        asm: Assembly-CSharp}
+      data:
+        _questToGive: {fileID: 11400000, guid: b14442f73ae174141881dccc00ad90a2, type: 2}
+    - rid: 6018952398241005702
+      type: {class: GiveQuestAction, ns: FlavorfulStory.QuestSystem.TriggerActions,
+        asm: Assembly-CSharp}
+      data:
+        _questToGive: {fileID: 11400000, guid: 5db9704eeeefe264ba76b93b86129a5d, type: 2}
