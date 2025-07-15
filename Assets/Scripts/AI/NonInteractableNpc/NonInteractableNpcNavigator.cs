@@ -6,8 +6,13 @@ using UnityEngine.AI;
 
 namespace FlavorfulStory.AI.NonInteractableNpc
 {
+    /// <summary> Навигатор для неинтерактивного NPC с поддержкой перемещения к точкам расписания. </summary>
     public class NonInteractableNpcNavigator : NpcNavigator, INpcNavigatorMover<SchedulePoint>
     {
+        /// <summary> Инициализирует новый экземпляр навигатора неинтерактивного NPC. </summary>
+        /// <param name="navMeshAgent"> Агент навигационной сетки для перемещения. </param>
+        /// <param name="warpGraph"> Граф варп-порталов для телепортации между локациями. </param>
+        /// <param name="transform"> Трансформ объекта NPC. </param>
         public NonInteractableNpcNavigator(NavMeshAgent navMeshAgent,
             WarpGraph warpGraph,
             Transform transform)
@@ -15,6 +20,8 @@ namespace FlavorfulStory.AI.NonInteractableNpc
         {
         }
 
+        /// <summary> Запускает перемещение к указанной точке расписания. </summary>
+        /// <param name="point"> Точка расписания для перемещения. </param>
         public void MoveTo(SchedulePoint point)
         {
             _currentTargetPoint = point;
@@ -27,7 +34,9 @@ namespace FlavorfulStory.AI.NonInteractableNpc
                 _navMeshAgent.SetDestination(point.Position);
         }
 
-        // public void MoveTo(Vector3 point) //TODO: подумать над тем как это сделать
+        // /// <summary> Запускает перемещение к указанной позиции. </summary>
+        // /// <param name="point"> Целевая позиция для перемещения. </param>
+        // public void MoveTo(Vector3 point) //TODO: реализовать после удаления WarpGraph
         // {
         //     // var point = location.GetRandomPointOnNavMesh();
         //     _currentTargetPoint = point;

@@ -8,7 +8,6 @@ namespace FlavorfulStory.AI.InteractableNpc
 {
     /// <summary> NPC с возможностью взаимодействия с игроком. </summary>
     /// <remarks> Требует наличия компонента NpcCollisionHandler для обработки столкновений. </remarks>
-    [RequireComponent(typeof(NpcCollisionHandler))]
     public class InteractableNpc : Npc
     {
         /// <summary> Информация о персонаже. </summary>
@@ -26,14 +25,11 @@ namespace FlavorfulStory.AI.InteractableNpc
         private NpcScheduleHandler _npcScheduleHandler;
 
         /// <summary> Инициализирует компонент обработчика столкновений. </summary>
-        protected override void Awake() => _collisionHandler = GetComponent<NpcCollisionHandler>();
-
-        /// <summary> Выполняет инициализацию всех систем и компонентов InteractableNpc. </summary>
-        protected override void Start()
+        protected override void Awake()
         {
             _npcScheduleHandler = new NpcScheduleHandler();
-            base.Start();
-            _collisionHandler.Initialize(_stateController as ICharacterCollisionHandler);
+            base.Awake();
+            _collisionHandler = new NpcCollisionHandler(_stateController as InteractableNpcStateController);
         }
 
         /// <summary> Создает контроллер движения для интерактивного NPC. </summary>
@@ -62,5 +58,13 @@ namespace FlavorfulStory.AI.InteractableNpc
                 transform
             );
         }
+
+        /// <summary> Обрабатывает вход другого объекта в триггер коллизии NPC. </summary>
+        /// <param name="other"> Коллайдер, вошедший в триггер. </param>
+        private void OnTriggerEnter(Collider other) => _collisionHandler?.HandleTriggerEnter(other);
+
+        /// <summary> Обрабатывает выход другого объекта из триггера коллизии NPC. </summary>
+        /// <param name="other"> Коллайдер, покинувший триггер. </param>
+        private void OnTriggerExit(Collider other) => _collisionHandler?.HandleTriggerExit(other);
     }
 }

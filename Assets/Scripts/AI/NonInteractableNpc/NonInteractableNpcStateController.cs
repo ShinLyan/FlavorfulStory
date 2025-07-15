@@ -17,35 +17,74 @@ namespace FlavorfulStory.AI.NonInteractableNpc
     /// управляющий переходами между различными состояниями персонажа. </summary>
     public class NonInteractableNpcStateController : StateController
     {
+        #region Fields
+
+        /// <summary> Контроллер движения неинтерактивного NPC. </summary>
         private readonly NonInteractableNpcMovementController _npcMovementController;
+
+        /// <summary> Менеджер локаций для получения информации о местоположениях. </summary>
         private readonly LocationManager _locationManager;
+
+        /// <summary> Обработчик предметов для работы с игровыми объектами. </summary>
         private readonly ItemHandler _itemHandler;
 
+        /// <summary> Состояние перемещения NPC. </summary>
         private MovementState _movementState;
+
+        /// <summary> Состояние анимации NPC. </summary>
         private AnimationState _animationState;
+
+        /// <summary> Состояние выбора мебели. </summary>
         private FurniturePickerState _furniturePickerState;
+
+        /// <summary> Состояние выбора предмета. </summary>
         private ItemPickerState _itemPickerState;
+
+        /// <summary> Состояние оплаты. </summary>
         private PaymentState _paymentState;
+
+        /// <summary> Состояние выбора случайной точки. </summary>
         private RandomPointPickerState _randomPointPickerState;
+
+        /// <summary> Состояние выбора полки. </summary>
         private ShelfPickerState _shelfPickerState;
-        private WaitingState _waitingState;
+
+        /// <summary> Состояние отказа от предмета. </summary>
         private RefuseItemState _refuseItemState;
 
+        /// <summary> Состояние ожидания. </summary>
+        private WaitingState _waitingState;
+
+        /// <summary> Последовательность перемещения к случайной точке. </summary>
         private SequenceState _randomPointSequence;
+
+        /// <summary> Последовательность взаимодействия с мебелью. </summary>
         private SequenceState _furnitureSequence;
+
+        /// <summary> Последовательность покупки предмета. </summary>
         private SequenceState _buyItemSequence;
+
+        /// <summary> Последовательность отказа от предмета. </summary>
         private SequenceState _refuseItemSequence;
 
+        /// <summary> Контроллер игрока для взаимодействия с игроком. </summary>
         private readonly PlayerController _playerController;
+
+        /// <summary> Transform компонент NPC для получения информации о позиции и трансформации. </summary>
         private readonly Transform _npcTransform;
 
+        /// <summary> Флаг, указывающий, посещал ли NPC мебель после покупки. </summary>
         private bool _hadVisitedFurnitureAfterPurchase;
 
-        /// <summary> Инициализирует новый экземпляр контроллера состояний. </summary>
-        /// <param name="npcMovementController"> Контроллер движения NPC. </param>
-        /// <param name="locationManager"> Менеджер локаций. </param>
-        /// <param name="npcAnimationController"> Контроллер анимации NPC. </param>
-        /// <param name="itemHandler"> Обработчик предмета. </param>
+        #endregion
+
+        /// <summary> Инициализирует новый экземпляр контроллера состояний для неинтерактивного NPC. </summary>
+        /// <param name="npcMovementController"> Контроллер движения NPC, отвечающий за перемещение персонажа. </param>
+        /// <param name="locationManager"> Менеджер локаций для получения информации о местоположениях. </param>
+        /// <param name="npcAnimationController"> Контроллер анимации NPC для управления анимациями персонажа. </param>
+        /// <param name="itemHandler"> Обработчик предметов для работы с игровыми объектами. </param>
+        /// <param name="playerController"> Контроллер игрока для взаимодействия с игроком. </param>
+        /// <param name="npcTransform"> Transform компонент NPC для получения информации о позиции и трансформации. </param>
         public NonInteractableNpcStateController(NonInteractableNpcMovementController npcMovementController,
             LocationManager locationManager,
             NpcAnimationController npcAnimationController,
@@ -64,6 +103,7 @@ namespace FlavorfulStory.AI.NonInteractableNpc
             Initialize();
         }
 
+        /// <summary> Инициализирует все состояния и последовательности NPC. </summary>
         protected override void InitializeStates()
         {
             var shopLocation = (ShopLocation)_locationManager.GetLocationByName(LocationName.NewShop);
@@ -74,7 +114,7 @@ namespace FlavorfulStory.AI.NonInteractableNpc
             var states = new CharacterState[]
             {
                 _movementState, _animationState, _furniturePickerState, _itemPickerState, _paymentState,
-                _randomPointPickerState, _shelfPickerState, _waitingState
+                _randomPointPickerState, _shelfPickerState, _refuseItemState, _waitingState
             };
 
             foreach (var state in states)
@@ -84,6 +124,8 @@ namespace FlavorfulStory.AI.NonInteractableNpc
             }
         }
 
+        /// <summary> Создает все базовые состояния NPC. </summary>
+        /// <param name="shopLocation"> Локация магазина для инициализации состояний. </param>
         private void CreateStates(ShopLocation shopLocation)
         {
             _movementState = new MovementState(_npcMovementController);
@@ -98,6 +140,7 @@ namespace FlavorfulStory.AI.NonInteractableNpc
             _refuseItemState = new RefuseItemState(shopLocation);
         }
 
+        /// <summary> Создает все последовательности состояний для различных сценариев поведения NPC. </summary>
         private void CreateSequences()
         {
             _randomPointSequence = new SequenceState(this,
@@ -127,6 +170,7 @@ namespace FlavorfulStory.AI.NonInteractableNpc
             _randomPointSequence.OnSequenceEnded += StartRandomSequence;
         }
 
+        /// <summary> Сбрасывает все состояния в исходное состояние. </summary>
         protected override void ResetStates()
         {
             foreach (var state in _nameToCharacterStates.Values) state.Reset();
@@ -134,21 +178,17 @@ namespace FlavorfulStory.AI.NonInteractableNpc
         }
 
         /// <summary> Возвращает управление после завершения последовательности. </summary>
-        public override void ReturnFromSequence() { SetState(typeof(WaitingState).ToString()); }
+        public override void ReturnFromSequence() => SetState(typeof(WaitingState).ToString());
 
-
-        public override void Update()
-        {
-            base.Update();
-            if (Input.GetKeyDown(KeyCode.Space)) StartRandomSequence();
-        }
-
-        private void StartRandomSequence()
+        /// <summary> Запускает случайную последовательность действий NPC. </summary>
+        public void StartRandomSequence()
         {
             string selectedSequence = CalculateNextSequence();
             SetState(selectedSequence);
         }
 
+        /// <summary> Вычисляет следующую последовательность действий на основе доступных вариантов и весов. </summary>
+        /// <returns> Имя выбранной последовательности. </returns>
         private string CalculateNextSequence()
         {
             var shopLocation = (ShopLocation)_locationManager.GetLocationByName(LocationName.NewShop);
@@ -183,6 +223,7 @@ namespace FlavorfulStory.AI.NonInteractableNpc
             return availableOptions.Last().sequenceName;
         }
 
+        /// <summary> Обрабатывает переход после завершения покупки. </summary>
         private void HandleAfterPurchaseTransition()
         {
             var shopLocation = (ShopLocation)_locationManager.GetLocationByName(LocationName.NewShop);
@@ -195,16 +236,23 @@ namespace FlavorfulStory.AI.NonInteractableNpc
             }
             else
             {
-                //TODO: отправить в точку деспавна
-                var point = new SchedulePoint(); //TODO: переделать после удаление WarpGraph
-                point.Position = _playerController.transform.position;
-                point.LocationName = LocationName.RockyIsland;
-
-                _npcMovementController.SetPoint(point);
-                SetState(typeof(MovementState).ToString());
+                GoToDespawnPoint();
             }
         }
 
+        /// <summary> Отправляет NPC в точку деспавна. </summary>
+        private void GoToDespawnPoint()
+        {
+            //TODO: отправить в точку деспавна
+            var point = new SchedulePoint(); //TODO: переделать после удаление WarpGraph
+            point.Position = _playerController.transform.position;
+            point.LocationName = LocationName.RockyIsland;
+
+            _npcMovementController.SetPoint(point);
+            SetState(typeof(MovementState).ToString());
+        }
+
+        /// <summary> Обрабатывает переход после завершения последовательности с мебелью. </summary>
         private void HandleAfterFurnitureSequence()
         {
             if (_hadVisitedFurnitureAfterPurchase)

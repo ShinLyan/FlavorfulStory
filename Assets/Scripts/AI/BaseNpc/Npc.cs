@@ -24,10 +24,7 @@ namespace FlavorfulStory.AI.BaseNpc
         [Inject] protected PlayerController _playerController;
 
         /// <summary> Вызывается при создании объекта, может быть переопределен в наследниках </summary>
-        protected virtual void Awake() { }
-
-        /// <summary> Выполняет инициализацию всех контроллеров и систем NPC при запуске. </summary>
-        protected virtual void Start()
+        protected virtual void Awake()
         {
             _animationController = CreateAnimationController();
             _movementController = CreateMovementController();
@@ -35,6 +32,15 @@ namespace FlavorfulStory.AI.BaseNpc
 
             WorldTime.OnTimePaused += _animationController.PauseAnimation;
             WorldTime.OnTimeUnpaused += _animationController.ContinueAnimation;
+        }
+
+        /// <summary> Выполняет инициализацию всех контроллеров и систем NPC при запуске. </summary>
+        protected virtual void Start() { }
+
+        protected virtual void OnDestroy()
+        {
+            WorldTime.OnTimePaused -= _animationController.PauseAnimation;
+            WorldTime.OnTimeUnpaused -= _animationController.ContinueAnimation;
         }
 
         /// <summary> Обновляет логику состояний и движения NPC каждый кадр. </summary>

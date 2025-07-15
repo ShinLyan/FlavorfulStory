@@ -4,18 +4,33 @@ using Random = UnityEngine.Random;
 
 namespace FlavorfulStory.SceneManagement.ShopLocation
 {
+    /// <summary> Локация магазина с функциональностью управления полками, мебелью и кассой. </summary>
     public class ShopLocation : Location
     {
-        [field: SerializeField] public CashDesk CashDesk { get; private set; }
+        /// <summary> Касса магазина для обслуживания покупателей. </summary>
+        [field: SerializeField]
+        public CashDesk CashDesk { get; private set; }
 
+        /// <summary> Массив полок в магазине. </summary>
         [SerializeField] private ShopObject[] _shelves;
 
+        /// <summary> Массив мебели в магазине. </summary>
         [SerializeField] private ShopObject[] _furnitures;
 
+        /// <summary> Минимальное расстояние от объектов магазина при генерации случайных точек. </summary>
+        private const float MinDistance = 3f;
+
+        /// <summary> Возвращает случайную доступную мебель. </summary>
+        /// <returns> Доступная мебель или null, если все мебель занята. </returns>
         public Furniture GetAvailableFurniture() => (Furniture)GetRandomObject(_furnitures);
 
+        /// <summary> Возвращает случайную доступную полку. </summary>
+        /// <returns> Доступная полка или null, если все полки заняты. </returns>
         public Shelf GetAvailableShelf() => (Shelf)GetRandomObject(_shelves);
 
+        /// <summary> Получает массив доступных (незанятых) объектов из переданного массива. </summary>
+        /// <param name="objects"> Массив объектов магазина для фильтрации. </param>
+        /// <returns> Массив доступных объектов. </returns>
         private static ShopObject[] GetAvailableObjects(ShopObject[] objects)
         {
             var availableObjects = new List<ShopObject>();
@@ -26,6 +41,9 @@ namespace FlavorfulStory.SceneManagement.ShopLocation
             return availableObjects.ToArray();
         }
 
+        /// <summary> Возвращает случайный объект из массива доступных объектов. </summary>
+        /// <param name="objects"> Массив объектов для выбора. </param>
+        /// <returns> Случайный доступный объект или null, если все объекты заняты. </returns>
         private static ShopObject GetRandomObject(ShopObject[] objects)
         {
             var availableObjects = GetAvailableObjects(objects);
@@ -35,20 +53,22 @@ namespace FlavorfulStory.SceneManagement.ShopLocation
             return availableObjects[Random.Range(0, availableObjects.Length)];
         }
 
-
+        /// <summary> Проверяет, пусты ли все доступные полки. </summary>
+        /// <returns> True, если все доступные полки пусты, иначе false. </returns>
         public bool AreAvailableShelvesEmpty()
         {
-            var shelves = GetAvailableObjects(_shelves);
             // TODO: Реализация проверки, есть ли на полках товары
-            return shelves.Length == 0;
+            return GetAvailableObjects(_shelves).Length == 0;
         }
 
-        public bool AreAllFurnitureOccupied()
-        {
-            var furnitures = GetAvailableObjects(_furnitures);
-            return furnitures.Length == 0;
-        }
+        /// <summary> Проверяет, занята ли вся мебель в магазине. </summary>
+        /// <returns> True, если вся мебель занята, иначе false. </returns>
+        public bool AreAllFurnitureOccupied() => GetAvailableObjects(_furnitures).Length == 0;
 
+        /// <summary> Генерирует случайную точку на навигационной сетке с учетом минимального
+        /// расстояния от объектов магазина. </summary>
+        /// <param name="maxAttempts"> Максимальное количество попыток генерации точки. </param>
+        /// <returns> Случайная позиция на навигационной сетке или Vector3.zero. </returns>
         public override Vector3 GetRandomPointOnNavMesh(int maxAttempts = 20)
         {
             for (int i = 0; i < maxAttempts; i++)
@@ -57,10 +77,9 @@ namespace FlavorfulStory.SceneManagement.ShopLocation
                 if (position == Vector3.zero) continue;
 
                 bool isValidPosition = true;
-                float minDistance = 3f;
 
                 foreach (var shelf in _shelves)
-                    if (Vector3.Distance(position, shelf.transform.position) < minDistance)
+                    if (Vector3.Distance(position, shelf.transform.position) < MinDistance)
                     {
                         isValidPosition = false;
                         break;
@@ -69,7 +88,7 @@ namespace FlavorfulStory.SceneManagement.ShopLocation
                 if (!isValidPosition) continue;
 
                 foreach (var furniture in _furnitures)
-                    if (Vector3.Distance(position, furniture.transform.position) < minDistance)
+                    if (Vector3.Distance(position, furniture.transform.position) < MinDistance)
                     {
                         isValidPosition = false;
                         break;
@@ -78,7 +97,6 @@ namespace FlavorfulStory.SceneManagement.ShopLocation
                 if (isValidPosition) return position;
             }
 
-            Debug.Log("HUI");
             return Vector3.zero;
         }
     }
