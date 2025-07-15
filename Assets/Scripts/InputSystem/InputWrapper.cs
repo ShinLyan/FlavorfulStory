@@ -93,12 +93,18 @@ namespace FlavorfulStory.InputSystem
         public static Vector3 GetMousePosition() =>
             !_allowedButtons[InputButton.MousePosition] ? Vector3.zero : Input.mousePosition;
 
-        /// <summary> Заблокировать передвижение игрока. </summary>
-        public static void BlockPlayerMovement() =>
+        /// <summary> Заблокировать управление игрока (перемещение, скролл). </summary>
+        public static void BlockPlayerInput()
+        {
             BlockInput(InputButton.Horizontal, InputButton.Vertical);
+            BlockInput(InputButton.MouseScroll);
+        }
 
-        /// <summary> Разблокировать передвижение игрока. </summary>
-        public static void UnblockPlayerMovement() =>
+        /// <summary> Разблокировать управление игрока (перемещение, скролл). </summary>
+        public static void UnblockPlayerInput()
+        {
             UnblockInput(InputButton.Horizontal, InputButton.Vertical);
+            UnblockInput(InputButton.MouseScroll);
+        }
     }
 }

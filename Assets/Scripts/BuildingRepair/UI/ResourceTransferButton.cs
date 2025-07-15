@@ -17,13 +17,13 @@ namespace FlavorfulStory.BuildingRepair.UI
         private InventoryItem _resource;
 
         /// <summary> Событие, которое вызывается при нажатии на кнопку. </summary>
-        public event Action<InventoryItem, ResourceTransferButtonType> OnClick;
+        public event Action<InventoryItem, ResourceTransferButtonType> OnResourceTransferButtonClick;
 
         /// <summary> Обработчик события клика по кнопке. Проверяет наличие ресурса и вызывает событие OnClick. </summary>
         protected override void Click()
         {
             base.Click();
-            OnClick?.Invoke(_resource, _buttonType);
+            OnResourceTransferButtonClick?.Invoke(_resource, _buttonType);
             SfxPlayer.Instance.PlayOneShot(SfxType.Eat);
         }
 

@@ -48,15 +48,15 @@ namespace FlavorfulStory.BuildingRepair.UI
         /// <summary> Подписаться на события при активации объекта. </summary>
         private void OnEnable()
         {
-            _addResourceButton.OnClick += OnResourceTransferButtonClick;
-            _returnResourceButton.OnClick += OnResourceTransferButtonClick;
+            _addResourceButton.OnResourceTransferButtonClick += OnResourceTransferButtonClick;
+            _returnResourceButton.OnResourceTransferButtonClick += OnResourceTransferButtonClick;
         }
 
         /// <summary> Отписаться от событий при деактивации объекта. </summary>
         private void OnDisable()
         {
-            _addResourceButton.OnClick -= OnResourceTransferButtonClick;
-            _returnResourceButton.OnClick -= OnResourceTransferButtonClick;
+            _addResourceButton.OnResourceTransferButtonClick -= OnResourceTransferButtonClick;
+            _returnResourceButton.OnResourceTransferButtonClick -= OnResourceTransferButtonClick;
         }
 
         /// <summary> Установить ресурс для текущего элемента. </summary>

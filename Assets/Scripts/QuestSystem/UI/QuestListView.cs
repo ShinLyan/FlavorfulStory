@@ -52,6 +52,7 @@ namespace FlavorfulStory.QuestSystem
             );
 
             UpdateView();
+            SelectFirstAvailableButton();
         }
 
         /// <summary> Обновляет список кнопок квестов, пересоздавая их на основе текущих данных. </summary>
