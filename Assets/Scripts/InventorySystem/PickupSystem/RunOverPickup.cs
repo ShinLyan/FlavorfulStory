@@ -6,14 +6,17 @@ namespace FlavorfulStory.InventorySystem.PickupSystem
     [RequireComponent(typeof(Pickup))]
     public class RunOverPickup : MonoBehaviour
     {
-        /// <summary> Обрабатывает событие пересечения триггера. </summary>
-        /// <param name="other"> Коллайдер объекта, пересекшего триггер. </param>
-        private void OnTriggerEnter(Collider other)
-        {
-            if (!other.CompareTag("Player")) return;
+        /// <summary> Ссылка на компонент подбираемого предмета. </summary>
+        private Pickup _pickup;
 
-            var pickup = GetComponent<Pickup>();
-            if (pickup.CanBePickedUp) pickup.PickupItem();
+        /// <summary> Получает компонент Pickup при инициализации. </summary>
+        private void Awake() => _pickup = GetComponent<Pickup>();
+
+        /// <summary> При нахождении игрока в триггере — попытка подбора предмета. </summary>
+        /// <param name="other"> Коллайдер игрока. </param>
+        private void OnTriggerStay(Collider other)
+        {
+            if (other.CompareTag("Player")) _pickup.TryPickup();
         }
     }
 }

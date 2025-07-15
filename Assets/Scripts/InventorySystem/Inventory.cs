@@ -156,18 +156,36 @@ namespace FlavorfulStory.InventorySystem
             return true;
         }
 
-        /// <summary> Извлечь предмет из указанного слота. </summary>
+        /// <summary> Извлечь предмет из указанного слота. Удаляет указанное количество или всё содержимое. </summary>
         /// <param name="slotIndex"> Индекс слота в инвентаре. </param>
-        /// <param name="number"> Количество предметов. </param>
-        public void RemoveFromSlot(int slotIndex, int number)
+        /// <param name="number"> Количество предметов. Если больше количества в слоте — удалит всё. </param>
+        public void RemoveFromSlot(int slotIndex, int number = int.MaxValue)
         {
-            if ((_slots[slotIndex].Number -= number) <= 0)
+            if (slotIndex < 0 || slotIndex >= _slots.Length)
             {
-                _slots[slotIndex].Item = null;
-                _slots[slotIndex].Number = 0;
+                Debug.LogError($"Invalid slot index: {slotIndex}");
+                return;
             }
 
+            var slot = _slots[slotIndex];
+            if (!slot.Item || slot.Number <= 0)
+            {
+                Debug.LogError($"Attempted to remove from empty slot {slotIndex}");
+                return;
+            }
+
+            slot.Number -= number;
+            if (slot.Number <= 0) ClearSlot(slotIndex);
+
             InventoryUpdated?.Invoke();
+        }
+
+        /// <summary> Очистить слот инвентаря. </summary>
+        /// <param name="slotIndex"> Индекс слота в инвентаре. </param>
+        private void ClearSlot(int slotIndex)
+        {
+            _slots[slotIndex].Item = null;
+            _slots[slotIndex].Number = 0;
         }
 
         #region Saving

@@ -25,14 +25,6 @@ namespace FlavorfulStory.AI.BaseNpc
             _animator.SetFloat(_speedHash, speed, dampTime, Time.deltaTime);
         }
 
-        /// <summary> Воспроизводит анимацию состояния по заданному типу анимации. </summary>
-        /// <param name="animationStateName"> Тип анимации для воспроизведения. </param>
-        public void PlayStateAnimation(AnimationType animationStateName)
-        {
-            if (animationStateName == AnimationType.Idle) return;
-            _animator.Play(animationStateName.ToString());
-        }
-
         /// <summary> Запустить анимацию. </summary>
         /// <param name="animationType"> Тип проигрываемой анимации.</param>
         public void TriggerAnimation(AnimationType animationType)
@@ -40,11 +32,6 @@ namespace FlavorfulStory.AI.BaseNpc
             string animationName = animationType.ToString();
             _animator.SetTrigger(Animator.StringToHash(animationName));
         }
-
-        /// <summary> Запустить анимацию. </summary>
-        /// <param name="animationName"> Тип проигрываемой анимации.</param>
-        public void TriggerAnimation(string animationName) =>
-            _animator.SetTrigger(Animator.StringToHash(animationName));
 
         /// <summary> Остановить анимацию. </summary>
         public void PauseAnimation() => _animator.speed = 0;

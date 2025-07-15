@@ -7,15 +7,19 @@ using FlavorfulStory.Audio;
 using FlavorfulStory.InventorySystem.DropSystem;
 using FlavorfulStory.ObjectManagement;
 using UnityEngine;
+using Zenject;
+using Random = UnityEngine.Random;
 
 namespace FlavorfulStory.ResourceContainer
 {
     /// <summary> Добываемый объект. </summary>
     /// <remarks> Реализует интерфейсы <see cref="IHitable" /> и <see cref="IDestroyable" />. </remarks>
-    [RequireComponent(typeof(ItemDropper), typeof(ObjectSwitcher))]
+    [RequireComponent(typeof(ObjectSwitcher))]
     public class DestroyableResourceContainer : MonoBehaviour, IHitable, IDestroyable
     {
         #region Fields and Properties
+
+        [Inject] private readonly IItemDropService _itemDropService;
 
         /// <summary> Список стадий. </summary>
         [Tooltip("Список стадий."), SerializeField]
@@ -28,9 +32,6 @@ namespace FlavorfulStory.ResourceContainer
         /// <summary> Тип инструмента, необходимого для разрушения. </summary>
         [Tooltip("Тип инструмента, необходимого для разрушения."), SerializeField]
         private ToolType[] _toolsToBeHit;
-
-        /// <summary> Выбрасыватель предметов. </summary>
-        private ItemDropper _itemDropper;
 
         /// <summary> Переключатель грейдов. </summary>
         private ObjectSwitcher _objectSwitcher;
@@ -85,7 +86,6 @@ namespace FlavorfulStory.ResourceContainer
         {
             foreach (var stage in _stages) _hitsToDestroy += stage.RequiredHits;
 
-            _itemDropper = GetComponent<ItemDropper>();
             _objectSwitcher = GetComponent<ObjectSwitcher>();
 
             if (_objectSwitcher.ObjectsCount != _stages.Count)
@@ -122,8 +122,21 @@ namespace FlavorfulStory.ResourceContainer
         /// <summary> Выбросить ресурсы для текущей стадии объекта. </summary>
         private void DropResourcesForCurrentGrade()
         {
+            const float ResourceDropForce = 5f;
+
             foreach (var item in _stages[_currentGradeIndex].Items)
-                _itemDropper.DropItem(item.ItemPrefab, item.Quantity);
+                _itemDropService.Drop(item.ItemPrefab, item.Quantity, GetDropPosition(),
+                    Vector3.up * ResourceDropForce);
+        }
+
+        /// <summary> Получить позицию дропа. </summary>
+        /// <returns> Позиция дропа. </returns>
+        private Vector3 GetDropPosition()
+        {
+            const float DropOffsetRange = 2f; // Диапазон случайного смещения по осям X и Z
+            float offsetX = Random.Range(-DropOffsetRange, DropOffsetRange);
+            float offsetZ = Random.Range(-DropOffsetRange, DropOffsetRange);
+            return transform.position + new Vector3(offsetX, 1, offsetZ);
         }
 
         #endregion

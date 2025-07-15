@@ -4,6 +4,7 @@ using FlavorfulStory.AI.InteractableNpc;
 using FlavorfulStory.CursorSystem;
 using FlavorfulStory.InteractionSystem;
 using FlavorfulStory.Player;
+using FlavorfulStory.TooltipSystem;
 using UnityEngine;
 using Zenject;
 
@@ -46,9 +47,8 @@ namespace FlavorfulStory.DialogueSystem
 
         #region IInteractable
 
-        /// <summary> Действие игрока по отношению к объекту. </summary>
-        [field: SerializeField]
-        public ActionDescription ActionDescription { get; private set; }
+        /// <summary> Описание действия с объектом. </summary>
+        public TooltipActionData TooltipAction => new("E", ActionType.Talk, $"to {NpcInfo.NpcName}");
 
         /// <summary> Флаг, разрешено ли взаимодействие с NPC. </summary>
         public bool IsInteractionAllowed { get; private set; }

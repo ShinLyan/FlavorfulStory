@@ -2,6 +2,7 @@ using DG.Tweening;
 using FlavorfulStory.Actions;
 using FlavorfulStory.InteractionSystem;
 using FlavorfulStory.Player;
+using FlavorfulStory.TooltipSystem;
 using FlavorfulStory.UI;
 using FlavorfulStory.UI.Animation;
 using UnityEngine;
@@ -42,8 +43,8 @@ namespace FlavorfulStory.TimeManagement
 
         #region IInteractable
 
-        /// <summary> Действие игрока по отношению к объекту. </summary>
-        [field: SerializeField] public ActionDescription ActionDescription { get; private set; }
+        /// <summary> Описание действия с объектом. </summary>
+        public TooltipActionData TooltipAction => new("E", ActionType.Sleep, "to Bed");
 
         /// <summary> Возвращает возможность взаимодействия с объектом. </summary>
         public bool IsInteractionAllowed => true;

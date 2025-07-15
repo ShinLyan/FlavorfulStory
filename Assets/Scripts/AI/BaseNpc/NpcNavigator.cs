@@ -37,7 +37,7 @@ namespace FlavorfulStory.AI.BaseNpc
         /// <summary> Дистанция, на которой считается что цель достигнута. </summary>
         private const float ArrivalDistance = 0.05f;
 
-        /// <summary> Позиция спавна NPC. </summary>
+        /// <summary> Начальная позиция NPC при создании. </summary>
         private readonly Vector3 _spawnPosition;
 
         /// <summary> Локация спавна NPC. </summary>
@@ -45,8 +45,8 @@ namespace FlavorfulStory.AI.BaseNpc
 
         /// <summary> Скорость агента. </summary>
         private Vector3 _agentSpeed;
-
-        /// <summary> Токен отмены для варп-переходов. </summary>
+        
+        /// <summary> Токен отмены для телепортации между локациями. </summary>
         private CancellationTokenSource _warpCts;
 
         /// <summary> Событие, вызываемое при достижении пункта назначения. </summary>

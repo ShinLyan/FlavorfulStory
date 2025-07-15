@@ -1,5 +1,7 @@
+using FlavorfulStory.Actions;
 using FlavorfulStory.InputSystem;
 using FlavorfulStory.Saving;
+using FlavorfulStory.TooltipSystem;
 using UnityEngine;
 using Zenject;
 
@@ -10,6 +12,9 @@ namespace FlavorfulStory.InventorySystem.UI
     /// визуальное состояние слотов панели инструментов. </remarks>
     public class Toolbar : MonoBehaviour, ISaveable
     {
+        /// <summary> Последний предмет, по коотороому показываем тултип. </summary>
+        private InventoryItem _lastTooltipItem;
+
         /// <summary> Массив слотов панели инструментов. </summary>
         private ToolbarSlotView[] _slots;
 
@@ -25,12 +30,17 @@ namespace FlavorfulStory.InventorySystem.UI
         /// <summary> Инвентарь игрока. </summary>
         private Inventory _playerInventory;
 
+        /// <summary> Показчик тултипов. </summary>
+        private IActionTooltipShower _tooltipShower;
+
         /// <summary> Внедрение зависимости — инвентарь игрока. </summary>
         /// <param name="inventory"> Инвентарь игрока. </param>
+        /// <param name="tooltipShower"> Показчик тултипов. </param>
         [Inject]
-        private void Construct(Inventory inventory)
+        private void Construct(Inventory inventory, IActionTooltipShower tooltipShower)
         {
             _playerInventory = inventory;
+            _tooltipShower = tooltipShower;
         }
 
         /// <summary> Инициализация полей и подписка на события тулбар слотов. </summary>
@@ -54,16 +64,35 @@ namespace FlavorfulStory.InventorySystem.UI
         /// <summary> Обрабатывает ввод колесика мыши в каждом кадре. </summary>
         private void Update() => HandleMouseScrollInput();
 
+        /// <summary> Установить состояние взаимодействия. </summary>
+        /// <param name="state"> Состояние взаимодействия. </param>
+        public void SetInteractableState(bool state) => _isInteractable = state;
+
         /// <summary> Сбрасывает состояние выделения всех слотов панели инструментов. </summary>
         private void ResetToolbar()
         {
             foreach (var slot in _slots) slot.ResetSelection();
         }
 
+        /// <summary> Выбирает предмет в панели инструментов по указанному индексу. </summary>
+        /// <param name="index"> Индекс предмета, который нужно выбрать. </param>
+        public void SelectItem(int index)
+        {
+            if (!_isInteractable) return;
+
+            _slots[SelectedItemIndex].ResetSelection();
+            SelectedItemIndex = index;
+            _slots[SelectedItemIndex].Select();
+
+            ShowItemTooltip();
+        }
+
         /// <summary> Обновляет визуальное представление всех слотов панели инструментов. </summary>
         private void RedrawToolbar()
         {
             foreach (var slot in _slots) slot.Redraw();
+
+            ShowItemTooltip();
         }
 
         /// <summary> Обрабатывает ввод колесика мыши для смены выбранного предмета. </summary>
@@ -77,20 +106,27 @@ namespace FlavorfulStory.InventorySystem.UI
             SelectItem(newSelectedItemIndex);
         }
 
-        /// <summary> Выбирает предмет в панели инструментов по указанному индексу. </summary>
-        /// <param name="index"> Индекс предмета, который нужно выбрать. </param>
-        public void SelectItem(int index)
+        /// <summary> Показать тултип для выбранного предмета. </summary>
+        private void ShowItemTooltip()
         {
-            if (!_isInteractable) return;
+            if (_lastTooltipItem && _lastTooltipItem.CanBeDropped)
+            {
+                var oldTooltip = new TooltipActionData("G", ActionType.Drop, _lastTooltipItem.ItemName);
+                _tooltipShower.Remove(oldTooltip);
+            }
 
-            _slots[SelectedItemIndex].ResetSelection();
-            SelectedItemIndex = index;
-            _slots[SelectedItemIndex].Select();
+            var item = SelectedItem;
+            if (item && item.CanBeDropped)
+            {
+                var newTooltip = new TooltipActionData("G", ActionType.Drop, item.ItemName);
+                _tooltipShower.Add(newTooltip);
+                _lastTooltipItem = item;
+            }
+            else
+            {
+                _lastTooltipItem = null;
+            }
         }
-
-        /// <summary> Установить состояние взаимодействия. </summary>
-        /// <param name="state"> Состояние взаимодействия. </param>
-        public void SetInteractableState(bool state) => _isInteractable = state;
 
         #region Saving
 

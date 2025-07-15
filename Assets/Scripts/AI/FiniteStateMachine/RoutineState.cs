@@ -6,15 +6,11 @@ namespace FlavorfulStory.AI.FiniteStateMachine
     /// <summary> Состояние рутины NPC, в котором персонаж выполняет действия согласно расписанию. </summary>
     public class RoutineState : CharacterState, ICurrentSchedulePointDependable
     {
-        #region Fields
-
         /// <summary> Контроллер анимации NPC для управления анимациями персонажа. </summary>
         private readonly NpcAnimationController _animationController;
 
         /// <summary> Текущая точка расписания, в которой находится NPC. </summary>
         private SchedulePoint _currentPoint;
-
-        #endregion
 
         /// <summary> Инициализирует новое состояние рутины с заданными зависимостями. </summary>
         /// <param name="animationController"> Контроллер анимации для воспроизведения анимаций. </param>
@@ -24,6 +20,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine
             _currentPoint = null;
         }
 
+        /// <summary> Вызывается при входе в состояние. </summary>
         public override void Enter() => PlayAnimation();
 
         /// <summary> Сбрасывает состояние рутины к начальному состоянию. </summary>
