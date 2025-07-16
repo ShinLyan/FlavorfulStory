@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using FlavorfulStory.EditorTools.Attributes;
 using FlavorfulStory.Infrastructure;
 using FlavorfulStory.SceneManagement;
 using FlavorfulStory.TimeManagement;
@@ -22,7 +23,14 @@ namespace FlavorfulStory.AI
         [SerializeField] private NpcSpawnPoint[] _spawnPoints;
 
         /// <summary> Интервал между спавнами NPC в секундах. </summary>
-        [SerializeField] private float _spawnInterval = 10f;
+        [SerializeField, SteppedRange(5f, 120f, 5f)]
+        private float _spawnInterval = 30f;
+
+        /// <summary> Время одного тика в секундах. </summary>
+        private const int TickTime = 5;
+
+        /// <summary> Интервал спавна, переведенный в тики. </summary>
+        private int SpawnIntervalInTicks => (int)_spawnInterval / TickTime;
 
         /// <summary> Максимальное количество одновременно активных NPC. </summary>
         [SerializeField] private int _maxTotalCharacters = 10;
@@ -42,19 +50,39 @@ namespace FlavorfulStory.AI
         /// <summary> Менеджер локаций для управления местоположениями. </summary>
         [Inject] private LocationManager _locationManager;
 
+        /// <summary> Пул объектов для переиспользования NPC. </summary>
         private ObjectPool<NonInteractableNpc.NonInteractableNpc> _npcPool;
 
+        /// <summary> Флаг, указывающий, приостановлено ли время в игре. </summary>
         private bool _isTimePaused;
+
+        /// <summary> Счетчик тиков для отслеживания интервала спавна. </summary>
+        private int _tickCounter;
 
         private void Awake()
         {
             WorldTime.OnDayEnded += _ => StartCoroutine(DespawnAllNpcCoroutine());
             WorldTime.OnTimePaused += () => _isTimePaused = true;
             WorldTime.OnTimeUnpaused += () => _isTimePaused = false;
+            WorldTime.OnTimeTick += OnTimeTickHandler;
         }
 
+        /// <summary>  Обработчик события тика времени. Управляет спавном NPC на основе игрового времени. </summary>
+        /// <param name="gameTime"> Текущее игровое время. </param>
+        private void OnTimeTickHandler(DateTime gameTime)
+        {
+            if (!_isSpawning || _isTimePaused) return;
 
-        /// <summary> Инициализация компонента. </summary>
+            _tickCounter++;
+
+            if (_tickCounter >= SpawnIntervalInTicks && CanSpawn())
+            {
+                SpawnNpcFromPool();
+                _tickCounter = 0;
+            }
+        }
+
+        /// <summary> Проверяет наличие необходимых данных и создает пул объектов для NPC. </summary>
         private void Start()
         {
             if (_spawnPoints == null || _spawnPoints.Length == 0)
@@ -77,13 +105,13 @@ namespace FlavorfulStory.AI
                 defaultCapacity: _maxTotalCharacters,
                 maxSize: _maxTotalCharacters
             );
-
-            StartCoroutine(SpawnRoutine());
         }
 
+        /// <summary> Создает новый экземпляр NPC для пула объектов. </summary>
+        /// <returns> Новый экземпляр NPC. </returns>
         private NonInteractableNpc.NonInteractableNpc CreateNpc()
         {
-            var npcSpawnPoint = _spawnPoints[Random.Range(0, _spawnPoints.Length)];
+            NpcSpawnPoint npcSpawnPoint = _spawnPoints[Random.Range(0, _spawnPoints.Length)];
             var pos = npcSpawnPoint.GetRandomPosition();
 
             NonInteractableNpc.NonInteractableNpc prefab = _npcPrefabs[Random.Range(0, _npcPrefabs.Length)];
@@ -93,16 +121,15 @@ namespace FlavorfulStory.AI
             return npc;
         }
 
+        /// <summary> Извлекает NPC из пула и настраивает его для спавна. </summary>
         private void SpawnNpcFromPool()
         {
             var npc = _npcPool.Get();
-
-            NpcSpawnPoint npcSpawnPoint = _spawnPoints[Random.Range(0, _spawnPoints.Length)];
-
+            var npcSpawnPoint = _spawnPoints[Random.Range(0, _spawnPoints.Length)];
             var pos = npcSpawnPoint.GetRandomPosition();
+
             npc.transform.position = pos;
             npc.transform.rotation = Quaternion.identity;
-
             _activeCharacters.Add(npc);
 
             npc.OnReachedDespawnPoint += () => DespawnNpc(npc);
@@ -110,24 +137,12 @@ namespace FlavorfulStory.AI
             StartCoroutine(SetDestinationAfterInit(npc));
         }
 
-
-        /// <summary> Корутина для периодического спавна NPC. </summary>
-        private IEnumerator SpawnRoutine()
-        {
-            while (_isSpawning)
-            {
-                yield return new WaitForSeconds(_spawnInterval);
-
-                if (CanSpawn()) SpawnNpcFromPool();
-            }
-        }
-
-        /// <summary>  Проверяет, можно ли создать нового NPC. </summary>
-        /// <returns> True, если количество активных NPC меньше максимального. </returns>
+        /// <summary> Проверяет, можно ли создать нового NPC. </summary>
+        /// <returns> True, если количество активных NPC меньше максимального и время не приостановлено. </returns>
         private bool CanSpawn() => _activeCharacters.Count < _maxTotalCharacters && !_isTimePaused;
 
-
         /// <summary> Возвращает NPC в пул и удаляет из списка активных. </summary>
+        /// <param name="npc"> NPC для деспавна. </param>
         private void DespawnNpc(NonInteractableNpc.NonInteractableNpc npc)
         {
             if (_activeCharacters.Contains(npc))
@@ -137,33 +152,31 @@ namespace FlavorfulStory.AI
             }
         }
 
+        /// <summary> Корутина для деспавна всех активных NPC с пропуском одного кадра.
+        /// Используется при окончании дня для очистки мира от NPC. </summary>
+        /// <returns> Корутина для выполнения деспавна. </returns>
         private IEnumerator DespawnAllNpcCoroutine()
         {
             yield return null;
-
             foreach (var npc in _activeCharacters.ToArray()) DespawnNpc(npc);
         }
 
-        /// <summary> Устанавливает пункт назначения для созданного NPC после его инициализации. </summary>
+        /// <summary>  Устанавливает пункт назначения для созданного NPC после его инициализации. </summary>
         /// <param name="npc"> NPC, для которого устанавливается пункт назначения. </param>
         /// <returns> Корутина для установки пункта назначения. </returns>
         private IEnumerator SetDestinationAfterInit(NonInteractableNpc.NonInteractableNpc npc)
         {
             yield return null;
-
-            //TODO: переделать после удаления WarpGraph 
             var loc = _locationManager.GetLocationByName(LocationName.NewShop);
-            var pos = loc.transform.position;
-
-            npc.SetDestination(pos, LocationName.NewShop);
+            npc.SetDestination(loc.transform.position, LocationName.NewShop);
         }
 
-        /// <summary>  Получает случайную точку деспавна, исключая указанную точку. </summary>
+        /// <summary> Получает случайную точку деспавна, исключая указанную точку. </summary>
         /// <param name="excludePoint"> Точка, которую следует исключить из выбора. </param>
         /// <returns> Случайная точка деспавна. </returns>
         private NpcSpawnPoint GetRandomDespawnPoint(NpcSpawnPoint excludePoint)
         {
-            if (_spawnPoints.Length == 1) return _spawnPoints[0]; // Если только одна точка, возвращаем её
+            if (_spawnPoints.Length == 1) return _spawnPoints[0];
 
             NpcSpawnPoint result;
             do
