@@ -59,6 +59,7 @@ namespace FlavorfulStory.AI
         /// <summary> Счетчик тиков для отслеживания интервала спавна. </summary>
         private int _tickCounter;
 
+        /// <summary> Инициализация подписок на события времени. </summary>
         private void Awake()
         {
             WorldTime.OnDayEnded += _ => StartCoroutine(DespawnAllNpcCoroutine());

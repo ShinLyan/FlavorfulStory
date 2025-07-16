@@ -46,10 +46,6 @@ namespace FlavorfulStory.SceneManagement
             {
                 searchBounds = new Bounds(_navMeshSurface.transform.position, _navMeshSurface.size);
             }
-            else if (TryGetComponent(out Collider col))
-            {
-                searchBounds = col.bounds;
-            }
             else
             {
                 Debug.LogWarning("Не удалось найти точку на NavMesh.");

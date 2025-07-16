@@ -7,12 +7,15 @@ namespace FlavorfulStory.AI
     [RequireComponent(typeof(Collider))]
     public class NpcSpawnPoint : MonoBehaviour
     {
+        /// <summary> Размер прямоугольной области спавна. </summary>
         [Header("Spawn Area Settings")] [SerializeField]
         private Vector3 _spawnBoxSize = new(4f, 0f, 4f);
 
+        /// <summary> Смещение области спавна относительно центра объекта. </summary>
         [SerializeField] private Vector3 _spawnBoxOffset = new(3f, 0f, 0f);
 
         /// <summary> Возвращает случайную позицию в прямоугольной области спавна. </summary>
+        /// <returns> Случайная мировая позиция в области спавна. </returns>
         public Vector3 GetRandomPosition()
         {
             Vector3 localRandomPoint = new Vector3(
@@ -28,12 +31,15 @@ namespace FlavorfulStory.AI
             return worldPoint;
         }
 
+        /// <summary> Обработчик входа в триггер. Вызывает событие достижения точки деспавна для NPC. </summary>
+        /// <param name="other"> Коллайдер объекта, вошедшего в триггер. </param>
         private void OnTriggerEnter(Collider other)
         {
             if (other.TryGetComponent<NonInteractableNpc.NonInteractableNpc>(out var npc))
                 npc.OnReachedDespawnPoint?.Invoke();
         }
 
+        /// <summary> Отрисовка гизмо в редакторе для визуализации области спавна. </summary>
         private void OnDrawGizmosSelected()
         {
             Matrix4x4 originalMatrix = Gizmos.matrix;
