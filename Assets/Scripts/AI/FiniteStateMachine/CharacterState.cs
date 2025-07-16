@@ -8,21 +8,18 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         /// <summary> Событие, вызываемое для запроса перехода к другому состоянию. </summary>
         public event Action<string> OnStateChangeRequested;
 
+        /// <summary> Контекст состояния, содержащий общие данные и зависимости. </summary>
         public StateContext Context { get; protected set; }
 
+        /// <summary> Устанавливает контекст состояния с общими данными и зависимостями. </summary>
+        /// <param name="context"> Контекст состояния для установки. </param>
         public void SetContext(StateContext context) => Context = context;
 
         /// <summary> Вызывается при входе в состояние. </summary>
-        public virtual void Enter()
-        {
-            // Debug.Log("Entering state: " + GetType().Name);
-        }
+        public virtual void Enter() { }
 
         /// <summary> Вызывается при выходе из состояния. </summary>
-        public virtual void Exit()
-        {
-            // Debug.Log("Exiting state: " + GetType().Name);
-        }
+        public virtual void Exit() { }
 
         /// <summary> Обновление логики состояния, вызываемое каждый кадр. </summary>
         public virtual void Update() { }

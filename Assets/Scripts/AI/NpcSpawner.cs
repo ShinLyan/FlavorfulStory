@@ -67,21 +67,6 @@ namespace FlavorfulStory.AI
             WorldTime.OnTimeTick += OnTimeTickHandler;
         }
 
-        /// <summary>  Обработчик события тика времени. Управляет спавном NPC на основе игрового времени. </summary>
-        /// <param name="gameTime"> Текущее игровое время. </param>
-        private void OnTimeTickHandler(DateTime gameTime)
-        {
-            if (!_isSpawning || _isTimePaused) return;
-
-            _tickCounter++;
-
-            if (_tickCounter >= SpawnIntervalInTicks && CanSpawn())
-            {
-                SpawnNpcFromPool();
-                _tickCounter = 0;
-            }
-        }
-
         /// <summary> Проверяет наличие необходимых данных и создает пул объектов для NPC. </summary>
         private void Start()
         {
@@ -121,6 +106,25 @@ namespace FlavorfulStory.AI
             return npc;
         }
 
+        /// <summary>  Обработчик события тика времени. Управляет спавном NPC на основе игрового времени. </summary>
+        /// <param name="gameTime"> Текущее игровое время. </param>
+        private void OnTimeTickHandler(DateTime gameTime)
+        {
+            if (!_isSpawning || _isTimePaused) return;
+
+            _tickCounter++;
+
+            if (_tickCounter >= SpawnIntervalInTicks && CanSpawn())
+            {
+                SpawnNpcFromPool();
+                _tickCounter = 0;
+            }
+        }
+
+        /// <summary> Проверяет, можно ли создать нового NPC. </summary>
+        /// <returns> True, если количество активных NPC меньше максимального и время не приостановлено. </returns>
+        private bool CanSpawn() => _activeCharacters.Count < _maxTotalCharacters && !_isTimePaused;
+
         /// <summary> Извлекает NPC из пула и настраивает его для спавна. </summary>
         private void SpawnNpcFromPool()
         {
@@ -137,9 +141,15 @@ namespace FlavorfulStory.AI
             StartCoroutine(SetDestinationAfterInit(npc));
         }
 
-        /// <summary> Проверяет, можно ли создать нового NPC. </summary>
-        /// <returns> True, если количество активных NPC меньше максимального и время не приостановлено. </returns>
-        private bool CanSpawn() => _activeCharacters.Count < _maxTotalCharacters && !_isTimePaused;
+        /// <summary>  Устанавливает пункт назначения для созданного NPC после его инициализации. </summary>
+        /// <param name="npc"> NPC, для которого устанавливается пункт назначения. </param>
+        /// <returns> Корутина для установки пункта назначения. </returns>
+        private IEnumerator SetDestinationAfterInit(NonInteractableNpc.NonInteractableNpc npc)
+        {
+            yield return null;
+            var loc = _locationManager.GetLocationByName(LocationName.NewShop);
+            npc.SetDestination(loc.transform.position, LocationName.NewShop);
+        }
 
         /// <summary> Возвращает NPC в пул и удаляет из списка активных. </summary>
         /// <param name="npc"> NPC для деспавна. </param>
@@ -159,16 +169,6 @@ namespace FlavorfulStory.AI
         {
             yield return null;
             foreach (var npc in _activeCharacters.ToArray()) DespawnNpc(npc);
-        }
-
-        /// <summary>  Устанавливает пункт назначения для созданного NPC после его инициализации. </summary>
-        /// <param name="npc"> NPC, для которого устанавливается пункт назначения. </param>
-        /// <returns> Корутина для установки пункта назначения. </returns>
-        private IEnumerator SetDestinationAfterInit(NonInteractableNpc.NonInteractableNpc npc)
-        {
-            yield return null;
-            var loc = _locationManager.GetLocationByName(LocationName.NewShop);
-            npc.SetDestination(loc.transform.position, LocationName.NewShop);
         }
 
         /// <summary> Получает случайную точку деспавна, исключая указанную точку. </summary>

@@ -117,7 +117,7 @@ namespace FlavorfulStory.AI.NonInteractableNpc
             var states = new CharacterState[]
             {
                 _movementState, _animationState, _furniturePickerState, _itemPickerState, _paymentState,
-                _randomPointPickerState, _shelfPickerState, _refuseItemState, _waitingState
+                _randomPointPickerState, _shelfPickerState, _refuseItemState, _waitingState, new IdleState()
             };
 
             foreach (var state in states)
@@ -177,7 +177,7 @@ namespace FlavorfulStory.AI.NonInteractableNpc
         protected override void ResetStates()
         {
             foreach (var state in _nameToCharacterStates.Values) state.Reset();
-            SetState(typeof(WaitingState).ToString()); //TODO: think about initial state
+            SetState(typeof(IdleState).ToString()); //TODO: think about initial state
         }
 
         /// <summary> Запускает случайную последовательность действий NPC. </summary>
