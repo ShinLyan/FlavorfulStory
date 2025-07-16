@@ -4,9 +4,8 @@ using UnityEngine;
 
 namespace FlavorfulStory.TooltipSystem
 {
-    /// <summary> Помещается в слот UI инвентаря для отображения тултипа предмета. </summary>
+    /// <summary> Спавнер тултипа с описанием предмета. </summary>
     [RequireComponent(typeof(IItemHolder))]
-    // TODO: Рефакторинг тултипов!!! Никаких спавнеров - один для игровых объектов, один для UI
     public class ItemTooltipSpawner : TooltipSpawner
     {
         #region Override Methods

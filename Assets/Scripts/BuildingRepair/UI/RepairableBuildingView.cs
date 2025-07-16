@@ -1,14 +1,14 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Cysharp.Threading.Tasks;
 using FlavorfulStory.Infrastructure.Factories;
 using FlavorfulStory.InputSystem;
 using FlavorfulStory.InventorySystem;
 using FlavorfulStory.TimeManagement;
-using FlavorfulStory.UI;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 using Zenject;
 
 namespace FlavorfulStory.BuildingRepair.UI
@@ -18,11 +18,8 @@ namespace FlavorfulStory.BuildingRepair.UI
     {
         #region Fields and Properties
 
-        /// <summary> Контейнер содержимого окна. </summary>
-        [SerializeField] private GameObject _content;
-
         /// <summary> Текст с названием ремонтируемого объекта. </summary>
-        [SerializeField] private TMP_Text _objectNameText;
+        [SerializeField] private TMP_Text _buildingNameText;
 
         /// <summary> Текст, отображаемый при завершении ремонта. </summary>
         [SerializeField] private TMP_Text _repairCompletedText;
@@ -31,7 +28,7 @@ namespace FlavorfulStory.BuildingRepair.UI
         [SerializeField] private Transform _requirementViewsContainer;
 
         /// <summary> Кнопка подтверждения ремонта. </summary>
-        [SerializeField] private UIButton _buildButton;
+        [SerializeField] private Button _buildButton;
 
         /// <summary> Список отображений требований ресурсов. </summary>
         private readonly List<ResourceRequirementView> _requirementViews = new();
@@ -62,7 +59,7 @@ namespace FlavorfulStory.BuildingRepair.UI
         private void Awake() => CacheInitialViews();
 
         /// <summary> Сохранить существующие отображения ресурсов, если они уже находятся в контейнере. </summary>
-        private void CacheInitialViews()
+        private void CacheInitialViews() // TODO: ПЕРЕПИСАТЬ НА НОВЫЙ OBJECTPOOL
         {
             foreach (Transform child in _requirementViewsContainer)
             {
@@ -80,15 +77,14 @@ namespace FlavorfulStory.BuildingRepair.UI
             if (!_isOpen || !InputWrapper.GetButtonDown(InputButton.SwitchGameMenu)) return;
 
             Close();
-            StartCoroutine(BlockGameMenuForOneFrame());
+            BlockGameMenuForOneFrame().Forget();
         }
 
         /// <summary> Заблокировать кнопку игрового меню на один кадр. </summary>
-        /// <returns> Корутина Unity. </returns>
-        private static IEnumerator BlockGameMenuForOneFrame()
+        private static async UniTaskVoid BlockGameMenuForOneFrame() // TODO: УДАЛИТЬ КОСТЫЛЬ НА WINDOW FABRIC
         {
             InputWrapper.BlockInput(InputButton.SwitchGameMenu);
-            yield return null;
+            await UniTask.Yield();
             InputWrapper.UnblockAllInput();
         }
 
@@ -122,12 +118,8 @@ namespace FlavorfulStory.BuildingRepair.UI
             }
 
             DisableExcessViews(stage.Requirements.Count);
-
-            _objectNameText.text = stage.BuildingName;
-            _repairCompletedText.gameObject.SetActive(false);
-            _repairCompletedText.text = $"{stage.BuildingName}'s repair completed";
-
-            _buildButton.Interactable = IsRepairPossible(stage, investedResources);
+            _buildingNameText.text = stage.BuildingName;
+            _buildButton.interactable = IsRepairPossible(stage, investedResources);
         }
 
         /// <summary> Получить или создать отображение требования по индексу. </summary>
@@ -176,21 +168,22 @@ namespace FlavorfulStory.BuildingRepair.UI
         private void Open()
         {
             _isOpen = true;
-            _content.SetActive(true);
+            gameObject.SetActive(true);
+            _requirementViewsContainer.gameObject.SetActive(true);
             WorldTime.Pause();
             InputWrapper.BlockAllInput();
             InputWrapper.UnblockInput(InputButton.SwitchGameMenu);
-            if (_onBuildPressed != null) _buildButton.OnClick += _onBuildPressed;
+            if (_onBuildPressed != null) _buildButton.onClick.AddListener(_onBuildPressed.Invoke);
         }
 
         /// <summary> Закрыть окно ремонта и сбросить состояние. </summary>
-        private void Close()
+        public void Close()
         {
             _isOpen = false;
-            _content.SetActive(false);
+            gameObject.SetActive(false);
             WorldTime.Unpause();
             InputWrapper.UnblockAllInput();
-            if (_onBuildPressed != null) _buildButton.OnClick -= _onBuildPressed;
+            if (_onBuildPressed != null) _buildButton.onClick.RemoveListener(_onBuildPressed.Invoke);
 
             CleanupViews();
 
@@ -198,7 +191,7 @@ namespace FlavorfulStory.BuildingRepair.UI
         }
 
         /// <summary> Сбросить отображения требований и обработчики. </summary>
-        private void CleanupViews()
+        private void CleanupViews() // TODO: ПЕРЕПИСАТЬ НА НОВЫЙ OBJECTPOOL
         {
             foreach (var view in _requirementViews)
             {
@@ -211,12 +204,15 @@ namespace FlavorfulStory.BuildingRepair.UI
         }
 
         /// <summary> Отобразить сообщение об окончании ремонта. </summary>
-        /// <param name="name"> Тип ремонтируемого здания. </param>
-        public void DisplayCompletionMessage(RepairableBuildingName name)
+        /// <param name="repairableBuildingName"> Название ремонтируемого здания. </param>
+        public void DisplayCompletionMessage(RepairableBuildingName repairableBuildingName)
         {
-            _requirementViews.ForEach(view => view.gameObject.SetActive(false));
+            _requirementViewsContainer.gameObject.SetActive(false);
+
+            _repairCompletedText.text = $"{repairableBuildingName}'s repair completed";
             _repairCompletedText.gameObject.SetActive(true);
-            _buildButton.Interactable = false;
+
+            _buildButton.gameObject.SetActive(false);
         }
     }
 }
