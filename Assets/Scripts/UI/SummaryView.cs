@@ -10,7 +10,7 @@ namespace FlavorfulStory.UI
     public class SummaryView : MonoBehaviour
     {
         /// <summary> Основной контейнер UI сводки. </summary>
-        [SerializeField] private GameObject _content;
+        [SerializeField] private GameObject _content; // TODO: ПО УМОЛЧАНИЮ ВЫКЛЮЧАТЬ ВЕСЬ VIEW, УДАЛИТЬ CONTENT
 
         /// <summary> Текстовый элемент для отображения сводной информации. </summary>
         [SerializeField] private TMP_Text _summaryText;

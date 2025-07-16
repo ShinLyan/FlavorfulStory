@@ -90,7 +90,7 @@ namespace FlavorfulStory.InventorySystem.UI
         /// <summary> Корутина для плавного изменения цвета слота. </summary>
         /// <param name="color"> Целевой цвет. </param>
         /// <returns> Перечислитель для корутины. </returns>
-        private IEnumerator FadeToColorCoroutine(Color color)
+        private IEnumerator FadeToColorCoroutine(Color color) // TODO: ПЕРЕПИСАТЬ НА DOTWEEN
         {
             var startColor = ButtonImage.color;
             float timeElapsed = 0;
