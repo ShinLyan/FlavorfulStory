@@ -1,8 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using FlavorfulStory.Infrastructure;
 using FlavorfulStory.SceneManagement;
+using FlavorfulStory.TimeManagement;
 using UnityEngine;
 using Zenject;
+using Random = UnityEngine.Random;
 
 namespace FlavorfulStory.AI
 {
@@ -39,6 +42,18 @@ namespace FlavorfulStory.AI
         /// <summary> Менеджер локаций для управления местоположениями. </summary>
         [Inject] private LocationManager _locationManager;
 
+        private ObjectPool<NonInteractableNpc.NonInteractableNpc> _npcPool;
+
+        private bool _isTimePaused;
+
+        private void Awake()
+        {
+            WorldTime.OnDayEnded += _ => StartCoroutine(DespawnAllNpcCoroutine());
+            WorldTime.OnTimePaused += () => _isTimePaused = true;
+            WorldTime.OnTimeUnpaused += () => _isTimePaused = false;
+        }
+
+
         /// <summary> Инициализация компонента. </summary>
         private void Start()
         {
@@ -54,40 +69,79 @@ namespace FlavorfulStory.AI
                 return;
             }
 
+            _npcPool = new ObjectPool<NonInteractableNpc.NonInteractableNpc>(
+                CreateNpc,
+                npc => npc.gameObject.SetActive(true),
+                npc => npc.gameObject.SetActive(false),
+                actionOnDestroy: npc => Destroy(npc.gameObject),
+                defaultCapacity: _maxTotalCharacters,
+                maxSize: _maxTotalCharacters
+            );
+
             StartCoroutine(SpawnRoutine());
         }
 
+        private NonInteractableNpc.NonInteractableNpc CreateNpc()
+        {
+            var npcSpawnPoint = _spawnPoints[Random.Range(0, _spawnPoints.Length)];
+            var pos = npcSpawnPoint.GetRandomPosition();
+
+            NonInteractableNpc.NonInteractableNpc prefab = _npcPrefabs[Random.Range(0, _npcPrefabs.Length)];
+            var npc = _diContainer.InstantiatePrefabForComponent<NonInteractableNpc.NonInteractableNpc>(
+                prefab, pos, Quaternion.identity, _parentTransform
+            );
+            return npc;
+        }
+
+        private void SpawnNpcFromPool()
+        {
+            var npc = _npcPool.Get();
+
+            NpcSpawnPoint npcSpawnPoint = _spawnPoints[Random.Range(0, _spawnPoints.Length)];
+
+            var pos = npcSpawnPoint.GetRandomPosition();
+            npc.transform.position = pos;
+            npc.transform.rotation = Quaternion.identity;
+
+            _activeCharacters.Add(npc);
+
+            npc.OnReachedDespawnPoint += () => DespawnNpc(npc);
+            npc.SetDespawnPoint(GetRandomDespawnPoint(npcSpawnPoint).transform.position);
+            StartCoroutine(SetDestinationAfterInit(npc));
+        }
+
+
         /// <summary> Корутина для периодического спавна NPC. </summary>
-        /// <returns> Корутина для периодического спавна. </returns>
         private IEnumerator SpawnRoutine()
         {
             while (_isSpawning)
             {
                 yield return new WaitForSeconds(_spawnInterval);
 
-                if (CanSpawn()) SpawnNpc();
+                if (CanSpawn()) SpawnNpcFromPool();
             }
         }
 
         /// <summary>  Проверяет, можно ли создать нового NPC. </summary>
         /// <returns> True, если количество активных NPC меньше максимального. </returns>
-        private bool CanSpawn() => _activeCharacters.Count < _maxTotalCharacters;
+        private bool CanSpawn() => _activeCharacters.Count < _maxTotalCharacters && !_isTimePaused;
 
-        /// <summary> Создает нового NPC в случайной точке спавна, используя случайный префаб. </summary>
-        private void SpawnNpc()
+
+        /// <summary> Возвращает NPC в пул и удаляет из списка активных. </summary>
+        private void DespawnNpc(NonInteractableNpc.NonInteractableNpc npc)
         {
-            NpcSpawnPoint npcSpawnPoint = _spawnPoints[Random.Range(0, _spawnPoints.Length)];
-            NonInteractableNpc.NonInteractableNpc randomPrefab = _npcPrefabs[Random.Range(0, _npcPrefabs.Length)];
+            if (_activeCharacters.Contains(npc))
+            {
+                _activeCharacters.Remove(npc);
+                _npcPool.Release(npc);
+            }
+        }
 
-            var npc = _diContainer.InstantiatePrefabForComponent<NonInteractableNpc.NonInteractableNpc>(
-                randomPrefab,
-                npcSpawnPoint.GetRandomPosition(),
-                Quaternion.identity,
-                _parentTransform);
+        private IEnumerator DespawnAllNpcCoroutine()
+        {
+            yield return null;
 
-            _activeCharacters.Add(npc);
-
-            StartCoroutine(SetDestinationAfterInit(npc));
+            foreach (var npc in _activeCharacters.ToArray()) DespawnNpc(npc);
         }
 
         /// <summary> Устанавливает пункт назначения для созданного NPC после его инициализации. </summary>

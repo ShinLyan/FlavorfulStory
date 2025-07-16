@@ -1,28 +1,54 @@
 ﻿using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace FlavorfulStory.AI
 {
-    /// <summary> Точка спавна NPC с возможностью генерации случайных позиций в радиусе. </summary>
+    /// <summary> Точка спавна NPC с возможностью генерации случайных позиций в прямоугольной области. </summary>
+    [RequireComponent(typeof(Collider))]
     public class NpcSpawnPoint : MonoBehaviour
     {
-        /// <summary> Радиус спавна для генерации случайных позиций вокруг точки. </summary>
-        [SerializeField] private float _spawnRadius = 2f;
+        [Header("Spawn Area Settings")] [SerializeField]
+        private Vector3 _spawnBoxSize = new(4f, 0f, 4f);
 
-        /// <summary> Возвращает случайную позицию в радиусе спавна с сохранением высоты исходной точки. </summary>
-        /// <returns> Случайная позиция в пределах радиуса спавна. </returns>
+        [SerializeField] private Vector3 _spawnBoxOffset = new(3f, 0f, 0f);
+
+        /// <summary> Возвращает случайную позицию в прямоугольной области спавна. </summary>
         public Vector3 GetRandomPosition()
         {
-            Vector3 randomPos = transform.position + Random.insideUnitSphere * _spawnRadius;
-            randomPos.y = transform.position.y;
-            return randomPos;
+            Vector3 localRandomPoint = new Vector3(
+                Random.Range(-0.5f, 0.5f),
+                0f,
+                Random.Range(-0.5f, 0.5f)
+            );
+
+            localRandomPoint = Vector3.Scale(localRandomPoint, _spawnBoxSize);
+            Vector3 worldPoint = transform.TransformPoint(_spawnBoxOffset + localRandomPoint);
+
+            worldPoint.y = transform.position.y;
+            return worldPoint;
         }
 
-        /// <summary> Отрисовывает визуальные элементы точки спавна в редакторе. </summary>
-        private void OnDrawGizmos()
+        private void OnTriggerEnter(Collider other)
         {
+            if (other.TryGetComponent<NonInteractableNpc.NonInteractableNpc>(out var npc))
+                npc.OnReachedDespawnPoint?.Invoke();
+        }
+
+        private void OnDrawGizmosSelected()
+        {
+            Matrix4x4 originalMatrix = Gizmos.matrix;
+
+            Gizmos.color = new Color(0, 1, 1, 0.3f);
+            Gizmos.matrix = Matrix4x4.TRS(transform.position, transform.rotation, Vector3.one);
+
+            Gizmos.DrawCube(_spawnBoxOffset, _spawnBoxSize);
             Gizmos.color = Color.cyan;
-            Gizmos.DrawWireSphere(transform.position, _spawnRadius);
-            Gizmos.DrawIcon(transform.position + Vector3.up * 2, "SpawnPointIcon", true);
+            Gizmos.DrawWireCube(_spawnBoxOffset, _spawnBoxSize);
+
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawLine(Vector3.zero, _spawnBoxOffset);
+
+            Gizmos.matrix = originalMatrix;
         }
     }
 }

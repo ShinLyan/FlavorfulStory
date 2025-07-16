@@ -27,6 +27,7 @@ namespace FlavorfulStory.AI.NonInteractableNpc
             : base(navMeshAgent, warpGraph, transform, animationController)
         {
             _nonInteractableNavigator = (NonInteractableNpcNavigator)_navigator;
+            _currentPoint = null;
 
             _nonInteractableNavigator.OnDestinationReached += () =>
             {
@@ -46,7 +47,7 @@ namespace FlavorfulStory.AI.NonInteractableNpc
         }
 
         /// <summary> Запускает перемещение к текущей установленной точке. </summary>
-        public override void MoveToPoint() { _nonInteractableNavigator.MoveTo(_currentPoint); }
+        public override void MoveToPoint() => _nonInteractableNavigator.MoveTo(_currentPoint);
 
         // public void SetPoint(Vector3 newPoint) => _currentPoint = newPoint; //TODO: подумать
         /// <summary> Устанавливает новую точку расписания для перемещения. </summary>

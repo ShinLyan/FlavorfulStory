@@ -97,16 +97,18 @@ namespace FlavorfulStory.AI.InteractableNpc
             _animationController.TriggerAnimation(AnimationType.Locomotion);
         }
 
+        protected override void OnReset(DateTime currentTime)
+        {
+            PrioritizeSchedule(currentTime);
+            base.OnReset(currentTime);
+        }
+
         /// <summary> Сбрасывает все состояния и устанавливает состояние рутины. </summary>
         protected override void ResetStates()
         {
             foreach (var state in _nameToCharacterStates.Values) state.Reset();
             SetState(typeof(RoutineState).ToString());
         }
-
-        /// <summary> Выполняет приоритизацию расписания перед сбросом состояний. </summary>
-        /// <param name="currentTime"> Текущее игровое время. </param>
-        protected override void OnPreReset(DateTime currentTime) => PrioritizeSchedule(currentTime);
 
         /// <summary> Определяет приоритетное расписание на основе текущих условий игры. </summary>
         /// <param name="currentTime"> Текущее игровое время. </param>

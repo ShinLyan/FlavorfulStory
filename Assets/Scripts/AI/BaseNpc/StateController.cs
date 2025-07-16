@@ -45,20 +45,12 @@ namespace FlavorfulStory.AI.BaseNpc
 
         /// <summary> Сбрасывает систему состояний при смене дня или инициализации. </summary>
         /// <param name="currentTime"> Текущее игровое время. </param>
-        private void OnReset(DateTime currentTime)
-        {
-            OnPreReset(currentTime);
-            ResetStates();
-        }
+        protected virtual void OnReset(DateTime currentTime) => ResetStates();
 
-        /// <summary> Выполняет действия перед сбросом состояний. </summary>
-        /// <param name="currentTime"> Текущее игровое время. </param>
-        /// <remarks> Может быть переопределен в наследниках для дополнительной логики. </remarks>
-        protected virtual void OnPreReset(DateTime currentTime) { }
 
         /// <summary> Сбрасывает все состояния к начальному и устанавливает состояние рутины. </summary>
         /// <remarks> Может быть переопределен в наследниках для специфической логики сброса. </remarks>
-        protected virtual void ResetStates() { }
+        protected abstract void ResetStates();
 
         /// <summary> Устанавливает новое состояние персонажа по типу. </summary>
         /// <param name="type"> Тип состояния для установки. </param>

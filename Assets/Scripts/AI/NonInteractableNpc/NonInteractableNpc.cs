@@ -1,5 +1,7 @@
-﻿using FlavorfulStory.Actions;
+﻿using System;
+using FlavorfulStory.Actions;
 using FlavorfulStory.AI.BaseNpc;
+using FlavorfulStory.AI.FiniteStateMachine;
 using FlavorfulStory.AI.Scheduling;
 using FlavorfulStory.AI.WarpGraphSystem;
 using FlavorfulStory.SceneManagement;
@@ -18,6 +20,9 @@ namespace FlavorfulStory.AI.NonInteractableNpc
 
         /// <summary> Обработчик предметов для взаимодействия с объектами. </summary>
         private ItemHandler _itemHandler;
+
+        /// <summary> Событие, вызываемое при достижении NPC точки спавна для уничтожения. </summary>
+        public Action OnReachedDespawnPoint;
 
         /// <summary> Инициализирует компоненты неинтерактивного NPC. </summary>
         protected override void Awake()
@@ -60,10 +65,15 @@ namespace FlavorfulStory.AI.NonInteractableNpc
             point.Position = destination;
             point.LocationName = locationName;
 
-            (_movementController as NonInteractableNpcMovementController)?.SetPoint(point);
-            _movementController.MoveToPoint();
+            ((NonInteractableNpcMovementController)_movementController).SetPoint(point);
+            ((NonInteractableNpcStateController)_stateController).ForceSetState(typeof(MovementState).ToString());
             ((NonInteractableNpcMovementController)_movementController).OnDestinationReached += () =>
                 (_stateController as NonInteractableNpcStateController)?.StartRandomSequence();
+        }
+
+        public void SetDespawnPoint(Vector3 destination, LocationName locationName = LocationName.RockyIsland)
+        {
+            (_stateController as NonInteractableNpcStateController)?.SetDespawnPoint(destination, locationName);
         }
     }
 }

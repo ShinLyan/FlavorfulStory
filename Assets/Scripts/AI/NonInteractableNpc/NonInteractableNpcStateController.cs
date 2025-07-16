@@ -76,6 +76,8 @@ namespace FlavorfulStory.AI.NonInteractableNpc
         /// <summary> Флаг, указывающий, посещал ли NPC мебель после покупки. </summary>
         private bool _hadVisitedFurnitureAfterPurchase;
 
+        private SchedulePoint _despawnPoint;
+
         #endregion
 
         /// <summary> Инициализирует новый экземпляр контроллера состояний для неинтерактивного NPC. </summary>
@@ -99,6 +101,7 @@ namespace FlavorfulStory.AI.NonInteractableNpc
             _npcTransform = npcTransform;
 
             _hadVisitedFurnitureAfterPurchase = false;
+            _despawnPoint = null;
 
             Initialize();
         }
@@ -177,9 +180,6 @@ namespace FlavorfulStory.AI.NonInteractableNpc
             SetState(typeof(WaitingState).ToString()); //TODO: think about initial state
         }
 
-        /// <summary> Возвращает управление после завершения последовательности. </summary>
-        public override void ReturnFromSequence() => SetState(typeof(WaitingState).ToString());
-
         /// <summary> Запускает случайную последовательность действий NPC. </summary>
         public void StartRandomSequence()
         {
@@ -243,12 +243,8 @@ namespace FlavorfulStory.AI.NonInteractableNpc
         /// <summary> Отправляет NPC в точку деспавна. </summary>
         private void GoToDespawnPoint()
         {
-            //TODO: отправить в точку деспавна
-            var point = new SchedulePoint(); //TODO: переделать после удаление WarpGraph
-            point.Position = _playerController.transform.position;
-            point.LocationName = LocationName.RockyIsland;
-
-            _npcMovementController.SetPoint(point);
+            //TODO: переделать после удаление WarpGraph
+            _npcMovementController.SetPoint(_despawnPoint);
             SetState(typeof(MovementState).ToString());
         }
 
@@ -260,5 +256,16 @@ namespace FlavorfulStory.AI.NonInteractableNpc
             else
                 StartRandomSequence();
         }
+
+        public void SetDespawnPoint(Vector3 destination, LocationName locationName = LocationName.RockyIsland)
+        {
+            var point = new SchedulePoint(); //TODO: переделать после удаление WarpGraph
+            point.Position = destination;
+            point.LocationName = locationName;
+
+            _despawnPoint = point;
+        }
+
+        public void ForceSetState(string type) => SetState(type);
     }
 }
