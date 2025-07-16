@@ -70,22 +70,7 @@ namespace FlavorfulStory.BuildingRepair
         /// <summary> Запуск инициализации после загрузки сцены. </summary>
         private void Start()
         {
-            InitializeInvestedResourcesList();
-            InitializeRepairStages();
-        }
-
-        /// <summary> Инициализация списка вложенных ресурсов. </summary>
-        /// <remarks> Список инвестированных ресурсов на текущей стадии будет инициализирован нулями. </remarks>
-        private void InitializeInvestedResourcesList()
-        {
-            if (_investedResources != null) return;
-
             _investedResources = CurrentStage.Requirements.Select(_ => 0).ToList();
-        }
-
-        /// <summary> Инициализация стадий ремонта. </summary>
-        private void InitializeRepairStages()
-        {
             _objectSwitcher.Initialize();
 
             // На случай системы сохранения
@@ -114,7 +99,7 @@ namespace FlavorfulStory.BuildingRepair
             _onStageUpdated += _view.UpdateView;
             OnRepairCompleted += _view.DisplayCompletionMessage;
 
-            _view.Show(CurrentStage, _investedResources, TransferResource, Build,
+            _view.Show(CurrentStage, _investedResources, AddResource, ReturnResource, Build,
                 () =>
                 {
                     _onStageUpdated -= _view.UpdateView;
@@ -148,20 +133,6 @@ namespace FlavorfulStory.BuildingRepair
             _objectSwitcher.SwitchTo(_repairStageIndex);
             SfxPlayer.Instance.PlayOneShot(SfxType.Build);
 
-            InitializeInvestedResourcesList();
-            _onStageUpdated?.Invoke(CurrentStage, _investedResources);
-        }
-
-        /// <summary> Обработка передачи ресурса в ремонт или возврата. </summary>
-        /// <param name="resource"> Ресурс, который передается в ремонт. </param>
-        /// <param name="type"> Тип кнопки для добавления или возвращения ресурса. </param>
-        private void TransferResource(InventoryItem resource, ResourceTransferButtonType type)
-        {
-            if (type == ResourceTransferButtonType.Add)
-                AddResource(resource);
-            else
-                ReturnResource(resource);
-
             _onStageUpdated?.Invoke(CurrentStage, _investedResources);
         }
 
@@ -180,6 +151,8 @@ namespace FlavorfulStory.BuildingRepair
 
             _investedResources[index] += toInvest;
             _playerInventory.RemoveItem(resource, toInvest);
+
+            _onStageUpdated?.Invoke(CurrentStage, _investedResources);
         }
 
         /// <summary> Вернуть ресурс в инвентарь. </summary>
@@ -194,6 +167,8 @@ namespace FlavorfulStory.BuildingRepair
 
             _playerInventory.TryAddToFirstAvailableSlot(resource, invested);
             _investedResources[index] = 0;
+
+            _onStageUpdated?.Invoke(CurrentStage, _investedResources);
         }
 
         #region Saving

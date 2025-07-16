@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 8119559991041388890}
   - component: {fileID: 6493702981426936176}
   - component: {fileID: 6896033617434537092}
-  - component: {fileID: 3746229905666828559}
   m_Layer: 5
   m_Name: AddResourceButton
   m_TagString: Untagged
@@ -85,7 +84,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 346537172583375172}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
   m_Name: 
@@ -122,19 +121,6 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &3746229905666828559
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 346537172583375172}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 36f7f1decb706fa41b2c78b25adfd657, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _buttonType: 0
 --- !u!1 &746803291399139315
 GameObject:
   m_ObjectHideFlags: 0
@@ -211,7 +197,6 @@ GameObject:
   - component: {fileID: 5310658231423747575}
   - component: {fileID: 5577401144237942476}
   - component: {fileID: 303901440932444748}
-  - component: {fileID: 24676771003697901}
   m_Layer: 5
   m_Name: ReturnResourceButton
   m_TagString: Untagged
@@ -284,7 +269,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1624765912782899941}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
   m_Name: 
@@ -321,19 +306,6 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &24676771003697901
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1624765912782899941}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 36f7f1decb706fa41b2c78b25adfd657, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _buttonType: 1
 --- !u!1 &3336740871693969319
 GameObject:
   m_ObjectHideFlags: 0
@@ -414,8 +386,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _resourceIcon: {fileID: 1204353406043900489}
   _quantityText: {fileID: 7451592401237252109}
-  _addResourceButton: {fileID: 3746229905666828559}
-  _returnResourceButton: {fileID: 24676771003697901}
+  _addResourceButton: {fileID: 6896033617434537092}
+  _returnResourceButton: {fileID: 303901440932444748}
 --- !u!114 &8825423727288089794
 MonoBehaviour:
   m_ObjectHideFlags: 0

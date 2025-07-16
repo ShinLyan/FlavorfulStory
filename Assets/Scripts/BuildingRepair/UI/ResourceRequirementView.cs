@@ -21,10 +21,10 @@ namespace FlavorfulStory.BuildingRepair.UI
         [SerializeField] private TMP_Text _quantityText;
 
         /// <summary> Кнопка добавления ресурса в процесс ремонта. </summary>
-        [SerializeField] private ResourceTransferButton _addResourceButton;
+        [SerializeField] private Button _addResourceButton;
 
         /// <summary> Кнопка возврата ресурса в инвентарь. </summary>
-        [SerializeField] private ResourceTransferButton _returnResourceButton;
+        [SerializeField] private Button _returnResourceButton;
 
         /// <summary> Текущий ресурс, с которым работает этот элемент. </summary>
         private InventoryItem _resource;
@@ -35,9 +35,11 @@ namespace FlavorfulStory.BuildingRepair.UI
         /// <summary> Вложенное количество ресурса. </summary>
         private int _investedQuantity;
 
-        /// <summary> Событие, которое вызывается при клике на одну из кнопок
-        /// добавления или возврата ресурса. </summary>
-        public event Action<InventoryItem, ResourceTransferButtonType> OnResourceTransferButtonClick;
+        /// <summary> Событие, вызываемое при нажатии кнопки добавления ресурса. </summary>
+        public event Action<InventoryItem> OnAddClicked;
+
+        /// <summary> Событие, вызываемое при нажатии кнопки возврата ресурса. </summary>
+        public event Action<InventoryItem> OnReturnClicked;
 
         /// <summary> Инвентарь игрока. </summary>
         private Inventory _playerInventory;
@@ -50,15 +52,15 @@ namespace FlavorfulStory.BuildingRepair.UI
         /// <summary> Подписаться на события при активации объекта. </summary>
         private void OnEnable()
         {
-            _addResourceButton.OnResourceTransferButtonClick += OnResourceTransferButtonClick;
-            _returnResourceButton.OnResourceTransferButtonClick += OnResourceTransferButtonClick;
+            _addResourceButton.onClick.AddListener(() => OnAddClicked?.Invoke(_resource));
+            _returnResourceButton.onClick.AddListener(() => OnReturnClicked?.Invoke(_resource));
         }
 
         /// <summary> Отписаться от событий при деактивации объекта. </summary>
         private void OnDisable()
         {
-            _addResourceButton.OnResourceTransferButtonClick -= OnResourceTransferButtonClick;
-            _returnResourceButton.OnResourceTransferButtonClick -= OnResourceTransferButtonClick;
+            _addResourceButton.onClick.RemoveAllListeners();
+            _returnResourceButton.onClick.RemoveAllListeners();
         }
 
         /// <summary> Установить ресурс для текущего элемента. </summary>
@@ -73,16 +75,13 @@ namespace FlavorfulStory.BuildingRepair.UI
 
         /// <summary> Инициализировать данные о ресурсе. </summary>
         /// <param name="resource"> Ресурс. </param>
-        /// <param name="requiredQuantity"> Требуемое количество ресурса. </param>
-        /// <param name="investedQuantity"> Вложенное количество ресурса. </param>
-        private void InitializeResourceData(InventoryItem resource, int requiredQuantity, int investedQuantity)
+        /// <param name="requiredNumber"> Требуемое количество ресурса. </param>
+        /// <param name="investedNumber"> Вложенное количество ресурса. </param>
+        private void InitializeResourceData(InventoryItem resource, int requiredNumber, int investedNumber)
         {
             _resource = resource;
-            _requiredQuantity = requiredQuantity;
-            _investedQuantity = investedQuantity;
-
-            _addResourceButton.SetResource(_resource);
-            _returnResourceButton.SetResource(_resource);
+            _requiredQuantity = requiredNumber;
+            _investedQuantity = investedNumber;
         }
 
         /// <summary> Обновить визуальное отображение информации о ресурсе. </summary>
@@ -95,9 +94,9 @@ namespace FlavorfulStory.BuildingRepair.UI
         /// <summary> Обновить состояние кнопок добавления и возврата ресурса. </summary>
         private void UpdateButtonsStates()
         {
-            _addResourceButton.Interactable =
+            _addResourceButton.interactable =
                 _investedQuantity < _requiredQuantity && _playerInventory.GetItemNumber(_resource) > 0;
-            _returnResourceButton.Interactable = _investedQuantity > 0 && _playerInventory.HasSpaceFor(_resource);
+            _returnResourceButton.interactable = _investedQuantity > 0 && _playerInventory.HasSpaceFor(_resource);
         }
 
         /// <summary> Получить предмет для отображения в тултипе. </summary>

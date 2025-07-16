@@ -3,8 +3,10 @@
     /// <summary> Название ремонтируемого здания. </summary>
     public enum RepairableBuildingName
     {
-        Stall
+        /// <summary> Ларёк. </summary>
+        Stall,
 
-        // Shop
+        /// <summary> Магазин Игрока. </summary>
+        Shop
     }
 }

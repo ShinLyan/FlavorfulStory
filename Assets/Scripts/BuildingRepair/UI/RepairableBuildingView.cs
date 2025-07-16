@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
+using FlavorfulStory.Infrastructure;
 using FlavorfulStory.Infrastructure.Factories;
 using FlavorfulStory.InputSystem;
 using FlavorfulStory.InventorySystem;
@@ -30,20 +31,26 @@ namespace FlavorfulStory.BuildingRepair.UI
         /// <summary> Кнопка подтверждения ремонта. </summary>
         [SerializeField] private Button _buildButton;
 
+        /// <summary> Пул для повторного использования требований к ремонту. </summary>
+        private ObjectPool<ResourceRequirementView> _requirementPool;
+
         /// <summary> Список отображений требований ресурсов. </summary>
         private readonly List<ResourceRequirementView> _requirementViews = new();
 
         /// <summary> Открыто ли окно ремонта? </summary>
         private bool _isOpen;
 
-        /// <summary> Обработчик событий передачи ресурсов. </summary>
-        private Action<InventoryItem, ResourceTransferButtonType> _transferHandler;
+        /// <summary> Делегат, вызываемый при добавлении ресурса. </summary>
+        private Action<InventoryItem> _onAdd;
 
-        /// <summary> Обработчик нажатия кнопки постройки. </summary>
-        private Action _onBuildPressed;
+        /// <summary> Делегат, вызываемый при возврате ресурса. </summary>
+        private Action<InventoryItem> _onReturn;
 
-        /// <summary> Обработчик запроса на закрытие окна. </summary>
-        private Action _onCloseRequested;
+        /// <summary> Делегат, вызываемый при нажатии кнопки постройки. </summary>
+        private Action _onBuild;
+
+        /// <summary> Делегат, вызываемый при закрытии окна. </summary>
+        private Action _onClose;
 
         /// <summary> Фабрика создания отображений требований ресурсов. </summary>
         private IGameFactory<ResourceRequirementView> _requirementViewFactory;
@@ -56,19 +63,39 @@ namespace FlavorfulStory.BuildingRepair.UI
         private void Construct(IGameFactory<ResourceRequirementView> factory) => _requirementViewFactory = factory;
 
         /// <summary> Инициализация кэша вьюшек, если они уже присутствуют в иерархии. </summary>
-        private void Awake() => CacheInitialViews();
-
-        /// <summary> Сохранить существующие отображения ресурсов, если они уже находятся в контейнере. </summary>
-        private void CacheInitialViews() // TODO: ПЕРЕПИСАТЬ НА НОВЫЙ OBJECTPOOL
+        private void Awake()
         {
-            foreach (Transform child in _requirementViewsContainer)
-            {
-                var view = child.GetComponent<ResourceRequirementView>();
-                if (!view || _requirementViews.Contains(view)) continue;
+            _requirementPool = new ObjectPool<ResourceRequirementView>(
+                () => _requirementViewFactory.Create(_requirementViewsContainer),
+                view =>
+                {
+                    view.gameObject.SetActive(true);
+                    view.transform.SetParent(_requirementViewsContainer, false);
+                },
+                view =>
+                {
+                    view.OnAddClicked -= _onAdd;
+                    view.OnReturnClicked -= _onReturn;
+                    view.gameObject.SetActive(false);
+                }
+            );
 
-                view.gameObject.SetActive(false);
-                _requirementViews.Add(view);
-            }
+            RegisterExistingViews(_requirementViewsContainer, _requirementPool);
+        }
+
+        /// <summary> Регистрирует уже существующие дочерние элементы в переданном контейнере
+        /// как неактивные и добавляет их в пул. </summary>
+        /// <typeparam name="T"> Тип компонента, который нужно зарегистрировать. </typeparam>
+        /// <param name="parent"> Родительский трансформ, содержащий компоненты. </param>
+        /// <param name="pool"> Пул объектов, в который добавляются компоненты. </param>
+        private static void RegisterExistingViews<T>(Transform parent, ObjectPool<T> pool) where T : Component
+        {
+            foreach (Transform child in parent)
+                if (child.TryGetComponent<T>(out var component))
+                {
+                    component.gameObject.SetActive(false);
+                    pool.Release(component);
+                }
         }
 
         /// <summary> Проверить ввод пользователя и закрыть окно при необходимости. </summary>
@@ -91,19 +118,20 @@ namespace FlavorfulStory.BuildingRepair.UI
         /// <summary> Отобразить UI ремонта для указанного объекта. </summary>
         /// <param name="stage"> Объект ремонта. </param>
         /// <param name="investedResources"> Список вложенных ресурсов. </param>
-        /// <param name="onTransfer"> Обработчик передачи ресурсов. </param>
+        /// <param name="onAdd"> Обработчик добавления ресурсов. </param>
+        /// <param name="onReturn"> Обработчик забирания ресурсов. </param>
         /// <param name="onBuild"> Обработчик подтверждения ремонта. </param>
-        /// <param name="onCloseRequested"> Обработчик запроса закрытия окна. </param>
+        /// <param name="onClose"> Обработчик закрытия окна ремонта. </param>
         public void Show(RepairStage stage, List<int> investedResources,
-            Action<InventoryItem, ResourceTransferButtonType> onTransfer,
-            Action onBuild, Action onCloseRequested)
+            Action<InventoryItem> onAdd, Action<InventoryItem> onReturn, Action onBuild, Action onClose)
         {
-            _transferHandler = onTransfer;
-            _onBuildPressed = onBuild;
-            _onCloseRequested = onCloseRequested;
+            _onAdd = onAdd;
+            _onReturn = onReturn;
+            _onBuild = onBuild;
+            _onClose = onClose;
 
-            UpdateView(stage, investedResources);
             Open();
+            UpdateView(stage, investedResources);
         }
 
         /// <summary> Обновить отображение требований и состояния ремонта. </summary>
@@ -111,50 +139,29 @@ namespace FlavorfulStory.BuildingRepair.UI
         /// <param name="investedResources"> Список вложенных ресурсов. </param>
         public void UpdateView(RepairStage stage, List<int> investedResources)
         {
+            ClearView();
+
             for (int i = 0; i < stage.Requirements.Count; i++)
             {
-                var view = EnsureRequirementView(i);
-                UpdateRequirementView(view, stage.Requirements[i], investedResources[i]);
+                var view = _requirementPool.Get();
+                view.transform.SetAsLastSibling();
+                view.Setup(stage.Requirements[i], investedResources[i]);
+
+                view.OnAddClicked += _onAdd;
+                view.OnReturnClicked += _onReturn;
+
+                _requirementViews.Add(view);
             }
 
-            DisableExcessViews(stage.Requirements.Count);
             _buildingNameText.text = stage.BuildingName;
             _buildButton.interactable = IsRepairPossible(stage, investedResources);
         }
 
-        /// <summary> Получить или создать отображение требования по индексу. </summary>
-        /// <param name="index"> Индекс требования. </param>
-        /// <returns> Отображение требования ресурса. </returns>
-        private ResourceRequirementView EnsureRequirementView(int index)
+        /// <summary> Очистить отображение окна ремонта. </summary>
+        private void ClearView()
         {
-            if (index < _requirementViews.Count) return _requirementViews[index];
-
-            var view = _requirementViewFactory.Create(_requirementViewsContainer);
-            _requirementViews.Add(view);
-            return view;
-        }
-
-        /// <summary> Настроить отображение отдельного требования ресурса. </summary>
-        /// <param name="view"> Отображение требования. </param>
-        /// <param name="requirement"> Требование ресурса. </param>
-        /// <param name="invested"> Количество вложенного ресурса. </param>
-        private void UpdateRequirementView(ResourceRequirementView view, ItemStack requirement, int invested)
-        {
-            view.gameObject.SetActive(true);
-            view.Setup(requirement, invested);
-            view.OnResourceTransferButtonClick -= _transferHandler;
-            view.OnResourceTransferButtonClick += _transferHandler;
-        }
-
-        /// <summary> Отключить лишние отображения требований. </summary>
-        /// <param name="activeCount"> Количество активных требований. </param>
-        private void DisableExcessViews(int activeCount)
-        {
-            for (int i = activeCount; i < _requirementViews.Count; i++)
-            {
-                _requirementViews[i].gameObject.SetActive(false);
-                _requirementViews[i].OnResourceTransferButtonClick -= _transferHandler;
-            }
+            foreach (var view in _requirementViews) _requirementPool.Release(view);
+            _requirementViews.Clear();
         }
 
         /// <summary> Проверить возможность завершения ремонта. </summary>
@@ -170,10 +177,12 @@ namespace FlavorfulStory.BuildingRepair.UI
             _isOpen = true;
             gameObject.SetActive(true);
             _requirementViewsContainer.gameObject.SetActive(true);
+
             WorldTime.Pause();
             InputWrapper.BlockAllInput();
             InputWrapper.UnblockInput(InputButton.SwitchGameMenu);
-            if (_onBuildPressed != null) _buildButton.onClick.AddListener(_onBuildPressed.Invoke);
+
+            if (_onBuild != null) _buildButton.onClick.AddListener(_onBuild.Invoke);
         }
 
         /// <summary> Закрыть окно ремонта и сбросить состояние. </summary>
@@ -181,26 +190,18 @@ namespace FlavorfulStory.BuildingRepair.UI
         {
             _isOpen = false;
             gameObject.SetActive(false);
+
             WorldTime.Unpause();
             InputWrapper.UnblockAllInput();
-            if (_onBuildPressed != null) _buildButton.onClick.RemoveListener(_onBuildPressed.Invoke);
 
-            CleanupViews();
+            if (_onBuild != null) _buildButton.onClick.RemoveListener(_onBuild.Invoke);
+            ClearView();
 
-            _onCloseRequested?.Invoke();
-        }
+            _onAdd = null;
+            _onReturn = null;
+            _onBuild = null;
 
-        /// <summary> Сбросить отображения требований и обработчики. </summary>
-        private void CleanupViews() // TODO: ПЕРЕПИСАТЬ НА НОВЫЙ OBJECTPOOL
-        {
-            foreach (var view in _requirementViews)
-            {
-                view.gameObject.SetActive(false);
-                view.OnResourceTransferButtonClick -= _transferHandler;
-            }
-
-            _transferHandler = null;
-            _onBuildPressed = null;
+            _onClose?.Invoke();
         }
 
         /// <summary> Отобразить сообщение об окончании ремонта. </summary>
@@ -208,10 +209,8 @@ namespace FlavorfulStory.BuildingRepair.UI
         public void DisplayCompletionMessage(RepairableBuildingName repairableBuildingName)
         {
             _requirementViewsContainer.gameObject.SetActive(false);
-
             _repairCompletedText.text = $"{repairableBuildingName}'s repair completed";
             _repairCompletedText.gameObject.SetActive(true);
-
             _buildButton.gameObject.SetActive(false);
         }
     }
