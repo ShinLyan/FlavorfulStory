@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using FlavorfulStory.Infrastructure.Factories;
 using FlavorfulStory.InputSystem;
 using FlavorfulStory.InventorySystem;
@@ -46,9 +47,6 @@ namespace FlavorfulStory.BuildingRepair.UI
 
         /// <summary> Обработчик запроса на закрытие окна. </summary>
         private Action _onCloseRequested;
-
-        /// <summary> Событие, вызываемое при закрытии окна ремонта. </summary>
-        public event Action OnClose;
 
         /// <summary> Фабрика создания отображений требований ресурсов. </summary>
         private IGameFactory<ResourceRequirementView> _requirementViewFactory;
@@ -148,7 +146,7 @@ namespace FlavorfulStory.BuildingRepair.UI
         /// <param name="view"> Отображение требования. </param>
         /// <param name="requirement"> Требование ресурса. </param>
         /// <param name="invested"> Количество вложенного ресурса. </param>
-        private void UpdateRequirementView(ResourceRequirementView view, ResourceRequirement requirement, int invested)
+        private void UpdateRequirementView(ResourceRequirementView view, ItemStack requirement, int invested)
         {
             view.gameObject.SetActive(true);
             view.Setup(requirement, invested);
@@ -171,14 +169,8 @@ namespace FlavorfulStory.BuildingRepair.UI
         /// <param name="stage"> Стадия ремонта. </param>
         /// <param name="investedResources"> Вложенные ресурсы. </param>
         /// <returns> <c>true</c>, если все ресурсы вложены; иначе <c>false</c>. </returns>
-        private static bool IsRepairPossible(RepairStage stage, List<int> investedResources)
-        {
-            for (int i = 0; i < stage.Requirements.Count; i++)
-                if (investedResources[i] < stage.Requirements[i].Quantity)
-                    return false;
-
-            return true;
-        }
+        private static bool IsRepairPossible(RepairStage stage, List<int> investedResources) =>
+            !stage.Requirements.Where((itemStack, i) => investedResources[i] < itemStack.Number).Any();
 
         /// <summary> Открыть окно ремонта. </summary>
         private void Open()
@@ -203,7 +195,6 @@ namespace FlavorfulStory.BuildingRepair.UI
             CleanupViews();
 
             _onCloseRequested?.Invoke();
-            OnClose?.Invoke();
         }
 
         /// <summary> Сбросить отображения требований и обработчики. </summary>

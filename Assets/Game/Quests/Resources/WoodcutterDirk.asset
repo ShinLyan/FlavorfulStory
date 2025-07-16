@@ -26,7 +26,7 @@ MonoBehaviour:
       <Params>k__BackingField:
         rid: 6018952306055708870
     _onStageCompleteActions:
-    - rid: 6018952398241005707
+    - rid: 6018952421768953941
   - _objectives:
     - <Reference>k__BackingField: a24aede6-1098-4816-ab3f-6531bfebe282
       <Description>k__BackingField: Collect 15 logs
@@ -49,9 +49,9 @@ MonoBehaviour:
         rid: 6018952306055708870
     _onStageCompleteActions: []
   _rewards:
-  - <Number>k__BackingField: 20
-    <Item>k__BackingField: {fileID: 11400000, guid: 3e31ae779574be343a52d151fa604692,
+  - <Item>k__BackingField: {fileID: 11400000, guid: 3e31ae779574be343a52d151fa604692,
       type: 2}
+    <Number>k__BackingField: 20
   references:
     version: 2
     RefIds:
@@ -69,12 +69,6 @@ MonoBehaviour:
         <InventoryItem>k__BackingField: {fileID: 11400000, guid: c105c0283ae6d95488d48924be055535,
           type: 2}
         <RequiredAmount>k__BackingField: 15
-    - rid: 6018952398241005707
-      type: {class: GiveItemAction, ns: FlavorfulStory.QuestSystem.TriggerActions,
-        asm: Assembly-CSharp}
-      data:
-        _item: {fileID: 11400000, guid: f52e46c028eba1e438c99795992bf6d5, type: 2}
-        _amount: 1
     - rid: 6018952398241005708
       type: {class: HaveObjectiveParams, ns: FlavorfulStory.QuestSystem.Objectives.Params,
         asm: Assembly-CSharp}
@@ -82,3 +76,10 @@ MonoBehaviour:
         <InventoryItem>k__BackingField: {fileID: 11400000, guid: c105c0283ae6d95488d48924be055535,
           type: 2}
         <RequiredAmount>k__BackingField: 5
+    - rid: 6018952421768953941
+      type: {class: GiveItemAction, ns: FlavorfulStory.QuestSystem.TriggerActions,
+        asm: Assembly-CSharp}
+      data:
+        _itemToGive:
+          <Item>k__BackingField: {fileID: 0}
+          <Number>k__BackingField: 0

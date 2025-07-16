@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using FlavorfulStory.InventorySystem;
 using UnityEngine;
 
 namespace FlavorfulStory.BuildingRepair
@@ -14,6 +15,6 @@ namespace FlavorfulStory.BuildingRepair
 
         /// <summary> Ресурсные требования для выполнения стадии ремонта. </summary>
         [field: Tooltip("Ресурсные требования для выполнения стадии ремонта."), SerializeField]
-        public List<ResourceRequirement> Requirements { get; private set; }
+        public List<ItemStack> Requirements { get; private set; }
     }
 }

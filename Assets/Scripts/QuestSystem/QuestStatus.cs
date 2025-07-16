@@ -111,6 +111,7 @@ namespace FlavorfulStory.QuestSystem
             /// <summary> Имя квеста для восстановления ссылки. </summary>
             public string QuestName;
 
+            /// <summary> Индекс текущего этапа квеста. </summary>
             public int CurrentStageIndex;
 
             /// <summary> Список выполненных целей. </summary>

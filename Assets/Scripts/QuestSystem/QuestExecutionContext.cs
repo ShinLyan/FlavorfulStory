@@ -1,5 +1,6 @@
 ﻿using FlavorfulStory.DialogueSystem;
 using FlavorfulStory.InventorySystem;
+using FlavorfulStory.InventorySystem.DropSystem;
 
 namespace FlavorfulStory.QuestSystem
 {
@@ -15,15 +16,21 @@ namespace FlavorfulStory.QuestSystem
         /// <summary> Компонент диалогов игрока. </summary>
         public PlayerSpeaker PlayerSpeaker { get; }
 
+        /// <summary> Сервис, отвечающий за выброс предметов из инвентаря в игровом мире. </summary>
+        public IItemDropService ItemDropService { get; }
+
         /// <summary> Создаёт контекст выполнения цели. </summary>
         /// <param name="questList"> Список квестов. </param>
         /// <param name="inventory"> Инвентарь игрока. </param>
         /// <param name="playerSpeaker"> Компонент диалогов игрока. </param>
-        public QuestExecutionContext(QuestList questList, Inventory inventory, PlayerSpeaker playerSpeaker)
+        /// <param name="itemDropService"> Сервис, отвечающий за выброс предметов из инвентаря в игровом мире. </param>
+        public QuestExecutionContext(QuestList questList, Inventory inventory, PlayerSpeaker playerSpeaker,
+            IItemDropService itemDropService)
         {
             QuestList = questList;
             Inventory = inventory;
             PlayerSpeaker = playerSpeaker;
+            ItemDropService = itemDropService;
         }
     }
 }

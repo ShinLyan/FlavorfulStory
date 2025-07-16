@@ -174,7 +174,7 @@ namespace FlavorfulStory.BuildingRepair
 
             var requirement = CurrentStage.Requirements[index];
             int available = _playerInventory.GetItemNumber(resource);
-            int needed = requirement.Quantity - _investedResources[index];
+            int needed = requirement.Number - _investedResources[index];
             int toInvest = Mathf.Min(available, needed);
             if (toInvest <= 0) return;
 

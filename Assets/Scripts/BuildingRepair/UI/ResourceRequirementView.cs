@@ -62,7 +62,7 @@ namespace FlavorfulStory.BuildingRepair.UI
         /// <summary> Установить ресурс для текущего элемента. </summary>
         /// <param name="requirement"> Ресурсное требование. </param>
         /// <param name="investedNumber"> Количество вложенного ресурса в процесс ремонта. </param>
-        public void Setup(ResourceRequirement requirement, int investedNumber)
+        public void Setup(ItemStack requirement, int investedNumber)
         {
             if (!requirement.Item)
             {
@@ -70,7 +70,7 @@ namespace FlavorfulStory.BuildingRepair.UI
                 return;
             }
 
-            InitializeResourceData(requirement.Item, requirement.Quantity, investedNumber);
+            InitializeResourceData(requirement.Item, requirement.Number, investedNumber);
             UpdateView();
             UpdateButtonsStates();
         }

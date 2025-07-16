@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using FlavorfulStory.Infrastructure;
+using FlavorfulStory.InventorySystem;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -153,7 +154,7 @@ namespace FlavorfulStory.QuestSystem
 
         /// <summary> Создает и отображает награды за квест. </summary>
         /// <param name="rewards"> Список наград. </param>
-        private void SetupRewards(IEnumerable<QuestReward> rewards)
+        private void SetupRewards(IEnumerable<ItemStack> rewards)
         {
             foreach (var reward in rewards)
             {

@@ -8,21 +8,15 @@ namespace FlavorfulStory.QuestSystem.TriggerActions
     [Serializable]
     public class GiveItemAction : QuestTriggerAction
     {
-        /// <summary> Предмет, который нужно выдать. </summary>
-        [Tooltip("Предмет, который нужно выдать.")]
-        [SerializeField] private InventoryItem _item;
-
-        /// <summary> Количество предметов, которое нужно выдать. </summary>
-        [Tooltip("Количество предметов, которое нужно выдать."), Min(1f)]
-        [SerializeField] private int _amount = 1;
+        /// <summary> Предмет и его количество, которые нужно выдать. </summary>
+        [SerializeField] private ItemStack _itemToGive;
 
         /// <summary> Выдает игроку указанный предмет в контексте квеста. </summary>
         /// <param name="context"> Контекст выполнения квеста. </param>
         public override void Execute(QuestExecutionContext context)
         {
-            bool isSuccess = context.Inventory.TryAddToFirstAvailableSlot(_item, _amount);
-            // TODO: Переделать на новый itemdropper
-            // if (!isSuccess) _itemDropper.DropItem(reward.Item, reward.Number);
+            bool isSuccess = context.Inventory.TryAddToFirstAvailableSlot(_itemToGive.Item, _itemToGive.Number);
+            if (!isSuccess) context.ItemDropService.Drop(_itemToGive, context.PlayerSpeaker.transform.position);
         }
     }
 }

@@ -63,13 +63,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _stages:
   - <Items>k__BackingField:
-    - ItemPrefab: {fileID: 11400000, guid: 3e31ae779574be343a52d151fa604692, type: 2}
-      Quantity: 15
-    <RequiredHits>k__BackingField: 5
+    - <Item>k__BackingField: {fileID: 11400000, guid: 3e31ae779574be343a52d151fa604692,
+        type: 2}
+      <Number>k__BackingField: 10
+    <RequiredHits>k__BackingField: 4
   - <Items>k__BackingField:
-    - ItemPrefab: {fileID: 11400000, guid: 3e31ae779574be343a52d151fa604692, type: 2}
-      Quantity: 10
-    <RequiredHits>k__BackingField: 3
+    - <Item>k__BackingField: {fileID: 11400000, guid: 3e31ae779574be343a52d151fa604692,
+        type: 2}
+      <Number>k__BackingField: 15
+    <RequiredHits>k__BackingField: 5
   _destroyDelay: 0
   _toolsToBeHit: 01000000
   <SfxType>k__BackingField: 1

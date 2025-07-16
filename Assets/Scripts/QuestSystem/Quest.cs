@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using FlavorfulStory.AI;
+using FlavorfulStory.InventorySystem;
 using UnityEngine;
 
 namespace FlavorfulStory.QuestSystem
@@ -34,10 +35,10 @@ namespace FlavorfulStory.QuestSystem
 
         /// <summary> Список наград за выполнение квеста. </summary>
         [Tooltip("Список наград за выполнение квеста."), SerializeField]
-        private List<QuestReward> _rewards;
+        private List<ItemStack> _rewards;
 
         /// <summary> Коллекция наград за квест (только для чтения). </summary>
-        public IEnumerable<QuestReward> Rewards => _rewards;
+        public IEnumerable<ItemStack> Rewards => _rewards;
 
         /// <summary> Кэш всех загруженных квестов. </summary>
         private static Quest[] _cachedQuests;

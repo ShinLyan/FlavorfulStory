@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using FlavorfulStory.Core;
+using FlavorfulStory.InventorySystem;
 using FlavorfulStory.InventorySystem.DropSystem;
 using FlavorfulStory.Saving;
 using UnityEngine;
@@ -93,12 +94,12 @@ namespace FlavorfulStory.QuestSystem
 
         /// <summary> Выдает награды за завершение квеста: добавляет в инвентарь или дропает на землю. </summary>
         /// <param name="rewards"> Награды за завершение квеста. </param>
-        private void GiveReward(IEnumerable<QuestReward> rewards)
+        private void GiveReward(IEnumerable<ItemStack> rewards)
         {
             foreach (var reward in rewards)
             {
                 bool isSuccess = _context.Inventory.TryAddToFirstAvailableSlot(reward.Item, reward.Number);
-                if (!isSuccess) _itemDropService.Drop(reward.Item, reward.Number, transform.position);
+                if (!isSuccess) _itemDropService.Drop(reward, transform.position);
             }
         }
 
