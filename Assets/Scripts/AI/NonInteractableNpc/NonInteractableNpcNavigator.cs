@@ -22,7 +22,7 @@ namespace FlavorfulStory.AI.NonInteractableNpc
 
         /// <summary> Запускает перемещение к указанной точке расписания. </summary>
         /// <param name="point"> Точка расписания для перемещения. </param>
-        public void MoveTo(SchedulePoint point)
+        public void MoveTo(SchedulePoint point) //TODO: реализовать через Vector3 после удаления WarpGraph
         {
             _currentTargetPoint = point;
             _isNotMoving = false;
@@ -33,20 +33,5 @@ namespace FlavorfulStory.AI.NonInteractableNpc
             else
                 _navMeshAgent.SetDestination(point.Position);
         }
-
-        // /// <summary> Запускает перемещение к указанной позиции. </summary>
-        // /// <param name="point"> Целевая позиция для перемещения. </param>
-        // public void MoveTo(Vector3 point) //TODO: реализовать после удаления WarpGraph
-        // {
-        //     // var point = location.GetRandomPointOnNavMesh();
-        //     _currentTargetPoint = point;
-        //     _isNotMoving = false;
-        //     ResumeAgent();
-        //
-        //     // if (_currentLocation != point.LocationName)
-        //     //     StartWarpTransition(point);
-        //     // else
-        //     _navMeshAgent.SetDestination(point);
-        // }
     }
 }

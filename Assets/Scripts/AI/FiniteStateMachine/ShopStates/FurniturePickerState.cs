@@ -1,9 +1,9 @@
 using FlavorfulStory.AI.NonInteractableNpc;
 using FlavorfulStory.AI.Scheduling;
 using FlavorfulStory.SceneManagement;
-using FlavorfulStory.SceneManagement.ShopLocation;
+using FlavorfulStory.Shop;
 
-namespace FlavorfulStory.AI.FiniteStateMachine.InShopStates
+namespace FlavorfulStory.AI.FiniteStateMachine.ShopStates
 {
     /// <summary> Состояние для выбора мебели и перемещения к ней персонажа. </summary>
     public class FurniturePickerState : CharacterState
@@ -31,7 +31,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine.InShopStates
 
             if (!furniture) return;
 
-            furniture.SetOccupied(true);
+            furniture.IsOccupied = true;
             Context?.Set("SelectedFurniture", furniture);
 
             var accessiblePoint = furniture.GetAccessiblePoint();
@@ -42,7 +42,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine.InShopStates
             point.Rotation = accessiblePoint.rotation.eulerAngles;
 
             _movementController.SetPoint(point);
-            _movementController.OnDestinationReached += () => furniture.SetOccupied(false);
+            _movementController.OnDestinationReached += () => furniture.IsOccupied = false;
         }
 
         /// <summary> Возвращает статус завершения состояния. </summary>

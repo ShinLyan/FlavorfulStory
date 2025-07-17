@@ -1,8 +1,9 @@
 using System.Collections.Generic;
+using FlavorfulStory.SceneManagement;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-namespace FlavorfulStory.SceneManagement.ShopLocation
+namespace FlavorfulStory.Shop
 {
     /// <summary> Локация магазина с функциональностью управления полками, мебелью и кассой. </summary>
     public class ShopLocation : Location
@@ -12,28 +13,29 @@ namespace FlavorfulStory.SceneManagement.ShopLocation
         public CashDesk CashDesk { get; private set; }
 
         /// <summary> Массив полок в магазине. </summary>
-        [SerializeField] private ShopObject[] _shelves;
+        [SerializeField] private Shelf[] _shelves;
 
         /// <summary> Массив мебели в магазине. </summary>
-        [SerializeField] private ShopObject[] _furnitures;
+        [SerializeField] private Furniture[] _furnitures;
 
         /// <summary> Минимальное расстояние от объектов магазина при генерации случайных точек. </summary>
         private const float MinDistance = 3f;
 
         /// <summary> Возвращает случайную доступную мебель. </summary>
         /// <returns> Доступная мебель или null, если все мебель занята. </returns>
-        public Furniture GetAvailableFurniture() => (Furniture)GetRandomObject(_furnitures);
+        public Furniture GetAvailableFurniture() => GetRandomObject(_furnitures);
 
         /// <summary> Возвращает случайную доступную полку. </summary>
         /// <returns> Доступная полка или null, если все полки заняты. </returns>
-        public Shelf GetAvailableShelf() => (Shelf)GetRandomObject(_shelves);
+        public Shelf GetAvailableShelf() => GetRandomObject(_shelves);
 
         /// <summary> Получает массив доступных (незанятых) объектов из переданного массива. </summary>
+        /// <typeparam name="T"> Тип объекта, производный от ShopObject. </typeparam>
         /// <param name="objects"> Массив объектов магазина для фильтрации. </param>
         /// <returns> Массив доступных объектов. </returns>
-        private static ShopObject[] GetAvailableObjects(ShopObject[] objects)
+        private static T[] GetAvailableObjects<T>(T[] objects) where T : ShopObject
         {
-            var availableObjects = new List<ShopObject>();
+            var availableObjects = new List<T>();
             foreach (var obj in objects)
                 if (!obj.IsOccupied)
                     availableObjects.Add(obj);
@@ -41,10 +43,11 @@ namespace FlavorfulStory.SceneManagement.ShopLocation
             return availableObjects.ToArray();
         }
 
-        /// <summary> Возвращает случайный объект из массива доступных объектов. </summary>
+        /// <summary> Получает случайный свободный объект из массива объектов магазина. </summary>
+        /// <typeparam name="T"> Тип объекта, наследующийся от ShopObject. </typeparam>
         /// <param name="objects"> Массив объектов для выбора. </param>
-        /// <returns> Случайный доступный объект или null, если все объекты заняты. </returns>
-        private static ShopObject GetRandomObject(ShopObject[] objects)
+        /// <returns> Случайный свободный объект типа T, или null, если все объекты заняты. </returns>
+        private static T GetRandomObject<T>(T[] objects) where T : ShopObject
         {
             var availableObjects = GetAvailableObjects(objects);
 

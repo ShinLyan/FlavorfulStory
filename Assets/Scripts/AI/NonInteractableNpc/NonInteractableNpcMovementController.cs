@@ -41,10 +41,8 @@ namespace FlavorfulStory.AI.NonInteractableNpc
         /// <param name="graph"> Граф варп-порталов. </param>
         /// <param name="transform"> Трансформ объекта. </param>
         /// <returns> Экземпляр навигатора для неинтерактивного NPC. </returns>
-        protected override INpcNavigator CreateNavigator(NavMeshAgent agent, WarpGraph graph, Transform transform)
-        {
-            return new NonInteractableNpcNavigator(agent, graph, transform);
-        }
+        protected override INpcNavigator CreateNavigator(NavMeshAgent agent, WarpGraph graph, Transform transform) =>
+            new NonInteractableNpcNavigator(agent, graph, transform);
 
         /// <summary> Запускает перемещение к текущей установленной точке. </summary>
         public override void MoveToPoint() => _nonInteractableNavigator.MoveTo(_currentPoint);

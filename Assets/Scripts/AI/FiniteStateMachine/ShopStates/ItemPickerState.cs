@@ -2,9 +2,9 @@ using FlavorfulStory.Actions;
 using FlavorfulStory.AI.NonInteractableNpc;
 using FlavorfulStory.AI.Scheduling;
 using FlavorfulStory.SceneManagement;
-using FlavorfulStory.SceneManagement.ShopLocation;
+using FlavorfulStory.Shop;
 
-namespace FlavorfulStory.AI.FiniteStateMachine.InShopStates
+namespace FlavorfulStory.AI.FiniteStateMachine.ShopStates
 {
     /// <summary> Состояние для выбора предмета и перемещения к кассе. </summary>
     public class ItemPickerState : CharacterState
@@ -34,7 +34,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine.InShopStates
         public override void Enter()
         {
             base.Enter();
-            if (Context != null && Context.TryGet<Shelf>("SelectedShelf", out var shelf)) shelf.SetOccupied(false);
+            if (Context != null && Context.TryGet<Shelf>("SelectedShelf", out var shelf)) shelf.IsOccupied = false;
             // var item = shelf.Items[Random.Range(0, shelf.Items.Count)]; //TODO
             // _itemHandler.EquipItem(item);
 

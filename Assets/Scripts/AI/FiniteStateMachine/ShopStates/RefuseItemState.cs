@@ -1,6 +1,6 @@
-﻿using FlavorfulStory.SceneManagement.ShopLocation;
+﻿using FlavorfulStory.Shop;
 
-namespace FlavorfulStory.AI.FiniteStateMachine.InShopStates
+namespace FlavorfulStory.AI.FiniteStateMachine.ShopStates
 {
     /// <summary> Состояние для отказа от выбранного предмета и освобождения полки. </summary>
     public class RefuseItemState : CharacterState
@@ -16,7 +16,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine.InShopStates
         public override void Enter()
         {
             base.Enter();
-            if (Context != null && Context.TryGet<Shelf>("SelectedShelf", out var shelf)) shelf.SetOccupied(false);
+            if (Context != null && Context.TryGet<Shelf>("SelectedShelf", out var shelf)) shelf.IsOccupied = false;
         }
 
         /// <summary> Возвращает статус завершения состояния. </summary>

@@ -1,10 +1,10 @@
 using FlavorfulStory.AI.NonInteractableNpc;
 using FlavorfulStory.AI.Scheduling;
 using FlavorfulStory.SceneManagement;
-using FlavorfulStory.SceneManagement.ShopLocation;
+using FlavorfulStory.Shop;
 using UnityEngine;
 
-namespace FlavorfulStory.AI.FiniteStateMachine.InShopStates
+namespace FlavorfulStory.AI.FiniteStateMachine.ShopStates
 {
     /// <summary> Состояние для выбора случайной точки на навигационной сетке и перемещения к ней. </summary>
     public class RandomPointPickerState : CharacterState

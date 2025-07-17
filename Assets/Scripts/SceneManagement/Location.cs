@@ -20,6 +20,7 @@ namespace FlavorfulStory.SceneManagement
         [field: Tooltip("Является ли локация помещением?"), SerializeField]
         public bool IsRoom { get; private set; }
 
+        /// <summary> Поверхность NavMesh для данной локации. </summary> 
         [SerializeField] private NavMeshSurface _navMeshSurface;
 
         /// <summary> Устанавливает активное состояние всех объектов из списка. </summary>
@@ -37,7 +38,9 @@ namespace FlavorfulStory.SceneManagement
         public bool IsPositionInLocation(Vector3 position) =>
             TryGetComponent(out Collider component) && component.bounds.Contains(position);
 
-
+        /// <summary> Находит случайную точку на NavMesh в пределах локации. </summary>
+        /// <param name="maxAttempts"> Максимальное количество попыток поиска точки. По умолчанию 20. </param>
+        /// <returns> Случайная позиция на NavMesh. Возвращает Vector3.zero, если точка не найдена. </returns>
         public virtual Vector3 GetRandomPointOnNavMesh(int maxAttempts = 20)
         {
             Bounds searchBounds;
@@ -51,7 +54,6 @@ namespace FlavorfulStory.SceneManagement
                 Debug.LogWarning("Не удалось найти точку на NavMesh.");
                 return Vector3.zero;
             }
-
 
             for (int i = 0; i < maxAttempts; i++)
             {

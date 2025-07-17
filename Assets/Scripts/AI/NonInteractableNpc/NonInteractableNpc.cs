@@ -71,9 +71,10 @@ namespace FlavorfulStory.AI.NonInteractableNpc
                 (_stateController as NonInteractableNpcStateController)?.StartRandomSequence();
         }
 
-        public void SetDespawnPoint(Vector3 destination, LocationName locationName = LocationName.RockyIsland)
-        {
+        /// <summary> Устанавливает точку исчезновения для неинтерактивного NPC. </summary>
+        /// <param name="destination"> Координаты точки, где NPC должен исчезнуть. </param>
+        /// <param name="locationName"> Локация, в которой находится точка исчезновения. По умолчанию RockyIsland. </param>
+        public void SetDespawnPoint(Vector3 destination, LocationName locationName = LocationName.RockyIsland) =>
             (_stateController as NonInteractableNpcStateController)?.SetDespawnPoint(destination, locationName);
-        }
     }
 }

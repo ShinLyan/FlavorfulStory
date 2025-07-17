@@ -4,7 +4,7 @@ using Random = UnityEngine.Random;
 namespace FlavorfulStory.AI
 {
     /// <summary> Точка спавна NPC с возможностью генерации случайных позиций в прямоугольной области. </summary>
-    [RequireComponent(typeof(Collider))]
+    [RequireComponent(typeof(CapsuleCollider))]
     public class NpcSpawnPoint : MonoBehaviour
     {
         /// <summary> Размер прямоугольной области спавна. </summary>
@@ -39,6 +39,7 @@ namespace FlavorfulStory.AI
                 npc.OnReachedDespawnPoint?.Invoke();
         }
 
+#if UNITY_EDITOR
         /// <summary> Отрисовка гизмо в редакторе для визуализации области спавна. </summary>
         private void OnDrawGizmosSelected()
         {
@@ -56,5 +57,6 @@ namespace FlavorfulStory.AI
 
             Gizmos.matrix = originalMatrix;
         }
+#endif
     }
 }

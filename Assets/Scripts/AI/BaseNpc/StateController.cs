@@ -42,11 +42,9 @@ namespace FlavorfulStory.AI.BaseNpc
         /// <summary> Обновляет текущее состояние персонажа каждый кадр. </summary>
         public virtual void Update() => _currentState?.Update();
 
-
         /// <summary> Сбрасывает систему состояний при смене дня или инициализации. </summary>
         /// <param name="currentTime"> Текущее игровое время. </param>
         protected virtual void OnReset(DateTime currentTime) => ResetStates();
-
 
         /// <summary> Сбрасывает все состояния к начальному и устанавливает состояние рутины. </summary>
         /// <remarks> Может быть переопределен в наследниках для специфической логики сброса. </remarks>
@@ -67,8 +65,11 @@ namespace FlavorfulStory.AI.BaseNpc
         /// <remarks> Может быть переопределен в наследниках для дополнительных подписок. </remarks>
         protected virtual void SubscribeToEvents() => WorldTime.OnDayEnded += OnReset;
 
+        /// <summary> Начинает выполнение именованной последовательности действий. </summary>
+        /// <param name="sequenceName"> Имя последовательности для запуска. </param>
         public virtual void StartSequence(string sequenceName) { }
 
+        /// <summary> Возвращает персонажа из выполнения последовательности к обычному поведению. </summary>
         public virtual void ReturnFromSequence() { }
     }
 }

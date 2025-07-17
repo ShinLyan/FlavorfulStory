@@ -10,10 +10,7 @@ using Random = UnityEngine.Random;
 
 namespace FlavorfulStory.AI
 {
-    /// <summary>
-    /// Компонент для спавна неинтерактивных NPC в игровом мире.
-    /// Управляет созданием случайных NPC из списка префабов в заданных точках спавна.
-    /// </summary>
+    /// <summary> Компонент для спавна неинтерактивных NPC в игровом мире. </summary>
     public class NpcSpawner : MonoBehaviour
     {
         /// <summary> Массив префабов NPC для случайного выбора при спавне. </summary>
@@ -45,10 +42,20 @@ namespace FlavorfulStory.AI
         private readonly bool _isSpawning = true;
 
         /// <summary> Контейнер для инъекции зависимостей. </summary>
-        [Inject] private DiContainer _diContainer;
+        private DiContainer _diContainer;
 
         /// <summary> Менеджер локаций для управления местоположениями. </summary>
-        [Inject] private LocationManager _locationManager;
+        private LocationManager _locationManager;
+
+        /// <summary> Инициализирует необходимые зависимости для спавнера NPC. </summary>
+        /// <param name="diContainer"> Контейнер зависимостей для инъекций объектов. </param>
+        /// <param name="locationManager"> Менеджер местоположения для управления сценами. </param>
+        [Inject]
+        private void Construct(DiContainer diContainer, LocationManager locationManager)
+        {
+            _diContainer = diContainer;
+            _locationManager = locationManager;
+        }
 
         /// <summary> Пул объектов для переиспользования NPC. </summary>
         private ObjectPool<NonInteractableNpc.NonInteractableNpc> _npcPool;

@@ -1,8 +1,8 @@
 using FlavorfulStory.Actions;
-using FlavorfulStory.SceneManagement.ShopLocation;
+using FlavorfulStory.Shop;
 using UnityEngine;
 
-namespace FlavorfulStory.AI.FiniteStateMachine.InShopStates
+namespace FlavorfulStory.AI.FiniteStateMachine.ShopStates
 {
     /// <summary> Состояние для обработки оплаты товаров у кассы. </summary>
     public class PaymentState : CharacterState

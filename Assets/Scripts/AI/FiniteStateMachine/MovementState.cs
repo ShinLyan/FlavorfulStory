@@ -12,6 +12,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         /// <summary> Находится ли персонаж в данный момент в состоянии движения? </summary>
         private bool _isInState;
 
+        /// <summary> Флаг завершения состояния движения. Устанавливается в true при достижении цели. </summary>
         private bool _isComplete;
 
         /// <summary> Инициализирует новое состояние движения с заданным контроллером движения. </summary>
@@ -21,15 +22,8 @@ namespace FlavorfulStory.AI.FiniteStateMachine
             _isComplete = false;
             _movementController = movementController;
 
-
             WorldTime.OnTimePaused += StopMovementOnPause;
             WorldTime.OnTimeUnpaused += ContinueMovementOnUnpause;
-        }
-
-        private void OnCompleteMovement()
-        {
-            _isComplete = true;
-            RequestStateChange(typeof(RoutineState));
         }
 
         /// <summary> Входит в состояние движения и начинает перемещение к текущей точке расписания. </summary>
@@ -53,6 +47,14 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         /// <summary> Сбрасывает состояние движения, мгновенно останавливая NPC. </summary>
         public override void Reset() => _movementController.Stop(true);
 
+        /// <summary> Обрабатывает завершение движения к точке назначения. </summary>
+        /// <remarks> Устанавливает флаг завершения и инициирует переход к состоянию рутины. </remarks>
+        private void OnCompleteMovement()
+        {
+            _isComplete = true;
+            RequestStateChange(typeof(RoutineState));
+        }
+
         /// <summary> Останавливает движение NPC при паузе игрового времени, если персонаж находится в состоянии движения. </summary>
         private void StopMovementOnPause()
         {
@@ -65,6 +67,8 @@ namespace FlavorfulStory.AI.FiniteStateMachine
             if (_isInState) _movementController.MoveToPoint();
         }
 
+        /// <summary> Проверяет, завершено ли выполнение состояния движения. </summary>
+        /// <returns> true, если персонаж достиг точки назначения; иначе false. </returns>
         public override bool IsComplete() => _isComplete;
     }
 }

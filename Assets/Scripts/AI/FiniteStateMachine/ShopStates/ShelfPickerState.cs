@@ -1,9 +1,9 @@
 using FlavorfulStory.AI.NonInteractableNpc;
 using FlavorfulStory.AI.Scheduling;
 using FlavorfulStory.SceneManagement;
-using FlavorfulStory.SceneManagement.ShopLocation;
+using FlavorfulStory.Shop;
 
-namespace FlavorfulStory.AI.FiniteStateMachine.InShopStates
+namespace FlavorfulStory.AI.FiniteStateMachine.ShopStates
 {
     /// <summary> Состояние для выбора доступной полки и перемещения к ней. </summary>
     public class ShelfPickerState : CharacterState
@@ -31,7 +31,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine.InShopStates
 
             if (!availableShelf) return;
 
-            availableShelf.SetOccupied(true);
+            availableShelf.IsOccupied = true;
             Context?.Set("SelectedShelf", availableShelf);
 
             var freePoint = availableShelf.GetAccessiblePoint();

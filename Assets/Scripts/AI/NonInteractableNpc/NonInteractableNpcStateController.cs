@@ -3,13 +3,13 @@ using System.Linq;
 using FlavorfulStory.Actions;
 using FlavorfulStory.AI.BaseNpc;
 using FlavorfulStory.AI.FiniteStateMachine;
-using FlavorfulStory.AI.FiniteStateMachine.InShopStates;
+using FlavorfulStory.AI.FiniteStateMachine.ShopStates;
 using FlavorfulStory.AI.Scheduling;
 using FlavorfulStory.Player;
 using FlavorfulStory.SceneManagement;
-using FlavorfulStory.SceneManagement.ShopLocation;
+using FlavorfulStory.Shop;
 using UnityEngine;
-using AnimationState = FlavorfulStory.AI.FiniteStateMachine.InShopStates.AnimationState;
+using AnimationState = FlavorfulStory.AI.FiniteStateMachine.ShopStates.AnimationState;
 
 namespace FlavorfulStory.AI.NonInteractableNpc
 {
@@ -257,6 +257,9 @@ namespace FlavorfulStory.AI.NonInteractableNpc
                 StartRandomSequence();
         }
 
+        /// <summary> Устанавливает точку исчезновения для NPC. </summary>
+        /// <param name="destination"> Координаты точки, где NPC должен исчезнуть. </param>
+        /// <param name="locationName"> Локация, в которой находится точка исчезновения. По умолчанию RockyIsland. </param>
         public void SetDespawnPoint(Vector3 destination, LocationName locationName = LocationName.RockyIsland)
         {
             var point = new SchedulePoint(); //TODO: переделать после удаление WarpGraph
@@ -266,6 +269,9 @@ namespace FlavorfulStory.AI.NonInteractableNpc
             _despawnPoint = point;
         }
 
+        /// <summary> Принудительно устанавливает состояние NPC по строковому типу. </summary>
+        /// <param name="type"> Строковое представление типа состояния для установки. </param>
+        /// <remarks> Обёртка над методом SetState для принудительного изменения состояния. </remarks>
         public void ForceSetState(string type) => SetState(type);
     }
 }

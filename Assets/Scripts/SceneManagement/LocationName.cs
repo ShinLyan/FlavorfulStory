@@ -13,6 +13,7 @@ namespace FlavorfulStory.SceneManagement
         /// <summary> Магазин. </summary>
         Shop,
 
+        /// <summary> Новый магазин. </summary> TODO: Оставить только один Shop, удалить позже
         NewShop
     }
 }

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace FlavorfulStory.AI.FiniteStateMachine.InShopStates
+namespace FlavorfulStory.AI.FiniteStateMachine.ShopStates
 {
     /// <summary> Состояние анимации персонажа с таймером для управления завершением. </summary>
     public class AnimationState : CharacterState
