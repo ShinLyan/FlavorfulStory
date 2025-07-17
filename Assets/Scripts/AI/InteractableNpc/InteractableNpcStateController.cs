@@ -83,6 +83,19 @@ namespace FlavorfulStory.AI.InteractableNpc
             _scheduleHandler.OnSchedulePointChanged += OnSchedulePointChanged;
         }
 
+        protected override void OnReset(DateTime currentTime)
+        {
+            PrioritizeSchedule(currentTime);
+            base.OnReset(currentTime);
+        }
+
+        /// <summary> Сбрасывает все состояния и устанавливает состояние рутины. </summary>
+        protected override void ResetStates()
+        {
+            foreach (var state in _nameToCharacterStates.Values) state.Reset();
+            SetState(typeof(RoutineState).ToString());
+        }
+
         /// <summary> Обрабатывает изменение точки расписания и переключает состояние на движение если необходимо. </summary>
         /// <param name="newPoint"> Новая точка расписания. </param>
         private void OnSchedulePointChanged(SchedulePoint newPoint)
@@ -95,19 +108,6 @@ namespace FlavorfulStory.AI.InteractableNpc
                 SetState(typeof(MovementState).ToString());
 
             _animationController.TriggerAnimation(AnimationType.Locomotion);
-        }
-
-        protected override void OnReset(DateTime currentTime)
-        {
-            PrioritizeSchedule(currentTime);
-            base.OnReset(currentTime);
-        }
-
-        /// <summary> Сбрасывает все состояния и устанавливает состояние рутины. </summary>
-        protected override void ResetStates()
-        {
-            foreach (var state in _nameToCharacterStates.Values) state.Reset();
-            SetState(typeof(RoutineState).ToString());
         }
 
         /// <summary> Определяет приоритетное расписание на основе текущих условий игры. </summary>

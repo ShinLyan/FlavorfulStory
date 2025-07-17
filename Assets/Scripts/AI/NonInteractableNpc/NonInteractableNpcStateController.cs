@@ -5,7 +5,6 @@ using FlavorfulStory.AI.BaseNpc;
 using FlavorfulStory.AI.FiniteStateMachine;
 using FlavorfulStory.AI.FiniteStateMachine.ShopStates;
 using FlavorfulStory.AI.Scheduling;
-using FlavorfulStory.Player;
 using FlavorfulStory.SceneManagement;
 using FlavorfulStory.Shop;
 using UnityEngine;
@@ -52,9 +51,6 @@ namespace FlavorfulStory.AI.NonInteractableNpc
         /// <summary> Состояние отказа от предмета. </summary>
         private RefuseItemState _refuseItemState;
 
-        /// <summary> Состояние ожидания. </summary>
-        private WaitingState _waitingState;
-
         /// <summary> Последовательность перемещения к случайной точке. </summary>
         private SequenceState _randomPointSequence;
 
@@ -66,12 +62,6 @@ namespace FlavorfulStory.AI.NonInteractableNpc
 
         /// <summary> Последовательность отказа от предмета. </summary>
         private SequenceState _refuseItemSequence;
-
-        /// <summary> Контроллер игрока для взаимодействия с игроком. </summary>
-        private readonly PlayerController _playerController;
-
-        /// <summary> Transform компонент NPC для получения информации о позиции и трансформации. </summary>
-        private readonly Transform _npcTransform;
 
         /// <summary> Флаг, указывающий, посещал ли NPC мебель после покупки. </summary>
         private bool _hadVisitedFurnitureAfterPurchase;
@@ -85,20 +75,15 @@ namespace FlavorfulStory.AI.NonInteractableNpc
         /// <param name="locationManager"> Менеджер локаций для получения информации о местоположениях. </param>
         /// <param name="npcAnimationController"> Контроллер анимации NPC для управления анимациями персонажа. </param>
         /// <param name="itemHandler"> Обработчик предметов для работы с игровыми объектами. </param>
-        /// <param name="playerController"> Контроллер игрока для взаимодействия с игроком. </param>
-        /// <param name="npcTransform"> Transform компонент NPC для получения информации о позиции и трансформации. </param>
         public NonInteractableNpcStateController(NonInteractableNpcMovementController npcMovementController,
             LocationManager locationManager,
             NpcAnimationController npcAnimationController,
-            ItemHandler itemHandler,
-            PlayerController playerController, Transform npcTransform)
+            ItemHandler itemHandler)
             : base(npcAnimationController)
         {
             _npcMovementController = npcMovementController;
             _locationManager = locationManager;
             _itemHandler = itemHandler;
-            _playerController = playerController;
-            _npcTransform = npcTransform;
 
             _hadVisitedFurnitureAfterPurchase = false;
             _despawnPoint = null;
@@ -117,7 +102,7 @@ namespace FlavorfulStory.AI.NonInteractableNpc
             var states = new CharacterState[]
             {
                 _movementState, _animationState, _furniturePickerState, _itemPickerState, _paymentState,
-                _randomPointPickerState, _shelfPickerState, _refuseItemState, _waitingState, new IdleState()
+                _randomPointPickerState, _shelfPickerState, _refuseItemState, new IdleState()
             };
 
             foreach (var state in states)
@@ -139,7 +124,6 @@ namespace FlavorfulStory.AI.NonInteractableNpc
             _paymentState = new PaymentState(shopLocation, _itemHandler);
             _randomPointPickerState = new RandomPointPickerState(_npcMovementController, shopLocation);
             _shelfPickerState = new ShelfPickerState(_npcMovementController, shopLocation);
-            _waitingState = new WaitingState(_playerController, _npcTransform);
             _refuseItemState = new RefuseItemState(shopLocation);
         }
 
@@ -208,7 +192,7 @@ namespace FlavorfulStory.AI.NonInteractableNpc
 
             availableOptions.Add(("_randomPointSequence", 25f));
 
-            if (availableOptions.Count == 0) return typeof(WaitingState).ToString();
+            if (availableOptions.Count == 0) return typeof(IdleState).ToString();
 
             float totalWeight = availableOptions.Sum(x => x.weight);
             float randomValue = Random.Range(0f, totalWeight);
