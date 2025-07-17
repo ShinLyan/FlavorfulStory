@@ -13,13 +13,10 @@ using Random = UnityEngine.Random;
 namespace FlavorfulStory.ResourceContainer
 {
     /// <summary> Добываемый объект. </summary>
-    /// <remarks> Реализует интерфейсы <see cref="IHitable" /> и <see cref="IDestroyable" />. </remarks>
     [RequireComponent(typeof(ObjectSwitcher))]
     public class DestroyableResourceContainer : MonoBehaviour, IHitable, IDestroyable
     {
         #region Fields and Properties
-
-        [Inject] private readonly IItemDropService _itemDropService;
 
         /// <summary> Список стадий. </summary>
         [Tooltip("Список стадий."), SerializeField]
@@ -32,6 +29,9 @@ namespace FlavorfulStory.ResourceContainer
         /// <summary> Тип инструмента, необходимого для разрушения. </summary>
         [Tooltip("Тип инструмента, необходимого для разрушения."), SerializeField]
         private ToolType[] _toolsToBeHit;
+
+        /// <summary> Сервис выброса предметов в мир. </summary>
+        private IItemDropService _itemDropService;
 
         /// <summary> Переключатель грейдов. </summary>
         private ObjectSwitcher _objectSwitcher;
@@ -61,6 +61,11 @@ namespace FlavorfulStory.ResourceContainer
 
         /// <summary> Событие, вызываемое при полном разрушении объекта. </summary>
         public event Action<IDestroyable> OnObjectDestroyed;
+
+        /// <summary> Внедрение зависимостей Zenject. </summary>
+        /// <param name="itemDropService"> Сервис выброса предметов в мир. </param>
+        [Inject]
+        private void Construct(IItemDropService itemDropService) => _itemDropService = itemDropService;
 
         #endregion
 
@@ -124,9 +129,8 @@ namespace FlavorfulStory.ResourceContainer
         {
             const float ResourceDropForce = 5f;
 
-            foreach (var item in _stages[_currentGradeIndex].Items)
-                _itemDropService.Drop(item.ItemPrefab, item.Quantity, GetDropPosition(),
-                    Vector3.up * ResourceDropForce);
+            foreach (var itemStack in _stages[_currentGradeIndex].Items)
+                _itemDropService.Drop(itemStack, GetDropPosition(), Vector3.up * ResourceDropForce);
         }
 
         /// <summary> Получить позицию дропа. </summary>
@@ -143,8 +147,8 @@ namespace FlavorfulStory.ResourceContainer
 
         #region HitBehaviour
 
-        [field: SerializeField]
-        public SfxType SfxType { private get; set; }
+        /// <summary> Тип проигрываемого звука. </summary>
+        [field: SerializeField] public SfxType SfxType { private get; set; }
 
         /// <summary> Получить удар. </summary>
         /// <param name="toolType"> Тип инструмента, которым наносится удар. </param>

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using FlavorfulStory.AI;
+using FlavorfulStory.Core;
 using FlavorfulStory.DialogueSystem.UI;
 using FlavorfulStory.InputSystem;
 using FlavorfulStory.TimeManagement;
@@ -10,13 +12,13 @@ using Random = UnityEngine.Random;
 
 namespace FlavorfulStory.DialogueSystem
 {
-    /// <summary> Компонент для управления диалогом игрока. </summary>
-    public class PlayerSpeaker : MonoBehaviour, IDialogueInitiator
+    /// <summary> Компонент диалогов игрока. </summary>
+    public class PlayerSpeaker : MonoBehaviour
     {
         #region Fields
 
         /// <summary> NPC, с которым в данный момент ведётся диалог. </summary>
-        private NpcSpeaker CurrentNpcSpeaker { get; set; }
+        private NpcSpeaker _currentNpcSpeaker;
 
         /// <summary> Текущий активный диалог. </summary>
         private Dialogue _currentDialogue;
@@ -34,7 +36,7 @@ namespace FlavorfulStory.DialogueSystem
         private bool IsDialogueActive => _currentDialogue;
 
         /// <summary> Событие завершения диалога. </summary>
-        public event Action OnConversationEnded;
+        public event Action<NpcName, Dialogue> OnDialogueCompleted;
 
         #endregion
 
@@ -79,7 +81,7 @@ namespace FlavorfulStory.DialogueSystem
         {
             WorldTime.Pause();
 
-            CurrentNpcSpeaker = npcSpeaker;
+            _currentNpcSpeaker = npcSpeaker;
             _currentDialogue = dialogue;
             _currentNode = dialogue.RootNode;
 
@@ -93,15 +95,15 @@ namespace FlavorfulStory.DialogueSystem
         public void EndDialogue()
         {
             WorldTime.Unpause();
-
-            _currentDialogue = null;
             TriggerExitAction();
-            CurrentNpcSpeaker = null;
+
+            OnDialogueCompleted?.Invoke(_currentNpcSpeaker.NpcInfo.NpcName, _currentDialogue);
+            _dialogueView.Hide();
+
+            _currentNpcSpeaker = null;
+            _currentDialogue = null;
             _currentNode = null;
             IsChoosingDialogue = false;
-
-            _dialogueView.OnHidden += () => OnConversationEnded?.Invoke();
-            _dialogueView.Hide();
 
             // Защищаем от повторного запуска взаимодействия
             InputWrapper.BlockInput(InputButton.Interact);
@@ -115,7 +117,8 @@ namespace FlavorfulStory.DialogueSystem
         {
             if (!IsDialogueActive) return;
 
-            var playerChoices = _currentDialogue.GetPlayerChildNodes(_currentNode).ToList();
+            // var playerChoices = FilterOnCondition(_currentDialogue.GetPlayerChildNodes(_currentNode)).ToList();
+            var playerChoices = _currentDialogue.GetPlayerChildNodes(_currentNode);
             if (playerChoices.Any())
             {
                 IsChoosingDialogue = true;
@@ -124,13 +127,15 @@ namespace FlavorfulStory.DialogueSystem
                 return;
             }
 
-            var allChildren = _currentDialogue.GetChildNodes(_currentNode).ToList();
+            // var allChildren = FilterOnCondition(_currentDialogue.GetChildNodes(_currentNode)).ToList();
+            var allChildren = _currentDialogue.GetChildNodes(_currentNode);
             if (!allChildren.Any())
             {
                 EndDialogue();
                 return;
             }
 
+            // var npcChoices = FilterOnCondition(_currentDialogue.GetNpcChildNodes(_currentNode)).ToList();
             var npcChoices = _currentDialogue.GetNpcChildNodes(_currentNode).ToList();
             var nextNode = npcChoices[Random.Range(0, npcChoices.Count)];
 
@@ -142,9 +147,20 @@ namespace FlavorfulStory.DialogueSystem
             UpdateDialogueView();
         }
 
+        /// <summary> Отфильтровать узлы диалога на основе выполнения условий. </summary>
+        /// <param name="inputNodes"> Список узлов для фильтрации. </param>
+        /// <returns> Список узлов, условия которых выполнены. </returns>
+        private IEnumerable<DialogueNode> FilterOnCondition(IEnumerable<DialogueNode> inputNodes) =>
+            inputNodes.Where(node => node.CheckCondition(GetEvaluators()));
+
+        /// <summary> Получить список всех компонентов-предикатов для оценки условий. </summary>
+        /// <returns> Коллекция компонентов, реализующих IPredicateEvaluator. </returns>
+        private IEnumerable<IPredicateEvaluator> GetEvaluators() => GetComponents<IPredicateEvaluator>();
+
         /// <summary> Получить список доступных для игрока вариантов ответа. </summary>
         /// <returns> Список узлов, которые представляет выбор игрока. </returns>
         private IEnumerable<DialogueNode> GetChoices() => _currentDialogue.GetPlayerChildNodes(_currentNode);
+        // FilterOnCondition(_currentDialogue.GetPlayerChildNodes(_currentNode));
 
         /// <summary> Выбрать вариант ответа игрока. </summary>
         /// <param name="chosenNode"> Узел, выбранный игроком. </param>
@@ -159,13 +175,7 @@ namespace FlavorfulStory.DialogueSystem
         /// <summary> Обновить UI диалога в соответствии с текущим узлом. </summary>
         private void UpdateDialogueView()
         {
-            if (!IsDialogueActive)
-            {
-                _dialogueView.Hide();
-                return;
-            }
-
-            var data = new DialogueData(_currentNode.Text, CurrentNpcSpeaker?.NpcInfo, IsChoosingDialogue,
+            var data = new DialogueData(_currentNode.Text, _currentNpcSpeaker?.NpcInfo, IsChoosingDialogue,
                 GetChoices());
             _dialogueView.Show(data);
         }
@@ -187,7 +197,7 @@ namespace FlavorfulStory.DialogueSystem
         private void TriggerAction(string action)
         {
             if (action == string.Empty) return;
-            CurrentNpcSpeaker.GetComponent<DialogueTrigger>().TriggerDialogue(action);
+            _currentNpcSpeaker.GetComponent<DialogueTrigger>().TriggerDialogue(action);
         }
     }
 }

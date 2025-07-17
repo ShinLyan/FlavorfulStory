@@ -8,7 +8,7 @@ namespace FlavorfulStory.InteractionSystem
     public interface IInteractable
     {
         /// <summary> Действие для отображения в тултипе. </summary>
-        TooltipActionData TooltipAction { get; }
+        ActionTooltipData ActionTooltip { get; }
 
         /// <summary> Доступно ли взаимодействие с объектом в текущий момент? </summary>
         bool IsInteractionAllowed { get; }

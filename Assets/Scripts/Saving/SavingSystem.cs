@@ -95,7 +95,8 @@ namespace FlavorfulStory.Saving
         /// <param name="state"> Словарь, содержащий состояния всех объектов, которые необходимо зафиксировать. </param>
         private static void CaptureState(Dictionary<string, object> state)
         {
-            foreach (var saveable in Object.FindObjectsByType<SaveableEntity>(FindObjectsSortMode.None))
+            foreach (var saveable in
+                     Object.FindObjectsByType<SaveableEntity>(FindObjectsInactive.Include, FindObjectsSortMode.None))
                 state[saveable.UniqueIdentifier] = saveable.CaptureState();
 
             state["lastSceneBuildIndex"] = SceneManager.GetActiveScene().buildIndex;

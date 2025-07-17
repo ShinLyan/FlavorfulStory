@@ -1,7 +1,6 @@
 using FlavorfulStory.InputSystem;
 using FlavorfulStory.SceneManagement;
 using FlavorfulStory.TimeManagement;
-using TMPro;
 using UnityEngine;
 
 namespace FlavorfulStory.UI
@@ -13,66 +12,62 @@ namespace FlavorfulStory.UI
         /// <summary> Контейнер с контентом меню. </summary>
         [SerializeField] private GameObject _content;
 
-        /// <summary> Текст обозначения кнопки для переключения на предыдущую вкладку. </summary>
-        [SerializeField] private TMP_Text _previousTabLabel;
-
-        /// <summary> Текст обозначения кнопки для переключения на следующую вкладку. </summary>
-        [SerializeField] private TMP_Text _nextTabLabel;
-
         /// <summary> Массив вкладок в меню. </summary>
         private Tab[] _tabs;
 
         /// <summary> Индекс текущей активной вкладки. </summary>
-        private int _currentTabindex;
+        private int _currentTabIndex;
 
         /// <summary> Инициализация компонента.
         /// Находит все вкладки и назначает обработчики для их выбора. </summary>
         private void Awake()
         {
             _tabs = GetComponentsInChildren<Tab>(true);
-            for (int i = 0; i < _tabs.Length; i++)
-            {
-                _tabs[i].OnTabSelected += SelectTab;
-                _tabs[i].SetIndex(i);
-            }
+            for (int i = 0; i < _tabs.Length; i++) _tabs[i].Initialize(i, OnTabSelected);
         }
 
-        /// <summary> Устанавливает начальную вкладку (главную). </summary>
+        /// <summary> Обрабатывает выбор вкладки по её индексу. 
+        /// Активирует меню (если скрыто) и отображает выбранную вкладку. </summary>
+        /// <param name="index"> Индекс выбранной вкладки. </param>
+        private void OnTabSelected(int index)
+        {
+            SwitchMenu(true);
+            SelectTab(index);
+        }
+
+        /// <summary> Устанавливает начальную вкладку - MainTab. </summary>
         private void Start()
         {
-            _currentTabindex = 0; // MainTab по умолчанию
-            ShowCurrentTab();
+            _currentTabIndex = 0;
+            SelectTab(_currentTabIndex);
         }
 
         /// <summary> Обрабатывает ввод пользователя для переключения состояния меню,
         /// смены вкладки и нажатия на кнопки вкладок. </summary>
         private void Update()
         {
-            HandleSwitchInput();
-            HandleAdjacentTabsInput();
-            HandleTabButtonsInput();
+            HandleInputToSwitchMenu();
+            HandleTabInput();
         }
 
-        /// <summary> Обрабатывает ввод для переключения состояния меню (нажатие клавиши для скрытия/показа меню). </summary>
-        private void HandleSwitchInput()
+        /// <summary> Обрабатывает ввод для переключения состояния меню. </summary>
+        private void HandleInputToSwitchMenu()
         {
-            if (InputWrapper.GetButtonDown(InputButton.SwitchGameMenu)) SwitchContent(!_content.activeSelf);
+            if (InputWrapper.GetButtonDown(InputButton.SwitchGameMenu)) SwitchMenu(!_content.activeSelf);
         }
 
         /// <summary> Переключает состояние видимости меню. </summary>
         /// <param name="isEnabled"> Новое состояние видимости меню. </param>
-        public void SwitchContent(bool isEnabled)
+        public void SwitchMenu(bool isEnabled)
         {
             if (isEnabled)
             {
-                InputWrapper.BlockPlayerMovement();
-                InputWrapper.BlockInput(InputButton.MouseScroll);
+                InputWrapper.BlockPlayerInput();
                 WorldTime.Pause();
             }
             else
             {
-                InputWrapper.UnblockPlayerMovement();
-                InputWrapper.UnblockInput(InputButton.MouseScroll);
+                InputWrapper.UnblockPlayerInput();
                 WorldTime.Unpause();
             }
 
@@ -80,58 +75,41 @@ namespace FlavorfulStory.UI
         }
 
         /// <summary> Обрабатывает ввод для переключения между соседними вкладками. </summary>
-        private void HandleAdjacentTabsInput()
+        private void HandleTabInput()
         {
-            if (!_content.activeInHierarchy) return;
+            if (!_content.activeSelf) return;
 
             if (InputWrapper.GetButtonDown(InputButton.SwitchToPreviousTab) ||
                 InputWrapper.GetButtonDown(InputButton.SwitchToNextTab))
             {
-                bool isPreviousTab = InputWrapper.GetButtonDown(InputButton.SwitchToPreviousTab);
-                int direction = isPreviousTab ? -1 : 1;
-                int newTabIndex = (_currentTabindex + _tabs.Length + direction) % _tabs.Length;
-                SelectTab(newTabIndex);
-            }
-        }
-
-        /// <summary> Обрабатывает ввод для нажатия на кнопки вкладок. </summary>
-        private void HandleTabButtonsInput()
-        {
-            if (_content.activeInHierarchy &&
-                InputWrapper.GetButtonDown(_tabs[_currentTabindex].InputButton))
-            {
-                SwitchContent(false);
-                return;
+                int direction = InputWrapper.GetButtonDown(InputButton.SwitchToPreviousTab) ? -1 : 1;
+                int newIndex = (_currentTabIndex + _tabs.Length + direction) % _tabs.Length;
+                SelectTab(newIndex);
             }
 
             for (int i = 0; i < _tabs.Length; i++)
-                if (InputWrapper.GetButtonDown(_tabs[i].InputButton))
-                {
-                    SwitchContent(true);
-                    SelectTab(i);
-                    return;
-                }
+            {
+                if (!InputWrapper.GetButtonDown(_tabs[i].InputButton)) continue;
+
+                SwitchMenu(true);
+                SelectTab(i);
+                return;
+            }
         }
 
         /// <summary> Выбирает вкладку и скрывает текущую. </summary>
         /// <param name="index"> Индекс вкладки для выбора. </param>
         private void SelectTab(int index)
         {
-            HideCurrentTab();
-            _currentTabindex = index;
-            ShowCurrentTab();
+            _tabs[_currentTabIndex].Deactivate();
+            _currentTabIndex = index;
+            _tabs[_currentTabIndex].Activate();
         }
 
-        /// <summary> Показывает текущую вкладку. </summary>
-        private void ShowCurrentTab() => _tabs[_currentTabindex].Select();
+        /// <summary> Обрабатывает нажатие кнопки "Продолжить", скрывая игровое меню. </summary>
+        public void OnClickContinue() => SwitchMenu(false);
 
-        /// <summary> Скрывает текущую вкладку. </summary>
-        private void HideCurrentTab() => _tabs[_currentTabindex].ResetSelection();
-
-        /// <summary> Скрывает меню. </summary>
-        public void OnClickContinue() => SwitchContent(false);
-
-        /// <summary> Обработчик нажатия кнопки возврата в главное меню. Загружает сцену главного меню. </summary>
+        /// <summary> Обрабатывает нажатие кнопки "Вернуться в главное меню". Загружает сцену главного меню. </summary>
         public void OnClickReturnToMainMenu() => SavingWrapper.LoadSceneByName(SceneName.MainMenu.ToString());
     }
 }

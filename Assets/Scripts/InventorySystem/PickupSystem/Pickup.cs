@@ -12,12 +12,15 @@ namespace FlavorfulStory.InventorySystem.PickupSystem
         [Tooltip("Радиус подбора предмета."), SerializeField, Range(0f, 5f)]
         private float _pickupRadius = 1f;
 
+        /// <summary> Стак предметов для подбора. </summary>
+        [Tooltip("Стак предметов для подбора."), SerializeField]
+        private ItemStack _itemStack;
+
         /// <summary> Предмет, который можно подобрать. </summary>
-        [field: SerializeField]
-        public InventoryItem Item { get; private set; }
+        public InventoryItem Item => _itemStack.Item;
 
         /// <summary> Количество предметов, доступных для подбора. </summary>
-        public int Number { get; private set; } = 1;
+        public int Number => _itemStack.Number;
 
         /// <summary> Ссылка на инвентарь игрока. </summary>
         private Inventory _inventory;
@@ -34,13 +37,11 @@ namespace FlavorfulStory.InventorySystem.PickupSystem
         private void Construct(Inventory inventory) => _inventory = inventory;
 
         /// <summary> Устанавливает предмет, количество и задержку перед возможностью подбора. </summary>
-        /// <param name="item"> Предмет, который можно подобрать. </param>
-        /// <param name="number"> Количество предметов. </param>
+        /// <param name="itemStack"> Предмет и его количество, которые можно подобрать. </param>
         /// <param name="pickupDelay"> Задержка в секундах до возможности подбора. </param>
-        public void Setup(InventoryItem item, int number, float pickupDelay = 1f)
+        public void Setup(ItemStack itemStack, float pickupDelay = 1f)
         {
-            Item = item;
-            Number = number;
+            _itemStack = itemStack;
             _canBePickedUp = false;
             Invoke(nameof(ActivatePickup), pickupDelay);
         }

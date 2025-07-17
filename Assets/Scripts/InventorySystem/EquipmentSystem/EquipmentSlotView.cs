@@ -8,8 +8,8 @@ namespace FlavorfulStory.InventorySystem.EquipmentSystem
     /// <summary> Слот для отображения и управления экипировкой. </summary>
     public class EquipmentSlotView : MonoBehaviour, IDragContainer<InventoryItem>, IItemHolder
     {
-        /// <summary> Отображение иконки предмета экипировки. </summary>
-        [SerializeField] private InventoryItemIcon _inventoryItemIcon;
+        /// <summary> Отображение стака предмета. </summary>
+        [SerializeField] private ItemStackView _itemStackView;
 
         /// <summary> Тип экипировки, связанный со слотом. </summary>
         [SerializeField] private EquipmentType _equipmentType;
@@ -29,7 +29,7 @@ namespace FlavorfulStory.InventorySystem.EquipmentSystem
         private void Start() => UpdateView();
 
         /// <summary> Обновление отображения слота экипировки. </summary>
-        private void UpdateView() => _inventoryItemIcon.SetItem(GetItem(), 1);
+        private void UpdateView() => _itemStackView.UpdateView(GetItem(), 1);
 
         /// <summary> Получение максимально допустимого количества предметов, которые могут быть добавлены в слот. </summary>
         /// <param name="item"> Проверяемый предмет. </param>
