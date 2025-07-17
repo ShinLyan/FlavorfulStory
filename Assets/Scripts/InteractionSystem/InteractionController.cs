@@ -84,11 +84,11 @@ namespace FlavorfulStory.InteractionSystem
         {
             if (_lastTooltipSource == _closestInteractable) return;
 
-            if (_lastTooltipSource != null) _tooltipShower.Remove(_lastTooltipSource.TooltipAction);
+            if (_lastTooltipSource != null) _tooltipShower.Remove(_lastTooltipSource.ActionTooltip);
 
             _lastTooltipSource = _closestInteractable;
 
-            if (_closestInteractable != null) _tooltipShower.Add(_closestInteractable.TooltipAction);
+            if (_closestInteractable != null) _tooltipShower.Add(_closestInteractable.ActionTooltip);
         }
 
         /// <summary> Добавляет объект в список доступных для взаимодействия при входе в триггер. </summary>

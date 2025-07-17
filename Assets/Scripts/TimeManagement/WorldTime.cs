@@ -1,6 +1,7 @@
 using System;
 using FlavorfulStory.EditorTools.Attributes;
 using FlavorfulStory.Saving;
+using FlavorfulStory.SceneManagement;
 using UnityEngine;
 
 // TODO: Актуализировать под Zenject
@@ -105,6 +106,7 @@ namespace FlavorfulStory.TimeManagement
                 CurrentGameTime.SeasonDay + dayAdjustment, dayStartHour, 0);
 
             OnDayEnded?.Invoke(CurrentGameTime);
+            SavingWrapper.Save();
         }
 
         /// <summary> Поставить игровое время на паузу. </summary>

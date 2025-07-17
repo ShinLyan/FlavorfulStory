@@ -17,7 +17,8 @@ namespace FlavorfulStory.ObjectManagement
         #region Fields and Properties
 
         /// <summary> Префаб объекта для спавна. </summary>
-        [Header("Настройки спавна")] [Tooltip("Префаб объекта для спавна."), SerializeField]
+        [Header("Настройки спавна")]
+        [Tooltip("Префаб объекта для спавна."), SerializeField]
         protected GameObject _spawnObjectPrefab;
 
         /// <summary> Количество объектов для спавна. </summary>
@@ -29,7 +30,8 @@ namespace FlavorfulStory.ObjectManagement
         private Vector2 _scaleVariation;
 
         /// <summary> Ширина зоны спавна. </summary>
-        [Header("Размер зоны спавна")] [Tooltip("Ширина зоны спавна."), SerializeField, Range(0f, 1000f)]
+        [Header("Размер зоны спавна")]
+        [Tooltip("Ширина зоны спавна."), SerializeField, Range(0f, 1000f)]
         private int _widthSpawnArea;
 
         /// <summary> Длина зоны спавна. </summary>
@@ -67,10 +69,7 @@ namespace FlavorfulStory.ObjectManagement
         /// <summary> Внедрить контейнер зависимостей. </summary>
         /// <param name="container"> Контейнер Zenject. </param>
         [Inject]
-        private void Construct(DiContainer container)
-        {
-            _container = container;
-        }
+        private void Construct(DiContainer container) => _container = container;
 
         #endregion
 

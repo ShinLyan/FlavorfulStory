@@ -9,14 +9,14 @@ using Zenject;
 
 namespace FlavorfulStory.DialogueSystem
 {
-    /// <summary> Компонент, позволяющий NPC инициировать диалог при взаимодействии курсором. </summary>
+    /// <summary> Компонент, позволяющий NPC инициировать диалог при взаимодействии с игроком. </summary>
     public class NpcSpeaker : MonoBehaviour, IInteractable, ICursorInteractable
     {
         /// <summary> Диалог, который будет запущен при взаимодействии с NPC. </summary>
         [SerializeField] private Dialogue _dialogue;
 
-        /// <summary> Инициатор диалога, связанный с игроком. </summary>
-        private IDialogueInitiator _dialogueInitiator;
+        /// <summary> Компонент диалогов игрока. </summary>
+        private PlayerSpeaker _playerSpeaker;
 
         /// <summary> Контроллер игрока. </summary>
         private PlayerController _playerController;
@@ -25,12 +25,12 @@ namespace FlavorfulStory.DialogueSystem
         public NpcInfo NpcInfo { get; private set; }
 
         /// <summary> Внедрение зависимостей Zenject. </summary>
-        /// <param name="dialogueInitiator"> Инициатор диалога, связанный с игроком. </param>
+        /// <param name="playerSpeaker"> Компонент диалогов игрока. </param>
         /// <param name="playerController"> Контроллер игрока. </param>
         [Inject]
-        private void Construct(IDialogueInitiator dialogueInitiator, PlayerController playerController)
+        private void Construct(PlayerSpeaker playerSpeaker, PlayerController playerController)
         {
-            _dialogueInitiator = dialogueInitiator;
+            _playerSpeaker = playerSpeaker;
             _playerController = playerController;
         }
 
@@ -40,14 +40,18 @@ namespace FlavorfulStory.DialogueSystem
             IsInteractionAllowed = true;
             NpcInfo = GetComponent<Npc>().NpcInfo;
 
-            if (_dialogueInitiator is PlayerSpeaker playerSpeaker)
-                playerSpeaker.OnConversationEnded += () => EndInteraction(_playerController);
+            _playerSpeaker.OnDialogueCompleted += OnDialogueCompleted;
         }
+
+        /// <summary> Обработчик завершения диалога — завершает взаимодействие с NPC. </summary>
+        /// <param name="npcName"> Имя NPC. </param>
+        /// <param name="dialogue"> Диалог, который завершился. </param>
+        private void OnDialogueCompleted(NpcName npcName, Dialogue dialogue) => EndInteraction(_playerController);
 
         #region IInteractable
 
         /// <summary> Описание действия с объектом. </summary>
-        public TooltipActionData TooltipAction => new("E", ActionType.Talk, $"to {NpcInfo.NpcName}");
+        public ActionTooltipData ActionTooltip => new("E", ActionType.Talk, $"to {NpcInfo.NpcName}");
 
         /// <summary> Флаг, разрешено ли взаимодействие с NPC. </summary>
         public bool IsInteractionAllowed { get; private set; }
@@ -65,7 +69,7 @@ namespace FlavorfulStory.DialogueSystem
             if (!IsInteractionAllowed) return;
 
             IsInteractionAllowed = false;
-            _dialogueInitiator?.StartDialogue(this, _dialogue);
+            _playerSpeaker.StartDialogue(this, _dialogue);
         }
 
         /// <summary> Завершает взаимодействие с NPC. </summary>

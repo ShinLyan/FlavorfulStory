@@ -39,13 +39,16 @@
         /// <summary> Открыть вкладку настроек в игровом меню. </summary>
         OpenSettingsTab,
 
+        /// <summary> Открыть вкладку со списком квестов в игровом меню. </summary>
+        OpenQuestTab,
+
         /// <summary> Взаимодействие с объектами. </summary>
         Interact,
 
         /// <summary> Позиция курсора мыши. </summary>
         MousePosition,
-        
+
         /// <summary> Выбросить текущий предмет в руках. </summary>
-        DropCurrentItem,
+        DropCurrentItem
     }
 }

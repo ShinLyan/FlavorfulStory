@@ -111,14 +111,14 @@ namespace FlavorfulStory.InventorySystem.UI
         {
             if (_lastTooltipItem && _lastTooltipItem.CanBeDropped)
             {
-                var oldTooltip = new TooltipActionData("G", ActionType.Drop, _lastTooltipItem.ItemName);
+                var oldTooltip = new ActionTooltipData("G", ActionType.Drop, _lastTooltipItem.ItemName);
                 _tooltipShower.Remove(oldTooltip);
             }
 
             var item = SelectedItem;
             if (item && item.CanBeDropped)
             {
-                var newTooltip = new TooltipActionData("G", ActionType.Drop, item.ItemName);
+                var newTooltip = new ActionTooltipData("G", ActionType.Drop, item.ItemName);
                 _tooltipShower.Add(newTooltip);
                 _lastTooltipItem = item;
             }

@@ -35,6 +35,6 @@ namespace FlavorfulStory.InventorySystem.DropSystem
         /// <param name="item"> Тип добавляемого элемента. </param>
         /// <param name="number"> Количество добавляемых элементов. </param>
         public void AddItems(InventoryItem item, int number) =>
-            _itemDropService.Drop(item, number, _playerController.transform.position);
+            _itemDropService.Drop(new ItemStack { Item = item, Number = number }, _playerController.transform.position);
     }
 }

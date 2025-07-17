@@ -10,51 +10,37 @@ namespace FlavorfulStory.UI
         /// <summary> Кнопка вкладки. </summary>
         [SerializeField] private TabButton _tabButton;
 
-        /// <summary> Контент, отображаемый при активной вкладке. </summary>
-        [SerializeField] private GameObject _tabContent;
+        /// <summary> Кнопка ввода, связанная с данной вкладкой. </summary>
+        [field: SerializeField] public InputButton InputButton { get; private set; }
 
         /// <summary> Индекс вкладки в наборе вкладок. </summary>
         private int _index;
 
-        /// <summary> Кнопка ввода, связанная с данной вкладкой. </summary>
-        [field: SerializeField] public InputButton InputButton { get; private set; }
-
         /// <summary> Подписка на событие клика по кнопке вкладки при инициализации. </summary>
         /// <summary> Событие, вызываемое при выборе вкладки. </summary>
-        ///<remarks> Передает индекс выбранной вкладки. </remarks>
-        public event Action<int> OnTabSelected;
+        /// <remarks> Передает индекс выбранной вкладки. </remarks>
+        private Action<int> _onTabSelected;
 
-        /// <summary> Инициализирует обработчик события клика по кнопке вкладки. </summary>
-        private void Awake()
+        public void Initialize(int index, Action<int> onTabSelected)
         {
-            _tabButton.OnClick += SwitchTo;
+            _index = index;
+            _onTabSelected = onTabSelected;
+            _tabButton.OnClick = () => _onTabSelected?.Invoke(_index);
+            _tabButton.Interactable = true;
         }
 
-        /// <summary> Выбор этой вкладки, вызов события выбора и активация контента. </summary>
-        private void SwitchTo()
+        public void Activate()
         {
-            OnTabSelected?.Invoke(_index);
-            Select();
-        }
-
-        /// <summary> Активация вкладки и ее контента. </summary>
-        public void Select()
-        {
+            gameObject.SetActive(true);
             _tabButton.IsActive = true;
             _tabButton.SetNameState(true);
-            _tabContent.SetActive(true);
         }
 
-        /// <summary> Сброс состояния вкладки и скрытие контента. </summary>
-        public void ResetSelection()
+        public void Deactivate()
         {
             _tabButton.IsActive = false;
+            gameObject.SetActive(false);
             _tabButton.SetNameState(false);
-            _tabContent.SetActive(false);
         }
-
-        /// <summary> Устанавливает индекс вкладки. </summary>
-        ///<param name="index"> Числовой индекс вкладки. </param>
-        public void SetIndex(int index) => _index = index;
     }
 }

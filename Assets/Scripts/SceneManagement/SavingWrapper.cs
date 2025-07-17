@@ -68,7 +68,7 @@ namespace FlavorfulStory.SceneManagement
 
         /// <summary> Загружает первую сцену игры. </summary>
         /// <returns> Корутина, выполняющая загрузку первой сцены. </returns>
-        private IEnumerator LoadFirstScene()
+        private IEnumerator LoadFirstScene() // TODO ПЕРЕПИСАТЬ НА UniTask
         {
             var fadeTween = _canvasGroupFader.Show();
             var sceneLoad = SceneManager.LoadSceneAsync(FirstUploadedScene.ToString());
@@ -109,7 +109,8 @@ namespace FlavorfulStory.SceneManagement
 
         /// <summary> Загружает сцену по её названию. </summary>
         /// <param name="sceneName"> Название сцены. </param>
-        public static void LoadSceneByName(string sceneName) => SceneManager.LoadScene(sceneName);
+        public static void LoadSceneByName(string sceneName) =>
+            SceneManager.LoadScene(sceneName); // TODO: ПЕРЕПИСАТЬ НА АСИНХРОННУЮ ВЕРСИЮ
 
         /// <summary> Загружает данные игры из текущего сохранения. </summary>
         public static void Load() => SavingSystem.Load(GetCurrentSaveFileName());
