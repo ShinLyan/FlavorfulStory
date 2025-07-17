@@ -4,8 +4,8 @@ using UnityEngine;
 
 namespace FlavorfulStory.InventorySystem
 {
-    /// <summary> ScriptableObject, представляющий предмет, который может быть помещен в инвентарь. </summary>
     // TODO: сделать абстрактным, когда все типы предметов будут реализованы
+    /// <summary> ScriptableObject, представляющий предмет, который может быть помещен в инвентарь. </summary>
     [CreateAssetMenu(menuName = "FlavorfulStory/Inventory/Item")]
     public class InventoryItem : ScriptableObject, ISerializationCallbackReceiver
     {
@@ -51,8 +51,13 @@ namespace FlavorfulStory.InventorySystem
 
         /// <summary> Стоимость продажи предмета в магазине. </summary>
         /// <remarks> Учитывается только если <see cref="IsSellable"/> равен <c>true</c>.</remarks> 
-        [field: Tooltip("Стоимость продажи предмета в магазине."), SerializeField, Min(0)]
-        public int SellPrice { get; private set; } = 300;
+        [field: Tooltip("Стоимость продажи предмета в магазине."), SerializeField, Min(0f)]
+        public int SellPrice { get; private set; }
+
+        /// <summary> Стоимость покупки предмета у вендора в магазине. </summary>
+        /// <remarks> Учитывается только если <see cref="IsSellable"/> равен <c>true</c>.</remarks> 
+        [field: Tooltip("Стоимость покупки предмета у вендора в магазине."), SerializeField, Min(0f)]
+        public int BuyPrice { get; private set; }
 
         #endregion
 

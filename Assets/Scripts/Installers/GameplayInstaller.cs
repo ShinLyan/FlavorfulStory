@@ -2,6 +2,7 @@
 using FlavorfulStory.BuildingRepair.UI;
 using FlavorfulStory.DialogueSystem;
 using FlavorfulStory.DialogueSystem.UI;
+using FlavorfulStory.Economy;
 using FlavorfulStory.Infrastructure.Factories;
 using FlavorfulStory.InventorySystem;
 using FlavorfulStory.InventorySystem.DropSystem;
@@ -13,6 +14,7 @@ using FlavorfulStory.QuestSystem;
 using FlavorfulStory.QuestSystem.Objectives;
 using FlavorfulStory.Saving;
 using FlavorfulStory.SceneManagement;
+using FlavorfulStory.Shop;
 using FlavorfulStory.TimeManagement;
 using FlavorfulStory.TooltipSystem;
 using FlavorfulStory.UI;
@@ -66,6 +68,11 @@ namespace FlavorfulStory.Installers
         {
             Container.Bind<PlayerController>().FromComponentInHierarchy().AsSingle();
             Container.Bind<Equipment>().FromComponentInHierarchy().AsSingle();
+
+            Container.Bind<PlayerWalletView>().FromComponentInHierarchy().AsSingle();
+
+            Container.Bind<ICurrencyStorage>().WithId("Player").To<PlayerWallet>().AsSingle();
+            Container.Bind<ICurrencyStorage>().WithId("Register").To<CashRegister>().AsSingle();
         }
 
         /// <summary> Установить зависимости, связанные с инвентарем. </summary>
