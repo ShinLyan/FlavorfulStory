@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using FlavorfulStory.Infrastructure;
-using FlavorfulStory.Utils;
 using UnityEngine;
 
 namespace FlavorfulStory.TooltipSystem
@@ -9,25 +8,25 @@ namespace FlavorfulStory.TooltipSystem
     public class ActionTooltipShower : MonoBehaviour, IActionTooltipShower
     {
         /// <summary> Префаб отдельной строчки действия в тултипе. </summary>
-        [SerializeField] private TooltipActionView _tooltipActionPrefab;
+        [SerializeField] private ActionTooltipView _actionTooltipViewPrefab;
 
         /// <summary> Родительский трансформ, куда помещаются UI-элементы действий. </summary>
         [SerializeField] private Transform _parentTransform;
 
         /// <summary> Пул для переиспользуемых элементов тултипа. </summary>
-        private ObjectPool<TooltipActionView> _pool;
+        private ObjectPool<ActionTooltipView> _pool;
 
         /// <summary> Список активных (отображаемых) действий. </summary>
-        private readonly List<TooltipActionData> _activeTooltips = new();
+        private readonly List<ActionTooltipData> _activeTooltips = new();
 
         /// <summary> Список UI-элементов, созданных и отображённых на экране. </summary>
-        private readonly List<TooltipActionView> _spawnedViews = new();
+        private readonly List<ActionTooltipView> _spawnedViews = new();
 
         /// <summary> Инициализация пула и скрытие тултипа при запуске. </summary>
         private void Start()
         {
-            _pool = new ObjectPool<TooltipActionView>(
-                () => Instantiate(_tooltipActionPrefab, _parentTransform),
+            _pool = new ObjectPool<ActionTooltipView>(
+                () => Instantiate(_actionTooltipViewPrefab, _parentTransform),
                 tooltipActionView => tooltipActionView.Show(),
                 tooltipActionView => tooltipActionView.Hide()
             );
@@ -37,7 +36,7 @@ namespace FlavorfulStory.TooltipSystem
 
         /// <summary> Добавляет действие во всплывающую подсказку. </summary>
         /// <param name="action"> Данные действия (клавиша + описание). </param>
-        public void Add(TooltipActionData action)
+        public void Add(ActionTooltipData action)
         {
             if (_activeTooltips.Contains(action)) return;
 
@@ -47,7 +46,7 @@ namespace FlavorfulStory.TooltipSystem
 
         /// <summary> Удаляет действие из тултипа. </summary>
         /// <param name="action"> Данные действия, которые нужно удалить. </param>
-        public void Remove(TooltipActionData action)
+        public void Remove(ActionTooltipData action)
         {
             if (_activeTooltips.Remove(action)) RefreshTooltipViews();
         }
@@ -76,9 +75,9 @@ namespace FlavorfulStory.TooltipSystem
         }
 
         /// <summary> Формирует финальный текст действия, объединяя глагол и цель. </summary>
-        /// <param name="tooltip"> Структура данных действия. </param>
+        /// <param name="actionTooltip"> Структура данных действия. </param>
         /// <returns> Строка формата: "Harvest Bread". </returns>
-        private static string CreateActionDescription(TooltipActionData tooltip) =>
-            $"{tooltip.Action} {tooltip.Target}";
+        private static string CreateActionDescription(ActionTooltipData actionTooltip) =>
+            $"{actionTooltip.Action} {actionTooltip.Target}";
     }
 }

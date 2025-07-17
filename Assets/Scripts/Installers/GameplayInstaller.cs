@@ -47,6 +47,9 @@ namespace FlavorfulStory.Installers
         /// <summary> Затемнитель интерфейса HUD. </summary>
         [SerializeField] private CanvasGroupFader _hudFader;
 
+        /// <summary> Префаб всплывающей подсказки для предмета. </summary>
+        [SerializeField] private ItemTooltipView _itemTooltipPrefab;
+
         /// <summary> Выполняет установку всех зависимостей, необходимых для сцены. </summary>
         public override void InstallBindings()
         {
@@ -113,6 +116,8 @@ namespace FlavorfulStory.Installers
             Container.Bind<Toolbar>().FromComponentInHierarchy().AsSingle();
 
             Container.Bind<CanvasGroupFader>().WithId("HUD").FromInstance(_hudFader).AsSingle();
+
+            Container.Bind<ItemTooltipView>().FromInstance(_itemTooltipPrefab).AsSingle();
         }
 
         /// <summary> Установить зависимости, связанные с системами и логикой. </summary>

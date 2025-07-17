@@ -1,6 +1,5 @@
 using System;
 using FlavorfulStory.InventorySystem;
-using FlavorfulStory.TooltipSystem;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -10,11 +9,10 @@ namespace FlavorfulStory.BuildingRepair.UI
 {
     /// <summary> Отображение информации о требуемых ресурсах для текущей стадии ремонта. </summary>
     /// <remarks> Управляет визуализацией и взаимодействием с кнопками добавления и возврата ресурса. </remarks>
-    [RequireComponent(typeof(ItemTooltipSpawner))]
-    public class ResourceRequirementView : MonoBehaviour, IItemHolder
+    public class ResourceRequirementView : MonoBehaviour
     {
         /// <summary> Иконка ресурса, отображаемая на панели. </summary>
-        [SerializeField] private Image _resourceIcon;
+        [SerializeField] private RepairResourceSlotView _resourceSlotView;
 
         /// <summary> Текстовое поле, отображающее количество текущего ресурса
         /// и необходимое для завершения стадии. </summary>
@@ -87,7 +85,7 @@ namespace FlavorfulStory.BuildingRepair.UI
         /// <summary> Обновить визуальное отображение информации о ресурсе. </summary>
         private void UpdateView()
         {
-            _resourceIcon.sprite = _resource.Icon;
+            _resourceSlotView.Setup(_resource);
             _quantityText.text = $"{_investedQuantity}/{_requiredQuantity}";
         }
 
@@ -98,9 +96,5 @@ namespace FlavorfulStory.BuildingRepair.UI
                 _investedQuantity < _requiredQuantity && _playerInventory.GetItemNumber(_resource) > 0;
             _returnResourceButton.interactable = _investedQuantity > 0 && _playerInventory.HasSpaceFor(_resource);
         }
-
-        /// <summary> Получить предмет для отображения в тултипе. </summary>
-        /// <returns> Предмет для отображения в тултипе. </returns>
-        public InventoryItem GetItem() => _resource;
     }
 }

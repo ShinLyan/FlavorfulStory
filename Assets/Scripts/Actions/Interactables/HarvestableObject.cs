@@ -27,7 +27,7 @@ namespace FlavorfulStory.Actions.Interactables
         #region IInteractable
 
         /// <summary> Описание действия с объектом. </summary>
-        public TooltipActionData TooltipAction => new("E", ActionType.Gather, _harvestItems[0].Item.ItemName);
+        public ActionTooltipData ActionTooltip => new("E", ActionType.Gather, _harvestItems[0].Item.ItemName);
 
         /// <summary> Свойство возможности взаимодействия с объектом. </summary>
         public virtual bool IsInteractionAllowed { get; protected set; } = true;

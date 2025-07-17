@@ -44,7 +44,16 @@ namespace FlavorfulStory.InventorySystem
         /// <summary> Можно ли выкинуть этот предмет из инвентаря? </summary>
         [field: Tooltip("Можно ли выбросить этот предмет из инвентаря?"), SerializeField]
         public bool CanBeDropped { get; private set; } = true;
-        
+
+        /// <summary> Можно ли продать предмет? </summary>
+        [field: Tooltip("Можно ли продать предмет?"), SerializeField]
+        public bool IsSellable { get; private set; } = true;
+
+        /// <summary> Стоимость продажи предмета в магазине. </summary>
+        /// <remarks> Учитывается только если <see cref="IsSellable"/> равен <c>true</c>.</remarks> 
+        [field: Tooltip("Стоимость продажи предмета в магазине."), SerializeField, Min(0)]
+        public int SellPrice { get; private set; } = 300;
+
         #endregion
 
         #region ISerializationCallbackReceiver

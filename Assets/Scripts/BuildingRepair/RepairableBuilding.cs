@@ -81,7 +81,7 @@ namespace FlavorfulStory.BuildingRepair
         #region IInteractable
 
         /// <summary> Описание действия с объектом. </summary>
-        public TooltipActionData TooltipAction => new("E", ActionType.Build, CurrentStage.BuildingName);
+        public ActionTooltipData ActionTooltip => new("E", ActionType.Build, CurrentStage.BuildingName);
 
         /// <summary> Доступно ли взаимодействие с объектом в текущий момент? </summary>
         public bool IsInteractionAllowed => !_isRepairCompleted;
