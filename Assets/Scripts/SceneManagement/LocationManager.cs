@@ -79,5 +79,16 @@ namespace FlavorfulStory.SceneManagement
             else
                 Debug.LogError($"Локации {name} не существует!");
         }
+
+        /// <summary> Получает локацию по её имени. </summary>
+        /// <param name="name"> Имя локации для поиска. </param>
+        /// <returns> Объект локации, если найден; иначе — <c>null</c>. </returns> 
+        public Location GetLocationByName(LocationName name)
+        {
+            if (_locationByName.TryGetValue(name, out var location)) return location;
+
+            Debug.LogError($"Локации {name} не существует!");
+            return null;
+        }
     }
 }

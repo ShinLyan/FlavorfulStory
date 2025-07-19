@@ -1,3 +1,4 @@
+using FlavorfulStory.AI.BaseNpc;
 using FlavorfulStory.AI.Scheduling;
 
 namespace FlavorfulStory.AI.FiniteStateMachine

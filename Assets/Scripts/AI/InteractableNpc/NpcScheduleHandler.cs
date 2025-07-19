@@ -5,7 +5,7 @@ using FlavorfulStory.AI.Scheduling;
 using FlavorfulStory.TimeManagement;
 using DateTime = FlavorfulStory.TimeManagement.DateTime;
 
-namespace FlavorfulStory.AI
+namespace FlavorfulStory.AI.InteractableNpc
 {
     /// <summary> Обработчик расписания NPC, который управляет временными точками расписания персонажа. </summary>
     public class NpcScheduleHandler : IScheduleDependable
