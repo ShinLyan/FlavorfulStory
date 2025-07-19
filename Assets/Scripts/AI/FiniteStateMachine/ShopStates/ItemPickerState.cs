@@ -1,8 +1,11 @@
 using FlavorfulStory.Actions;
 using FlavorfulStory.AI.NonInteractableNpc;
 using FlavorfulStory.AI.Scheduling;
+using FlavorfulStory.Economy;
+using FlavorfulStory.InventorySystem;
 using FlavorfulStory.SceneManagement;
 using FlavorfulStory.Shop;
+using UnityEngine;
 
 namespace FlavorfulStory.AI.FiniteStateMachine.ShopStates
 {
@@ -18,10 +21,13 @@ namespace FlavorfulStory.AI.FiniteStateMachine.ShopStates
         /// <summary> Контроллер движения неинтерактивного NPC. </summary>
         private readonly NonInteractableNpcMovementController _movementController;
 
+        private TransactionService _transactionService;
+
         /// <summary> Инициализирует новый экземпляр состояния выбора предмета. </summary>
         /// <param name="npcMovementController"> Контроллер движения для управления перемещением NPC. </param>
         /// <param name="shopLocation"> Локация магазина для получения информации о кассе. </param>
         /// <param name="itemHandler"> Обработчик предметов для экипировки товаров. </param>
+        /// <param name="transactionService"> </param>
         public ItemPickerState(NonInteractableNpcMovementController npcMovementController, ShopLocation shopLocation,
             ItemHandler itemHandler)
         {
@@ -34,12 +40,21 @@ namespace FlavorfulStory.AI.FiniteStateMachine.ShopStates
         public override void Enter()
         {
             base.Enter();
+
+            Debug.Log(_itemHandler);
             if (Context != null && Context.TryGet<Shelf>("SelectedShelf", out var shelf)) shelf.IsOccupied = false;
             // var item = shelf.Items[Random.Range(0, shelf.Items.Count)]; //TODO
-            // _itemHandler.EquipItem(item);
+
+            //TODO: тестовый предмет, переделать на предмет с полки
+            var item = ItemDatabase.GetItemFromID("e31d1d53-dae6-4643-9843-fa03f23aef85");
+            var itemPrefab = item.PickupPrefab.GetComponent<Rigidbody>().useGravity = false;
+            var itemStack = new ItemStack { Item = item, Number = 1 };
+            _itemHandler.EquipItem(itemStack);
 
             var accessiblePoint = _shopLocation.CashDesk.GetAccessiblePoint();
             Context?.Set("CashDeskPoint", accessiblePoint);
+            Context?.Set("PurchaseItem", itemStack);
+
 
             var point = new SchedulePoint(); //TODO: rework
             point.Position = accessiblePoint.position;

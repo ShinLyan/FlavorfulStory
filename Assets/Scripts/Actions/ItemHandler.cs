@@ -1,18 +1,76 @@
+using System;
 using FlavorfulStory.InventorySystem;
+using Unity.Collections;
 using UnityEngine;
 
 namespace FlavorfulStory.Actions
 {
+    /// <summary>
+    /// Обработчик предметов для NPC, позволяющий визуализировать предметы в руках.
+    /// Поддерживает простую систему экипировки/снятия предметов.
+    /// </summary>
     public class ItemHandler : MonoBehaviour
     {
-        public void EquipItem(InventoryItem item)
+        [Header("References")] [Tooltip("Трансформ, куда будет помещаться экипированный предмет")] [SerializeField]
+        private Transform _handSlot;
+
+        [Header("Settings")] [Tooltip("Автоматически уничтожать старый предмет при экипировке нового")] [SerializeField]
+        private bool _autoDestroyPreviousItem = true;
+
+        [Tooltip("Текущий экипированный предмет (только для просмотра)")] [SerializeField, ReadOnly]
+        private InventoryItem _currentItem;
+
+        [Tooltip("Текущий экземпляр предмета (только для просмотра)")] [SerializeField, ReadOnly]
+        private GameObject _currentItemInstance;
+
+        /// <summary> Событие при изменении экипированного предмета </summary>
+        public event Action<InventoryItem> OnItemChanged;
+
+        /// <summary> Экипировать указанный предмет. </summary>
+        /// <param name="itemStack"> Предмет для экипировки. </param>
+        public void EquipItem(ItemStack itemStack)
         {
-            //TODO: реализовать метод
+            Debug.Log("Попытка экипировать предмет: " + itemStack.Item?.ItemName, this);
+            if (!itemStack.Item)
+            {
+                Debug.LogWarning("Попытка экипировать null предмет", this);
+                return;
+            }
+
+            UnequipItem();
+
+            if (itemStack.Item.PickupPrefab)
+            {
+                _currentItemInstance = Instantiate(itemStack.Item.PickupPrefab.gameObject, _handSlot);
+                _currentItem = itemStack.Item;
+                OnItemChanged?.Invoke(_currentItem);
+            }
+            else
+            {
+                Debug.LogError(
+                    $"Не удалось экипировать предмет {itemStack.Item.ItemName}: отсутствует PickupPrefab или ItemPrefab",
+                    this);
+            }
         }
 
-        public void UnequipItem(InventoryItem item)
+        /// <summary> Снять текущий экипированный предмет. </summary>
+        /// <param name="destroyItem"> Уничтожать ли экземпляр предмета. </param>
+        public void UnequipItem(bool destroyItem = true)
         {
-            //TODO: реализовать метод
+            if (!_currentItem) return;
+
+            var previousItem = _currentItem;
+            _currentItem = null;
+
+            if (_currentItemInstance)
+            {
+                if (destroyItem || _autoDestroyPreviousItem)
+                    Destroy(_currentItemInstance);
+                else
+                    _currentItemInstance.SetActive(false);
+            }
+
+            OnItemChanged?.Invoke(null);
         }
     }
 }

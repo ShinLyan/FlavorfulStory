@@ -4,6 +4,7 @@ using FlavorfulStory.AI.BaseNpc;
 using FlavorfulStory.AI.FiniteStateMachine;
 using FlavorfulStory.AI.Scheduling;
 using FlavorfulStory.AI.WarpGraphSystem;
+using FlavorfulStory.Economy;
 using FlavorfulStory.SceneManagement;
 using UnityEngine;
 using UnityEngine.AI;
@@ -18,6 +19,8 @@ namespace FlavorfulStory.AI.NonInteractableNpc
         /// <summary> Менеджер локаций для управления переходами между локациями. </summary>
         [Inject] private LocationManager _locationManager;
 
+        [Inject] private TransactionService _transactionService;
+
         /// <summary> Обработчик предметов для взаимодействия с объектами. </summary>
         private ItemHandler _itemHandler;
 
@@ -27,9 +30,13 @@ namespace FlavorfulStory.AI.NonInteractableNpc
         /// <summary> Инициализирует компоненты неинтерактивного NPC. </summary>
         protected override void Awake()
         {
-            base.Awake();
             _itemHandler = GetComponent<ItemHandler>();
+            base.Awake();
+
+            Debug.Log("Неинтерактивный NPC инициализирован: " + _itemHandler);
         }
+
+        protected override void Start() { base.Start(); }
 
         /// <summary> Создает контроллер движения для неинтерактивного NPC. </summary>
         /// <returns> Экземпляр контроллера движения неинтерактивного NPC. </returns>
@@ -51,7 +58,8 @@ namespace FlavorfulStory.AI.NonInteractableNpc
                 _movementController as NonInteractableNpcMovementController,
                 _locationManager,
                 _animationController,
-                _itemHandler
+                _itemHandler,
+                _transactionService
             );
         }
 

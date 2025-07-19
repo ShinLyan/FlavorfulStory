@@ -10,7 +10,7 @@ namespace FlavorfulStory.Shop
     {
         /// <summary> Касса магазина для обслуживания покупателей. </summary>
         [field: SerializeField]
-        public CashDesk CashDesk { get; private set; }
+        public CashRegister CashDesk { get; private set; }
 
         /// <summary> Массив полок в магазине. </summary>
         [SerializeField] private Shelf[] _shelves;

@@ -5,6 +5,7 @@ using FlavorfulStory.AI.BaseNpc;
 using FlavorfulStory.AI.FiniteStateMachine;
 using FlavorfulStory.AI.FiniteStateMachine.ShopStates;
 using FlavorfulStory.AI.Scheduling;
+using FlavorfulStory.Economy;
 using FlavorfulStory.SceneManagement;
 using FlavorfulStory.Shop;
 using UnityEngine;
@@ -68,6 +69,8 @@ namespace FlavorfulStory.AI.NonInteractableNpc
 
         private SchedulePoint _despawnPoint;
 
+        private readonly TransactionService _transactionService;
+
         #endregion
 
         /// <summary> Инициализирует новый экземпляр контроллера состояний для неинтерактивного NPC. </summary>
@@ -75,15 +78,18 @@ namespace FlavorfulStory.AI.NonInteractableNpc
         /// <param name="locationManager"> Менеджер локаций для получения информации о местоположениях. </param>
         /// <param name="npcAnimationController"> Контроллер анимации NPC для управления анимациями персонажа. </param>
         /// <param name="itemHandler"> Обработчик предметов для работы с игровыми объектами. </param>
+        /// <param name="transactionService"></param>
         public NonInteractableNpcStateController(NonInteractableNpcMovementController npcMovementController,
             LocationManager locationManager,
             NpcAnimationController npcAnimationController,
-            ItemHandler itemHandler)
+            ItemHandler itemHandler,
+            TransactionService transactionService)
             : base(npcAnimationController)
         {
             _npcMovementController = npcMovementController;
             _locationManager = locationManager;
             _itemHandler = itemHandler;
+            _transactionService = transactionService;
 
             _hadVisitedFurnitureAfterPurchase = false;
             _despawnPoint = null;
@@ -121,7 +127,7 @@ namespace FlavorfulStory.AI.NonInteractableNpc
             _furniturePickerState = new FurniturePickerState(_npcMovementController, shopLocation);
             _itemPickerState =
                 new ItemPickerState(_npcMovementController, shopLocation, _itemHandler);
-            _paymentState = new PaymentState(shopLocation, _itemHandler);
+            _paymentState = new PaymentState(shopLocation, _itemHandler, _transactionService);
             _randomPointPickerState = new RandomPointPickerState(_npcMovementController, shopLocation);
             _shelfPickerState = new ShelfPickerState(_npcMovementController, shopLocation);
             _refuseItemState = new RefuseItemState(shopLocation);

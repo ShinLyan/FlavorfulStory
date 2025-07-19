@@ -1107,6 +1107,11 @@ PrefabInstance:
       propertyPath: m_Radius
       value: 0.9
       objectReference: {fileID: 0}
+    - target: {fileID: 1835068933118814622, guid: 568b5c19f5a356f43be93b695d5c8f32,
+        type: 3}
+      propertyPath: <CashDesk>k__BackingField
+      value: 
+      objectReference: {fileID: 8195510124016254908}
     - target: {fileID: 2390581727315456118, guid: 568b5c19f5a356f43be93b695d5c8f32,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -1217,11 +1222,24 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.y
       value: -90
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 2175008746177787263, guid: 568b5c19f5a356f43be93b695d5c8f32, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 568b5c19f5a356f43be93b695d5c8f32, type: 3}
+--- !u!114 &8195510124016254908 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1057549801587702300, guid: 568b5c19f5a356f43be93b695d5c8f32,
+    type: 3}
+  m_PrefabInstance: {fileID: 8195510124016254902}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ec94a14b4b9d41c6829ca071b8449c87, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

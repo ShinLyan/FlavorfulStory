@@ -71,8 +71,17 @@ namespace FlavorfulStory.Installers
 
             Container.Bind<PlayerWalletView>().FromComponentInHierarchy().AsSingle();
 
-            Container.Bind<ICurrencyStorage>().WithId("Player").To<PlayerWallet>().AsSingle();
-            Container.Bind<ICurrencyStorage>().WithId("Register").To<CashRegister>().AsSingle();
+            Container.Bind<ICurrencyStorage>()
+                .WithId("Player")
+                .To<PlayerWallet>()
+                .FromComponentInHierarchy()
+                .AsSingle();
+
+            Container.Bind<ICurrencyStorage>()
+                .WithId("Register")
+                .To<CashRegister>()
+                .FromComponentInHierarchy()
+                .AsSingle();
         }
 
         /// <summary> Установить зависимости, связанные с инвентарем. </summary>
@@ -142,6 +151,8 @@ namespace FlavorfulStory.Installers
             Container.Bind<SleepTrigger>().FromComponentInHierarchy().AsSingle();
 
             Container.BindInterfacesAndSelfTo<DayEndManager>().AsSingle();
+
+            Container.Bind<TransactionService>().AsSingle();
         }
     }
 }
