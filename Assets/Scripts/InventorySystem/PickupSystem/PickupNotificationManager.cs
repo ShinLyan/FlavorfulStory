@@ -143,12 +143,12 @@ namespace FlavorfulStory.InventorySystem.PickupSystem
         /// <returns> true — если уведомление было найдено и обновлено; иначе false. </returns>
         private bool TryUpdateExistingNotification(string itemId, int amount)
         {
-            var existingNotification =
-                _activeNotifications.FirstOrDefault(notification => notification.View.ItemID == itemId);
-            if (existingNotification == null) return false;
-
-            existingNotification.View.AddAmount(amount);
-            ResetNotificationLifetime(existingNotification);
+            // var existingNotification =
+            //     _activeNotifications.FirstOrDefault(notification => notification.View.ItemID == itemId);
+            // if (existingNotification == null) return false;
+            //
+            // existingNotification.View.AddAmount(amount);
+            // ResetNotificationLifetime(existingNotification);
 
             return true;
         }
@@ -163,8 +163,8 @@ namespace FlavorfulStory.InventorySystem.PickupSystem
             var instance = Instantiate(_notificationPrefab, _notificationsParent);
             var view = instance.GetComponent<PickupNotificationView>();
             
-            view.SetPositionInfo(NotificationPosition.TopLeft);
-            view.Initialize(icon, amount, itemId, itemName);
+            // view.SetPositionInfo(NotificationPosition.TopLeft);
+            // view.Initialize(icon, amount, itemId, itemName);
 
             var notification = new ActiveNotification { View = view };
 
@@ -192,7 +192,7 @@ namespace FlavorfulStory.InventorySystem.PickupSystem
         {
             _activeNotifications.Remove(notification);
             notification.LifetimeTween?.Kill(true);
-            notification.View.FadeAndDestroy(FadeDuration);
+            //notification.View.FadeAndDestroy(FadeDuration);
         }
 
         /// <summary> Переупорядочить активные уведомления по вертикали с анимацией. </summary>
@@ -209,7 +209,7 @@ namespace FlavorfulStory.InventorySystem.PickupSystem
                 if (!Mathf.Approximately(view.RectTransform.anchoredPosition.y, targetY))
                 {
                     var newPosition = new Vector2(view.StartXPosition, targetY);
-                    view.SetPosition(newPosition, MoveDuration);
+                    // view.SetPosition(newPosition, MoveDuration);
                 }
 
                 totalOffset += view.Height;

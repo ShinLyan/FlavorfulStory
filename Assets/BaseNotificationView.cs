@@ -7,53 +7,17 @@ namespace FlavorfulStory
 {
     /// <summary> UI-элемент уведомления о подобранном предмете. </summary>
     [RequireComponent(typeof(RectTransform), typeof(CanvasGroup))]
-    public partial class BaseNotificationView : MonoBehaviour
+    public abstract class BaseNotificationView : MonoBehaviour
     {
-        #region Fields and Properties
-
-        /// <summary> Иконка предмета. </summary>
-        [SerializeField] private Image _itemIconImage;
-
-        /// <summary> Текст с количеством и названием предмета. </summary>
-        [SerializeField] private TMP_Text _amountMessageText;
-
-        /// <summary> CanvasGroup для управления прозрачностью и взаимодействием. </summary>
-        private CanvasGroup _canvasGroup;
-
-        /// <summary> Tween-анимация для появления/исчезновения. </summary>
-        private Tween _fadeTween;
-
-        /// <summary> Tween-анимация для плавного обновления количества. </summary>
-        private Tween _countTween;
-
-        /// <summary> Название предмета. </summary>
-        private string _itemName;
-
-        /// <summary> Актуальное количество предметов. </summary>
-        private int _currentAmount;
-
-        /// <summary> Отображаемое количество на экране (анимируется). </summary>
-        private int _displayedAmount;
-
-        /// <summary> Начальная X-позиция, на которой должно появляться уведомление. </summary>
+        public abstract void Initialize(INotificationData data);
+        public abstract float Height { get; }
+        public RectTransform RectTransform { get; private set; }
+        public NotificationPosition Position { get; private set; }
         public float StartXPosition { get; private set; }
 
-        /// <summary> Идентификатор предмета (для группировки и повторного обновления). </summary>
-        public string ItemID { get; private set; }
+        [SerializeField] private RectTransform _backgroundRect;
+        private CanvasGroup _canvasGroup;
 
-        /// <summary> Текущая высота уведомления (для позиционирования). </summary>
-        public float Height => RectTransform.rect.height;
-
-        /// <summary> RectTransform, используемый для позиционирования уведомления. </summary>
-        public RectTransform RectTransform { get; private set; }
-
-        /// <summary> X-позиция за пределами экрана (для анимации входа/выхода). </summary>
-        //private float OffscreenXPosition => StartXPosition + Screen.width;
-        private float OffscreenXPosition => -StartXPosition;
-
-        #endregion
-
-        /// <summary> Инициализация полей класса. </summary>
         private void Awake()
         {
             RectTransform = GetComponent<RectTransform>();
@@ -61,82 +25,51 @@ namespace FlavorfulStory
             StartXPosition = RectTransform.anchoredPosition.x;
         }
 
-        public NotificationPosition Position { get; private set; }
-
-        public void SetPositionInfo(NotificationPosition position)
+        public void SetupPosition(NotificationPosition position, Vector2 padding)
         {
             Position = position;
-            ApplyAnchorAndPivot(position);
-        }
-        
-        /// <summary> Инициализировать уведомление визуалом, ID, количеством и позицией. </summary>
-        /// <param name="itemSprite"> Иконка предмета. </param>
-        /// <param name="amount"> Количество предметов. </param>
-        /// <param name="itemId"> Уникальный идентификатор предмета. </param>
-        /// <param name="itemName"> Название предмета. </param>
-        public void Initialize(Sprite itemSprite, int amount, string itemId, string itemName)
-        {
-            _itemIconImage.sprite = itemSprite;
-            ItemID = itemId;
-            _itemName = itemName;
 
-            _currentAmount = amount;
-            _displayedAmount = amount;
-            _canvasGroup.alpha = 0f;
-
-            UpdateMessage();
-
-            RectTransform.anchoredPosition = new Vector2(OffscreenXPosition, RectTransform.anchoredPosition.y);
-        }
-
-        /// <summary> Обновить текстовое сообщение с количеством и названием предмета. </summary>
-        private void UpdateMessage() => _amountMessageText.text = $"x{_displayedAmount} {_itemName}";
-
-        /// <summary> Добавить количество к уже отображаемому значению и воспроизвести анимацию. </summary>
-        /// <param name="amount"> Добавляемое количество. </param>
-        public void AddAmount(int amount)
-        {
-            int oldAmount = _currentAmount;
-            _currentAmount += amount;
-
-            _countTween?.Kill(true);
-            _countTween = DOVirtual.Int(oldAmount, _currentAmount, 0.4f, newAmount =>
+            var anchor = position switch
             {
-                _displayedAmount = newAmount;
-                UpdateMessage();
-            });
+                NotificationPosition.TopLeft     => new Vector2(0f, 1f),
+                NotificationPosition.TopRight    => new Vector2(1f, 1f),
+                NotificationPosition.BottomLeft  => new Vector2(0f, 0f),
+                NotificationPosition.BottomRight => new Vector2(1f, 0f),
+                _ => Vector2.zero
+            };
+
+            ApplyToRect(RectTransform, anchor);
+            ApplyToRect(_backgroundRect, anchor);
+
+            // Применяем X-отступ от края экрана
+            float xOffset = anchor.x == 0f ? padding.x : -padding.x;
+            RectTransform.anchoredPosition = new Vector2(xOffset, 0f);
+
+            StartXPosition = RectTransform.anchoredPosition.x;
         }
 
-        /// <summary> Запустить анимацию появления уведомления. </summary>
-        /// <param name="fadeDuration"> Длительность анимации появления. </param>
+        private void ApplyToRect(RectTransform rect, Vector2 anchor)
+        {
+            rect.anchorMin = rect.anchorMax = rect.pivot = anchor;
+        }
+
         public void Show(float fadeDuration)
         {
-            _fadeTween?.Kill(true);
-
-            DOTween.Sequence()
-                .Join(_canvasGroup.DOFade(1f, fadeDuration))
-                .Join(RectTransform.DOAnchorPosX(StartXPosition, fadeDuration).SetEase(Ease.OutCubic));
+            _canvasGroup.DOFade(1f, fadeDuration);
+            RectTransform.DOAnchorPosX(StartXPosition, fadeDuration).SetEase(Ease.OutCubic);
         }
 
-        /// <summary> Плавно переместить уведомление в указанную позицию. </summary>
-        /// <param name="anchoredPosition"> Целевая позиция (в координатах UI). </param>
-        /// <param name="duration"> Длительность перемещения. </param>
-        public void SetPosition(Vector2 anchoredPosition, float duration)
+        public void HideAndDestroy(float fadeDuration)
         {
-            RectTransform.DOAnchorPos(anchoredPosition, duration).SetEase(Ease.OutCubic);
-        }
-
-        /// <summary> Плавно скрыть уведомление и удалить объект. </summary>
-        /// <param name="duration"> Длительность анимации исчезновения. </param>
-        public void FadeAndDestroy(float duration)
-        {
-            _fadeTween?.Kill(true);
-            _countTween?.Kill(true);
-
             DOTween.Sequence()
-                .Join(_canvasGroup.DOFade(0f, duration))
-                .Join(RectTransform.DOAnchorPosX(OffscreenXPosition, duration).SetEase(Ease.InCubic))
+                .Join(_canvasGroup.DOFade(0f, fadeDuration))
+                .Join(RectTransform.DOAnchorPosX(-StartXPosition, fadeDuration))
                 .OnComplete(() => Destroy(gameObject));
+        }
+
+        public void MoveTo(Vector2 target, float duration)
+        {
+            RectTransform.DOAnchorPos(target, duration).SetEase(Ease.OutCubic);
         }
     }
 }

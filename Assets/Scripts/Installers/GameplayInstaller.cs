@@ -55,6 +55,12 @@ namespace FlavorfulStory.Installers
         {
             Container.Bind<Inventory>().FromInstance(_playerInventory).AsSingle();
             Container.Bind<PickupNotificationManager>().FromComponentInHierarchy().AsSingle();
+            //TODO: Ревизия нижнего
+            Container
+                .Bind<INotificationService>()
+                .To<NotificationService>()
+                .FromComponentInHierarchy() // или FromNewComponentOnNewGameObject() и т.п.
+                .AsSingle();
             Container.Bind<Equipment>().FromComponentInHierarchy().AsSingle();
             Container.Bind<PlayerController>().FromComponentInHierarchy().AsSingle();
 

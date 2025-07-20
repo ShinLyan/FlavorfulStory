@@ -19,6 +19,7 @@ namespace FlavorfulStory.InventorySystem
 
         /// <summary> Менеджер уведомлений о подборе предмета. </summary>
         private PickupNotificationManager _notificationManager;
+        private INotificationService  _notificationService;
 
         /// <summary> Событие, вызываемое при изменении инвентаря (добавление, удаление предметов). </summary>
         public event Action InventoryUpdated;
@@ -26,9 +27,10 @@ namespace FlavorfulStory.InventorySystem
         /// <summary> Внедрение зависимостей Zenject. </summary>
         /// <param name="notificationManager"> Менеджер уведомлений о подборе предмета. </param>
         [Inject]
-        private void Construct(PickupNotificationManager notificationManager)
+        private void Construct(PickupNotificationManager notificationManager, INotificationService notificationService)
         {
             _notificationManager = notificationManager;
+            _notificationService = notificationService;
         }
 
         /// <summary> Инициализация слотов и ссылки на инвентарь игрока. </summary>
@@ -150,7 +152,14 @@ namespace FlavorfulStory.InventorySystem
                 remainingNumber -= addAmount;
             }
 
-            _notificationManager.ShowNotification(item.Icon, number, item.ItemName, item.ItemName);
+            //_notificationManager.ShowNotification(item.Icon, number, item.ItemName, item.ItemName);
+            _notificationService.Show(new PickupNotificationData
+            {
+                ItemID = "woodID",
+                ItemName = "Wood",
+                Amount = 3,
+                Icon = ItemDatabase.GetItemFromID("25cddd17-003d-4380-a40f-f4318ccb136f").Icon
+            });
 
             InventoryUpdated?.Invoke();
             return true;
