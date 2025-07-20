@@ -42,7 +42,7 @@ namespace FlavorfulStory.InventorySystem.PickupSystem
         private class ActiveNotification
         {
             /// <summary> Визуальное представление уведомления. </summary>
-            public PickupNotificationView View;
+            public BaseNotificationView View;
 
             /// <summary> Таймер жизни уведомления. </summary>
             public Tween LifetimeTween;
@@ -162,6 +162,8 @@ namespace FlavorfulStory.InventorySystem.PickupSystem
         {
             var instance = Instantiate(_notificationPrefab, _notificationsParent);
             var view = instance.GetComponent<PickupNotificationView>();
+            
+            view.SetPositionInfo(NotificationPosition.TopLeft);
             view.Initialize(icon, amount, itemId, itemName);
 
             var notification = new ActiveNotification { View = view };
@@ -196,21 +198,21 @@ namespace FlavorfulStory.InventorySystem.PickupSystem
         /// <summary> Переупорядочить активные уведомления по вертикали с анимацией. </summary>
         private void RepositionNotifications()
         {
-            float totalHeight = 0f;
+            float totalOffset = 0f;
+            bool growDownward = _activeNotifications.FirstOrDefault()?.View.Position is NotificationPosition.TopLeft or NotificationPosition.TopRight;
 
             foreach (var notification in _activeNotifications)
             {
                 var view = notification.View;
-                float targetY = totalHeight;
-                float currentY = view.RectTransform.anchoredPosition.y;
+                float targetY = growDownward ? -totalOffset : totalOffset;
 
-                if (!Mathf.Approximately(currentY, targetY))
+                if (!Mathf.Approximately(view.RectTransform.anchoredPosition.y, targetY))
                 {
                     var newPosition = new Vector2(view.StartXPosition, targetY);
                     view.SetPosition(newPosition, MoveDuration);
                 }
 
-                totalHeight += view.Height;
+                totalOffset += view.Height;
             }
         }
     }
