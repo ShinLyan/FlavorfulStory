@@ -156,7 +156,7 @@ namespace FlavorfulStory.ResourceContainer
         {
             if (IsDestroyed || !_toolsToBeHit.Contains(toolType)) return;
 
-            SfxPlayer.Instance.PlayOneShot(SfxType);
+            SfxPlayer.Play(SfxType);
             HitsTaken++;
             if (HitsTaken >= _hitsToDestroy)
             {

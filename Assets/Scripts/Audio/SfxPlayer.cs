@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -6,63 +7,44 @@ using Random = UnityEngine.Random;
 namespace FlavorfulStory.Audio
 {
     /// <summary> Компонент для воспроизведения звуковых эффектов (SFX) в игре. </summary>
-    [RequireComponent(typeof(AudioSource))]
-    public class SfxPlayer : MonoBehaviour
+    public class SfxPlayer : IDisposable
     {
-        /// <summary> Экземпляр синглтона. </summary>
-        public static SfxPlayer Instance { get; private set; }
+        /// <summary> Аудиоисточник, через который воспроизводятся звуки. </summary>
+        private readonly AudioSource _audioSource;
 
-        /// <summary> Источник аудио. </summary>
-        private AudioSource _audioSource;
+        /// <summary> Список данных о звуковых эффектах. </summary>
+        private readonly List<SfxData> _sfxDataList;
 
-        /// <summary> Данные о звуках. </summary>
-        private readonly Dictionary<SfxType, List<AudioClip>> _sfxData = new();
+        /// <summary> Событие запроса на воспроизведение звука определённого типа. </summary>
+        private static event Action<SfxType> OnPlayRequested;
 
-        /// <summary> Создать Источник аудио. Загрузить звуки. </summary>
-        private void Awake()
+        /// <summary> Конструктор. Подписывается на событие воспроизведения звука. </summary>
+        /// <param name="audioSource"> Источник звука. </param>
+        /// <param name="sfxDataList"> Список доступных звуков. </param>
+        public SfxPlayer(AudioSource audioSource, List<SfxData> sfxDataList)
         {
-            if (!Instance)
-            {
-                Instance = this;
-            }
-            else
-            {
-                Destroy(gameObject);
-                return;
-            }
+            _audioSource = audioSource;
+            _sfxDataList = sfxDataList;
 
-            _audioSource = GetComponent<AudioSource>();
-            LoadSfxData();
+            OnPlayRequested += HandlePlay;
         }
 
-        /// <summary> Загрузить аудиоклипы. </summary>
-        private void LoadSfxData()
-        {
-            foreach (var resource in Resources.LoadAll<SfxData>(string.Empty))
-                _sfxData.Add(resource.Type, new List<AudioClip>(resource.Clips));
-        }
+        /// <summary> Отписывается от событий при уничтожении объекта. </summary>
+        public void Dispose() => OnPlayRequested -= HandlePlay;
 
-        /// <summary> Проиграть SFX. </summary>
+        /// <summary> Проигрывает один случайный звуковой эффект указанного типа. </summary>
         /// <param name="type"> Тип проигрываемого звука. </param>
-        public void PlayOneShot(SfxType type)
-        {
-            if (_sfxData.TryGetValue(type, out var clips))
-            {
-                var clip = clips[Random.Range(0, clips.Count)];
-                _audioSource.PlayOneShot(clip);
-            }
-            else
-            {
-                Debug.LogError($"Не найден трек для типа: {type}");
-            }
-        }
+        public static void Play(SfxType type) => OnPlayRequested?.Invoke(type);
 
-        /// <summary> Проиграть случайный звук. </summary>
-        /// <param name="clips"> Аудиоклипы. </param>
-        public void PlayOneShot(IEnumerable<AudioClip> clips)
+        /// <summary> Обработчик события воспроизведения. </summary>
+        /// <param name="type"> Тип звука, который требуется воспроизвести. </param>
+        private void HandlePlay(SfxType type)
         {
-            var audioClips = clips as AudioClip[] ?? clips.ToArray();
-            _audioSource.PlayOneShot(audioClips.ElementAt(Random.Range(0, audioClips.Count())));
+            var data = _sfxDataList.FirstOrDefault(sfxData => sfxData.Type == type);
+            if (!data || data.Clips.Count == 0) return;
+
+            var clip = data.Clips[Random.Range(0, data.Clips.Count)];
+            if (clip) _audioSource.PlayOneShot(clip);
         }
     }
 }

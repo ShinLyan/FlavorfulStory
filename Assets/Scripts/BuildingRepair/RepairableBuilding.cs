@@ -131,7 +131,7 @@ namespace FlavorfulStory.BuildingRepair
 
             _repairStageIndex++;
             _objectSwitcher.SwitchTo(_repairStageIndex);
-            SfxPlayer.Instance.PlayOneShot(SfxType.Build);
+            SfxPlayer.Play(SfxType.Build);
 
             _onStageUpdated?.Invoke(CurrentStage, _investedResources);
         }
