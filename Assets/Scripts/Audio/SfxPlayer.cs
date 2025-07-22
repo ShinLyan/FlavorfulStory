@@ -13,7 +13,7 @@ namespace FlavorfulStory.Audio
         private readonly AudioSource _audioSource;
 
         /// <summary> Список данных о звуковых эффектах. </summary>
-        private readonly List<SfxData> _sfxDataList;
+        private readonly IEnumerable<SfxData> _sfxDataList;
 
         /// <summary> Событие запроса на воспроизведение звука определённого типа. </summary>
         private static event Action<SfxType> OnPlayRequested;
@@ -21,7 +21,7 @@ namespace FlavorfulStory.Audio
         /// <summary> Конструктор. Подписывается на событие воспроизведения звука. </summary>
         /// <param name="audioSource"> Источник звука. </param>
         /// <param name="sfxDataList"> Список доступных звуков. </param>
-        public SfxPlayer(AudioSource audioSource, List<SfxData> sfxDataList)
+        public SfxPlayer(AudioSource audioSource, IEnumerable<SfxData> sfxDataList)
         {
             _audioSource = audioSource;
             _sfxDataList = sfxDataList;
@@ -41,7 +41,7 @@ namespace FlavorfulStory.Audio
         private void HandlePlay(SfxType type)
         {
             var data = _sfxDataList.FirstOrDefault(sfxData => sfxData.Type == type);
-            if (!data || data.Clips.Count == 0) return;
+            if (data.Clips.Count == 0) return;
 
             var clip = data.Clips[Random.Range(0, data.Clips.Count)];
             if (clip) _audioSource.PlayOneShot(clip);

@@ -1,7 +1,6 @@
 ﻿using FlavorfulStory.Audio;
 using FlavorfulStory.SceneManagement;
 using FlavorfulStory.UI.Animation;
-using FlavorfulStory.Utils;
 using UnityEngine;
 using Zenject;
 
@@ -18,6 +17,9 @@ namespace FlavorfulStory.Installers
         [Header("Audio")]
         [SerializeField] private AudioSource _sfxPrefab;
 
+        /// <summary> Хранилище всех доступных SFX-данных. </summary>
+        [SerializeField] private SfxDatabase _sfxDatabase;
+
         /// <summary> Вызывает методы для привязки зависимостей. </summary>
         public override void InstallBindings()
         {
@@ -30,9 +32,7 @@ namespace FlavorfulStory.Installers
             {
                 var sfxSource = Container.InstantiatePrefabForComponent<AudioSource>(_sfxPrefab);
                 sfxSource.gameObject.name = "SFX";
-
-                var sfxDataList = ResourcesLoader.LoadAllSfxData();
-                return new SfxPlayer(sfxSource, sfxDataList);
+                return new SfxPlayer(sfxSource, _sfxDatabase.SfxList);
             }).AsSingle().NonLazy();
         }
     }
