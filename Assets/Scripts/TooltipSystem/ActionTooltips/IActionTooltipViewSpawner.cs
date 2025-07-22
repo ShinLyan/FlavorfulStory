@@ -1,7 +1,7 @@
-namespace FlavorfulStory.TooltipSystem
+namespace FlavorfulStory.TooltipSystem.ActionTooltips
 {
     /// <summary> Интерфейс для отображения тултипа возможных действий взаимодействия с интерактивным объектом. </summary>
-    public interface IActionTooltipShower
+    public interface IActionTooltipViewSpawner
     {
         /// <summary> Добавляет действие во всплывающую подсказку. </summary>
         /// <param name="action"> Данные действия (клавиша + описание). </param>
