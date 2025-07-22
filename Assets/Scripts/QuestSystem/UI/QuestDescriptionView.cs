@@ -160,7 +160,7 @@ namespace FlavorfulStory.QuestSystem
             {
                 var instance = _rewardPool.Get();
                 instance.transform.SetAsLastSibling();
-                instance.UpdateView(reward.Item, reward.Number);
+                instance.UpdateView(reward);
                 _activeRewards.Add(instance);
             }
         }

@@ -4,7 +4,7 @@ using FlavorfulStory.Actions;
 namespace FlavorfulStory.TooltipSystem
 {
     /// <summary> Содержит данные для отображения действия в тултипе, включая клавишу и описание действия. </summary>
-    public struct ActionTooltipData
+    public readonly struct ActionTooltipData : IEquatable<ActionTooltipData>
     {
         /// <summary> Текст клавиши действия, отображаемый в тултипе (например, "E"). </summary>
         public string KeyText { get; }
@@ -28,12 +28,14 @@ namespace FlavorfulStory.TooltipSystem
 
         /// <summary> Проверяет равенство двух TooltipActionData по содержимому. </summary>
         /// <param name="obj"> Объект для сравнения. </param>
-        /// <returns> True, если объекты эквивалентны; иначе — false. </returns>
-        public override bool Equals(object obj)
-        {
-            if (obj is not ActionTooltipData other) return false;
-            return KeyText == other.KeyText && Action == other.Action && Target == other.Target;
-        }
+        /// <returns> <c>true</c>, если объекты эквивалентны; иначе — <c>false</c>. </returns>
+        public override bool Equals(object obj) => obj is ActionTooltipData other && Equals(other);
+
+        /// <summary> Проверяет равенство двух TooltipActionData по содержимому. </summary>
+        /// <param name="other"> Объект для сравнения. </param>
+        /// <returns> <c>true</c>, если объекты эквивалентны; иначе — <c>false</c>. </returns>
+        public bool Equals(ActionTooltipData other) =>
+            KeyText == other.KeyText && Action == other.Action && Target == other.Target;
 
         /// <summary> Генерирует хэш-код на основе полей. </summary>
         /// <returns> Хэш-код объекта. </returns>

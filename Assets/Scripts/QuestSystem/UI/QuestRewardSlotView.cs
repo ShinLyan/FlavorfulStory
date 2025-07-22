@@ -20,12 +20,11 @@ namespace FlavorfulStory.QuestSystem
         public InventoryItem GetItem() => _rewardItem;
 
         /// <summary> Обновляет отображение слота награды с новым предметом и количеством. </summary>
-        /// <param name="rewardItem"> Предмет награды. </param>
-        /// <param name="rewardNumber"> Количество предметов. </param>
-        public void UpdateView(InventoryItem rewardItem, int rewardNumber)
+        /// <param name="itemStack"> Предмет и его количество. </param>
+        public void UpdateView(ItemStack itemStack)
         {
-            _rewardItem = rewardItem;
-            _itemStackView.UpdateView(rewardItem, rewardNumber);
+            _rewardItem = itemStack.Item;
+            _itemStackView.UpdateView(itemStack);
         }
     }
 }

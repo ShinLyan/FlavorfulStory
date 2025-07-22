@@ -4,7 +4,6 @@ using FlavorfulStory.Saving;
 using FlavorfulStory.SceneManagement;
 using UnityEngine;
 
-// TODO: Актуализировать под Zenject
 namespace FlavorfulStory.TimeManagement
 {
     /// <summary> Управляет глобальным игровым временем, изменяя его по тикам и вызывая события. </summary>

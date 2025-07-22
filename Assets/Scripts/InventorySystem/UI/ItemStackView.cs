@@ -18,15 +18,14 @@ namespace FlavorfulStory.InventorySystem.UI
         [SerializeField] private TMP_Text _itemNumberText;
 
         /// <summary> Обновить отображение стака предмета. </summary>
-        /// <param name="item"> Предмет инвентаря. </param>
-        /// <param name="number"> Количество предметов. </param>
-        public void UpdateView(InventoryItem item, int number)
+        /// <param name="itemStack"> Предмет и его количество. </param>
+        public void UpdateView(ItemStack itemStack)
         {
-            _itemImage.enabled = item;
-            if (item) _itemImage.sprite = item.Icon;
+            _itemImage.enabled = itemStack.Item;
+            if (itemStack.Item) _itemImage.sprite = itemStack.Item.Icon;
 
-            _itemNumberContainer.SetActive(number > 1);
-            _itemNumberText.text = number.ToString();
+            _itemNumberContainer.SetActive(itemStack.Number > 1);
+            _itemNumberText.text = itemStack.Number.ToString();
         }
     }
 }
