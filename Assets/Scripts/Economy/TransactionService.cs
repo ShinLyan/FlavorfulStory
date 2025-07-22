@@ -38,5 +38,7 @@ namespace FlavorfulStory.Economy
             int cost = itemStack.Item.BuyPrice * itemStack.Number;
             return _playerWallet.TrySpend(cost);
         }
+
+        //TODO: добавить метод TransferMoneyFromCashRegisterToPlayer()
     }
 }

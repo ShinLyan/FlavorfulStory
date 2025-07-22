@@ -46,8 +46,8 @@ namespace FlavorfulStory.AI.FiniteStateMachine.ShopStates
             // var item = shelf.Items[Random.Range(0, shelf.Items.Count)]; //TODO
 
             //TODO: тестовый предмет, переделать на предмет с полки
-            var item = ItemDatabase.GetItemFromID("e31d1d53-dae6-4643-9843-fa03f23aef85");
-            var itemPrefab = item.PickupPrefab.GetComponent<Rigidbody>().useGravity = false;
+            var item = ItemDatabase.GetItemFromID("460b1671-464a-4d0f-94a8-fe034fcb7ea2");
+            bool itemPrefab = item.PickupPrefab.GetComponent<Rigidbody>().useGravity = false;
             var itemStack = new ItemStack { Item = item, Number = 1 };
             _itemHandler.EquipItem(itemStack);
 

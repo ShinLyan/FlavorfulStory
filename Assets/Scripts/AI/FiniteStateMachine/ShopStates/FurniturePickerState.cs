@@ -36,10 +36,12 @@ namespace FlavorfulStory.AI.FiniteStateMachine.ShopStates
 
             var accessiblePoint = furniture.GetAccessiblePoint();
 
-            var point = new SchedulePoint(); //TODO: rework
-            point.Position = accessiblePoint.position;
-            point.LocationName = LocationName.NewShop;
-            point.Rotation = accessiblePoint.rotation.eulerAngles;
+            var point = new SchedulePoint
+            {
+                Position = accessiblePoint.position,
+                LocationName = LocationName.NewShop,
+                Rotation = accessiblePoint.rotation.eulerAngles
+            }; //TODO: rework
 
             _movementController.SetPoint(point);
             _movementController.OnDestinationReached += () => furniture.IsOccupied = false;

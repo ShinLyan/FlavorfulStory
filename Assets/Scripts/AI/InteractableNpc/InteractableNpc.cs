@@ -1,6 +1,7 @@
 ﻿using FlavorfulStory.AI.BaseNpc;
 using FlavorfulStory.AI.Scheduling;
 using FlavorfulStory.AI.WarpGraphSystem;
+using FlavorfulStory.DialogueSystem;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -8,6 +9,7 @@ namespace FlavorfulStory.AI.InteractableNpc
 {
     /// <summary> NPC с возможностью взаимодействия с игроком. </summary>
     /// <remarks> Требует наличия компонента NpcCollisionHandler для обработки столкновений. </remarks>
+    [RequireComponent(typeof(CapsuleCollider), typeof(NpcSpeaker))]
     public class InteractableNpc : Npc
     {
         /// <summary> Информация о персонаже. </summary>

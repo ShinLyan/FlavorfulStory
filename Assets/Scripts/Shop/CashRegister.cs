@@ -52,7 +52,6 @@ namespace FlavorfulStory.Shop
             if (point) _accessPointsAvailability[point] = false;
         }
 
-
         #region ICurrencyStorage
 
         /// <summary> Текущее количество золота. </summary>
@@ -122,7 +121,7 @@ namespace FlavorfulStory.Shop
             const float pointLabelHeight = 0.5f;
             const int labelFontSize = 11;
 
-            GUIStyle labelStyle = new GUIStyle
+            var labelStyle = new GUIStyle
             {
                 fontSize = labelFontSize,
                 normal = new GUIStyleState { textColor = Color.white },
@@ -142,7 +141,7 @@ namespace FlavorfulStory.Shop
                 Gizmos.DrawLine(transform.position, point.position);
 
                 string statusText = isOccupied ? "<color=#ff3333>Occupied</color>" : "<color=#33ff33>Free</color>";
-                Vector3 labelPosition = point.position + Vector3.up * pointLabelHeight;
+                var labelPosition = point.position + Vector3.up * pointLabelHeight;
 
                 Handles.Label(labelPosition, statusText, labelStyle);
             }

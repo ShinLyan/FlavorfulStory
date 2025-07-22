@@ -1,6 +1,5 @@
 using System;
 using FlavorfulStory.InventorySystem;
-using Unity.Collections;
 using UnityEngine;
 
 namespace FlavorfulStory.Actions
@@ -17,10 +16,8 @@ namespace FlavorfulStory.Actions
         [Header("Settings")] [Tooltip("Автоматически уничтожать старый предмет при экипировке нового")] [SerializeField]
         private bool _autoDestroyPreviousItem = true;
 
-        [Tooltip("Текущий экипированный предмет (только для просмотра)")] [SerializeField, ReadOnly]
         private InventoryItem _currentItem;
 
-        [Tooltip("Текущий экземпляр предмета (только для просмотра)")] [SerializeField, ReadOnly]
         private GameObject _currentItemInstance;
 
         /// <summary> Событие при изменении экипированного предмета </summary>
