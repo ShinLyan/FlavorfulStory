@@ -1,7 +1,7 @@
 using TMPro;
 using UnityEngine;
 
-namespace FlavorfulStory.TooltipSystem
+namespace FlavorfulStory.TooltipSystem.ActionTooltips
 {
     /// <summary> Отображает одну строку действия с клавишей и описанием в тултипе. </summary>
     public class ActionTooltipView : MonoBehaviour

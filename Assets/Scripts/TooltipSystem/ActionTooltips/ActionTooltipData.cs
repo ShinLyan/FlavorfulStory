@@ -1,7 +1,7 @@
 using System;
 using FlavorfulStory.Actions;
 
-namespace FlavorfulStory.TooltipSystem
+namespace FlavorfulStory.TooltipSystem.ActionTooltips
 {
     /// <summary> Содержит данные для отображения действия в тултипе, включая клавишу и описание действия. </summary>
     public readonly struct ActionTooltipData : IEquatable<ActionTooltipData>
@@ -15,15 +15,21 @@ namespace FlavorfulStory.TooltipSystem
         /// <summary> Название объекта, над которым выполняется действие. </summary>
         public string Target { get; }
 
+        /// <summary> Источник вызова тултипа действия. </summary>
+        public ActionTooltipSource Source { get; }
+
         /// <summary> Конструктор, инициализирующий данные для тултипа. </summary>
         /// <param name="keyText"> Текст клавиши действия, отображаемый в тултипе (например, "E"). </param>
         /// <param name="action"> Тип действия, которое выполняется. </param>
         /// <param name="target"> Название объекта, над которым выполняется действие. </param>
-        public ActionTooltipData(string keyText, ActionType action, string target)
+        /// <param name="source"> Источник вызова тултипа действия. </param>
+        public ActionTooltipData(string keyText, ActionType action, string target,
+            ActionTooltipSource source = ActionTooltipSource.Interactable)
         {
             KeyText = keyText;
             Action = action;
             Target = target;
+            Source = source;
         }
 
         /// <summary> Проверяет равенство двух TooltipActionData по содержимому. </summary>
@@ -35,11 +41,11 @@ namespace FlavorfulStory.TooltipSystem
         /// <param name="other"> Объект для сравнения. </param>
         /// <returns> <c>true</c>, если объекты эквивалентны; иначе — <c>false</c>. </returns>
         public bool Equals(ActionTooltipData other) =>
-            KeyText == other.KeyText && Action == other.Action && Target == other.Target;
+            KeyText == other.KeyText && Action == other.Action && Target == other.Target && Source == other.Source;
 
         /// <summary> Генерирует хэш-код на основе полей. </summary>
         /// <returns> Хэш-код объекта. </returns>
         /// <remarks> Необходимо для сравнения и проверки на равенство. </remarks>
-        public override int GetHashCode() => HashCode.Combine(KeyText, Action, Target);
+        public override int GetHashCode() => HashCode.Combine(KeyText, Action, Target, Source);
     }
 }

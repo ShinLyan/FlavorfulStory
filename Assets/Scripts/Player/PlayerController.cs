@@ -88,8 +88,11 @@ namespace FlavorfulStory.Player
             _playerStats = GetComponent<PlayerStats>();
             _playerMover = GetComponent<PlayerMover>();
             _animator = GetComponent<Animator>();
+
             _interactionController = GetComponentInChildren<InteractionController>();
-            _interactionController.SetInteractionActions(() => SetBusyState(true), () => SetBusyState(false));
+            _interactionController.StartInteractionAction = () => SetBusyState(true);
+            _interactionController.EndInteractionAction = () => SetBusyState(false);
+
             _toolHandler = GetComponent<ToolHandler>();
             _toolHandler.UnequipAction = () => SetBusyState(false);
             PlayerModel.SetPositionProvider(() => transform.position);
@@ -258,13 +261,15 @@ namespace FlavorfulStory.Player
         }
 
         /// <summary> Обновить позицию и направление взгляда игрока после телепортации. </summary>
-        /// <param name="newTransform"> Новый трансформ игрока. </param>
+        /// <param name="newTransform"> Трансформ игрока. </param>
         public void UpdatePosition(Transform newTransform)
         {
             SetPosition(newTransform.position);
             _playerMover.SetLookRotation(newTransform.forward);
         }
 
+        /// <summary> Установить позицию игрока. </summary>
+        /// <param name="newPosition"> Позиция игрока, которую нужно установить. </param>
         public void SetPosition(Vector3 newPosition) => _playerMover.SetPosition(newPosition);
 
         /// <summary> Восстановить статы игрока после сна. </summary>
