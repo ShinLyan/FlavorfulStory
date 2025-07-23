@@ -10,7 +10,7 @@ namespace FlavorfulStory.InventorySystem.PickupSystem
     {
         /// <summary> Предмет, который будет заспавнен в сцене. </summary>
         [Tooltip("Предмет, который будет заспавнен в сцене."), SerializeField]
-        private InventorySlot _inventorySlot;
+        private ItemStack _inventorySlot;
 
         /// <summary> Был ли предмет собран? </summary>
         private bool _isPickedUp;
@@ -32,7 +32,7 @@ namespace FlavorfulStory.InventorySystem.PickupSystem
         /// <summary> Создает объект Pickup на сцене. </summary>
         private void SpawnPickup()
         {
-            _pickupFactory.Create(_inventorySlot.Item, transform.position, _inventorySlot.Number, transform);
+            _pickupFactory.Create(_inventorySlot, transform.position, 0f, transform);
             _isPickedUp = true;
         }
 
@@ -44,7 +44,7 @@ namespace FlavorfulStory.InventorySystem.PickupSystem
 
         /// <summary> Восстанавливает состояние объекта при загрузке. </summary>
         /// <param name="state"> Сохраненное состояние объекта. </param>
-        public void RestoreState(object state) => _isPickedUp = (bool)state;
+        public void RestoreState(object state) => _isPickedUp = state is true;
 
         #endregion
     }

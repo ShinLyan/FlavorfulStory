@@ -7,12 +7,13 @@ using FlavorfulStory.Audio;
 using FlavorfulStory.InventorySystem.DropSystem;
 using FlavorfulStory.ObjectManagement;
 using UnityEngine;
+using Zenject;
+using Random = UnityEngine.Random;
 
 namespace FlavorfulStory.ResourceContainer
 {
     /// <summary> Добываемый объект. </summary>
-    /// <remarks> Реализует интерфейсы <see cref="IHitable" /> и <see cref="IDestroyable" />. </remarks>
-    [RequireComponent(typeof(ItemDropper), typeof(ObjectSwitcher))]
+    [RequireComponent(typeof(ObjectSwitcher))]
     public class DestroyableResourceContainer : MonoBehaviour, IHitable, IDestroyable
     {
         #region Fields and Properties
@@ -29,8 +30,8 @@ namespace FlavorfulStory.ResourceContainer
         [Tooltip("Тип инструмента, необходимого для разрушения."), SerializeField]
         private ToolType[] _toolsToBeHit;
 
-        /// <summary> Выбрасыватель предметов. </summary>
-        private ItemDropper _itemDropper;
+        /// <summary> Сервис выброса предметов в мир. </summary>
+        private IItemDropService _itemDropService;
 
         /// <summary> Переключатель грейдов. </summary>
         private ObjectSwitcher _objectSwitcher;
@@ -61,6 +62,11 @@ namespace FlavorfulStory.ResourceContainer
         /// <summary> Событие, вызываемое при полном разрушении объекта. </summary>
         public event Action<IDestroyable> OnObjectDestroyed;
 
+        /// <summary> Внедрение зависимостей Zenject. </summary>
+        /// <param name="itemDropService"> Сервис выброса предметов в мир. </param>
+        [Inject]
+        private void Construct(IItemDropService itemDropService) => _itemDropService = itemDropService;
+
         #endregion
 
         /// <summary> Рассчитать индекс текущей стадии объекта. </summary>
@@ -85,7 +91,6 @@ namespace FlavorfulStory.ResourceContainer
         {
             foreach (var stage in _stages) _hitsToDestroy += stage.RequiredHits;
 
-            _itemDropper = GetComponent<ItemDropper>();
             _objectSwitcher = GetComponent<ObjectSwitcher>();
 
             if (_objectSwitcher.ObjectsCount != _stages.Count)
@@ -122,16 +127,28 @@ namespace FlavorfulStory.ResourceContainer
         /// <summary> Выбросить ресурсы для текущей стадии объекта. </summary>
         private void DropResourcesForCurrentGrade()
         {
-            foreach (var item in _stages[_currentGradeIndex].Items)
-                _itemDropper.DropItem(item.ItemPrefab, item.Quantity);
+            const float ResourceDropForce = 5f;
+
+            foreach (var itemStack in _stages[_currentGradeIndex].Items)
+                _itemDropService.Drop(itemStack, GetDropPosition(), Vector3.up * ResourceDropForce);
+        }
+
+        /// <summary> Получить позицию дропа. </summary>
+        /// <returns> Позиция дропа. </returns>
+        private Vector3 GetDropPosition()
+        {
+            const float DropOffsetRange = 2f; // Диапазон случайного смещения по осям X и Z
+            float offsetX = Random.Range(-DropOffsetRange, DropOffsetRange);
+            float offsetZ = Random.Range(-DropOffsetRange, DropOffsetRange);
+            return transform.position + new Vector3(offsetX, 1, offsetZ);
         }
 
         #endregion
 
         #region HitBehaviour
 
-        [field: SerializeField]
-        public SfxType SfxType { private get; set; }
+        /// <summary> Тип проигрываемого звука. </summary>
+        [field: SerializeField] public SfxType SfxType { private get; set; }
 
         /// <summary> Получить удар. </summary>
         /// <param name="toolType"> Тип инструмента, которым наносится удар. </param>
@@ -139,7 +156,7 @@ namespace FlavorfulStory.ResourceContainer
         {
             if (IsDestroyed || !_toolsToBeHit.Contains(toolType)) return;
 
-            SfxPlayer.Instance.PlayOneShot(SfxType);
+            SfxPlayer.Play(SfxType);
             HitsTaken++;
             if (HitsTaken >= _hitsToDestroy)
             {

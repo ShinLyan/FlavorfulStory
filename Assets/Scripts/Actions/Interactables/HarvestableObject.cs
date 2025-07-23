@@ -1,9 +1,10 @@
+using UnityEngine;
 using System.Collections.Generic;
+using Zenject;
 using FlavorfulStory.InteractionSystem;
 using FlavorfulStory.InventorySystem;
 using FlavorfulStory.Player;
-using UnityEngine;
-using Zenject;
+using FlavorfulStory.TooltipSystem.ActionTooltips;
 
 namespace FlavorfulStory.Actions.Interactables
 {
@@ -13,7 +14,7 @@ namespace FlavorfulStory.Actions.Interactables
     {
         /// <summary> Собираемые предметы/ресурсы, что будут добавлены в инвентарь при взаимодействии. </summary>
         [Tooltip("Собираемые предметы."), SerializeField]
-        private List<DropItem> _harvestItems;
+        private List<ItemStack> _harvestItems;
 
         /// <summary> Инвентарь игрока. </summary>
         private Inventory _playerInventory;
@@ -25,8 +26,8 @@ namespace FlavorfulStory.Actions.Interactables
 
         #region IInteractable
 
-        /// <summary> Действие игрока по отношению к объекту. </summary>
-        [field: SerializeField] public ActionDescription ActionDescription { get; private set; }
+        /// <summary> Описание действия с объектом. </summary>
+        public ActionTooltipData ActionTooltip => new("E", ActionType.Gather, _harvestItems[0].Item.ItemName);
 
         /// <summary> Свойство возможности взаимодействия с объектом. </summary>
         public virtual bool IsInteractionAllowed { get; protected set; } = true;
@@ -47,8 +48,8 @@ namespace FlavorfulStory.Actions.Interactables
 
             IsInteractionAllowed = false;
 
-            foreach (var dropItem in _harvestItems)
-                _playerInventory.TryAddToFirstAvailableSlot(dropItem.ItemPrefab, dropItem.Quantity);
+            foreach (var itemStack in _harvestItems)
+                _playerInventory.TryAddToFirstAvailableSlot(itemStack.Item, itemStack.Number);
         }
 
         /// <summary> Завершает взаимодействие с объектом. </summary>

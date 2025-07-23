@@ -54,7 +54,7 @@ namespace FlavorfulStory.Crafting
         {
             foreach (var input in recipe.InputItems)
             {
-                int totalAmount = input.Quantity * count;
+                int totalAmount = input.Number * count;
                 inventory.RemoveItem(input.Item, totalAmount);
             }
         }
@@ -67,7 +67,7 @@ namespace FlavorfulStory.Crafting
         {
             foreach (var output in recipe.OutputItems)
             {
-                int totalAmount = output.Quantity * count;
+                int totalAmount = output.Number * count;
                 if (!inventory.TryAddToFirstAvailableSlot(output.Item, totalAmount))
                     // TODO: IItemDropService.Drop(_dropPoint, output.Item, totalAmount);
                     Debug.LogWarning($"Not enough space for crafted item: {output.Item.ItemName}, {totalAmount}");
@@ -83,7 +83,7 @@ namespace FlavorfulStory.Crafting
         {
             foreach (var itemRequirement in recipe.InputItems)
             {
-                int requiredAmount = itemRequirement.Quantity * count;
+                int requiredAmount = itemRequirement.Number * count;
                 if (inventory.GetItemNumber(itemRequirement.Item) < requiredAmount) return false;
             }
 
@@ -101,7 +101,7 @@ namespace FlavorfulStory.Crafting
             // Пока оставляю так - тк игрок не "помещает" предметы в крафт
             foreach (var output in recipe.OutputItems)
             {
-                int totalAmount = output.Quantity * count;
+                int totalAmount = output.Number * count;
                 if (!inventory.HasSpaceFor(output.Item, totalAmount)) return false;
             }
 

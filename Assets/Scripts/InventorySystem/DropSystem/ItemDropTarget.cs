@@ -1,4 +1,5 @@
 ﻿using FlavorfulStory.InventorySystem.UI.Dragging;
+using FlavorfulStory.Player;
 using UnityEngine;
 using Zenject;
 
@@ -7,13 +8,21 @@ namespace FlavorfulStory.InventorySystem.DropSystem
     /// <summary> Целевой контейнер для предметов, выбрасываемых из инвентаря. </summary>
     public class ItemDropTarget : MonoBehaviour, IDragDestination<InventoryItem>
     {
-        /// <summary> Выбрасыватель предметов. </summary>
-        private ItemDropper _itemDropper;
+        /// <summary> Контроллер игрока. </summary>
+        private PlayerController _playerController;
 
-        /// <summary> Внедренеие зависимостей Zenject. </summary>
-        /// <param name="itemDropper"> Выбрасыватель предметов. </param>
+        /// <summary> Выбрасыватель предметов. </summary>
+        private IItemDropService _itemDropService;
+
+        /// <summary> Внедрение зависимостей Zenject. </summary>
+        /// <param name="playerController"> Контроллер игрока. </param>
+        /// <param name="itemDropService"> Выбрасыватель предметов. </param>
         [Inject]
-        private void Construct(ItemDropper itemDropper) => _itemDropper = itemDropper;
+        private void Construct(PlayerController playerController, IItemDropService itemDropService)
+        {
+            _playerController = playerController;
+            _itemDropService = itemDropService;
+        }
 
         /// <summary> Получить максимально допустимое количество элементов,
         /// которые можно добавить в это место назначения. </summary>
@@ -25,6 +34,7 @@ namespace FlavorfulStory.InventorySystem.DropSystem
         /// <summary> Добавить элементы в это место назначения с обновлением UI и данных. </summary>
         /// <param name="item"> Тип добавляемого элемента. </param>
         /// <param name="number"> Количество добавляемых элементов. </param>
-        public void AddItems(InventoryItem item, int number) => _itemDropper.DropItem(item, number);
+        public void AddItems(InventoryItem item, int number) =>
+            _itemDropService.Drop(new ItemStack { Item = item, Number = number }, _playerController.transform.position);
     }
 }

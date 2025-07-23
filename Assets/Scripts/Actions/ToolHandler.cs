@@ -22,11 +22,7 @@ namespace FlavorfulStory.Actions
         private GameObject _currentTool;
 
         /// <summary> Действие, что должно выполниться при UnEquip'е инструмента. </summary>
-        private Action _unequipAction;
-
-        /// <summary> Задать действие анэквипа. </summary>
-        /// <param name="action"> Действие анэквипа. </param>
-        public void SetUnequipAction(Action action) => _unequipAction = action;
+        public Action UnequipAction;
 
         /// <summary> Активирует визуальное отображение инструмента на основе переданного объекта Tool. </summary>
         /// <param name="tool">Инструмент, который нужно отобразить.</param>
@@ -52,10 +48,8 @@ namespace FlavorfulStory.Actions
             _currentTool.SetActive(false);
             _currentTool = null;
 
-            InputWrapper.UnblockPlayerMovement();
-            InputWrapper.UnblockInput(InputButton.MouseScroll);
-
-            _unequipAction?.Invoke();
+            InputWrapper.UnblockPlayerInput();
+            UnequipAction?.Invoke();
         }
     }
 }

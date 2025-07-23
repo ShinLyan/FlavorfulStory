@@ -29,13 +29,12 @@ namespace FlavorfulStory.Saving
         /// <param name="state"> Объект состояния, который необходимо восстановить. </param>
         public void RestoreState(object state)
         {
-            var stateDict = state as Dictionary<string, object>;
-            if (stateDict == null) return;
+            if (state is not Dictionary<string, object> stateDict) return;
 
             foreach (var saveable in GetComponents<ISaveable>())
             {
                 string typeString = saveable.GetType().ToString();
-                if (stateDict.ContainsKey(typeString)) saveable.RestoreState(stateDict[typeString]);
+                if (stateDict.TryGetValue(typeString, out object value)) saveable.RestoreState(value);
             }
         }
 
@@ -70,7 +69,7 @@ namespace FlavorfulStory.Saving
             _saveableEntityDatabase[property.stringValue] = this;
         }
 
-        /// <summary> Является ли GUID уникальным?</summary>
+        /// <summary> Является ли GUID уникальным? </summary>
         /// <param name="candidate"> Кандидат для проверки. </param>
         /// <returns> Возвращает True - если GUID является уникальным, False - в противном случае. </returns>
         private bool IsUnique(string candidate)
@@ -78,7 +77,7 @@ namespace FlavorfulStory.Saving
             if (!_saveableEntityDatabase.ContainsKey(candidate) || _saveableEntityDatabase[candidate] == this)
                 return true;
 
-            if (_saveableEntityDatabase[candidate] == null
+            if (!_saveableEntityDatabase[candidate]
                 || _saveableEntityDatabase[candidate].UniqueIdentifier != candidate)
             {
                 _saveableEntityDatabase.Remove(candidate);

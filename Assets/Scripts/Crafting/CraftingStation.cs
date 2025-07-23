@@ -5,6 +5,7 @@ using FlavorfulStory.InputSystem;
 using FlavorfulStory.InteractionSystem;
 using FlavorfulStory.InventorySystem;
 using FlavorfulStory.Player;
+using FlavorfulStory.TooltipSystem.ActionTooltips;
 
 namespace FlavorfulStory.Crafting
 {
@@ -17,8 +18,8 @@ namespace FlavorfulStory.Crafting
         /// <summary> Инвентарь игрока, участвующий в крафте. </summary>
         private Inventory _playerInventory;
 
-        /// <summary> Описание действия, отображаемого при наведении на объект. </summary>
-        [field: SerializeField] public ActionDescription ActionDescription { get; private set; }
+        /// <summary> Описание действия с объектом. </summary>        
+        public ActionTooltipData ActionTooltip => new ("E", ActionType.Craft, "at Crafting Station");
 
         /// <summary> Разрешено ли сейчас взаимодействие с крафт-станцией. </summary>
         public bool IsInteractionAllowed { get; private set; } = true;
@@ -76,10 +77,12 @@ namespace FlavorfulStory.Crafting
             }
 
             IsInteractionAllowed = false;
+            _craftingWindow.SetCraftingInProgress(true);
 
             await CraftingProcessor.ExecuteRecipe(recipe, count, _playerInventory, () =>
             {
                 IsInteractionAllowed = true;
+                _craftingWindow.SetCraftingInProgress(false);
                 _craftingWindow.OnCraftCompleted();
             });
         }

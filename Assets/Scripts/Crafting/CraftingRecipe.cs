@@ -30,11 +30,11 @@ namespace FlavorfulStory.Crafting
 
         /// <summary> Список предметов, необходимых для крафта. </summary>
         [field: Tooltip("Требование рецепта по ресурсам."), SerializeField]
-        public List<ItemRequirement> InputItems { get; private set; }
+        public List<ItemStack> InputItems { get; private set; }
 
         /// <summary> Список предметов, получаемых в результате крафта. </summary>
         [field: Tooltip("Результат крафта рецепта."), SerializeField]
-        public List<ItemRequirement> OutputItems { get; private set; }
+        public List<ItemStack> OutputItems { get; private set; }
 
         /// <summary> Иконка рецепта. </summary>
         [field: Tooltip("Спрайт крафта рецепта."), SerializeField]

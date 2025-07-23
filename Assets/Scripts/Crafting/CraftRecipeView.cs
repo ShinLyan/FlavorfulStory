@@ -15,7 +15,7 @@ namespace FlavorfulStory.Crafting
         [SerializeField] private Image _lockImage;
 
         /// <summary> ID рецепта, связанного с этим элементом. </summary>
-        private string _recipeID;
+        private CraftingRecipe _recipe;
         
         /// <summary> Действие, вызываемое при клике на элемент. </summary>
         private Action _clickAction;
@@ -33,12 +33,10 @@ namespace FlavorfulStory.Crafting
             _clickAction = clickAction;
             OnClick += _clickAction;
 
-            _recipeID = recipeID;
-            
-            var recipe = CraftingRecipeProvider.GetRecipeFromID(_recipeID);
-            _itemImage.sprite = recipe.Sprite;
-            _itemImage.color = new Color(1f, 1f, 1f, recipe.IsLocked ? LockedItemAlpha : 1f);
-            _lockImage.enabled = recipe.IsLocked;
+            _recipe = CraftingRecipeProvider.GetRecipeFromID(recipeID);
+            _itemImage.sprite = _recipe.Sprite;
+            _itemImage.color = new Color(1f, 1f, 1f, _recipe.IsLocked ? LockedItemAlpha : 1f);
+            _lockImage.enabled = _recipe.IsLocked;
         }
 
         /// <summary> Вызывается при отключении объекта. Отписывает колбэк. </summary>
@@ -59,6 +57,8 @@ namespace FlavorfulStory.Crafting
         /// <summary> Включает отображение рецепта. </summary>
         public void Enable() => transform.parent.gameObject.SetActive(true);
 
-        public CraftingRecipe GetRecipe() => CraftingRecipeProvider.GetRecipeFromID(_recipeID);
+        /// <summary> Получить рецепт. </summary>
+        /// <returns> Выбранный рецепт в <see cref="CraftingWindow"/>. </returns>
+        public CraftingRecipe GetRecipe() => _recipe;
     }
 }

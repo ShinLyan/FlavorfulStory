@@ -3,6 +3,7 @@ using FlavorfulStory.CursorSystem;
 using FlavorfulStory.InputSystem;
 using FlavorfulStory.InteractionSystem;
 using FlavorfulStory.InventorySystem;
+using FlavorfulStory.InventorySystem.DropSystem;
 using FlavorfulStory.InventorySystem.UI;
 using FlavorfulStory.Stats;
 using FlavorfulStory.Utils;
@@ -20,9 +21,21 @@ namespace FlavorfulStory.Player
     {
         #region Fields and Properties
 
-        /// <summary> Панель быстрого доступа, содержащая инвентарь игрока. </summary>
-        [Tooltip("Панель быстрого доступа, содержащая инвентарь игрока."), SerializeField]
+        /// <summary> Трансформ выброса предмета. </summary>
+        /// <remarks> Прокидывается в <see cref="IItemDropService"/>. </remarks>
+        [SerializeField] private Transform _dropPoint;
+
+        /// <summary> Инвентарь игрока. </summary>
+        private Inventory _playerInventory;
+
+        /// <summary> Панель быстрого доступа. </summary>
         private Toolbar _toolbar;
+
+        /// <summary> Сервис выброса предметов. </summary>
+        private IItemDropService _itemDropService;
+
+        /// <summary> Статы игрока. </summary>
+        private PlayerStats _playerStats;
 
         /// <summary> Занят ли игрок? </summary>
         private bool _isBusy;
@@ -57,16 +70,17 @@ namespace FlavorfulStory.Player
 
         #endregion
 
-        /// <summary> Инвентарь игрока. </summary>
-        private Inventory _playerInventory;
-
-        /// <summary> Статы игрока. </summary>
-        private PlayerStats _playerStats;
-
         /// <summary> Внедрение зависимости — инвентарь игрока. </summary>
         /// <param name="inventory"> Инвентарь игрока. </param>
+        /// <param name="toolbar"> </param>
+        /// <param name="itemDropService"> Сервис выброса предметов в игровой мир. </param>
         [Inject]
-        private void Construct(Inventory inventory) => _playerInventory = inventory;
+        private void Construct(Inventory inventory, Toolbar toolbar, IItemDropService itemDropService)
+        {
+            _playerInventory = inventory;
+            _toolbar = toolbar;
+            _itemDropService = itemDropService;
+        }
 
         /// <summary> Инициализация компонентов. </summary>
         private void Awake()
@@ -74,10 +88,13 @@ namespace FlavorfulStory.Player
             _playerStats = GetComponent<PlayerStats>();
             _playerMover = GetComponent<PlayerMover>();
             _animator = GetComponent<Animator>();
+
             _interactionController = GetComponentInChildren<InteractionController>();
-            _interactionController.SetInteractionActions(() => SetBusyState(true), () => SetBusyState(false));
+            _interactionController.StartInteractionAction = () => SetBusyState(true);
+            _interactionController.EndInteractionAction = () => SetBusyState(false);
+
             _toolHandler = GetComponent<ToolHandler>();
-            _toolHandler.SetUnequipAction(() => SetBusyState(false));
+            _toolHandler.UnequipAction = () => SetBusyState(false);
             PlayerModel.SetPositionProvider(() => transform.position);
         }
 
@@ -137,16 +154,31 @@ namespace FlavorfulStory.Player
             }
         }
 
-        /// <summary> Обработка использования предмета из панели быстрого доступа. </summary>
+        /// <summary> Обработка доступных действий выбранного предмета из панели быстрого доступа. </summary>
         private void HandleToolbarUseInput()
         {
-            if (CurrentItem is not IUsable usable || IsToolUseBlocked) return;
+            if (CurrentItem == null) return;
 
-            if ((!Input.GetMouseButton(0) || usable.UseActionType != UseActionType.LeftClick) &&
-                (!Input.GetMouseButton(1) || usable.UseActionType != UseActionType.RightClick))
-                return;
+            if (CurrentItem is IUsable usable && !IsToolUseBlocked) HandleCurrentItemUse(usable);
 
-            BeginInteraction(usable);
+            if (CurrentItem.CanBeDropped && !IsToolUseBlocked) HandleCurrentItemDrop();
+        }
+
+        /// <summary> Обработка использования предмета из панели быстрого доступа. </summary>
+        private void HandleCurrentItemUse(IUsable usable)
+        {
+            if ((Input.GetMouseButton(0) && usable.UseActionType == UseActionType.LeftClick) ||
+                (Input.GetMouseButton(1) && usable.UseActionType == UseActionType.RightClick))
+                BeginInteraction(usable);
+        }
+
+        /// <summary> Обработка выброса предмета из панели быстрого доступа. </summary>
+        private void HandleCurrentItemDrop()
+        {
+            const float DropItemForce = 2.5f;
+            if (InputWrapper.GetButtonDown(InputButton.DropCurrentItem))
+                _itemDropService.DropFromInventory(_playerInventory, _toolbar.SelectedItemIndex,
+                    _dropPoint.transform.position, _dropPoint.forward * DropItemForce);
         }
 
         /// <summary> Начать взаимодействие с предметом. </summary>
@@ -155,6 +187,7 @@ namespace FlavorfulStory.Player
         {
             if (usable == null) return;
 
+            // TODO: ЧТО-то непонятное тут происходит. ПОФИКСИТЬ. ПЛЮС ПОЧЕМУ-то НЕ УНИЧТОЖАЕТСЯ ХЛЕБ ЕСЛИ СЪЕСТЬ ЕГО
             StartUsingItem(usable);
             if (usable is EdibleInventoryItem) ConsumeEdibleItem();
             _toolCooldownTimer = PlayerModel.ToolCooldown;
@@ -174,7 +207,7 @@ namespace FlavorfulStory.Player
         private void ConsumeEdibleItem()
         {
             _playerInventory.RemoveFromSlot(_toolbar.SelectedItemIndex, 1);
-            InputWrapper.UnblockPlayerMovement();
+            InputWrapper.UnblockPlayerInput();
             SetBusyState(false);
         }
 
@@ -231,13 +264,15 @@ namespace FlavorfulStory.Player
         }
 
         /// <summary> Обновить позицию и направление взгляда игрока после телепортации. </summary>
-        /// <param name="newTransform"> Новый трансформ игрока. </param>
+        /// <param name="newTransform"> Трансформ игрока. </param>
         public void UpdatePosition(Transform newTransform)
         {
             SetPosition(newTransform.position);
             _playerMover.SetLookRotation(newTransform.forward);
         }
 
+        /// <summary> Установить позицию игрока. </summary>
+        /// <param name="newPosition"> Позиция игрока, которую нужно установить. </param>
         public void SetPosition(Vector3 newPosition) => _playerMover.SetPosition(newPosition);
 
         /// <summary> Восстановить статы игрока после сна. </summary>

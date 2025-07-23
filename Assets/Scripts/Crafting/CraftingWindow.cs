@@ -68,6 +68,9 @@ namespace FlavorfulStory.Crafting
 
         /// <summary> Было ли окно уже инициализировано. </summary>
         private bool _initialized;
+        
+        /// <summary> Находится ли выбранная станция в процессе крафта. </summary>
+        private bool _isCraftingInProgress;
 
         /// <summary> Делегат, вызываемый при начале крафта. </summary>
         private Action<CraftingRecipe, int> _onCraftRequested;
@@ -125,7 +128,10 @@ namespace FlavorfulStory.Crafting
                 .Where(recipe => _showLockedRecipes || !recipe.IsLocked);
 
             if (!string.IsNullOrEmpty(recipeNamePrefix))
-                query = query.Where(r => r.RecipeName.StartsWith(recipeNamePrefix, StringComparison.OrdinalIgnoreCase));
+                query = query.Where(recipe => recipe.RecipeName.StartsWith
+                (
+                    recipeNamePrefix, StringComparison.OrdinalIgnoreCase
+                ));
 
             var filtered = query
                 .OrderBy(recipe => recipe.IsLocked)
@@ -201,13 +207,25 @@ namespace FlavorfulStory.Crafting
         /// <summary> Обновляет отображение текущего рецепта и его состояния. </summary>
         private void UpdateCraftInfo()
         {
+            if (_currentRecipe == null) return;
+
             _currentRecipeImage.sprite = _currentRecipe.Sprite;
             _recipeName.text = _currentRecipe.RecipeName;
             SetupRequirements();
-            _craftButton.interactable =
+
+            bool canCraft = 
                 CraftingProcessor.CanCraft(_currentRecipe, _craftCount, _playerInventory) == CraftingResult.Success;
+            _craftButton.interactable = canCraft && !_isCraftingInProgress;
         }
 
+        /// <summary> Устанавливает состояние процесса крафта. </summary>
+        /// <param name="inProgress"> Идет ли процесс крафта у выбранной станции. </param>
+        public void SetCraftingInProgress(bool inProgress)
+        {
+            _isCraftingInProgress = inProgress;
+            UpdateCraftInfo();
+        }        
+        
         /// <summary> Обновляет текст количества создаваемых предметов. </summary>
         private void UpdateCraftCountText() => _craftCountText.text = _craftCount.ToString();
 
@@ -236,7 +254,7 @@ namespace FlavorfulStory.Crafting
 
             foreach (var input in _currentRecipe.InputItems)
             {
-                int required = input.Quantity * _craftCount;
+                int required = input.Number * _craftCount;
                 int available = _playerInventory.GetItemNumber(input.Item);
                 result[input.Item] = (available, required);
             }

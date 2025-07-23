@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
-using FlavorfulStory.InventorySystem.UI.Tooltips;
+using Zenject;
+using FlavorfulStory.TooltipSystem;
 
 namespace FlavorfulStory.Crafting
 {
@@ -7,20 +8,35 @@ namespace FlavorfulStory.Crafting
     [RequireComponent(typeof(IRecipeHolder))]
     public class RecipeTooltipSpawner : TooltipSpawner
     {
-        /// <summary> Можно ли создать тултип? </summary>
-        protected override bool CanCreateTooltip() =>
-            GetComponent<IRecipeHolder>().GetRecipe() != null;
+        /// <summary> Ссылка на компонент, содержащий рецепт. </summary>
+        private IRecipeHolder _recipeHolder;
 
-        /// <summary> Обновление содержимого тултипа. </summary>
+        /// <summary> Инжектирует префаб тултипа рецепта. </summary>
+        /// <param name="tooltipPrefab"> Префаб тултипа. </param>
+        [Inject]
+        private void Construct(RecipeTooltipView tooltipPrefab) =>
+            TooltipPrefab = tooltipPrefab.gameObject;
+
+        /// <summary> Получает ссылку на компонент рецепта при инициализации. </summary>
+        private void Awake() => _recipeHolder = GetComponent<IRecipeHolder>();
+
+        /// <summary> Проверяет, можно ли создать тултип (если есть рецепт). </summary>
+        /// <returns> Существует ли рецепт?. </returns>
+        protected override bool CanCreateTooltip() => _recipeHolder?.GetRecipe() != null;
+
+        /// <summary> Обновляет содержимое тултипа на основе текущего рецепта. </summary>
+        /// <param name="tooltip"> Тултип, который нужно обновить. </param>
         protected override void UpdateTooltip(GameObject tooltip)
         {
-            if (!tooltip.TryGetComponent<RecipeTooltip>(out var recipeTooltip)) return;
+            if (!tooltip.TryGetComponent<RecipeTooltipView>(out var recipeTooltip)) return;
 
-            var recipe = GetComponent<IRecipeHolder>().GetRecipe();
+            var recipe = _recipeHolder.GetRecipe();
             recipeTooltip.Setup(recipe.RecipeName, BuildDescription(recipe));
         }
 
-        /// <summary> Собирает текст описания рецепта. </summary>
+        /// <summary> Формирует описание рецепта. </summary>
+        /// <param name="recipe"> Рецепт для отображения. </param>
+        /// <returns> Строку описания. </returns>
         private string BuildDescription(CraftingRecipe recipe)
         {
             return recipe.Description;
