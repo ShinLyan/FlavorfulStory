@@ -1,3 +1,5 @@
+using UnityEngine;
+using Zenject;
 using DG.Tweening;
 using FlavorfulStory.Actions;
 using FlavorfulStory.InteractionSystem;
@@ -5,8 +7,6 @@ using FlavorfulStory.Player;
 using FlavorfulStory.TooltipSystem.ActionTooltips;
 using FlavorfulStory.UI;
 using FlavorfulStory.UI.Animation;
-using UnityEngine;
-using Zenject;
 
 namespace FlavorfulStory.TimeManagement
 {

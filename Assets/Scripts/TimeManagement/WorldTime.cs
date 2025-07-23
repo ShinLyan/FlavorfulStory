@@ -1,8 +1,9 @@
+using UnityEngine;
 using System;
+using Zenject;
 using FlavorfulStory.EditorTools.Attributes;
 using FlavorfulStory.Saving;
 using FlavorfulStory.SceneManagement;
-using UnityEngine;
 
 namespace FlavorfulStory.TimeManagement
 {
@@ -10,7 +11,10 @@ namespace FlavorfulStory.TimeManagement
     public class WorldTime : MonoBehaviour, ISaveable
     {
         #region Fields
-
+        
+        /// <summary> Сигнальная шина Zenject для отправки и получения событий. </summary>
+        [Inject] private readonly SignalBus _signalBus;
+        
         /// <summary> Сколько игровых минут проходит за реальную секунду. </summary>
         [Header("Time Scale")]
         [Tooltip("Сколько игровых минут проходит за реальную секунду."), SerializeField, SteppedRange(-100f, 1000f, 5f)]
@@ -39,10 +43,7 @@ namespace FlavorfulStory.TimeManagement
 
         /// <summary> Вызывается при завершении игрового дня. </summary>
         public static Action<DateTime> OnDayEnded;
-
-        /// <summary> Вызывается при наступлении ночи. </summary>
-        public static Action<DateTime> OnNightStarted;
-
+        
         /// <summary> Вызывается при заданном тике времени. </summary>
         public static Action<DateTime> OnTimeTick;
 
@@ -72,7 +73,6 @@ namespace FlavorfulStory.TimeManagement
 
             OnTimeUpdated = null;
             OnDayEnded = null;
-            OnNightStarted = null;
             OnTimeTick = null;
             OnTimePaused = null;
             OnTimeUnpaused = null;
@@ -87,7 +87,7 @@ namespace FlavorfulStory.TimeManagement
             CurrentGameTime = CurrentGameTime.AddMinutes(Time.deltaTime * _timeScale);
 
             if (previousTime.Hour < NightStartHour && CurrentGameTime.Hour >= NightStartHour)
-                OnNightStarted?.Invoke(CurrentGameTime);
+                _signalBus.Fire(new NightStartedSignal(CurrentGameTime));
 
             if ((int)CurrentGameTime.Minute % TimeBetweenTicks == 0) OnTimeTick?.Invoke(CurrentGameTime);
 

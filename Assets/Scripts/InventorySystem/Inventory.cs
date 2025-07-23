@@ -3,6 +3,7 @@ using System.Linq;
 using FlavorfulStory.Core;
 using FlavorfulStory.InventorySystem.PickupSystem;
 using FlavorfulStory.Saving;
+using FlavorfulStory.UI.Notifications;
 using UnityEngine;
 using Zenject;
 
@@ -18,20 +19,11 @@ namespace FlavorfulStory.InventorySystem
         /// <summary> Предметы инвентаря. </summary>
         private ItemStack[] _inventorySlots;
 
-        /// <summary> Менеджер уведомлений о подборе предмета. </summary>
-        private PickupNotificationManager _notificationManager;
-
         /// <summary> Событие, вызываемое при изменении инвентаря (добавление, удаление предметов). </summary>
         public event Action InventoryUpdated;
 
         /// <summary> Событие при сборе предмета. Передает сам предмет. </summary>
         public event Action<InventoryItem> ItemCollected;
-
-        /// <summary> Внедрение зависимостей Zenject. </summary>
-        /// <param name="notificationManager"> Менеджер уведомлений о подборе предмета. </param>
-        [Inject]
-        private void Construct(PickupNotificationManager notificationManager) =>
-            _notificationManager = notificationManager;
 
         /// <summary> Инициализация слотов и ссылки на инвентарь игрока. </summary>
         private void Awake() => _inventorySlots = new ItemStack[InventorySize];
@@ -160,9 +152,6 @@ namespace FlavorfulStory.InventorySystem
                 _inventorySlots[index].Number += addAmount;
                 remainingNumber -= addAmount;
             }
-
-            // TODO: ПЕРЕДЕЛАТЬ НА EVENT. Inventory не должен знать о _notificationManager
-            _notificationManager.ShowNotification(item.Icon, number, item.ItemName, item.ItemName);
 
             ItemCollected?.Invoke(item);
             InventoryUpdated?.Invoke();

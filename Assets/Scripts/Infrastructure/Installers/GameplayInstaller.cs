@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using Unity.Cinemachine;
+using UnityEngine;
+using System.Collections.Generic;
+using Zenject;
 using FlavorfulStory.BuildingRepair.UI;
 using FlavorfulStory.DialogueSystem;
 using FlavorfulStory.DialogueSystem.UI;
@@ -20,12 +23,10 @@ using FlavorfulStory.TooltipSystem;
 using FlavorfulStory.TooltipSystem.ActionTooltips;
 using FlavorfulStory.UI;
 using FlavorfulStory.UI.Animation;
+using FlavorfulStory.UI.Notifications;
 using FlavorfulStory.Visuals.Lightning;
-using Unity.Cinemachine;
-using UnityEngine;
-using Zenject;
 
-namespace FlavorfulStory.Installers
+namespace FlavorfulStory.Infrastructure.Installers
 {
     /// <summary> Установщик зависимостей, необходимых для игрового процесса. </summary>
     public class GameplayInstaller : MonoInstaller
@@ -82,7 +83,6 @@ namespace FlavorfulStory.Installers
         private void BindInventory()
         {
             Container.Bind<Inventory>().FromInstance(_playerInventory).AsSingle();
-            Container.Bind<PickupNotificationManager>().FromComponentInHierarchy().AsSingle();
             Container.Bind<PickupFactory>().AsSingle();
             Container.Bind<PickupSpawner>().FromComponentsInHierarchy().AsCached();
             Container.Bind<IItemDropService>().To<ItemDropService>().AsSingle();
@@ -118,7 +118,9 @@ namespace FlavorfulStory.Installers
             Container.Bind<ConfirmationWindowView>().FromComponentInHierarchy().AsSingle();
             Container.Bind<SummaryView>().FromComponentInHierarchy().AsSingle();
             Container.Bind<RepairableBuildingView>().FromComponentInHierarchy().AsSingle();
-
+            
+            Container.Bind<INotificationService>().To<NotificationService>().FromComponentInHierarchy().AsSingle();
+            
             Container.Bind<IGameFactory<InventorySlotView>>().To<InventorySlotViewFactory>().AsSingle()
                 .WithArguments(_inventorySlotViewPrefab);
             Container.Bind<IGameFactory<ResourceRequirementView>>().To<ResourceRequirementViewFactory>().AsSingle()
@@ -155,6 +157,8 @@ namespace FlavorfulStory.Installers
             Container.Bind<CinemachineCamera>().FromInstance(_teleportVirtualCamera).AsSingle();
 
             Container.Bind<SleepTrigger>().FromComponentInHierarchy().AsSingle();
+            Container.BindInterfacesTo<SleepNotifier>().AsSingle();
+            Container.DeclareSignal<NightStartedSignal>();
 
             Container.BindInterfacesAndSelfTo<DayEndManager>().AsSingle();
         }
