@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using FlavorfulStory.Crafting;
 using FlavorfulStory.BuildingRepair.UI;
 using FlavorfulStory.DialogueSystem;
 using FlavorfulStory.DialogueSystem.UI;
@@ -37,7 +38,7 @@ namespace FlavorfulStory.Installers
         [SerializeField] private InventorySlotView _inventorySlotViewPrefab;
 
         /// <summary> Префаб отображения требования ресурса. </summary>
-        [SerializeField] private ResourceRequirementView _requirementViewPrefab;
+        [SerializeField] private ItemRequirementView _requirementViewPrefab;
 
         /// <summary> Префаб кнопки в списке квестов. </summary>
         [SerializeField] private QuestListButton _questListButtonPrefab;
@@ -52,6 +53,9 @@ namespace FlavorfulStory.Installers
 
         /// <summary> Префаб всплывающей подсказки для предмета. </summary>
         [SerializeField] private ItemTooltipView _itemTooltipPrefab;
+        
+        /// <summary> Префаб всплывающей подсказки для рецепта крафта. </summary>
+        [SerializeField] private RecipeTooltipView _recipeTooltipPrefab;
 
         /// <summary> Выполняет установку всех зависимостей, необходимых для сцены. </summary>
         public override void InstallBindings()
@@ -121,7 +125,7 @@ namespace FlavorfulStory.Installers
 
             Container.Bind<IGameFactory<InventorySlotView>>().To<InventorySlotViewFactory>().AsSingle()
                 .WithArguments(_inventorySlotViewPrefab);
-            Container.Bind<IGameFactory<ResourceRequirementView>>().To<ResourceRequirementViewFactory>().AsSingle()
+            Container.Bind<IGameFactory<ItemRequirementView>>().To<ResourceRequirementViewFactory>().AsSingle()
                 .WithArguments(_requirementViewPrefab);
 
             Container.Bind<Toolbar>().FromComponentInHierarchy().AsSingle();
@@ -129,6 +133,7 @@ namespace FlavorfulStory.Installers
             Container.Bind<CanvasGroupFader>().WithId("HUD").FromInstance(_hudFader).AsSingle();
 
             Container.Bind<ItemTooltipView>().FromInstance(_itemTooltipPrefab).AsSingle();
+            Container.Bind<RecipeTooltipView>().FromInstance(_recipeTooltipPrefab).AsSingle();
         }
 
         /// <summary> Установить зависимости, связанные с системой отображения тултипов действий. </summary>
@@ -140,6 +145,7 @@ namespace FlavorfulStory.Installers
             Container.BindInterfacesAndSelfTo<ActionTooltipController>().AsSingle().NonLazy();
             Container.Bind<IActionTooltipViewSpawner>().To<ActionTooltipViewSpawner>().FromComponentInHierarchy()
                 .AsSingle();
+            Container.Bind<CraftingWindow>().FromComponentInHierarchy().AsSingle();
         }
 
         /// <summary> Установить зависимости, связанные с системами и логикой. </summary>

@@ -16,6 +16,9 @@
         Drop,
 
         /// <summary> Строительство или установка объекта. </summary>
-        Build
+        Build,
+        
+        /// <summary> Создание предметов. </summary>
+        Craft,
     }
 }

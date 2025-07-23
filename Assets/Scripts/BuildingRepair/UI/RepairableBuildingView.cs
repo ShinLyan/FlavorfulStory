@@ -1,16 +1,16 @@
+using UnityEngine.UI;
+using UnityEngine;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using TMPro;
+using Zenject;
 using Cysharp.Threading.Tasks;
 using FlavorfulStory.Infrastructure;
 using FlavorfulStory.Infrastructure.Factories;
 using FlavorfulStory.InputSystem;
 using FlavorfulStory.InventorySystem;
 using FlavorfulStory.TimeManagement;
-using TMPro;
-using UnityEngine;
-using UnityEngine.UI;
-using Zenject;
 
 namespace FlavorfulStory.BuildingRepair.UI
 {
@@ -32,10 +32,10 @@ namespace FlavorfulStory.BuildingRepair.UI
         [SerializeField] private Button _buildButton;
 
         /// <summary> Пул для повторного использования требований к ремонту. </summary>
-        private ObjectPool<ResourceRequirementView> _requirementPool;
+        private ObjectPool<ItemRequirementView> _requirementPool;
 
         /// <summary> Список отображений требований ресурсов. </summary>
-        private readonly List<ResourceRequirementView> _requirementViews = new();
+        private readonly List<ItemRequirementView> _requirementViews = new();
 
         /// <summary> Открыто ли окно ремонта? </summary>
         private bool _isOpen;
@@ -53,19 +53,19 @@ namespace FlavorfulStory.BuildingRepair.UI
         private Action _onClose;
 
         /// <summary> Фабрика создания отображений требований ресурсов. </summary>
-        private IGameFactory<ResourceRequirementView> _requirementViewFactory;
+        private IGameFactory<ItemRequirementView> _requirementViewFactory;
 
         #endregion
 
         /// <summary> Внедрить фабрику создания отображений требований ресурсов. </summary>
         /// <param name="factory"> Фабрика создания отображений требований ресурсов. </param>
         [Inject]
-        private void Construct(IGameFactory<ResourceRequirementView> factory) => _requirementViewFactory = factory;
+        private void Construct(IGameFactory<ItemRequirementView> factory) => _requirementViewFactory = factory;
 
         /// <summary> Инициализация кэша вьюшек, если они уже присутствуют в иерархии. </summary>
         private void Awake()
         {
-            _requirementPool = new ObjectPool<ResourceRequirementView>(
+            _requirementPool = new ObjectPool<ItemRequirementView>(
                 () => _requirementViewFactory.Create(_requirementViewsContainer),
                 view =>
                 {

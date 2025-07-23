@@ -1,10 +1,10 @@
-﻿using System;
+﻿using UnityEngine;
+using System;
 using System.Linq;
+using Zenject;
 using FlavorfulStory.Core;
 using FlavorfulStory.InventorySystem.PickupSystem;
 using FlavorfulStory.Saving;
-using UnityEngine;
-using Zenject;
 
 namespace FlavorfulStory.InventorySystem
 {
@@ -43,6 +43,41 @@ namespace FlavorfulStory.InventorySystem
         /// <summary> Есть ли место для предмета в инвентаре? </summary>
         public bool HasSpaceFor(InventoryItem item) => FindSlot(item) >= 0;
 
+        /// <summary> Есть ли место для предмета в инвентаре? </summary>
+        public bool HasSpaceFor(InventoryItem item, int number)
+        {
+            var mockSlots = new ItemStack[InventorySize];
+            _inventorySlots.CopyTo(mockSlots, 0);
+            
+            int remainingNumber = number;
+            while (remainingNumber > 0)
+            {
+                int index = FindSlotInMockSlots();
+                if (index < 0) return false;
+
+                int addAmount = Mathf.Min(remainingNumber, item.StackSize - mockSlots[index].Number);
+                mockSlots[index].Item ??= item;
+                mockSlots[index].Number += addAmount;
+                remainingNumber -= addAmount;
+            }
+            
+            return true;
+            
+            int FindSlotInMockSlots()
+            {
+                //Same item, not full stack
+                for (int i = 0; i < mockSlots.Length; i++)
+                    if (mockSlots[i].Item == item && mockSlots[i].Number < item.StackSize)
+                        return i;
+                //Empty slot
+                for (int i = 0; i < mockSlots.Length; i++)
+                    if (mockSlots[i].Item == null)
+                        return i;
+                //NONE
+                return -1;
+            }
+        }
+        
         /// <summary> Найти слот, в который можно поместить данный предмет. </summary>
         /// <param name="item"> Предмет, который нужно поместить в слот. </param>
         /// <returns> Возвращает индекс слота предмета. Если предмет не найден, возвращает -1. </returns>

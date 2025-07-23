@@ -1,10 +1,10 @@
+using UnityEngine;
 using System.Collections.Generic;
+using Zenject;
 using FlavorfulStory.InteractionSystem;
 using FlavorfulStory.InventorySystem;
 using FlavorfulStory.Player;
 using FlavorfulStory.TooltipSystem.ActionTooltips;
-using UnityEngine;
-using Zenject;
 
 namespace FlavorfulStory.Actions.Interactables
 {
