@@ -18,8 +18,8 @@ namespace FlavorfulStory.DialogueSystem
         {
             if (string.IsNullOrEmpty(actionToTrigger)) return;
 
-            foreach (var dialogueEvent in DialogueEvents.Where(dialogueEvent =>
-                         dialogueEvent.ActionName == actionToTrigger))
+            foreach (var dialogueEvent in DialogueEvents
+                         .Where(dialogueEvent => dialogueEvent.ActionName == actionToTrigger))
                 dialogueEvent.OnTrigger?.Invoke();
         }
     }

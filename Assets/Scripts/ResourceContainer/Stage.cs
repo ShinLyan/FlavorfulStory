@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using FlavorfulStory.Actions;
+using FlavorfulStory.InventorySystem;
 using UnityEngine;
 
 namespace FlavorfulStory.ResourceContainer
@@ -11,7 +11,7 @@ namespace FlavorfulStory.ResourceContainer
     {
         /// <summary> Список предметов, выпадающих при разрушении. </summary>
         [field: Tooltip("Список предметов, выпадающих при разрушении."), SerializeField]
-        public List<DropItem> Items { get; private set; }
+        public List<ItemStack> Items { get; private set; }
 
         /// <summary> Количество ударов для каждой стадии объекта. </summary>
         [field: Tooltip("Количество ударов для перехода на следующую стадию."), SerializeField, Range(1, 5)]

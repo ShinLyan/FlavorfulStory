@@ -88,10 +88,13 @@ namespace FlavorfulStory.Player
             _playerStats = GetComponent<PlayerStats>();
             _playerMover = GetComponent<PlayerMover>();
             _animator = GetComponent<Animator>();
+
             _interactionController = GetComponentInChildren<InteractionController>();
-            _interactionController.SetInteractionActions(() => SetBusyState(true), () => SetBusyState(false));
+            _interactionController.StartInteractionAction = () => SetBusyState(true);
+            _interactionController.EndInteractionAction = () => SetBusyState(false);
+
             _toolHandler = GetComponent<ToolHandler>();
-            _toolHandler.SetUnequipAction(() => SetBusyState(false));
+            _toolHandler.UnequipAction = () => SetBusyState(false);
             PlayerModel.SetPositionProvider(() => transform.position);
         }
 
@@ -170,7 +173,6 @@ namespace FlavorfulStory.Player
         private void HandleCurrentItemDrop()
         {
             const float DropItemForce = 2.5f;
-            const float PickupDelay = 1.5f;
             if (InputWrapper.GetButtonDown(InputButton.DropCurrentItem))
                 _itemDropService.DropFromInventory(_playerInventory, _toolbar.SelectedItemIndex,
                     _dropPoint.transform.position, _dropPoint.forward * DropItemForce);
@@ -182,6 +184,7 @@ namespace FlavorfulStory.Player
         {
             if (usable == null) return;
 
+            // TODO: ЧТО-то непонятное тут происходит. ПОФИКСИТЬ. ПЛЮС ПОЧЕМУ-то НЕ УНИЧТОЖАЕТСЯ ХЛЕБ ЕСЛИ СЪЕСТЬ ЕГО
             StartUsingItem(usable);
             if (usable is EdibleInventoryItem) ConsumeEdibleItem();
             _toolCooldownTimer = PlayerModel.ToolCooldown;
@@ -201,7 +204,7 @@ namespace FlavorfulStory.Player
         private void ConsumeEdibleItem()
         {
             _playerInventory.RemoveFromSlot(_toolbar.SelectedItemIndex, 1);
-            InputWrapper.UnblockPlayerMovement();
+            InputWrapper.UnblockPlayerInput();
             SetBusyState(false);
         }
 
@@ -258,13 +261,15 @@ namespace FlavorfulStory.Player
         }
 
         /// <summary> Обновить позицию и направление взгляда игрока после телепортации. </summary>
-        /// <param name="newTransform"> Новый трансформ игрока. </param>
+        /// <param name="newTransform"> Трансформ игрока. </param>
         public void UpdatePosition(Transform newTransform)
         {
             SetPosition(newTransform.position);
             _playerMover.SetLookRotation(newTransform.forward);
         }
 
+        /// <summary> Установить позицию игрока. </summary>
+        /// <param name="newPosition"> Позиция игрока, которую нужно установить. </param>
         public void SetPosition(Vector3 newPosition) => _playerMover.SetPosition(newPosition);
 
         /// <summary> Восстановить статы игрока после сна. </summary>

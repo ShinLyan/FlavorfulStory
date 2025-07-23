@@ -22,6 +22,8 @@ namespace FlavorfulStory.DialogueSystem.UI
         /// <returns> Ссылка на созданную модель. </returns>
         public void InstantiateModel(GameObject modelPrefab)
         {
+            if (_currentModel) return;
+
             _currentModel = Instantiate(modelPrefab, _spawnPoint);
             SetLayerRecursively(_currentModel.transform, LayerMask.NameToLayer("DialogueModel"));
         }

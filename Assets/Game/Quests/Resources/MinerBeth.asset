@@ -1,0 +1,84 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 117c81b660034043a189d64323bfafe8, type: 3}
+  m_Name: MinerBeth
+  m_EditorClassIdentifier: 
+  <QuestGiver>k__BackingField: {fileID: 11400000, guid: f86a80addd769f448ac4dfb94a1f4690,
+    type: 2}
+  <QuestName>k__BackingField: Miner Beth
+  <QuestDescription>k__BackingField: Beth will help you gather stone materials. First,
+    mine some raw stones, then process them into stone blocks using a furnace. Return
+    to Beth once everything is ready for the shop renovation.
+  <QuestType>k__BackingField: 0
+  _stages:
+  - _objectives:
+    - <Reference>k__BackingField: a24aede6-1098-4816-ab3f-6531bfebe282
+      <Description>k__BackingField: Find Beth and talk to her
+      <Type>k__BackingField: 1
+      <Params>k__BackingField:
+        rid: 6018952306055708870
+    _onStageCompleteActions: []
+  - _objectives:
+    - <Reference>k__BackingField: a24aede6-1098-4816-ab3f-6531bfebe282
+      <Description>k__BackingField: Collect 15 stones
+      <Type>k__BackingField: 0
+      <Params>k__BackingField:
+        rid: 6018952398241005712
+    _onStageCompleteActions: []
+  - _objectives:
+    - <Reference>k__BackingField: a24aede6-1098-4816-ab3f-6531bfebe282
+      <Description>k__BackingField: Refine into 5 stone blocks
+      <Type>k__BackingField: 0
+      <Params>k__BackingField:
+        rid: 6018952398241005715
+    _onStageCompleteActions: []
+  - _objectives:
+    - <Reference>k__BackingField: a24aede6-1098-4816-ab3f-6531bfebe282
+      <Description>k__BackingField: Find Beth and talk to her
+      <Type>k__BackingField: 1
+      <Params>k__BackingField:
+        rid: 6018952398241005714
+    _onStageCompleteActions: []
+  _rewards:
+  - <Number>k__BackingField: 20
+    <Item>k__BackingField: {fileID: 11400000, guid: 3e31ae779574be343a52d151fa604692,
+      type: 2}
+  references:
+    version: 2
+    RefIds:
+    - rid: 6018952306055708870
+      type: {class: TalkObjectiveParams, ns: FlavorfulStory.QuestSystem.Objectives.Params,
+        asm: Assembly-CSharp}
+      data:
+        <NpcName>k__BackingField: 0
+        <Dialogue>k__BackingField: {fileID: 11400000, guid: 9e5424065cee3bd4893b828eeb63d49c,
+          type: 2}
+    - rid: 6018952398241005712
+      type: {class: HaveObjectiveParams, ns: FlavorfulStory.QuestSystem.Objectives.Params,
+        asm: Assembly-CSharp}
+      data:
+        <InventoryItem>k__BackingField: {fileID: 11400000, guid: 3e31ae779574be343a52d151fa604692,
+          type: 2}
+        <RequiredAmount>k__BackingField: 15
+    - rid: 6018952398241005714
+      type: {class: TalkObjectiveParams, ns: FlavorfulStory.QuestSystem.Objectives.Params,
+        asm: Assembly-CSharp}
+      data:
+        <NpcName>k__BackingField: 0
+        <Dialogue>k__BackingField: {fileID: 0}
+    - rid: 6018952398241005715
+      type: {class: HaveObjectiveParams, ns: FlavorfulStory.QuestSystem.Objectives.Params,
+        asm: Assembly-CSharp}
+      data:
+        <InventoryItem>k__BackingField: {fileID: 11400000, guid: 2a2da073808dea144b51f79a8eac7b46,
+          type: 2}
+        <RequiredAmount>k__BackingField: 5

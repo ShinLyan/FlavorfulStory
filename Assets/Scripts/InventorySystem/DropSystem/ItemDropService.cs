@@ -27,13 +27,12 @@ namespace FlavorfulStory.InventorySystem.DropSystem
         public ItemDropService(PickupFactory pickupFactory) => _pickupFactory = pickupFactory;
 
         /// <summary> Выбрасывает предмет в мир в указанной позиции с опциональной силой. </summary>
-        /// <param name="item"> Предмет для выбрасывания. </param>
-        /// <param name="quantity"> Количество выбрасываемого предмета. </param>
+        /// <param name="itemStack"> Предмет и его количество для выбрасывания. </param>
         /// <param name="position"> Позиция появления предмета. </param>
         /// <param name="force"> Применяемая сила (например, для отталкивания). </param>
-        public void Drop(InventoryItem item, int quantity, Vector3 position, Vector3? force = null)
+        public void Drop(ItemStack itemStack, Vector3 position, Vector3? force = null)
         {
-            var pickup = Spawn(item, quantity, position, PickupDelay);
+            var pickup = Spawn(itemStack, position, PickupDelay);
             if (pickup && force.HasValue) ApplyForce(pickup, force.Value);
         }
 
@@ -44,8 +43,8 @@ namespace FlavorfulStory.InventorySystem.DropSystem
         /// <param name="force"> Применяемая сила (необязательно). </param>
         public void DropFromInventory(Inventory inventory, int slotIndex, Vector3 position, Vector3? force = null)
         {
-            if (!TryConsumeInventorySlot(inventory, slotIndex, out var item, out int quantity)) return;
-            Drop(item, quantity, position, force);
+            if (!TryConsumeInventorySlot(inventory, slotIndex, out var itemStack)) return;
+            Drop(itemStack, position, force);
         }
 
         /// <summary> Устанавливает контейнер, в котором будут размещаться выброшенные предметы. </summary>
@@ -53,16 +52,15 @@ namespace FlavorfulStory.InventorySystem.DropSystem
         public void SetDroppedItemsContainer(Transform container) => _container = container;
 
         /// <summary> Спавнит предмет в мире с заданным количеством и задержкой. </summary>
-        /// <param name="item"> Предмет для спавна. </param>
-        /// <param name="quantity"> Количество предметов. </param>
+        /// <param name="itemStack"> Предмет для спавна. </param>
         /// <param name="position"> Позиция появления. </param>
         /// <param name="pickupDelay"> Задержка перед возможностью поднятия. </param>
         /// <returns> Ссылка на созданный Pickup. </returns>
-        private Pickup Spawn(InventoryItem item, int quantity, Vector3 position, float pickupDelay = 1f)
+        private Pickup Spawn(ItemStack itemStack, Vector3 position, float pickupDelay = 1f)
         {
             if (!_container) Debug.LogError($"{nameof(ItemDropService)}.{nameof(Spawn)}: Container is not set)");
 
-            var pickup = _pickupFactory.Create(item, position, quantity, pickupDelay, _container);
+            var pickup = _pickupFactory.Create(itemStack, position, pickupDelay, _container);
             if (pickup) _spawnedPickups.Add(pickup);
             return pickup;
         }
@@ -78,16 +76,14 @@ namespace FlavorfulStory.InventorySystem.DropSystem
         /// <summary> Извлекает предмет и его количество из слота инвентаря и удаляет его. </summary>
         /// <param name="inventory"> Инвентарь игрока. </param>
         /// <param name="slotIndex"> Индекс слота. </param>
-        /// <param name="item"> Возвращаемый предмет. </param>
-        /// <param name="quantity"> Возвращаемое количество. </param>
+        /// <param name="itemStack"> Возвращаемый предмет и его количество. </param>
         /// <returns> True, если удалось извлечь предмет; иначе — false. </returns>
         private static bool TryConsumeInventorySlot(Inventory inventory, int slotIndex,
-            out InventoryItem item, out int quantity)
+            out ItemStack itemStack)
         {
-            item = inventory.GetItemInSlot(slotIndex);
-            quantity = inventory.GetNumberInSlot(slotIndex);
+            itemStack = inventory.GetItemStackInSlot(slotIndex);
 
-            if (quantity <= 0 || !item)
+            if (itemStack.Number <= 0 || !itemStack.Item)
             {
                 Debug.LogError($"[ItemDropService] Slot {slotIndex} is empty.");
                 return false;
@@ -135,7 +131,8 @@ namespace FlavorfulStory.InventorySystem.DropSystem
             foreach (var record in records)
             {
                 var item = ItemDatabase.GetItemFromID(record.ItemID);
-                if (item) Spawn(item, record.Quantity, record.Position.ToVector());
+                var itemStack = new ItemStack { Item = item, Number = record.Quantity };
+                if (item) Spawn(itemStack, record.Position.ToVector());
             }
         }
 

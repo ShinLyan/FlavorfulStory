@@ -1,7 +1,6 @@
-using FlavorfulStory.Actions;
 using FlavorfulStory.InputSystem;
 using FlavorfulStory.Saving;
-using FlavorfulStory.TooltipSystem;
+using FlavorfulStory.TooltipSystem.ActionTooltips;
 using UnityEngine;
 using Zenject;
 
@@ -12,14 +11,17 @@ namespace FlavorfulStory.InventorySystem.UI
     /// визуальное состояние слотов панели инструментов. </remarks>
     public class Toolbar : MonoBehaviour, ISaveable
     {
-        /// <summary> Последний предмет, по коотороому показываем тултип. </summary>
-        private InventoryItem _lastTooltipItem;
-
         /// <summary> Массив слотов панели инструментов. </summary>
         private ToolbarSlotView[] _slots;
 
         /// <summary> Можно ли взаимодействовать? </summary>
         private bool _isInteractable;
+
+        /// <summary> Инвентарь игрока. </summary>
+        private Inventory _playerInventory;
+
+        /// <summary> Шина сигналов для оповещения других компонентов. </summary>
+        private SignalBus _signalBus;
 
         /// <summary> Индекс выбранного предмета. </summary>
         public int SelectedItemIndex { get; private set; }
@@ -27,23 +29,17 @@ namespace FlavorfulStory.InventorySystem.UI
         /// <summary> Выбранный предмет. </summary>
         public InventoryItem SelectedItem => _slots[SelectedItemIndex].GetItem();
 
-        /// <summary> Инвентарь игрока. </summary>
-        private Inventory _playerInventory;
-
-        /// <summary> Показчик тултипов. </summary>
-        private IActionTooltipShower _tooltipShower;
-
-        /// <summary> Внедрение зависимости — инвентарь игрока. </summary>
+        /// <summary> Внедрение зависимостей Zenject. </summary>
         /// <param name="inventory"> Инвентарь игрока. </param>
-        /// <param name="tooltipShower"> Показчик тултипов. </param>
+        /// <param name="signalBus"> Сигнальная шина Zenject. </param>
         [Inject]
-        private void Construct(Inventory inventory, IActionTooltipShower tooltipShower)
+        private void Construct(Inventory inventory, SignalBus signalBus)
         {
             _playerInventory = inventory;
-            _tooltipShower = tooltipShower;
+            _signalBus = signalBus;
         }
 
-        /// <summary> Инициализация полей и подписка на события тулбар слотов. </summary>
+        /// <summary> Инициализация полей и подписка на события слотов панели. </summary>
         private void Awake()
         {
             _slots = GetComponentsInChildren<ToolbarSlotView>();
@@ -51,6 +47,14 @@ namespace FlavorfulStory.InventorySystem.UI
 
             _playerInventory.InventoryUpdated += RedrawToolbar;
             foreach (var slot in _slots) slot.OnSlotClicked += SelectItem;
+        }
+
+        /// <summary> Обновляет визуальное представление всех слотов панели инструментов. </summary>
+        private void RedrawToolbar()
+        {
+            foreach (var slot in _slots) slot.Redraw();
+
+            _signalBus.Fire(new ToolbarSlotSelectedSignal { SelectedItem = SelectedItem });
         }
 
         /// <summary> Первоначальная настройка панели инструментов. </summary>
@@ -61,39 +65,14 @@ namespace FlavorfulStory.InventorySystem.UI
             _slots[SelectedItemIndex].Select();
         }
 
-        /// <summary> Обрабатывает ввод колесика мыши в каждом кадре. </summary>
-        private void Update() => HandleMouseScrollInput();
-
-        /// <summary> Установить состояние взаимодействия. </summary>
-        /// <param name="state"> Состояние взаимодействия. </param>
-        public void SetInteractableState(bool state) => _isInteractable = state;
-
         /// <summary> Сбрасывает состояние выделения всех слотов панели инструментов. </summary>
         private void ResetToolbar()
         {
             foreach (var slot in _slots) slot.ResetSelection();
         }
 
-        /// <summary> Выбирает предмет в панели инструментов по указанному индексу. </summary>
-        /// <param name="index"> Индекс предмета, который нужно выбрать. </param>
-        public void SelectItem(int index)
-        {
-            if (!_isInteractable) return;
-
-            _slots[SelectedItemIndex].ResetSelection();
-            SelectedItemIndex = index;
-            _slots[SelectedItemIndex].Select();
-
-            ShowItemTooltip();
-        }
-
-        /// <summary> Обновляет визуальное представление всех слотов панели инструментов. </summary>
-        private void RedrawToolbar()
-        {
-            foreach (var slot in _slots) slot.Redraw();
-
-            ShowItemTooltip();
-        }
+        /// <summary> Обрабатывает ввод колесика мыши в каждом кадре. </summary>
+        private void Update() => HandleMouseScrollInput();
 
         /// <summary> Обрабатывает ввод колесика мыши для смены выбранного предмета. </summary>
         private void HandleMouseScrollInput()
@@ -106,27 +85,22 @@ namespace FlavorfulStory.InventorySystem.UI
             SelectItem(newSelectedItemIndex);
         }
 
-        /// <summary> Показать тултип для выбранного предмета. </summary>
-        private void ShowItemTooltip()
+        /// <summary> Выбирает предмет в панели инструментов по указанному индексу. </summary>
+        /// <param name="index"> Индекс предмета, который нужно выбрать. </param>
+        public void SelectItem(int index)
         {
-            if (_lastTooltipItem && _lastTooltipItem.CanBeDropped)
-            {
-                var oldTooltip = new TooltipActionData("G", ActionType.Drop, _lastTooltipItem.ItemName);
-                _tooltipShower.Remove(oldTooltip);
-            }
+            if (!_isInteractable || index == SelectedItemIndex) return;
 
-            var item = SelectedItem;
-            if (item && item.CanBeDropped)
-            {
-                var newTooltip = new TooltipActionData("G", ActionType.Drop, item.ItemName);
-                _tooltipShower.Add(newTooltip);
-                _lastTooltipItem = item;
-            }
-            else
-            {
-                _lastTooltipItem = null;
-            }
+            _slots[SelectedItemIndex].ResetSelection();
+            SelectedItemIndex = index;
+            _slots[SelectedItemIndex].Select();
+
+            _signalBus.Fire(new ToolbarSlotSelectedSignal { SelectedItem = SelectedItem });
         }
+
+        /// <summary> Установить состояние взаимодействия. </summary>
+        /// <param name="state"> Состояние взаимодействия. </param>
+        public void SetInteractableState(bool state) => _isInteractable = state;
 
         #region Saving
 

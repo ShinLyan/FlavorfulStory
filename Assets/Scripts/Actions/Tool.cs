@@ -58,7 +58,7 @@ namespace FlavorfulStory.Actions
 
             player.RotateTowards(targetPosition);
             player.TriggerAnimation($"Use{ToolType}");
-            InputWrapper.BlockPlayerMovement();
+            InputWrapper.BlockPlayerInput();
 
             return true;
         }

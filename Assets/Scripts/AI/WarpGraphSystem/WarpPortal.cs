@@ -70,7 +70,7 @@ namespace FlavorfulStory.AI.WarpGraphSystem
 
         /// <summary> Корутин телепортации игрока с управлением фейдами и сменой локаций. </summary>
         /// <param name="playerController"> Контроллер игрока. </param>
-        private IEnumerator TeleportPlayer(PlayerController playerController)
+        private IEnumerator TeleportPlayer(PlayerController playerController) // TODO: Переписать на UniTask
         {
             InputWrapper.BlockAllInput();
             yield return _canvasGroupFader.Show().WaitForCompletion();

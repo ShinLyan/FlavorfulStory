@@ -4,8 +4,8 @@ using UnityEngine;
 
 namespace FlavorfulStory.InventorySystem
 {
-    /// <summary> ScriptableObject, представляющий предмет, который может быть помещен в инвентарь. </summary>
     // TODO: сделать абстрактным, когда все типы предметов будут реализованы
+    /// <summary> ScriptableObject, представляющий предмет, который может быть помещен в инвентарь. </summary>
     [CreateAssetMenu(menuName = "FlavorfulStory/Inventory/Item")]
     public class InventoryItem : ScriptableObject, ISerializationCallbackReceiver
     {
@@ -44,7 +44,21 @@ namespace FlavorfulStory.InventorySystem
         /// <summary> Можно ли выкинуть этот предмет из инвентаря? </summary>
         [field: Tooltip("Можно ли выбросить этот предмет из инвентаря?"), SerializeField]
         public bool CanBeDropped { get; private set; } = true;
-        
+
+        /// <summary> Можно ли продать предмет? </summary>
+        [field: Tooltip("Можно ли продать предмет?"), SerializeField]
+        public bool IsSellable { get; private set; } = true;
+
+        /// <summary> Стоимость продажи предмета в магазине. </summary>
+        /// <remarks> Учитывается только если <see cref="IsSellable"/> равен <c>true</c>.</remarks> 
+        [field: Tooltip("Стоимость продажи предмета в магазине."), SerializeField, Min(0f)]
+        public int SellPrice { get; private set; }
+
+        /// <summary> Стоимость покупки предмета у вендора в магазине. </summary>
+        /// <remarks> Учитывается только если <see cref="IsSellable"/> равен <c>true</c>.</remarks> 
+        [field: Tooltip("Стоимость покупки предмета у вендора в магазине."), SerializeField, Min(0f)]
+        public int BuyPrice { get; private set; }
+
         #endregion
 
         #region ISerializationCallbackReceiver

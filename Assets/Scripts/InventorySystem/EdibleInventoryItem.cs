@@ -12,15 +12,15 @@ namespace FlavorfulStory.InventorySystem
     {
         /// <summary> Кнопка мыши для использования предмета. </summary>
         [field: Tooltip("Кнопка использования предмета."), SerializeField]
-        public UseActionType UseActionType { get; set; }
+        public UseActionType UseActionType { get; private set; }
 
         /// <summary> Тип звуков поедания. </summary>
         [field: Tooltip("Тип звуков поедания."), SerializeField]
-        public SfxType SfxType { get; set; }
+        public SfxType SfxType { get; private set; }
 
         /// <summary> Съесть поедаемый предмет инвентаря. </summary>
         /// <param name="player"> Контроллер игрока. </param>
-        /// <param name="hitableLayers"></param>
+        /// <param name="hitableLayers"> Слои, которые можно бить. </param>
         public bool Use(PlayerController player, LayerMask hitableLayers)
         {
             Eat();
@@ -33,7 +33,7 @@ namespace FlavorfulStory.InventorySystem
         /// <summary> Съесть предмет и применить его эффект к игроку. </summary>
         public void Eat()
         {
-            SfxPlayer.Instance.PlayOneShot(SfxType);
+            SfxPlayer.Play(SfxType);
             Debug.Log("🍎 Ем вкусную еду. Восстановил HP и энергию.");
         }
     }
