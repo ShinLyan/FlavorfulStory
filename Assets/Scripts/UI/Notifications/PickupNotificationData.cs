@@ -3,7 +3,7 @@
 namespace FlavorfulStory.UI.Notifications
 {
     /// <summary> Данные для уведомления о подобранном предмете. </summary>
-    public class PickupNotificationData : INotificationData
+    public struct PickupNotificationData : INotificationData
     {
         /// <summary> Тип уведомления. </summary>
         public NotificationType Type => NotificationType.ItemPickup;

@@ -1,37 +1,38 @@
-using UnityEngine;
+using System;
 using Zenject;
 using FlavorfulStory.TimeManagement;
-using DateTime = FlavorfulStory.TimeManagement.DateTime;
 
 namespace FlavorfulStory.UI.Notifications
 {
     /// <summary> Отправляет уведомление при наступлении ночи. </summary>
-    public class SleepNotifier : MonoBehaviour
+    public class SleepNotifier : IInitializable, IDisposable
     {
         /// <summary> Сервис отображения уведомлений. </summary>
-        private INotificationService _notificationService;
+        private readonly INotificationService _notificationService;
+        
+        private readonly SignalBus _signalBus;
         
         /// <summary> Инжект зависимости сервиса уведомлений. </summary>
         /// <param name="notificationService"> Сервис уведомлений. </param>
-        [Inject]
-        private void Construct(INotificationService notificationService)
+        protected SleepNotifier(INotificationService notificationService, SignalBus signalBus)
         {
             _notificationService = notificationService;
+            _signalBus = signalBus;
         }
 
         /// <summary> Подписка на событие начала ночи. </summary>
-        private void OnEnable() => WorldTime.OnNightStarted += NightStartedHandler; 
-        
-        /// <summary> Отписка от события начала ночи. </summary>
-        private void OnDisable() => WorldTime.OnNightStarted -= NightStartedHandler;
+        public void Initialize() => _signalBus.Subscribe<NightStartedSignal>(OnNightStarted);
 
-        /// <summary> Обработчик события начала ночи. </summary>
-        /// <param name="dateTime"> Текущее внутриигровое время. </param>
-        private void NightStartedHandler(DateTime dateTime)
+        /// <summary> Отписка от события начала ночи. </summary>
+        public void Dispose() => _signalBus.Unsubscribe<NightStartedSignal>(OnNightStarted);
+
+        /// <summary> Обрабатывает сигнал наступления ночи и запускает показ уведомления. </summary>
+        /// <param name="signal"> Сигнал, содержащий информацию о времени начала ночи. </param>
+        private void OnNightStarted(NightStartedSignal signal)
         {
             _notificationService.Show(new SleepNotificationData()
             {
-                hour = (int) dateTime.Hour
+                Hour = (int) signal.Time.Hour
             });
         }
     }

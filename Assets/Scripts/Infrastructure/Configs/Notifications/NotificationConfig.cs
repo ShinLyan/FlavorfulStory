@@ -8,14 +8,23 @@ namespace FlavorfulStory.Infrastructure.Configs.Notifications
     public class NotificationConfig : ScriptableObject
     {
         /// <summary> Тип уведомления, которому соответствует данная конфигурация. </summary>
-        public NotificationType Type;
+        [field: SerializeField, Tooltip("Тип уведомления")]
+        public NotificationType Type { get; private set;}
+        
         /// <summary> Позиция на экране, в которой должно отображаться уведомление. </summary>
-        public NotificationPosition Position;
+        [field: SerializeField, Tooltip("Позиция на экране")]
+        public NotificationPosition Position { get; private set;}
+        
         /// <summary> Префаб UI-элемента уведомления. </summary>
-        public BaseNotificationView Prefab;
+        [field: SerializeField, Tooltip("Префаб уведомления")]
+        public BaseNotificationView Prefab { get; private set;}
+        
         /// <summary> Время показа уведомления на экране. </summary>
-        public float DisplayTime;
+        [field: SerializeField, Tooltip("Время отображения (в секундах)")]
+        public float DisplayTime { get; private set;}
+        
         /// <summary> Время появления и исчезновения уведомления. </summary>
-        public float FadeTime;
+        [field: SerializeField, Tooltip("Время появления и исчезновения (в секундах)")]
+        public float FadeTime { get; private set;}
     }
 }

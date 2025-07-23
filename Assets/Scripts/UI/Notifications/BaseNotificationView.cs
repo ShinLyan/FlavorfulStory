@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using DG.Tweening;
+using TMPro;
 
 namespace FlavorfulStory.UI.Notifications
 {
@@ -7,21 +8,24 @@ namespace FlavorfulStory.UI.Notifications
     [RequireComponent(typeof(RectTransform), typeof(CanvasGroup))]
     public abstract class BaseNotificationView : MonoBehaviour
     {
+        /// <summary> Контейнер с визуальной частью уведомления. </summary>        
+        [SerializeField] private RectTransform _contentRect;
+        
         /// <summary> Инициализирует уведомление на основе переданных данных. </summary>
         /// <param name="data"> Данные уведомления. </param>
         public abstract void Initialize(INotificationData data);
         /// <summary> Высота элемента уведомления. </summary>
-        public abstract float Height { get; }
+        public float Height => RectTransform.rect.height;
         /// <summary> Позиция, в которой отображается уведомление. </summary>
         public NotificationPosition Position { get; private set; }
         /// <summary> Начальная позиция по оси X. </summary>
         public float StartXPosition { get; private set; }
         
-        /// <summary> Контейнер с визуальной частью уведомления. </summary>        
-        [SerializeField] private RectTransform _contentRect;
+        /// <summary> Текстовое поле с сообщением. </summary>
+        [SerializeField] protected TMP_Text _label;        
         
         /// <summary> RectTransform текущего объекта. </summary>
-        protected RectTransform RectTransform { get; private set; }
+        private RectTransform RectTransform { get; set; }
         
         /// <summary> CanvasGroup, управляющий прозрачностью уведомления. </summary>
         private CanvasGroup _canvasGroup;

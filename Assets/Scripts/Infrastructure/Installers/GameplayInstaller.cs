@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using Unity.Cinemachine;
+using UnityEngine;
+using System.Collections.Generic;
+using Zenject;
 using FlavorfulStory.BuildingRepair.UI;
 using FlavorfulStory.DialogueSystem;
 using FlavorfulStory.DialogueSystem.UI;
@@ -22,11 +25,8 @@ using FlavorfulStory.UI;
 using FlavorfulStory.UI.Animation;
 using FlavorfulStory.UI.Notifications;
 using FlavorfulStory.Visuals.Lightning;
-using Unity.Cinemachine;
-using UnityEngine;
-using Zenject;
 
-namespace FlavorfulStory.Installers
+namespace FlavorfulStory.Infrastructure.Installers
 {
     /// <summary> Установщик зависимостей, необходимых для игрового процесса. </summary>
     public class GameplayInstaller : MonoInstaller
@@ -157,6 +157,8 @@ namespace FlavorfulStory.Installers
             Container.Bind<CinemachineCamera>().FromInstance(_teleportVirtualCamera).AsSingle();
 
             Container.Bind<SleepTrigger>().FromComponentInHierarchy().AsSingle();
+            Container.BindInterfacesTo<SleepNotifier>().AsSingle();
+            Container.DeclareSignal<NightStartedSignal>();
 
             Container.BindInterfacesAndSelfTo<DayEndManager>().AsSingle();
         }

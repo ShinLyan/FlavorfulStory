@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Zenject;
 using Cysharp.Threading.Tasks;
 using FlavorfulStory.Infrastructure.Configs.Notifications;
+using FlavorfulStory.InventorySystem;
 
 namespace FlavorfulStory.UI.Notifications
 {
@@ -11,29 +12,40 @@ namespace FlavorfulStory.UI.Notifications
     /// <remarks> Показ уведомления зависит от его типа и позиции. </remarks>
     public class NotificationService : MonoBehaviour, INotificationService
     {
-        /// <summary> Глобальные настройки системы уведомлений. </summary>
-        private NotificationSystemSettings _settings;
-        
         /// <summary> Контейнер уведомлений в верхнем левом углу. </summary>
         [SerializeField] private Transform _topLeft;
+        
         /// <summary> Контейнер уведомлений в верхнем правом углу. </summary>
         [SerializeField] private Transform _topRight;
+        
         /// <summary> Контейнер уведомлений в нижнем левом углу. </summary>
         [SerializeField] private Transform _bottomLeft;
+        
         /// <summary> Контейнер уведомлений в нижнем правом углу. </summary>
         [SerializeField] private Transform _bottomRight;
         
+                
+        /// <summary> Глобальные настройки системы уведомлений. </summary>
+        private NotificationSystemSettings _settings;
+        
+        /// <summary> Инвентарь игрока. </summary>
+        private Inventory _playerInventory;
+        
+        
         /// <summary> Активные уведомления, сгруппированные по позиции. </summary>
         private readonly Dictionary<NotificationPosition, List<BaseNotificationView>> _activeViewsByPosition = new();
+        
         /// <summary> Кеш конфигураций уведомлений по типу. </summary>
         private readonly Dictionary<NotificationType, NotificationConfig> _configCache = new();
 
-        /// <summary> Инжект глобальных настроек уведомлений. </summary>
+        /// <summary> Инжект глобальных настроек и инвентаря игрока. </summary>
         /// <param name="settings"> Настройки системы уведомлений. </param>
+        /// <param name="playerInventory"> Инвентарь игрока. </param>
         [Inject]
-        private void Construct(NotificationSystemSettings settings)
+        private void Construct(NotificationSystemSettings settings, Inventory playerInventory)
         {
             _settings = settings;
+            _playerInventory = playerInventory;
         }
         
         /// <summary> Кеширует конфигурации уведомлений при инициализации. </summary>
@@ -42,6 +54,12 @@ namespace FlavorfulStory.UI.Notifications
             foreach (var config in _settings.NotificationConfigs)
                 _configCache[config.Type] = config;
         }
+
+        /// <summary> Подписка на событие подбора предмета. </summary>
+        private void OnEnable() => _playerInventory.ItemCollected += ItemCollectedHandler;
+
+        /// <summary> Отписка от события подбора предмета. </summary>
+        private void OnDisable() => _playerInventory.ItemCollected -= ItemCollectedHandler;
 
         /// <summary> Отображает уведомление по переданным данным. </summary>
         /// <param name="data"> Данные уведомления. </param>
@@ -120,5 +138,20 @@ namespace FlavorfulStory.UI.Notifications
             NotificationPosition.BottomRight => _bottomRight,
             _ => throw new Exception("Invalid position")
         };
+
+        /// <summary> Обработчик события подбора предмета игроком. </summary>
+        /// <param name="item"> Подобранный предмет. </param>
+        private void ItemCollectedHandler(InventoryItem item)
+        {
+            Show
+            (
+                new PickupNotificationData()
+                {
+                    Amount = _playerInventory.GetItemNumber(item),
+                    Icon = item.Icon,
+                    ItemName = item.ItemName
+                }     
+            );
+        }
     }
 }

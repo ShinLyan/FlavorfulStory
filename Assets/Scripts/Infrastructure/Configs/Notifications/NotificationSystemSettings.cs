@@ -10,24 +10,32 @@ namespace FlavorfulStory.Infrastructure.Configs.Notifications
         public class NotificationSystemSettings : ScriptableObject
         {
             /// <summary> Время перемещения уведомлений при перестроении. </summary>
-            public float MoveTime;
+            [field: SerializeField, Tooltip("Время перемещения уведомлений")]
+            public float MoveTime { get; private set; }
             /// <summary> Расстояние между уведомлениями в стеке. </summary>
-            public float StackSpacing;
+            [field: SerializeField, Tooltip("Расстояние между уведомлениями")]
+            public float StackSpacing { get; private set; }
             /// <summary> Стандартная функция easing для анимаций. </summary>
-            public Ease DefaultEasing;
+            [field: SerializeField, Tooltip("Стандартная функция easing")]
+            public Ease DefaultEasing { get; private set; }
 
             /// <summary> Отступ сверху экрана для уведомлений. </summary>
             [Header("Screen Padding")]
-            public float PaddingTop;
+            [field: SerializeField, Tooltip("Отступ сверху экрана")]
+            public float PaddingTop { get; private set; }
             /// <summary> Отступ снизу экрана для уведомлений. </summary>
-            public float PaddingBottom;
+            [field: SerializeField, Tooltip("Отступ снизу экрана")]
+            public float PaddingBottom { get; private set; }
             /// <summary> Отступ слева экрана для уведомлений. </summary>
-            public float PaddingLeft;
+            [field: SerializeField, Tooltip("Отступ слева экрана")]
+            public float PaddingLeft { get; private set; }
             /// <summary> Отступ справа экрана для уведомлений. </summary>
-            public float PaddingRight;
+            [field: SerializeField, Tooltip("Отступ справа экрана")]
+            public float PaddingRight { get; private set; }
 
             /// <summary> Список конфигураций всех типов уведомлений. </summary>
-            public List<NotificationConfig> NotificationConfigs;
+            [field: SerializeField, Tooltip("Конфигурации всех типов уведомлений")]
+            public List<NotificationConfig> NotificationConfigs {get; private set;}
 
             /// <summary> Возвращает горизонтальный отступ в зависимости от позиции. </summary>
             /// <param name="position"> Позиция уведомления. </param>
@@ -42,9 +50,9 @@ namespace FlavorfulStory.Infrastructure.Configs.Notifications
             };
 
             /// <summary> Возвращает вертикальный отступ в зависимости от позиции. </summary>
-            /// <param name="pos"> Позиция уведомления. </param>
+            /// <param name="position"> Позиция уведомления. </param>
             /// <returns> Вертикальный отступ. </returns>
-            public float GetVerticalPadding(NotificationPosition pos) => pos switch
+            public float GetVerticalPadding(NotificationPosition position) => position switch
             {
                 NotificationPosition.TopLeft     => PaddingTop,
                 NotificationPosition.TopRight    => PaddingTop,
