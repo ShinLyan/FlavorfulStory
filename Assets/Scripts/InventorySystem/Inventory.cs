@@ -2,6 +2,7 @@
 using System.Linq;
 using FlavorfulStory.InventorySystem.PickupSystem;
 using FlavorfulStory.Saving;
+using FlavorfulStory.UI.Notifications;
 using UnityEngine;
 using Zenject;
 
@@ -17,19 +18,17 @@ namespace FlavorfulStory.InventorySystem
         /// <summary> Предметы инвентаря. </summary>
         private InventorySlot[] _slots;
 
-        /// <summary> Менеджер уведомлений о подборе предмета. </summary>
-        private PickupNotificationManager _notificationManager;
+        /// <summary> Сервис уведомлений о подборе предмета. </summary>
         private INotificationService  _notificationService;
 
         /// <summary> Событие, вызываемое при изменении инвентаря (добавление, удаление предметов). </summary>
         public event Action InventoryUpdated;
 
         /// <summary> Внедрение зависимостей Zenject. </summary>
-        /// <param name="notificationManager"> Менеджер уведомлений о подборе предмета. </param>
+        /// <param name="notificationService"> Сервис уведомлений о подборе предмета. </param>
         [Inject]
-        private void Construct(PickupNotificationManager notificationManager, INotificationService notificationService)
+        private void Construct(INotificationService notificationService)
         {
-            _notificationManager = notificationManager;
             _notificationService = notificationService;
         }
 
@@ -151,14 +150,12 @@ namespace FlavorfulStory.InventorySystem
                 _slots[index].Number += addAmount;
                 remainingNumber -= addAmount;
             }
-
-            //_notificationManager.ShowNotification(item.Icon, number, item.ItemName, item.ItemName);
+            
             _notificationService.Show(new PickupNotificationData
             {
-                ItemID = "woodID",
-                ItemName = "Wood",
-                Amount = 3,
-                Icon = ItemDatabase.GetItemFromID("25cddd17-003d-4380-a40f-f4318ccb136f").Icon
+                ItemName = item.ItemName,
+                Amount = number,
+                Icon = item.Icon
             });
 
             InventoryUpdated?.Invoke();

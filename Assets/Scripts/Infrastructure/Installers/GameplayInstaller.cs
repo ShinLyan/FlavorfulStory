@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using UnityEngine;
+using Unity.Cinemachine;
+using Zenject;
+using System.Collections.Generic;
 using FlavorfulStory.BuildingRepair;
 using FlavorfulStory.DialogueSystem;
 using FlavorfulStory.DialogueSystem.UI;
@@ -15,12 +18,10 @@ using FlavorfulStory.TimeManagement;
 using FlavorfulStory.TooltipSystem;
 using FlavorfulStory.UI;
 using FlavorfulStory.UI.Animation;
+using FlavorfulStory.UI.Notifications;
 using FlavorfulStory.Visuals.Lightning;
-using Unity.Cinemachine;
-using UnityEngine;
-using Zenject;
 
-namespace FlavorfulStory.Installers
+namespace FlavorfulStory.Infrastructure.Installers
 {
     /// <summary> Установщик зависимостей, необходимых для игрового процесса. </summary>
     public class GameplayInstaller : MonoInstaller
@@ -39,7 +40,7 @@ namespace FlavorfulStory.Installers
         /// при переходе между локациями. </remarks>
         [SerializeField] private CinemachineCamera _teleportVirtualCamera;
 
-        /// <param name="hudFader"> Затемнитель интерфейса HUD. </param>
+        /// <summary> Затемнитель интерфейса HUD. </summary>
         [SerializeField] private CanvasGroupFader _hudFader;
 
         /// <summary> Выполняет установку всех зависимостей, необходимых для сцены. </summary>
@@ -54,13 +55,6 @@ namespace FlavorfulStory.Installers
         private void BindGameplay()
         {
             Container.Bind<Inventory>().FromInstance(_playerInventory).AsSingle();
-            Container.Bind<PickupNotificationManager>().FromComponentInHierarchy().AsSingle();
-            //TODO: Ревизия нижнего
-            Container
-                .Bind<INotificationService>()
-                .To<NotificationService>()
-                .FromComponentInHierarchy() // или FromNewComponentOnNewGameObject() и т.п.
-                .AsSingle();
             Container.Bind<Equipment>().FromComponentInHierarchy().AsSingle();
             Container.Bind<PlayerController>().FromComponentInHierarchy().AsSingle();
 
@@ -83,6 +77,7 @@ namespace FlavorfulStory.Installers
                 .WithArguments(_inventorySlotViewPrefab);
             Container.Bind<IGameFactory<ResourceRequirementView>>().To<ResourceRequirementViewFactory>().AsSingle()
                 .WithArguments(_requirementViewPrefab);
+            Container.Bind<INotificationService>().To<NotificationService>().FromComponentInHierarchy().AsSingle();
             Container.Bind<ConfirmationWindowView>().FromComponentInHierarchy().AsSingle();
             Container.Bind<SummaryView>().FromComponentInHierarchy().AsSingle();
             Container.Bind<BuildingRepairView>().FromComponentInHierarchy().AsSingle();
@@ -101,8 +96,8 @@ namespace FlavorfulStory.Installers
             Container.Bind<GlobalLightSystem>().FromComponentInHierarchy().AsSingle();
 
             Container.Bind<Location>().FromComponentsInHierarchy().AsCached();
-            Container.Bind<List<Location>>().FromMethod(ctx =>
-                new List<Location>(ctx.Container.ResolveAll<Location>())).AsSingle();
+            Container.Bind<List<Location>>().FromMethod(context =>
+                new List<Location>(context.Container.ResolveAll<Location>())).AsSingle();
             Container.BindInterfacesAndSelfTo<LocationManager>().AsSingle();
 
             Container.Bind<CinemachineCamera>().FromInstance(_teleportVirtualCamera).AsSingle();
