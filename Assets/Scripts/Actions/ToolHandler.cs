@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using FlavorfulStory.InputSystem;
+using FlavorfulStory.InventorySystem;
 using UnityEngine;
 
 namespace FlavorfulStory.Actions
