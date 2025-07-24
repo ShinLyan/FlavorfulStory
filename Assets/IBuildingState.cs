@@ -4,8 +4,12 @@ namespace FlavorfulStory
 {
     public interface IBuildingState
     {
+        void BeginState();
+
         void EndState();
+
         void OnAction(Vector3Int gridPosition);
+
         void UpdateState(Vector3Int gridPosition);
     }
 }

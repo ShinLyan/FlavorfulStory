@@ -1,4 +1,7 @@
+using System.Collections.Generic;
+using System.Linq;
 using FlavorfulStory.Audio;
+using FlavorfulStory.PlacementSystem;
 using UnityEngine;
 
 namespace FlavorfulStory
@@ -8,58 +11,61 @@ namespace FlavorfulStory
         private int _gameObjectIndex = -1;
         private readonly Grid _grid;
         private readonly PreviewSystem _previewSystem;
-        private readonly GridData _floorData;
-        private readonly GridData _furnitureData;
+        private readonly Dictionary<PlacementLayer, GridData> _gridLayers;
         private readonly ObjectPlacer _objectPlacer;
 
-        public RemovingState(Grid grid, PreviewSystem previewSystem, GridData floorData, GridData furnitureData,
+        private static readonly PlacementLayer[] RemovalPriority =
+        {
+            PlacementLayer.Decoration, // мелкий декор поверх мебели
+            PlacementLayer.Furniture, // на полу, коллизия
+            PlacementLayer.Wall, // может быть за мебелью
+            PlacementLayer.Floor // базовый слой
+        };
+
+        public RemovingState(Grid grid, PreviewSystem previewSystem, Dictionary<PlacementLayer, GridData> gridLayers,
             ObjectPlacer objectPlacer)
         {
             _grid = grid;
             _previewSystem = previewSystem;
-            _floorData = floorData;
-            _furnitureData = furnitureData;
+            _gridLayers = gridLayers;
             _objectPlacer = objectPlacer;
-
-            _previewSystem.StartShowingRemovePreview();
         }
 
-        public void EndState() { _previewSystem.StopShowingPreview(); }
+        public void BeginState() => _previewSystem.StartShowingRemovePreview();
+
+        public void EndState() => _previewSystem.StopShowingPreview();
 
         public void OnAction(Vector3Int gridPosition)
         {
-            GridData selectedData = null;
-            if (!_furnitureData.CanPlaceObjectAt(gridPosition, Vector2Int.one))
-                selectedData = _furnitureData;
-            else if (!_floorData.CanPlaceObjectAt(gridPosition, Vector2Int.one)) selectedData = _floorData;
-
-            if (selectedData != null)
+            foreach (var layer in RemovalPriority)
             {
+                var gridData = _gridLayers[layer];
+
+                if (gridData.CanPlaceObjectAt(gridPosition, Vector2Int.one)) continue;
+
                 SfxPlayer.Play(SfxType.RemoveObject);
 
-                _gameObjectIndex = selectedData.GetRepresentationIndex(gridPosition);
+                _gameObjectIndex = gridData.GetRepresentationIndex(gridPosition);
                 if (_gameObjectIndex == -1) return;
 
-                selectedData.RemoveObjectAt(gridPosition);
+                gridData.RemoveObjectAt(gridPosition);
                 _objectPlacer.RemoveObjectAt(_gameObjectIndex);
-            }
-            else
-            {
-                SfxPlayer.Play(SfxType.PlacementError);
+
+                _previewSystem.UpdatePosition(_grid.CellToWorld(gridPosition), IsSelectionValid(gridPosition));
+                return;
             }
 
-            var cellPosition = _grid.CellToWorld(gridPosition);
-            _previewSystem.UpdatePosition(cellPosition, IsSelectionValid(gridPosition));
+            SfxPlayer.Play(SfxType.PlacementError);
+            _previewSystem.UpdatePosition(_grid.CellToWorld(gridPosition), false);
         }
-
-        private bool IsSelectionValid(Vector3Int gridPosition) =>
-            !(_furnitureData.CanPlaceObjectAt(gridPosition, Vector2Int.one) &&
-              _floorData.CanPlaceObjectAt(gridPosition, Vector2Int.one));
 
         public void UpdateState(Vector3Int gridPosition)
         {
             bool validity = IsSelectionValid(gridPosition);
             _previewSystem.UpdatePosition(_grid.CellToWorld(gridPosition), validity);
         }
+
+        private bool IsSelectionValid(Vector3Int gridPosition) =>
+            RemovalPriority.Any(layer => !_gridLayers[layer].CanPlaceObjectAt(gridPosition, Vector2Int.one));
     }
 }
