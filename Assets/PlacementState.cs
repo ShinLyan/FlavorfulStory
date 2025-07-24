@@ -1,3 +1,4 @@
+using FlavorfulStory.Audio;
 using UnityEngine;
 
 namespace FlavorfulStory
@@ -36,10 +37,12 @@ namespace FlavorfulStory
         {
             bool placementValidity = CheckPlacementValidity(gridPosition, _selectedObjectIndex);
             if (!placementValidity)
-                //   SfxPlayer.Play(); SfxType.WrongPlacement
+            {
+                SfxPlayer.Play(SfxType.PlacementError);
                 return;
+            }
 
-            //   SfxPlayer.Play(); SfxType.CorrectPlacement
+            SfxPlayer.Play(SfxType.PlacementSuccess);
 
             int index = _objectPlacer.PlaceObject(_objectsDatabase.ObjectsData[_selectedObjectIndex].Prefab,
                 _grid.CellToWorld(gridPosition));

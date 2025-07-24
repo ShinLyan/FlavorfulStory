@@ -1,3 +1,4 @@
+using FlavorfulStory.Audio;
 using UnityEngine;
 
 namespace FlavorfulStory
@@ -32,19 +33,19 @@ namespace FlavorfulStory
                 selectedData = _furnitureData;
             else if (!_floorData.CanPlaceObjectAt(gridPosition, Vector2Int.one)) selectedData = _floorData;
 
-            if (selectedData == null)
+            if (selectedData != null)
             {
-                //   SfxPlayer.Play(); SfxType.WrongPlacement
-            }
-            else
-            {
-                //   SfxPlayer.Play(); SfxType.Remove
+                SfxPlayer.Play(SfxType.RemoveObject);
 
                 _gameObjectIndex = selectedData.GetRepresentationIndex(gridPosition);
                 if (_gameObjectIndex == -1) return;
 
                 selectedData.RemoveObjectAt(gridPosition);
                 _objectPlacer.RemoveObjectAt(_gameObjectIndex);
+            }
+            else
+            {
+                SfxPlayer.Play(SfxType.PlacementError);
             }
 
             var cellPosition = _grid.CellToWorld(gridPosition);
