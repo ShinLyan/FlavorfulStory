@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -7,17 +6,21 @@ namespace FlavorfulStory
     [CreateAssetMenu(menuName = "FlavorfulStory/Objects Database")]
     public class ObjectsDatabase : ScriptableObject
     {
-        [SerializeField] private List<ObjectData> _objectsData;
+        [SerializeField] private List<PlaceableObject> _placeables;
 
-        public List<ObjectData> ObjectsData => _objectsData;
-    }
+        public IEnumerable<PlaceableObject> Placeables => _placeables;
 
-    [Serializable]
-    public class ObjectData
-    {
-        [field: SerializeField] public string Name { get; private set; }
-        [field: SerializeField] public int Id { get; private set; }
-        [field: SerializeField] public Vector2Int Size { get; private set; } = Vector2Int.one;
-        [field: SerializeField] public GameObject Prefab { get; private set; }
+        /// <summary> Получить объект по индексу. </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        public PlaceableObject GetByIndex(int index) => _placeables[index];
+
+        /// <summary> Количество объектов. </summary>
+        public int Count => _placeables.Count;
+
+        /// <summary> Найти индекс объекта. </summary>
+        /// <param name="placeable"></param>
+        /// <returns></returns>
+        public int IndexOf(PlaceableObject placeable) => _placeables.IndexOf(placeable);
     }
 }
