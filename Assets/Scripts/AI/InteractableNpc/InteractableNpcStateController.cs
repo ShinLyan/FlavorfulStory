@@ -65,15 +65,13 @@ namespace FlavorfulStory.AI.InteractableNpc
         /// <remarks> Создает состояния взаимодействия, движения, рутины и ожидания, настраивает связи между ними. </remarks>
         protected override void InitializeStates()
         {
-            var states = new CharacterState[]
-            {
-                new InteractionState(), new MovementState(_npcMovementController),
-                new RoutineState(_animationController), new WaitingState(_playerController, _npcTransform)
-            };
+            _nameToCharacterStates.Add(StateName.Interaction, new InteractionState());
+            _nameToCharacterStates.Add(StateName.Movement, new MovementState(_npcMovementController));
+            _nameToCharacterStates.Add(StateName.Routine, new RoutineState(_animationController));
+            _nameToCharacterStates.Add(StateName.Waiting, new WaitingState(_playerController, _npcTransform));
 
-            foreach (var state in states)
+            foreach (var state in _nameToCharacterStates.Values)
             {
-                _nameToCharacterStates.Add(state.GetType().ToString(), state);
                 state.OnStateChangeRequested += SetState;
 
                 if (state is ICurrentSchedulePointDependable dependable)
@@ -93,7 +91,7 @@ namespace FlavorfulStory.AI.InteractableNpc
         protected override void ResetStates()
         {
             foreach (var state in _nameToCharacterStates.Values) state.Reset();
-            SetState(typeof(RoutineState).ToString());
+            SetState(StateName.Routine);
         }
 
         /// <summary> Обрабатывает изменение точки расписания и переключает состояние на движение если необходимо. </summary>
@@ -105,7 +103,7 @@ namespace FlavorfulStory.AI.InteractableNpc
             if (_currentState is MovementState)
                 _currentState.Enter();
             else
-                SetState(typeof(MovementState).ToString());
+                SetState(StateName.Movement);
 
             _animationController.TriggerAnimation(AnimationType.Locomotion);
         }
@@ -127,7 +125,7 @@ namespace FlavorfulStory.AI.InteractableNpc
         /// <param name="other"> Коллайдер, вошедший в триггер. </param>
         public void OnTriggerEntered(Collider other)
         {
-            SetState(typeof(WaitingState).ToString());
+            SetState(StateName.Waiting);
             _animationController.TriggerAnimation(AnimationType.Idle);
         }
 
@@ -135,7 +133,7 @@ namespace FlavorfulStory.AI.InteractableNpc
         /// <param name="other"> Коллайдер, вышедший из триггера. </param>
         public void OnTriggerExited(Collider other)
         {
-            SetState(typeof(MovementState).ToString());
+            SetState(StateName.Movement);
             _animationController.TriggerAnimation(AnimationType.Locomotion);
         }
     }

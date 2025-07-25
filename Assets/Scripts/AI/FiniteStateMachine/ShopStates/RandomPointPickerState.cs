@@ -31,6 +31,9 @@ namespace FlavorfulStory.AI.FiniteStateMachine.ShopStates
             base.Enter();
             var pointVector = _shopLocation.GetRandomPointOnNavMesh();
 
+            Context?.Set(ContextType.AnimationType, AnimationType.Thinking);
+            Context?.Set(ContextType.AnimationTime, 3f);
+
             var point = new SchedulePoint(); //TODO: переделать после удаление WarpGraph
             point.Position = pointVector;
             point.LocationName = LocationName.NewShop;

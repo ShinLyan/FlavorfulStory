@@ -52,7 +52,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         private void OnCompleteMovement()
         {
             _isComplete = true;
-            RequestStateChange(typeof(RoutineState));
+            RequestStateChange(StateName.Routine);
         }
 
         /// <summary> Останавливает движение NPC при паузе игрового времени, если персонаж находится в состоянии движения. </summary>

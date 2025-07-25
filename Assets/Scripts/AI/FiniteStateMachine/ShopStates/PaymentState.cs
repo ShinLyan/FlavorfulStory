@@ -15,6 +15,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine.ShopStates
         /// <summary> Локация магазина для взаимодействия с кассой. </summary>
         private readonly ShopLocation _shopLocation;
 
+        /// <summary> Сервис для обработки транзакций и торговых операций. </summary>
         private readonly TransactionService _transactionService;
 
         /// <summary> Инициализирует новый экземпляр состояния оплаты. </summary>
@@ -31,6 +32,8 @@ namespace FlavorfulStory.AI.FiniteStateMachine.ShopStates
         /// <summary> Выполняет вход в состояние, освобождает точку у кассы и обрабатывает оплату. </summary>
         public override void Enter()
         {
+            base.Enter();
+
             if (Context != null && Context.TryGet<Transform>(ContextType.CashDeskPoint, out var point))
                 _shopLocation.CashDesk.ReleasePoint(point);
 

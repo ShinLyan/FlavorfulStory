@@ -68,10 +68,16 @@ namespace FlavorfulStory.AI.NonInteractableNpc
             point.Position = destination;
             point.LocationName = locationName;
 
-            ((NonInteractableNpcMovementController)_movementController).SetPoint(point);
-            ((NonInteractableNpcStateController)_stateController).ForceSetState(typeof(MovementState).ToString());
-            ((NonInteractableNpcMovementController)_movementController).OnDestinationReached += () =>
-                (_stateController as NonInteractableNpcStateController)?.StartRandomSequence();
+            var movementController = (NonInteractableNpcMovementController)_movementController;
+            var stateController = (NonInteractableNpcStateController)_stateController;
+
+            movementController.SetPoint(point);
+            stateController.ForceSetState(StateName.Movement);
+            movementController.OnDestinationReached += () =>
+            {
+                stateController.ForceSetState(StateName.Idle);
+                stateController.StartRandomSequence();
+            };
         }
 
         /// <summary> Устанавливает точку исчезновения для неинтерактивного NPC. </summary>

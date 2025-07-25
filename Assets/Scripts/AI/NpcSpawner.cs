@@ -23,17 +23,17 @@ namespace FlavorfulStory.AI
         [SerializeField, SteppedRange(5f, 120f, 5f)]
         private float _spawnInterval = 30f;
 
+        /// <summary> Максимальное количество одновременно активных NPC. </summary>
+        [SerializeField, Range(0, 20)] private int _maxTotalCharacters = 10;
+
+        /// <summary> Трансформ, к которому будут привязаны созданные NPC. </summary>
+        [SerializeField] private Transform _parentTransform;
+
         /// <summary> Время одного тика в секундах. </summary>
         private const int TickTime = 5;
 
         /// <summary> Интервал спавна, переведенный в тики. </summary>
         private int SpawnIntervalInTicks => (int)_spawnInterval / TickTime;
-
-        /// <summary> Максимальное количество одновременно активных NPC. </summary>
-        [SerializeField] private int _maxTotalCharacters = 10;
-
-        /// <summary> Трансформ, к которому будут привязаны созданные NPC. </summary>
-        [SerializeField] private Transform _parentTransform;
 
         /// <summary> Список активных NPC на сцене. </summary>
         private readonly List<NonInteractableNpc.NonInteractableNpc> _activeCharacters = new();
@@ -104,10 +104,10 @@ namespace FlavorfulStory.AI
         /// <returns> Новый экземпляр NPC. </returns>
         private NonInteractableNpc.NonInteractableNpc CreateNpc()
         {
-            NpcSpawnPoint npcSpawnPoint = _spawnPoints[Random.Range(0, _spawnPoints.Length)];
+            var npcSpawnPoint = _spawnPoints[Random.Range(0, _spawnPoints.Length)];
             var pos = npcSpawnPoint.GetRandomPosition();
 
-            NonInteractableNpc.NonInteractableNpc prefab = _npcPrefabs[Random.Range(0, _npcPrefabs.Length)];
+            var prefab = _npcPrefabs[Random.Range(0, _npcPrefabs.Length)];
             var npc = _diContainer.InstantiatePrefabForComponent<NonInteractableNpc.NonInteractableNpc>(
                 prefab, pos, Quaternion.identity, _parentTransform
             );

@@ -12,7 +12,7 @@ namespace FlavorfulStory.AI.BaseNpc
         protected CharacterState _currentState;
 
         /// <summary> Словарь для быстрого доступа к состояниям по их типу. </summary>
-        protected readonly Dictionary<string, CharacterState> _nameToCharacterStates;
+        protected readonly Dictionary<StateName, CharacterState> _nameToCharacterStates;
 
         /// <summary> Контроллер анимации NPC для управления анимационными состояниями. </summary>
         protected readonly NpcAnimationController _animationController;
@@ -21,7 +21,7 @@ namespace FlavorfulStory.AI.BaseNpc
         /// <param name="npcAnimationController"> Контроллер анимации NPC. </param>
         protected StateController(NpcAnimationController npcAnimationController)
         {
-            _nameToCharacterStates = new Dictionary<string, CharacterState>();
+            _nameToCharacterStates = new Dictionary<StateName, CharacterState>();
             _animationController = npcAnimationController;
         }
 
@@ -54,10 +54,10 @@ namespace FlavorfulStory.AI.BaseNpc
         protected abstract void ResetStates();
 
         /// <summary> Устанавливает новое состояние персонажа по типу. </summary>
-        /// <param name="type"> Тип состояния для установки. </param>
-        protected void SetState(string type)
+        /// <param name="stateName"> Тип состояния для установки. </param>
+        protected void SetState(StateName stateName)
         {
-            if (!_nameToCharacterStates.TryGetValue(type, out var next) || _currentState == next) return;
+            if (!_nameToCharacterStates.TryGetValue(stateName, out var next) || _currentState == next) return;
 
             _currentState?.Exit();
             _currentState = next;

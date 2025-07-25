@@ -13,8 +13,10 @@ namespace FlavorfulStory.AI.FiniteStateMachine.ShopStates
         /// <summary> Флаг, указывающий завершена ли анимация. </summary>
         private bool _isAnimationComplete;
 
+        /// <summary> Флаг, указывающий находится ли игра в режиме паузы. </summary>
         private bool _isPaused;
 
+        /// <summary> Контроллер анимаций NPC, используемый для управления анимациями. </summary>
         private readonly NpcAnimationController _npcAnimationController;
 
         public AnimationState(NpcAnimationController npcAnimationController)
@@ -37,8 +39,6 @@ namespace FlavorfulStory.AI.FiniteStateMachine.ShopStates
                 _npcAnimationController.TriggerAnimation(animationType);
 
             if (Context.TryGet(ContextType.AnimationTime, out float animationTime)) _timer = animationTime;
-
-            Debug.Log(animationType + " " + _timer);
         }
 
         /// <summary> Обновляет состояние анимации каждый кадр, уменьшая таймер. </summary>

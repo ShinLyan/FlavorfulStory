@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using FlavorfulStory.AI.BaseNpc;
 
 namespace FlavorfulStory.AI.FiniteStateMachine
 {
@@ -9,9 +8,6 @@ namespace FlavorfulStory.AI.FiniteStateMachine
     {
         /// <summary> Текущее выполняемое состояние в последовательности. </summary>
         private CharacterState _currentState;
-
-        /// <summary> Контроллер состояний для управления переходами. </summary>
-        private readonly StateController _stateController;
 
         /// <summary> Индекс текущего состояния в последовательности. </summary>
         private int _currentStateIndex;
@@ -25,9 +21,8 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         /// <summary> Инициализирует новый экземпляр состояния последовательности. </summary>
         /// <param name="stateController"> Контроллер состояний для управления переходами. </param>
         /// <param name="states"> Коллекция состояний для выполнения в последовательности. </param>
-        public SequenceState(StateController stateController, IEnumerable<CharacterState> states)
+        public SequenceState(IEnumerable<CharacterState> states)
         {
-            _stateController = stateController;
             _states = new List<CharacterState>(states);
             _currentStateIndex = 0;
         }
