@@ -41,8 +41,8 @@ namespace FlavorfulStory.AI.FiniteStateMachine.ShopStates
         {
             base.Enter();
 
-            Debug.Log(_itemHandler);
-            if (Context != null && Context.TryGet<Shelf>("SelectedShelf", out var shelf)) shelf.IsOccupied = false;
+            if (Context != null && Context.TryGet<ShopObject>(ContextType.SelectedObject, out var shelf))
+                shelf.IsOccupied = false;
             // var item = shelf.Items[Random.Range(0, shelf.Items.Count)]; //TODO
 
             //TODO: тестовый предмет, переделать на предмет с полки
@@ -52,8 +52,10 @@ namespace FlavorfulStory.AI.FiniteStateMachine.ShopStates
             _itemHandler.EquipItem(itemStack);
 
             var accessiblePoint = _shopLocation.CashDesk.GetAccessiblePoint();
-            Context?.Set("CashDeskPoint", accessiblePoint);
-            Context?.Set("PurchaseItem", itemStack);
+            Context?.Set(ContextType.CashDeskPoint, accessiblePoint);
+            Context?.Set(ContextType.PurchaseItem, itemStack);
+            Context?.Set(ContextType.AnimationType, _shopLocation.CashDesk.InteractableObjectAnimation);
+            Context?.Set(ContextType.AnimationTime, 3f);
 
 
             var point = new SchedulePoint(); //TODO: rework

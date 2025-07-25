@@ -123,7 +123,7 @@ namespace FlavorfulStory.AI.NonInteractableNpc
         private void CreateStates(ShopLocation shopLocation)
         {
             _movementState = new MovementState(_npcMovementController);
-            _animationState = new AnimationState();
+            _animationState = new AnimationState(_animationController);
             _furniturePickerState = new FurniturePickerState(_npcMovementController, shopLocation);
             _itemPickerState =
                 new ItemPickerState(_npcMovementController, shopLocation, _itemHandler);

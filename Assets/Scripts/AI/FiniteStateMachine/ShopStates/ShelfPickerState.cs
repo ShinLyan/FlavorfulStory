@@ -32,7 +32,9 @@ namespace FlavorfulStory.AI.FiniteStateMachine.ShopStates
             if (!availableShelf) return;
 
             availableShelf.IsOccupied = true;
-            Context?.Set("SelectedShelf", availableShelf);
+            Context?.Set<ShopObject>(ContextType.SelectedObject, availableShelf);
+            Context?.Set(ContextType.AnimationType, availableShelf.InteractableObjectAnimation);
+            Context?.Set(ContextType.AnimationTime, 3f);
 
             var freePoint = availableShelf.GetAccessiblePoint();
 

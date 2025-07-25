@@ -9,8 +9,7 @@ namespace FlavorfulStory.Shop
         /// <summary> Массив доступных позиций для взаимодействия с объектом. </summary>
         [SerializeField] protected Transform[] _accessiblePositions;
 
-        //TODO: для каждого объекта сделать анимацию взаимодейтсвия с ним
-        // [SerializeField] private InteractableObjectAnimationType _interactableObjectAnimationType;
+        [field: SerializeField] public AnimationType InteractableObjectAnimation { get; private set; }
 
         /// <summary> Указывает, занят ли объект в данный момент. </summary>
         public bool IsOccupied { get; set; }
@@ -40,7 +39,7 @@ namespace FlavorfulStory.Shop
                         Gizmos.DrawLine(transform.position, point.position);
             }
 
-            GUIStyle style = new GUIStyle();
+            var style = new GUIStyle();
             style.normal.textColor = IsOccupied ? occupiedColor : freeColor;
             Handles.Label(transform.position + Vector3.up,
                 IsOccupied ? "Occupied" : "Free",

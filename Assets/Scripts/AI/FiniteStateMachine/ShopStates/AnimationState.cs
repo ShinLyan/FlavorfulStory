@@ -1,3 +1,5 @@
+using FlavorfulStory.AI.BaseNpc;
+using FlavorfulStory.TimeManagement;
 using UnityEngine;
 
 namespace FlavorfulStory.AI.FiniteStateMachine.ShopStates
@@ -11,17 +13,39 @@ namespace FlavorfulStory.AI.FiniteStateMachine.ShopStates
         /// <summary> Флаг, указывающий завершена ли анимация. </summary>
         private bool _isAnimationComplete;
 
+        private bool _isPaused;
+
+        private readonly NpcAnimationController _npcAnimationController;
+
+        public AnimationState(NpcAnimationController npcAnimationController)
+        {
+            _npcAnimationController = npcAnimationController;
+
+            WorldTime.OnTimePaused += () => _isPaused = true;
+            WorldTime.OnTimeUnpaused += () => _isPaused = false;
+        }
+
         /// <summary> Инициализирует состояние анимации при входе. </summary>
         public override void Enter()
         {
             base.Enter();
-            _timer = 3f;
             _isAnimationComplete = false;
+
+            if (Context == null) return;
+
+            if (Context.TryGet<AnimationType>(ContextType.AnimationType, out var animationType))
+                _npcAnimationController.TriggerAnimation(animationType);
+
+            if (Context.TryGet(ContextType.AnimationTime, out float animationTime)) _timer = animationTime;
+
+            Debug.Log(animationType + " " + _timer);
         }
 
         /// <summary> Обновляет состояние анимации каждый кадр, уменьшая таймер. </summary>
         public override void Update()
         {
+            if (_isPaused) return;
+
             if (!_isAnimationComplete && _timer > 0)
             {
                 _timer -= Time.deltaTime;
@@ -29,6 +53,8 @@ namespace FlavorfulStory.AI.FiniteStateMachine.ShopStates
                 if (_timer <= 0) _isAnimationComplete = true;
             }
         }
+
+        public override void Exit() => _npcAnimationController.TriggerAnimation(AnimationType.Locomotion);
 
         /// <summary> Возвращает статус завершения анимации. </summary>
         /// <returns> true, если анимация завершена; иначе false. </returns>

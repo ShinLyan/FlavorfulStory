@@ -32,7 +32,9 @@ namespace FlavorfulStory.AI.FiniteStateMachine.ShopStates
             if (!furniture) return;
 
             furniture.IsOccupied = true;
-            Context?.Set("SelectedFurniture", furniture);
+            Context?.Set<ShopObject>(ContextType.SelectedObject, furniture);
+            Context?.Set(ContextType.AnimationType, furniture.InteractableObjectAnimation);
+            Context?.Set(ContextType.AnimationTime, 3f);
 
             var accessiblePoint = furniture.GetAccessiblePoint();
 

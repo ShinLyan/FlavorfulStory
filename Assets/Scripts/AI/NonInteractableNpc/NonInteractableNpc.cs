@@ -32,11 +32,7 @@ namespace FlavorfulStory.AI.NonInteractableNpc
         {
             _itemHandler = GetComponent<ItemHandler>();
             base.Awake();
-
-            Debug.Log("Неинтерактивный NPC инициализирован: " + _itemHandler);
         }
-
-        protected override void Start() { base.Start(); }
 
         /// <summary> Создает контроллер движения для неинтерактивного NPC. </summary>
         /// <returns> Экземпляр контроллера движения неинтерактивного NPC. </returns>

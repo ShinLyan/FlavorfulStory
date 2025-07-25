@@ -27,12 +27,7 @@ namespace FlavorfulStory.Actions
         /// <param name="itemStack"> Предмет для экипировки. </param>
         public void EquipItem(ItemStack itemStack)
         {
-            Debug.Log("Попытка экипировать предмет: " + itemStack.Item?.ItemName, this);
-            if (!itemStack.Item)
-            {
-                Debug.LogWarning("Попытка экипировать null предмет", this);
-                return;
-            }
+            if (!itemStack.Item) return;
 
             UnequipItem();
 

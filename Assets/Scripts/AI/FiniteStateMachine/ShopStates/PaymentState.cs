@@ -31,10 +31,10 @@ namespace FlavorfulStory.AI.FiniteStateMachine.ShopStates
         /// <summary> Выполняет вход в состояние, освобождает точку у кассы и обрабатывает оплату. </summary>
         public override void Enter()
         {
-            if (Context != null && Context.TryGet<Transform>("CashDeskPoint", out var point))
+            if (Context != null && Context.TryGet<Transform>(ContextType.CashDeskPoint, out var point))
                 _shopLocation.CashDesk.ReleasePoint(point);
 
-            if (Context != null && Context.TryGet<ItemStack>("PurchaseItem", out var itemStack))
+            if (Context != null && Context.TryGet<ItemStack>(ContextType.PurchaseItem, out var itemStack))
             {
                 _transactionService.SellToNpc(itemStack);
                 _itemHandler.UnequipItem();
