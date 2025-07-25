@@ -89,7 +89,10 @@ namespace FlavorfulStory.TimeManagement
             if (previousTime.Hour < NightStartHour && CurrentGameTime.Hour >= NightStartHour)
                 OnNightStarted?.Invoke(CurrentGameTime);
 
-            if ((int)CurrentGameTime.Minute % TimeBetweenTicks == 0) OnTimeTick?.Invoke(CurrentGameTime);
+            int previousTick = (int)(previousTime.Minute / TimeBetweenTicks);
+            int currentTick = (int)(CurrentGameTime.Minute / TimeBetweenTicks);
+
+            if (currentTick != previousTick) OnTimeTick?.Invoke(CurrentGameTime);
 
             OnTimeUpdated?.Invoke(CurrentGameTime);
 
