@@ -4,7 +4,6 @@ using FlavorfulStory.Actions;
 using FlavorfulStory.AI.BaseNpc;
 using FlavorfulStory.AI.FiniteStateMachine;
 using FlavorfulStory.AI.FiniteStateMachine.ShopStates;
-using FlavorfulStory.AI.Scheduling;
 using FlavorfulStory.Economy;
 using FlavorfulStory.SceneManagement;
 using FlavorfulStory.Shop;
@@ -32,7 +31,7 @@ namespace FlavorfulStory.AI.NonInteractableNpc
         private bool _hadVisitedFurnitureAfterPurchase;
 
         /// <summary> Точка, в которой NPC должен исчезнуть. </summary>
-        private SchedulePoint _despawnPoint;
+        private Vector3 _despawnPoint;
 
         /// <summary> Сервис для обработки транзакций и торговых операций. </summary>
         private readonly TransactionService _transactionService;
@@ -58,7 +57,7 @@ namespace FlavorfulStory.AI.NonInteractableNpc
             _transactionService = transactionService;
 
             _hadVisitedFurnitureAfterPurchase = false;
-            _despawnPoint = null;
+            _despawnPoint = Vector3.zero;
 
             Initialize();
         }
@@ -211,7 +210,6 @@ namespace FlavorfulStory.AI.NonInteractableNpc
         /// <summary> Отправляет NPC в точку деспавна. </summary>
         private void GoToDespawnPoint()
         {
-            //TODO: переделать после удаление WarpGraph
             _npcMovementController.SetPoint(_despawnPoint);
             SetState(StateName.Movement);
         }
@@ -227,15 +225,7 @@ namespace FlavorfulStory.AI.NonInteractableNpc
 
         /// <summary> Устанавливает точку исчезновения для NPC. </summary>
         /// <param name="destination"> Координаты точки, где NPC должен исчезнуть. </param>
-        /// <param name="locationName"> Локация, в которой находится точка исчезновения. По умолчанию RockyIsland. </param>
-        public void SetDespawnPoint(Vector3 destination, LocationName locationName = LocationName.RockyIsland)
-        {
-            var point = new SchedulePoint(); //TODO: переделать после удаление WarpGraph
-            point.Position = destination;
-            point.LocationName = locationName;
-
-            _despawnPoint = point;
-        }
+        public void SetDespawnPoint(Vector3 destination) => _despawnPoint = destination;
 
         /// <summary> Принудительно устанавливает состояние NPC по строковому типу. </summary>
         /// <param name="stateName"> Строковое представление типа состояния для установки. </param>

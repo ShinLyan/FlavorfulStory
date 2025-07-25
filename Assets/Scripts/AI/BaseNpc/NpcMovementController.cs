@@ -1,5 +1,4 @@
 ﻿using System;
-using FlavorfulStory.AI.WarpGraphSystem;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -19,32 +18,27 @@ namespace FlavorfulStory.AI.BaseNpc
         public Action OnDestinationReached;
 
         /// <summary> Навигатор для управления перемещением NPC. </summary>
-        protected readonly INpcNavigator _navigator;
+        protected readonly NpcNavigator _navigator;
 
         /// <summary> Инициализирует новый экземпляр контроллера движения NPC. </summary>
         /// <param name="navMeshAgent"> NavMeshAgent для навигации. </param>
-        /// <param name="warpGraph"> Граф варп-точек для навигации. </param>
         /// <param name="transform"> Transform NPC. </param>
         /// <param name="animationController"> Контроллер анимации NPC. </param>
         protected NpcMovementController(NavMeshAgent navMeshAgent,
-            WarpGraph warpGraph,
             Transform transform,
             NpcAnimationController animationController)
         {
             _agent = navMeshAgent;
             _animationController = animationController;
-            _navigator = CreateNavigator(_agent, warpGraph, transform);
+            _navigator = CreateNavigator(_agent, transform);
         }
 
         /// <summary> Фабричный метод для создания навигатора — может быть переопределён в потомке. </summary>
         /// <param name="agent"> NavMeshAgent для навигации. </param>
-        /// <param name="graph"> Граф варп-точек. </param>
         /// <param name="transform"> Transform NPC. </param>
         /// <returns> Новый экземпляр навигатора. </returns>
-        protected virtual INpcNavigator CreateNavigator(NavMeshAgent agent, WarpGraph graph, Transform transform)
-        {
-            return new NpcNavigator(agent, graph, transform);
-        }
+        protected virtual NpcNavigator CreateNavigator(NavMeshAgent agent, Transform transform) =>
+            new(agent, transform);
 
         /// <summary> Обновляет движение NPC каждый кадр.
         /// Рассчитывает скорость анимации на основе скорости NavMeshAgent и обновляет навигатор. </summary>

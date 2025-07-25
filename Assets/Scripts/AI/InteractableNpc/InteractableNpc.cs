@@ -1,6 +1,5 @@
 ﻿using FlavorfulStory.AI.BaseNpc;
 using FlavorfulStory.AI.Scheduling;
-using FlavorfulStory.AI.WarpGraphSystem;
 using FlavorfulStory.DialogueSystem;
 using UnityEngine;
 using UnityEngine.AI;
@@ -40,7 +39,6 @@ namespace FlavorfulStory.AI.InteractableNpc
         {
             return new InteractableNpcMovementController(
                 GetComponent<NavMeshAgent>(),
-                WarpGraph.Build(FindObjectsByType<WarpPortal>(FindObjectsInactive.Include, FindObjectsSortMode.None)),
                 transform,
                 _animationController,
                 _npcScheduleHandler

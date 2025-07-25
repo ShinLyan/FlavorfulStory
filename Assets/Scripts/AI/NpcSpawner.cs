@@ -156,7 +156,7 @@ namespace FlavorfulStory.AI
         {
             yield return null;
             var loc = _locationManager.GetLocationByName(LocationName.NewShop);
-            npc.SetDestination(loc.transform.position, LocationName.NewShop);
+            npc.SetDestination(loc.transform.position);
         }
 
         /// <summary> Возвращает NPC в пул и удаляет из списка активных. </summary>

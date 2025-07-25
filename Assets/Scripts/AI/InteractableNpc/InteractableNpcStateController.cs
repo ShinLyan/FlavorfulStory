@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using FlavorfulStory.AI.BaseNpc;
 using FlavorfulStory.AI.FiniteStateMachine;
+using FlavorfulStory.AI.FiniteStateMachine.InteractableStates;
 using FlavorfulStory.AI.Scheduling;
 using FlavorfulStory.Player;
 using UnityEngine;

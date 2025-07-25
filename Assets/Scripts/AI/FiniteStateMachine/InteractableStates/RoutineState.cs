@@ -1,7 +1,7 @@
 using FlavorfulStory.AI.BaseNpc;
 using FlavorfulStory.AI.Scheduling;
 
-namespace FlavorfulStory.AI.FiniteStateMachine
+namespace FlavorfulStory.AI.FiniteStateMachine.InteractableStates
 {
     /// <summary> Состояние рутины NPC, в котором персонаж выполняет действия согласно расписанию. </summary>
     public class RoutineState : CharacterState, ICurrentSchedulePointDependable

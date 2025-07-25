@@ -11,7 +11,7 @@ using Zenject;
 namespace FlavorfulStory.AI.WarpGraphSystem
 {
     /// <summary> Объединенный класс для управления телепортами и связями между локациями </summary>
-    public class WarpPortal : MonoBehaviour
+    public class Portal : MonoBehaviour
     {
         /// <summary> Точка, куда будет телепортирован персонаж при переходе. </summary>
         [Header("Teleport Settings")]
@@ -20,11 +20,10 @@ namespace FlavorfulStory.AI.WarpGraphSystem
 
         /// <summary> Связанная точка телепорта (целевой портал). </summary>
         [field: Tooltip("Связанная точка телепорта."), SerializeField]
-        public WarpPortal ConnectedWarp { get; private set; }
+        public Portal Connected { get; private set; }
 
         /// <summary> Цвет соединений внутри одной локации (визуализация в редакторе). </summary>
-        [Header("Visualization")]
-        [Tooltip("Цвет соединений внутри одной локации"), SerializeField]
+        [Header("Visualization")] [Tooltip("Цвет соединений внутри одной локации"), SerializeField]
         private Color _localConnectionColor = Color.blue;
 
         /// <summary> Цвет соединений между разными локациями (визуализация в редакторе). </summary>
@@ -77,7 +76,7 @@ namespace FlavorfulStory.AI.WarpGraphSystem
 
             if (_virtualCamera) _virtualCamera.enabled = false;
 
-            playerController.UpdatePosition(ConnectedWarp._spawnPoint);
+            playerController.UpdatePosition(Connected._spawnPoint);
 
             yield return null;
 
@@ -96,14 +95,14 @@ namespace FlavorfulStory.AI.WarpGraphSystem
             Gizmos.DrawSphere(transform.position, 0.3f);
 
             // Соединение с парным порталом
-            if (ConnectedWarp)
+            if (Connected)
             {
                 Gizmos.color = _remoteConnectionColor;
-                Gizmos.DrawLine(transform.position, ConnectedWarp.transform.position);
+                Gizmos.DrawLine(transform.position, Connected.transform.position);
             }
 
             // Соединения внутри локации
-            foreach (var portal in FindObjectsByType<WarpPortal>(FindObjectsSortMode.None))
+            foreach (var portal in FindObjectsByType<Portal>(FindObjectsSortMode.None))
                 if (portal != this && portal.ParentLocationName == ParentLocationName)
                 {
                     Gizmos.color = _localConnectionColor;

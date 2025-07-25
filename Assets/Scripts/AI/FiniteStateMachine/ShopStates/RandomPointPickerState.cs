@@ -1,8 +1,5 @@
 using FlavorfulStory.AI.NonInteractableNpc;
-using FlavorfulStory.AI.Scheduling;
-using FlavorfulStory.SceneManagement;
 using FlavorfulStory.Shop;
-using UnityEngine;
 
 namespace FlavorfulStory.AI.FiniteStateMachine.ShopStates
 {
@@ -29,17 +26,12 @@ namespace FlavorfulStory.AI.FiniteStateMachine.ShopStates
         public override void Enter()
         {
             base.Enter();
-            var pointVector = _shopLocation.GetRandomPointOnNavMesh();
+            var point = _shopLocation.GetRandomPointOnNavMesh();
 
             Context?.Set(ContextType.AnimationType, AnimationType.Thinking);
             Context?.Set(ContextType.AnimationTime, 3f);
 
-            var point = new SchedulePoint(); //TODO: переделать после удаление WarpGraph
-            point.Position = pointVector;
-            point.LocationName = LocationName.NewShop;
-            point.Rotation = Quaternion.Euler(0, Random.Range(0f, 360f), 0).eulerAngles;
-
-            _movementController.SetPoint(point);
+            _movementController.SetPoint(point); //TODO: добавить поворот в сторону точки
         }
 
         /// <summary> Возвращает статус завершения состояния. </summary>

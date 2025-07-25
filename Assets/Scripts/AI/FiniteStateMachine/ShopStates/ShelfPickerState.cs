@@ -1,6 +1,4 @@
 using FlavorfulStory.AI.NonInteractableNpc;
-using FlavorfulStory.AI.Scheduling;
-using FlavorfulStory.SceneManagement;
 using FlavorfulStory.Shop;
 
 namespace FlavorfulStory.AI.FiniteStateMachine.ShopStates
@@ -36,14 +34,9 @@ namespace FlavorfulStory.AI.FiniteStateMachine.ShopStates
             Context?.Set(ContextType.AnimationType, availableShelf.InteractableObjectAnimation);
             Context?.Set(ContextType.AnimationTime, 3f);
 
-            var freePoint = availableShelf.GetAccessiblePoint();
+            var point = availableShelf.GetAccessiblePoint();
 
-            var point = new SchedulePoint(); //TODO: переделать после удаление WarpGraph
-            point.Position = freePoint.position;
-            point.LocationName = LocationName.NewShop;
-            point.Rotation = freePoint.rotation.eulerAngles;
-
-            _movementController.SetPoint(point);
+            _movementController.SetPoint(point.position); //TODO: добавить поворот в сторону точки
         }
 
         /// <summary> Возвращает статус завершения состояния. </summary>

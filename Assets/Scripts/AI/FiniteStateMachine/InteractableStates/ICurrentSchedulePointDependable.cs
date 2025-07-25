@@ -1,6 +1,6 @@
 ﻿using FlavorfulStory.AI.Scheduling;
 
-namespace FlavorfulStory.AI.FiniteStateMachine
+namespace FlavorfulStory.AI.FiniteStateMachine.InteractableStates
 {
     /// <summary> Интерфейс для объектов, которые зависят от текущей точки расписания
     /// и могут реагировать на её изменения. </summary>

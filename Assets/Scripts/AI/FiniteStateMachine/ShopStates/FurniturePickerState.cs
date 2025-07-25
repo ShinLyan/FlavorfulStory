@@ -1,6 +1,4 @@
 using FlavorfulStory.AI.NonInteractableNpc;
-using FlavorfulStory.AI.Scheduling;
-using FlavorfulStory.SceneManagement;
 using FlavorfulStory.Shop;
 
 namespace FlavorfulStory.AI.FiniteStateMachine.ShopStates
@@ -38,14 +36,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine.ShopStates
 
             var accessiblePoint = furniture.GetAccessiblePoint();
 
-            var point = new SchedulePoint
-            {
-                Position = accessiblePoint.position,
-                LocationName = LocationName.NewShop,
-                Rotation = accessiblePoint.rotation.eulerAngles
-            }; //TODO: rework
-
-            _movementController.SetPoint(point);
+            _movementController.SetPoint(accessiblePoint.position); //TODO: добавить поворот в сторону точки
             _movementController.OnDestinationReached += () => furniture.IsOccupied = false;
         }
 

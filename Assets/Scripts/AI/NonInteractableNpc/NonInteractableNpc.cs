@@ -2,8 +2,6 @@
 using FlavorfulStory.Actions;
 using FlavorfulStory.AI.BaseNpc;
 using FlavorfulStory.AI.FiniteStateMachine;
-using FlavorfulStory.AI.Scheduling;
-using FlavorfulStory.AI.WarpGraphSystem;
 using FlavorfulStory.Economy;
 using FlavorfulStory.SceneManagement;
 using UnityEngine;
@@ -40,7 +38,6 @@ namespace FlavorfulStory.AI.NonInteractableNpc
         {
             return new NonInteractableNpcMovementController(
                 GetComponent<NavMeshAgent>(),
-                WarpGraph.Build(FindObjectsByType<WarpPortal>(FindObjectsInactive.Include, FindObjectsSortMode.None)),
                 transform,
                 _animationController
             );
@@ -61,17 +58,12 @@ namespace FlavorfulStory.AI.NonInteractableNpc
 
         /// <summary> Устанавливает цель для перемещения NPC с автоматическим запуском случайной последовательности по прибытии. </summary>
         /// <param name="destination"> Целевая позиция для перемещения. </param>
-        /// <param name="locationName"> Название локации назначения. </param>
-        public void SetDestination(Vector3 destination, LocationName locationName)
+        public void SetDestination(Vector3 destination)
         {
-            var point = new SchedulePoint(); //TODO: переделать после удаление WarpGraph
-            point.Position = destination;
-            point.LocationName = locationName;
-
             var movementController = (NonInteractableNpcMovementController)_movementController;
             var stateController = (NonInteractableNpcStateController)_stateController;
 
-            movementController.SetPoint(point);
+            movementController.SetPoint(destination);
             stateController.ForceSetState(StateName.Movement);
             movementController.OnDestinationReached += () =>
             {
@@ -82,8 +74,7 @@ namespace FlavorfulStory.AI.NonInteractableNpc
 
         /// <summary> Устанавливает точку исчезновения для неинтерактивного NPC. </summary>
         /// <param name="destination"> Координаты точки, где NPC должен исчезнуть. </param>
-        /// <param name="locationName"> Локация, в которой находится точка исчезновения. По умолчанию RockyIsland. </param>
-        public void SetDespawnPoint(Vector3 destination, LocationName locationName = LocationName.RockyIsland) =>
-            (_stateController as NonInteractableNpcStateController)?.SetDespawnPoint(destination, locationName);
+        public void SetDespawnPoint(Vector3 destination) =>
+            (_stateController as NonInteractableNpcStateController)?.SetDespawnPoint(destination);
     }
 }

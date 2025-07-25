@@ -1,9 +1,7 @@
 using FlavorfulStory.Actions;
 using FlavorfulStory.AI.NonInteractableNpc;
-using FlavorfulStory.AI.Scheduling;
 using FlavorfulStory.Economy;
 using FlavorfulStory.InventorySystem;
-using FlavorfulStory.SceneManagement;
 using FlavorfulStory.Shop;
 using UnityEngine;
 
@@ -47,7 +45,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine.ShopStates
 
             //TODO: тестовый предмет, переделать на предмет с полки
             var item = ItemDatabase.GetItemFromID("460b1671-464a-4d0f-94a8-fe034fcb7ea2");
-            bool itemPrefab = item.PickupPrefab.GetComponent<Rigidbody>().useGravity = false;
+            item.PickupPrefab.GetComponent<Rigidbody>().useGravity = false;
             var itemStack = new ItemStack { Item = item, Number = 1 };
             _itemHandler.EquipItem(itemStack);
 
@@ -57,13 +55,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine.ShopStates
             Context?.Set(ContextType.AnimationType, _shopLocation.CashDesk.InteractableObjectAnimation);
             Context?.Set(ContextType.AnimationTime, 3f);
 
-
-            var point = new SchedulePoint(); //TODO: rework
-            point.Position = accessiblePoint.position;
-            point.LocationName = LocationName.NewShop;
-            point.Rotation = accessiblePoint.rotation.eulerAngles;
-
-            _movementController.SetPoint(point);
+            _movementController.SetPoint(accessiblePoint.position); //TODO: добавить поворот в сторону точки
         }
 
         /// <summary> Возвращает статус завершения состояния. </summary>

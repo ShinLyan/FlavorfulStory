@@ -1,6 +1,6 @@
 using FlavorfulStory.AI.Scheduling;
 
-namespace FlavorfulStory.AI.FiniteStateMachine
+namespace FlavorfulStory.AI.FiniteStateMachine.InteractableStates
 {
     /// <summary> Интерфейс для объектов, зависящих от расписания NPC. </summary>
     public interface IScheduleDependable

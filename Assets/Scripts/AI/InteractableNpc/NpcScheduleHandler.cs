@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using FlavorfulStory.AI.FiniteStateMachine;
+using FlavorfulStory.AI.FiniteStateMachine.InteractableStates;
 using FlavorfulStory.AI.Scheduling;
 using FlavorfulStory.TimeManagement;
 using DateTime = FlavorfulStory.TimeManagement.DateTime;
