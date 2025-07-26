@@ -22,7 +22,7 @@ namespace FlavorfulStory
             if (Input.GetKeyDown(KeyCode.M)) OnExit?.Invoke();
         }
 
-        public bool IsPointerOverUI() => EventSystem.current.IsPointerOverGameObject();
+        public static bool IsPointerOverUI() => EventSystem.current.IsPointerOverGameObject();
 
         public Vector3 GetSelectedMapPosition()
         {

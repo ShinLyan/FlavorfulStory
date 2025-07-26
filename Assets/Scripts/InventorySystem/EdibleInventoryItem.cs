@@ -11,6 +11,7 @@ namespace FlavorfulStory.InventorySystem
     public class EdibleInventoryItem : InventoryItem, IUsable, IEdible
     {
         /// <summary> Кнопка мыши для использования предмета. </summary>
+        [field: Header("Edible Properties")]
         [field: Tooltip("Кнопка использования предмета."), SerializeField]
         public UseActionType UseActionType { get; private set; }
 

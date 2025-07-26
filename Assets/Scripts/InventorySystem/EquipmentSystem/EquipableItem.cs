@@ -7,6 +7,7 @@ namespace FlavorfulStory.InventorySystem.EquipmentSystem
     public class EquipableItem : InventoryItem
     {
         /// <summary> Слот экипировки, в который может быть помещен предмет. </summary>
+        [field: Header("Equipable Properties")]
         [field: Tooltip("Слот экипировки, в который может быть помещен предмет.")]
         [field: SerializeField] public EquipmentType AllowedEquipmentLocation { get; private set; }
     }

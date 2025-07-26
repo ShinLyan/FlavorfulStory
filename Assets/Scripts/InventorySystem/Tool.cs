@@ -17,6 +17,7 @@ namespace FlavorfulStory.InventorySystem
         #region Fields and Properties
 
         /// <summary> Тип инструмента. </summary>
+        [field: Header("Tool Properties")]
         [field: Tooltip("Тип инструмента."), SerializeField]
         public ToolType ToolType { get; private set; }
 
