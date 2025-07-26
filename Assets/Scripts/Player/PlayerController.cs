@@ -5,6 +5,7 @@ using FlavorfulStory.InteractionSystem;
 using FlavorfulStory.InventorySystem;
 using FlavorfulStory.InventorySystem.DropSystem;
 using FlavorfulStory.InventorySystem.UI;
+using FlavorfulStory.PlacementSystem;
 using FlavorfulStory.Stats;
 using FlavorfulStory.Utils;
 using UnityEngine;
@@ -49,6 +50,8 @@ namespace FlavorfulStory.Player
         /// <summary> Взаимодействие игрока с объектами. </summary>
         private InteractionController _interactionController;
 
+        [SerializeField] private PlacementController _placementController;
+
         #region Tools
 
         /// <summary> Обработчик инструмента. </summary>
@@ -80,6 +83,7 @@ namespace FlavorfulStory.Player
             _playerInventory = inventory;
             _toolbar = toolbar;
             _itemDropService = itemDropService;
+            //     _placementController = placementController; // TODO Перевести на Zenject
         }
 
         /// <summary> Инициализация компонентов. </summary>
@@ -143,18 +147,24 @@ namespace FlavorfulStory.Player
             for (int i = 0; i < ToolbarItemsCount; i++)
             {
                 var key = i == 9 ? KeyCode.Alpha0 : KeyCode.Alpha1 + i;
-                if (Input.GetKeyDown(key))
-                {
-                    _toolbar.SelectItem(i);
-                    break;
-                }
+                if (!Input.GetKeyDown(key)) continue;
+
+                _toolbar.SelectItem(i);
+
+                // TODO: баг если кликнуть на тулбар слот, то это не срабатывает, а только если кликнуть хоткей
+                if (_toolbar.SelectedItem is PlaceableItem placeable)
+                    _placementController.EnterPlacementMode(PlacementModeType.Place, placeable);
+                else
+                    _placementController.ExitCurrentMode(); // если убрал — отключаем сетку
+
+                break;
             }
         }
 
         /// <summary> Обработка доступных действий выбранного предмета из панели быстрого доступа. </summary>
         private void HandleToolbarUseInput()
         {
-            if (CurrentItem == null) return;
+            if (!CurrentItem) return;
 
             if (CurrentItem is IUsable usable && !IsToolUseBlocked) HandleCurrentItemUse(usable);
 

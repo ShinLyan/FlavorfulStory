@@ -12,9 +12,10 @@ namespace FlavorfulStory.PlacementSystem
         [field: SerializeField, Tooltip("Слой, на котором размещается объект.")]
         public PlacementLayer Layer { get; private set; }
 
-        /// <summary> Является ли объект препятствием (непроходимый)? </summary>
-        public bool IsObstacle => Layer == PlacementLayer.Furniture;
-
+        /// <summary> Можно ли вращать объект при размещении? </summary>
+        // [field: SerializeField, Tooltip("Можно ли вращать объект при размещении?")]
+        // public bool IsRotatable { get; private set; } = true;
+        
         private void OnDrawGizmos()
         {
             var origin = transform.position;
@@ -30,19 +31,10 @@ namespace FlavorfulStory.PlacementSystem
                 Gizmos.DrawCube(cellCenter, new Vector3(1f, 0.1f, 1f));
             }
         }
-
-        /// <summary> Можно ли вращать объект при размещении? </summary>
-        // [field: SerializeField, Tooltip("Можно ли вращать объект при размещении?")]
-        // public bool IsRotatable { get; private set; } = true;
-
+        
         // [field: SerializeField, Tooltip("Можно ли взаимодействовать с объектом (сундук, магазин и т.д.).")]
         // public bool IsInteractable { get; private set; }
-
-        // [field: SerializeField, Tooltip("Префаб объекта, который будет спавниться.")]
-        // public GameObject RuntimePrefab { get; private set; }
-
-        // /// <summary> Установлен ли объект на сцене? </summary>
-        // public bool IsPlaced { get; private set; }
+        
         //
         // /// <summary> Метод вызывается при окончательной установке объекта в мир. </summary>
         // public void ConfirmPlacement()
