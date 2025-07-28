@@ -1,11 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace FlavorfulStory.Audio
 {
-    /// <summary> Данные для воспроизведения звуковых эффектов (SFX). </summary>
-    [CreateAssetMenu(menuName = "FlavorfulStory/Audio/SfxData")]
-    public class SfxData : ScriptableObject
+    /// <summary> Структура данных для одного типа SFX. </summary>
+    [Serializable]
+    public struct SfxData
     {
         /// <summary> Тип звукового эффекта. </summary>
         [field: Tooltip("Тип звукового эффекта."), SerializeField]

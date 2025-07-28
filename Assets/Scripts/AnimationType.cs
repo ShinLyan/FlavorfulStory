@@ -9,6 +9,9 @@
         /// <summary> Анимация ожидания (бездействия). </summary>
         Idle,
 
+        /// <summary> Анимация передвижения персонажа. </summary>
+        Locomotion,
+
         /// <summary> Анимация использования топора. </summary>
         UseAxe,
 
@@ -16,6 +19,18 @@
         PettingAnimal,
 
         /// <summary> Анимация питья. </summary>
-        Drinking
+        Drinking,
+
+        /// <summary> Анимация рутины. </summary>
+        Routine,
+
+        /// <summary> Анимация специального действия 1. </summary>
+        Special1,
+
+        /// <summary> Анимация специального действия 2. </summary>
+        Special2,
+
+        /// <summary> Анимация специального действия 3. </summary>
+        Special3
     }
 }

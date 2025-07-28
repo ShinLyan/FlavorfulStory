@@ -4,7 +4,7 @@ using System.Linq;
 using FlavorfulStory.InputSystem;
 using FlavorfulStory.Player;
 using FlavorfulStory.ResourceContainer;
-using FlavorfulStory.TooltipSystem;
+using FlavorfulStory.TooltipSystem.ActionTooltips;
 using UnityEngine;
 using Zenject;
 
@@ -18,9 +18,6 @@ namespace FlavorfulStory.InteractionSystem
         /// <summary> PlayerController родительского объекта. </summary>
         private PlayerController _playerController;
 
-        /// <summary> UI-объект для отображения тултипа взаимодействия. </summary>
-        private IActionTooltipShower _tooltipShower;
-
         /// <summary> Список объектов, доступных для взаимодействия. </summary>
         private readonly List<IInteractable> _availableInteractables = new();
 
@@ -31,25 +28,27 @@ namespace FlavorfulStory.InteractionSystem
         private IInteractable _activeInteractable;
 
         /// <summary> Делегат действия, вызываемый при начале взаимодействия. </summary>
-        private Action _startInteractionAction;
+        public Action StartInteractionAction;
 
         /// <summary> Делегат действия, вызываемый при завершении взаимодействия. </summary>
-        private Action _endInteractionAction;
+        public Action EndInteractionAction;
+
+        /// <summary> Шина сигналов для отправки уведомлений другим системам. </summary>
+        private SignalBus _signalBus;
 
         #endregion
 
         /// <summary> Внедрение зависимостей Zenject. </summary>
         /// <param name="playerController"> Контроллер игрока. </param>
-        /// <param name="tooltipShower"> Отображатель тултипов. </param>
+        /// <param name="signalBus"> Система событий (SignalBus). </param>
         [Inject]
-        private void Construct(PlayerController playerController, IActionTooltipShower tooltipShower)
+        private void Construct(PlayerController playerController, SignalBus signalBus)
         {
             _playerController = playerController;
-            _tooltipShower = tooltipShower;
+            _signalBus = signalBus;
         }
 
-        /// <summary> Проверяет нажатие кнопки взаимодействия и вызывает метод Interact()
-        /// для ближайшего объекта. </summary>
+        /// <summary> Определяет ближайший объект и обрабатывает ввод на взаимодействие. </summary>
         private void Update()
         {
             if (_availableInteractables.Count > 0) UpdateClosestInteractable();
@@ -62,8 +61,11 @@ namespace FlavorfulStory.InteractionSystem
         /// <summary> Обновить ближайший интерактивный объект. </summary>
         private void UpdateClosestInteractable()
         {
-            _closestInteractable = FindClosestInteractable();
-            UpdateTooltip();
+            var newClosest = FindClosestInteractable();
+            if (newClosest == _closestInteractable) return;
+
+            _closestInteractable = newClosest;
+            _signalBus.Fire(new ClosestInteractableChangedSignal { ClosestInteractable = _closestInteractable });
         }
 
         /// <summary> Определяет ближайший объект для взаимодействия из доступных. </summary>
@@ -72,15 +74,6 @@ namespace FlavorfulStory.InteractionSystem
             .Where(interactable => interactable.IsInteractionAllowed)
             .OrderBy(interactable => interactable.GetDistanceTo(transform))
             .FirstOrDefault();
-
-        /// <summary> Обновить тултип. </summary>
-        private void UpdateTooltip()
-        {
-            if (_closestInteractable != null)
-                _tooltipShower.Show(_closestInteractable);
-            else
-                _tooltipShower.Hide();
-        }
 
         /// <summary> Добавляет объект в список доступных для взаимодействия при входе в триггер. </summary>
         /// <param name="other"> Коллайдер объекта, вошедшего в триггер. </param>
@@ -115,30 +108,21 @@ namespace FlavorfulStory.InteractionSystem
             UpdateClosestInteractable();
         }
 
-        /// <summary> Начало взаимодействия с объектом. </summary>
+        /// <summary> Начинает взаимодействие с ближайшим интерактивным объектом. </summary>
         private void BeginInteraction()
         {
-            _startInteractionAction?.Invoke();
+            StartInteractionAction?.Invoke();
             _activeInteractable = _closestInteractable;
             _activeInteractable?.BeginInteraction(_playerController);
         }
 
-        /// <summary> Завершение взаимодействия с объектом. </summary>
+        /// <summary> Завершает взаимодействия с объектом. </summary>
         /// <remarks> Метод подписан на событие в анимации игрока (Gather_interaction). </remarks>
         public void EndInteraction()
         {
-            _endInteractionAction?.Invoke();
+            EndInteractionAction?.Invoke();
             _activeInteractable?.EndInteraction(_playerController);
             _activeInteractable = null;
-        }
-
-        /// <summary> Устанавливает действия, вызываемые при начале и завершении взаимодействия. </summary>
-        /// <param name="onStart"> Действие при начале взаимодействия. </param>
-        /// <param name="onEnd"> Действие при завершении взаимодействия. </param>
-        public void SetInteractionActions(Action onStart, Action onEnd)
-        {
-            _startInteractionAction = onStart;
-            _endInteractionAction = onEnd;
         }
     }
 }

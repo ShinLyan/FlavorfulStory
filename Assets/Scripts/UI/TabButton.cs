@@ -1,4 +1,3 @@
-using System;
 using FlavorfulStory.Audio;
 using TMPro;
 using UnityEngine;
@@ -21,9 +20,6 @@ namespace FlavorfulStory.UI
         /// <summary> Активна ли вкладка? </summary>
         public bool IsActive { get; set; }
 
-        /// <summary> Событие клика по вкладке. </summary>
-        public event Action OnClick;
-
         /// <summary> Установка цвета текста при активации компонента. </summary>
         private void OnEnable() => _label.color = IsActive ? _activeLabelColor : _defaultLabelColor;
 
@@ -33,7 +29,7 @@ namespace FlavorfulStory.UI
         /// <summary> Наведение курсора на кнопку. </summary>
         protected override void HoverStart()
         {
-            SfxPlayer.Instance.PlayOneShot(SfxType.UIHover);
+            SfxPlayer.Play(SfxType.UIHover);
             SetNameState(true);
         }
 

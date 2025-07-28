@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using FlavorfulStory.Core;
 using FlavorfulStory.InventorySystem.PickupSystem;
 using FlavorfulStory.Saving;
 using UnityEngine;
@@ -8,14 +9,14 @@ using Zenject;
 namespace FlavorfulStory.InventorySystem
 {
     /// <summary> Инвентарь игрока с настраиваемым количеством слотов. </summary>
-    public class Inventory : MonoBehaviour, ISaveable
+    public class Inventory : MonoBehaviour, IPredicateEvaluator, ISaveable
     {
         /// <summary> Количество слотов в инвентаре. </summary>
         [field: Tooltip("Количество слотов в инвентаре."), SerializeField]
         public int InventorySize { get; private set; }
 
         /// <summary> Предметы инвентаря. </summary>
-        private InventorySlot[] _slots;
+        private ItemStack[] _inventorySlots;
 
         /// <summary> Менеджер уведомлений о подборе предмета. </summary>
         private PickupNotificationManager _notificationManager;
@@ -23,16 +24,21 @@ namespace FlavorfulStory.InventorySystem
         /// <summary> Событие, вызываемое при изменении инвентаря (добавление, удаление предметов). </summary>
         public event Action InventoryUpdated;
 
+        /// <summary> Событие при сборе предмета. Передает сам предмет. </summary>
+        public event Action<InventoryItem> ItemCollected;
+
         /// <summary> Внедрение зависимостей Zenject. </summary>
         /// <param name="notificationManager"> Менеджер уведомлений о подборе предмета. </param>
         [Inject]
-        private void Construct(PickupNotificationManager notificationManager)
-        {
+        private void Construct(PickupNotificationManager notificationManager) =>
             _notificationManager = notificationManager;
-        }
 
         /// <summary> Инициализация слотов и ссылки на инвентарь игрока. </summary>
-        private void Awake() => _slots = new InventorySlot[InventorySize];
+        private void Awake() => _inventorySlots = new ItemStack[InventorySize];
+
+        /// <summary> При старте вызываем событие обновление инвентаря. </summary>
+        /// <remarks> После восстановления состояния нужно разослать событие. </remarks>
+        private void Start() => InventoryUpdated?.Invoke();
 
         /// <summary> Есть ли место для предмета в инвентаре? </summary>
         public bool HasSpaceFor(InventoryItem item) => FindSlot(item) >= 0;
@@ -50,30 +56,35 @@ namespace FlavorfulStory.InventorySystem
         {
             if (!item.IsStackable) return -1;
             return Array.FindIndex(
-                _slots,
+                _inventorySlots,
                 slot => ReferenceEquals(slot.Item, item) && slot.Number < item.StackSize);
         }
 
         /// <summary> Найти индекс свободного слота в инвентаре. </summary>
         /// <returns> Возвращает индекс свободного слота в инвентаре.
         /// Если все слоты заполнены, то возвращает -1. </returns>
-        private int FindEmptySlot() => Array.FindIndex(_slots, slot => !slot.Item);
+        private int FindEmptySlot() => Array.FindIndex(_inventorySlots, slot => !slot.Item);
 
         /// <summary> Есть ли экземпляр этого предмета в инвентаре? </summary>
         /// <param name="item"> Предмет. </param>
         /// <returns> Возвращает True - если предмет есть в инвентаре, False - в противном случае. </returns>
-        public bool HasItem(InventoryItem item) => _slots.Any(slot => ReferenceEquals(slot.Item, item));
+        public bool HasItem(InventoryItem item) => _inventorySlots.Any(slot => ReferenceEquals(slot.Item, item));
+
+        /// <summary> Получить предмет инвентаря и его количество в заданном слоте. </summary>
+        /// <param name="slotIndex"> Индекс слота, из которого нужно получить предмет. </param>
+        /// <returns> Возвращает предмет инвентаря и его количество в заданном слоте. </returns>
+        public ItemStack GetItemStackInSlot(int slotIndex) => _inventorySlots[slotIndex];
 
         /// <summary> Получить предмет инвентаря в заданном слоте. </summary>
         /// <param name="slotIndex"> Индекс слота, из которого нужно получить предмет. </param>
         /// <returns> Возвращает предмет инвентаря в заданном слоте. </returns>
-        public InventoryItem GetItemInSlot(int slotIndex) => _slots[slotIndex].Item;
+        public InventoryItem GetItemInSlot(int slotIndex) => _inventorySlots[slotIndex].Item;
 
         /// <summary> Получить общее количество заданного предмета в инвентаре. </summary>
         /// <param name="item"> Предмет инвентаря. </param>
         /// <returns> Возвращает общее количество заданного предмета в инвентаре. </returns>
         public int GetItemNumber(InventoryItem item) =>
-            _slots.Where(slot => slot.Item == item).Sum(slot => slot.Number);
+            _inventorySlots.Where(slot => slot.Item == item).Sum(slot => slot.Number);
 
         public void RemoveItem(InventoryItem item, int number)
         {
@@ -91,10 +102,10 @@ namespace FlavorfulStory.InventorySystem
             }
 
             int remainingToRemove = number;
-            for (int i = 0; i < _slots.Length && remainingToRemove > 0; i++)
-                if (_slots[i].Item == item)
+            for (int i = 0; i < _inventorySlots.Length && remainingToRemove > 0; i++)
+                if (_inventorySlots[i].Item == item)
                 {
-                    int numberToRemove = Math.Min(_slots[i].Number, remainingToRemove);
+                    int numberToRemove = Math.Min(_inventorySlots[i].Number, remainingToRemove);
                     RemoveFromSlot(i, numberToRemove);
                     remainingToRemove -= numberToRemove;
                 }
@@ -103,7 +114,7 @@ namespace FlavorfulStory.InventorySystem
         /// <summary> Получить количество предметов инвентаря в заданном слоте. </summary>
         /// <param name="slotIndex"> Индекс слота, из которого нужно получить количество. </param>
         /// <returns> Возвращает количество предметов инвентаря в заданном слоте. </returns>
-        public int GetNumberInSlot(int slotIndex) => _slots[slotIndex].Number;
+        public int GetNumberInSlot(int slotIndex) => _inventorySlots[slotIndex].Number;
 
         /// <summary> Попробовать добавить предмет в указанный слот. </summary>
         /// <remarks> Если такой стак уже существует, он будет добавлен в существующий стак.
@@ -114,7 +125,7 @@ namespace FlavorfulStory.InventorySystem
         /// <returns> Возвращает True, если предмет был добавлен в любое место инвентаря. </returns>
         public bool TryAddItemToSlot(int slotIndex, InventoryItem item, int number)
         {
-            if (_slots[slotIndex].Item) return TryAddToFirstAvailableSlot(item, number);
+            if (_inventorySlots[slotIndex].Item) return TryAddToFirstAvailableSlot(item, number);
 
             while (number > 0)
             {
@@ -122,9 +133,9 @@ namespace FlavorfulStory.InventorySystem
                 if (index < 0) index = FindEmptySlot();
                 if (index < 0) return false;
 
-                int addAmount = Math.Min(number, item.StackSize - _slots[slotIndex].Number);
-                _slots[slotIndex].Item ??= item;
-                _slots[slotIndex].Number += addAmount;
+                int addAmount = Math.Min(number, item.StackSize - _inventorySlots[slotIndex].Number);
+                _inventorySlots[slotIndex].Item ??= item;
+                _inventorySlots[slotIndex].Number += addAmount;
                 number -= addAmount;
             }
 
@@ -144,30 +155,50 @@ namespace FlavorfulStory.InventorySystem
                 int index = FindSlot(item);
                 if (index < 0) return false;
 
-                int addAmount = Mathf.Min(remainingNumber, item.StackSize - _slots[index].Number);
-                _slots[index].Item ??= item;
-                _slots[index].Number += addAmount;
+                int addAmount = Mathf.Min(remainingNumber, item.StackSize - _inventorySlots[index].Number);
+                _inventorySlots[index].Item ??= item;
+                _inventorySlots[index].Number += addAmount;
                 remainingNumber -= addAmount;
             }
 
+            // TODO: ПЕРЕДЕЛАТЬ НА EVENT. Inventory не должен знать о _notificationManager
             _notificationManager.ShowNotification(item.Icon, number, item.ItemName, item.ItemName);
 
+            ItemCollected?.Invoke(item);
             InventoryUpdated?.Invoke();
             return true;
         }
 
-        /// <summary> Извлечь предмет из указанного слота. </summary>
+        /// <summary> Извлечь предмет из указанного слота. Удаляет указанное количество или всё содержимое. </summary>
         /// <param name="slotIndex"> Индекс слота в инвентаре. </param>
-        /// <param name="number"> Количество предметов. </param>
-        public void RemoveFromSlot(int slotIndex, int number)
+        /// <param name="number"> Количество предметов. Если больше количества в слоте — удалит всё. </param>
+        public void RemoveFromSlot(int slotIndex, int number = int.MaxValue)
         {
-            if ((_slots[slotIndex].Number -= number) <= 0)
+            if (slotIndex < 0 || slotIndex >= _inventorySlots.Length)
             {
-                _slots[slotIndex].Item = null;
-                _slots[slotIndex].Number = 0;
+                Debug.LogError($"Invalid slot index: {slotIndex}");
+                return;
             }
 
+            var slot = _inventorySlots[slotIndex];
+            if (!slot.Item || slot.Number <= 0)
+            {
+                Debug.LogError($"Attempted to remove from empty slot {slotIndex}");
+                return;
+            }
+
+            slot.Number -= number;
+            if (slot.Number <= 0) ClearSlot(slotIndex);
+
             InventoryUpdated?.Invoke();
+        }
+
+        /// <summary> Очистить слот инвентаря. </summary>
+        /// <param name="slotIndex"> Индекс слота в инвентаре. </param>
+        private void ClearSlot(int slotIndex)
+        {
+            _inventorySlots[slotIndex].Item = null;
+            _inventorySlots[slotIndex].Number = 0;
         }
 
         #region Saving
@@ -190,10 +221,10 @@ namespace FlavorfulStory.InventorySystem
             var slotRecords = new InventorySlotRecord[InventorySize];
             for (int i = 0; i < InventorySize; i++)
             {
-                if (!_slots[i].Item) continue;
+                if (!_inventorySlots[i].Item) continue;
 
-                slotRecords[i].ItemID = _slots[i].Item.ItemID;
-                slotRecords[i].Number = _slots[i].Number;
+                slotRecords[i].ItemID = _inventorySlots[i].Item.ItemID;
+                slotRecords[i].Number = _inventorySlots[i].Number;
             }
 
             return slotRecords;
@@ -208,12 +239,25 @@ namespace FlavorfulStory.InventorySystem
             {
                 if (slotRecords == null) continue;
 
-                _slots[i].Item = ItemDatabase.GetItemFromID(slotRecords[i].ItemID);
-                _slots[i].Number = slotRecords[i].Number;
+                _inventorySlots[i].Item = ItemDatabase.GetItemFromID(slotRecords[i].ItemID);
+                _inventorySlots[i].Number = slotRecords[i].Number;
             }
-
-            InventoryUpdated?.Invoke();
         }
+
+        #endregion
+
+        #region IPredicateEvaluator
+
+        /// <summary> Оценивает заданный предикат с параметрами. </summary>
+        /// <param name="predicate"> Имя предиката для проверки. </param>
+        /// <param name="parameters"> Массив параметров для предиката. </param>
+        /// <returns> True, если условие выполнено; false, если не выполнено;
+        /// null, если предикат не поддерживается. </returns>
+        public bool? Evaluate(string predicate, string[] parameters) => predicate switch
+        {
+            "HasInventoryItem" => HasItem(ItemDatabase.GetItemFromID(parameters[0])),
+            _ => null
+        };
 
         #endregion
     }

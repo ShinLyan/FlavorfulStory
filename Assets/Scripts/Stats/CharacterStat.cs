@@ -54,7 +54,7 @@ namespace FlavorfulStory.Stats
 
         /// <summary> Установить конкретное значение, ограниченное диапазоном от 0 до максимума. </summary>
         /// <param name="newValue"> Новое значение. </param>
-        public void SetValue(float newValue)
+        private void SetValue(float newValue)
         {
             float clamped = Mathf.Clamp(newValue, 0, MaxValue);
             ApplyValueChange(clamped);
@@ -66,6 +66,17 @@ namespace FlavorfulStory.Stats
         {
             MaxValue = Mathf.Max(0, newMaxValue);
             OnMaxValueChanged?.Invoke(MaxValue);
+        }
+
+        /// <summary> Восстановить полное значение параметра. </summary>
+        public void RestoreFull() => SetValue(MaxValue);
+
+        /// <summary> Восстановить процент от максимального значения параметра. </summary>
+        /// <param name="percent"> Процент от максимального значения, которое нужно восстановить. </param>
+        public void RestorePercent(float percent)
+        {
+            float clampedPercent = Mathf.Clamp01(percent);
+            SetValue(MaxValue * clampedPercent);
         }
     }
 }

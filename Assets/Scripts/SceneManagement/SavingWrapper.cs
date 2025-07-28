@@ -1,6 +1,8 @@
-﻿using System.Collections;
+﻿using Cysharp.Threading.Tasks;
+using DG.Tweening;
 using FlavorfulStory.InputSystem;
 using FlavorfulStory.Saving;
+using FlavorfulStory.UI.Animation;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Zenject;
@@ -10,6 +12,12 @@ namespace FlavorfulStory.SceneManagement
     /// <summary> Управляет сохранением, загрузкой и переключением сцен. </summary>
     public class SavingWrapper : MonoBehaviour
     {
+        /// <summary> Компонент затемнения экрана при переходах между сценами. </summary>
+        private CanvasGroupFader _canvasGroupFader;
+
+        /// <summary> Менеджер локаций. </summary>
+        private LocationManager _locationManager;
+
         /// <summary> Название первой сцены, которая загружается при старте новой игры. </summary>
         private const SceneName FirstUploadedScene = SceneName.Game;
 
@@ -18,97 +26,72 @@ namespace FlavorfulStory.SceneManagement
 
         /// <summary> Возвращает true, если существует активное имя сохранения и связанный с ним файл. </summary>
         public static bool SaveFileExists => PlayerPrefs.HasKey(CurrentSaveKey) &&
-                                             SavingSystem.SaveFileExists(GetCurrentSaveFileName());
+                                             SavingSystem.SaveFileExists(CurrentSaveFileName);
 
-        /// <summary> Компонент затемнения экрана при переходах между сценами. </summary>
-        private Fader _fader;
-
-        /// <summary> Менеджер локаций. </summary>
-        private LocationManager _locationManager;
+        /// <summary> Название текущего сохранения. </summary>
+        private static string CurrentSaveFileName => PlayerPrefs.GetString(CurrentSaveKey);
 
         /// <summary> Внедрение зависимостей Zenject. </summary>
-        /// <param name="fader"> Компонент затемнения экрана при переходах между сценами. </param>
+        /// <param name="canvasGroupFader"> Компонент затемнения экрана при переходах между сценами. </param>
         /// <param name="locationManager"> Менеджер локаций. </param>
         [Inject]
-        private void Construct(Fader fader, [InjectOptional] LocationManager locationManager)
+        private void Construct(CanvasGroupFader canvasGroupFader, [InjectOptional] LocationManager locationManager)
         {
-            _fader = fader;
+            _canvasGroupFader = canvasGroupFader;
             _locationManager = locationManager;
         }
 
-        /// <summary> Продолжает последнюю сохранённую игру. </summary>
-        /// <remarks> Вызывается из главного меню. </remarks>
-        public void ContinueGame()
-        {
-            if (!SaveFileExists) return;
-
-            StartCoroutine(LoadLastScene());
-        }
-
-        /// <summary> Начинает новую игру с указанным файлом сохранения. </summary>
+        /// <summary> Асинхронно начинает новую игру. </summary>
         /// <param name="saveFileName"> Название файла сохранения. </param>
-        public void StartNewGame(string saveFileName)
+        public async UniTask StartNewGameAsync(string saveFileName)
         {
             if (string.IsNullOrEmpty(saveFileName)) return;
 
             SetCurrentSaveFileName(saveFileName);
-            StartCoroutine(LoadFirstScene());
+
+            await _canvasGroupFader.Show().AsyncWaitForCompletion();
+
+            await SceneManager.LoadSceneAsync(FirstUploadedScene.ToString());
+            Save();
+
+            _canvasGroupFader.Hide();
+            _locationManager?.UpdateActiveLocation();
+            InputWrapper.UnblockAllInput();
+        }
+
+        /// <summary> Асинхронно продолжает игру из последнего сохранения. </summary>
+        public async UniTask ContinueGameAsync()
+        {
+            if (!SaveFileExists) return;
+
+            await _canvasGroupFader.Show().AsyncWaitForCompletion();
+
+            await SavingSystem.LoadLastScene(CurrentSaveFileName);
+
+            _canvasGroupFader.Hide();
+            _locationManager?.UpdateActiveLocation();
+            InputWrapper.UnblockAllInput();
         }
 
         /// <summary> Устанавливает текущее сохранение. </summary>
-        /// <param name="saveFileName"> Название файла сохранения. </param>
         private static void SetCurrentSaveFileName(string saveFileName) =>
             PlayerPrefs.SetString(CurrentSaveKey, saveFileName);
 
-        /// <summary> Получает название текущего сохранения. </summary>
-        /// <returns> Название текущего сохранения. </returns>
-        private static string GetCurrentSaveFileName() => PlayerPrefs.GetString(CurrentSaveKey);
-
-        /// <summary> Загружает первую сцену игры. </summary>
-        /// <returns> Корутина, выполняющая загрузку первой сцены. </returns>
-        private IEnumerator LoadFirstScene()
-        {
-            yield return _fader.FadeOut(Fader.FadeOutTime);
-            yield return SceneManager.LoadSceneAsync(FirstUploadedScene.ToString());
-            Save();
-            yield return _fader.FadeIn(Fader.FadeInTime);
-
-            _locationManager?.ActivatePlayerCurrentLocation();
-            InputWrapper.UnblockAllInput();
-        }
-
-        /// <summary> Загружает последнюю сохранённую сцену. </summary>
-        /// <returns> Корутина, выполняющая загрузку последней сохранённой сцены. </returns>
-        private IEnumerator LoadLastScene()
-        {
-            yield return _fader.FadeOut(Fader.FadeOutTime);
-            yield return SavingSystem.LoadLastScene(GetCurrentSaveFileName());
-            yield return _fader.FadeIn(Fader.FadeInTime);
-
-            _locationManager?.ActivatePlayerCurrentLocation();
-            InputWrapper.UnblockAllInput();
-        }
-
         /// <summary> Асинхронно загружает сцену по её названию. </summary>
         /// <param name="sceneName"> Название сцены. </param>
-        /// <returns> Корутина, выполняющая загрузку сцены. </returns>
-        public static IEnumerator LoadSceneAsyncByName(string sceneName)
+        public static async UniTask LoadSceneAsyncByName(string sceneName)
         {
-            yield return SceneManager.LoadSceneAsync(sceneName);
+            await SceneManager.LoadSceneAsync(sceneName);
         }
 
-        /// <summary> Загружает сцену по её названию. </summary>
-        /// <param name="sceneName"> Название сцены. </param>
-        public static void LoadSceneByName(string sceneName) => SceneManager.LoadScene(sceneName);
-
         /// <summary> Загружает данные игры из текущего сохранения. </summary>
-        public static void Load() => SavingSystem.Load(GetCurrentSaveFileName());
+        public static void Load() => SavingSystem.Load(CurrentSaveFileName);
 
         /// <summary> Сохраняет данные игры в текущий файл сохранения. </summary>
-        public static void Save() => SavingSystem.Save(GetCurrentSaveFileName());
+        public static void Save() => SavingSystem.Save(CurrentSaveFileName);
 
         /// <summary> Удаляет текущее сохранение. </summary>
-        public static void Delete() => SavingSystem.Delete(GetCurrentSaveFileName());
+        public static void Delete() => SavingSystem.Delete(CurrentSaveFileName);
 
         #region Debug
 

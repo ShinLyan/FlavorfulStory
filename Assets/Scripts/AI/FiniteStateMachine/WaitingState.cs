@@ -1,19 +1,31 @@
+using FlavorfulStory.Player;
+using UnityEngine;
+
 namespace FlavorfulStory.AI.FiniteStateMachine
 {
     /// <summary> Состояние ожидания NPC, в котором персонаж не выполняет активных действий. </summary>
     public class WaitingState : CharacterState
     {
-        /// <summary> Вызывается при входе в состояние. </summary>
-        public override void Enter() { }
+        /// <summary> Ссылка на контроллер игрока, используемая для определения его позиции. </summary>
+        private readonly PlayerController _playerController;
 
-        /// <summary> Вызывается при выходе из состояния. </summary>
-        public override void Exit() { }
+        /// <summary> Трансформ NPC, необходимый для поворота в сторону игрока. </summary>
+        private readonly Transform _npcTransform;
 
-        /// <summary> Обновление логики состояния, вызываемое каждый кадр. </summary>
-        /// <param name="deltaTime"> Время, прошедшее с последнего кадра. </param>
-        public override void Update(float deltaTime) { }
+        /// <summary> Конструктор состояния ожидания NPC. </summary>
+        /// <param name="playerController"> Ссылка на контроллер игрока. </param>
+        /// <param name="npcTransform"> Трансформ NPC, к которому применяется поворот. </param>
+        public WaitingState(PlayerController playerController, Transform npcTransform)
+        {
+            _playerController = playerController;
+            _npcTransform = npcTransform;
+        }
 
-        /// <summary> Сброс состояния в начальное состояние. </summary>
-        public override void Reset() { }
+        /// <summary> Обновляет поведение NPC: поворачивает его к игроку. </summary>
+        public override void Update()
+        {
+            _npcTransform.rotation =
+                Quaternion.LookRotation(_playerController.transform.position - _npcTransform.position);
+        }
     }
 }

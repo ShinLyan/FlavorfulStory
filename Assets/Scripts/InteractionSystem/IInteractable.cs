@@ -1,15 +1,15 @@
 ﻿using FlavorfulStory.Player;
-using FlavorfulStory.TooltipSystem;
+using FlavorfulStory.TooltipSystem.ActionTooltips;
 using UnityEngine;
 
 namespace FlavorfulStory.InteractionSystem
 {
-    /// <summary> Интерфейс для объектов, с которыми можно взаимодействовать
-    /// (например, двери, предметы, NPC). </summary>
-    /// <remarks> Наследуется от <see cref="ITooltipableAction"/>, что позволяет отображать всплывающие
-    /// подсказки при наведении. </remarks>
-    public interface IInteractable : ITooltipableAction
+    /// <summary> Интерфейс для объектов, с которыми можно взаимодействовать. </summary>
+    public interface IInteractable
     {
+        /// <summary> Действие для отображения в тултипе. </summary>
+        ActionTooltipData ActionTooltip { get; }
+
         /// <summary> Доступно ли взаимодействие с объектом в текущий момент? </summary>
         bool IsInteractionAllowed { get; }
 

@@ -17,7 +17,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &6920983285985209228
 RectTransform:
   m_ObjectHideFlags: 0
@@ -439,6 +439,8 @@ GameObject:
   - component: {fileID: 4578775148810025697}
   - component: {fileID: 2901247750316440538}
   - component: {fileID: 8967465090084375201}
+  - component: {fileID: 7669098455873900843}
+  - component: {fileID: 105509498620949873}
   - component: {fileID: 7829750907451991891}
   m_Layer: 0
   m_Name: ConfirmationView
@@ -530,6 +532,30 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
+--- !u!225 &7669098455873900843
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5492742034813545481}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
+--- !u!114 &105509498620949873
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5492742034813545481}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3e8d526b1b005ec4bbbb7fa3ea9faaa3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &7829750907451991891
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -542,7 +568,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8a66d1fc840549dd954a98e8ec13ebf8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _content: {fileID: 306247337857611647}
   _titleText: {fileID: 2087857364825286845}
   _descriptionText: {fileID: 7769075816940744765}
   _yesButton: {fileID: 5588775071718283224}

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace FlavorfulStory.InputSystem
@@ -19,31 +20,44 @@ namespace FlavorfulStory.InputSystem
                 _allowedButtons.Add(inputButton, true);
         }
 
-        /// <summary> Блокирует указанную кнопку ввода. </summary>
-        /// <param name="inputToBlock"> Кнопка для блокировки. </param>
-        public static void BlockInput(InputButton inputToBlock) => _allowedButtons[inputToBlock] = false;
-
         /// <summary> Блокирует указанные кнопки ввода. </summary>
-        /// <param name="inputToBlock"> Коллекция кнопок для блокировки. </param>
-        public static void BlockInput(IEnumerable<InputButton> inputToBlock) =>
-            inputToBlock.ToList().ForEach(button => _allowedButtons[button] = false);
-
-        /// <summary> Блокирует все кнопки ввода. </summary>
-        public static void BlockAllInput() =>
-            _allowedButtons.Keys.ToList().ForEach(button => _allowedButtons[button] = false);
-
-        /// <summary> Разблокирует указанную кнопку ввода. </summary>
-        /// <param name="inputToUnlock"> Кнопка для разблокировки. </param>
-        public static void UnblockInput(InputButton inputToUnlock) => _allowedButtons[inputToUnlock] = true;
+        /// <param name="buttonsToBlock"> Кнопки для блокировки. </param>
+        public static void BlockInput(params InputButton[] buttonsToBlock)
+        {
+            foreach (var button in buttonsToBlock) _allowedButtons[button] = false;
+        }
 
         /// <summary> Разблокирует указанные кнопки ввода. </summary>
-        /// <param name="inputToUnlock"> Коллекция кнопок для разблокировки. </param>
-        public static void UnblockInput(IEnumerable<InputButton> inputToUnlock) =>
-            inputToUnlock.ToList().ForEach(button => _allowedButtons[button] = true);
+        /// <param name="buttonsToUnblock"> Кнопки для разблокировки.</param>
+        public static void UnblockInput(params InputButton[] buttonsToUnblock)
+        {
+            foreach (var button in buttonsToUnblock) _allowedButtons[button] = true;
+        }
+
+        /// <summary> Блокирует все кнопки ввода. </summary>
+        public static void BlockAllInput()
+        {
+            foreach (var key in _allowedButtons.Keys.ToArray()) _allowedButtons[key] = false;
+        }
 
         /// <summary> Разблокирует все кнопки ввода. </summary>
-        public static void UnblockAllInput() =>
-            _allowedButtons.Keys.ToList().ForEach(button => _allowedButtons[button] = true);
+        public static void UnblockAllInput()
+        {
+            foreach (var key in _allowedButtons.Keys.ToArray()) _allowedButtons[key] = true;
+        }
+
+        /// <summary> Разблокирует указанные кнопки ввода на следующем кадре. </summary>
+        /// <param name="buttonsToUnblock">Кнопки для разблокировки. </param>
+        public static void UnblockInputNextFrame(params InputButton[] buttonsToUnblock) =>
+            UnblockNextFrameAsync(buttonsToUnblock).Forget();
+
+        /// <summary> Асинхронный метод разблокировки кнопок на следующем кадре. </summary>
+        /// <param name="buttonsToUnblock">Кнопки для разблокировки. </param>
+        private static async UniTaskVoid UnblockNextFrameAsync(InputButton[] buttonsToUnblock)
+        {
+            await UniTask.Yield(); // Ждем следующий кадр
+            UnblockInput(buttonsToUnblock);
+        }
 
         /// <summary> Проверяет отпускание кнопки в текущем кадре. </summary>
         /// <param name="button"> Проверяемая кнопка. </param>
@@ -79,12 +93,18 @@ namespace FlavorfulStory.InputSystem
         public static Vector3 GetMousePosition() =>
             !_allowedButtons[InputButton.MousePosition] ? Vector3.zero : Input.mousePosition;
 
-        /// <summary> Заблокировать передвижение игрока. </summary>
-        public static void BlockPlayerMovement() =>
-            BlockInput(new[] { InputButton.Horizontal, InputButton.Vertical });
+        /// <summary> Заблокировать управление игрока (перемещение, скролл). </summary>
+        public static void BlockPlayerInput()
+        {
+            BlockInput(InputButton.Horizontal, InputButton.Vertical);
+            BlockInput(InputButton.MouseScroll);
+        }
 
-        /// <summary> Разблокировать передвижение игрока. </summary>
-        public static void UnblockPlayerMovement() =>
-            UnblockInput(new[] { InputButton.Horizontal, InputButton.Vertical });
+        /// <summary> Разблокировать управление игрока (перемещение, скролл). </summary>
+        public static void UnblockPlayerInput()
+        {
+            UnblockInput(InputButton.Horizontal, InputButton.Vertical);
+            UnblockInput(InputButton.MouseScroll);
+        }
     }
 }
