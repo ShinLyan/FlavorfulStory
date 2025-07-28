@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using FlavorfulStory.Infrastructure;
+using FlavorfulStory.Utils.FlavorfulStory.Utils;
 using UnityEngine;
 
 namespace FlavorfulStory.TooltipSystem
@@ -78,6 +79,6 @@ namespace FlavorfulStory.TooltipSystem
         /// <param name="actionTooltip"> Структура данных действия. </param>
         /// <returns> Строка формата: "Harvest Bread". </returns>
         private static string CreateActionDescription(ActionTooltipData actionTooltip) =>
-            $"{actionTooltip.Action} {actionTooltip.Target}";
+            $"{actionTooltip.Action.ToFriendlyString()} {actionTooltip.Target}";
     }
 }

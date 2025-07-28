@@ -1,19 +1,32 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using FlavorfulStory.Actions;
 using FlavorfulStory.Economy;
+using FlavorfulStory.InteractionSystem;
+using FlavorfulStory.Player;
 using FlavorfulStory.Saving;
+using FlavorfulStory.TooltipSystem;
 using UnityEditor;
 using UnityEngine;
+using Zenject;
 using Random = UnityEngine.Random;
 
 namespace FlavorfulStory.Shop
 {
     /// <summary> Касса магазина, реализующая хранение валюты и сохранение её состояния. </summary>
-    public class CashRegister : ShopObject, ICurrencyStorage, ISaveable
+    public class CashRegister : ShopObject, ICurrencyStorage, ISaveable, IInteractable
     {
         /// <summary> Словарь доступности точек доступа к кассе. </summary>
         private Dictionary<Transform, bool> _accessPointsAvailability;
+
+        /// <summary> Сервис транзакций, отвечающий за покупку и продажу предметов. </summary>
+        private TransactionService _transactionService;
+
+        /// <summary> Внедрение зависимостей Zenject. </summary>
+        /// <param name="transactionService"> Сервис транзакций. </param>
+        [Inject]
+        private void Construct(TransactionService transactionService) => _transactionService = transactionService;
 
         /// <summary> Инициализирует значение золота при запуске. </summary>
         private void Start()
@@ -79,6 +92,34 @@ namespace FlavorfulStory.Shop
             OnAmountChanged?.Invoke(Amount);
             return true;
         }
+
+        #endregion
+
+        #region IInteractable
+
+        /// <summary> Описание действия с объектом. </summary>
+        public ActionTooltipData ActionTooltip => new("E", ActionType.GetMoney, "from Cash Desk");
+
+        /// <summary> Возвращает возможность взаимодействия с объектом. </summary>
+        public bool IsInteractionAllowed => true;
+
+        /// <summary> Вычисляет расстояние до указанного трансформа. </summary>
+        /// <param name="otherTransform"> Трансформ, до которого вычисляется расстояние. </param>
+        /// <returns> Расстояние до объекта. </returns>
+        public float GetDistanceTo(Transform otherTransform) =>
+            Vector3.Distance(transform.position, otherTransform.position);
+
+        /// <summary> Начинает взаимодействие с кассой. </summary>
+        /// <param name="player"> Контроллер игрока. </param>
+        public void BeginInteraction(PlayerController player)
+        {
+            _transactionService.TransferMoneyFromCashRegisterToPlayer();
+            player.SetBusyState(false);
+        }
+
+        /// <summary> Завершает взаимодействие с кассой. </summary>
+        /// <param name="player"> Контроллер игрока. </param>
+        public void EndInteraction(PlayerController player) { }
 
         #endregion
 

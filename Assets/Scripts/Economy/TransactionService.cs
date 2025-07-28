@@ -39,6 +39,11 @@ namespace FlavorfulStory.Economy
             return _playerWallet.TrySpend(cost);
         }
 
-        //TODO: добавить метод TransferMoneyFromCashRegisterToPlayer()
+        /// <summary> Перевести деньги из кассы игроку. </summary>
+        public void TransferMoneyFromCashRegisterToPlayer()
+        {
+            _playerWallet.Add(_cashRegister.Amount);
+            _cashRegister.TrySpend(_cashRegister.Amount);
+        }
     }
 }
