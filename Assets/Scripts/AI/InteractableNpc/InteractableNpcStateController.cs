@@ -43,8 +43,7 @@ namespace FlavorfulStory.AI.InteractableNpc
         public InteractableNpcStateController(NpcSchedule npcSchedule,
             InteractableNpcMovementController npcMovementController,
             NpcAnimationController npcAnimationController, NpcScheduleHandler scheduleHandler,
-            PlayerController playerController, Transform npcTransform)
-            : base(npcAnimationController)
+            PlayerController playerController, Transform npcTransform) : base(npcAnimationController)
         {
             _sortedScheduleParams = npcSchedule.GetSortedScheduleParams();
             _scheduleHandler = scheduleHandler;
@@ -60,6 +59,14 @@ namespace FlavorfulStory.AI.InteractableNpc
             base.SubscribeToEvents();
             _scheduleHandler.OnSchedulePointChanged += OnSchedulePointChanged;
             OnCurrentScheduleParamsChanged += _scheduleHandler.SetCurrentScheduleParams;
+        }
+
+        /// <summary> Отписка от событий при уничтожении. </summary>
+        protected override void UnsubscribeFromEvents()
+        {
+            base.UnsubscribeFromEvents();
+            _scheduleHandler.OnSchedulePointChanged -= OnSchedulePointChanged;
+            OnCurrentScheduleParamsChanged -= _scheduleHandler.SetCurrentScheduleParams;
         }
 
         /// <summary> Инициализирует все состояния для интерактивного NPC. </summary>

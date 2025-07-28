@@ -14,10 +14,8 @@ namespace FlavorfulStory.AI.NonInteractableNpc
         /// <param name="navMeshAgent"> Агент навигационной сетки для перемещения. </param>
         /// <param name="transform"> Трансформ объекта NPC. </param>
         /// <param name="animationController"> Контроллер анимации для управления анимациями движения. </param>
-        public NonInteractableNpcMovementController(NavMeshAgent navMeshAgent,
-            Transform transform,
-            NpcAnimationController animationController)
-            : base(navMeshAgent, transform, animationController)
+        public NonInteractableNpcMovementController(NavMeshAgent navMeshAgent, Transform transform,
+            NpcAnimationController animationController) : base(navMeshAgent, transform, animationController)
         {
             _currentPoint = Vector3.zero;
 

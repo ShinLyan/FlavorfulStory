@@ -9,8 +9,8 @@ namespace FlavorfulStory.AI.FiniteStateMachine.ShopStates
         public override void Enter()
         {
             base.Enter();
-            if (Context != null && Context.TryGet<ShopObject>(ContextType.SelectedObject, out var shelf))
-                shelf.IsOccupied = false;
+            if (Context != null && Context.TryGet<ShopObject>(ContextType.SelectedObject, out var showcase))
+                showcase.IsOccupied = false;
         }
 
         /// <summary> Возвращает статус завершения состояния. </summary>

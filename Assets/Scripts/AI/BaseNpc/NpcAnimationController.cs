@@ -1,9 +1,11 @@
-﻿using UnityEngine;
+﻿using System;
+using FlavorfulStory.TimeManagement;
+using UnityEngine;
 
 namespace FlavorfulStory.AI.BaseNpc
 {
     /// <summary> Контроллер анимации NPC, управляющий всеми анимационными состояниями персонажа. </summary>
-    public class NpcAnimationController
+    public class NpcAnimationController : IDisposable
     {
         /// <summary> Компонент Animator для управления анимациями. </summary>
         private readonly Animator _animator;
@@ -13,7 +15,19 @@ namespace FlavorfulStory.AI.BaseNpc
 
         /// <summary> Инициализирует контроллер анимации с заданным компонентом Animator. </summary>
         /// <param name="animator"> Компонент Animator для управления анимациями NPC. </param>
-        public NpcAnimationController(Animator animator) => _animator = animator;
+        public NpcAnimationController(Animator animator)
+        {
+            _animator = animator;
+
+            WorldTime.OnTimePaused += PauseAnimation;
+            WorldTime.OnTimeUnpaused += ContinueAnimation;
+        }
+
+        public void Dispose()
+        {
+            WorldTime.OnTimePaused -= PauseAnimation;
+            WorldTime.OnTimeUnpaused -= ContinueAnimation;
+        }
 
         /// <summary> Устанавливает скорость анимации с плавным переходом. </summary>
         /// <param name="speed"> Значение скорости для установки. </param>
@@ -31,10 +45,10 @@ namespace FlavorfulStory.AI.BaseNpc
             _animator.SetTrigger(Animator.StringToHash(animationType.ToString()));
 
         /// <summary> Остановить анимацию. </summary>
-        public void PauseAnimation() => _animator.speed = 0;
+        private void PauseAnimation() => _animator.speed = 0;
 
         /// <summary> Продолжить анимацию. </summary>
-        public void ContinueAnimation() => _animator.speed = 1;
+        private void ContinueAnimation() => _animator.speed = 1;
 
         /// <summary> Сбрасывает все параметры Animator к значениям по умолчанию. </summary>
         public void Reset() => _animator.Rebind();

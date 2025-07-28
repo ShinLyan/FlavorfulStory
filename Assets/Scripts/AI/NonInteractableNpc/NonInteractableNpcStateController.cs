@@ -43,13 +43,10 @@ namespace FlavorfulStory.AI.NonInteractableNpc
         /// <param name="locationManager"> Менеджер локаций для получения информации о местоположениях. </param>
         /// <param name="npcAnimationController"> Контроллер анимации NPC для управления анимациями персонажа. </param>
         /// <param name="itemHandler"> Обработчик предметов для работы с игровыми объектами. </param>
-        /// <param name="transactionService"></param>
+        /// <param name="transactionService"> Сервис для транзакций. </param>
         public NonInteractableNpcStateController(NonInteractableNpcMovementController npcMovementController,
-            LocationManager locationManager,
-            NpcAnimationController npcAnimationController,
-            ItemHandler itemHandler,
-            TransactionService transactionService)
-            : base(npcAnimationController)
+            LocationManager locationManager, NpcAnimationController npcAnimationController,
+            ItemHandler itemHandler, TransactionService transactionService) : base(npcAnimationController)
         {
             _npcMovementController = npcMovementController;
             _locationManager = locationManager;
@@ -87,8 +84,8 @@ namespace FlavorfulStory.AI.NonInteractableNpc
                 new PaymentState(shopLocation, _itemHandler, _transactionService));
             _nameToCharacterStates.Add(StateName.RandomPointPicker,
                 new RandomPointPickerState(_npcMovementController, shopLocation));
-            _nameToCharacterStates.Add(StateName.ShelfPicker,
-                new ShelfPickerState(_npcMovementController, shopLocation));
+            _nameToCharacterStates.Add(StateName.ShowcasePicker,
+                new ShowcasePickerState(_npcMovementController, shopLocation));
             _nameToCharacterStates.Add(StateName.RefuseItem, new RefuseItemState());
         }
 
@@ -114,7 +111,7 @@ namespace FlavorfulStory.AI.NonInteractableNpc
             _nameToCharacterStates.Add(StateName.BuyItemSequence, new SequenceState(
                 new[]
                 {
-                    _nameToCharacterStates[StateName.ShelfPicker],
+                    _nameToCharacterStates[StateName.ShowcasePicker],
                     _nameToCharacterStates[StateName.Movement],
                     _nameToCharacterStates[StateName.Animation],
                     _nameToCharacterStates[StateName.ItemPicker],
@@ -127,7 +124,7 @@ namespace FlavorfulStory.AI.NonInteractableNpc
             _nameToCharacterStates.Add(StateName.RefuseItemSequence, new SequenceState(
                 new[]
                 {
-                    _nameToCharacterStates[StateName.ShelfPicker],
+                    _nameToCharacterStates[StateName.ShowcasePicker],
                     _nameToCharacterStates[StateName.Movement],
                     _nameToCharacterStates[StateName.Animation],
                     _nameToCharacterStates[StateName.RefuseItem]
@@ -160,12 +157,12 @@ namespace FlavorfulStory.AI.NonInteractableNpc
         {
             var shopLocation = (ShopLocation)_locationManager.GetLocationByName(LocationName.NewShop);
 
-            bool areShelvesAvailable = !shopLocation.AreAvailableShelvesEmpty();
+            bool areShowcasesAvailable = !shopLocation.AreAvailableShowcasesEmpty();
             bool areFurnitureAvailable = !shopLocation.AreAllFurnitureOccupied();
 
             var availableOptions = new List<(StateName sequenceName, float weight)>();
 
-            if (areShelvesAvailable)
+            if (areShowcasesAvailable)
             {
                 availableOptions.Add((StateName.BuyItemSequence, (float)(50 * 0.67)));
                 availableOptions.Add((StateName.RefuseItemSequence, (float)(50 * 0.33)));

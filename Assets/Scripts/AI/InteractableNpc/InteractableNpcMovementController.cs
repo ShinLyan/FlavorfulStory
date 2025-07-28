@@ -18,10 +18,8 @@ namespace FlavorfulStory.AI.InteractableNpc
         /// <param name="transform"> Transform NPC. </param>
         /// <param name="animationController"> Контроллер анимации NPC. </param>
         /// <param name="scheduleHandler"> Обработчик расписания NPC. </param>
-        public InteractableNpcMovementController(NavMeshAgent navMeshAgent,
-            Transform transform,
-            NpcAnimationController animationController,
-            NpcScheduleHandler scheduleHandler)
+        public InteractableNpcMovementController(NavMeshAgent navMeshAgent, Transform transform,
+            NpcAnimationController animationController, NpcScheduleHandler scheduleHandler)
             : base(navMeshAgent, transform, animationController)
         {
             _scheduleHandler = scheduleHandler;

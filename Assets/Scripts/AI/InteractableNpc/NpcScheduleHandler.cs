@@ -8,7 +8,7 @@ using DateTime = FlavorfulStory.TimeManagement.DateTime;
 namespace FlavorfulStory.AI.InteractableNpc
 {
     /// <summary> Обработчик расписания NPC, который управляет временными точками расписания персонажа. </summary>
-    public class NpcScheduleHandler : IScheduleDependable
+    public class NpcScheduleHandler : IScheduleDependable, IDisposable
     {
         /// <summary> Стек текущих точек расписания, отсортированных по времени. </summary>
         private Stack<SchedulePoint> _currentPath;
@@ -24,6 +24,12 @@ namespace FlavorfulStory.AI.InteractableNpc
         {
             WorldTime.OnTimeTick += UpdateSchedulePoint;
             WorldTime.OnDayEnded += Reset;
+        }
+
+        public void Dispose()
+        {
+            WorldTime.OnTimeTick -= UpdateSchedulePoint;
+            WorldTime.OnDayEnded -= Reset;
         }
 
         /// <summary> Устанавливает параметры текущего расписания для NPC. </summary>

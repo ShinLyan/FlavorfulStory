@@ -14,9 +14,16 @@ namespace FlavorfulStory.AI.NonInteractableNpc
     [RequireComponent(typeof(ItemHandler))]
     public class NonInteractableNpc : Npc
     {
+        /// <summary> Контроллер передвижений для неинтерктивного НПС. </summary>
+        private NonInteractableNpcMovementController _nonInteractableNpcMovementController;
+
+        /// <summary> Стейт-контроллер для неинтерктивного НПС. </summary>
+        private NonInteractableNpcStateController _nonInteractableNpcStateController;
+
         /// <summary> Менеджер локаций для управления переходами между локациями. </summary>
         [Inject] private LocationManager _locationManager;
 
+        /// <summary> Сервис для транзакций. </summary>
         [Inject] private TransactionService _transactionService;
 
         /// <summary> Обработчик предметов для взаимодействия с объектами. </summary>
@@ -25,50 +32,42 @@ namespace FlavorfulStory.AI.NonInteractableNpc
         /// <summary> Событие, вызываемое при достижении NPC точки спавна для уничтожения. </summary>
         public Action OnReachedDespawnPoint;
 
-        /// <summary> Инициализирует компоненты неинтерактивного NPC. </summary>
-        protected override void Awake()
-        {
-            _itemHandler = GetComponent<ItemHandler>();
-            base.Awake();
-        }
-
         /// <summary> Создает контроллер движения для неинтерактивного NPC. </summary>
         /// <returns> Экземпляр контроллера движения неинтерактивного NPC. </returns>
         protected override NpcMovementController CreateMovementController()
         {
-            return new NonInteractableNpcMovementController(
+            _nonInteractableNpcMovementController = new NonInteractableNpcMovementController(
                 GetComponent<NavMeshAgent>(),
                 transform,
                 _animationController
             );
+            return _nonInteractableNpcMovementController;
         }
 
         /// <summary> Создает контроллер состояний для неинтерактивного NPC. </summary>
         /// <returns> Экземпляр контроллера состояний неинтерактивного NPC. </returns>
         protected override StateController CreateStateController()
         {
-            return new NonInteractableNpcStateController(
+            _nonInteractableNpcStateController = new NonInteractableNpcStateController(
                 _movementController as NonInteractableNpcMovementController,
                 _locationManager,
                 _animationController,
-                _itemHandler,
+                GetComponent<ItemHandler>(),
                 _transactionService
             );
+            return _nonInteractableNpcStateController;
         }
 
         /// <summary> Устанавливает цель для перемещения NPC с автоматическим запуском случайной последовательности по прибытии. </summary>
         /// <param name="destination"> Целевая позиция для перемещения. </param>
         public void SetDestination(Vector3 destination)
         {
-            var movementController = (NonInteractableNpcMovementController)_movementController;
-            var stateController = (NonInteractableNpcStateController)_stateController;
-
-            movementController.SetPoint(destination);
-            stateController.ForceSetState(StateName.Movement);
-            movementController.OnDestinationReached += () =>
+            _nonInteractableNpcMovementController.SetPoint(destination);
+            _nonInteractableNpcStateController.ForceSetState(StateName.Movement);
+            _nonInteractableNpcMovementController.OnDestinationReached += () =>
             {
-                stateController.ForceSetState(StateName.Idle);
-                stateController.StartRandomSequence();
+                _nonInteractableNpcStateController.ForceSetState(StateName.Idle);
+                _nonInteractableNpcStateController.StartRandomSequence();
             };
         }
 

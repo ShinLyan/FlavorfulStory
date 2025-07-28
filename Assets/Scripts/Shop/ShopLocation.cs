@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using FlavorfulStory.SceneManagement;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -13,7 +14,7 @@ namespace FlavorfulStory.Shop
         public CashRegister CashDesk { get; private set; }
 
         /// <summary> Массив полок в магазине. </summary>
-        [SerializeField] private Shelf[] _shelves;
+        [SerializeField] private Showcase[] _showcases;
 
         /// <summary> Массив мебели в магазине. </summary>
         [SerializeField] private Furniture[] _furnitures;
@@ -27,7 +28,7 @@ namespace FlavorfulStory.Shop
 
         /// <summary> Возвращает случайную доступную полку. </summary>
         /// <returns> Доступная полка или null, если все полки заняты. </returns>
-        public Shelf GetAvailableShelf() => GetRandomObject(_shelves);
+        public Showcase GetAvailableShowcase() => GetRandomObject(_showcases);
 
         /// <summary> Получает массив доступных (незанятых) объектов из переданного массива. </summary>
         /// <typeparam name="T"> Тип объекта, производный от ShopObject. </typeparam>
@@ -58,10 +59,10 @@ namespace FlavorfulStory.Shop
 
         /// <summary> Проверяет, пусты ли все доступные полки. </summary>
         /// <returns> True, если все доступные полки пусты, иначе false. </returns>
-        public bool AreAvailableShelvesEmpty()
+        public bool AreAvailableShowcasesEmpty()
         {
             // TODO: Реализация проверки, есть ли на полках товары
-            return GetAvailableObjects(_shelves).Length == 0;
+            return GetAvailableObjects(_showcases).Length == 0;
         }
 
         /// <summary> Проверяет, занята ли вся мебель в магазине. </summary>
@@ -79,23 +80,14 @@ namespace FlavorfulStory.Shop
                 var position = base.GetRandomPointOnNavMesh(maxAttempts);
                 if (position == Vector3.zero) continue;
 
-                bool isValidPosition = true;
-
-                foreach (var shelf in _shelves)
-                    if (Vector3.Distance(position, shelf.transform.position) < MinDistance)
-                    {
-                        isValidPosition = false;
-                        break;
-                    }
+                bool isValidPosition = _showcases.All(showcase =>
+                    !(Vector3.Distance(position, showcase.transform.position) < MinDistance));
 
                 if (!isValidPosition) continue;
 
-                foreach (var furniture in _furnitures)
-                    if (Vector3.Distance(position, furniture.transform.position) < MinDistance)
-                    {
-                        isValidPosition = false;
-                        break;
-                    }
+                if (_furnitures.All(furniture =>
+                        Vector3.Distance(position, furniture.transform.position) < MinDistance))
+                    isValidPosition = false;
 
                 if (isValidPosition) return position;
             }

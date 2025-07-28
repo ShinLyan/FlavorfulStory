@@ -31,7 +31,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         RandomPointPicker,
 
         /// <summary> Состояние выбора прилавка. </summary>
-        ShelfPicker,
+        ShowcasePicker,
 
         /// <summary> Состояние отказа от предмета. </summary>
         RefuseItem,

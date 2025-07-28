@@ -11,8 +11,7 @@ namespace FlavorfulStory.AI.InteractableNpc
         /// <summary> Инициализирует новый экземпляр навигатора для интерактивного NPC. </summary>
         /// <param name="navMeshAgent"> NavMeshAgent для навигации. </param>
         /// <param name="transform"> Transform NPC. </param>
-        public InteractableNpcNavigator(NavMeshAgent navMeshAgent, Transform transform)
-            : base(navMeshAgent, transform)
+        public InteractableNpcNavigator(NavMeshAgent navMeshAgent, Transform transform) : base(navMeshAgent, transform)
         {
         }
 

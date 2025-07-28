@@ -1,5 +1,4 @@
 ﻿using FlavorfulStory.Player;
-using FlavorfulStory.TimeManagement;
 using UnityEngine;
 using UnityEngine.AI;
 using Zenject;
@@ -29,22 +28,16 @@ namespace FlavorfulStory.AI.BaseNpc
             _animationController = CreateAnimationController();
             _movementController = CreateMovementController();
             _stateController = CreateStateController();
-
-            WorldTime.OnTimePaused += _animationController.PauseAnimation;
-            WorldTime.OnTimeUnpaused += _animationController.ContinueAnimation;
         }
-
-        /// <summary> Выполняет инициализацию всех контроллеров и систем NPC при запуске. </summary>
-        protected virtual void Start() { }
 
         protected virtual void OnDestroy()
         {
-            WorldTime.OnTimePaused -= _animationController.PauseAnimation;
-            WorldTime.OnTimeUnpaused -= _animationController.ContinueAnimation;
+            _animationController.Dispose();
+            _stateController.Dispose();
         }
 
         /// <summary> Обновляет логику состояний и движения NPC каждый кадр. </summary>
-        protected virtual void Update()
+        protected void Update()
         {
             _stateController.Update();
             _movementController.UpdateMovement();
@@ -52,10 +45,7 @@ namespace FlavorfulStory.AI.BaseNpc
 
         /// <summary> Создает контроллер анимации для NPC. </summary>
         /// <returns> Новый экземпляр NpcAnimationController. </returns>
-        protected virtual NpcAnimationController CreateAnimationController()
-        {
-            return new NpcAnimationController(GetComponent<Animator>());
-        }
+        private NpcAnimationController CreateAnimationController() => new(GetComponent<Animator>());
 
         /// <summary> Создает контроллер движения для NPC. </summary>
         /// <returns> Новый экземпляр NpcMovementController. </returns>

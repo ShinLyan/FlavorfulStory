@@ -24,8 +24,7 @@ namespace FlavorfulStory.AI.BaseNpc
         /// <param name="navMeshAgent"> NavMeshAgent для навигации. </param>
         /// <param name="transform"> Transform NPC. </param>
         /// <param name="animationController"> Контроллер анимации NPC. </param>
-        protected NpcMovementController(NavMeshAgent navMeshAgent,
-            Transform transform,
+        protected NpcMovementController(NavMeshAgent navMeshAgent, Transform transform,
             NpcAnimationController animationController)
         {
             _agent = navMeshAgent;

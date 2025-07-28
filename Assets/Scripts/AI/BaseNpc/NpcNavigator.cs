@@ -63,18 +63,17 @@ namespace FlavorfulStory.AI.BaseNpc
                 MoveTo(_currentTargetPoint);
             }
 
-            if (!_isNotMoving)
-            {
-                var offset = _npcTransform.position - _currentTargetPoint;
-                offset.y = 0;
-                float sqrDistance = offset.sqrMagnitude;
+            if (_isNotMoving) return;
 
-                if (sqrDistance <= ArrivalDistance)
-                {
-                    // _navMeshAgent.transform.rotation = Quaternion.Euler(_currentTargetPoint.Rotation);
-                    OnDestinationReached?.Invoke();
-                    Stop();
-                }
+            var offset = _npcTransform.position - _currentTargetPoint;
+            offset.y = 0;
+            float sqrDistance = offset.sqrMagnitude;
+
+            if (sqrDistance <= ArrivalDistance)
+            {
+                // _navMeshAgent.transform.rotation = Quaternion.Euler(_currentTargetPoint.Rotation);
+                OnDestinationReached?.Invoke();
+                Stop();
             }
         }
 

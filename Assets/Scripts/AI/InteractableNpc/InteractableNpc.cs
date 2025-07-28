@@ -33,6 +33,13 @@ namespace FlavorfulStory.AI.InteractableNpc
             _collisionHandler = new NpcCollisionHandler(_stateController as InteractableNpcStateController);
         }
 
+        /// <summary> Отписка от событий при уничтожении. </summary>
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            _npcScheduleHandler.Dispose();
+        }
+
         /// <summary> Создает контроллер движения для интерактивного NPC. </summary>
         /// <returns> Новый экземпляр InteractableNpcMovementController. </returns>
         protected override NpcMovementController CreateMovementController()

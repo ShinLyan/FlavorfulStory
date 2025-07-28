@@ -1,12 +1,14 @@
+using System;
 using System.Collections.Generic;
 using FlavorfulStory.AI.FiniteStateMachine;
 using FlavorfulStory.TimeManagement;
+using DateTime = FlavorfulStory.TimeManagement.DateTime;
 
 namespace FlavorfulStory.AI.BaseNpc
 {
     /// <summary> Контроллер состояний конечного автомата NPC,
     /// управляющий переходами между различными состояниями персонажа. </summary>
-    public abstract class StateController
+    public abstract class StateController : IDisposable
     {
         /// <summary> Текущее активное состояние персонажа. </summary>
         protected CharacterState _currentState;
@@ -25,6 +27,8 @@ namespace FlavorfulStory.AI.BaseNpc
             _animationController = npcAnimationController;
         }
 
+        public void Dispose() => UnsubscribeFromEvents();
+
         /// <summary> Выполняет полную инициализацию контроллера состояний. </summary>
         /// <remarks> Инициализирует состояния, подписывается на события и сбрасывает систему к начальному состоянию. </remarks>
         protected void Initialize()
@@ -38,16 +42,19 @@ namespace FlavorfulStory.AI.BaseNpc
         /// <remarks> Должен быть реализован в наследниках. </remarks>
         protected abstract void InitializeStates();
 
-        /// <summary> Подписывается на события системы времени. </summary>
+        /// <summary> Подписывается на события. </summary>
         /// <remarks> Может быть переопределен в наследниках для дополнительных подписок. </remarks>
         protected virtual void SubscribeToEvents() => WorldTime.OnDayEnded += OnReset;
+
+        /// <summary> Подписывается на события. </summary>
+        protected virtual void UnsubscribeFromEvents() => WorldTime.OnDayEnded -= OnReset;
 
         /// <summary> Сбрасывает систему состояний при смене дня или инициализации. </summary>
         /// <param name="currentTime"> Текущее игровое время. </param>
         protected virtual void OnReset(DateTime currentTime) => ResetStates();
 
         /// <summary> Обновляет текущее состояние персонажа каждый кадр. </summary>
-        public virtual void Update() => _currentState?.Update();
+        public void Update() => _currentState?.Update();
 
         /// <summary> Сбрасывает все состояния к начальному и устанавливает состояние рутины. </summary>
         /// <remarks> Может быть переопределен в наследниках для специфической логики сброса. </remarks>
