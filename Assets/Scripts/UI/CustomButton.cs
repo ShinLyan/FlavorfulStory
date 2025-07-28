@@ -77,7 +77,7 @@ namespace FlavorfulStory.UI
         protected virtual void Click()
         {
             OnClick?.Invoke();
-            SfxPlayer.Instance.PlayOneShot(SfxType.UIClick);
+            SfxPlayer.Play(SfxType.UIClick);
         }
 
         /// <summary> Вызывается при включении взаимодействия. </summary>

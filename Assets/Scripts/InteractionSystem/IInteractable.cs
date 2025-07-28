@@ -1,5 +1,5 @@
 ﻿using FlavorfulStory.Player;
-using FlavorfulStory.TooltipSystem;
+using FlavorfulStory.TooltipSystem.ActionTooltips;
 using UnityEngine;
 
 namespace FlavorfulStory.InteractionSystem

@@ -29,7 +29,7 @@ namespace FlavorfulStory.UI
         /// <summary> Наведение курсора на кнопку. </summary>
         protected override void HoverStart()
         {
-            SfxPlayer.Instance.PlayOneShot(SfxType.UIHover);
+            SfxPlayer.Play(SfxType.UIHover);
             SetNameState(true);
         }
 

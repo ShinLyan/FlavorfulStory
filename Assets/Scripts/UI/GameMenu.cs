@@ -1,7 +1,9 @@
+using Cysharp.Threading.Tasks;
 using FlavorfulStory.InputSystem;
 using FlavorfulStory.SceneManagement;
 using FlavorfulStory.TimeManagement;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace FlavorfulStory.UI
 {
@@ -11,6 +13,12 @@ namespace FlavorfulStory.UI
     {
         /// <summary> Контейнер с контентом меню. </summary>
         [SerializeField] private GameObject _content;
+
+        /// <summary> Кнопка продолжения игры. </summary>
+        [SerializeField] private Button _continueButton;
+
+        /// <summary> Кнопка выхода в главное меню. </summary>
+        [SerializeField] private Button _exitButton;
 
         /// <summary> Массив вкладок в меню. </summary>
         private Tab[] _tabs;
@@ -24,6 +32,16 @@ namespace FlavorfulStory.UI
         {
             _tabs = GetComponentsInChildren<Tab>(true);
             for (int i = 0; i < _tabs.Length; i++) _tabs[i].Initialize(i, OnTabSelected);
+
+            _continueButton.onClick.AddListener(OnClickContinue);
+            _exitButton.onClick.AddListener(OnClickReturnToMainMenu);
+        }
+
+        /// <summary> Отписывается от событий при уничтожении компонента. </summary>
+        private void OnDestroy()
+        {
+            _continueButton.onClick.RemoveListener(OnClickContinue);
+            _exitButton.onClick.RemoveListener(OnClickReturnToMainMenu);
         }
 
         /// <summary> Обрабатывает выбор вкладки по её индексу. 
@@ -107,9 +125,10 @@ namespace FlavorfulStory.UI
         }
 
         /// <summary> Обрабатывает нажатие кнопки "Продолжить", скрывая игровое меню. </summary>
-        public void OnClickContinue() => SwitchMenu(false);
+        private void OnClickContinue() => SwitchMenu(false);
 
         /// <summary> Обрабатывает нажатие кнопки "Вернуться в главное меню". Загружает сцену главного меню. </summary>
-        public void OnClickReturnToMainMenu() => SavingWrapper.LoadSceneByName(SceneName.MainMenu.ToString());
+        private void OnClickReturnToMainMenu() =>
+            SavingWrapper.LoadSceneAsyncByName(SceneName.MainMenu.ToString()).Forget();
     }
 }

@@ -26,7 +26,7 @@ namespace FlavorfulStory.InventorySystem.UI
         public void Setup(int index)
         {
             _index = index;
-            _itemStackView.UpdateView(_inventory.GetItemInSlot(index), _inventory.GetNumberInSlot(index));
+            _itemStackView.UpdateView(_inventory.GetItemStackInSlot(_index));
         }
 
         /// <summary> Получить максимально допустимое количество элементов. </summary>
