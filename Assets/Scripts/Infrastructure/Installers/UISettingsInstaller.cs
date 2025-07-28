@@ -1,6 +1,6 @@
+using FlavorfulStory.Notifications.Configs;
 using UnityEngine;
 using Zenject;
-using FlavorfulStory.Infrastructure.Configs.Notifications;
 
 namespace FlavorfulStory.Infrastructure.Installers
 {
@@ -13,9 +13,6 @@ namespace FlavorfulStory.Infrastructure.Installers
         public NotificationSystemSettings NotificationSettings { get; private set; }
 
         /// <summary> Регистрирует зависимости UI в контейнере Zenject. </summary>
-        public override void InstallBindings()
-        {
-            Container.BindInstance(NotificationSettings).AsSingle();
-        }
+        public override void InstallBindings() => Container.BindInstance(NotificationSettings).AsSingle();
     }
 }

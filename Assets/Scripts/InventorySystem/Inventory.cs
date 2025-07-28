@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Linq;
 using FlavorfulStory.Core;
-using FlavorfulStory.InventorySystem.PickupSystem;
 using FlavorfulStory.Saving;
-using FlavorfulStory.UI.Notifications;
 using UnityEngine;
 using Zenject;
 
@@ -22,8 +20,13 @@ namespace FlavorfulStory.InventorySystem
         /// <summary> Событие, вызываемое при изменении инвентаря (добавление, удаление предметов). </summary>
         public event Action InventoryUpdated;
 
-        /// <summary> Событие при сборе предмета. Передает сам предмет. </summary>
-        public event Action<InventoryItem> ItemCollected;
+        /// <summary> Сигнальная шина Zenject для отправки и получения событий. </summary>
+        private SignalBus _signalBus;
+
+        /// <summary> Внедрение зависимостей Zenject. </summary>
+        /// <param name="signalBus"> Сигнальная шина Zenject для отправки событий. </param>
+        [Inject]
+        private void Construct(SignalBus signalBus) => _signalBus = signalBus;
 
         /// <summary> Инициализация слотов и ссылки на инвентарь игрока. </summary>
         private void Awake() => _inventorySlots = new ItemStack[InventorySize];
@@ -44,23 +47,21 @@ namespace FlavorfulStory.InventorySystem
         /// <summary> Найти индекс существующего стака предметов этого типа. </summary>
         /// <param name="item"> Предмет, для которого нужно найти стак. </param>
         /// <returns> Возвращает индекс стака предмета. Если стак для предмета не найден, возвращает -1. </returns>
-        private int FindStackIndex(InventoryItem item)
-        {
-            if (!item.IsStackable) return -1;
-            return Array.FindIndex(
-                _inventorySlots,
-                slot => ReferenceEquals(slot.Item, item) && slot.Number < item.StackSize);
-        }
+        private int FindStackIndex(InventoryItem item) => item.IsStackable
+            ? Array.FindIndex(_inventorySlots,
+                itemStack => ReferenceEquals(itemStack.Item, item) && itemStack.Number < item.StackSize)
+            : -1;
 
         /// <summary> Найти индекс свободного слота в инвентаре. </summary>
         /// <returns> Возвращает индекс свободного слота в инвентаре.
         /// Если все слоты заполнены, то возвращает -1. </returns>
-        private int FindEmptySlot() => Array.FindIndex(_inventorySlots, slot => !slot.Item);
+        private int FindEmptySlot() => Array.FindIndex(_inventorySlots, itemStack => !itemStack.Item);
 
         /// <summary> Есть ли экземпляр этого предмета в инвентаре? </summary>
         /// <param name="item"> Предмет. </param>
         /// <returns> Возвращает True - если предмет есть в инвентаре, False - в противном случае. </returns>
-        public bool HasItem(InventoryItem item) => _inventorySlots.Any(slot => ReferenceEquals(slot.Item, item));
+        public bool HasItem(InventoryItem item) =>
+            _inventorySlots.Any(itemStack => ReferenceEquals(itemStack.Item, item));
 
         /// <summary> Получить предмет инвентаря и его количество в заданном слоте. </summary>
         /// <param name="slotIndex"> Индекс слота, из которого нужно получить предмет. </param>
@@ -76,8 +77,11 @@ namespace FlavorfulStory.InventorySystem
         /// <param name="item"> Предмет инвентаря. </param>
         /// <returns> Возвращает общее количество заданного предмета в инвентаре. </returns>
         public int GetItemNumber(InventoryItem item) =>
-            _inventorySlots.Where(slot => slot.Item == item).Sum(slot => slot.Number);
+            _inventorySlots.Where(itemStack => itemStack.Item == item).Sum(itemStack => itemStack.Number);
 
+        /// <summary> Удаляет указанное количество предметов из инвентаря. </summary>
+        /// <param name="item"> Предмет, который нужно удалить. </param>
+        /// <param name="number"> Количество предметов для удаления. </param>
         public void RemoveItem(InventoryItem item, int number)
         {
             if (!HasItem(item))
@@ -153,7 +157,7 @@ namespace FlavorfulStory.InventorySystem
                 remainingNumber -= addAmount;
             }
 
-            ItemCollected?.Invoke(item);
+            _signalBus.Fire(new ItemCollectedSignal(new ItemStack(item, number)));
             InventoryUpdated?.Invoke();
             return true;
         }

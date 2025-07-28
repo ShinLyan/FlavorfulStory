@@ -1,4 +1,4 @@
-﻿namespace FlavorfulStory.UI.Notifications
+﻿namespace FlavorfulStory.Notifications
 {
     /// <summary> Позиция на экране, где отображается уведомление. </summary>
     public enum NotificationPosition
@@ -13,6 +13,6 @@
         BottomLeft,
 
         /// <summary> Правый нижний угол. </summary>
-        BottomRight,
+        BottomRight
     }
 }

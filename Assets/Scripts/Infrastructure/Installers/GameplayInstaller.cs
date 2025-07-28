@@ -1,7 +1,4 @@
-﻿using Unity.Cinemachine;
-using UnityEngine;
-using System.Collections.Generic;
-using Zenject;
+﻿using System.Collections.Generic;
 using FlavorfulStory.BuildingRepair.UI;
 using FlavorfulStory.DialogueSystem;
 using FlavorfulStory.DialogueSystem.UI;
@@ -12,6 +9,8 @@ using FlavorfulStory.InventorySystem.DropSystem;
 using FlavorfulStory.InventorySystem.EquipmentSystem;
 using FlavorfulStory.InventorySystem.PickupSystem;
 using FlavorfulStory.InventorySystem.UI;
+using FlavorfulStory.Notifications;
+using FlavorfulStory.Notifications.UI;
 using FlavorfulStory.Player;
 using FlavorfulStory.QuestSystem;
 using FlavorfulStory.QuestSystem.Objectives;
@@ -23,8 +22,10 @@ using FlavorfulStory.TooltipSystem;
 using FlavorfulStory.TooltipSystem.ActionTooltips;
 using FlavorfulStory.UI;
 using FlavorfulStory.UI.Animation;
-using FlavorfulStory.UI.Notifications;
 using FlavorfulStory.Visuals.Lightning;
+using Unity.Cinemachine;
+using UnityEngine;
+using Zenject;
 
 namespace FlavorfulStory.Infrastructure.Installers
 {
@@ -118,9 +119,9 @@ namespace FlavorfulStory.Infrastructure.Installers
             Container.Bind<ConfirmationWindowView>().FromComponentInHierarchy().AsSingle();
             Container.Bind<SummaryView>().FromComponentInHierarchy().AsSingle();
             Container.Bind<RepairableBuildingView>().FromComponentInHierarchy().AsSingle();
-            
+
             Container.Bind<INotificationService>().To<NotificationService>().FromComponentInHierarchy().AsSingle();
-            
+
             Container.Bind<IGameFactory<InventorySlotView>>().To<InventorySlotViewFactory>().AsSingle()
                 .WithArguments(_inventorySlotViewPrefab);
             Container.Bind<IGameFactory<ResourceRequirementView>>().To<ResourceRequirementViewFactory>().AsSingle()
@@ -157,8 +158,12 @@ namespace FlavorfulStory.Infrastructure.Installers
             Container.Bind<CinemachineCamera>().FromInstance(_teleportVirtualCamera).AsSingle();
 
             Container.Bind<SleepTrigger>().FromComponentInHierarchy().AsSingle();
-            Container.BindInterfacesTo<SleepNotifier>().AsSingle();
+
             Container.DeclareSignal<NightStartedSignal>();
+            Container.DeclareSignal<ItemCollectedSignal>();
+
+            Container.BindInterfacesTo<SleepSignalNotifier>().AsSingle();
+            Container.BindInterfacesTo<ItemPickupSignalNotifier>().AsSingle();
 
             Container.BindInterfacesAndSelfTo<DayEndManager>().AsSingle();
         }

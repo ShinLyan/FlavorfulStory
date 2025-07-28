@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-namespace FlavorfulStory.UI.Notifications
+namespace FlavorfulStory.Notifications.UI
 {
     /// <summary> UI-элемент уведомления о подборе предмета. </summary>
     public class PickupNotificationView : BaseNotificationView
@@ -13,9 +13,10 @@ namespace FlavorfulStory.UI.Notifications
         /// <param name="data"> Данные уведомления. </param>
         public override void Initialize(INotificationData data)
         {
-            if (data is not PickupNotificationData pickupData) return;
-            _label.text = $"x{pickupData.Amount} {pickupData.ItemName}";
-            _icon.sprite = pickupData.Icon;
+            if (data is not PickupNotificationData notificationData) return;
+
+            _label.text = $"x{notificationData.Amount} {notificationData.ItemName}";
+            _icon.sprite = notificationData.Icon;
         }
     }
 }

@@ -12,5 +12,14 @@ namespace FlavorfulStory.InventorySystem
 
         /// <summary> Количество предметов. </summary>
         [field: SerializeField, Min(1f)] public int Number { get; set; }
+
+        /// <summary> Конструктор с параметрами. </summary>
+        /// <param name="item"> Предмет. </param>
+        /// <param name="number"> Количество предметов. </param>
+        public ItemStack(InventoryItem item, int number)
+        {
+            Item = item;
+            Number = number;
+        }
     }
 }

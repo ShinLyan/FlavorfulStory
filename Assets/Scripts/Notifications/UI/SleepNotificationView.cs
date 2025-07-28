@@ -1,7 +1,4 @@
-﻿using UnityEngine;
-using TMPro;
-
-namespace FlavorfulStory.UI.Notifications
+﻿namespace FlavorfulStory.Notifications.UI
 {
     /// <summary> UI-элемент уведомления о наступлении ночи. </summary>
     public class SleepNotificationView : BaseNotificationView
@@ -10,8 +7,9 @@ namespace FlavorfulStory.UI.Notifications
         /// <param name="data"> Данные уведомления. </param>
         public override void Initialize(INotificationData data)
         {
-            if (data is not SleepNotificationData d) return;
-            _label.text = "Дирк ждет тебя в кроватки! Уже наступила ночь.";
+            if (data is not SleepNotificationData notificationData) return;
+
+            _label.text = $"Скоро наступит ночь. Осталось {(int)notificationData.Hour} часов.";
         }
     }
 }
