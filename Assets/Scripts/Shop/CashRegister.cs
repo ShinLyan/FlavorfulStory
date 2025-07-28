@@ -6,7 +6,7 @@ using FlavorfulStory.Economy;
 using FlavorfulStory.InteractionSystem;
 using FlavorfulStory.Player;
 using FlavorfulStory.Saving;
-using FlavorfulStory.TooltipSystem;
+using FlavorfulStory.TooltipSystem.ActionTooltips;
 using UnityEditor;
 using UnityEngine;
 using Zenject;

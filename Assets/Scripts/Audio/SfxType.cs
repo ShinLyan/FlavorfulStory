@@ -25,6 +25,9 @@
         Eat,
 
         /// <summary> Звук строительства. </summary>
-        Build
+        Build,
+
+        /// <summary> Звук денег. </summary>
+        Money
     }
 }

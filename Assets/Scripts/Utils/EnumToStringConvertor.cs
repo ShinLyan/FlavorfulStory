@@ -10,7 +10,7 @@ namespace FlavorfulStory.Utils
         public static class EnumToStringConvertor
         {
             /// <summary> Преобразует значение enum в строку, разделяя слова в CamelCase стиле. </summary>
-            public static string ToFriendlyString<TEnum>(this TEnum value) where TEnum : Enum
+            public static string ToDisplayName<TEnum>(this TEnum value) where TEnum : Enum
             {
                 string name = value.ToString();
 
