@@ -1,13 +1,8 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using FlavorfulStory.SceneManagement;
 using FlavorfulStory.TimeManagement;
 using UnityEditor;
-using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.AI;
-using UnityEngine.SceneManagement;
 using DayOfWeek = FlavorfulStory.TimeManagement.DayOfWeek;
 
 #if UNITY_EDITOR
@@ -19,45 +14,12 @@ namespace FlavorfulStory.AI.Scheduling.Editor
     [CustomEditor(typeof(NpcScheduleDemonstrator))]
     public class NpcScheduleEditor : UnityEditor.Editor
     {
-        /// <summary> Кэшированный список всех локаций в сцене. </summary>
-        private static readonly List<Location> _locations = new();
-
         /// <summary> Кэшированные данные триангуляции NavMesh. </summary>
         private NavMeshTriangulation _cachedNavMeshTriangulation;
 
         /// <summary> Флаг, указывающий, что NavMesh был закэширован. </summary>
         private bool _isNavMeshCached;
 
-        /// <summary> Инициализация при загрузке редактора. Подписывается на события изменения
-        /// режима PlayMode и открытия сцены. </summary>
-        [InitializeOnLoadMethod]
-        private static void InitializeOnLoad()
-        {
-            EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
-            EditorSceneManager.sceneOpened += (_, _) => RefreshLocations();
-        }
-
-        /// <summary> Обновить список локаций при изменении режима PlayMode. </summary>
-        /// <param name="state"> Текущее состояние PlayMode. </param>
-        private static void OnPlayModeStateChanged(PlayModeStateChange state)
-        {
-            if (state is PlayModeStateChange.EnteredEditMode or PlayModeStateChange.EnteredPlayMode) RefreshLocations();
-        }
-
-        /// <summary> Обновляет список локаций при активации редактора. </summary>
-        private void OnEnable() => RefreshLocations();
-
-        /// <summary> Обновляет список всех локаций в активной сцене. </summary>
-        private static void RefreshLocations()
-        {
-            _locations.Clear();
-
-            if (Application.isPlaying && !SceneManager.GetActiveScene().isLoaded) return;
-
-            // TODO: ZENJECT
-            var locs = FindObjectsByType<Location>(FindObjectsInactive.Include, FindObjectsSortMode.None);
-            _locations.AddRange(locs);
-        }
 
         /// <summary> Отрисовывает элементы в сцене: точки маршрута, линии между ними, метки с информацией, 
         /// инструменты для перемещения и вращения выбранной точки. </summary>
@@ -99,12 +61,7 @@ namespace FlavorfulStory.AI.Scheduling.Editor
                 // Рисуем метку с фоном
                 var labelPosition = pathPoint.Position + Vector3.forward * viewer.SphereSize;
                 string labelContent =
-                    $"{pathPoint.Hour:00}:{pathPoint.Minutes:00}\n{pathPoint.NpcAnimation}\n{pathPoint.LocationName}";
-
-                var realLocationName =
-                    (from location in _locations
-                        where location.IsPositionInLocation(pathPoint.Position)
-                        select location.LocationName).FirstOrDefault();
+                    $"{pathPoint.Hour:00}:{pathPoint.Minutes:00}\n{pathPoint.NpcAnimation}";
 
                 var labelStyle = new GUIStyle(GUI.skin.label)
                 {
@@ -113,9 +70,7 @@ namespace FlavorfulStory.AI.Scheduling.Editor
                     normal = new GUIStyleState
                     {
                         textColor = Color.black,
-                        background = realLocationName == pathPoint.LocationName
-                            ? Texture2D.whiteTexture
-                            : Texture2D.grayTexture
+                        background = Texture2D.whiteTexture
                     },
                     padding = new RectOffset(6, 6, 4, 4),
                     alignment = TextAnchor.MiddleCenter
@@ -457,7 +412,6 @@ namespace FlavorfulStory.AI.Scheduling.Editor
             {
                 Hour = 12,
                 Minutes = 0,
-                LocationName = LocationName.RockyIsland,
                 NpcAnimation = AnimationType.Idle,
                 Position = currentParam.Path.Length > 0
                     ? currentParam.Path[^1].Position + Vector3.forward
@@ -500,7 +454,6 @@ namespace FlavorfulStory.AI.Scheduling.Editor
             {
                 point.Hour = EditorGUILayout.IntSlider("Hour", point.Hour, 0, 23);
                 point.Minutes = EditorGUILayout.IntSlider("Minutes", point.Minutes, 0, 59);
-                point.LocationName = (LocationName)EditorGUILayout.EnumPopup("Location", point.LocationName);
                 point.NpcAnimation = (AnimationType)EditorGUILayout.EnumPopup("Animation", point.NpcAnimation);
             }
 
