@@ -1,106 +1,68 @@
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace FlavorfulStory.LocalizationSystem
 {
-    /// <summary> Сервис для получения переведённых строк по ключу. </summary>
-    public class LocalizationService : IDisposable
+    public class LocalizationService
     {
-        private readonly Dictionary<string, LocalizationData> _allLanguages;
+        private readonly Dictionary<string, Dictionary<string, string>> _translationsPerKey;
+        private readonly HashSet<string> _languages;
         private Dictionary<string, string> _currentMap;
         private string _currentLang;
 
-        private static LocalizationService _instance;
+        // === Статический доступ ===
 
-        public static string CurrentLanguage => _instance?._currentLang;
+        public static LocalizationService Instance { get; private set; }
 
-        public static bool IsInitialized => _instance != null;
+        public static bool IsInitialized => Instance != null;
+        public static string CurrentLanguage => Instance?._currentLang;
 
-        public static IReadOnlyDictionary<string, Dictionary<string, string>> AllTranslations
+        public static IReadOnlyList<string> AvailableLanguages =>
+            Instance != null ? new List<string>(Instance._languages) : new List<string>();
+
+
+        public event Action OnLanguageChanged;
+
+        public LocalizationService(LocalizationDatabase database, string defaultLang = "EN")
         {
-            get
-            {
-                if (_instance == null) return null;
+            _translationsPerKey = database.ToDictionary();
+            _languages = new HashSet<string>();
 
-                var result = new Dictionary<string, Dictionary<string, string>>();
+            foreach (var entry in _translationsPerKey.Values)
+            foreach (string lang in entry.Keys)
+                _languages.Add(lang);
 
-                foreach (var langPair in _instance._allLanguages)
-                {
-                    string lang = langPair.Key;
-                    var translations = langPair.Value.Translations;
-
-                    foreach (var kvp in translations)
-                    {
-                        string key = kvp.Key;
-                        string value = kvp.Value;
-
-                        if (!result.ContainsKey(key)) result[key] = new Dictionary<string, string>();
-
-                        result[key][lang] = value;
-                    }
-                }
-
-                return result;
-            }
-        }
-
-        public static List<string> AvailableLanguages =>
-            _instance != null ? new List<string>(_instance._allLanguages.Keys) : new List<string>();
-
-
-        public LocalizationService(Dictionary<string, LocalizationData> allLanguages, string defaultLang = "en")
-        {
-            _allLanguages = allLanguages;
             SetLanguage(defaultLang);
-
-            _instance = this;
+            Instance = this;
         }
 
-        public void Dispose()
+        public void SetLanguage(string lang)
         {
-            if (_instance == this) _instance = null;
+            _currentLang = _languages.Contains(lang) ? lang : "EN";
+            _currentMap = new Dictionary<string, string>();
+
+            foreach (var kvp in _translationsPerKey)
+                if (kvp.Value.TryGetValue(_currentLang, out string val))
+                    _currentMap[kvp.Key] = val;
+
+            OnLanguageChanged?.Invoke();
         }
 
-        public static void SetLanguage(string lang)
+        public string Get(string key) =>
+            _currentMap.GetValueOrDefault(key, "");
+
+        public string GetLocalizedValueOrNull(string key, string lang)
         {
-            _instance?.SetLanguageInternal(lang);
-            UILocalizer.RefreshAll();
+            return _translationsPerKey.TryGetValue(key, out var map) && map.TryGetValue(lang, out string val)
+                ? val
+                : null;
         }
 
-        private void SetLanguageInternal(string lang)
-        {
-            if (_allLanguages.TryGetValue(lang, out var data))
-            {
-                _currentLang = lang;
-                _currentMap = data.Translations;
-            }
-            else
-            {
-                Debug.LogWarning($"Language '{lang}' not found. Fallback to English.");
-                _currentLang = "en";
-                _currentMap = _allLanguages.ContainsKey("en")
-                    ? _allLanguages["en"].Translations
-                    : new Dictionary<string, string>();
-            }
-        }
+        public static void SetLanguageStatic(string lang) => Instance?.SetLanguage(lang);
 
-        public static string Get(string key)
-        {
-            if (_instance == null) return $"#{key}#";
+        public static string GetStatic(string key) => Instance?.Get(key) ?? "";
 
-            return _instance._currentMap.TryGetValue(key, out string val) ? val : $"#{key}#";
-        }
-
-        public static string GetLocalizedValueOrNull(string key, string lang)
-        {
-            if (_instance == null) return null;
-
-            if (_instance._allLanguages.TryGetValue(lang, out var data))
-                if (data.Translations.TryGetValue(key, out string value))
-                    return value;
-
-            return null;
-        }
+        public static string GetLocalizedValueStatic(string key, string lang) =>
+            Instance?.GetLocalizedValueOrNull(key, lang);
     }
 }

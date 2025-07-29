@@ -19,6 +19,8 @@ namespace FlavorfulStory.Installers
         /// <summary> Хранилище всех доступных SFX-данных. </summary>
         [SerializeField] private SfxDatabase _sfxDatabase;
 
+        [SerializeField] private LocalizationDatabase _localizationDatabase;
+
         /// <summary> Вызывает методы для привязки зависимостей. </summary>
         public override void InstallBindings()
         {
@@ -34,11 +36,18 @@ namespace FlavorfulStory.Installers
                 return new SfxPlayer(sfxSource, _sfxDatabase.SfxList);
             }).AsSingle().NonLazy();
 
-            Container.Bind<LocalizationService>().FromMethod(_ =>
-            {
-                var allLanguages = LocalizationLoader.LoadFromResources("Localization");
-                return new LocalizationService(allLanguages);
-            }).AsSingle().NonLazy();
+            Container
+                .Bind<UILocalizer>()
+                .FromNewComponentOnNewGameObject()
+                .WithGameObjectName("UILocalizer (AutoCreated)")
+                .AsSingle()
+                .NonLazy();
+
+            Container
+                .Bind<LocalizationService>()
+                .AsSingle()
+                .WithArguments(_localizationDatabase, "EN");
+            Container.Resolve<LocalizationService>();
         }
     }
 }
