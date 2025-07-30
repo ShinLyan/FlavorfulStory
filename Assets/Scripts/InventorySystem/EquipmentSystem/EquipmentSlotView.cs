@@ -29,7 +29,7 @@ namespace FlavorfulStory.InventorySystem.EquipmentSystem
         private void Start() => UpdateView();
 
         /// <summary> Обновление отображения слота экипировки. </summary>
-        private void UpdateView() => _itemStackView.UpdateView(GetItem(), 1);
+        private void UpdateView() => _itemStackView.UpdateView(new ItemStack { Item = GetItem(), Number = 1 });
 
         /// <summary> Получение максимально допустимого количества предметов, которые могут быть добавлены в слот. </summary>
         /// <param name="item"> Проверяемый предмет. </param>

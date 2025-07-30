@@ -17,6 +17,7 @@ using FlavorfulStory.SceneManagement;
 using FlavorfulStory.Shop;
 using FlavorfulStory.TimeManagement;
 using FlavorfulStory.TooltipSystem;
+using FlavorfulStory.TooltipSystem.ActionTooltips;
 using FlavorfulStory.UI;
 using FlavorfulStory.UI.Animation;
 using FlavorfulStory.Visuals.Lightning;
@@ -55,6 +56,8 @@ namespace FlavorfulStory.Installers
         /// <summary> Выполняет установку всех зависимостей, необходимых для сцены. </summary>
         public override void InstallBindings()
         {
+            SignalBusInstaller.Install(Container);
+
             BindPlayer();
             BindInventory();
             BindDialogue();
@@ -119,10 +122,11 @@ namespace FlavorfulStory.Installers
         /// <summary> Установить зависимости, связанные с пользовательским интерфейсом. </summary>
         private void BindUI()
         {
+            BindActionTooltipSystem();
+
             Container.Bind<ConfirmationWindowView>().FromComponentInHierarchy().AsSingle();
             Container.Bind<SummaryView>().FromComponentInHierarchy().AsSingle();
             Container.Bind<RepairableBuildingView>().FromComponentInHierarchy().AsSingle();
-            Container.Bind<IActionTooltipShower>().To<ActionTooltipShower>().FromComponentInHierarchy().AsSingle();
 
             Container.Bind<IGameFactory<InventorySlotView>>().To<InventorySlotViewFactory>().AsSingle()
                 .WithArguments(_inventorySlotViewPrefab);
@@ -134,6 +138,17 @@ namespace FlavorfulStory.Installers
             Container.Bind<CanvasGroupFader>().WithId("HUD").FromInstance(_hudFader).AsSingle();
 
             Container.Bind<ItemTooltipView>().FromInstance(_itemTooltipPrefab).AsSingle();
+        }
+
+        /// <summary> Установить зависимости, связанные с системой отображения тултипов действий. </summary>
+        private void BindActionTooltipSystem()
+        {
+            Container.DeclareSignal<ToolbarSlotSelectedSignal>();
+            Container.DeclareSignal<ClosestInteractableChangedSignal>();
+
+            Container.BindInterfacesAndSelfTo<ActionTooltipController>().AsSingle().NonLazy();
+            Container.Bind<IActionTooltipViewSpawner>().To<ActionTooltipViewSpawner>().FromComponentInHierarchy()
+                .AsSingle();
         }
 
         /// <summary> Установить зависимости, связанные с системами и логикой. </summary>

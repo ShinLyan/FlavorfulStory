@@ -9,7 +9,7 @@ using FlavorfulStory.InventorySystem;
 using FlavorfulStory.ObjectManagement;
 using FlavorfulStory.Player;
 using FlavorfulStory.Saving;
-using FlavorfulStory.TooltipSystem;
+using FlavorfulStory.TooltipSystem.ActionTooltips;
 using UnityEngine;
 using Zenject;
 
@@ -131,7 +131,7 @@ namespace FlavorfulStory.BuildingRepair
 
             _repairStageIndex++;
             _objectSwitcher.SwitchTo(_repairStageIndex);
-            SfxPlayer.Instance.PlayOneShot(SfxType.Build);
+            SfxPlayer.Play(SfxType.Build);
 
             _onStageUpdated?.Invoke(CurrentStage, _investedResources);
         }

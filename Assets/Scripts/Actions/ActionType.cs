@@ -16,6 +16,9 @@
         Drop,
 
         /// <summary> Строительство или установка объекта. </summary>
-        Build
+        Build,
+
+        /// <summary> Получить деньги. </summary>
+        GetMoney
     }
 }

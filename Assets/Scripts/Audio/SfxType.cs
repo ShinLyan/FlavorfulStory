@@ -25,6 +25,12 @@
         Eat,
 
         /// <summary> Звук строительства. </summary>
-        Build
+        Build,
+
+        /// <summary> Звук кассы. </summary>
+        CashRegister,
+
+        /// <summary> Звук покупки. </summary>
+        Buy
     }
 }

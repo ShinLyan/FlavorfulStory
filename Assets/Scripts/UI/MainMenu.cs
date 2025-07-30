@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using Cysharp.Threading.Tasks;
 using FlavorfulStory.SceneManagement;
 using TMPro;
 using UnityEngine;
@@ -31,32 +32,27 @@ namespace FlavorfulStory.UI
         /// <summary> Ссылка на компонент, управляющий системой сохранений. </summary>
         private SavingWrapper _savingWrapper;
 
-        /// <summary> Название сохраненного файла для новой игры, формируемое на основе ввода игрока. </summary>
-        /// <remarks> Название формируется путем соединения строк имени игрока и названия магазина. </remarks>
-        private string NewGameSaveFileName => string.Concat(_newGameInputFields.Select(field => field.text));
-
         /// <summary> Внедрение зависимости компонента сохранений. </summary>
         /// <param name="savingWrapper"> Экземпляр SavingWrapper. </param>
         [Inject]
-        public void Construct(SavingWrapper savingWrapper)
-        {
-            _savingWrapper = savingWrapper;
-        }
+        public void Construct(SavingWrapper savingWrapper) => _savingWrapper = savingWrapper;
 
         /// <summary> При старте включает отображение кнопок при условии существующего файла сохранения. </summary>
         private void Start()
         {
-            _continueGameButton.gameObject.SetActive(SavingWrapper.SaveFileExists);
-            _loadGameButton.gameObject.SetActive(SavingWrapper.SaveFileExists);
+            bool saveExists = SavingWrapper.SaveFileExists;
+            _continueGameButton.gameObject.SetActive(saveExists);
+            _loadGameButton.gameObject.SetActive(saveExists);
         }
 
         /// <summary> Обрабатывает запуск новой игры. </summary>
-        /// <remarks> Проверяет корректность заполнения полей ввода и, при успехе, 
-        /// инициирует запуск новой игры через систему сохранений. </remarks>
+        /// <remarks> Проверяет корректность заполнения полей ввода и инициирует запуск новой игры. </remarks>
         public void OnClickNewGame()
         {
             if (!AreInputFieldsValid()) return;
-            _savingWrapper.StartNewGame(NewGameSaveFileName);
+
+            string newGameSaveFileName = string.Concat(_newGameInputFields.Select(field => field.text));
+            _savingWrapper.StartNewGameAsync(newGameSaveFileName).Forget();
         }
 
         /// <summary> Проверяет поля ввода на корректность. </summary>
@@ -89,7 +85,7 @@ namespace FlavorfulStory.UI
             Array.ForEach(_newGameInputFields, inputField => inputField.text = string.Empty);
 
         /// <summary> Продолжить ранее сохраненную игру. </summary>
-        public void OnClickContinue() => _savingWrapper.ContinueGame();
+        public void OnClickContinue() => _savingWrapper.ContinueGameAsync().Forget();
 
         /// <summary> Завершить работу приложения. </summary>
         public void OnClickExit() => Application.Quit();

@@ -1,4 +1,5 @@
-﻿using FlavorfulStory.InventorySystem;
+﻿using FlavorfulStory.Audio;
+using FlavorfulStory.InventorySystem;
 using Zenject;
 
 namespace FlavorfulStory.Economy
@@ -24,10 +25,12 @@ namespace FlavorfulStory.Economy
 
         /// <summary> Продает предмет NPC и переводит деньги в кассу. </summary>
         /// <param name="itemStack"> Продаваемый предмет и его количество. </param>
-        public void SellToNpc(ItemStack itemStack)
+        /// <param name="playSound"> Проиграть звук. </param>
+        public void SellToNpc(ItemStack itemStack, bool playSound = true)
         {
             int total = itemStack.Item.SellPrice * itemStack.Number;
             _cashRegister.Add(total); // Деньги идут в кассу
+            if (playSound) SfxPlayer.Play(SfxType.Buy);
         }
 
         /// <summary> Пытается купить предмет у NPC и списывает деньги с кошелька игрока. </summary>
@@ -39,6 +42,11 @@ namespace FlavorfulStory.Economy
             return _playerWallet.TrySpend(cost);
         }
 
-        //TODO: добавить метод TransferMoneyFromCashRegisterToPlayer()
+        /// <summary> Перевести деньги из кассы игроку. </summary>
+        public void TransferMoneyFromCashRegisterToPlayer()
+        {
+            _playerWallet.Add(_cashRegister.Amount);
+            _cashRegister.TrySpend(_cashRegister.Amount);
+        }
     }
 }

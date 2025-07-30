@@ -1,5 +1,5 @@
 using System;
-using System.Collections;
+using DG.Tweening;
 using FlavorfulStory.UI;
 using TMPro;
 using UnityEngine;
@@ -39,10 +39,23 @@ namespace FlavorfulStory.InventorySystem.UI
         /// <summary> Инвентарь игрока. </summary>
         private Inventory _playerInventory;
 
+        /// <summary> Анимация затухания подсветки при наведении курсора. </summary>
+        private Tween _hoverTween;
+
+        /// <summary> Анимация изменения цвета слота при выборе или сбросе. </summary>
+        private Tween _colorTween;
+
         /// <summary> Внедрение зависимости — инвентарь игрока. </summary>
         /// <param name="inventory"> Инвентарь игрока. </param>
         [Inject]
         private void Construct(Inventory inventory) => _playerInventory = inventory;
+
+        /// <summary> Освобождает ресурсы и завершает активные анимации при уничтожении объекта. </summary>
+        private void OnDestroy()
+        {
+            _hoverTween?.Kill();
+            _colorTween?.Kill();
+        }
 
         /// <summary> Инициализирует слот панели инструментов. </summary>
         protected override void Initialize()
@@ -53,16 +66,32 @@ namespace FlavorfulStory.InventorySystem.UI
         }
 
         /// <summary> Обрабатывает начало наведения курсора на слот. </summary>
-        protected override void HoverStart() => _hoverImage.CrossFadeAlpha(1.0f, FadeDuration, true);
+        protected override void HoverStart() => FadeHoverImage(1f);
 
         /// <summary> Обрабатывает окончание наведения курсора на слот. </summary>
-        protected override void HoverEnd() => _hoverImage.CrossFadeAlpha(0.0f, FadeDuration, true);
+        protected override void HoverEnd() => FadeHoverImage(0f);
 
         /// <summary> Обрабатывает клик по слоту. </summary>
         protected override void Click()
         {
             base.Click();
             OnSlotClicked?.Invoke(_index);
+        }
+
+        /// <summary> Выполняет анимацию появления/исчезновения подсветки при наведении курсора. </summary>
+        /// <param name="targetAlpha"> Целевое значение прозрачности (0 — невидимо, 1 — полностью видно). </param>
+        private void FadeHoverImage(float targetAlpha)
+        {
+            _hoverTween?.Kill();
+            _hoverTween = _hoverImage.DOFade(targetAlpha, FadeDuration).SetUpdate(true);
+        }
+
+        /// <summary> Выполняет анимацию изменения цвета фона слота. </summary>
+        /// <param name="color"> Целевой цвет. </param>
+        private void FadeToColor(Color color)
+        {
+            _colorTween?.Kill();
+            _colorTween = ButtonImage.DOColor(color, FadeDuration).SetUpdate(true);
         }
 
         /// <summary> Выделяет данный слот. </summary>
@@ -76,32 +105,10 @@ namespace FlavorfulStory.InventorySystem.UI
         }
 
         /// <summary> Обновляет отображение предмета в слоте. </summary>
-        public void Redraw() =>
-            _itemStackView.UpdateView(_playerInventory.GetItemInSlot(_index), _playerInventory.GetNumberInSlot(_index));
+        public void Redraw() => _itemStackView.UpdateView(_playerInventory.GetItemStackInSlot(_index));
 
         /// <summary> Получает предмет, находящийся в данном слоте. </summary>
         /// <returns> Предмет инвентаря в текущем слоте. </returns>
         public InventoryItem GetItem() => _playerInventory.GetItemInSlot(_index);
-
-        /// <summary> Запускает плавное изменение цвета слота. </summary>
-        /// <param name="color"> Целевой цвет. </param>
-        private void FadeToColor(Color color) => StartCoroutine(FadeToColorCoroutine(color));
-
-        /// <summary> Корутина для плавного изменения цвета слота. </summary>
-        /// <param name="color"> Целевой цвет. </param>
-        /// <returns> Перечислитель для корутины. </returns>
-        private IEnumerator FadeToColorCoroutine(Color color) // TODO: ПЕРЕПИСАТЬ НА DOTWEEN
-        {
-            var startColor = ButtonImage.color;
-            float timeElapsed = 0;
-            while (timeElapsed <= FadeDuration)
-            {
-                ButtonImage.color = Color.Lerp(startColor, color, timeElapsed / FadeDuration);
-                timeElapsed += Time.deltaTime;
-                yield return null;
-            }
-
-            ButtonImage.color = color;
-        }
     }
 }

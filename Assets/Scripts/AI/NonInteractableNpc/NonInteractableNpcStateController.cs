@@ -79,9 +79,9 @@ namespace FlavorfulStory.AI.NonInteractableNpc
             _nameToCharacterStates.Add(StateName.FurniturePicker,
                 new FurniturePickerState(_npcMovementController, shopLocation));
             _nameToCharacterStates.Add(StateName.ItemPicker,
-                new ItemPickerState(_npcMovementController, shopLocation, _itemHandler));
+                new ItemPickerState(_npcMovementController, shopLocation));
             _nameToCharacterStates.Add(StateName.Payment,
-                new PaymentState(shopLocation, _itemHandler, _transactionService));
+                new PaymentState(_locationManager, _transactionService));
             _nameToCharacterStates.Add(StateName.RandomPointPicker,
                 new RandomPointPickerState(_npcMovementController, shopLocation));
             _nameToCharacterStates.Add(StateName.ShowcasePicker,
