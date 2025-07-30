@@ -1,8 +1,6 @@
 using FlavorfulStory.Economy;
 using FlavorfulStory.InventorySystem;
 using FlavorfulStory.SceneManagement;
-using FlavorfulStory.Shop;
-using UnityEngine;
 
 namespace FlavorfulStory.AI.FiniteStateMachine.ShopStates
 {
@@ -28,9 +26,6 @@ namespace FlavorfulStory.AI.FiniteStateMachine.ShopStates
         public override void Enter()
         {
             base.Enter();
-
-            if (Context != null && Context.TryGet<Transform>(ContextType.CashDeskPoint, out var point))
-                ((ShopLocation)_locationManager.GetLocationByName(LocationName.NewShop)).CashDesk.ReleasePoint(point);
 
             if (Context != null && Context.TryGet<ItemStack>(ContextType.PurchaseItem, out var itemStack))
             {

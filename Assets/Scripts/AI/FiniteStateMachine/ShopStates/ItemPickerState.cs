@@ -28,8 +28,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine.ShopStates
         {
             base.Enter();
 
-            if (Context != null && Context.TryGet<ShopObject>(ContextType.SelectedObject, out var showcase))
-                showcase.IsOccupied = false;
+            // if (Context != null && Context.TryGet<ShopObject>(ContextType.SelectedObject, out var showcase))
             // var item = showcase.Items[Random.Range(0, showcase.Items.Count)]; //TODO
 
             //TODO: тестовый предмет, переделать на предмет с полки

@@ -1,5 +1,4 @@
 ﻿using System;
-using FlavorfulStory.Actions;
 using FlavorfulStory.AI.BaseNpc;
 using FlavorfulStory.AI.FiniteStateMachine;
 using FlavorfulStory.Economy;
@@ -11,7 +10,6 @@ using Zenject;
 namespace FlavorfulStory.AI.NonInteractableNpc
 {
     /// <summary> Неинтерактивный NPC, который может перемещаться и выполнять последовательности действий. </summary>
-    [RequireComponent(typeof(ItemHandler))]
     public class NonInteractableNpc : Npc
     {
         /// <summary> Контроллер передвижений для неинтерктивного НПС. </summary>
@@ -25,9 +23,6 @@ namespace FlavorfulStory.AI.NonInteractableNpc
 
         /// <summary> Сервис для транзакций. </summary>
         [Inject] private TransactionService _transactionService;
-
-        /// <summary> Обработчик предметов для взаимодействия с объектами. </summary>
-        private ItemHandler _itemHandler;
 
         /// <summary> Событие, вызываемое при достижении NPC точки спавна для уничтожения. </summary>
         public Action OnReachedDespawnPoint;
@@ -52,7 +47,6 @@ namespace FlavorfulStory.AI.NonInteractableNpc
                 _movementController as NonInteractableNpcMovementController,
                 _locationManager,
                 _animationController,
-                GetComponent<ItemHandler>(),
                 _transactionService
             );
             return _nonInteractableNpcStateController;

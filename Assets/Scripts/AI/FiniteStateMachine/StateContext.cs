@@ -30,5 +30,8 @@ namespace FlavorfulStory.AI.FiniteStateMachine
             value = default;
             return false;
         }
+
+        /// <summary> Очищает весь контекст, удаляя все сохранённые данные. </summary>
+        public void Clear() => _data.Clear();
     }
 }

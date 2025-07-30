@@ -19,12 +19,13 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         public event Action OnSequenceEnded;
 
         /// <summary> Инициализирует новый экземпляр состояния последовательности. </summary>
-        /// <param name="stateController"> Контроллер состояний для управления переходами. </param>
         /// <param name="states"> Коллекция состояний для выполнения в последовательности. </param>
         public SequenceState(IEnumerable<CharacterState> states)
         {
             _states = new List<CharacterState>(states);
             _currentStateIndex = 0;
+
+            OnSequenceEnded += () => Context.Clear();
         }
 
         /// <summary> Выполняет вход в состояние и запускает первое состояние последовательности. </summary>

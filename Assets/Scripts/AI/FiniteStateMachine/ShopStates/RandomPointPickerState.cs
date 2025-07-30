@@ -28,7 +28,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine.ShopStates
             base.Enter();
             var point = _shopLocation.GetRandomPointOnNavMesh();
 
-            Context?.Set(ContextType.AnimationType, AnimationType.Thinking);
+            Context?.Set(ContextType.AnimationType, AnimationType.Special1); //TODO: добавить анимацию обдумывания
             Context?.Set(ContextType.AnimationTime, 3f);
 
             _movementController.SetPoint(point); //TODO: добавить поворот в сторону точки

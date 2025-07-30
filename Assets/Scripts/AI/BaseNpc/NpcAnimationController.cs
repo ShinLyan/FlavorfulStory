@@ -41,8 +41,10 @@ namespace FlavorfulStory.AI.BaseNpc
 
         /// <summary> Запустить анимацию. </summary>
         /// <param name="animationType"> Тип проигрываемой анимации.</param>
-        public void TriggerAnimation(AnimationType animationType) =>
+        public void TriggerAnimation(AnimationType animationType)
+        {
             _animator.SetTrigger(Animator.StringToHash(animationType.ToString()));
+        }
 
         /// <summary> Остановить анимацию. </summary>
         private void PauseAnimation() => _animator.speed = 0;

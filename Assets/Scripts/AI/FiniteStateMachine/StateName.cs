@@ -34,7 +34,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         ShowcasePicker,
 
         /// <summary> Состояние отказа от предмета. </summary>
-        RefuseItem,
+        ReleaseObject,
 
         /// <summary> Состояние оплаты. </summary>
         Payment,

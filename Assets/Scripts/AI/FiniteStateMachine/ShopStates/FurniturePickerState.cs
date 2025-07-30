@@ -37,7 +37,6 @@ namespace FlavorfulStory.AI.FiniteStateMachine.ShopStates
             var accessiblePoint = furniture.GetAccessiblePoint();
 
             _movementController.SetPoint(accessiblePoint.position); //TODO: добавить поворот в сторону точки
-            _movementController.OnDestinationReached += () => furniture.IsOccupied = false;
         }
 
         /// <summary> Возвращает статус завершения состояния. </summary>

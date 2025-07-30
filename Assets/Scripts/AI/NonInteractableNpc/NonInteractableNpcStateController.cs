@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using FlavorfulStory.Actions;
 using FlavorfulStory.AI.BaseNpc;
 using FlavorfulStory.AI.FiniteStateMachine;
 using FlavorfulStory.AI.FiniteStateMachine.ShopStates;
@@ -24,9 +23,6 @@ namespace FlavorfulStory.AI.NonInteractableNpc
         /// <summary> Менеджер локаций для получения информации о местоположениях. </summary>
         private readonly LocationManager _locationManager;
 
-        /// <summary> Обработчик предметов для работы с игровыми объектами. </summary>
-        private readonly ItemHandler _itemHandler;
-
         /// <summary> Флаг, указывающий, посещал ли NPC мебель после покупки. </summary>
         private bool _hadVisitedFurnitureAfterPurchase;
 
@@ -42,17 +38,15 @@ namespace FlavorfulStory.AI.NonInteractableNpc
         /// <param name="npcMovementController"> Контроллер движения NPC, отвечающий за перемещение персонажа. </param>
         /// <param name="locationManager"> Менеджер локаций для получения информации о местоположениях. </param>
         /// <param name="npcAnimationController"> Контроллер анимации NPC для управления анимациями персонажа. </param>
-        /// <param name="itemHandler"> Обработчик предметов для работы с игровыми объектами. </param>
         /// <param name="transactionService"> Сервис для транзакций. </param>
         public NonInteractableNpcStateController(NonInteractableNpcMovementController npcMovementController,
             LocationManager locationManager, NpcAnimationController npcAnimationController,
-            ItemHandler itemHandler, TransactionService transactionService) : base(npcAnimationController)
+            TransactionService transactionService) : base(npcAnimationController)
         {
             _npcMovementController = npcMovementController;
             _locationManager = locationManager;
-            _itemHandler = itemHandler;
             _transactionService = transactionService;
-
+            
             _hadVisitedFurnitureAfterPurchase = false;
             _despawnPoint = Vector3.zero;
 
@@ -86,7 +80,7 @@ namespace FlavorfulStory.AI.NonInteractableNpc
                 new RandomPointPickerState(_npcMovementController, shopLocation));
             _nameToCharacterStates.Add(StateName.ShowcasePicker,
                 new ShowcasePickerState(_npcMovementController, shopLocation));
-            _nameToCharacterStates.Add(StateName.RefuseItem, new RefuseItemState());
+            _nameToCharacterStates.Add(StateName.ReleaseObject, new ReleaseObjectState(shopLocation));
         }
 
         /// <summary> Создает все последовательности состояний для различных сценариев поведения NPC. </summary>
@@ -105,8 +99,10 @@ namespace FlavorfulStory.AI.NonInteractableNpc
                 {
                     _nameToCharacterStates[StateName.FurniturePicker],
                     _nameToCharacterStates[StateName.Movement],
-                    _nameToCharacterStates[StateName.Animation]
+                    _nameToCharacterStates[StateName.Animation],
+                    _nameToCharacterStates[StateName.ReleaseObject]
                 }));
+
 
             _nameToCharacterStates.Add(StateName.BuyItemSequence, new SequenceState(
                 new[]
@@ -115,19 +111,20 @@ namespace FlavorfulStory.AI.NonInteractableNpc
                     _nameToCharacterStates[StateName.Movement],
                     _nameToCharacterStates[StateName.Animation],
                     _nameToCharacterStates[StateName.ItemPicker],
+                    _nameToCharacterStates[StateName.ReleaseObject],
                     _nameToCharacterStates[StateName.Movement],
+                    _nameToCharacterStates[StateName.Payment],
                     _nameToCharacterStates[StateName.Animation],
-                    _nameToCharacterStates[StateName.Payment]
+                    _nameToCharacterStates[StateName.ReleaseObject]
                 })
             );
-
             _nameToCharacterStates.Add(StateName.RefuseItemSequence, new SequenceState(
                 new[]
                 {
                     _nameToCharacterStates[StateName.ShowcasePicker],
                     _nameToCharacterStates[StateName.Movement],
                     _nameToCharacterStates[StateName.Animation],
-                    _nameToCharacterStates[StateName.RefuseItem]
+                    _nameToCharacterStates[StateName.ReleaseObject]
                 }));
 
 
