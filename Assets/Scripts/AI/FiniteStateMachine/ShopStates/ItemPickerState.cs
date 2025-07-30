@@ -36,13 +36,17 @@ namespace FlavorfulStory.AI.FiniteStateMachine.ShopStates
             item.PickupPrefab.GetComponent<Rigidbody>().useGravity = false;
             var itemStack = new ItemStack { Item = item, Number = 1 };
 
-            var accessiblePoint = _shopLocation.CashDesk.GetAccessiblePoint();
+            var accessiblePoint = _shopLocation.CashRegister.GetAccessiblePoint();
+            _shopLocation.CashRegister.SetPointOccupancy(accessiblePoint, true);
+
             Context?.Set(ContextType.CashDeskPoint, accessiblePoint);
             Context?.Set(ContextType.PurchaseItem, itemStack);
-            Context?.Set(ContextType.AnimationType, _shopLocation.CashDesk.InteractableObjectAnimation);
+            Context?.Set(ContextType.AnimationType, _shopLocation.CashRegister.InteractableObjectAnimation);
             Context?.Set(ContextType.AnimationTime, 3f);
 
             _movementController.SetPoint(accessiblePoint.position); //TODO: добавить поворот в сторону точки
+            _movementController.OnDestinationReached +=
+                () => _shopLocation.CashRegister.SetPointOccupancy(accessiblePoint, false);
         }
 
         /// <summary> Возвращает статус завершения состояния. </summary>

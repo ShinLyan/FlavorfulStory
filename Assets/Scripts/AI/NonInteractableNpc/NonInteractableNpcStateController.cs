@@ -46,7 +46,7 @@ namespace FlavorfulStory.AI.NonInteractableNpc
             _npcMovementController = npcMovementController;
             _locationManager = locationManager;
             _transactionService = transactionService;
-            
+
             _hadVisitedFurnitureAfterPurchase = false;
             _despawnPoint = Vector3.zero;
 
@@ -110,8 +110,8 @@ namespace FlavorfulStory.AI.NonInteractableNpc
                     _nameToCharacterStates[StateName.ShowcasePicker],
                     _nameToCharacterStates[StateName.Movement],
                     _nameToCharacterStates[StateName.Animation],
-                    _nameToCharacterStates[StateName.ItemPicker],
                     _nameToCharacterStates[StateName.ReleaseObject],
+                    _nameToCharacterStates[StateName.ItemPicker],
                     _nameToCharacterStates[StateName.Movement],
                     _nameToCharacterStates[StateName.Payment],
                     _nameToCharacterStates[StateName.Animation],

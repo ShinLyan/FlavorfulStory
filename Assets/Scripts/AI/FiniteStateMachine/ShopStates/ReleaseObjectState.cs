@@ -1,5 +1,4 @@
 using FlavorfulStory.Shop;
-using UnityEngine;
 
 namespace FlavorfulStory.AI.FiniteStateMachine.ShopStates
 {
@@ -8,15 +7,17 @@ namespace FlavorfulStory.AI.FiniteStateMachine.ShopStates
         private readonly ShopLocation _shopLocation;
         public ReleaseObjectState(ShopLocation shopLocation) => _shopLocation = shopLocation;
 
-        /// <summary> Выполняет вход в состояние и освобождает выбранную полку. </summary>
+        /// <summary> Выполняет вход в состояние. </summary>
         public override void Enter()
         {
             base.Enter();
-            if (Context != null && Context.TryGet<ShopObject>(ContextType.SelectedObject, out var shopObject))
+            if (Context == null) return;
+
+            if (Context.TryGet<ShopObject>(ContextType.SelectedObject, out var shopObject))
                 shopObject.IsOccupied = false;
 
-            if (Context != null && Context.TryGet<Transform>(ContextType.CashDeskPoint, out var point))
-                _shopLocation.CashDesk.ReleasePoint(point);
+            // if (Context.TryGet<Transform>(ContextType.CashDeskPoint, out var point))
+            //     _shopLocation.CashRegister.SetPointOccupancy(point, false);
         }
 
         /// <summary> Возвращает статус завершения состояния. </summary>

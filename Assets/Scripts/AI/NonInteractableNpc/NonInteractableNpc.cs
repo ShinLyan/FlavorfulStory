@@ -3,6 +3,7 @@ using FlavorfulStory.AI.BaseNpc;
 using FlavorfulStory.AI.FiniteStateMachine;
 using FlavorfulStory.Economy;
 using FlavorfulStory.SceneManagement;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.AI;
 using Zenject;
@@ -69,5 +70,17 @@ namespace FlavorfulStory.AI.NonInteractableNpc
         /// <param name="destination"> Координаты точки, где NPC должен исчезнуть. </param>
         public void SetDespawnPoint(Vector3 destination) =>
             (_stateController as NonInteractableNpcStateController)?.SetDespawnPoint(destination);
+
+        protected virtual void OnDrawGizmosSelected()
+        {
+            if (_stateController != null)
+            {
+                Gizmos.color = Color.yellow;
+                var labelPosition = transform.position + Vector3.up * 2.5f;
+#if UNITY_EDITOR
+                Handles.Label(labelPosition, _stateController.CurrentStateName.ToString());
+#endif
+            }
+        }
     }
 }

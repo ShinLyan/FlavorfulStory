@@ -18,14 +18,14 @@ namespace FlavorfulStory.AI
         /// <returns> Случайная мировая позиция в области спавна. </returns>
         public Vector3 GetRandomPosition()
         {
-            Vector3 localRandomPoint = new Vector3(
+            var localRandomPoint = new Vector3(
                 Random.Range(-0.5f, 0.5f),
                 0f,
                 Random.Range(-0.5f, 0.5f)
             );
 
             localRandomPoint = Vector3.Scale(localRandomPoint, _spawnBoxSize);
-            Vector3 worldPoint = transform.TransformPoint(_spawnBoxOffset + localRandomPoint);
+            var worldPoint = transform.TransformPoint(_spawnBoxOffset + localRandomPoint);
 
             worldPoint.y = transform.position.y;
             return worldPoint;
@@ -43,7 +43,7 @@ namespace FlavorfulStory.AI
         /// <summary> Отрисовка гизмо в редакторе для визуализации области спавна. </summary>
         private void OnDrawGizmosSelected()
         {
-            Matrix4x4 originalMatrix = Gizmos.matrix;
+            var originalMatrix = Gizmos.matrix;
 
             Gizmos.color = new Color(0, 1, 1, 0.3f);
             Gizmos.matrix = Matrix4x4.TRS(transform.position, transform.rotation, Vector3.one);

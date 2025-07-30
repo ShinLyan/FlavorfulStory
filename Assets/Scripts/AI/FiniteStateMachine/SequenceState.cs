@@ -20,25 +20,14 @@ namespace FlavorfulStory.AI.FiniteStateMachine
 
         /// <summary> Инициализирует новый экземпляр состояния последовательности. </summary>
         /// <param name="states"> Коллекция состояний для выполнения в последовательности. </param>
-        public SequenceState(IEnumerable<CharacterState> states)
-        {
-            _states = new List<CharacterState>(states);
-            _currentStateIndex = 0;
-
-            OnSequenceEnded += () => Context.Clear();
-        }
+        public SequenceState(IEnumerable<CharacterState> states) { _states = new List<CharacterState>(states); }
 
         /// <summary> Выполняет вход в состояние и запускает первое состояние последовательности. </summary>
         public override void Enter()
         {
-            if (_currentStateIndex == _states.Count - 1)
-            {
-                Back();
-                return;
-            }
-
             SetContext(new StateContext());
 
+            _currentStateIndex = 0;
             _currentState = _states[_currentStateIndex];
             _currentState.SetContext(Context);
             _currentState.Enter();

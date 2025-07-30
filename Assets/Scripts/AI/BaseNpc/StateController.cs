@@ -19,6 +19,10 @@ namespace FlavorfulStory.AI.BaseNpc
         /// <summary> Контроллер анимации NPC для управления анимационными состояниями. </summary>
         protected readonly NpcAnimationController _animationController;
 
+        /// <summary> Имя текущего стейта. </summary>
+        /// <remarks> Для дебага. </remarks>
+        public StateName CurrentStateName { get; private set; }
+
         /// <summary> Инициализирует новый экземпляр контроллера состояний. </summary>
         /// <param name="npcAnimationController"> Контроллер анимации NPC. </param>
         protected StateController(NpcAnimationController npcAnimationController)
@@ -65,6 +69,8 @@ namespace FlavorfulStory.AI.BaseNpc
         protected void SetState(StateName stateName)
         {
             if (!_nameToCharacterStates.TryGetValue(stateName, out var next) || _currentState == next) return;
+
+            CurrentStateName = stateName;
 
             _currentState?.Exit();
             _currentState = next;

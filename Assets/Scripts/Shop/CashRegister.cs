@@ -87,15 +87,14 @@ namespace FlavorfulStory.Shop
             if (freePoints.Count == 0) return null;
 
             var randomPoint = freePoints[Random.Range(0, freePoints.Count)];
-            _accessPointsAvailability[randomPoint] = true;
             return randomPoint;
         }
 
         /// <summary> Освобождает указанную точку доступа, делая её доступной для использования. </summary>
         /// <param name="point"> Transform точки доступа для освобождения. </param>
-        public void ReleasePoint(Transform point)
+        public void SetPointOccupancy(Transform point, bool isOccupied)
         {
-            if (point) _accessPointsAvailability[point] = false;
+            if (point) _accessPointsAvailability[point] = isOccupied;
         }
 
         /// <summary> Обработчик входа объекта в триггер кассы. </summary>
