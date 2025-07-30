@@ -26,14 +26,19 @@ namespace FlavorfulStory.Shop
         /// <summary> Сервис транзакций, отвечающий за покупку и продажу предметов. </summary>
         private TransactionService _transactionService;
 
+        /// <summary> Монетка. </summary>
         [SerializeField] private GameObject _coin;
 
+        /// <summary> Текстовое отображение денег в кассе. </summary>
         [SerializeField] private TMP_Text _moneyAmountText;
 
+        /// <summary> Флаг, указывающий находится ли игрок в триггере кассы. </summary>
         private bool _playerInTrigger;
 
+        /// <summary> Tween-анимация для эффекта исчезновения текста. </summary>
         private Tween _textFadeTween;
 
+        /// <summary> Tween-анимация для эффекта масштабирования текста. </summary>
         private Tween _textScaleTween;
 
         /// <summary> Внедрение зависимостей Zenject. </summary>
@@ -41,6 +46,7 @@ namespace FlavorfulStory.Shop
         [Inject]
         private void Construct(TransactionService transactionService) => _transactionService = transactionService;
 
+        /// <summary> Инициализация компонента при загрузке. </summary>
         private void Awake()
         {
             _playerInTrigger = false;
@@ -92,6 +98,8 @@ namespace FlavorfulStory.Shop
             if (point) _accessPointsAvailability[point] = false;
         }
 
+        /// <summary> Обработчик входа объекта в триггер кассы. </summary>
+        /// <param name="other"> Коллайдер вошедшего объекта. </param>
         private void OnTriggerEnter(Collider other)
         {
             if (other.CompareTag("Player"))
@@ -103,6 +111,8 @@ namespace FlavorfulStory.Shop
             }
         }
 
+        /// <summary> Обработчик выхода объекта из триггера кассы. </summary>
+        /// <param name="other"> Коллайдер вышедшего объекта. </param>
         private void OnTriggerExit(Collider other)
         {
             if (other.CompareTag("Player"))
