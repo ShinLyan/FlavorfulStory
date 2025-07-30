@@ -27,7 +27,10 @@
         /// <summary> Звук строительства. </summary>
         Build,
 
-        /// <summary> Звук денег. </summary>
-        Money
+        /// <summary> Звук кассы. </summary>
+        CashRegister,
+
+        /// <summary> Звук покупки. </summary>
+        Buy
     }
 }

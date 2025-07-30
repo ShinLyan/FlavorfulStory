@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using DG.Tweening;
 using FlavorfulStory.Actions;
+using FlavorfulStory.Audio;
 using FlavorfulStory.Economy;
 using FlavorfulStory.InteractionSystem;
 using FlavorfulStory.Player;
 using FlavorfulStory.Saving;
 using FlavorfulStory.TooltipSystem.ActionTooltips;
+using TMPro;
 using UnityEditor;
 using UnityEngine;
 using Zenject;
@@ -23,16 +26,40 @@ namespace FlavorfulStory.Shop
         /// <summary> Сервис транзакций, отвечающий за покупку и продажу предметов. </summary>
         private TransactionService _transactionService;
 
+        [SerializeField] private GameObject _coin;
+
+        [SerializeField] private TMP_Text _moneyAmountText;
+
+        private bool _playerInTrigger;
+
+        private Tween _textFadeTween;
+
+        private Tween _textScaleTween;
+
         /// <summary> Внедрение зависимостей Zenject. </summary>
         /// <param name="transactionService"> Сервис транзакций. </param>
         [Inject]
         private void Construct(TransactionService transactionService) => _transactionService = transactionService;
+
+        private void Awake()
+        {
+            _playerInTrigger = false;
+
+            OnAmountChanged += amount =>
+            {
+                _coin.SetActive(amount > 0 && !_playerInTrigger);
+                _moneyAmountText.text = amount.ToString();
+            };
+        }
 
         /// <summary> Инициализирует значение золота при запуске. </summary>
         private void Start()
         {
             InitializeAccessPoints();
             OnAmountChanged?.Invoke(Amount);
+
+            var color = _moneyAmountText.color;
+            _moneyAmountText.color = new Color(color.r, color.g, color.b, 0f);
         }
 
         /// <summary> Инициализирует словарь доступности точек доступа, устанавливая все точки как свободные. </summary>
@@ -64,6 +91,58 @@ namespace FlavorfulStory.Shop
         {
             if (point) _accessPointsAvailability[point] = false;
         }
+
+        private void OnTriggerEnter(Collider other)
+        {
+            if (other.CompareTag("Player"))
+            {
+                _playerInTrigger = true;
+                _coin.SetActive(false);
+                _moneyAmountText.gameObject.SetActive(true);
+                AnimateTextObjectPopUp(true);
+            }
+        }
+
+        private void OnTriggerExit(Collider other)
+        {
+            if (other.CompareTag("Player"))
+            {
+                _playerInTrigger = false;
+                AnimateTextObjectPopUp(false);
+
+                if (Amount > 0) _coin.SetActive(true);
+            }
+        }
+
+        /// <summary> Показывает или скрывает объект текста с анимацией. </summary>
+        private void AnimateTextObjectPopUp(bool show, float duration = 0.3f)
+        {
+            _textFadeTween?.Kill();
+            _textScaleTween?.Kill();
+
+            const float minScaleValue = 0.8f;
+            if (show)
+            {
+                _moneyAmountText.gameObject.SetActive(show);
+
+                _moneyAmountText.color = new Color(1f, 1f, 1f, 0f);
+                _moneyAmountText.transform.localScale = Vector3.one * minScaleValue;
+
+                _textFadeTween = _moneyAmountText.DOFade(1f, duration).SetEase(Ease.OutSine);
+                _textScaleTween = _moneyAmountText.transform
+                    .DOScale(1f, duration)
+                    .SetEase(Ease.OutBack);
+            }
+            else
+            {
+                _textFadeTween = _moneyAmountText.DOFade(0f, duration).SetEase(Ease.InSine);
+                _textScaleTween = _moneyAmountText.transform
+                    .DOScale(minScaleValue, duration)
+                    .SetEase(Ease.InBack)
+                    .OnComplete(() => { _moneyAmountText.gameObject.SetActive(show); });
+            }
+        }
+
 
         #region ICurrencyStorage
 
@@ -113,8 +192,12 @@ namespace FlavorfulStory.Shop
         /// <param name="player"> Контроллер игрока. </param>
         public void BeginInteraction(PlayerController player)
         {
-            _transactionService.TransferMoneyFromCashRegisterToPlayer();
             player.SetBusyState(false);
+            if (Amount <= 0) return;
+
+            _transactionService.TransferMoneyFromCashRegisterToPlayer();
+            _coin.SetActive(false);
+            SfxPlayer.Play(SfxType.CashRegister);
         }
 
         /// <summary> Завершает взаимодействие с кассой. </summary>

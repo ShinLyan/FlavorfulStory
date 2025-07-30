@@ -90,5 +90,14 @@ namespace FlavorfulStory.SceneManagement
             Debug.LogError($"Локации {name} не существует!");
             return null;
         }
+
+        /// <summary> Проверяет, находится ли игрок в указанной локации. </summary>
+        /// <param name="location"> Локация для проверки. </param>
+        /// <returns> Возвращает <c>true</c>, если игрок находится в локации, иначе <c>false</c>. </returns>
+        public bool IsPlayerInLocation(LocationName locationName)
+        {
+            var location = GetLocationByName(locationName);
+            return location.IsPositionInLocation(_playerController.transform.position);
+        }
     }
 }
