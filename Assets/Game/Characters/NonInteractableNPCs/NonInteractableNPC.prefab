@@ -69,15 +69,7 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 2558568035153998490, guid: ffcfee3efdece404eb395958f4e12686,
         type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 6321486519475095258}
-    - targetCorrespondingSourceObject: {fileID: 2558568035153998490, guid: ffcfee3efdece404eb395958f4e12686,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: -2279028417712779732}
-    - targetCorrespondingSourceObject: {fileID: 2558568035153998490, guid: ffcfee3efdece404eb395958f4e12686,
-        type: 3}
-      insertIndex: -1
+      insertIndex: 7
       addedObject: {fileID: -6896682680898945704}
   m_SourcePrefab: {fileID: 100100000, guid: ffcfee3efdece404eb395958f4e12686, type: 3}
 --- !u!1 &4692148074770073259 stripped
@@ -86,47 +78,6 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 7105562842613543985}
   m_PrefabAsset: {fileID: 0}
---- !u!54 &6321486519475095258
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4692148074770073259}
-  serializedVersion: 4
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 0
-  m_IsKinematic: 1
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
---- !u!114 &-2279028417712779732
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4692148074770073259}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f889b58c3ba04a0f94234f14fc50dce9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _handSlot: {fileID: 0}
-  _autoDestroyPreviousItem: 1
 --- !u!114 &-6896682680898945704
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -139,3 +90,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c4e0ee7c03cd428a806c7b47e43ba6ea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  <NpcInfo>k__BackingField: {fileID: 0}

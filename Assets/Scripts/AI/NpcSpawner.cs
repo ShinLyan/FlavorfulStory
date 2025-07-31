@@ -111,6 +111,8 @@ namespace FlavorfulStory.AI
             var npc = _diContainer.InstantiatePrefabForComponent<NonInteractableNpc.NonInteractableNpc>(
                 prefab, pos, Quaternion.identity, _parentTransform
             );
+
+            // var npc = Instantiate(prefab, pos, Quaternion.identity, _parentTransform);
             return npc;
         }
 

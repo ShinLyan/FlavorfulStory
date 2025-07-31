@@ -2,8 +2,10 @@
 using System.Linq;
 using FlavorfulStory.AI.BaseNpc;
 using FlavorfulStory.AI.FiniteStateMachine;
+using FlavorfulStory.AI.FiniteStateMachine.InteractableStates;
 using FlavorfulStory.AI.FiniteStateMachine.ShopStates;
 using FlavorfulStory.Economy;
+using FlavorfulStory.Player;
 using FlavorfulStory.SceneManagement;
 using FlavorfulStory.Shop;
 using UnityEngine;
@@ -39,9 +41,12 @@ namespace FlavorfulStory.AI.NonInteractableNpc
         /// <param name="locationManager"> Менеджер локаций для получения информации о местоположениях. </param>
         /// <param name="npcAnimationController"> Контроллер анимации NPC для управления анимациями персонажа. </param>
         /// <param name="transactionService"> Сервис для транзакций. </param>
+        /// <param name="playerController"> Контроллер иргока. </param>
+        /// <param name="npcTransform"> Transform NPC для определения позиции. </param>
         public NonInteractableNpcStateController(NonInteractableNpcMovementController npcMovementController,
             LocationManager locationManager, NpcAnimationController npcAnimationController,
-            TransactionService transactionService) : base(npcAnimationController)
+            TransactionService transactionService, PlayerController playerController, Transform npcTransform)
+            : base(npcAnimationController, playerController, npcTransform)
         {
             _npcMovementController = npcMovementController;
             _locationManager = locationManager;
@@ -81,6 +86,7 @@ namespace FlavorfulStory.AI.NonInteractableNpc
             _nameToCharacterStates.Add(StateName.ShowcasePicker,
                 new ShowcasePickerState(_npcMovementController, shopLocation));
             _nameToCharacterStates.Add(StateName.ReleaseObject, new ReleaseObjectState(shopLocation));
+            _nameToCharacterStates.Add(StateName.Waiting, new WaitingState(_playerController, _npcTransform));
         }
 
         /// <summary> Создает все последовательности состояний для различных сценариев поведения NPC. </summary>
@@ -225,5 +231,21 @@ namespace FlavorfulStory.AI.NonInteractableNpc
         /// <param name="stateName"> Строковое представление типа состояния для установки. </param>
         /// <remarks> Обёртка над методом SetState для принудительного изменения состояния. </remarks>
         public void ForceSetState(StateName stateName) => SetState(stateName);
+
+        /// <summary> Вызывается при входе игрока в триггер NPC. Переводит NPC в состояние ожидания. </summary>
+        /// <param name="other"> Коллайдер, вошедший в триггер. </param>
+        public override void OnTriggerEntered(Collider other) //TODO: REMAKE
+        {
+            SetState(StateName.Waiting);
+            _animationController.TriggerAnimation(AnimationType.Idle);
+        }
+
+        /// <summary> Вызывается при выходе игрока из триггера NPC. Переводит NPC в состояние движения. </summary>
+        /// <param name="other"> Коллайдер, вышедший из триггера. </param>
+        public override void OnTriggerExited(Collider other) //TODO: REMAKE
+        {
+            SetState(StateName.Movement);
+            _animationController.TriggerAnimation(AnimationType.Locomotion);
+        }
     }
 }

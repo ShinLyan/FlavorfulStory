@@ -63,6 +63,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: InteracrableNPC
       objectReference: {fileID: 0}
+    - target: {fileID: 8899354503593919559, guid: ffcfee3efdece404eb395958f4e12686,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -101,7 +106,7 @@ CapsuleCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
