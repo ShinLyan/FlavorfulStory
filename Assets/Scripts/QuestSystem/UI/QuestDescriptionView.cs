@@ -2,6 +2,7 @@
 using System.Linq;
 using FlavorfulStory.Infrastructure;
 using FlavorfulStory.InventorySystem;
+using FlavorfulStory.LocalizationSystem;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -124,10 +125,10 @@ namespace FlavorfulStory.QuestSystem
         /// <param name="quest"> Квест для отображения. </param>
         private void SetupQuestTexts(Quest quest)
         {
-            _questNameText.text = quest.QuestName;
+            _questNameText.text = LocalizationService.GetLocalizedString(quest.QuestName);
             _npcIcon.sprite = quest.QuestGiver.Icon;
             _npcNameText.text = quest.QuestGiver.NpcName.ToString();
-            _descriptionText.text = quest.QuestDescription;
+            _descriptionText.text = LocalizationService.GetLocalizedString(quest.QuestDescription);
         }
 
         /// <summary> Создает и отображает цели квеста. </summary>
@@ -147,7 +148,7 @@ namespace FlavorfulStory.QuestSystem
                     instance.transform.SetAsLastSibling();
                     bool isCompleted = questStatus.IsStageComplete(stageIndex) ||
                                        questStatus.IsObjectiveComplete(objective);
-                    instance.Setup(objective.Description, isCompleted);
+                    instance.Setup(LocalizationService.GetLocalizedString(objective.Description), isCompleted);
                     _activeObjectives.Add(instance);
                 }
         }

@@ -1,5 +1,6 @@
 ﻿using System;
 using FlavorfulStory.InventorySystem.PickupSystem;
+using FlavorfulStory.LocalizationSystem;
 using UnityEngine;
 
 namespace FlavorfulStory.InventorySystem
@@ -17,13 +18,19 @@ namespace FlavorfulStory.InventorySystem
                         "Очистите это поле, если вы хотите создать новое."), SerializeField]
         public string ItemID { get; private set; }
 
-        /// <summary> Название предмета, которое будет отображаться в UI. </summary>
-        [field: Tooltip("Название предмета, которое будет отображаться в UI."), SerializeField]
-        public string ItemName { get; private set; }
+        [field: Tooltip("Ключ локализации для названия предмета."), SerializeField]
+        public string ItemNameKey { get; private set; }
 
-        /// <summary> Описание предмета, которое будет отображаться в UI. </summary>
-        [field: Tooltip("Описание предмета, которое будет отображаться в UI."), SerializeField, TextArea]
-        public string Description { get; private set; }
+        [field: Tooltip("Ключ локализации для описания предмета."), SerializeField]
+        public string DescriptionKey { get; private set; }
+
+        // /// <summary> Название предмета, которое будет отображаться в UI. </summary>
+        // [field: Tooltip("Название предмета, которое будет отображаться в UI."), SerializeField]
+        public string ItemName => LocalizationService.GetLocalizedString(ItemNameKey);
+
+        // /// <summary> Описание предмета, которое будет отображаться в UI. </summary>
+        // [field: Tooltip("Описание предмета, которое будет отображаться в UI."), SerializeField, TextArea]
+        public string Description => LocalizationService.GetLocalizedString(DescriptionKey);
 
         /// <summary> Иконка предмета, которая будет отображаться в UI. </summary>
         [field: Tooltip("Иконка предмета, которая будет отображаться в UI."), SerializeField]

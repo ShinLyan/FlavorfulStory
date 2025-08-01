@@ -945,6 +945,7 @@ GameObject:
   - component: {fileID: 3969232231662187370}
   - component: {fileID: 3519010619981119541}
   - component: {fileID: 4007903437042745674}
+  - component: {fileID: 8896936262214277493}
   m_Layer: 5
   m_Name: ObjectivesTitleText
   m_TagString: Untagged
@@ -1071,6 +1072,19 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &8896936262214277493
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6752104869282506852}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c49d80b06f284994816281728dc55b8d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _localizationKey: UI_QuestMenu_Label_Objectives
 --- !u!1 &8294105184788856326
 GameObject:
   m_ObjectHideFlags: 0
@@ -1147,6 +1161,7 @@ GameObject:
   - component: {fileID: 74285277542204563}
   - component: {fileID: 4552467225512103982}
   - component: {fileID: 7685647698854703942}
+  - component: {fileID: 4979052767478320575}
   m_Layer: 5
   m_Name: 'RewardsTitleText '
   m_TagString: Untagged
@@ -1273,6 +1288,19 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &4979052767478320575
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8820264552221504709}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c49d80b06f284994816281728dc55b8d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _localizationKey: UI_QuestMenu_Label_Rewards
 --- !u!1001 &621695914935425265
 PrefabInstance:
   m_ObjectHideFlags: 0

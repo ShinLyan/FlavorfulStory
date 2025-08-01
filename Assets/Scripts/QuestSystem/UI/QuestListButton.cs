@@ -1,4 +1,5 @@
-﻿using FlavorfulStory.UI;
+﻿using FlavorfulStory.LocalizationSystem;
+using FlavorfulStory.UI;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -32,7 +33,7 @@ namespace FlavorfulStory.QuestSystem
         public void Setup(QuestStatus questStatus)
         {
             _questStatus = questStatus;
-            _questNameText.text = questStatus.Quest.QuestName;
+            _questNameText.text = LocalizationService.GetLocalizedString(questStatus.Quest.QuestName);
         }
 
         /// <summary> Обработчик включения взаимодействия — скрывает индикатор наведения. </summary>
