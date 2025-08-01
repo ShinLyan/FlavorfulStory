@@ -20,24 +20,29 @@ namespace FlavorfulStory.InventorySystem.UI
         /// <summary> Контейнер для размещения отображений ячеек. </summary>
         private Transform _slotsContainer;
 
-        /// <summary> Внедрить зависимости: инвентарь и фабрику отображений ячеек. </summary>
-        /// <param name="inventory"> Инвентарь игрока. </param>
-        /// <param name="slotFactory"> Фабрика отображений ячеек. </param>
-        [Inject]
-        private void Construct(Inventory inventory, IGameFactory<InventorySlotView> slotFactory)
-        {
-            _playerInventory = inventory;
-            _slotFactory = slotFactory;
-        }
-
         /// <summary> Инициализировать отображения и подписаться на обновление инвентаря. </summary>
         private void Awake()
         {
             _slotsContainer = transform;
             CacheInitialSlots();
-            _playerInventory.InventoryUpdated += UpdateView;
         }
 
+        /// <summary> Переинициализирует отображение для указанного инвентаря. </summary>
+        public void Initialize(Inventory inventory, IGameFactory<InventorySlotView> slotFactory)
+        {
+            if (_playerInventory != null)
+                _playerInventory.InventoryUpdated -= UpdateView;
+
+            _playerInventory = inventory;
+            _slotFactory = slotFactory;
+
+            foreach (var slot in _slots)
+                slot.Construct(_playerInventory);
+
+            _playerInventory.InventoryUpdated += UpdateView;
+            UpdateView();
+        }
+        
         /// <summary> Сохранить существующие отображения ячеек, если они уже присутствуют в иерархии. </summary>
         private void CacheInitialSlots()
         {
@@ -46,6 +51,7 @@ namespace FlavorfulStory.InventorySystem.UI
                 var slot = child.GetComponent<InventorySlotView>();
                 if (!slot || _slots.Contains(slot)) continue;
 
+                slot.Construct(_playerInventory);
                 slot.gameObject.SetActive(false);
                 _slots.Add(slot);
             }
@@ -74,6 +80,7 @@ namespace FlavorfulStory.InventorySystem.UI
             if (index < _slots.Count) return _slots[index];
 
             var slot = _slotFactory.Create(_slotsContainer);
+            slot.Construct(_playerInventory);
             _slots.Add(slot);
             return slot;
         }

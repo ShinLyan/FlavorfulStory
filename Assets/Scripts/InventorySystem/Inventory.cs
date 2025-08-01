@@ -8,9 +8,12 @@ using Zenject;
 
 namespace FlavorfulStory.InventorySystem
 {
+    
     /// <summary> Инвентарь игрока с настраиваемым количеством слотов. </summary>
     public class Inventory : MonoBehaviour, IPredicateEvaluator, ISaveable
     {
+        [field: SerializeField] public InventoryType Type { get; set; }
+        
         /// <summary> Количество слотов в инвентаре. </summary>
         [field: Tooltip("Количество слотов в инвентаре."), SerializeField]
         public int InventorySize { get; private set; }

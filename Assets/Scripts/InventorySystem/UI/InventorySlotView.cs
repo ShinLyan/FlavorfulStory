@@ -18,13 +18,16 @@ namespace FlavorfulStory.InventorySystem.UI
 
         /// <summary> Внедрение зависимости — инвентарь игрока. </summary>
         /// <param name="inventory"> Инвентарь игрока. </param>
-        [Inject]
-        private void Construct(Inventory inventory) => _inventory = inventory;
+        public void Construct(Inventory inventory) => _inventory = inventory;
 
         /// <summary> Установить индекс слота. </summary>
         /// <param name="index"> Индекс в инвентаре. </param>
         public void Setup(int index)
         {
+            if (_inventory == null)
+                throw new System.Exception("[InventorySlotView] Inventory not assigned! " +
+                                           "Call Construct() before Setup()");
+            
             _index = index;
             _itemStackView.UpdateView(_inventory.GetItemStackInSlot(_index));
         }

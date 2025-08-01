@@ -87,6 +87,12 @@ namespace FlavorfulStory.Installers
             Container.Bind<PickupSpawner>().FromComponentsInHierarchy().AsCached();
             Container.Bind<IItemDropService>().To<ItemDropService>().AsSingle();
             Container.Bind<ISaveable>().To<ItemDropService>().FromResolve();
+            
+            Container.Bind<List<Inventory>>()
+                .FromMethod(context => new List<Inventory>(FindObjectsOfType<Inventory>())).AsSingle();
+
+            Container.Bind<IInventoryProvider>().To<InventoryProvider>().AsSingle();
+            Container.Bind<InventoryTransferService>().AsSingle();
         }
 
         /// <summary> Установить зависимости, связанные с системой диалогов. </summary>
@@ -118,7 +124,8 @@ namespace FlavorfulStory.Installers
             Container.Bind<ConfirmationWindowView>().FromComponentInHierarchy().AsSingle();
             Container.Bind<SummaryView>().FromComponentInHierarchy().AsSingle();
             Container.Bind<RepairableBuildingView>().FromComponentInHierarchy().AsSingle();
-
+            Container.Bind<InventoryExchangeWindow>().FromComponentInHierarchy().AsSingle();
+            
             Container.Bind<IGameFactory<InventorySlotView>>().To<InventorySlotViewFactory>().AsSingle()
                 .WithArguments(_inventorySlotViewPrefab);
             Container.Bind<IGameFactory<ResourceRequirementView>>().To<ResourceRequirementViewFactory>().AsSingle()
