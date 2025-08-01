@@ -1,4 +1,5 @@
-﻿using TMPro;
+﻿using FlavorfulStory.LocalizationSystem;
+using TMPro;
 using UnityEngine;
 
 namespace FlavorfulStory.QuestSystem
@@ -14,7 +15,7 @@ namespace FlavorfulStory.QuestSystem
         /// <param name="questName"> Название квеста. </param>
         public void Show(string questName)
         {
-            _questNameText.text = questName;
+            _questNameText.text = LocalizationService.GetLocalizedString(questName);
             gameObject.SetActive(true);
 
             CancelInvoke(nameof(Hide));

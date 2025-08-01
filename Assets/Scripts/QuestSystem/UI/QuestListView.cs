@@ -2,6 +2,7 @@
 using System.Linq;
 using FlavorfulStory.Infrastructure;
 using FlavorfulStory.Infrastructure.Factories;
+using FlavorfulStory.LocalizationSystem;
 using UnityEngine;
 using Zenject;
 
@@ -40,6 +41,7 @@ namespace FlavorfulStory.QuestSystem
                     Destroy(child.gameObject);
 
             _questList.OnQuestListUpdated += UpdateView;
+            LocalizationService.OnLanguageChanged += LocalizeButtons;
         }
 
         /// <summary> Заполняет список кнопок при старте. </summary>
@@ -110,6 +112,12 @@ namespace FlavorfulStory.QuestSystem
             var firstButton = _questButtonMap.Select(pair => pair.Value).FirstOrDefault();
             firstButton?.Select();
             OnQuestButtonClicked(firstButton);
+        }
+
+        /// <summary> Лакализует кнопки. </summary>
+        private void LocalizeButtons()
+        {
+            foreach (var (questStatus, questListButton) in _questButtonMap) questListButton.Setup(questStatus);
         }
     }
 }
