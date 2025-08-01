@@ -4,12 +4,18 @@ using UnityEngine;
 
 namespace FlavorfulStory.LocalizationSystem
 {
+    /// <summary> Поисковик использования ключей локализации в квестах и их задачах. </summary>
     public class QuestLocalizationUsageFinder : ILocalizationUsageFinder
     {
+        /// <summary> Кэшированный массив всех квестов в проекте. </summary>
         private Quest[] _cachedQuests;
 
-        private void LoadQuests() { _cachedQuests = Resources.LoadAll<Quest>(""); }
+        /// <summary> Загружает все квесты из папки Resources. </summary>
+        private void LoadQuests() => _cachedQuests = Resources.LoadAll<Quest>("");
 
+        /// <summary> Находит все использования ключа локализации в квестах. </summary>
+        /// <param name="key"> Ключ локализации для поиска. </param>
+        /// <returns> Список квестов, содержащих указанный ключ в названии, описании или задачах. </returns>
         public List<Object> FindUsages(string key)
         {
             if (_cachedQuests == null || _cachedQuests.Length == 0) LoadQuests();
@@ -18,7 +24,7 @@ namespace FlavorfulStory.LocalizationSystem
 
             foreach (var quest in _cachedQuests)
             {
-                if (quest == null) continue;
+                if (!quest) continue;
 
                 if (quest.QuestName.Contains($"[{key}]") || quest.QuestDescription.Contains($"[{key}]"))
                     results.Add(quest);

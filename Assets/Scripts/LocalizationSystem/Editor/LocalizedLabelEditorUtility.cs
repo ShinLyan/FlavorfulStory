@@ -5,8 +5,10 @@ using UnityEngine;
 
 namespace FlavorfulStory.LocalizationSystem
 {
+    /// <summary> Утилита редактора для работы с компонентами LocalizedLabel. </summary>
     public static class LocalizedLabelEditorUtility
     {
+        /// <summary> Добавляет компонент LocalizedLabel ко всем объектам с TMP_Text. </summary>
         [MenuItem("Tools/Localization/Add LocalizedLabel To All TMP_Text")]
         public static void AddLocalizedLabelToAllTMPTexts()
         {
@@ -23,6 +25,7 @@ namespace FlavorfulStory.LocalizationSystem
             Debug.Log($"LocalizedLabel added to {addedCount} TMP_Text objects.");
         }
 
+        /// <summary> Удаляет компоненты LocalizedLabel с пустыми ключами локализации. </summary>
         [MenuItem("Tools/Localization/Remove Empty LocalizedLabels")]
         public static void RemoveEmptyLocalizedLabels()
         {
@@ -34,8 +37,7 @@ namespace FlavorfulStory.LocalizationSystem
             {
                 var so = new SerializedObject(label);
                 var keyProp = so.FindProperty("_localizationKey");
-
-                string key = keyProp != null ? keyProp.stringValue : null;
+                string key = keyProp?.stringValue;
 
                 if (string.IsNullOrWhiteSpace(key))
                 {

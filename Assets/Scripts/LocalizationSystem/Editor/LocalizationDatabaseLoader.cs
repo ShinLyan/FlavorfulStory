@@ -4,11 +4,14 @@ using FlavorfulStory.LocalizationSystem;
 using UnityEditor;
 using UnityEngine;
 
+/// <summary> Кастомный редактор для импорта локализации из CSV-файлов в LocalizationDatabase. </summary>
 [CustomEditor(typeof(LocalizationDatabase))]
 public class LocalizationDatabaseLoader : Editor
 {
+    /// <summary> Разделитель полей в CSV-файле. </summary>
     private const char BaseDelimiter = ';';
 
+    /// <summary> Отрисовывает интерфейс инспектора с дополнительной кнопкой импорта. </summary>
     public override void OnInspectorGUI()
     {
         base.OnInspectorGUI();
@@ -19,14 +22,15 @@ public class LocalizationDatabaseLoader : Editor
         if (GUILayout.Button("Импортировать из CSV (Resources/Localization/*.csv)")) ImportCsvFiles();
     }
 
+    /// <summary> Импортирует данные локализации из всех CSV-файлов в папке Resources/Localization. </summary>
     private void ImportCsvFiles()
     {
         var database = (LocalizationDatabase)target;
 
-        string folderPath = Path.Combine(Application.dataPath, "Resources/Localization");
+        string folderPath = Path.Combine(Application.dataPath, "Game/Localizations/Localization");
         if (!Directory.Exists(folderPath))
         {
-            Debug.LogWarning("Папка Resources/Localization не найдена.");
+            Debug.LogWarning("Папка Game/Localizations/Localization не найдена.");
             return;
         }
 

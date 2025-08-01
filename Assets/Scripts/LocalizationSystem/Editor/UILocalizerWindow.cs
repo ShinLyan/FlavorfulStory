@@ -5,24 +5,43 @@ using UnityEngine;
 
 namespace FlavorfulStory.LocalizationSystem
 {
+    /// <summary> Окно редактора для работы с локализацией и управления переводами. </summary>
     public class UILocalizerWindow : EditorWindow
     {
+        /// <summary> База данных локализации. </summary>
         private LocalizationDatabase _database;
+
+        /// <summary> Позиция скролла в окне. </summary>
         private Vector2 _scrollPos;
 
+        /// <summary> Словарь всех переводов с группировкой по ключам. </summary>
         private Dictionary<string, Dictionary<string, string>> _entries = new();
+
+        /// <summary> Список доступных языков. </summary>
         private List<string> _languages = new();
+
+        /// <summary> Текущая выбранная группа ключей. </summary>
         private string _currentGroup = "";
+
+        /// <summary> Список всех групп ключей. </summary>
         private List<string> _groups = new();
 
+        /// <summary> Стиль для пропущенных переводов. </summary>
         private GUIStyle _missedTranslationStyle;
+
+        /// <summary> Стиль для обычных переводов. </summary>
         private GUIStyle _translationStyle;
+
+        /// <summary> Стиль для используемых ключей. </summary>
         private GUIStyle _usedStyle;
+
+        /// <summary> Стиль для неиспользуемых ключей. </summary>
         private GUIStyle _unusedStyle;
 
+        /// <summary> Менеджер поиска использования ключей. </summary>
         private LocalizationUsageFinderManager _usageFinderManager;
-        private UIPrefabLocalizationUsageFinder _uiFinder;
 
+        /// <summary> Открывает окно UILocalizer. </summary>
         [MenuItem("Tools/Localization/UILocalizer")]
         public static void ShowWindow()
         {
@@ -30,11 +49,10 @@ namespace FlavorfulStory.LocalizationSystem
             window.minSize = new Vector2(600, 400);
         }
 
+        /// <summary> Инициализирует окно редактора. </summary>
         private void OnEnable()
         {
-            _uiFinder = new UIPrefabLocalizationUsageFinder();
-            _usageFinderManager = new LocalizationUsageFinderManager(_uiFinder);
-            _uiFinder.RebuildIndex();
+            _usageFinderManager = new LocalizationUsageFinderManager();
 
             _missedTranslationStyle = new GUIStyle(EditorStyles.textArea)
             {
@@ -61,6 +79,7 @@ namespace FlavorfulStory.LocalizationSystem
             };
         }
 
+        /// <summary> Отрисовывает интерфейс окна. </summary>
         private void OnGUI()
         {
             _database = (LocalizationDatabase)EditorGUILayout.ObjectField("Localization Database", _database,
@@ -69,22 +88,6 @@ namespace FlavorfulStory.LocalizationSystem
             if (_database == null) return;
 
             if (GUILayout.Button("Reload")) LoadEntries();
-
-
-            EditorGUILayout.BeginHorizontal();
-            if (_uiFinder.IsBuilding)
-            {
-                EditorGUILayout.LabelField("Rebuilding UI index...", GUILayout.Width(150));
-                var barRect = GUILayoutUtility.GetRect(200, 16);
-                EditorGUI.ProgressBar(barRect, _uiFinder.Progress,
-                    $"{Mathf.RoundToInt(_uiFinder.Progress * 100)}%");
-            }
-            else
-            {
-                if (GUILayout.Button("Rebuild UI Index", GUILayout.Width(150))) _uiFinder.RebuildIndex();
-            }
-
-            EditorGUILayout.EndHorizontal();
 
             if (_groups.Count > 0)
             {
@@ -109,7 +112,6 @@ namespace FlavorfulStory.LocalizationSystem
                 EditorGUILayout.BeginHorizontal();
 
                 EditorGUILayout.SelectableLabel(entry.Key, GUILayout.Width(250));
-
 
                 var usages = _usageFinderManager.FindUsages(_currentGroup, entry.Key);
                 bool isUsed = usages.Count > 0;
@@ -145,6 +147,7 @@ namespace FlavorfulStory.LocalizationSystem
             EditorGUILayout.EndScrollView();
         }
 
+        /// <summary> Загружает данные из базы локализации. </summary>
         private void LoadEntries()
         {
             _entries = _database.ToDictionary();
@@ -153,10 +156,13 @@ namespace FlavorfulStory.LocalizationSystem
             if (_groups.Count > 0) _currentGroup = _groups[0];
         }
 
+        /// <summary> Получает группу из ключа локализации. </summary>
+        /// <param name="key"> Ключ локализации. </param>
+        /// <returns> Название группы или "Unknown", если группа не определена. </returns>
         private string GetGroup(string key)
         {
             int index = key.IndexOf('_');
-            return index > 0 ? key.Substring(0, index) : "Unknown";
+            return index > 0 ? key[..index] : "Unknown";
         }
     }
 }
