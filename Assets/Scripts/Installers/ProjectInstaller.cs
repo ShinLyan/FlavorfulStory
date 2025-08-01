@@ -37,13 +37,6 @@ namespace FlavorfulStory.Installers
             }).AsSingle().NonLazy();
 
             Container
-                .Bind<UILocalizer>()
-                .FromNewComponentOnNewGameObject()
-                .WithGameObjectName("UILocalizer (AutoCreated)")
-                .AsSingle()
-                .NonLazy();
-
-            Container
                 .Bind<LocalizationService>()
                 .AsSingle()
                 .WithArguments(_localizationDatabase, "EN");

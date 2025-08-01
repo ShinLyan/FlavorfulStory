@@ -22,6 +22,17 @@ namespace FlavorfulStory.LocalizationSystem
         }
 
         public void SetEntries(List<LocalizationEntry> entries) => _entries = entries;
+
+        // Добавить этот метод
+        public List<string> GetLanguages()
+        {
+            var languages = new HashSet<string>();
+            foreach (var entry in _entries)
+            foreach (var translation in entry.Translations)
+                languages.Add(translation.LanguageCode);
+
+            return new List<string>(languages);
+        }
     }
 
     [Serializable]

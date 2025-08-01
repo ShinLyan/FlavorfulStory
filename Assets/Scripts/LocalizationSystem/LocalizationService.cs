@@ -10,18 +10,12 @@ namespace FlavorfulStory.LocalizationSystem
         private Dictionary<string, string> _currentMap;
         private string _currentLang;
 
-        // === Статический доступ ===
-
         public static LocalizationService Instance { get; private set; }
 
         public static bool IsInitialized => Instance != null;
         public static string CurrentLanguage => Instance?._currentLang;
 
-        public static IReadOnlyList<string> AvailableLanguages =>
-            Instance != null ? new List<string>(Instance._languages) : new List<string>();
-
-
-        public event Action OnLanguageChanged;
+        public static event Action OnLanguageChanged;
 
         public LocalizationService(LocalizationDatabase database, string defaultLang = "EN")
         {
@@ -36,7 +30,7 @@ namespace FlavorfulStory.LocalizationSystem
             Instance = this;
         }
 
-        public void SetLanguage(string lang)
+        private void SetLanguage(string lang)
         {
             _currentLang = _languages.Contains(lang) ? lang : "EN";
             _currentMap = new Dictionary<string, string>();
@@ -48,21 +42,13 @@ namespace FlavorfulStory.LocalizationSystem
             OnLanguageChanged?.Invoke();
         }
 
-        public string Get(string key) =>
+        private string Get(string key) =>
             _currentMap.GetValueOrDefault(key, "");
-
-        public string GetLocalizedValueOrNull(string key, string lang)
-        {
-            return _translationsPerKey.TryGetValue(key, out var map) && map.TryGetValue(lang, out string val)
-                ? val
-                : null;
-        }
 
         public static void SetLanguageStatic(string lang) => Instance?.SetLanguage(lang);
 
-        public static string GetStatic(string key) => Instance?.Get(key) ?? "";
+        public static string GetLocalizedString(string key) => Instance?.Get(key.TrimStart('[').TrimEnd(']')) ?? "";
 
-        public static string GetLocalizedValueStatic(string key, string lang) =>
-            Instance?.GetLocalizedValueOrNull(key, lang);
+        public static IEnumerable<string> GetAllLanguages() => Instance?._languages;
     }
 }

@@ -12,18 +12,18 @@ namespace FlavorfulStory.LocalizationSystem
         private void Awake()
         {
             _text = GetComponent<TMP_Text>();
-            LocalizationService.Instance.OnLanguageChanged += UpdateText;
+            LocalizationService.OnLanguageChanged += UpdateText;
             UpdateText();
         }
 
         private void OnDestroy()
         {
-            if (LocalizationService.IsInitialized) LocalizationService.Instance.OnLanguageChanged -= UpdateText;
+            if (LocalizationService.IsInitialized) LocalizationService.OnLanguageChanged -= UpdateText;
         }
 
         private void UpdateText()
         {
-            string newText = LocalizationService.GetStatic(_localizationKey);
+            string newText = LocalizationService.GetLocalizedString(_localizationKey);
             if (string.IsNullOrEmpty(newText)) return;
             _text.text = newText;
         }
