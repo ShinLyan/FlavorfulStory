@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using DG.Tweening;
 using FlavorfulStory.Infrastructure.Factories;
 using UnityEngine;
 
@@ -117,6 +119,77 @@ namespace FlavorfulStory.InventorySystem.UI
             }
 
             _slots.Clear();
+        }
+        
+        /// <summary> Найти вьюху слота по предмету. </summary>
+        /// <param name="item"> Предмет, который нужно найти. </param>
+        /// <param name="slotView"> Найденное отображение слота. </param>
+        /// <returns> Найден ли слот. </returns>
+        private bool TryFindSlotView(InventoryItem item, out InventorySlotView slotView)
+        {
+            foreach (Transform child in transform)
+            {
+                slotView = child.GetComponent<InventorySlotView>();
+                if (slotView != null && slotView.GetItem() == item)
+                    return true;
+            }
+
+            slotView = null;
+            return false;
+        }        
+        
+        /// <summary> Анимировать добавление предмета в инвентарь (визуальное подчёркивание появления). </summary>
+        /// <param name="item"> Предмет, который был добавлен. </param>
+        public void AnimateAdd(InventoryItem item)
+        {
+            if (!TryFindSlotView(item, out var slotView)) return;
+
+            var itemStackView = slotView.GetComponentInChildren<ItemStackView>();
+            var rect = itemStackView.GetComponent<RectTransform>();
+
+            rect.DOKill();
+            rect.anchoredPosition = Vector2.zero;
+
+            rect.DOShakeAnchorPos(
+                duration: 0.5f,
+                strength: Vector2.one,
+                vibrato: 20,
+                randomness: 0f,
+                snapping: false,
+                fadeOut: false,
+                randomnessMode: ShakeRandomnessMode.Full
+            );
+        }
+        
+        /// <summary> Анимировать удаление предмета из слота (визуальное затухание и сдвиг вверх). </summary>
+        /// <param name="slotIndex"> Индекс слота, из которого удаляется предмет. </param>
+        /// <param name="onComplete"> Действие, вызываемое после завершения анимации. </param>
+        public void AnimateRemoveAt(int slotIndex, Action onComplete)
+        {
+            if (slotIndex < 0 || slotIndex >= _slots.Count) return;
+
+            var slotView = _slots[slotIndex];
+            var itemStackView = slotView.GetComponentInChildren<ItemStackView>();
+            if (itemStackView == null) return;
+
+            var rect = itemStackView.GetComponent<RectTransform>();
+            var canvasGroup = itemStackView.GetComponent<CanvasGroup>() 
+                              ?? itemStackView.gameObject.AddComponent<CanvasGroup>();
+
+            rect.DOKill();
+            canvasGroup.DOKill();
+
+            canvasGroup.alpha = 1f;
+            rect.anchoredPosition = Vector2.zero;
+
+            rect.DOAnchorPosY(rect.anchoredPosition.y + 20f, 0.5f).SetEase(Ease.InOutQuad);
+            canvasGroup.DOFade(0f, 0.5f).SetEase(Ease.InOutQuad).OnComplete(() =>
+                {
+                    canvasGroup.alpha = 1f;
+                    rect.anchoredPosition = Vector2.zero;
+
+                    onComplete?.Invoke();
+                });
         }
     }
 }

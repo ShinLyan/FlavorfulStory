@@ -9,6 +9,16 @@ namespace FlavorfulStory.InventorySystem
         /// <summary> Список всех инвентарей в игре. </summary>
         private readonly List<Inventory> _inventories;
 
+        /// <summary> Зарегистрировать инвентарь. </summary>
+        public void Register(Inventory inventory)
+        {
+            if (!_inventories.Contains(inventory))
+                _inventories.Add(inventory);
+        }
+        
+        /// <summary> Отвязать инвентарь. </summary>
+        public void Unregister(Inventory inventory) => _inventories.Remove(inventory);
+
         /// <summary> Создать провайдер с переданным списком инвентарей. </summary>
         public InventoryProvider(List<Inventory> inventories) => _inventories = inventories;
 

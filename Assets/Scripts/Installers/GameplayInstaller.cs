@@ -87,11 +87,7 @@ namespace FlavorfulStory.Installers
             Container.Bind<PickupSpawner>().FromComponentsInHierarchy().AsCached();
             Container.Bind<IItemDropService>().To<ItemDropService>().AsSingle();
             Container.Bind<ISaveable>().To<ItemDropService>().FromResolve();
-            
-            Container.Bind<List<Inventory>>()
-                .FromMethod(context => new List<Inventory>(FindObjectsOfType<Inventory>())).AsSingle();
-
-            Container.Bind<IInventoryProvider>().To<InventoryProvider>().AsSingle();
+            Container.Bind<IInventoryProvider>().To<InventoryProvider>().AsSingle().NonLazy();
             Container.Bind<InventoryTransferService>().AsSingle();
         }
 

@@ -15,9 +15,17 @@ namespace FlavorfulStory.Actions.Interactables
         /// <summary> Данные для отображения тултипа действия (открыть сундук). </summary>
         [Inject] private InventoryExchangeWindow _exchangeWindow;
         
-        /// <summary> Разрешено ли взаимодействие с объектом. </summary>
+        /// <summary> Инвентарь сундука. </summary>
+        private Inventory _inventory;
+        
+        /// <summary> Тултип открытия сундука. </summary>
         public ActionTooltipData ActionTooltip => new("E", ActionType.Open, "Chest");
+        /// <summary> Разрешено ли взаимодействие с объектом. </summary>
         public bool IsInteractionAllowed => true;
+
+        /// <summary> Инициализация сундука. </summary>
+        /// <remarks> Получение ссылки на инввентарь сундука. </remarks>
+        private void Awake() => _inventory = GetComponent<Inventory>();
 
         /// <summary> Расстояние до игрока. </summary>
         public float GetDistanceTo(Transform otherTransform) =>
@@ -27,12 +35,7 @@ namespace FlavorfulStory.Actions.Interactables
         public void BeginInteraction(PlayerController player)
         {
             player.SetBusyState(true);
-
-            _exchangeWindow.Show(
-                player.GetComponent<Inventory>(), 
-                GetComponent<Inventory>(),
-                () => player.SetBusyState(false)
-            );
+            _exchangeWindow.Show(player.GetComponent<Inventory>(), _inventory, () => player.SetBusyState(false));
         }
 
         /// <summary> Завершить взаимодействие. </summary>

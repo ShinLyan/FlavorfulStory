@@ -12,7 +12,8 @@ namespace FlavorfulStory.InventorySystem
     /// <summary> Инвентарь игрока с настраиваемым количеством слотов. </summary>
     public class Inventory : MonoBehaviour, IPredicateEvaluator, ISaveable
     {
-        [field: SerializeField] public InventoryType Type { get; set; }
+        /// <summary> Тип инвентаря. </summary>
+        [field: Tooltip("Тип инвентаря."), SerializeField] public InventoryType Type { get; set; }
         
         /// <summary> Количество слотов в инвентаре. </summary>
         [field: Tooltip("Количество слотов в инвентаре."), SerializeField]
@@ -24,6 +25,9 @@ namespace FlavorfulStory.InventorySystem
         /// <summary> Менеджер уведомлений о подборе предмета. </summary>
         private PickupNotificationManager _notificationManager;
 
+        /// <summary> Провайдер инвентарей. </summary>
+        private IInventoryProvider _inventoryProvider;        
+        
         /// <summary> Событие, вызываемое при изменении инвентаря (добавление, удаление предметов). </summary>
         public event Action InventoryUpdated;
 
@@ -32,16 +36,27 @@ namespace FlavorfulStory.InventorySystem
 
         /// <summary> Внедрение зависимостей Zenject. </summary>
         /// <param name="notificationManager"> Менеджер уведомлений о подборе предмета. </param>
+        /// /// <param name="inventoryProvider"> Провайдер инвентарей. </param>
         [Inject]
-        private void Construct(PickupNotificationManager notificationManager) =>
+        private void Construct(PickupNotificationManager notificationManager, IInventoryProvider inventoryProvider)
+        {
             _notificationManager = notificationManager;
+            _inventoryProvider = inventoryProvider;
+        }
 
         /// <summary> Инициализация слотов и ссылки на инвентарь игрока. </summary>
-        private void Awake() => _inventorySlots = new ItemStack[InventorySize];
+        private void Awake()
+        {
+            _inventorySlots = new ItemStack[InventorySize];
+            _inventoryProvider?.Register(this);
+        }
 
         /// <summary> При старте вызываем событие обновление инвентаря. </summary>
         /// <remarks> После восстановления состояния нужно разослать событие. </remarks>
         private void Start() => InventoryUpdated?.Invoke();
+        
+        /// <summary> Отвязать инвентарь. </summary>
+        private void OnDestroy() => _inventoryProvider?.Unregister(this);
 
         /// <summary> Есть ли место для предмета в инвентаре? </summary>
         public bool HasSpaceFor(InventoryItem item) => FindSlot(item) >= 0;
