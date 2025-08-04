@@ -1,47 +1,79 @@
 ﻿using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
+using FlavorfulStory.Infrastructure;
 using FlavorfulStory.Notifications.Configs;
 using FlavorfulStory.Notifications.UI;
 using UnityEngine;
 using Zenject;
+using Object = UnityEngine.Object;
 
 namespace FlavorfulStory.Notifications
 {
-    /// <summary> Сервис отображения уведомлений. </summary>
+    /// <summary> Сервис отображения уведомлений с поддержкой ObjectPool. </summary>
     /// <remarks> Показ уведомления зависит от его типа и позиции. </remarks>
-    public class NotificationService : MonoBehaviour, INotificationService
+    public class NotificationService : IInitializable, IDisposable, INotificationService
     {
-        /// <summary> Контейнер уведомлений в верхнем левом углу. </summary>
-        [SerializeField] private Transform _topLeft;
+        /// <summary> Глобальные настройки системы уведомлений. </summary>
+        private readonly NotificationSystemSettings _settings;
 
-        /// <summary> Контейнер уведомлений в верхнем правом углу. </summary>
-        [SerializeField] private Transform _topRight;
-
-        /// <summary> Контейнер уведомлений в нижнем левом углу. </summary>
-        [SerializeField] private Transform _bottomLeft;
-
-        /// <summary> Контейнер уведомлений в нижнем правом углу. </summary>
-        [SerializeField] private Transform _bottomRight;
-
-        /// <summary> Активные уведомления, сгруппированные по позиции. </summary>
-        private readonly Dictionary<NotificationPosition, List<BaseNotificationView>> _activeViewsByPosition = new();
+        /// <summary> Компонент, содержащий якоря для разных зон экрана. </summary>
+        private readonly NotificationAnchorLocator _locator;
 
         /// <summary> Кеш конфигураций уведомлений по типу. </summary>
-        private readonly Dictionary<NotificationType, NotificationConfig> _configCache = new();
+        private readonly Dictionary<NotificationType, NotificationConfig> _configCache;
 
-        /// <summary> Глобальные настройки системы уведомлений. </summary>
-        private NotificationSystemSettings _settings;
+        /// <summary> Активные уведомления, сгруппированные по позиции. </summary>
+        private readonly Dictionary<NotificationPosition, List<BaseNotificationView>> _activeViewsByPosition;
 
-        /// <summary> Инжект глобальных настроек и инвентаря игрока. </summary>
-        /// <param name="settings"> Настройки системы уведомлений. </param>
-        [Inject]
-        private void Construct(NotificationSystemSettings settings) => _settings = settings;
+        /// <summary> Пулы вьюшек для каждого типа уведомлений. </summary>
+        private readonly Dictionary<NotificationType, ObjectPool<BaseNotificationView>> _pools;
+
+        /// <summary> Конструктор сервиса уведомлений. </summary>
+        /// <param name="settings"> Глобальные настройки отображения. </param>
+        /// <param name="locator"> Компонент с привязками к позициям на экране. </param>
+        public NotificationService(NotificationSystemSettings settings, NotificationAnchorLocator locator)
+        {
+            _settings = settings;
+            _locator = locator;
+            _configCache = new Dictionary<NotificationType, NotificationConfig>();
+            _activeViewsByPosition = new Dictionary<NotificationPosition, List<BaseNotificationView>>();
+            _pools = new Dictionary<NotificationType, ObjectPool<BaseNotificationView>>();
+        }
 
         /// <summary> Кеширует конфигурации уведомлений при инициализации. </summary>
-        private void Awake()
+        public void Initialize()
+        {
+            InitConfigCache();
+            InitPools();
+        }
+
+        /// <summary> Заполняет словарь конфигураций уведомлений по типам. </summary>
+        private void InitConfigCache()
         {
             foreach (var config in _settings.NotificationConfigs) _configCache[config.Type] = config;
+        }
+
+        /// <summary> Создаёт ObjectPool для каждого типа уведомлений. </summary>
+        private void InitPools()
+        {
+            foreach (var config in _settings.NotificationConfigs)
+            {
+                var prefab = config.Prefab;
+                var pool = new ObjectPool<BaseNotificationView>(
+                    () => Object.Instantiate(prefab, _locator.GetContainer(config.Position)),
+                    view => view.gameObject.SetActive(true),
+                    view => view.gameObject.SetActive(false)
+                );
+
+                _pools[config.Type] = pool;
+            }
+        }
+
+        /// <summary> Очищает все пулы при уничтожении. </summary>
+        public void Dispose()
+        {
+            foreach (var pool in _pools.Values) pool.Clear();
         }
 
         /// <summary> Отображает уведомление по переданным данным. </summary>
@@ -51,40 +83,42 @@ namespace FlavorfulStory.Notifications
             if (!_configCache.TryGetValue(data.Type, out var config)) return;
 
             var position = config.Position;
-            var parent = GetContainer(position);
+            var pool = _pools[config.Type];
+            var view = pool.Get();
 
-            var instance = Instantiate(config.Prefab, parent);
-            instance.SetupPosition(position, new Vector2(
-                _settings.GetHorizontalPadding(position),
-                _settings.GetVerticalPadding(position)));
-            instance.Initialize(data);
-            instance.Show(_settings.FadeTime, _settings.DefaultEasing);
+            view.Initialize(data);
 
             if (!_activeViewsByPosition.TryGetValue(position, out var list))
                 _activeViewsByPosition[position] = list = new List<BaseNotificationView>();
 
-            list.Add(instance);
+            list.Add(view);
 
-            if (position is NotificationPosition.TopLeft or NotificationPosition.TopRight)
-                instance.transform.SetAsLastSibling();
-            else
-                instance.transform.SetAsFirstSibling();
-
-            LifetimeAsync(instance, config).Forget();
+            view.SetupPosition(position,
+                new Vector2(_settings.GetHorizontalPadding(position), _settings.GetVerticalPadding(position)));
             Reposition(list, position);
+
+            view.Show(_settings.FadeTime, _settings.DefaultEasing);
+            view.transform.SetAsLastSibling();
+
+            HandleLifetime(view, config, pool).Forget();
         }
 
         /// <summary> Управляет временем жизни уведомления и удалением после завершения. </summary>
-        /// <param name="view"> Вьюха уведомления. </param>
-        /// <param name="config"> Конфиг уведомления. </param>
-        private async UniTaskVoid LifetimeAsync(BaseNotificationView view, NotificationConfig config)
+        /// <param name="view"> Отображение уведомления. </param>
+        /// <param name="config"> Конфигурация уведомления. </param>
+        /// <param name="pool"> Пул, в который возвращается отображение после завершения. </param>
+        private async UniTaskVoid HandleLifetime(BaseNotificationView view, NotificationConfig config,
+            ObjectPool<BaseNotificationView> pool)
         {
-            await UniTask.Delay(TimeSpan.FromSeconds(_settings.DisplayTime),
-                cancellationToken: this.GetCancellationTokenOnDestroy());
+            await UniTask.Delay(TimeSpan.FromSeconds(_settings.DisplayTime));
 
-            view.HideAndDestroy(_settings.FadeTime, _settings.DefaultEasing);
+            view.Hide(_settings.FadeTime, _settings.DefaultEasing);
+
+            await UniTask.Delay(TimeSpan.FromSeconds(_settings.FadeTime));
+
             _activeViewsByPosition[config.Position].Remove(view);
             Reposition(_activeViewsByPosition[config.Position], config.Position);
+            pool.Release(view);
         }
 
         /// <summary> Перераспределяет позиции уведомлений в указанной зоне. </summary>
@@ -101,22 +135,9 @@ namespace FlavorfulStory.Notifications
 
             foreach (var view in list)
             {
-                float targetY = offsetY;
-                view.MoveTo(new Vector2(view.StartXPosition, targetY), _settings.MoveTime, _settings.DefaultEasing);
+                view.MoveTo(new Vector2(view.StartXPosition, offsetY), _settings.MoveTime, _settings.DefaultEasing);
                 offsetY += growDown ? -(view.Height + spacing) : view.Height + spacing;
             }
         }
-
-        /// <summary> Возвращает соответствующий контейнер для позиции уведомления. </summary>
-        /// <param name="position"> Позиция уведомления. </param>
-        /// <returns> Трансформ-контейнер для уведомлений. </returns>
-        private Transform GetContainer(NotificationPosition position) => position switch
-        {
-            NotificationPosition.TopLeft => _topLeft,
-            NotificationPosition.TopRight => _topRight,
-            NotificationPosition.BottomLeft => _bottomLeft,
-            NotificationPosition.BottomRight => _bottomRight,
-            _ => throw new Exception("Invalid position")
-        };
     }
 }

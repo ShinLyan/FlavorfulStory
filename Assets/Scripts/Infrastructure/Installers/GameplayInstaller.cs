@@ -10,6 +10,7 @@ using FlavorfulStory.InventorySystem.EquipmentSystem;
 using FlavorfulStory.InventorySystem.PickupSystem;
 using FlavorfulStory.InventorySystem.UI;
 using FlavorfulStory.Notifications;
+using FlavorfulStory.Notifications.UI;
 using FlavorfulStory.Player;
 using FlavorfulStory.QuestSystem;
 using FlavorfulStory.QuestSystem.Objectives;
@@ -119,8 +120,6 @@ namespace FlavorfulStory.Infrastructure.Installers
             Container.Bind<SummaryView>().FromComponentInHierarchy().AsSingle();
             Container.Bind<RepairableBuildingView>().FromComponentInHierarchy().AsSingle();
 
-            Container.Bind<INotificationService>().To<NotificationService>().FromComponentInHierarchy().AsSingle();
-
             Container.Bind<IGameFactory<InventorySlotView>>().To<InventorySlotViewFactory>().AsSingle()
                 .WithArguments(_inventorySlotViewPrefab);
             Container.Bind<IGameFactory<ResourceRequirementView>>().To<ResourceRequirementViewFactory>().AsSingle()
@@ -131,6 +130,9 @@ namespace FlavorfulStory.Infrastructure.Installers
             Container.Bind<CanvasGroupFader>().WithId("HUD").FromInstance(_hudFader).AsSingle();
 
             Container.Bind<ItemTooltipView>().FromInstance(_itemTooltipPrefab).AsSingle();
+
+            Container.Bind<NotificationAnchorLocator>().FromComponentInHierarchy().AsSingle();
+            Container.BindInterfacesAndSelfTo<NotificationService>().AsSingle();
         }
 
         /// <summary> Установить зависимости, связанные с системой отображения тултипов действий. </summary>

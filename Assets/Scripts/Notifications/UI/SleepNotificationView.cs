@@ -9,7 +9,7 @@
         {
             if (data is not SleepNotificationData notificationData) return;
 
-            _label.text = $"Скоро наступит ночь. Осталось {(int)notificationData.Hour} часов.";
+            _label.text = $"Наступила ночь. Уже {(int)notificationData.Hour} часов.";
         }
     }
 }

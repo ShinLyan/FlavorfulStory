@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using DG.Tweening;
-using FlavorfulStory.Notifications.UI;
 using UnityEngine;
 
 namespace FlavorfulStory.Notifications.Configs

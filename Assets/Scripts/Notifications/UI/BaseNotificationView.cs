@@ -56,9 +56,10 @@ namespace FlavorfulStory.Notifications.UI
             ApplyToRect(_contentRect, anchor);
 
             float xOffset = anchor.x == 0f ? padding.x : -padding.x;
-            _rectTransform.anchoredPosition = new Vector2(xOffset, 0f);
+            float yOffset = anchor.y == 0f ? padding.y : -padding.y;
+            _rectTransform.anchoredPosition = new Vector2(xOffset, yOffset);
 
-            StartXPosition = _rectTransform.anchoredPosition.x;
+            StartXPosition = xOffset;
         }
 
         /// <summary> Применяет якорь и pivot к RectTransform. </summary>
@@ -72,17 +73,21 @@ namespace FlavorfulStory.Notifications.UI
         /// <param name="easing"> Easing-функция для анимации движения. </param>
         public void Show(float fadeDuration, Ease easing)
         {
-            _canvasGroup.DOFade(1f, fadeDuration);
-            _rectTransform.DOAnchorPosX(StartXPosition, fadeDuration).SetEase(easing);
+            const float OffsetPosition = 500f;
+            float offsetX = StartXPosition < 0 ? StartXPosition + OffsetPosition : StartXPosition - OffsetPosition;
+            _rectTransform.anchoredPosition = new Vector2(offsetX, _rectTransform.anchoredPosition.y);
+
+            DOTween.Sequence()
+                .Join(_canvasGroup.DOFade(1f, fadeDuration))
+                .Join(_rectTransform.DOAnchorPosX(StartXPosition, fadeDuration).SetEase(easing));
         }
 
         /// <summary> Прячет уведомление с анимацией и уничтожает объект. </summary>
         /// <param name="fadeDuration"> Длительность анимации исчезновения. </param>
         /// <param name="easing"> Easing-функция для движения. </param>
-        public void HideAndDestroy(float fadeDuration, Ease easing) => DOTween.Sequence()
+        public void Hide(float fadeDuration, Ease easing) => DOTween.Sequence()
             .Join(_canvasGroup.DOFade(0f, fadeDuration))
-            .Join(_rectTransform.DOAnchorPosX(-StartXPosition, fadeDuration).SetEase(easing))
-            .OnComplete(() => Destroy(gameObject));
+            .Join(_rectTransform.DOAnchorPosX(-StartXPosition, fadeDuration).SetEase(easing));
 
         /// <summary> Перемещает уведомление к целевой позиции с анимацией. </summary>
         /// <param name="target"> Целевая позиция. </param>
