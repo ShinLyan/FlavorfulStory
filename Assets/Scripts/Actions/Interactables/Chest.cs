@@ -14,6 +14,7 @@ namespace FlavorfulStory.Actions.Interactables
     {
         /// <summary> Данные для отображения тултипа действия (открыть сундук). </summary>
         [Inject] private InventoryExchangeWindow _exchangeWindow;
+        [Inject] private IInventoryProvider _inventoryProvider;
         
         /// <summary> Инвентарь сундука. </summary>
         private Inventory _inventory;
@@ -35,7 +36,7 @@ namespace FlavorfulStory.Actions.Interactables
         public void BeginInteraction(PlayerController player)
         {
             player.SetBusyState(true);
-            _exchangeWindow.Show(player.GetComponent<Inventory>(), _inventory, () => player.SetBusyState(false));
+            _exchangeWindow.Show(_inventoryProvider.GetPlayerInventory(), _inventory, () => player.SetBusyState(false));
         }
 
         /// <summary> Завершить взаимодействие. </summary>
