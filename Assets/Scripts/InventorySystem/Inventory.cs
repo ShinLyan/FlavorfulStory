@@ -245,6 +245,8 @@ namespace FlavorfulStory.InventorySystem
                 _inventorySlots[i].Item = ItemDatabase.GetItemFromID(slotRecords[i].ItemID);
                 _inventorySlots[i].Number = slotRecords[i].Number;
             }
+            
+            InventoryUpdated?.Invoke();
         }
 
         #endregion

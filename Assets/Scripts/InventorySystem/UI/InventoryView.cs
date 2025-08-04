@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using FlavorfulStory.Infrastructure.Factories;
 using UnityEngine;
-using Zenject;
 
 namespace FlavorfulStory.InventorySystem.UI
 {
@@ -107,7 +106,7 @@ namespace FlavorfulStory.InventorySystem.UI
             _playerInventory.InventoryUpdated -= UpdateView;
             CleanupSlots();
         }
-
+        
         /// <summary> Удалить все отображения ячеек и освободить ресурсы. </summary>
         private void CleanupSlots()
         {

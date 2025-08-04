@@ -1,32 +1,35 @@
 ﻿using System.Collections.Generic;
-using FlavorfulStory.InventorySystem;
 using FlavorfulStory.InventorySystem.PickupSystem;
 using UnityEngine;
 
-namespace FlavorfulStory
+namespace FlavorfulStory.InventorySystem
 {
-    /// <summary>
-    /// Отображает содержимое инвентаря, размещая PickupPrefab в указанных слотах.
-    /// Используется для сундуков, полок и других объектов с фиксированным числом визуальных позиций.
-    /// </summary>
+    /// <summary> Отображает содержимое инвентаря, размещая PickupPrefab в указанных слотах.
+    /// Используется для сундуков, полок и других объектов с фиксированным числом визуальных позиций. </summary>
     [RequireComponent(typeof(Inventory))]
     public class InventoryTransformPlacer : MonoBehaviour
     {
+        /// <summary> Точки размещения предметов. </summary>
         [Tooltip("Точки размещения предметов")]
         [SerializeField] private List<Transform> _slots = new();
 
+        /// <summary> Сопоставление индекса слота и размещённого объекта. </summary>
         private readonly Dictionary<int, GameObject> _occupied = new();
 
+        /// <summary> Инвентарь, содержимое которого визуализируется. </summary>
         private Inventory _inventory;
 
+        /// <summary> Подписывается на обновление инвентаря. </summary>
         private void Awake()
         {
             _inventory = GetComponent<Inventory>();
             _inventory.InventoryUpdated += RefreshVisuals;
         }
 
+        /// <summary> При старте обновляет визуальное представление. </summary>
         private void Start() => RefreshVisuals();
 
+        /// <summary> Отписывается от событий при уничтожении объекта. </summary>
         private void OnDestroy()
         {
             if (_inventory != null)
@@ -53,17 +56,17 @@ namespace FlavorfulStory
         }
 
         /// <summary> Отключает физику и компоненты подбора на объекте. </summary>
-        private static void PrepareInstance(GameObject obj)
+        private static void PrepareInstance(GameObject go)
         {
-            if (obj.TryGetComponent(out Collider col)) col.enabled = false;
+            if (go.TryGetComponent(out Collider collider)) collider.enabled = false;
 
-            if (obj.TryGetComponent(out Rigidbody rb))
+            if (go.TryGetComponent(out Rigidbody rigidbody))
             {
-                rb.isKinematic = true;
-                rb.useGravity = false;
+                rigidbody.isKinematic = true;
+                rigidbody.useGravity = false;
             }
 
-            if (obj.TryGetComponent(out Pickup pickup)) pickup.enabled = false;
+            if (go.TryGetComponent(out Pickup pickup)) pickup.enabled = false;
         }
 
         /// <summary> Устанавливает объект в слот с указанным индексом. </summary>

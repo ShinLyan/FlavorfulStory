@@ -1,6 +1,5 @@
 ﻿using FlavorfulStory.InventorySystem.UI.Dragging;
 using UnityEngine;
-using Zenject;
 
 namespace FlavorfulStory.InventorySystem.UI
 {
@@ -8,7 +7,7 @@ namespace FlavorfulStory.InventorySystem.UI
     public class InventorySlotView : MonoBehaviour, IDragContainer<InventoryItem>, IItemHolder
     {
         /// <summary> Отображение стака предмета. </summary>
-        [SerializeField] private ItemStackView _itemStackView;
+        [field: SerializeField] public ItemStackView _itemStackView { get; private set; }
 
         /// <summary> Индекс слота в инвентаре. </summary>
         private int _index;
