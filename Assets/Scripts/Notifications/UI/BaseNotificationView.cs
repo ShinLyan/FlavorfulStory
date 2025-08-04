@@ -14,24 +14,24 @@ namespace FlavorfulStory.Notifications.UI
         /// <summary> Текстовое поле с сообщением. </summary>
         [SerializeField] protected TMP_Text _label;
 
+        /// <summary> RectTransform текущего объекта. </summary>
+        private RectTransform _rectTransform;
+
         /// <summary> CanvasGroup, управляющий прозрачностью уведомления. </summary>
         private CanvasGroup _canvasGroup;
 
         /// <summary> Высота элемента уведомления. </summary>
-        public float Height => RectTransform.rect.height;
+        public float Height => _rectTransform.rect.height;
 
         /// <summary> Начальная позиция по оси X. </summary>
         public float StartXPosition { get; private set; }
 
-        /// <summary> RectTransform текущего объекта. </summary>
-        private RectTransform RectTransform { get; set; }
-
         /// <summary> Инициализация компонентов. </summary>
         private void Awake()
         {
-            RectTransform = GetComponent<RectTransform>();
+            _rectTransform = GetComponent<RectTransform>();
             _canvasGroup = GetComponent<CanvasGroup>();
-            StartXPosition = RectTransform.anchoredPosition.x;
+            StartXPosition = _rectTransform.anchoredPosition.x;
         }
 
         /// <summary> Инициализирует уведомление на основе переданных данных. </summary>
@@ -52,13 +52,13 @@ namespace FlavorfulStory.Notifications.UI
                 _ => Vector2.zero
             };
 
-            ApplyToRect(RectTransform, anchor);
+            ApplyToRect(_rectTransform, anchor);
             ApplyToRect(_contentRect, anchor);
 
             float xOffset = anchor.x == 0f ? padding.x : -padding.x;
-            RectTransform.anchoredPosition = new Vector2(xOffset, 0f);
+            _rectTransform.anchoredPosition = new Vector2(xOffset, 0f);
 
-            StartXPosition = RectTransform.anchoredPosition.x;
+            StartXPosition = _rectTransform.anchoredPosition.x;
         }
 
         /// <summary> Применяет якорь и pivot к RectTransform. </summary>
@@ -73,7 +73,7 @@ namespace FlavorfulStory.Notifications.UI
         public void Show(float fadeDuration, Ease easing)
         {
             _canvasGroup.DOFade(1f, fadeDuration);
-            RectTransform.DOAnchorPosX(StartXPosition, fadeDuration).SetEase(easing);
+            _rectTransform.DOAnchorPosX(StartXPosition, fadeDuration).SetEase(easing);
         }
 
         /// <summary> Прячет уведомление с анимацией и уничтожает объект. </summary>
@@ -81,7 +81,7 @@ namespace FlavorfulStory.Notifications.UI
         /// <param name="easing"> Easing-функция для движения. </param>
         public void HideAndDestroy(float fadeDuration, Ease easing) => DOTween.Sequence()
             .Join(_canvasGroup.DOFade(0f, fadeDuration))
-            .Join(RectTransform.DOAnchorPosX(-StartXPosition, fadeDuration).SetEase(easing))
+            .Join(_rectTransform.DOAnchorPosX(-StartXPosition, fadeDuration).SetEase(easing))
             .OnComplete(() => Destroy(gameObject));
 
         /// <summary> Перемещает уведомление к целевой позиции с анимацией. </summary>
@@ -89,6 +89,6 @@ namespace FlavorfulStory.Notifications.UI
         /// <param name="duration"> Длительность перемещения. </param>
         /// <param name="easing"> Easing-функция. </param>
         public void MoveTo(Vector2 target, float duration, Ease easing) =>
-            RectTransform.DOAnchorPos(target, duration).SetEase(easing);
+            _rectTransform.DOAnchorPos(target, duration).SetEase(easing);
     }
 }

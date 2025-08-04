@@ -3,13 +3,10 @@
 namespace FlavorfulStory.Notifications
 {
     /// <summary> Данные для уведомления о подобранном предмете. </summary>
-    public struct PickupNotificationData : INotificationData
+    public class PickupNotificationData : INotificationData
     {
         /// <summary> Тип уведомления. </summary>
         public NotificationType Type => NotificationType.ItemPickup;
-
-        /// <summary> Название предмета. </summary>
-        public string ItemName { get; }
 
         /// <summary> Количество предметов. </summary>
         public int Amount { get; }
@@ -17,6 +14,13 @@ namespace FlavorfulStory.Notifications
         /// <summary> Иконка предмета. </summary>
         public Sprite Icon { get; }
 
+        /// <summary> Название предмета. </summary>
+        public string ItemName { get; }
+
+        /// <summary> Конструктор с параметрами. </summary>
+        /// <param name="amount"> Количество предметов. </param>
+        /// <param name="icon"> Иконка предмета. </param>
+        /// <param name="itemName"> Название предмета. </param>
         public PickupNotificationData(int amount, Sprite icon, string itemName)
         {
             Amount = amount;

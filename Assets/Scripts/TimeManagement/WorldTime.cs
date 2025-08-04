@@ -1,9 +1,9 @@
-using UnityEngine;
 using System;
-using Zenject;
 using FlavorfulStory.EditorTools.Attributes;
 using FlavorfulStory.Saving;
 using FlavorfulStory.SceneManagement;
+using UnityEngine;
+using Zenject;
 
 namespace FlavorfulStory.TimeManagement
 {
@@ -11,14 +11,14 @@ namespace FlavorfulStory.TimeManagement
     public class WorldTime : MonoBehaviour, ISaveable
     {
         #region Fields
-        
-        /// <summary> Сигнальная шина Zenject для отправки и получения событий. </summary>
-        [Inject] private readonly SignalBus _signalBus;
-        
+
         /// <summary> Сколько игровых минут проходит за реальную секунду. </summary>
         [Header("Time Scale")]
         [Tooltip("Сколько игровых минут проходит за реальную секунду."), SerializeField, SteppedRange(-100f, 1000f, 5f)]
         private float _timeScale = 1f;
+
+        /// <summary> Сигнальная шина Zenject для отправки и получения событий. </summary>
+        private SignalBus _signalBus;
 
         /// <summary> Текущее игровое время. </summary>
         public static DateTime CurrentGameTime { get; private set; }
@@ -43,7 +43,7 @@ namespace FlavorfulStory.TimeManagement
 
         /// <summary> Вызывается при завершении игрового дня. </summary>
         public static Action<DateTime> OnDayEnded;
-        
+
         /// <summary> Вызывается при заданном тике времени. </summary>
         public static Action<DateTime> OnTimeTick;
 
@@ -54,6 +54,11 @@ namespace FlavorfulStory.TimeManagement
         public static Action OnTimeUnpaused;
 
         #endregion
+
+        /// <summary> Внедрение зависимостей Zenject. </summary>
+        /// <param name="signalBus"> Сигнальная шина Zenject для отправки и получения событий. </param>
+        [Inject]
+        private void Construct(SignalBus signalBus) => _signalBus = signalBus;
 
         /// <summary> Инициализировать начальное игровое время и подписаться на события. </summary>
         private void Awake() => CurrentGameTime = new DateTime(1, Season.Spring, 1, DayStartHour, 0);

@@ -1,7 +1,7 @@
 using FlavorfulStory.TimeManagement;
 using Zenject;
 
-namespace FlavorfulStory.Notifications.UI
+namespace FlavorfulStory.Notifications
 {
     /// <summary> Отправляет уведомление при наступлении ночи. </summary>
     public class SleepSignalNotifier : BaseSignalNotifier<NightStartedSignal>

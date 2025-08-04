@@ -10,7 +10,6 @@ using FlavorfulStory.InventorySystem.EquipmentSystem;
 using FlavorfulStory.InventorySystem.PickupSystem;
 using FlavorfulStory.InventorySystem.UI;
 using FlavorfulStory.Notifications;
-using FlavorfulStory.Notifications.UI;
 using FlavorfulStory.Player;
 using FlavorfulStory.QuestSystem;
 using FlavorfulStory.QuestSystem.Objectives;
