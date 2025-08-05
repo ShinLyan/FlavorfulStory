@@ -1,19 +1,20 @@
-﻿using FlavorfulStory.InteractionSystem;
+﻿using UnityEngine;
+using Zenject;
+using FlavorfulStory.InteractionSystem;
 using FlavorfulStory.InventorySystem;
 using FlavorfulStory.InventorySystem.UI;
 using FlavorfulStory.Player;
 using FlavorfulStory.TooltipSystem.ActionTooltips;
-using UnityEngine;
-using Zenject;
 
 namespace FlavorfulStory.Actions.Interactables
 {
     /// <summary> Объект-сундук, с которым можно взаимодействовать для обмена предметами. </summary>
     [RequireComponent(typeof(Inventory))]
-    public class Chest : MonoBehaviour, IInteractable
+    public class InventoryContainer : MonoBehaviour, IInteractable
     {
         /// <summary> Данные для отображения тултипа действия (открыть сундук). </summary>
         [Inject] private InventoryExchangeWindow _exchangeWindow;
+        /// <summary> Провайдер инвентарей. </summary>
         [Inject] private IInventoryProvider _inventoryProvider;
         
         /// <summary> Инвентарь сундука. </summary>

@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
-using FlavorfulStory.InventorySystem.PickupSystem;
+using System.Linq;
 using UnityEngine;
+using DG.Tweening;
+using FlavorfulStory.InventorySystem.PickupSystem;
 
 namespace FlavorfulStory.InventorySystem
 {
@@ -18,6 +20,9 @@ namespace FlavorfulStory.InventorySystem
 
         /// <summary> Инвентарь, содержимое которого визуализируется. </summary>
         private Inventory _inventory;
+        
+        /// <summary> Активные tween-последовательности анимации слотов. </summary>
+        private readonly List<Sequence> _slotTweens = new();
 
         /// <summary> Подписывается на обновление инвентаря. </summary>
         private void Awake()
@@ -27,13 +32,23 @@ namespace FlavorfulStory.InventorySystem
         }
 
         /// <summary> При старте обновляет визуальное представление. </summary>
-        private void Start() => RefreshVisuals();
+        private void Start()
+        {
+            AnimateSlots();
+            RefreshVisuals();
+        }
+            
 
         /// <summary> Отписывается от событий при уничтожении объекта. </summary>
         private void OnDestroy()
         {
             if (_inventory != null)
                 _inventory.InventoryUpdated -= RefreshVisuals;
+            
+            foreach (var tween in _slotTweens)
+                tween.Kill();
+            
+            _slotTweens.Clear();
         }
 
         /// <summary> Обновляет визуальное представление на основе текущего инвентаря. </summary>
@@ -55,6 +70,36 @@ namespace FlavorfulStory.InventorySystem
             }
         }
 
+        /// <summary> Запускает анимации вращения и подпрыгивания для всех слотов. </summary>
+        private void AnimateSlots()
+        {
+            float wiggleAmount = 0.05f;
+            float wiggleDuration = 1.5f;
+            float rotationDuration = 5f;
+
+            foreach (var slot in _slots)
+            {
+                if (slot == null) continue;
+
+                var sequence = DOTween.Sequence();
+                
+                sequence.Join(slot.DOLocalRotate(
+                        new Vector3(0, 360, 0),
+                        rotationDuration,
+                        RotateMode.FastBeyond360)
+                    .SetEase(Ease.Linear)
+                    .SetLoops(-1, LoopType.Restart)
+                );
+                
+                sequence.Join(slot.DOLocalMoveY(slot.localPosition.y + wiggleAmount, wiggleDuration)
+                    .SetEase(Ease.InOutSine)
+                    .SetLoops(-1, LoopType.Yoyo)
+                );
+
+                _slotTweens.Add(sequence);
+            }
+        }
+        
         /// <summary> Отключает физику и компоненты подбора на объекте. </summary>
         private static void PrepareInstance(GameObject go)
         {
@@ -70,9 +115,11 @@ namespace FlavorfulStory.InventorySystem
         }
 
         /// <summary> Устанавливает объект в слот с указанным индексом. </summary>
-        private void SetSlot(int index, GameObject instance)
+        /// <param name="index"> Индекс слота. </param>
+        /// <param name="product"> Товар(объект) который нужно положить в полку маггазина. </param>
+        private void SetSlot(int index, GameObject product)
         {
-            if (index < 0 || index >= _slots.Count || instance == null)
+            if (index < 0 || index >= _slots.Count || product == null)
             {
                 Debug.LogWarning($"[InventoryTransformPlacer] Неверный индекс ({index}) или instance == null");
                 return;
@@ -80,10 +127,10 @@ namespace FlavorfulStory.InventorySystem
 
             ClearSlot(index);
 
-            instance.transform.SetParent(_slots[index], worldPositionStays: false);
-            instance.transform.SetPositionAndRotation(_slots[index].position, _slots[index].rotation);
+            product.transform.SetParent(_slots[index], worldPositionStays: false);
+            product.transform.SetPositionAndRotation(_slots[index].position, _slots[index].rotation);
 
-            _occupied[index] = instance;
+            _occupied[index] = product;
         }
 
         /// <summary> Удаляет объект из указанного слота. </summary>
@@ -98,8 +145,8 @@ namespace FlavorfulStory.InventorySystem
         /// <summary> Удаляет все размещённые объекты. </summary>
         private void ClearAll()
         {
-            foreach (var obj in _occupied.Values)
-                if (obj) Destroy(obj);
+            foreach (var go in _occupied.Values.Where(x => x)) 
+                Destroy(go);
 
             _occupied.Clear();
         }

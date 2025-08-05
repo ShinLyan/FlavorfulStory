@@ -41,11 +41,11 @@ GameObject:
   m_Component:
   - component: {fileID: 6544892957398265726}
   - component: {fileID: 5187106888983099709}
+  - component: {fileID: 573388500473897756}
   - component: {fileID: 5977942370470472150}
-  - component: {fileID: 8218550968236801954}
   - component: {fileID: 2277052018657355916}
-  - component: {fileID: 8332797330734553964}
-  m_Layer: 0
+  - component: {fileID: 6283234922501473046}
+  m_Layer: 3
   m_Name: ShopShelf
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -83,6 +83,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <Type>k__BackingField: 2
   <InventorySize>k__BackingField: 1
+--- !u!114 &573388500473897756
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9185725653790557269}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 99e1b389a341488bb6958bc7216904e6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &5977942370470472150
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -97,18 +109,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _slots:
   - {fileID: 4817940939544260468}
---- !u!114 &8218550968236801954
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9185725653790557269}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7799ec413f762044ea10d7cb6449d026, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &2277052018657355916
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -122,28 +122,27 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _uniqueIdentifier: d45f9df2-475d-4e45-b269-c22d6795ab26
---- !u!95 &8332797330734553964
-Animator:
-  serializedVersion: 7
+--- !u!65 &6283234922501473046
+BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 9185725653790557269}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
   m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 41ba248cf0c97b449bff4b2e06da337c, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_AnimatePhysics: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
+  serializedVersion: 3
+  m_Size: {x: 2, y: 2, z: 2}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1001 &3337710183276382868
 PrefabInstance:
   m_ObjectHideFlags: 0
