@@ -1,4 +1,4 @@
-﻿namespace FlavorfulStory.Notifications.Data
+﻿namespace FlavorfulStory.Notifications
 {
     /// <summary> Интерфейс данных уведомления, содержащий его тип. </summary>
     public interface INotificationData

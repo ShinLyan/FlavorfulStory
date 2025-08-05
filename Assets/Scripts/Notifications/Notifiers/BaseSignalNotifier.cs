@@ -1,12 +1,12 @@
 ﻿using System;
-using FlavorfulStory.Notifications.Data;
 using Zenject;
 
 namespace FlavorfulStory.Notifications.Notifiers
 {
-    /// <summary> Базовый обработчик сигнала, создающий уведомление. </summary>
-    /// <typeparam name="TSignal"> Тип обрабатываемого сигнала. </typeparam>
+    /// <summary> Базовый обработчик сигнала, напрямую передающий сигнал как уведомление. </summary>
+    /// <typeparam name="TSignal"> Тип сигнала, реализующий INotificationData. </typeparam>
     public abstract class BaseSignalNotifier<TSignal> : IInitializable, IDisposable
+        where TSignal : INotificationData
     {
         /// <summary> Сервис отображения уведомлений. </summary>
         private readonly INotificationService _notificationService;
@@ -31,15 +31,6 @@ namespace FlavorfulStory.Notifications.Notifiers
 
         /// <summary> Обработка полученного сигнала и отображение уведомления. </summary>
         /// <param name="signal"> Полученный сигнал. </param>
-        private void OnSignalReceived(TSignal signal)
-        {
-            var notification = CreateNotification(signal);
-            if (notification != null) _notificationService.Show(notification);
-        }
-
-        /// <summary> Создаёт данные уведомления на основе полученного сигнала. </summary>
-        /// <param name="signal"> Сигнал, из которого нужно сформировать уведомление. </param>
-        /// <returns> Объект с данными для уведомления. </returns>
-        protected abstract INotificationData CreateNotification(TSignal signal);
+        private void OnSignalReceived(TSignal signal) => _notificationService.Show(signal);
     }
 }

@@ -1,5 +1,4 @@
 ﻿using FlavorfulStory.InventorySystem;
-using FlavorfulStory.Notifications.Data;
 using Zenject;
 
 namespace FlavorfulStory.Notifications.Notifiers
@@ -13,15 +12,6 @@ namespace FlavorfulStory.Notifications.Notifiers
         public ItemPickupSignalNotifier(INotificationService notificationService, SignalBus signalBus)
             : base(notificationService, signalBus)
         {
-        }
-
-        /// <summary> Создаёт уведомление о подборе предмета на основе полученного сигнала. </summary>
-        /// <param name="signal"> Сигнал, содержащий информацию о подобранном предмете. </param>
-        /// <returns> Данные для отображения уведомления. </returns>
-        protected override INotificationData CreateNotification(ItemCollectedSignal signal)
-        {
-            var itemStack = signal.ItemStack;
-            return new ItemPickupNotificationData(itemStack.Number, itemStack.Item.Icon, itemStack.Item.ItemName);
         }
     }
 }

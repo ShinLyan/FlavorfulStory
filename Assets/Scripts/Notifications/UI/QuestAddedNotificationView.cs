@@ -1,4 +1,4 @@
-﻿using FlavorfulStory.Notifications.Data;
+﻿using FlavorfulStory.QuestSystem;
 using TMPro;
 using UnityEngine;
 
@@ -14,7 +14,7 @@ namespace FlavorfulStory.Notifications.UI
         /// <param name="data"> Данные уведомления. </param>
         public override void Initialize(INotificationData data)
         {
-            if (data is not QuestAddedNotificationData notificationData) return;
+            if (data is not QuestAddedSignal notificationData) return;
 
             _questNameText.text = notificationData.QuestName;
         }

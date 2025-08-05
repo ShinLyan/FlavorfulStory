@@ -1,4 +1,3 @@
-using FlavorfulStory.Notifications.Data;
 using FlavorfulStory.TimeManagement;
 using Zenject;
 
@@ -14,11 +13,5 @@ namespace FlavorfulStory.Notifications.Notifiers
             : base(notificationService, signalBus)
         {
         }
-
-        /// <summary> Создаёт уведомление о наступлении ночи. </summary>
-        /// <param name="signal"> Сигнал, содержащий время начала ночи. </param>
-        /// <returns> Данные уведомления с указанием часа наступления ночи. </returns>
-        protected override INotificationData CreateNotification(NightStartedSignal signal) =>
-            new SleepNotificationData(signal.Time.Hour);
     }
 }

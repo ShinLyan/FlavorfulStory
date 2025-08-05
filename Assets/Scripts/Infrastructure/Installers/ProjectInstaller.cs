@@ -3,8 +3,6 @@ using FlavorfulStory.SceneManagement;
 using FlavorfulStory.UI.Animation;
 using UnityEngine;
 using Zenject;
-using FlavorfulStory.SceneManagement;
-using FlavorfulStory.UI.Animation;
 
 namespace FlavorfulStory.Infrastructure.Installers
 {

@@ -1,5 +1,4 @@
-﻿using FlavorfulStory.Notifications.Data;
-using FlavorfulStory.QuestSystem;
+﻿using FlavorfulStory.QuestSystem;
 using Zenject;
 
 namespace FlavorfulStory.Notifications.Notifiers
@@ -14,11 +13,5 @@ namespace FlavorfulStory.Notifications.Notifiers
             : base(notificationService, signalBus)
         {
         }
-
-        /// <summary> Создаёт уведомление на основе полученного сигнала. </summary>
-        /// <param name="signal"> Сигнал о добавлении квеста. </param>
-        /// <returns> Данные уведомления с названием квеста. </returns>
-        protected override INotificationData CreateNotification(QuestAddedSignal signal) =>
-            new QuestAddedNotificationData(signal.QuestName);
     }
 }

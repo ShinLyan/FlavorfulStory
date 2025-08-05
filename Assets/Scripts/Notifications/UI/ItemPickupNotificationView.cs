@@ -1,4 +1,4 @@
-﻿using FlavorfulStory.Notifications.Data;
+﻿using FlavorfulStory.InventorySystem;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -14,10 +14,11 @@ namespace FlavorfulStory.Notifications.UI
         /// <param name="data"> Данные уведомления. </param>
         public override void Initialize(INotificationData data)
         {
-            if (data is not ItemPickupNotificationData notificationData) return;
+            if (data is not ItemCollectedSignal notificationData) return;
 
-            _label.text = $"x{notificationData.Amount} {notificationData.ItemName}";
-            _icon.sprite = notificationData.Icon;
+            var itemStack = notificationData.ItemStack;
+            _label.text = $"x{itemStack.Number} {itemStack.Item.ItemName}";
+            _icon.sprite = itemStack.Item.Icon;
         }
     }
 }

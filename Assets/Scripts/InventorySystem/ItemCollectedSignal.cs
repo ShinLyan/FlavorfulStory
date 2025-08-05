@@ -1,8 +1,13 @@
-﻿namespace FlavorfulStory.InventorySystem
+﻿using FlavorfulStory.Notifications;
+
+namespace FlavorfulStory.InventorySystem
 {
     /// <summary> Сигнал, отправляемый при сборе предмета в инвентарь. </summary>
-    public struct ItemCollectedSignal
+    public struct ItemCollectedSignal : INotificationData
     {
+        /// <summary> Тип уведомления. </summary>
+        public NotificationType Type => NotificationType.ItemCollected;
+
         /// <summary> Собранный предмет и его количество. </summary>
         public ItemStack ItemStack { get; }
 

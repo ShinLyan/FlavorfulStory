@@ -1,8 +1,13 @@
-﻿namespace FlavorfulStory.QuestSystem
+﻿using FlavorfulStory.Notifications;
+
+namespace FlavorfulStory.QuestSystem
 {
     /// <summary> Сигнал, отправляемый при добавлении нового квеста. </summary>
-    public struct QuestAddedSignal
+    public struct QuestAddedSignal : INotificationData
     {
+        /// <summary> Тип уведомления. </summary>
+        public NotificationType Type => NotificationType.QuestAdded;
+
         /// <summary> Название добавленного квеста. </summary>
         public string QuestName { get; }
 

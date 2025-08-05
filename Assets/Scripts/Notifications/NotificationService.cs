@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using FlavorfulStory.Infrastructure;
 using FlavorfulStory.Notifications.Configs;
-using FlavorfulStory.Notifications.Data;
 using FlavorfulStory.Notifications.UI;
 using UnityEngine;
 using Zenject;
