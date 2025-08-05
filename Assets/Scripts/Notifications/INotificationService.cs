@@ -1,4 +1,6 @@
-﻿namespace FlavorfulStory.Notifications
+﻿using FlavorfulStory.Notifications.Data;
+
+namespace FlavorfulStory.Notifications
 {
     /// <summary> Интерфейс сервиса отображения уведомлений. </summary>
     public interface INotificationService

@@ -1,4 +1,6 @@
-﻿namespace FlavorfulStory.Notifications.UI
+﻿using FlavorfulStory.Notifications.Data;
+
+namespace FlavorfulStory.Notifications.UI
 {
     /// <summary> UI-элемент уведомления о наступлении ночи. </summary>
     public class SleepNotificationView : BaseNotificationView

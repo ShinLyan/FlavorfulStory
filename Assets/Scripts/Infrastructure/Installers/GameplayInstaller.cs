@@ -10,6 +10,7 @@ using FlavorfulStory.InventorySystem.EquipmentSystem;
 using FlavorfulStory.InventorySystem.PickupSystem;
 using FlavorfulStory.InventorySystem.UI;
 using FlavorfulStory.Notifications;
+using FlavorfulStory.Notifications.Notifiers;
 using FlavorfulStory.Notifications.UI;
 using FlavorfulStory.Player;
 using FlavorfulStory.QuestSystem;
@@ -65,6 +66,8 @@ namespace FlavorfulStory.Infrastructure.Installers
             BindDialogue();
             BindQuests();
             BindUI();
+            DeclareSignals();
+            BindNotifications();
             BindSystems();
         }
 
@@ -146,6 +149,22 @@ namespace FlavorfulStory.Infrastructure.Installers
                 .AsSingle();
         }
 
+        /// <summary> Объявление сигналов. </summary>
+        private void DeclareSignals()
+        {
+            Container.DeclareSignal<NightStartedSignal>();
+            Container.DeclareSignal<ItemCollectedSignal>();
+            Container.DeclareSignal<QuestAddedSignal>();
+        }
+
+        /// <summary> Установить зависимости, связанные с уведомлениями. </summary>
+        private void BindNotifications()
+        {
+            Container.BindInterfacesTo<SleepSignalNotifier>().AsSingle();
+            Container.BindInterfacesTo<ItemPickupSignalNotifier>().AsSingle();
+            Container.BindInterfacesTo<QuestAddedSignalNotifier>().AsSingle();
+        }
+
         /// <summary> Установить зависимости, связанные с системами и логикой. </summary>
         private void BindSystems()
         {
@@ -159,12 +178,6 @@ namespace FlavorfulStory.Infrastructure.Installers
             Container.Bind<CinemachineCamera>().FromInstance(_teleportVirtualCamera).AsSingle();
 
             Container.Bind<SleepTrigger>().FromComponentInHierarchy().AsSingle();
-
-            Container.DeclareSignal<NightStartedSignal>();
-            Container.DeclareSignal<ItemCollectedSignal>();
-
-            Container.BindInterfacesTo<SleepSignalNotifier>().AsSingle();
-            Container.BindInterfacesTo<ItemPickupSignalNotifier>().AsSingle();
 
             Container.BindInterfacesAndSelfTo<DayEndManager>().AsSingle();
         }

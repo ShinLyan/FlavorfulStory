@@ -1,4 +1,5 @@
 ﻿using DG.Tweening;
+using FlavorfulStory.Notifications.Data;
 using TMPro;
 using UnityEngine;
 

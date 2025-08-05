@@ -7,6 +7,9 @@
         ItemPickup,
 
         /// <summary> Уведомление о наступлении ночи. </summary>
-        Sleep
+        Sleep,
+
+        /// <summary> Уведомление о добавлении нового квеста. </summary>
+        QuestAdded
     }
 }
