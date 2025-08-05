@@ -1,5 +1,4 @@
 ﻿using DG.Tweening;
-using TMPro;
 using UnityEngine;
 
 namespace FlavorfulStory.Notifications.UI
@@ -10,9 +9,6 @@ namespace FlavorfulStory.Notifications.UI
     {
         /// <summary> Контейнер с визуальной частью уведомления. </summary>        
         [SerializeField] private RectTransform _contentRect;
-
-        /// <summary> Текстовое поле с сообщением. </summary>
-        [SerializeField] protected TMP_Text _label;
 
         /// <summary> RectTransform текущего объекта. </summary>
         private RectTransform _rectTransform;
