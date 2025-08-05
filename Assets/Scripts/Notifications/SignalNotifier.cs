@@ -1,11 +1,11 @@
 ﻿using System;
 using Zenject;
 
-namespace FlavorfulStory.Notifications.Notifiers
+namespace FlavorfulStory.Notifications
 {
-    /// <summary> Базовый обработчик сигнала, напрямую передающий сигнал как уведомление. </summary>
+    /// <summary> Обработчик сигнала, напрямую передающий сигнал как уведомление. </summary>
     /// <typeparam name="TSignal"> Тип сигнала, реализующий INotificationData. </typeparam>
-    public abstract class BaseSignalNotifier<TSignal> : IInitializable, IDisposable
+    public class SignalNotifier<TSignal> : IInitializable, IDisposable
         where TSignal : INotificationData
     {
         /// <summary> Сервис отображения уведомлений. </summary>
@@ -17,7 +17,7 @@ namespace FlavorfulStory.Notifications.Notifiers
         /// <summary> Конструктор, внедряющий зависимости. </summary>
         /// <param name="notificationService"> Сервис, отвечающий за показ уведомлений. </param>
         /// <param name="signalBus"> Шина сигналов для подписки на события. </param>
-        protected BaseSignalNotifier(INotificationService notificationService, SignalBus signalBus)
+        protected SignalNotifier(INotificationService notificationService, SignalBus signalBus)
         {
             _notificationService = notificationService;
             _signalBus = signalBus;

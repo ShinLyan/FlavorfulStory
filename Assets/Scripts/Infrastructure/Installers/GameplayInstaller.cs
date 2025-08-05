@@ -10,7 +10,6 @@ using FlavorfulStory.InventorySystem.EquipmentSystem;
 using FlavorfulStory.InventorySystem.PickupSystem;
 using FlavorfulStory.InventorySystem.UI;
 using FlavorfulStory.Notifications;
-using FlavorfulStory.Notifications.Notifiers;
 using FlavorfulStory.Notifications.UI;
 using FlavorfulStory.Player;
 using FlavorfulStory.QuestSystem;
@@ -160,9 +159,9 @@ namespace FlavorfulStory.Infrastructure.Installers
         /// <summary> Установить зависимости, связанные с уведомлениями. </summary>
         private void BindNotifications()
         {
-            Container.BindInterfacesTo<SleepSignalNotifier>().AsSingle();
-            Container.BindInterfacesTo<ItemPickupSignalNotifier>().AsSingle();
-            Container.BindInterfacesTo<QuestAddedSignalNotifier>().AsSingle();
+            Container.BindInterfacesTo<SignalNotifier<NightStartedSignal>>().AsSingle();
+            Container.BindInterfacesTo<SignalNotifier<ItemCollectedSignal>>().AsSingle();
+            Container.BindInterfacesTo<SignalNotifier<QuestAddedSignal>>().AsSingle();
         }
 
         /// <summary> Установить зависимости, связанные с системами и логикой. </summary>
