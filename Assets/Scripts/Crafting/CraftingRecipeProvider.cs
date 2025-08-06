@@ -12,6 +12,8 @@ namespace FlavorfulStory.Crafting
         /// <remarks> Хранит пары (GUID, рецепт). </remarks>
         private static readonly Dictionary<string, CraftingRecipe> _recipeDatabase;
 
+        //TODO: Убрать загрузку рецептов в какой-нибудь WarmUpAsync() в EntryPoint|Bootstrap
+        // А то сейчас лагает :(
         /// <summary> Инициализирует базу данных предметов. </summary>
         /// <remarks> Загружает все предметы из папки Resources. </remarks>
         static CraftingRecipeProvider()
