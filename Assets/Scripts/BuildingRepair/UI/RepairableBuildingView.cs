@@ -6,6 +6,7 @@ using FlavorfulStory.Infrastructure;
 using FlavorfulStory.Infrastructure.Factories;
 using FlavorfulStory.InputSystem;
 using FlavorfulStory.InventorySystem;
+using FlavorfulStory.LocalizationSystem;
 using FlavorfulStory.TimeManagement;
 using TMPro;
 using UnityEngine;
@@ -153,7 +154,7 @@ namespace FlavorfulStory.BuildingRepair.UI
                 _requirementViews.Add(view);
             }
 
-            _buildingNameText.text = stage.BuildingName;
+            _buildingNameText.text = LocalizationService.GetLocalizedString(stage.BuildingName);
             _buildButton.interactable = IsRepairPossible(stage, investedResources);
         }
 

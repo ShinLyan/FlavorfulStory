@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace FlavorfulStory.LocalizationSystem
 {
@@ -38,9 +39,7 @@ namespace FlavorfulStory.LocalizationSystem
             _translationsPerKey = database.ToDictionary();
             _languages = new HashSet<string>();
 
-            foreach (var entry in _translationsPerKey.Values)
-            foreach (string lang in entry.Keys)
-                _languages.Add(lang);
+            foreach (string lang in _translationsPerKey.Values.First().Keys) _languages.Add(lang);
 
             SetLanguage(defaultLang);
             _instance = this;
@@ -63,7 +62,7 @@ namespace FlavorfulStory.LocalizationSystem
         /// <summary> Получает локализованную строку по ключу. </summary>
         /// <param name="key">Ключ перевода.</param>
         /// <returns>Локализованная строка или пустая строка, если перевод не найден.</returns>
-        private string Get(string key) => _currentMap.GetValueOrDefault(key, "");
+        private string Get(string key) => _currentMap.GetValueOrDefault(key, key);
 
         /// <summary> Статический метод для установки языка локализации. </summary>
         /// <param name="lang">Код языка для установки.</param>
@@ -72,7 +71,19 @@ namespace FlavorfulStory.LocalizationSystem
         /// <summary> Статический метод для получения локализованной строки. </summary>
         /// <param name="key">Ключ перевода (автоматически обрезает квадратные скобки если есть).</param>
         /// <returns>Локализованная строка или пустая строка, если перевод не найден.</returns>
-        public static string GetLocalizedString(string key) => _instance?.Get(key.TrimStart('[').TrimEnd(']')) ?? "";
+        public static string GetLocalizedString(string key) => _instance?.Get(key.TrimStart('[').TrimEnd(']')) ?? key;
+
+        /// <summary>  Получает локализованную строку по значению перечисления. </summary>
+        /// <param name="enumValue">Значение перечисления.</param>
+        /// <returns>Локализованная строка или строка-плейсхолдер, если ключ не найден.</returns>
+        public static string GetLocalizedString(Enum enumValue)
+        {
+            if (enumValue == null) return string.Empty;
+
+            string enumType = enumValue.GetType().Name;
+            string enumKey = $"Enum_{enumType}_{enumValue}";
+            return GetLocalizedString(enumKey);
+        }
 
         /// <summary> Получает список всех доступных языков. </summary>
         /// <returns>Коллекция кодов доступных языков.</returns>

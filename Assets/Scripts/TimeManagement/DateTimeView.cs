@@ -1,3 +1,4 @@
+using FlavorfulStory.LocalizationSystem;
 using TMPro;
 using UnityEngine;
 
@@ -28,8 +29,8 @@ namespace FlavorfulStory.TimeManagement
         /// <param name="dateTime"> Текущие данные о времени. </param>
         private void SetDateTimeText(DateTime dateTime)
         {
-            _seasonText.text = dateTime.Season.ToString();
-            _dayText.text = $"{dateTime.DayOfWeek} {(int)dateTime.SeasonDay}";
+            _seasonText.text = LocalizationService.GetLocalizedString(dateTime.Season);
+            _dayText.text = $"{LocalizationService.GetLocalizedString(dateTime.DayOfWeek)} {(int)dateTime.SeasonDay}";
             _timeText.text = dateTime.TimeToString(_is24HourFormat);
         }
     }

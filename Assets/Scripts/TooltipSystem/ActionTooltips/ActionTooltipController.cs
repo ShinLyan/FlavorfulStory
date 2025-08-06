@@ -36,7 +36,7 @@ namespace FlavorfulStory.TooltipSystem.ActionTooltips
             var item = signal.SelectedItem;
             if (!item || !item.CanBeDropped) return;
 
-            var tooltip = new ActionTooltipData("G", ActionType.Drop, item.ItemName, ActionTooltipSource.Toolbar);
+            var tooltip = new ActionTooltipData("G", ActionType.Drop, item.ItemNameKey, ActionTooltipSource.Toolbar);
             AddTooltip(sourceKey, tooltip);
         }
 

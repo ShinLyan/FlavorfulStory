@@ -44,7 +44,7 @@ namespace FlavorfulStory.TimeManagement
         #region IInteractable
 
         /// <summary> Описание действия с объектом. </summary>
-        public ActionTooltipData ActionTooltip => new("E", ActionType.Sleep, "to Bed");
+        public ActionTooltipData ActionTooltip => new("E", ActionType.FallAsleep);
 
         /// <summary> Возвращает возможность взаимодействия с объектом. </summary>
         public bool IsInteractionAllowed => true;

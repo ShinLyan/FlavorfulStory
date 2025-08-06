@@ -13,259 +13,656 @@ MonoBehaviour:
   m_Name: New Localization Database
   m_EditorClassIdentifier: 
   _entries:
-  - Key: Dirk_IntroTown_Welcome
-    Translations: []
+  - Key: Enum_WeatherType_Clear
+    Translations:
+    - LanguageCode: RU
+      Text: "\u042F\u0441\u043D\u043E"
+    - LanguageCode: EN
+      Text: Clear
+    - LanguageCode: DE
+      Text: Klar
+    - LanguageCode: ES
+      Text: Claro
+  - Key: Enum_WeatherType_Rainy
+    Translations:
+    - LanguageCode: RU
+      Text: "\u0414\u043E\u0436\u0434\u043B\u0438\u0432\u043E"
+    - LanguageCode: EN
+      Text: It's rainy
+    - LanguageCode: DE
+      Text: Es ist regnerisch
+    - LanguageCode: ES
+      Text: Llueve
+  - Key: Enum_Season_Spring
+    Translations:
+    - LanguageCode: RU
+      Text: "\u0412\u0435\u0441\u043D\u0430"
+    - LanguageCode: EN
+      Text: Spring
+    - LanguageCode: DE
+      Text: "Fr\xFChling"
+    - LanguageCode: ES
+      Text: Primavera
+  - Key: Enum_Season_Summer
+    Translations:
+    - LanguageCode: RU
+      Text: "\u041B\u0435\u0442\u043E"
+    - LanguageCode: EN
+      Text: Summer
+    - LanguageCode: DE
+      Text: Sommer
+    - LanguageCode: ES
+      Text: Verano
+  - Key: Enum_Season_Autumn
+    Translations:
+    - LanguageCode: RU
+      Text: "\u041E\u0441\u0435\u043D\u044C"
+    - LanguageCode: EN
+      Text: Autumn
+    - LanguageCode: DE
+      Text: Herbst
+    - LanguageCode: ES
+      Text: "Oto\xF1o"
+  - Key: Enum_Season_Winter
+    Translations:
+    - LanguageCode: RU
+      Text: "\u0417\u0438\u043C\u0430"
+    - LanguageCode: EN
+      Text: Winter
+    - LanguageCode: DE
+      Text: Winter
+    - LanguageCode: ES
+      Text: Invierno
+  - Key: Enum_DayOfWeek_Monday
+    Translations:
+    - LanguageCode: RU
+      Text: "\u041F\u043E\u043D\u0435\u0434\u0435\u043B\u044C\u043D\u0438\u043A"
+    - LanguageCode: EN
+      Text: Monday
+    - LanguageCode: DE
+      Text: Montag
+    - LanguageCode: ES
+      Text: Lunes
+  - Key: Enum_DayOfWeek_Tuesday
+    Translations:
+    - LanguageCode: RU
+      Text: "\u0412\u0442\u043E\u0440\u043D\u0438\u043A"
+    - LanguageCode: EN
+      Text: Tuesday
+    - LanguageCode: DE
+      Text: Dienstag
+    - LanguageCode: ES
+      Text: Martes
+  - Key: Enum_DayOfWeek_Wednesday
+    Translations:
+    - LanguageCode: RU
+      Text: "\u0421\u0440\u0435\u0434\u0430"
+    - LanguageCode: EN
+      Text: Wednesday
+    - LanguageCode: DE
+      Text: Mittwoch
+    - LanguageCode: ES
+      Text: "Mi\xE9rcoles"
+  - Key: Enum_DayOfWeek_Thursday
+    Translations:
+    - LanguageCode: RU
+      Text: "\u0427\u0435\u0442\u0432\u0435\u0440\u0433"
+    - LanguageCode: EN
+      Text: Thursday
+    - LanguageCode: DE
+      Text: Donnerstag
+    - LanguageCode: ES
+      Text: Jueves
+  - Key: Enum_DayOfWeek_Friday
+    Translations:
+    - LanguageCode: RU
+      Text: "\u041F\u044F\u0442\u043D\u0438\u0446\u0430"
+    - LanguageCode: EN
+      Text: Friday
+    - LanguageCode: DE
+      Text: Freitag
+    - LanguageCode: ES
+      Text: Viernes
+  - Key: Enum_DayOfWeek_Saturday
+    Translations:
+    - LanguageCode: RU
+      Text: "\u0421\u0443\u0431\u0431\u043E\u0442\u0430"
+    - LanguageCode: EN
+      Text: Saturday
+    - LanguageCode: DE
+      Text: Samstag
+    - LanguageCode: ES
+      Text: "S\xE1bado"
+  - Key: Enum_DayOfWeek_Sunday
+    Translations:
+    - LanguageCode: RU
+      Text: "\u0412\u043E\u0441\u043A\u0440\u0435\u0441\u0435\u043D\u044C\u0435"
+    - LanguageCode: EN
+      Text: Sunday
+    - LanguageCode: DE
+      Text: Sonntag
+    - LanguageCode: ES
+      Text: Domingo
+  - Key: Enum_SceneName_MainMenu
+    Translations:
+    - LanguageCode: RU
+      Text: "\u0413\u043B\u0430\u0432\u043D\u043E\u0435 \u043C\u0435\u043D\u044E"
+    - LanguageCode: EN
+      Text: Main menu
+    - LanguageCode: DE
+      Text: "Hauptmen\xFC"
+    - LanguageCode: ES
+      Text: "Men\xFA principal"
+  - Key: Enum_SceneName_Game
+    Translations:
+    - LanguageCode: RU
+      Text: "\u0418\u0433\u0440\u0430"
+    - LanguageCode: EN
+      Text: Game
+    - LanguageCode: DE
+      Text: Spiel
+    - LanguageCode: ES
+      Text: Juego
+  - Key: Enum_LocationName_RockyIsland
+    Translations:
+    - LanguageCode: RU
+      Text: "\u0421\u043A\u0430\u043B\u0438\u0441\u0442\u044B\u0439 \u043E\u0441\u0442\u0440\u043E\u0432"
+    - LanguageCode: EN
+      Text: Rocky Island
+    - LanguageCode: DE
+      Text: Rocky Island
+    - LanguageCode: ES
+      Text: Isla Rocosa
+  - Key: Enum_LocationName_Restaurant
+    Translations:
+    - LanguageCode: RU
+      Text: "\u0420\u0435\u0441\u0442\u043E\u0440\u0430\u043D"
+    - LanguageCode: EN
+      Text: Restaurant
+    - LanguageCode: DE
+      Text: Restaurant
+    - LanguageCode: ES
+      Text: Restaurante
+  - Key: Enum_LocationName_Shop
+    Translations:
+    - LanguageCode: RU
+      Text: "\u041C\u0430\u0433\u0430\u0437\u0438\u043D"
+    - LanguageCode: EN
+      Text: Shop
+    - LanguageCode: DE
+      Text: "Gesch\xE4ft"
+    - LanguageCode: ES
+      Text: Comercio
+  - Key: Enum_QuestType_General
+    Translations:
+    - LanguageCode: RU
+      Text: "\u041E\u0431\u044B\u0447\u043D\u044B\u0439"
+    - LanguageCode: EN
+      Text: General
+    - LanguageCode: DE
+      Text: Normal
+    - LanguageCode: ES
+      Text: "Com\xFAn"
+  - Key: Enum_QuestType_Personal
+    Translations:
+    - LanguageCode: RU
+      Text: "\u041B\u0438\u0447\u043D\u044B\u0439"
+    - LanguageCode: EN
+      Text: Private
+    - LanguageCode: DE
+      Text: Privat
+    - LanguageCode: ES
+      Text: Privado
+  - Key: Enum_QuestType_Daily
+    Translations:
+    - LanguageCode: RU
+      Text: "\u0415\u0436\u0435\u0434\u043D\u0435\u0432\u043D\u044B\u0439"
+    - LanguageCode: EN
+      Text: Daily
+    - LanguageCode: DE
+      Text: "T\xE4glich"
+    - LanguageCode: ES
+      Text: A diario
+  - Key: Enum_QuestType_Weekly
+    Translations:
+    - LanguageCode: RU
+      Text: "\u0415\u0436\u0435\u043D\u0435\u0434\u0435\u043B\u044C\u043D\u044B\u0439"
+    - LanguageCode: EN
+      Text: Weekly
+    - LanguageCode: DE
+      Text: "W\xF6chentlich"
+    - LanguageCode: ES
+      Text: Semanalmente
+  - Key: Enum_ObjectiveType_Have
+    Translations:
+    - LanguageCode: RU
+      Text: "\u0418\u043C\u0435\u0442\u044C"
+    - LanguageCode: EN
+      Text: Have
+    - LanguageCode: DE
+      Text: Haben
+    - LanguageCode: ES
+      Text: Tener
+  - Key: Enum_ObjectiveType_Talk
+    Translations:
+    - LanguageCode: RU
+      Text: "\u041F\u043E\u0433\u043E\u0432\u043E\u0440\u0438\u0442\u044C"
+    - LanguageCode: EN
+      Text: Let's talk
+    - LanguageCode: DE
+      Text: Lassen Sie uns reden
+    - LanguageCode: ES
+      Text: Vamos a hablar
+  - Key: Enum_ObjectiveType_Sleep
+    Translations:
+    - LanguageCode: RU
+      Text: "\u041F\u043E\u0441\u043F\u0430\u0442\u044C"
+    - LanguageCode: EN
+      Text: Sleep
+    - LanguageCode: DE
+      Text: Schlafen
+    - LanguageCode: ES
+      Text: Dormir
+  - Key: Enum_ObjectiveType_Repair
+    Translations:
+    - LanguageCode: RU
+      Text: "\u041E\u0442\u0440\u0435\u043C\u043E\u043D\u0442\u0438\u0440\u043E\u0432\u0430\u0442\u044C"
+    - LanguageCode: EN
+      Text: Repair
+    - LanguageCode: DE
+      Text: Reparieren
+    - LanguageCode: ES
+      Text: Reparar
+  - Key: Enum_RepairableBuildingName_Stall
+    Translations:
+    - LanguageCode: RU
+      Text: "\u041B\u0430\u0440\u0435\u043A"
+    - LanguageCode: EN
+      Text: Stall
+    - LanguageCode: DE
+      Text: Stall
+    - LanguageCode: ES
+      Text: Parar
+  - Key: Enum_RepairableBuildingName_Shop
+    Translations:
+    - LanguageCode: RU
+      Text: "\u041C\u0430\u0433\u0430\u0437\u0438\u043D"
+    - LanguageCode: EN
+      Text: Shop
+    - LanguageCode: DE
+      Text: "Gesch\xE4ft"
+    - LanguageCode: ES
+      Text: Comercio
+  - Key: Enum_ActionType_Gather
+    Translations:
+    - LanguageCode: RU
+      Text: "\u0421\u043E\u0431\u0438\u0440\u0430\u0442\u044C"
+    - LanguageCode: EN
+      Text: Gather
+    - LanguageCode: DE
+      Text: Versammeln
+    - LanguageCode: ES
+      Text: Recolectar
+  - Key: Enum_ActionType_Talk
+    Translations:
+    - LanguageCode: RU
+      Text: "\u041F\u043E\u0433\u043E\u0432\u043E\u0440\u0438\u0442\u044C"
+    - LanguageCode: EN
+      Text: Talk
+    - LanguageCode: DE
+      Text: Lassen Sie uns reden
+    - LanguageCode: ES
+      Text: Vamos a hablar
+  - Key: Enum_ActionType_Sleep
+    Translations:
+    - LanguageCode: RU
+      Text: "\u041F\u043E\u0441\u043F\u0430\u0442\u044C"
+    - LanguageCode: EN
+      Text: Sleep
+    - LanguageCode: DE
+      Text: Schlafen
+    - LanguageCode: ES
+      Text: Dormir
+  - Key: Enum_ActionType_Drop
+    Translations:
+    - LanguageCode: RU
+      Text: "\u0411\u0440\u043E\u0441\u0438\u0442\u044C"
+    - LanguageCode: EN
+      Text: Drop
+    - LanguageCode: DE
+      Text: Wegwerfen
+    - LanguageCode: ES
+      Text: Tirar a la basura
+  - Key: Enum_ActionType_Build
+    Translations:
+    - LanguageCode: RU
+      Text: "\u041F\u043E\u0441\u0442\u0440\u043E\u0438\u0442\u044C"
+    - LanguageCode: EN
+      Text: Build
+    - LanguageCode: DE
+      Text: Bauen
+    - LanguageCode: ES
+      Text: Construir
+  - Key: Enum_Sentence_FallAsleep
+    Translations:
+    - LanguageCode: RU
+      Text: "\u0417\u0430\u0441\u043D\u0443\u0442\u044C"
+    - LanguageCode: EN
+      Text: Fall asleep
+    - LanguageCode: DE
+      Text: Einschlafen
+    - LanguageCode: ES
+      Text: Dormirse
   - Key: Item_Bread_Edible_Name
     Translations:
-    - LanguageCode: EN
-      Text: Bread
     - LanguageCode: RU
       Text: "\u0425\u043B\u0435\u0431"
+    - LanguageCode: EN
+      Text: Bread
     - LanguageCode: DE
       Text: Brot
+    - LanguageCode: ES
+      Text: Pan
   - Key: Item_Bread_Edible_Description
     Translations:
-    - LanguageCode: EN
-      Text: Warm and crusty bread. Perfect for a morning snack or a long journey.
     - LanguageCode: RU
       Text: "\u0422\u0451\u043F\u043B\u044B\u0439, \u0445\u0440\u0443\u0441\u0442\u044F\u0449\u0438\u0439
         \u0445\u043B\u0435\u0431. \u0418\u0434\u0435\u0430\u043B\u044C\u043D\u043E
         \u043F\u043E\u0434\u0445\u043E\u0434\u0438\u0442 \u0434\u043B\u044F \u0443\u0442\u0440\u0435\u043D\u043D\u0435\u0433\u043E
         \u043F\u0435\u0440\u0435\u043A\u0443\u0441\u0430 \u0438\u043B\u0438 \u0434\u043E\u043B\u0433\u043E\u0433\u043E
         \u043F\u043E\u0445\u043E\u0434\u0430."
+    - LanguageCode: EN
+      Text: Warm and crusty bread. Perfect for a morning snack or a long journey.
     - LanguageCode: DE
       Text: "Warmes, knuspriges Brot. Perfekt f\xFCr den Morgensnack oder eine lange
         Wanderung."
+    - LanguageCode: ES
+      Text: Pan calentito y crujiente. Perfecto para merendar o para una larga caminata.
   - Key: Item_Flower_Edible_Name
     Translations:
-    - LanguageCode: EN
-      Text: Flower
     - LanguageCode: RU
       Text: "\u0426\u0432\u0435\u0442\u043E\u043A"
+    - LanguageCode: EN
+      Text: Flower
     - LanguageCode: DE
       Text: Blume
+    - LanguageCode: ES
+      Text: Flor
   - Key: Item_Flower_Edible_Description
     Translations:
-    - LanguageCode: EN
-      Text: A bright, fragrant wildflower. Makes a lovely gift or decoration.
     - LanguageCode: RU
       Text: "\u042F\u0440\u043A\u0438\u0439 \u0438 \u0430\u0440\u043E\u043C\u0430\u0442\u043D\u044B\u0439
         \u043F\u043E\u043B\u0435\u0432\u043E\u0439 \u0446\u0432\u0435\u0442\u043E\u043A.
         \u041C\u043E\u0436\u0435\u0442 \u0431\u044B\u0442\u044C \u043F\u043E\u0434\u0430\u0440\u043A\u043E\u043C
         \u0438\u043B\u0438 \u0443\u043A\u0440\u0430\u0448\u0435\u043D\u0438\u0435\u043C."
+    - LanguageCode: EN
+      Text: A bright, fragrant wildflower. Makes a lovely gift or decoration.
     - LanguageCode: DE
       Text: Eine leuchtende und duftende Wildblume. Kann als Geschenk oder Dekoration
         verwendet werden.
+    - LanguageCode: ES
+      Text: "Una flor silvestre brillante y fragante. Ideal como regalo o decoraci\xF3n."
   - Key: Item_HealthPotion_Edible_Name
     Translations:
-    - LanguageCode: EN
-      Text: Health potion
     - LanguageCode: RU
       Text: "\u0417\u0435\u043B\u044C\u0435 \u0437\u0434\u043E\u0440\u043E\u0432\u044C\u044F"
+    - LanguageCode: EN
+      Text: Health potion
     - LanguageCode: DE
       Text: Heiltrank
+    - LanguageCode: ES
+      Text: "Poci\xF3n de salud"
   - Key: Item_HealthPotion_Edible_Description
     Translations:
-    - LanguageCode: EN
-      Text: A vial of healing liquid. Restores energy after a hard day's work.
     - LanguageCode: RU
       Text: "\u041F\u0443\u0437\u044B\u0440\u0451\u043A \u0441 \u0446\u0435\u043B\u0435\u0431\u043D\u043E\u0439
         \u0436\u0438\u0434\u043A\u043E\u0441\u0442\u044C\u044E. \u0412\u043E\u0441\u0441\u0442\u0430\u043D\u0430\u0432\u043B\u0438\u0432\u0430\u0435\u0442
         \u0441\u0438\u043B\u044B \u043F\u043E\u0441\u043B\u0435 \u0442\u044F\u0436\u0451\u043B\u043E\u0433\u043E
         \u0434\u043D\u044F."
+    - LanguageCode: EN
+      Text: A vial of healing liquid. Restores energy after a hard day's work.
     - LanguageCode: DE
       Text: "Eine Phiole mit heilender Fl\xFCssigkeit. Gibt nach einem anstrengenden
         Tag neue Kraft."
+    - LanguageCode: ES
+      Text: "Un frasco de l\xEDquido curativo. Recupera las fuerzas despu\xE9s de
+        un d\xEDa duro."
   - Key: Item_Boots_Equipable_Name
     Translations:
-    - LanguageCode: EN
-      Text: Boots
     - LanguageCode: RU
       Text: "\u0421\u0430\u043F\u043E\u0433\u0438"
+    - LanguageCode: EN
+      Text: Boots
     - LanguageCode: DE
       Text: Stiefel
+    - LanguageCode: ES
+      Text: Botas
   - Key: Item_Boots_Equipable_Description
     Translations:
-    - LanguageCode: EN
-      Text: Sturdy and comfortable boots. A great fit for farmers and adventurers.
     - LanguageCode: RU
       Text: "\u041F\u0440\u043E\u0447\u043D\u044B\u0435 \u0438 \u0443\u0434\u043E\u0431\u043D\u044B\u0435
         \u0441\u0430\u043F\u043E\u0433\u0438. \u041E\u0442\u043B\u0438\u0447\u043D\u044B\u0439
         \u0432\u044B\u0431\u043E\u0440 \u0434\u043B\u044F \u0444\u0435\u0440\u043C\u0435\u0440\u043E\u0432
         \u0438 \u043F\u0443\u0442\u0435\u0448\u0435\u0441\u0442\u0432\u0435\u043D\u043D\u0438\u043A\u043E\u0432."
+    - LanguageCode: EN
+      Text: Sturdy and comfortable boots. A great fit for farmers and adventurers.
     - LanguageCode: DE
       Text: "Strapazierf\xE4hige und bequeme Stiefel. Eine gro\xDFartige Wahl f\xFCr
         Landwirte und Reisende."
+    - LanguageCode: ES
+      Text: "Botas resistentes y c\xF3modas. Una excelente opci\xF3n para agricultores
+        y viajeros."
   - Key: Item_Hat_Equipable_Name
     Translations:
-    - LanguageCode: EN
-      Text: Hat
     - LanguageCode: RU
       Text: "\u0428\u043B\u044F\u043F\u0430"
+    - LanguageCode: EN
+      Text: Hat
     - LanguageCode: DE
       Text: Hut
+    - LanguageCode: ES
+      Text: Sombrero
   - Key: Item_Hat_Equipable_Description
     Translations:
-    - LanguageCode: EN
-      Text: A light hat that shields from the sun. Fashionable and functional.
     - LanguageCode: RU
       Text: "\u041B\u0451\u0433\u043A\u0430\u044F \u0448\u043B\u044F\u043F\u0430,
         \u0437\u0430\u0449\u0438\u0449\u0430\u044E\u0449\u0430\u044F \u043E\u0442
         \u0441\u043E\u043B\u043D\u0446\u0430. \u0418 \u0441\u0442\u0438\u043B\u044C\u043D\u043E,
         \u0438 \u043F\u043E\u043B\u0435\u0437\u043D\u043E."
+    - LanguageCode: EN
+      Text: A light hat that shields from the sun. Fashionable and functional.
     - LanguageCode: DE
       Text: "Ein leichter Hut, der vor der Sonne sch\xFCtzt. Stilvoll und praktisch
         zugleich."
+    - LanguageCode: ES
+      Text: "Un sombrero ligero que protege del sol. Elegante y pr\xE1ctico."
   - Key: Item_Pants_Equipable_Name
     Translations:
-    - LanguageCode: EN
-      Text: Pants
     - LanguageCode: RU
       Text: "\u0428\u0442\u0430\u043D\u044B"
+    - LanguageCode: EN
+      Text: Pants
     - LanguageCode: DE
       Text: Hose
+    - LanguageCode: ES
+      Text: Pantalones
   - Key: Item_Pants_Equipable_Description
     Translations:
-    - LanguageCode: EN
-      Text: Simple work pants. Durable and dirt-resistant.
     - LanguageCode: RU
       Text: "\u041F\u0440\u043E\u0441\u0442\u044B\u0435 \u0440\u0430\u0431\u043E\u0447\u0438\u0435
         \u0448\u0442\u0430\u043D\u044B. \u0414\u043E\u043B\u0433\u043E\u0432\u0435\u0447\u043D\u044B
         \u0438 \u043D\u0435 \u0431\u043E\u044F\u0442\u0441\u044F \u0433\u0440\u044F\u0437\u0438."
+    - LanguageCode: EN
+      Text: Simple work pants. Durable and dirt-resistant.
     - LanguageCode: DE
       Text: "Einfache Arbeitshose. Strapazierf\xE4hig und schmutzabweisend."
+    - LanguageCode: ES
+      Text: Pantalones de trabajo sencillos. Resistentes y resistentes a la suciedad.
   - Key: Item_Wood_Resource_Name
     Translations:
-    - LanguageCode: EN
-      Text: Wood
     - LanguageCode: RU
       Text: "\u0411\u0440\u0435\u0432\u043D\u043E"
+    - LanguageCode: EN
+      Text: Wood
     - LanguageCode: DE
       Text: Protokoll
+    - LanguageCode: ES
+      Text: Registro
   - Key: Item_Wood_Resource_Description
     Translations:
-    - LanguageCode: EN
-      Text: Freshly cut log. Useful for crafting and building.
     - LanguageCode: RU
       Text: "\u0421\u0432\u0435\u0436\u0435\u0441\u0440\u0443\u0431\u043B\u0435\u043D\u043D\u043E\u0435
         \u0431\u0440\u0435\u0432\u043D\u043E. \u041F\u043E\u0434\u0445\u043E\u0434\u0438\u0442
         \u0434\u043B\u044F \u043E\u0431\u0440\u0430\u0431\u043E\u0442\u043A\u0438
         \u0438 \u0441\u0442\u0440\u043E\u0438\u0442\u0435\u043B\u044C\u0441\u0442\u0432\u0430."
+    - LanguageCode: EN
+      Text: Freshly cut log. Useful for crafting and building.
     - LanguageCode: DE
       Text: "Frisch geschnittener Stamm. Geeignet f\xFCr die Verarbeitung und den
         Bau."
+    - LanguageCode: ES
+      Text: "Tronco reci\xE9n cortado. Apto para procesamiento y construcci\xF3n."
   - Key: Item_WoodBoard_Resource_Name
     Translations:
-    - LanguageCode: EN
-      Text: Wood board
     - LanguageCode: RU
       Text: "\u0414\u043E\u0441\u043A\u0430"
+    - LanguageCode: EN
+      Text: Wood board
     - LanguageCode: DE
       Text: Planke
+    - LanguageCode: ES
+      Text: Junta
   - Key: Item_WoodBoard_Resource_Description
     Translations:
-    - LanguageCode: EN
-      Text: A smooth wooden board. Often used for repairs and furniture.
     - LanguageCode: RU
       Text: "\u0413\u043B\u0430\u0434\u043A\u0430\u044F \u0434\u0435\u0440\u0435\u0432\u044F\u043D\u043D\u0430\u044F
         \u0434\u043E\u0441\u043A\u0430. \u0427\u0430\u0441\u0442\u043E \u0438\u0441\u043F\u043E\u043B\u044C\u0437\u0443\u0435\u0442\u0441\u044F
         \u0434\u043B\u044F \u0440\u0435\u043C\u043E\u043D\u0442\u0430 \u0438 \u043C\u0435\u0431\u0435\u043B\u0438."
+    - LanguageCode: EN
+      Text: A smooth wooden board. Often used for repairs and furniture.
     - LanguageCode: DE
       Text: "Glattes Holzbrett. Wird oft f\xFCr Reparaturen und M\xF6bel verwendet."
+    - LanguageCode: ES
+      Text: Tabla de madera lisa. Se utiliza a menudo para reparaciones y muebles.
   - Key: Item_Stone_Resource_Name
     Translations:
-    - LanguageCode: EN
-      Text: Stone
     - LanguageCode: RU
       Text: "\u041A\u0430\u043C\u0435\u043D\u044C"
+    - LanguageCode: EN
+      Text: Stone
     - LanguageCode: DE
       Text: Stein
+    - LanguageCode: ES
+      Text: Piedra
   - Key: Item_Stone_Resource_Description
     Translations:
-    - LanguageCode: EN
-      Text: A common stone found near mountains or rivers. Essential for construction.
     - LanguageCode: RU
       Text: "\u041E\u0431\u044B\u0447\u043D\u044B\u0439 \u043A\u0430\u043C\u0435\u043D\u044C,
         \u043D\u0430\u0439\u0434\u0435\u043D\u043D\u044B\u0439 \u0432 \u0433\u043E\u0440\u0430\u0445
         \u0438\u043B\u0438 \u0443 \u0440\u0435\u043A\u0438. \u041E\u0441\u043D\u043E\u0432\u0430
         \u0434\u043B\u044F \u043C\u043D\u043E\u0433\u0438\u0445 \u043F\u043E\u0441\u0442\u0440\u043E\u0435\u043A."
+    - LanguageCode: EN
+      Text: A common stone found near mountains or rivers. Essential for construction.
     - LanguageCode: DE
       Text: "Ein gew\xF6hnlicher Stein, der in den Bergen oder an Fl\xFCssen vorkommt.
         Die Grundlage f\xFCr viele Geb\xE4ude."
+    - LanguageCode: ES
+      Text: "Una piedra com\xFAn que se encuentra en las monta\xF1as o junto a los
+        r\xEDos. Es la base de muchos edificios."
   - Key: Item_StoneBlock_Resource_Name
     Translations:
-    - LanguageCode: EN
-      Text: Stone block
     - LanguageCode: RU
       Text: "\u041A\u0430\u043C\u0435\u043D\u043D\u044B\u0439 \u0431\u043B\u043E\u043A"
+    - LanguageCode: EN
+      Text: Stone block
     - LanguageCode: DE
       Text: Steinblock
+    - LanguageCode: ES
+      Text: Bloque de piedra
   - Key: Item_StoneBlock_Resource_Description
     Translations:
-    - LanguageCode: EN
-      Text: Refined stone ready for building. Solid and heavy.
     - LanguageCode: RU
       Text: "\u041E\u0431\u0440\u0430\u0431\u043E\u0442\u0430\u043D\u043D\u044B\u0439
         \u043A\u0430\u043C\u0435\u043D\u044C, \u0433\u043E\u0442\u043E\u0432\u044B\u0439
         \u043A \u0441\u0442\u0440\u043E\u0438\u0442\u0435\u043B\u044C\u0441\u0442\u0432\u0443.
         \u041F\u0440\u043E\u0447\u043D\u044B\u0439 \u0438 \u0442\u044F\u0436\u0451\u043B\u044B\u0439."
+    - LanguageCode: EN
+      Text: Refined stone ready for building. Solid and heavy.
     - LanguageCode: DE
       Text: Bearbeiteter Stein, baufertig. Langlebig und schwer.
+    - LanguageCode: ES
+      Text: "Piedra procesada, lista para la construcci\xF3n. Duradera y resistente."
   - Key: Item_Axe_Tool_Name
     Translations:
-    - LanguageCode: EN
-      Text: Axe
     - LanguageCode: RU
       Text: "\u0422\u043E\u043F\u043E\u0440"
+    - LanguageCode: EN
+      Text: Axe
     - LanguageCode: DE
       Text: Axt
+    - LanguageCode: ES
+      Text: Hacha
   - Key: Item_Axe_Tool_Description
     Translations:
-    - LanguageCode: EN
-      Text: A trusty axe for chopping trees and clearing brush.
     - LanguageCode: RU
       Text: "\u041D\u0430\u0434\u0451\u0436\u043D\u044B\u0439 \u0442\u043E\u043F\u043E\u0440
         \u0434\u043B\u044F \u0440\u0443\u0431\u043A\u0438 \u0434\u0435\u0440\u0435\u0432\u044C\u0435\u0432
         \u0438 \u043A\u0443\u0441\u0442\u0430\u0440\u043D\u0438\u043A\u0430."
+    - LanguageCode: EN
+      Text: A trusty axe for chopping trees and clearing brush.
     - LanguageCode: DE
       Text: "Eine zuverl\xE4ssige Axt zum F\xE4llen von B\xE4umen und Str\xE4uchern."
+    - LanguageCode: ES
+      Text: "Un hacha confiable para cortar \xE1rboles y arbustos."
   - Key: Item_Pickaxe_Tool_Name
     Translations:
-    - LanguageCode: EN
-      Text: Pickaxe
     - LanguageCode: RU
       Text: "\u041A\u0438\u0440\u043A\u0430"
+    - LanguageCode: EN
+      Text: Pickaxe
     - LanguageCode: DE
       Text: "W\xE4hlen"
+    - LanguageCode: ES
+      Text: Elegir
   - Key: Item_Pickaxe_Tool_Description
     Translations:
-    - LanguageCode: EN
-      Text: "A durable pickaxe for mining stone and ore. A miner\u2019s best friend."
     - LanguageCode: RU
       Text: "\u041F\u0440\u043E\u0447\u043D\u0430\u044F \u043A\u0438\u0440\u043A\u0430
         \u0434\u043B\u044F \u0434\u043E\u0431\u044B\u0447\u0438 \u043A\u0430\u043C\u043D\u044F
         \u0438 \u0440\u0443\u0434\u044B. \u041B\u044E\u0431\u0438\u043C\u044B\u0439
         \u0438\u043D\u0441\u0442\u0440\u0443\u043C\u0435\u043D\u0442 \u0448\u0430\u0445\u0442\u0451\u0440\u043E\u0432."
+    - LanguageCode: EN
+      Text: "A durable pickaxe for mining stone and ore. A miner\u2019s best friend."
     - LanguageCode: DE
       Text: Eine robuste Spitzhacke zum Abbau von Steinen und Erzen. Ein beliebtes
         Werkzeug der Bergleute.
+    - LanguageCode: ES
+      Text: Un pico robusto para extraer piedra y mineral. Una herramienta predilecta
+        de los mineros.
   - Key: Item_Name
-    Translations: []
+    Translations:
+    - LanguageCode: DE
+      Text: '#VALUE!'
+    - LanguageCode: ES
+      Text: '#VALUE!'
   - Key: Item_Description
-    Translations: []
+    Translations:
+    - LanguageCode: DE
+      Text: '#VALUE!'
+    - LanguageCode: ES
+      Text: '#VALUE!'
   - Key: Quest_HomeSweetHome_Name
     Translations:
-    - LanguageCode: EN
-      Text: Home, Sweet Home
     - LanguageCode: RU
       Text: "\u0412\u043E\u0437\u0432\u0440\u0430\u0449\u0435\u043D\u0438\u0435 \u0434\u043E\u043C\u043E\u0439"
+    - LanguageCode: EN
+      Text: Home, Sweet Home
+    - LanguageCode: DE
+      Text: "R\xFCckkehr nach Hause"
+    - LanguageCode: ES
+      Text: Regreso a casa
   - Key: Quest_HomeSweetHome_Description
     Translations:
-    - LanguageCode: EN
-      Text: You've arrived in a new countryside village, greeted by a local named
-        Feliana. She shows you an old shop that now belongs to you. First, take a
-        rest. Then, it's time to start the renovation and rebuild your life from
-        scratch.
     - LanguageCode: RU
       Text: "\u0422\u044B \u043F\u0440\u0438\u0431\u044B\u043B \u0432 \u043D\u043E\u0432\u044B\u0439
         \u0434\u0435\u0440\u0435\u0432\u0435\u043D\u0441\u043A\u0438\u0439 \u043A\u0440\u0430\u0439,
@@ -279,45 +676,76 @@ MonoBehaviour:
         \u043D\u0430\u0447\u0430\u0442\u044C \u0440\u0435\u043C\u043E\u043D\u0442
         \u0438 \u043E\u0431\u0443\u0441\u0442\u0440\u0430\u0438\u0432\u0430\u0442\u044C
         \u0441\u0432\u043E\u044E \u0436\u0438\u0437\u043D\u044C \u0437\u0430\u043D\u043E\u0432\u043E."
+    - LanguageCode: EN
+      Text: You've arrived in a new countryside village, greeted by a local named
+        Feliana. She shows you an old shop that now belongs to you. First, take a
+        rest. Then, it's time to start the renovation and rebuild your life from
+        scratch.
+    - LanguageCode: DE
+      Text: "Du bist in einer neuen l\xE4ndlichen Gegend angekommen und wirst von
+        der Einheimischen Feliana empfangen. Sie zeigt dir den Laden, der nun dir
+        geh\xF6rt. Du musst dich ein wenig ausruhen und dann damit beginnen, dein
+        Leben neu zu gestalten."
+    - LanguageCode: ES
+      Text: "Has llegado a una nueva tierra rural, donde te recibe una vecina, Feliana.
+        Te muestra la tienda, que ahora es tuya. Tendr\xE1s que descansar un poco
+        y luego empezar a arreglar tu vida."
   - Key: Quest_HomeSweetHome_Objective_1_1
     Translations:
-    - LanguageCode: EN
-      Text: Get some sleep
     - LanguageCode: RU
       Text: "\u0412\u044B\u0441\u043F\u0430\u0442\u044C\u0441\u044F"
+    - LanguageCode: EN
+      Text: Get some sleep
+    - LanguageCode: DE
+      Text: Schlafen Sie etwas
+    - LanguageCode: ES
+      Text: Duerme un poco
   - Key: Quest_HomeSweetHome_Objective_2_1
     Translations:
-    - LanguageCode: EN
-      Text: Find Feliana and talk to her
     - LanguageCode: RU
       Text: "\u041D\u0430\u0439\u0442\u0438 \u0424\u0435\u043B\u0438\u0430\u043D\u0443
         \u0438 \u043F\u043E\u0433\u043E\u0432\u043E\u0440\u0438\u0442\u044C \u0441
         \u043D\u0435\u0439"
+    - LanguageCode: EN
+      Text: Find Feliana and talk to her
+    - LanguageCode: DE
+      Text: Finde Feliana und sprich mit ihr
+    - LanguageCode: ES
+      Text: Encuentra a Feliana y habla con ella.
   - Key: Quest_HomeSweetHome_Objective_3_1
     Translations:
-    - LanguageCode: EN
-      Text: Complete the shop renovation
     - LanguageCode: RU
       Text: "\u0417\u0430\u0432\u0435\u0440\u0448\u0438\u0442\u044C \u0440\u0435\u043C\u043E\u043D\u0442
         \u043C\u0430\u0433\u0430\u0437\u0438\u043D\u0430"
+    - LanguageCode: EN
+      Text: Complete the shop renovation
+    - LanguageCode: DE
+      Text: "Schlie\xDFen Sie die Ladenrenovierung ab"
+    - LanguageCode: ES
+      Text: "Completar la renovaci\xF3n de la tienda"
   - Key: Quest_HomeSweetHome_Objective_4_1
     Translations:
-    - LanguageCode: EN
-      Text: Talk to Feliana again
     - LanguageCode: RU
       Text: "\u041F\u043E\u0433\u043E\u0432\u043E\u0440\u0438\u0442\u044C \u0441
         \u0424\u0435\u043B\u0438\u0430\u043D\u043E\u0439"
+    - LanguageCode: EN
+      Text: Talk to Feliana again
+    - LanguageCode: DE
+      Text: Sprich mit Feliana
+    - LanguageCode: ES
+      Text: Habla con Feliana
   - Key: Quest_WoodcutterDirk_Name
     Translations:
-    - LanguageCode: EN
-      Text: Woodcutter Dirk
     - LanguageCode: RU
       Text: "\u0414\u0440\u043E\u0432\u043E\u0441\u0435\u043A \u0414\u0438\u0440\u043A"
+    - LanguageCode: EN
+      Text: Woodcutter Dirk
+    - LanguageCode: DE
+      Text: "Holzf\xE4llerdolch"
+    - LanguageCode: ES
+      Text: "Dirk de le\xF1ador"
   - Key: Quest_WoodcutterDirk_Description
     Translations:
-    - LanguageCode: EN
-      Text: Dirk will help with wood. Gather logs, process them into planks, then
-        return to him when you're ready.
     - LanguageCode: RU
       Text: "\u041C\u0435\u0441\u0442\u043D\u044B\u0439 \u0434\u0440\u043E\u0432\u043E\u0441\u0435\u043A
         \u0414\u0438\u0440\u043A \u043E\u0431\u0435\u0449\u0430\u043B \u043F\u043E\u043C\u043E\u0447\u044C
@@ -326,45 +754,70 @@ MonoBehaviour:
         \u043F\u0435\u0440\u0435\u0440\u0430\u0431\u043E\u0442\u0430\u0442\u044C
         \u0438\u0445, \u0430 \u043F\u043E\u0441\u043B\u0435 \u0441\u043D\u043E\u0432\u0430
         \u043F\u043E\u0433\u043E\u0432\u043E\u0440\u0438\u0442\u044C \u0441 \u043D\u0438\u043C."
+    - LanguageCode: EN
+      Text: Dirk will help with wood. Gather logs, process them into planks, then
+        return to him when you're ready.
+    - LanguageCode: DE
+      Text: "Der \xF6rtliche Holzf\xE4ller Dirk hat versprochen, beim Holz zu helfen.
+        Du musst ein paar St\xE4mme hacken, verarbeiten und dann erneut mit ihm sprechen."
+    - LanguageCode: ES
+      Text: "El le\xF1ador local, Dirk, prometi\xF3 ayudarte con la le\xF1a. Tienes
+        que cortar algunos troncos, procesarlos y luego volver a hablar con \xE9l."
   - Key: Quest_WoodcutterDirk_Objective_1_1
     Translations:
-    - LanguageCode: EN
-      Text: Find Dirk and talk to him
     - LanguageCode: RU
       Text: "\u041D\u0430\u0439\u0442\u0438 \u0414\u0438\u0440\u043A\u0430 \u0438
         \u0432\u0437\u044F\u0442\u044C \u0442\u043E\u043F\u043E\u0440"
+    - LanguageCode: EN
+      Text: Find Dirk and talk to him
+    - LanguageCode: DE
+      Text: Finde Dirk und nimm die Axt
+    - LanguageCode: ES
+      Text: Encuentra a Dirk y toma el hacha.
   - Key: Quest_WoodcutterDirk_Objective_2_1
     Translations:
-    - LanguageCode: EN
-      Text: Collect 15 logs
     - LanguageCode: RU
       Text: "\u041D\u0430\u0440\u0443\u0431\u0438\u0442\u044C 15 \u0431\u0440\u0435\u0432\u0435\u043D"
+    - LanguageCode: EN
+      Text: Collect 15 logs
+    - LanguageCode: DE
+      Text: Hacken Sie 15 Holzscheite
+    - LanguageCode: ES
+      Text: Cortar 15 troncos
   - Key: Quest_WoodcutterDirk_Objective_3_1
     Translations:
-    - LanguageCode: EN
-      Text: Process logs into 5 planks
     - LanguageCode: RU
       Text: "\u041F\u0435\u0440\u0435\u0440\u0430\u0431\u043E\u0442\u0430\u0442\u044C
         \u0431\u0440\u0435\u0432\u043D\u0430 \u0432 5 \u0434\u043E\u0441\u043E\u043A"
+    - LanguageCode: EN
+      Text: Process logs into 5 planks
+    - LanguageCode: DE
+      Text: Protokolle in 5 Boards verarbeiten
+    - LanguageCode: ES
+      Text: Procesar registros en 5 tableros
   - Key: Quest_WoodcutterDirk_Objective_4_1
     Translations:
-    - LanguageCode: EN
-      Text: Talk to Dirk
     - LanguageCode: RU
       Text: "\u041F\u043E\u0433\u043E\u0432\u043E\u0440\u0438\u0442\u044C \u0441
         \u0414\u0438\u0440\u043A\u043E\u043C"
+    - LanguageCode: EN
+      Text: Talk to Dirk
+    - LanguageCode: DE
+      Text: Sprich mit Dirk
+    - LanguageCode: ES
+      Text: Habla con Dirk
   - Key: Quest_MinerBeth_Name
     Translations:
-    - LanguageCode: EN
-      Text: Miner Beth
     - LanguageCode: RU
       Text: "\u0428\u0430\u0445\u0442\u0451\u0440 \u0411\u044D\u0442"
+    - LanguageCode: EN
+      Text: Miner Beth
+    - LanguageCode: DE
+      Text: Bergmannsfledermaus
+    - LanguageCode: ES
+      Text: "Murci\xE9lago minero"
   - Key: Quest_MinerBeth_Description
     Translations:
-    - LanguageCode: EN
-      Text: Beth will help you gather stone materials. First, mine some raw stones,
-        then process them into stone blocks using a furnace. Return to Beth once
-        everything is ready for the shop renovation.
     - LanguageCode: RU
       Text: "\u0411\u044D\u0442 \u043F\u043E\u043C\u043E\u0436\u0435\u0442 \u0442\u0435\u0431\u0435
         \u0441 \u043A\u0430\u043C\u0435\u043D\u043D\u044B\u043C\u0438 \u043C\u0430\u0442\u0435\u0440\u0438\u0430\u043B\u0430\u043C\u0438.
@@ -376,240 +829,350 @@ MonoBehaviour:
         \u0412\u0435\u0440\u043D\u0438\u0441\u044C \u043A \u0411\u044D\u0442, \u043A\u043E\u0433\u0434\u0430
         \u0432\u0441\u0451 \u0431\u0443\u0434\u0435\u0442 \u0433\u043E\u0442\u043E\u0432\u043E
         \u0434\u043B\u044F \u0440\u0435\u043C\u043E\u043D\u0442\u0430 \u043C\u0430\u0433\u0430\u0437\u0438\u043D\u0430."
+    - LanguageCode: EN
+      Text: Beth will help you gather stone materials. First, mine some raw stones,
+        then process them into stone blocks using a furnace. Return to Beth once
+        everything is ready for the shop renovation.
+    - LanguageCode: DE
+      Text: "Beth hilft dir mit Steinmaterialien. Zuerst musst du Steine abbauen
+        und sie dann in einem Ofen zu Steinbl\xF6cken verarbeiten. Kehre zu Beth
+        zur\xFCck, wenn alles bereit ist, um den Laden zu reparieren."
+    - LanguageCode: ES
+      Text: "Beth te ayudar\xE1 con los materiales de piedra. Primero debes extraer
+        piedras y luego procesarlas en bloques de piedra usando un horno. Regresa
+        con Beth cuando todo est\xE9 listo para reparar la tienda."
   - Key: Quest_MinerBeth_Objective_1_1
     Translations:
-    - LanguageCode: EN
-      Text: Find Beth and talk to her
     - LanguageCode: RU
       Text: "\u041D\u0430\u0439\u0442\u0438 \u0411\u044D\u0442 \u0438 \u043F\u043E\u0433\u043E\u0432\u043E\u0440\u0438\u0442\u044C
         \u0441 \u043D\u0435\u0439"
+    - LanguageCode: EN
+      Text: Find Beth and talk to her
+    - LanguageCode: DE
+      Text: Finde Beth und sprich mit ihr
+    - LanguageCode: ES
+      Text: Encuentra a Beth y habla con ella.
   - Key: Quest_MinerBeth_Objective_2_1
     Translations:
-    - LanguageCode: EN
-      Text: Collect 15 stones
     - LanguageCode: RU
       Text: "\u041F\u043E\u043B\u0443\u0447\u0438\u0442\u044C \u043A\u0430\u043C\u043D\u0438"
+    - LanguageCode: EN
+      Text: Collect 15 stones
+    - LanguageCode: DE
+      Text: Steine holen
+    - LanguageCode: ES
+      Text: Consigue piedras
   - Key: Quest_MinerBeth_Objective_3_1
     Translations:
-    - LanguageCode: EN
-      Text: Refine into 5 stone blocks
     - LanguageCode: RU
       Text: "\u041F\u0435\u0440\u0435\u043F\u043B\u0430\u0432\u0438\u0442\u044C \u0432
         5 \u043A\u0430\u043C\u0435\u043D\u043D\u044B\u0445 \u0431\u043B\u043E\u043A\u043E\u0432"
+    - LanguageCode: EN
+      Text: Refine into 5 stone blocks
+    - LanguageCode: DE
+      Text: "In 5 Steinbl\xF6cke geschmolzen"
+    - LanguageCode: ES
+      Text: Fundido en 5 bloques de piedra
   - Key: Quest_MinerBeth_Objective_4_1
     Translations:
-    - LanguageCode: EN
-      Text: Return to Beth
     - LanguageCode: RU
       Text: "\u041F\u043E\u0433\u043E\u0432\u043E\u0440\u0438\u0442\u044C \u0441
         \u0411\u044D\u0442"
+    - LanguageCode: EN
+      Text: Return to Beth
+    - LanguageCode: DE
+      Text: Sprich mit Beth
+    - LanguageCode: ES
+      Text: Habla con Beth
   - Key: Quest_Name
     Translations:
-    - LanguageCode: EN
-      Text: asdsadasdsadsadsadsaa
     - LanguageCode: RU
       Text: "\u0430\u0432\u044B\u0444\u0430\u044B\u0444\u0432\u044B\u0444\u0432\u044B\u0444\u0432\u0444\u044B\u0432\u044B\u0444\u0432\u0444\u044B\u0432\u0444\u044B\u0432"
+    - LanguageCode: EN
+      Text: asdsadasdsadsadsadsaa
+    - LanguageCode: DE
+      Text: avyfayfwyfwfywfwfyvfyv
+    - LanguageCode: ES
+      Text: avyfayfwyfwfywfwfyvfyv
   - Key: Quest_Description
     Translations:
     - LanguageCode: EN
       Text: asdsadasdsadsadsadsaaasdsadasdsadsadsadsaaasdsadasdsadsadsadsaaasdsadasdsadsadsadsaaasdsadasdsadsadsadsaaasdsadasdsadsadsadsaaasdsadasdsadsadsadsaaasdsadasdsadsadsadsaaasdsadasdsadsadsadsaaasdsadasdsadsadsadsaaasdsadasdsadsadsadsaaasdsadasdsadsadsadsaaasdsadasdsadsadsadsaaasdsadasdsadsadsadsaa
+    - LanguageCode: DE
+      Text: '#VALUE!'
+    - LanguageCode: ES
+      Text: '#VALUE!'
   - Key: Quest_Objective
     Translations:
     - LanguageCode: EN
       Text: asdsadsadsadsadsaddsadsadsadsadsadasdsaasasdsadsadasdsadsa
+    - LanguageCode: DE
+      Text: '#VALUE!'
+    - LanguageCode: ES
+      Text: '#VALUE!'
   - Key: Quest
-    Translations: []
+    Translations:
+    - LanguageCode: DE
+      Text: '#VALUE!'
+    - LanguageCode: ES
+      Text: '#VALUE!'
   - Key: UI_StartButton
     Translations:
-    - LanguageCode: EN
-      Text: Start Game
     - LanguageCode: RU
       Text: "\u041D\u0430\u0447\u0430\u0442\u044C \u0438\u0433\u0440\u0443"
-  - Key: UI_ExitButton
-    Translations:
-    - LanguageCode: EN
-      Text: Exit
-    - LanguageCode: RU
-      Text: "\u0412\u044B\u0439\u0442\u0438"
-  - Key: UI_Error_NoItems
-    Translations:
-    - LanguageCode: EN
-      Text: No items found
-    - LanguageCode: RU
-      Text: "\u041F\u0440\u0435\u0434\u043C\u0435\u0442\u044B \u043D\u0435 \u043D\u0430\u0439\u0434\u0435\u043D\u044B"
-  - Key: UI_MainMenu_Button_Start
-    Translations:
     - LanguageCode: EN
       Text: Start Game
-    - LanguageCode: RU
-      Text: "\u041D\u0430\u0447\u0430\u0442\u044C \u0438\u0433\u0440\u0443"
     - LanguageCode: DE
       Text: Starte das Spiel
-  - Key: UI_MainMenu_Button_Exit
+    - LanguageCode: ES
+      Text: Iniciar el juego
+  - Key: UI_ExitButton
     Translations:
+    - LanguageCode: RU
+      Text: "\u0412\u044B\u0439\u0442\u0438"
     - LanguageCode: EN
       Text: Exit
-    - LanguageCode: RU
-      Text: "\u0412\u044B\u0439\u0442\u0438"
     - LanguageCode: DE
       Text: Ausloggen
-  - Key: UI_Settings_Toggle_Music
+    - LanguageCode: ES
+      Text: "Finalizar la sesi\xF3n"
+  - Key: UI_Error_NoItems
     Translations:
-    - LanguageCode: EN
-      Text: Music
     - LanguageCode: RU
-      Text: "\u041C\u0443\u0437\u044B\u043A\u0430"
-    - LanguageCode: DE
-      Text: Musik
-  - Key: Popup_Inventory_Label_NoItems
-    Translations:
+      Text: "\u041F\u0440\u0435\u0434\u043C\u0435\u0442\u044B \u043D\u0435 \u043D\u0430\u0439\u0434\u0435\u043D\u044B"
     - LanguageCode: EN
       Text: No items found
-    - LanguageCode: RU
-      Text: "\u041F\u0440\u0435\u0434\u043C\u0435\u0442\u043E\u0432 \u043D\u0435\u0442"
     - LanguageCode: DE
-      Text: Es sind keine Artikel vorhanden
-  - Key: UI_GameMenu_Button_Main
+      Text: "Keine Eintr\xE4ge gefunden"
+    - LanguageCode: ES
+      Text: "No se encontraron art\xEDculos"
+  - Key: UI_MainMenu_Button_Start
     Translations:
-    - LanguageCode: EN
-      Text: Home
     - LanguageCode: RU
-      Text: "\u0413\u043B\u0430\u0432\u043D\u0430\u044F"
-    - LanguageCode: DE
-      Text: Heim
-  - Key: UI_GameMenu_Button_Inventory
-    Translations:
+      Text: "\u041D\u0430\u0447\u0430\u0442\u044C \u0438\u0433\u0440\u0443"
     - LanguageCode: EN
-      Text: Inventory
-    - LanguageCode: RU
-      Text: "\u0418\u043D\u0432\u0435\u043D\u0442\u0430\u0440\u044C"
+      Text: Start Game
     - LanguageCode: DE
-      Text: Inventar
-  - Key: UI_GameMenu_Button_Quests
+      Text: Starte das Spiel
+    - LanguageCode: ES
+      Text: Iniciar el juego
+  - Key: UI_MainMenu_Button_Exit
     Translations:
-    - LanguageCode: EN
-      Text: Quests
-    - LanguageCode: RU
-      Text: "\u041A\u0432\u0435\u0441\u0442\u044B"
-    - LanguageCode: DE
-      Text: Quests
-  - Key: UI_GameMenu_Button_Settings
-    Translations:
-    - LanguageCode: EN
-      Text: Settings
-    - LanguageCode: RU
-      Text: "\u041D\u0430\u0441\u0442\u0440\u043E\u0439\u043A\u0438"
-    - LanguageCode: DE
-      Text: Einstellungen
-  - Key: UI_GameMenu_Button_Continue
-    Translations:
-    - LanguageCode: EN
-      Text: Continue
-    - LanguageCode: RU
-      Text: "\u041F\u0440\u043E\u0434\u043E\u043B\u0436\u0438\u0442\u044C"
-    - LanguageCode: DE
-      Text: Weitermachen
-  - Key: UI_GameMenu_Button_Exit
-    Translations:
-    - LanguageCode: EN
-      Text: Log out
     - LanguageCode: RU
       Text: "\u0412\u044B\u0439\u0442\u0438"
+    - LanguageCode: EN
+      Text: Exit
     - LanguageCode: DE
       Text: Ausloggen
-  - Key: UI_Settings_Label_MasterSound
+    - LanguageCode: ES
+      Text: "Finalizar la sesi\xF3n"
+  - Key: UI_Settings_Toggle_Music
     Translations:
-    - LanguageCode: EN
-      Text: Overall volume
-    - LanguageCode: RU
-      Text: "\u041E\u0431\u0449\u0430\u044F \u0433\u0440\u043E\u043C\u043A\u043E\u0441\u0442\u044C"
-    - LanguageCode: DE
-      Text: Gesamtvolumen
-  - Key: UI_Settings_Label_SoundFX
-    Translations:
-    - LanguageCode: EN
-      Text: Effects
-    - LanguageCode: RU
-      Text: "\u042D\u0444\u0444\u0435\u043A\u0442\u044B"
-    - LanguageCode: DE
-      Text: Auswirkungen
-  - Key: UI_Settings_Label_Music
-    Translations:
-    - LanguageCode: EN
-      Text: Music
     - LanguageCode: RU
       Text: "\u041C\u0443\u0437\u044B\u043A\u0430"
+    - LanguageCode: EN
+      Text: Music
     - LanguageCode: DE
       Text: Musik
-  - Key: UI_Settings_Dropdown_Resolution
+    - LanguageCode: ES
+      Text: "M\xFAsica"
+  - Key: Popup_Inventory_Label_NoItems
     Translations:
-    - LanguageCode: EN
-      Text: Permission
     - LanguageCode: RU
-      Text: "\u0420\u0430\u0437\u0440\u0435\u0448\u0435\u043D\u0438\u0435"
-    - LanguageCode: DE
-      Text: Erlaubnis
-  - Key: UI_Settings_Dropdown_ScreenMode
-    Translations:
+      Text: "\u041F\u0440\u0435\u0434\u043C\u0435\u0442\u043E\u0432 \u043D\u0435\u0442"
     - LanguageCode: EN
-      Text: Screen mode
-    - LanguageCode: RU
-      Text: "\u0420\u0435\u0436\u0438\u043C \u044D\u043A\u0440\u0430\u043D\u0430"
+      Text: No items found
     - LanguageCode: DE
-      Text: Bildschirmmodus
-  - Key: UI_Settings_Dropdown_Language
+      Text: Es sind keine Artikel vorhanden
+    - LanguageCode: ES
+      Text: "No hay art\xEDculos"
+  - Key: UI_GameMenu_Button_Main
     Translations:
+    - LanguageCode: RU
+      Text: "\u0413\u043B\u0430\u0432\u043D\u0430\u044F"
     - LanguageCode: EN
-      Text: Language
-    - LanguageCode: RU
-      Text: "\u042F\u0437\u044B\u043A"
+      Text: Home
     - LanguageCode: DE
-      Text: Sprache
-  - Key: UI_QuestMenu_Label_Objectives
+      Text: Heim
+    - LanguageCode: ES
+      Text: Hogar
+  - Key: UI_GameMenu_Button_Inventory
     Translations:
+    - LanguageCode: RU
+      Text: "\u0418\u043D\u0432\u0435\u043D\u0442\u0430\u0440\u044C"
     - LanguageCode: EN
-      Text: Objectives
-    - LanguageCode: RU
-      Text: "\u0426\u0435\u043B\u0438"
+      Text: Inventory
     - LanguageCode: DE
-      Text: Ziele
-  - Key: UI_QuestMenu_Label_Rewards
+      Text: Inventar
+    - LanguageCode: ES
+      Text: Inventario
+  - Key: UI_GameMenu_Button_Quests
     Translations:
+    - LanguageCode: RU
+      Text: "\u041A\u0432\u0435\u0441\u0442\u044B"
     - LanguageCode: EN
-      Text: Rewards
-    - LanguageCode: RU
-      Text: "\u041D\u0430\u0433\u0440\u0430\u0434\u044B"
+      Text: Quests
     - LanguageCode: DE
-      Text: Belohnungen
-  - Key: UI_MainMenu_Button_Continue
+      Text: Quests
+    - LanguageCode: ES
+      Text: Misiones
+  - Key: UI_GameMenu_Button_Settings
     Translations:
+    - LanguageCode: RU
+      Text: "\u041D\u0430\u0441\u0442\u0440\u043E\u0439\u043A\u0438"
+    - LanguageCode: EN
+      Text: Settings
+    - LanguageCode: DE
+      Text: Einstellungen
+    - LanguageCode: ES
+      Text: Ajustes
+  - Key: UI_GameMenu_Button_Continue
+    Translations:
+    - LanguageCode: RU
+      Text: "\u041F\u0440\u043E\u0434\u043E\u043B\u0436\u0438\u0442\u044C"
     - LanguageCode: EN
       Text: Continue
-    - LanguageCode: RU
-      Text: "\u041F\u0440\u043E\u0434\u043E\u043B\u0436\u0430\u0442\u044C"
     - LanguageCode: DE
       Text: Weitermachen
+    - LanguageCode: ES
+      Text: Continuar
+  - Key: UI_GameMenu_Button_Exit
+    Translations:
+    - LanguageCode: RU
+      Text: "\u0412\u044B\u0439\u0442\u0438"
+    - LanguageCode: EN
+      Text: Log out
+    - LanguageCode: DE
+      Text: Ausloggen
+    - LanguageCode: ES
+      Text: "Finalizar la sesi\xF3n"
+  - Key: UI_Settings_Label_MasterSound
+    Translations:
+    - LanguageCode: RU
+      Text: "\u041E\u0431\u0449\u0430\u044F \u0433\u0440\u043E\u043C\u043A\u043E\u0441\u0442\u044C"
+    - LanguageCode: EN
+      Text: Overall volume
+    - LanguageCode: DE
+      Text: Gesamtvolumen
+    - LanguageCode: ES
+      Text: Volumen total
+  - Key: UI_Settings_Label_SoundFX
+    Translations:
+    - LanguageCode: RU
+      Text: "\u042D\u0444\u0444\u0435\u043A\u0442\u044B"
+    - LanguageCode: EN
+      Text: Effects
+    - LanguageCode: DE
+      Text: Auswirkungen
+    - LanguageCode: ES
+      Text: Efectos
+  - Key: UI_Settings_Label_Music
+    Translations:
+    - LanguageCode: RU
+      Text: "\u041C\u0443\u0437\u044B\u043A\u0430"
+    - LanguageCode: EN
+      Text: Music
+    - LanguageCode: DE
+      Text: Musik
+    - LanguageCode: ES
+      Text: "M\xFAsica"
+  - Key: UI_Settings_Dropdown_Resolution
+    Translations:
+    - LanguageCode: RU
+      Text: "\u0420\u0430\u0437\u0440\u0435\u0448\u0435\u043D\u0438\u0435"
+    - LanguageCode: EN
+      Text: Permission
+    - LanguageCode: DE
+      Text: Erlaubnis
+    - LanguageCode: ES
+      Text: Permiso
+  - Key: UI_Settings_Dropdown_ScreenMode
+    Translations:
+    - LanguageCode: RU
+      Text: "\u0420\u0435\u0436\u0438\u043C \u044D\u043A\u0440\u0430\u043D\u0430"
+    - LanguageCode: EN
+      Text: Screen mode
+    - LanguageCode: DE
+      Text: Bildschirmmodus
+    - LanguageCode: ES
+      Text: Modo de pantalla
+  - Key: UI_Settings_Dropdown_Language
+    Translations:
+    - LanguageCode: RU
+      Text: "\u042F\u0437\u044B\u043A"
+    - LanguageCode: EN
+      Text: Language
+    - LanguageCode: DE
+      Text: Sprache
+    - LanguageCode: ES
+      Text: Idioma
+  - Key: UI_QuestMenu_Label_Objectives
+    Translations:
+    - LanguageCode: RU
+      Text: "\u0426\u0435\u043B\u0438"
+    - LanguageCode: EN
+      Text: Objectives
+    - LanguageCode: DE
+      Text: Ziele
+    - LanguageCode: ES
+      Text: Objetivos
+  - Key: UI_QuestMenu_Label_Rewards
+    Translations:
+    - LanguageCode: RU
+      Text: "\u041D\u0430\u0433\u0440\u0430\u0434\u044B"
+    - LanguageCode: EN
+      Text: Rewards
+    - LanguageCode: DE
+      Text: Auszeichnungen
+    - LanguageCode: ES
+      Text: Premios
+  - Key: UI_MainMenu_Button_Continue
+    Translations:
+    - LanguageCode: RU
+      Text: "\u041F\u0440\u043E\u0434\u043E\u043B\u0436\u0430\u0442\u044C"
+    - LanguageCode: EN
+      Text: Continue
+    - LanguageCode: DE
+      Text: Weitermachen
+    - LanguageCode: ES
+      Text: Continuar
   - Key: UI_MainMenu_Button_NewGame
     Translations:
-    - LanguageCode: EN
-      Text: New game
     - LanguageCode: RU
       Text: "\u041D\u043E\u0432\u0430\u044F \u0438\u0433\u0440\u0430"
+    - LanguageCode: EN
+      Text: New game
     - LanguageCode: DE
       Text: Neues Spiel
+    - LanguageCode: ES
+      Text: Nuevo juego
   - Key: UI_MainMenu_Button_Load
     Translations:
-    - LanguageCode: EN
-      Text: Load
     - LanguageCode: RU
       Text: "\u041D\u0430\u0433\u0440\u0443\u0437\u043A\u0430"
+    - LanguageCode: EN
+      Text: Load
     - LanguageCode: DE
       Text: Laden
+    - LanguageCode: ES
+      Text: Carga
   - Key: UI_MainMenu_Button_Credits
     Translations:
-    - LanguageCode: EN
-      Text: Credits
     - LanguageCode: RU
       Text: "\u041A\u0440\u0435\u0434\u0438\u0442\u044B"
+    - LanguageCode: EN
+      Text: Credits
     - LanguageCode: DE
       Text: Credits
+    - LanguageCode: ES
+      Text: "Cr\xE9ditos"
+  - Key: Enum_ActionType_FallAsleep
+    Translations:
+    - LanguageCode: RU
+      Text: "\u0417\u0430\u0441\u043D\u0443\u0442\u044C"
+    - LanguageCode: EN
+      Text: Fall asleep
+    - LanguageCode: DE
+      Text: Einschlafen
+    - LanguageCode: ES
+      Text: Dormirse

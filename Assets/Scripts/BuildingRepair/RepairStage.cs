@@ -11,7 +11,7 @@ namespace FlavorfulStory.BuildingRepair
     {
         /// <summary> Название объекта на данной стадии ремонта. </summary>
         [field: Tooltip("Название объекта на данной стадии ремонта."), SerializeField]
-        public string BuildingName { get; private set; }
+        public RepairableBuildingName BuildingName { get; private set; }
 
         /// <summary> Ресурсные требования для выполнения стадии ремонта. </summary>
         [field: Tooltip("Ресурсные требования для выполнения стадии ремонта."), SerializeField]

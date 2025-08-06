@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using FlavorfulStory.Infrastructure;
+using FlavorfulStory.LocalizationSystem;
 using UnityEngine;
 
 namespace FlavorfulStory.TooltipSystem.ActionTooltips
@@ -88,7 +89,11 @@ namespace FlavorfulStory.TooltipSystem.ActionTooltips
         /// <summary> Получить описание действия (клавиша + цель). </summary>
         /// <param name="actionTooltipData"> Данные действия. </param>
         /// <returns> Строка описания. </returns>
-        private static string GetActionTooltipDescription(ActionTooltipData actionTooltipData) =>
-            $"{actionTooltipData.Action} {actionTooltipData.Target}";
+        private static string GetActionTooltipDescription(ActionTooltipData actionTooltipData)
+        {
+            string localizedAction = LocalizationService.GetLocalizedString(actionTooltipData.Action);
+            string localizedExtraText = LocalizationService.GetLocalizedString(actionTooltipData.ExtraText);
+            return $"{localizedAction} {localizedExtraText}";
+        }
     }
 }

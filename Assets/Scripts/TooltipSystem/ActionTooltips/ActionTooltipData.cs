@@ -13,7 +13,7 @@ namespace FlavorfulStory.TooltipSystem.ActionTooltips
         public ActionType Action { get; }
 
         /// <summary> Название объекта, над которым выполняется действие. </summary>
-        public string Target { get; }
+        public string ExtraText { get; }
 
         /// <summary> Источник вызова тултипа действия. </summary>
         public ActionTooltipSource Source { get; }
@@ -21,15 +21,21 @@ namespace FlavorfulStory.TooltipSystem.ActionTooltips
         /// <summary> Конструктор, инициализирующий данные для тултипа. </summary>
         /// <param name="keyText"> Текст клавиши действия, отображаемый в тултипе (например, "E"). </param>
         /// <param name="action"> Тип действия, которое выполняется. </param>
-        /// <param name="target"> Название объекта, над которым выполняется действие. </param>
+        /// <param name="extraText"> Дополнительный текст. </param>
         /// <param name="source"> Источник вызова тултипа действия. </param>
-        public ActionTooltipData(string keyText, ActionType action, string target,
+        public ActionTooltipData(string keyText, ActionType action, string extraText = "",
             ActionTooltipSource source = ActionTooltipSource.Interactable)
         {
             KeyText = keyText;
             Action = action;
-            Target = target;
+            ExtraText = extraText;
             Source = source;
+        }
+
+        public ActionTooltipData(string keyText, ActionType action, Enum extraText,
+            ActionTooltipSource source = ActionTooltipSource.Interactable)
+            : this(keyText, action, extraText != null ? $"Enum_{extraText.GetType().Name}_{extraText}" : "", source)
+        {
         }
 
         /// <summary> Проверяет равенство двух TooltipActionData по содержимому. </summary>
@@ -41,11 +47,12 @@ namespace FlavorfulStory.TooltipSystem.ActionTooltips
         /// <param name="other"> Объект для сравнения. </param>
         /// <returns> <c>true</c>, если объекты эквивалентны; иначе — <c>false</c>. </returns>
         public bool Equals(ActionTooltipData other) =>
-            KeyText == other.KeyText && Action == other.Action && Target == other.Target && Source == other.Source;
+            KeyText == other.KeyText && Action == other.Action && ExtraText == other.ExtraText &&
+            Source == other.Source;
 
         /// <summary> Генерирует хэш-код на основе полей. </summary>
         /// <returns> Хэш-код объекта. </returns>
         /// <remarks> Необходимо для сравнения и проверки на равенство. </remarks>
-        public override int GetHashCode() => HashCode.Combine(KeyText, Action, Target, Source);
+        public override int GetHashCode() => HashCode.Combine(KeyText, Action, ExtraText, Source);
     }
 }
