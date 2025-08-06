@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using FlavorfulStory.LocalizationSystem;
+using UnityEngine;
 
 namespace FlavorfulStory.AI
 {
@@ -9,6 +10,9 @@ namespace FlavorfulStory.AI
         /// <summary> Имя NPC (используется в игровых системах и интерфейсе). </summary>
         [field: Tooltip("Имя NPC."), SerializeField]
         public NpcName NpcName { get; private set; }
+
+        /// <summary> Локализованное имя NPC. </summary>
+        public string LocalizedNpcName => LocalizationService.GetLocalizedString(NpcName);
 
         /// <summary> Доступен ли NPC для романтических отношений. </summary>
         [field: Tooltip("Доступен ли NPC для романтических отношений."), SerializeField]

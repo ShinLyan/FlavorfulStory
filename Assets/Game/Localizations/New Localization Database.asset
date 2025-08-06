@@ -13,6 +13,12 @@ MonoBehaviour:
   m_Name: New Localization Database
   m_EditorClassIdentifier: 
   _entries:
+  - Key: Dirk_IntroTown_Welcome
+    Translations:
+    - LanguageCode: DE
+      Text: '#VALUE!'
+    - LanguageCode: ES
+      Text: '#VALUE!'
   - Key: Enum_WeatherType_Clear
     Translations:
     - LanguageCode: RU
@@ -353,6 +359,36 @@ MonoBehaviour:
       Text: Einschlafen
     - LanguageCode: ES
       Text: Dormirse
+  - Key: Enum_NpcName_Dirk
+    Translations:
+    - LanguageCode: RU
+      Text: "\u0414\u0438\u0440\u043A"
+    - LanguageCode: EN
+      Text: Dirk
+    - LanguageCode: DE
+      Text: Dolch
+    - LanguageCode: ES
+      Text: "Pu\xF1al"
+  - Key: Enum_NpcName_Feliana
+    Translations:
+    - LanguageCode: RU
+      Text: "\u0424\u0435\u043B\u0438\u0430\u043D\u0430"
+    - LanguageCode: EN
+      Text: Feliana
+    - LanguageCode: DE
+      Text: Feliana
+    - LanguageCode: ES
+      Text: Feliana
+  - Key: Enum_NpcName_Bett
+    Translations:
+    - LanguageCode: RU
+      Text: "\u0411\u044D\u0442"
+    - LanguageCode: EN
+      Text: Bett
+    - LanguageCode: DE
+      Text: Bett
+    - LanguageCode: ES
+      Text: Bett
   - Key: Item_Bread_Edible_Name
     Translations:
     - LanguageCode: RU
@@ -1166,13 +1202,3 @@ MonoBehaviour:
       Text: Credits
     - LanguageCode: ES
       Text: "Cr\xE9ditos"
-  - Key: Enum_ActionType_FallAsleep
-    Translations:
-    - LanguageCode: RU
-      Text: "\u0417\u0430\u0441\u043D\u0443\u0442\u044C"
-    - LanguageCode: EN
-      Text: Fall asleep
-    - LanguageCode: DE
-      Text: Einschlafen
-    - LanguageCode: ES
-      Text: Dormirse

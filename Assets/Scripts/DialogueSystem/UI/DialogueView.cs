@@ -171,7 +171,7 @@ namespace FlavorfulStory.DialogueSystem.UI
             _currentSpeakerInfo = npc;
             _dialogueModelPresenter.InstantiateModel(npc.DialogueModelPrefab);
 
-            _speakerName.text = npc.NpcName.ToString();
+            _speakerName.text = npc.LocalizedNpcName;
             _romanceableIcon.gameObject.SetActive(npc.IsRomanceable);
         }
 

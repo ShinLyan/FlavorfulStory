@@ -127,7 +127,7 @@ namespace FlavorfulStory.QuestSystem
         {
             _questNameText.text = LocalizationService.GetLocalizedString(quest.QuestName);
             _npcIcon.sprite = quest.QuestGiver.Icon;
-            _npcNameText.text = quest.QuestGiver.NpcName.ToString();
+            _npcNameText.text = quest.QuestGiver.LocalizedNpcName;
             _descriptionText.text = LocalizationService.GetLocalizedString(quest.QuestDescription);
         }
 

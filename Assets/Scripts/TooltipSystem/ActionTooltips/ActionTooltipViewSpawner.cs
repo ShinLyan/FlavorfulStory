@@ -31,7 +31,10 @@ namespace FlavorfulStory.TooltipSystem.ActionTooltips
             );
 
             gameObject.SetActive(false);
+            LocalizationService.OnLanguageChanged += UpdateView;
         }
+
+        private void OnDestroy() => LocalizationService.OnLanguageChanged -= UpdateView;
 
         /// <summary> Добавляет действие во всплывающую подсказку. </summary>
         /// <param name="action"> Данные действия (клавиша + описание). </param>

@@ -20,10 +20,25 @@ namespace FlavorfulStory.TimeManagement
         [SerializeField] private bool _is24HourFormat = true;
 
         /// <summary> Подписка на событие изменения времени при активации объекта. </summary>
-        private void OnEnable() => WorldTime.OnTimeTick += SetDateTimeText;
+        private void OnEnable()
+        {
+            WorldTime.OnTimeTick += SetDateTimeText;
+            LocalizationService.OnLanguageChanged += LocalizeView;
+        }
 
         /// <summary> Отписка от события изменения времени при деактивации объекта. </summary>
-        private void OnDisable() => WorldTime.OnTimeTick -= SetDateTimeText;
+        private void OnDisable()
+        {
+            WorldTime.OnTimeTick -= SetDateTimeText;
+            LocalizationService.OnLanguageChanged -= LocalizeView;
+        }
+
+        private void LocalizeView()
+        {
+            _seasonText.text = LocalizationService.GetLocalizedString(WorldTime.CurrentGameTime.Season);
+            _dayText.text =
+                $"{LocalizationService.GetLocalizedString(WorldTime.CurrentGameTime.DayOfWeek)} {(int)WorldTime.CurrentGameTime.SeasonDay}";
+        }
 
         /// <summary> Обновление UI в соответствии с текущим временем. </summary>
         /// <param name="dateTime"> Текущие данные о времени. </param>

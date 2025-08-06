@@ -51,7 +51,7 @@ namespace FlavorfulStory.DialogueSystem
         #region IInteractable
 
         /// <summary> Описание действия с объектом. </summary>
-        public ActionTooltipData ActionTooltip => new("E", ActionType.Talk, NpcInfo.NpcName);
+        public ActionTooltipData ActionTooltip => new("E", ActionType.Talk, NpcInfo.LocalizedNpcName);
 
         /// <summary> Флаг, разрешено ли взаимодействие с NPC. </summary>
         public bool IsInteractionAllowed { get; private set; }
