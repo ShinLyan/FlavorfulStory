@@ -15,24 +15,27 @@ namespace FlavorfulStory.InventorySystem.UI
     {
         /// <summary> View для отображения второго инвентаря (например, сундука). </summary>
         [SerializeField] private InventoryView _otherInventoryView;
+
         /// <summary> View для отображения инвентаря игрока. </summary>
         [SerializeField] private InventoryView _playerInventoryView;
+
         /// <summary> Кнопка "Add to Existing" — переносит стакающиеся предметы. </summary>
         [SerializeField] private Button _addToExistingButton;
 
         /// <summary> Второй инвентарь (например, сундук). </summary>
         private Inventory _otherInventory;
+
         /// <summary> Инвентарь игрока. </summary>
         private Inventory _playerInventory;
-        
+
         /// <summary> Колбэк, вызываемый при закрытии окна. </summary>
         private Action _onClose;
 
         /// <summary> Фабрика для создания слотов в инвентаре. </summary>
         [Inject] private IGameFactory<InventorySlotView> _slotFactory;
 
-        [Inject] private InventoryTransferService _transferService;        
-        
+        [Inject] private InventoryTransferService _transferService;
+
         /// <summary> Закрывает окно по нажатию кнопки выхода из меню (например, Escape). </summary>
         private void Update()
         {
@@ -41,7 +44,7 @@ namespace FlavorfulStory.InventorySystem.UI
             Hide();
             BlockGameMenuForOneFrame().Forget();
         }
-        
+
         /// <summary> Открыть окно обмена между двумя инвентарями. </summary>
         /// <param name="playerInventory"> Инвентарь игрока. </param>
         /// <param name="otherInventory"> Инвентарь объекта (сундук и тд.). </param>
@@ -50,14 +53,14 @@ namespace FlavorfulStory.InventorySystem.UI
         {
             gameObject.SetActive(true);
             _onClose = onClose;
-            
+
             _otherInventory = otherInventory;
             _otherInventoryView.Initialize(otherInventory, _slotFactory);
             _playerInventory = playerInventory;
             _playerInventoryView.Initialize(playerInventory, _slotFactory);
-            
+
             _addToExistingButton.onClick.AddListener(OnAddToExistingClicked);
-            
+
             WorldTime.Pause();
             InputWrapper.BlockAllInput();
             InputWrapper.UnblockInput(InputButton.SwitchGameMenu);
@@ -78,16 +81,14 @@ namespace FlavorfulStory.InventorySystem.UI
         private void OnAddToExistingClicked()
         {
             var stackables = _transferService.GetStackablesToTransfer(_playerInventory, _otherInventory);
-            foreach (var (slotIndex, stack) in stackables)
+            foreach ((int slotIndex, var stack) in stackables)
             {
-                _playerInventoryView.AnimateRemoveAt(slotIndex, () =>
-                {
-                    _playerInventory.RemoveFromSlot(slotIndex, stack.Number);
-                });
+                _playerInventoryView.AnimateRemoveAt(slotIndex,
+                    () => { _playerInventory.RemoveFromSlot(slotIndex, stack.Number); });
                 _otherInventoryView.AnimateAdd(stack.Item);
             }
         }
-        
+
         /// <summary> Блокирует кнопку выхода из окна на один кадр (предотвращает повторное закрытие). </summary>
         private static async UniTaskVoid BlockGameMenuForOneFrame()
         {

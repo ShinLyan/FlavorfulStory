@@ -12,18 +12,16 @@ namespace FlavorfulStory.InventorySystem
         public List<(int SlotIndex, ItemStack Stack)> GetStackablesToTransfer(Inventory from, Inventory to)
         {
             var result = new List<(int, ItemStack)>();
-
             for (int i = 0; i < from.InventorySize; i++)
             {
-                var item = from.GetItemInSlot(i);
-                var count = from.GetNumberInSlot(i);
+                var itemStack = from.GetItemStackInSlot(i);
+                var item = itemStack.Item;
+                int number = itemStack.Number;
 
-                if (item == null || count <= 0 || !item.IsStackable) continue;
-                if (to.HasItem(item) && to.HasSpaceFor(item))
-                {
-                    if (to.TryAddToFirstAvailableSlot(item, count))
-                        result.Add((i, new ItemStack { Item = item, Number = count }));
-                }
+                if (!item || !item.IsStackable || itemStack.Number <= 0 || !to.HasItem(item) || !to.HasSpaceFor(item))
+                    continue;
+
+                if (to.TryAddToFirstAvailableSlot(item, number)) result.Add((i, itemStack));
             }
 
             return result;

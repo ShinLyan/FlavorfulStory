@@ -31,19 +31,17 @@ namespace FlavorfulStory.InventorySystem.UI
         /// <summary> Переинициализирует отображение для указанного инвентаря. </summary>
         public void Initialize(Inventory inventory, IGameFactory<InventorySlotView> slotFactory)
         {
-            if (_playerInventory != null)
-                _playerInventory.InventoryUpdated -= UpdateView;
+            if (_playerInventory) _playerInventory.InventoryUpdated -= UpdateView;
 
             _playerInventory = inventory;
             _slotFactory = slotFactory;
 
-            foreach (var slot in _slots)
-                slot.Construct(_playerInventory);
+            foreach (var slot in _slots) slot.Construct(_playerInventory);
 
             _playerInventory.InventoryUpdated += UpdateView;
             UpdateView();
         }
-        
+
         /// <summary> Сохранить существующие отображения ячеек, если они уже присутствуют в иерархии. </summary>
         private void CacheInitialSlots()
         {
@@ -108,7 +106,7 @@ namespace FlavorfulStory.InventorySystem.UI
             _playerInventory.InventoryUpdated -= UpdateView;
             CleanupSlots();
         }
-        
+
         /// <summary> Удалить все отображения ячеек и освободить ресурсы. </summary>
         private void CleanupSlots()
         {
@@ -120,7 +118,7 @@ namespace FlavorfulStory.InventorySystem.UI
 
             _slots.Clear();
         }
-        
+
         /// <summary> Найти вьюху слота по предмету. </summary>
         /// <param name="item"> Предмет, который нужно найти. </param>
         /// <param name="slotView"> Найденное отображение слота. </param>
@@ -130,14 +128,13 @@ namespace FlavorfulStory.InventorySystem.UI
             foreach (Transform child in transform)
             {
                 slotView = child.GetComponent<InventorySlotView>();
-                if (slotView != null && slotView.GetItem() == item)
-                    return true;
+                if (slotView != null && slotView.GetItem() == item) return true;
             }
 
             slotView = null;
             return false;
-        }        
-        
+        }
+
         /// <summary> Анимировать добавление предмета в инвентарь (визуальное подчёркивание появления). </summary>
         /// <param name="item"> Предмет, который был добавлен. </param>
         public void AnimateAdd(InventoryItem item)
@@ -151,16 +148,16 @@ namespace FlavorfulStory.InventorySystem.UI
             rect.anchoredPosition = Vector2.zero;
 
             rect.DOShakeAnchorPos(
-                duration: 0.5f,
-                strength: Vector2.one,
-                vibrato: 20,
-                randomness: 0f,
-                snapping: false,
-                fadeOut: false,
-                randomnessMode: ShakeRandomnessMode.Full
+                0.5f,
+                Vector2.one,
+                20,
+                0f,
+                false,
+                false,
+                ShakeRandomnessMode.Full
             );
         }
-        
+
         /// <summary> Анимировать удаление предмета из слота (визуальное затухание и сдвиг вверх). </summary>
         /// <param name="slotIndex"> Индекс слота, из которого удаляется предмет. </param>
         /// <param name="onComplete"> Действие, вызываемое после завершения анимации. </param>
@@ -173,7 +170,7 @@ namespace FlavorfulStory.InventorySystem.UI
             if (itemStackView == null) return;
 
             var rect = itemStackView.GetComponent<RectTransform>();
-            var canvasGroup = itemStackView.GetComponent<CanvasGroup>() 
+            var canvasGroup = itemStackView.GetComponent<CanvasGroup>()
                               ?? itemStackView.gameObject.AddComponent<CanvasGroup>();
 
             rect.DOKill();
@@ -184,12 +181,12 @@ namespace FlavorfulStory.InventorySystem.UI
 
             rect.DOAnchorPosY(rect.anchoredPosition.y + 20f, 0.5f).SetEase(Ease.InOutQuad);
             canvasGroup.DOFade(0f, 0.5f).SetEase(Ease.InOutQuad).OnComplete(() =>
-                {
-                    canvasGroup.alpha = 1f;
-                    rect.anchoredPosition = Vector2.zero;
+            {
+                canvasGroup.alpha = 1f;
+                rect.anchoredPosition = Vector2.zero;
 
-                    onComplete?.Invoke();
-                });
+                onComplete?.Invoke();
+            });
         }
     }
 }

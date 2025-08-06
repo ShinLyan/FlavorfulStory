@@ -8,13 +8,13 @@ using Zenject;
 
 namespace FlavorfulStory.InventorySystem
 {
-    
     /// <summary> Инвентарь игрока с настраиваемым количеством слотов. </summary>
     public class Inventory : MonoBehaviour, IPredicateEvaluator, ISaveable
     {
         /// <summary> Тип инвентаря. </summary>
-        [field: Tooltip("Тип инвентаря."), SerializeField] public InventoryType Type { get; set; }
-        
+        [field: Tooltip("Тип инвентаря."), SerializeField]
+        public InventoryType Type { get; private set; }
+
         /// <summary> Количество слотов в инвентаре. </summary>
         [field: Tooltip("Количество слотов в инвентаре."), SerializeField]
         public int InventorySize { get; private set; }
@@ -26,8 +26,8 @@ namespace FlavorfulStory.InventorySystem
         private PickupNotificationManager _notificationManager;
 
         /// <summary> Провайдер инвентарей. </summary>
-        private IInventoryProvider _inventoryProvider;        
-        
+        private IInventoryProvider _inventoryProvider;
+
         /// <summary> Событие, вызываемое при изменении инвентаря (добавление, удаление предметов). </summary>
         public event Action InventoryUpdated;
 
@@ -54,8 +54,8 @@ namespace FlavorfulStory.InventorySystem
         /// <summary> При старте вызываем событие обновление инвентаря. </summary>
         /// <remarks> После восстановления состояния нужно разослать событие. </remarks>
         private void Start() => InventoryUpdated?.Invoke();
-        
-        /// <summary> Отвязать инвентарь. </summary>
+
+        /// <summary> При уничтожении объекта отвязать инвентарь. </summary>
         private void OnDestroy() => _inventoryProvider?.Unregister(this);
 
         /// <summary> Есть ли место для предмета в инвентаре? </summary>
@@ -260,8 +260,8 @@ namespace FlavorfulStory.InventorySystem
                 _inventorySlots[i].Item = ItemDatabase.GetItemFromID(slotRecords[i].ItemID);
                 _inventorySlots[i].Number = slotRecords[i].Number;
             }
-            
-            InventoryUpdated?.Invoke();
+
+            InventoryUpdated?.Invoke(); // TODO: DELETE
         }
 
         #endregion

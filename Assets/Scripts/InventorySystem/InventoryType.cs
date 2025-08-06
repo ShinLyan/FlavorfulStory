@@ -1,13 +1,15 @@
 ﻿namespace FlavorfulStory.InventorySystem
 {
-    /// <summary> Тип инвентаря — используется для определения назначения и поведения. </summary>
+    /// <summary> Тип инвентаря. </summary>
     public enum InventoryType
     {
         /// <summary> Инвентарь игрока. </summary>
         Player,
-        /// <summary> Сундук — интерактивный инвентарь с обменом. </summary>
+
+        /// <summary> Сундук. </summary>
         Chest,
-        /// <summary> Полка магазина — только отображение, без взаимодействия. </summary>
-        ShopShelf,
+
+        /// <summary> Прилавок магазина. </summary>
+        Showcase
     }
 }

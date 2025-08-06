@@ -81,7 +81,7 @@ namespace FlavorfulStory.Installers
         /// <summary> Установить зависимости, связанные с инвентарем. </summary>
         private void BindInventory()
         {
-            Container.Bind<Inventory>().FromInstance(_playerInventory).AsSingle();
+            Container.Bind<Inventory>().FromInstance(_playerInventory).AsSingle(); // TODO: УДАЛИТЬ
             Container.Bind<PickupNotificationManager>().FromComponentInHierarchy().AsSingle();
             Container.Bind<PickupFactory>().AsSingle();
             Container.Bind<PickupSpawner>().FromComponentsInHierarchy().AsCached();
@@ -121,7 +121,7 @@ namespace FlavorfulStory.Installers
             Container.Bind<SummaryView>().FromComponentInHierarchy().AsSingle();
             Container.Bind<RepairableBuildingView>().FromComponentInHierarchy().AsSingle();
             Container.Bind<InventoryExchangeWindow>().FromComponentInHierarchy().AsSingle();
-            
+
             Container.Bind<IGameFactory<InventorySlotView>>().To<InventorySlotViewFactory>().AsSingle()
                 .WithArguments(_inventorySlotViewPrefab);
             Container.Bind<IGameFactory<ResourceRequirementView>>().To<ResourceRequirementViewFactory>().AsSingle()

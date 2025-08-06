@@ -1,154 +1,137 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 using DG.Tweening;
 using FlavorfulStory.InventorySystem.PickupSystem;
+using UnityEngine;
 
 namespace FlavorfulStory.InventorySystem
 {
-    /// <summary> Отображает содержимое инвентаря, размещая PickupPrefab в указанных слотах.
-    /// Используется для сундуков, полок и других объектов с фиксированным числом визуальных позиций. </summary>
+    /// <summary> Визуализирует содержимое инвентаря, размещая PickupPrefab в указанных слотах. </summary>
+    /// <remarks> Используется для прилавков магазина с фиксированным числом визуальных позиций. </remarks>
     [RequireComponent(typeof(Inventory))]
     public class InventoryTransformPlacer : MonoBehaviour
     {
-        /// <summary> Точки размещения предметов. </summary>
-        [Tooltip("Точки размещения предметов")]
-        [SerializeField] private List<Transform> _slots = new();
-
-        /// <summary> Сопоставление индекса слота и размещённого объекта. </summary>
-        private readonly Dictionary<int, GameObject> _occupied = new();
+        /// <summary> Слоты для размещения предметов. </summary>
+        [Tooltip("Слоты для размещения предметов."), SerializeField]
+        private List<Transform> _placementSlots;
 
         /// <summary> Инвентарь, содержимое которого визуализируется. </summary>
         private Inventory _inventory;
-        
-        /// <summary> Активные tween-последовательности анимации слотов. </summary>
-        private readonly List<Sequence> _slotTweens = new();
 
-        /// <summary> Подписывается на обновление инвентаря. </summary>
+        /// <summary> Сопоставление индекса слота и размещённого объекта. </summary>
+        private readonly Dictionary<int, GameObject> _itemsInSlots = new();
+
+        /// <summary> Активные анимации слотов. </summary>
+        private readonly List<Tween> _slotAnimations = new();
+
+        /// <summary> Подписка на обновление инвентаря и валидация количества слотов. </summary>
         private void Awake()
         {
             _inventory = GetComponent<Inventory>();
-            _inventory.InventoryUpdated += RefreshVisuals;
+            _inventory.InventoryUpdated += UpdateView;
+
+            if (_inventory.InventorySize != _placementSlots.Count)
+                Debug.LogError("Несоответствие размера инвентаря и количества точек для размещения предметов.");
         }
 
-        /// <summary> При старте обновляет визуальное представление. </summary>
+        /// <summary> Запускает анимации и визуализирует содержимое инвентаря. </summary>
         private void Start()
         {
             AnimateSlots();
-            RefreshVisuals();
+            UpdateView();
         }
-            
 
-        /// <summary> Отписывается от событий при уничтожении объекта. </summary>
+        /// <summary> Очистка ссылок и анимаций при уничтожении объекта. </summary>
         private void OnDestroy()
         {
-            if (_inventory != null)
-                _inventory.InventoryUpdated -= RefreshVisuals;
-            
-            foreach (var tween in _slotTweens)
-                tween.Kill();
-            
-            _slotTweens.Clear();
+            if (_inventory) _inventory.InventoryUpdated -= UpdateView;
+
+            foreach (var tween in _slotAnimations) tween.Kill();
+
+            _slotAnimations.Clear();
         }
 
         /// <summary> Обновляет визуальное представление на основе текущего инвентаря. </summary>
-        private void RefreshVisuals()
+        private void UpdateView()
         {
-            ClearAll();
-            int placedCount = 0;
+            ClearSlots();
 
-            for (int i = 0; i < _inventory.InventorySize && placedCount < _slots.Count; i++)
+            for (int i = 0; i < _inventory.InventorySize; i++)
             {
-                var stack = _inventory.GetItemStackInSlot(i);
-                if (stack.Item == null || stack.Number <= 0 || stack.Item.PickupPrefab == null)
-                    continue;
+                var itemStack = _inventory.GetItemStackInSlot(i);
+                if (!itemStack.Item) continue;
 
-                var instance = Instantiate(stack.Item.PickupPrefab.gameObject);
-                PrepareInstance(instance);
-                SetSlot(placedCount, instance);
-                placedCount++;
+                var instance = Instantiate(itemStack.Item.PickupPrefab.gameObject);
+                PrepareObject(instance);
+                PlaceInSlot(i, instance);
             }
         }
 
         /// <summary> Запускает анимации вращения и подпрыгивания для всех слотов. </summary>
         private void AnimateSlots()
         {
-            float wiggleAmount = 0.05f;
-            float wiggleDuration = 1.5f;
-            float rotationDuration = 5f;
+            const float RotationDuration = 5f;
+            const float WiggleAmount = 0.05f;
+            const float WiggleDuration = 1.5f;
 
-            foreach (var slot in _slots)
+            foreach (var slot in _placementSlots)
             {
-                if (slot == null) continue;
+                var rotationTween = slot
+                    .DOLocalRotate(new Vector3(0f, 360f, 0f), RotationDuration, RotateMode.FastBeyond360)
+                    .SetEase(Ease.Linear).SetLoops(-1, LoopType.Restart);
 
-                var sequence = DOTween.Sequence();
-                
-                sequence.Join(slot.DOLocalRotate(
-                        new Vector3(0, 360, 0),
-                        rotationDuration,
-                        RotateMode.FastBeyond360)
-                    .SetEase(Ease.Linear)
-                    .SetLoops(-1, LoopType.Restart)
-                );
-                
-                sequence.Join(slot.DOLocalMoveY(slot.localPosition.y + wiggleAmount, wiggleDuration)
-                    .SetEase(Ease.InOutSine)
-                    .SetLoops(-1, LoopType.Yoyo)
-                );
+                var wiggleTween = slot.DOLocalMoveY(slot.localPosition.y + WiggleAmount, WiggleDuration)
+                    .SetEase(Ease.InOutSine).SetLoops(-1, LoopType.Yoyo);
 
-                _slotTweens.Add(sequence);
+                _slotAnimations.Add(rotationTween);
+                _slotAnimations.Add(wiggleTween);
             }
         }
-        
-        /// <summary> Отключает физику и компоненты подбора на объекте. </summary>
-        private static void PrepareInstance(GameObject go)
-        {
-            if (go.TryGetComponent(out Collider collider)) collider.enabled = false;
 
-            if (go.TryGetComponent(out Rigidbody rigidbody))
+        /// <summary> Подготавливает объект к визуальному размещению: отключает физику и взаимодействие. </summary>
+        /// <param name="obj"> Игровой объект предмета. </param>
+        private static void PrepareObject(GameObject obj)
+        {
+            if (obj.TryGetComponent(out Collider collider)) collider.enabled = false;
+
+            if (obj.TryGetComponent(out Rigidbody rigidbody))
             {
                 rigidbody.isKinematic = true;
                 rigidbody.useGravity = false;
             }
 
-            if (go.TryGetComponent(out Pickup pickup)) pickup.enabled = false;
+            if (obj.TryGetComponent(out Pickup pickup)) pickup.enabled = false;
         }
 
         /// <summary> Устанавливает объект в слот с указанным индексом. </summary>
-        /// <param name="index"> Индекс слота. </param>
-        /// <param name="product"> Товар(объект) который нужно положить в полку маггазина. </param>
-        private void SetSlot(int index, GameObject product)
+        /// <param name="slotIndex"> Индекс слота. </param>
+        /// <param name="obj"> Объект, который нужно разместить. </param>
+        private void PlaceInSlot(int slotIndex, GameObject obj)
         {
-            if (index < 0 || index >= _slots.Count || product == null)
-            {
-                Debug.LogWarning($"[InventoryTransformPlacer] Неверный индекс ({index}) или instance == null");
-                return;
-            }
+            RemoveFromSlot(slotIndex);
 
-            ClearSlot(index);
+            var placementSlot = _placementSlots[slotIndex];
+            obj.transform.SetParent(placementSlot, false);
+            obj.transform.SetPositionAndRotation(placementSlot.position, placementSlot.rotation);
 
-            product.transform.SetParent(_slots[index], worldPositionStays: false);
-            product.transform.SetPositionAndRotation(_slots[index].position, _slots[index].rotation);
-
-            _occupied[index] = product;
+            _itemsInSlots[slotIndex] = obj;
         }
 
         /// <summary> Удаляет объект из указанного слота. </summary>
-        private void ClearSlot(int index)
+        /// <param name="index"> Индекс слота. </param>
+        private void RemoveFromSlot(int index)
         {
-            if (_occupied.TryGetValue(index, out var go) && go)
-                Destroy(go);
+            if (_itemsInSlots.TryGetValue(index, out var obj) && obj) Destroy(obj);
 
-            _occupied.Remove(index);
+            _itemsInSlots.Remove(index);
         }
 
-        /// <summary> Удаляет все размещённые объекты. </summary>
-        private void ClearAll()
+        /// <summary> Удаляет все размещённые объекты из слотов. </summary>
+        private void ClearSlots()
         {
-            foreach (var go in _occupied.Values.Where(x => x)) 
-                Destroy(go);
+            foreach (var go in _itemsInSlots.Values.Where(x => x)) Destroy(go);
 
-            _occupied.Clear();
+            _itemsInSlots.Clear();
         }
     }
 }

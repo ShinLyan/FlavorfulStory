@@ -7,7 +7,7 @@ namespace FlavorfulStory.InventorySystem.UI
     public class InventorySlotView : MonoBehaviour, IDragContainer<InventoryItem>, IItemHolder
     {
         /// <summary> Отображение стака предмета. </summary>
-        [field: SerializeField] public ItemStackView _itemStackView { get; private set; }
+        [SerializeField] private ItemStackView _itemStackView;
 
         /// <summary> Индекс слота в инвентаре. </summary>
         private int _index;
@@ -17,16 +17,12 @@ namespace FlavorfulStory.InventorySystem.UI
 
         /// <summary> Внедрение зависимости — инвентарь игрока. </summary>
         /// <param name="inventory"> Инвентарь игрока. </param>
-        public void Construct(Inventory inventory) => _inventory = inventory;
+        public void Construct(Inventory inventory) => _inventory = inventory; // TODO: поправить как было
 
         /// <summary> Установить индекс слота. </summary>
         /// <param name="index"> Индекс в инвентаре. </param>
         public void Setup(int index)
         {
-            if (_inventory == null)
-                throw new System.Exception("[InventorySlotView] Inventory not assigned! " +
-                                           "Call Construct() before Setup()");
-            
             _index = index;
             _itemStackView.UpdateView(_inventory.GetItemStackInSlot(_index));
         }
