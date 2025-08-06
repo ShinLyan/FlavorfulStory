@@ -55,6 +55,19 @@ namespace FlavorfulStory.QuestSystem
         /// очищает представление и деактивирует объект до первого обновления UI. </summary>
         private void Awake()
         {
+            InitializePools();
+
+            RegisterExistingViews(_objectivesContainer, _objectivePool);
+            RegisterExistingViews(_rewardsContainer, _rewardPool);
+
+            ClearView();
+
+            gameObject.SetActive(false);
+        }
+
+        /// <summary> Инициализация пулов. </summary>
+        private void InitializePools()
+        {
             _objectivePool = new ObjectPool<QuestObjectiveView>(
                 () => Instantiate(_questObjectivePrefab, _objectivesContainer),
                 view =>
@@ -74,13 +87,6 @@ namespace FlavorfulStory.QuestSystem
                 },
                 view => view.gameObject.SetActive(false)
             );
-
-            RegisterExistingViews(_objectivesContainer, _objectivePool);
-            RegisterExistingViews(_rewardsContainer, _rewardPool);
-
-            ClearView();
-
-            gameObject.SetActive(false);
         }
 
         /// <summary> Регистрирует уже существующие дочерние элементы в переданном контейнере

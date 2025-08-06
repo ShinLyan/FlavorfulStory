@@ -85,7 +85,7 @@ namespace FlavorfulStory.Infrastructure.Installers
         /// <summary> Установить зависимости, связанные с инвентарем. </summary>
         private void BindInventory()
         {
-            Container.Bind<Inventory>().FromInstance(_playerInventory).AsSingle(); // TODO: УДАЛИТЬ
+            Container.Bind<Inventory>().FromInstance(_playerInventory).AsSingle();
             Container.Bind<PickupFactory>().AsSingle();
             Container.Bind<PickupSpawner>().FromComponentsInHierarchy().AsCached();
             Container.Bind<IItemDropService>().To<ItemDropService>().AsSingle();
