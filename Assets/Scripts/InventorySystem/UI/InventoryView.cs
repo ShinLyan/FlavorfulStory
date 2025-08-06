@@ -3,14 +3,15 @@ using System.Collections.Generic;
 using DG.Tweening;
 using FlavorfulStory.Infrastructure.Factories;
 using UnityEngine;
+using Zenject;
 
 namespace FlavorfulStory.InventorySystem.UI
 {
     /// <summary> Управление отображением инвентаря в пользовательском интерфейсе. </summary>
     public class InventoryView : MonoBehaviour
     {
-        /// <summary> Инвентарь игрока. </summary>
-        private Inventory _playerInventory;
+        /// <summary> Инвентарь. </summary>
+        private Inventory _inventory;
 
         /// <summary> Фабрика для создания отображений ячеек инвентаря. </summary>
         private IGameFactory<InventorySlotView> _slotFactory;
@@ -21,25 +22,22 @@ namespace FlavorfulStory.InventorySystem.UI
         /// <summary> Контейнер для размещения отображений ячеек. </summary>
         private Transform _slotsContainer;
 
+        /// <summary> Внедрить зависимости: инвентарь и фабрику отображений ячеек. </summary>
+        /// <param name="inventory"> Инвентарь игрока. </param>
+        /// <param name="slotFactory"> Фабрика отображений ячеек. </param>
+        [Inject]
+        private void Construct(Inventory inventory, IGameFactory<InventorySlotView> slotFactory)
+        {
+            _inventory = inventory;
+            _slotFactory = slotFactory;
+        }
+
         /// <summary> Инициализировать отображения и подписаться на обновление инвентаря. </summary>
         private void Awake()
         {
             _slotsContainer = transform;
             CacheInitialSlots();
-        }
-
-        /// <summary> Переинициализирует отображение для указанного инвентаря. </summary>
-        public void Initialize(Inventory inventory, IGameFactory<InventorySlotView> slotFactory)
-        {
-            if (_playerInventory) _playerInventory.InventoryUpdated -= UpdateView;
-
-            _playerInventory = inventory;
-            _slotFactory = slotFactory;
-
-            foreach (var slot in _slots) slot.Construct(_playerInventory);
-
-            _playerInventory.InventoryUpdated += UpdateView;
-            UpdateView();
+            Initialize(_inventory);
         }
 
         /// <summary> Сохранить существующие отображения ячеек, если они уже присутствуют в иерархии. </summary>
@@ -50,25 +48,39 @@ namespace FlavorfulStory.InventorySystem.UI
                 var slot = child.GetComponent<InventorySlotView>();
                 if (!slot || _slots.Contains(slot)) continue;
 
-                slot.Construct(_playerInventory);
                 slot.gameObject.SetActive(false);
                 _slots.Add(slot);
             }
         }
 
-        /// <summary> Выполнить первичное обновление отображения инвентаря. </summary>
-        private void Start() => UpdateView();
+        /// <summary> Переинициализирует отображение для указанного инвентаря. </summary>
+        public void Initialize(Inventory inventory)
+        {
+            if (_inventory) _inventory.InventoryUpdated -= UpdateView;
+
+            _inventory = inventory;
+
+            _inventory.InventoryUpdated += UpdateView;
+            UpdateView();
+        }
+
+        /// <summary> Отписаться от событий и очистить отображения при уничтожении объекта. </summary>
+        private void OnDestroy()
+        {
+            _inventory.InventoryUpdated -= UpdateView;
+            ClearView();
+        }
 
         /// <summary> Обновить отображения ячеек в соответствии с данными инвентаря. </summary>
         private void UpdateView()
         {
-            for (int i = 0; i < _playerInventory.InventorySize; i++)
+            for (int i = 0; i < _inventory.InventorySize; i++)
             {
                 var slot = EnsureSlot(i);
                 UpdateSlotView(slot, i);
             }
 
-            DisableExcessSlots(_playerInventory.InventorySize);
+            DisableExcessSlots(_inventory.InventorySize);
         }
 
         /// <summary> Получить или создать отображение ячейки по индексу. </summary>
@@ -79,7 +91,6 @@ namespace FlavorfulStory.InventorySystem.UI
             if (index < _slots.Count) return _slots[index];
 
             var slot = _slotFactory.Create(_slotsContainer);
-            slot.Construct(_playerInventory);
             _slots.Add(slot);
             return slot;
         }
@@ -87,10 +98,10 @@ namespace FlavorfulStory.InventorySystem.UI
         /// <summary> Обновить отображение ячейки по индексу. </summary>
         /// <param name="slot"> Отображение ячейки. </param>
         /// <param name="index"> Индекс слота. </param>
-        private static void UpdateSlotView(InventorySlotView slot, int index)
+        private void UpdateSlotView(InventorySlotView slot, int index)
         {
             slot.gameObject.SetActive(true);
-            slot.Setup(index);
+            slot.Setup(index, _inventory);
         }
 
         /// <summary> Отключить отображения ячеек, превышающие активный размер инвентаря. </summary>
@@ -100,15 +111,8 @@ namespace FlavorfulStory.InventorySystem.UI
             for (int i = activeCount; i < _slots.Count; i++) _slots[i].gameObject.SetActive(false);
         }
 
-        /// <summary> Отписаться от событий и очистить отображения при уничтожении объекта. </summary>
-        private void OnDestroy()
-        {
-            _playerInventory.InventoryUpdated -= UpdateView;
-            CleanupSlots();
-        }
-
-        /// <summary> Удалить все отображения ячеек и освободить ресурсы. </summary>
-        private void CleanupSlots()
+        /// <summary> Очистить представление. </summary>
+        private void ClearView()
         {
             foreach (var slot in _slots)
             {
@@ -117,22 +121,6 @@ namespace FlavorfulStory.InventorySystem.UI
             }
 
             _slots.Clear();
-        }
-
-        /// <summary> Найти вьюху слота по предмету. </summary>
-        /// <param name="item"> Предмет, который нужно найти. </param>
-        /// <param name="slotView"> Найденное отображение слота. </param>
-        /// <returns> Найден ли слот. </returns>
-        private bool TryFindSlotView(InventoryItem item, out InventorySlotView slotView)
-        {
-            foreach (Transform child in transform)
-            {
-                slotView = child.GetComponent<InventorySlotView>();
-                if (slotView != null && slotView.GetItem() == item) return true;
-            }
-
-            slotView = null;
-            return false;
         }
 
         /// <summary> Анимировать добавление предмета в инвентарь (визуальное подчёркивание появления). </summary>
@@ -146,16 +134,23 @@ namespace FlavorfulStory.InventorySystem.UI
 
             rect.DOKill();
             rect.anchoredPosition = Vector2.zero;
+            rect.DOShakeAnchorPos(0.5f, Vector2.one, 20, 0f, false, false);
+        }
 
-            rect.DOShakeAnchorPos(
-                0.5f,
-                Vector2.one,
-                20,
-                0f,
-                false,
-                false,
-                ShakeRandomnessMode.Full
-            );
+        /// <summary> Найти вьюху слота по предмету. </summary>
+        /// <param name="item"> Предмет, который нужно найти. </param>
+        /// <param name="slotView"> Найденное отображение слота. </param>
+        /// <returns> Найден ли слот. </returns>
+        private bool TryFindSlotView(InventoryItem item, out InventorySlotView slotView)
+        {
+            foreach (Transform child in transform)
+            {
+                slotView = child.GetComponent<InventorySlotView>();
+                if (slotView && slotView.GetItem() == item) return true;
+            }
+
+            slotView = null;
+            return false;
         }
 
         /// <summary> Анимировать удаление предмета из слота (визуальное затухание и сдвиг вверх). </summary>
@@ -163,11 +158,9 @@ namespace FlavorfulStory.InventorySystem.UI
         /// <param name="onComplete"> Действие, вызываемое после завершения анимации. </param>
         public void AnimateRemoveAt(int slotIndex, Action onComplete)
         {
-            if (slotIndex < 0 || slotIndex >= _slots.Count) return;
-
             var slotView = _slots[slotIndex];
             var itemStackView = slotView.GetComponentInChildren<ItemStackView>();
-            if (itemStackView == null) return;
+            if (!itemStackView) return;
 
             var rect = itemStackView.GetComponent<RectTransform>();
             var canvasGroup = itemStackView.GetComponent<CanvasGroup>()
@@ -184,7 +177,6 @@ namespace FlavorfulStory.InventorySystem.UI
             {
                 canvasGroup.alpha = 1f;
                 rect.anchoredPosition = Vector2.zero;
-
                 onComplete?.Invoke();
             });
         }

@@ -1,12 +1,10 @@
 ﻿using System;
 using Cysharp.Threading.Tasks;
-using FlavorfulStory.Infrastructure.Factories;
 using FlavorfulStory.InputSystem;
 using FlavorfulStory.TimeManagement;
 using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
-using InputWrapper = FlavorfulStory.InputSystem.InputWrapper;
 
 namespace FlavorfulStory.InventorySystem.UI
 {
@@ -31,10 +29,19 @@ namespace FlavorfulStory.InventorySystem.UI
         /// <summary> Колбэк, вызываемый при закрытии окна. </summary>
         private Action _onClose;
 
-        /// <summary> Фабрика для создания слотов в инвентаре. </summary>
-        [Inject] private IGameFactory<InventorySlotView> _slotFactory;
+        /// <summary> Сервис для передачи предметов между инвентарями. </summary>
+        private InventoryTransferService _transferService;
 
-        [Inject] private InventoryTransferService _transferService;
+        /// <summary> Внедрение зависимостей Zenject. </summary>
+        /// <param name="transferService"> Сервис передачи предметов между инвентарями. </param>
+        [Inject]
+        private void Construct(InventoryTransferService transferService) => _transferService = transferService;
+
+        /// <summary> Подписывает обработчик на кнопку переноса предметов. </summary>
+        private void Awake() => _addToExistingButton.onClick.AddListener(OnAddToExistingClicked);
+
+        /// <summary> Удаляет все подписки при уничтожении объекта. </summary>
+        private void OnDestroy() => _addToExistingButton.onClick.RemoveAllListeners();
 
         /// <summary> Закрывает окно по нажатию кнопки выхода из меню (например, Escape). </summary>
         private void Update()
@@ -52,14 +59,14 @@ namespace FlavorfulStory.InventorySystem.UI
         public void Show(Inventory playerInventory, Inventory otherInventory, Action onClose)
         {
             gameObject.SetActive(true);
-            _onClose = onClose;
 
             _otherInventory = otherInventory;
-            _otherInventoryView.Initialize(otherInventory, _slotFactory);
             _playerInventory = playerInventory;
-            _playerInventoryView.Initialize(playerInventory, _slotFactory);
 
-            _addToExistingButton.onClick.AddListener(OnAddToExistingClicked);
+            _otherInventoryView.Initialize(otherInventory);
+            _playerInventoryView.Initialize(playerInventory);
+
+            _onClose = onClose;
 
             WorldTime.Pause();
             InputWrapper.BlockAllInput();
@@ -70,14 +77,19 @@ namespace FlavorfulStory.InventorySystem.UI
         public void Hide()
         {
             gameObject.SetActive(false);
-            WorldTime.Unpause();
-            InputWrapper.UnblockAllInput();
+
+            _otherInventory = null;
+            _playerInventory = null;
 
             _onClose?.Invoke();
             _onClose = null;
-            _addToExistingButton.onClick.RemoveAllListeners();
+
+            WorldTime.Unpause();
+            InputWrapper.UnblockAllInput();
         }
 
+        /// <summary> Обрабатывает нажатие на кнопку "Add to Existing". </summary>
+        /// <remarks> Переносит стакающиеся предметы из инвентаря игрока во второй инвентарь. </remarks>
         private void OnAddToExistingClicked()
         {
             var stackables = _transferService.GetStackablesToTransfer(_playerInventory, _otherInventory);

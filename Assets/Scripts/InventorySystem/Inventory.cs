@@ -176,7 +176,7 @@ namespace FlavorfulStory.InventorySystem
                 remainingNumber -= addAmount;
             }
 
-            _signalBus.Fire(new ItemCollectedSignal(new ItemStack(item, number)));
+            if (Type == InventoryType.Player) _signalBus.Fire(new ItemCollectedSignal(new ItemStack(item, number)));
             InventoryUpdated?.Invoke();
             return true;
         }

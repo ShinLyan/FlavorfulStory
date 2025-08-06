@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace FlavorfulStory.InventorySystem.UI
 {
-    /// <summary> Слот инвентаря в UI. </summary>
+    /// <summary> Представление слота инвентаря. </summary>
     public class InventorySlotView : MonoBehaviour, IDragContainer<InventoryItem>, IItemHolder
     {
         /// <summary> Отображение стака предмета. </summary>
@@ -15,15 +15,13 @@ namespace FlavorfulStory.InventorySystem.UI
         /// <summary> Инвентарь, с которым связан слот. </summary>
         private Inventory _inventory;
 
-        /// <summary> Внедрение зависимости — инвентарь игрока. </summary>
-        /// <param name="inventory"> Инвентарь игрока. </param>
-        public void Construct(Inventory inventory) => _inventory = inventory; // TODO: поправить как было
-
-        /// <summary> Установить индекс слота. </summary>
+        /// <summary> Установить данные слота инвентаря. </summary>
         /// <param name="index"> Индекс в инвентаре. </param>
-        public void Setup(int index)
+        /// <param name="inventory"> Инвентарь игрока. </param>
+        public void Setup(int index, Inventory inventory)
         {
             _index = index;
+            _inventory = inventory;
             _itemStackView.UpdateView(_inventory.GetItemStackInSlot(_index));
         }
 

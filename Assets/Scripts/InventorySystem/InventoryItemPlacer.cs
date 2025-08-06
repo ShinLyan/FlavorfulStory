@@ -9,7 +9,7 @@ namespace FlavorfulStory.InventorySystem
     /// <summary> Визуализирует содержимое инвентаря, размещая PickupPrefab в указанных слотах. </summary>
     /// <remarks> Используется для прилавков магазина с фиксированным числом визуальных позиций. </remarks>
     [RequireComponent(typeof(Inventory))]
-    public class InventoryTransformPlacer : MonoBehaviour
+    public class InventoryItemPlacer : MonoBehaviour
     {
         /// <summary> Слоты для размещения предметов. </summary>
         [Tooltip("Слоты для размещения предметов."), SerializeField]
