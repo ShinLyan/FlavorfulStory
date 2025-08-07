@@ -1,27 +1,38 @@
+using FlavorfulStory.GridSystem;
 using UnityEngine;
+using Zenject;
 
 namespace FlavorfulStory.PlacementSystem
 {
+    /// <summary> Отвечает за отображение предпросмотра размещаемого объекта в мире. </summary>
     public class PlacementPreview : MonoBehaviour
     {
-        [SerializeField] private GameObject _gridIndicator;
+        /// <summary> Материал, используемый для предпросмотра объекта. </summary>
         [SerializeField] private Material _previewMaterialPrefab;
 
+        /// <summary> Текущий отображаемый объект предпросмотра. </summary>
         private PlaceableObject _previewObject;
+
+        /// <summary> Экземпляр материала предпросмотра, назначаемый на рендереры. </summary>
         private Material _previewMaterialInstance;
-        private Renderer _gridIndicatorRenderer;
 
+        /// <summary> Сервис отображения индикатора грида. </summary>
+        private GridSelectionService _gridSelectionService;
+
+        /// <summary> Смещение по Y для предпросмотра объекта (визуальный отступ от земли). </summary>
         private const float PreviewYOffset = 0.05f;
-        private static readonly Color ValidColor = new(1f, 1f, 1f, 0.5f);
-        private static readonly Color InvalidColor = new(1f, 0f, 0f, 0.5f);
 
-        private void Awake()
-        {
-            _previewMaterialInstance = new Material(_previewMaterialPrefab);
-            _gridIndicatorRenderer = _gridIndicator.GetComponentInChildren<Renderer>();
-            _gridIndicator.SetActive(false);
-        }
+        /// <summary> Внедрение зависимостей Zenject. </summary>
+        /// <param name="gridSelectionService"> Сервис отображения индикатора грида. </param>
+        [Inject]
+        private void Construct(GridSelectionService gridSelectionService) =>
+            _gridSelectionService = gridSelectionService;
 
+        /// <summary> Инициализация компонента. </summary>
+        private void Awake() => _previewMaterialInstance = new Material(_previewMaterialPrefab);
+
+        /// <summary> Начать отображение предпросмотра размещения объекта. </summary>
+        /// <param name="placeable"> Объект, который планируется разместить. </param>
         public void StartShowingPlacementPreview(PlaceableObject placeable)
         {
             if (_previewObject) ClearPreviewObject();
@@ -30,23 +41,26 @@ namespace FlavorfulStory.PlacementSystem
             _previewObject.SetCollidersEnabled(false);
 
             ApplyPreviewMaterial(_previewObject.gameObject);
-            ConfigureCellIndicator(_previewObject.Size);
         }
 
+        /// <summary> Начать отображение предпросмотра удаления (без объекта, только индикатор). </summary>
         public void StartShowingRemovePreview()
         {
             if (_previewObject) ClearPreviewObject();
 
             SetPreviewColor(false);
-            ConfigureCellIndicator(Vector2Int.one);
         }
 
+        /// <summary> Остановить отображение предпросмотра и скрыть индикатор. </summary>
         public void StopShowingPreview()
         {
-            _gridIndicator.SetActive(false);
-            ClearPreviewObject();
+            _gridSelectionService.HideGridIndicator();
+            if (_previewObject) ClearPreviewObject();
         }
 
+        /// <summary> Обновить позицию предпросмотра и цвет в зависимости от валидности размещения. </summary>
+        /// <param name="position"> Новая позиция предпросмотра. </param>
+        /// <param name="isValid"> Является ли текущая позиция допустимой. </param>
         public void UpdatePosition(Vector3 position, bool isValid)
         {
             if (_previewObject)
@@ -55,10 +69,12 @@ namespace FlavorfulStory.PlacementSystem
                 SetPreviewColor(isValid);
             }
 
-            _gridIndicator.transform.position = position;
-            SetCursorColor(isValid);
+            var size = _previewObject ? _previewObject.Size : Vector2Int.one;
+            _gridSelectionService.ShowGridIndicator(position, size, isValid);
         }
 
+        /// <summary> Применить материал предпросмотра ко всем рендерерам объекта. </summary>
+        /// <param name="previewObject"> Объект предпросмотра. </param>
         private void ApplyPreviewMaterial(GameObject previewObject)
         {
             foreach (var renderer in previewObject.GetComponentsInChildren<Renderer>())
@@ -69,22 +85,13 @@ namespace FlavorfulStory.PlacementSystem
             }
         }
 
-        private void ConfigureCellIndicator(Vector2Int size)
-        {
-            if (size is { x: <= 0, y: <= 0 }) return;
-
-            _gridIndicator.transform.localScale = new Vector3(size.x, 1f, size.y);
-            _gridIndicatorRenderer.material.mainTextureScale = size;
-
-            _gridIndicator.SetActive(true);
-        }
-
+        /// <summary> Установить цвет предпросмотра в зависимости от валидности размещения. </summary>
+        /// <param name="isValid"> true – зелёный, false – красный. </param>
         private void SetPreviewColor(bool isValid) =>
-            _previewMaterialInstance.color = isValid ? ValidColor : InvalidColor;
+            _previewMaterialInstance.color =
+                isValid ? GridSelectionService.ValidColor : GridSelectionService.InvalidColor;
 
-        private void SetCursorColor(bool isValid) =>
-            _gridIndicatorRenderer.material.color = isValid ? ValidColor : InvalidColor;
-
+        /// <summary> Удалить объект предпросмотра и вернуть коллайдеры. </summary>
         private void ClearPreviewObject()
         {
             _previewObject.SetCollidersEnabled(true);

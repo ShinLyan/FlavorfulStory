@@ -56,6 +56,9 @@ namespace FlavorfulStory.Infrastructure.Installers
         /// <summary> Префаб всплывающей подсказки для предмета. </summary>
         [SerializeField] private ItemTooltipView _itemTooltipPrefab;
 
+        /// <summary> Индикатор клетки на гриде. </summary>
+        [SerializeField] private GameObject _gridIndicator;
+
         /// <summary> Выполняет установку всех зависимостей, необходимых для сцены. </summary>
         public override void InstallBindings()
         {
@@ -186,6 +189,7 @@ namespace FlavorfulStory.Infrastructure.Installers
 
             Container.Bind<Grid>().FromComponentInHierarchy().AsSingle();
             Container.Bind<IGridPositionProvider>().To<GridPositionProvider>().AsSingle();
+            Container.BindInterfacesAndSelfTo<GridSelectionService>().AsSingle().WithArguments(_gridIndicator);
         }
     }
 }
