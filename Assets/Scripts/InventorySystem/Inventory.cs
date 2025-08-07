@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using FlavorfulStory.Core;
-using FlavorfulStory.InventorySystem.PickupSystem;
 using FlavorfulStory.Saving;
 using UnityEngine;
 using Zenject;
@@ -11,6 +10,10 @@ namespace FlavorfulStory.InventorySystem
     /// <summary> Инвентарь игрока с настраиваемым количеством слотов. </summary>
     public class Inventory : MonoBehaviour, IPredicateEvaluator, ISaveable
     {
+        /// <summary> Тип инвентаря. </summary>
+        [field: Tooltip("Тип инвентаря."), SerializeField]
+        public InventoryType Type { get; private set; }
+
         /// <summary> Количество слотов в инвентаре. </summary>
         [field: Tooltip("Количество слотов в инвентаре."), SerializeField]
         public int InventorySize { get; private set; }
@@ -18,27 +21,38 @@ namespace FlavorfulStory.InventorySystem
         /// <summary> Предметы инвентаря. </summary>
         private ItemStack[] _inventorySlots;
 
-        /// <summary> Менеджер уведомлений о подборе предмета. </summary>
-        private PickupNotificationManager _notificationManager;
+        /// <summary> Провайдер инвентарей. </summary>
+        private IInventoryProvider _inventoryProvider;
+
+        /// <summary> Сигнальная шина Zenject для отправки и получения событий. </summary>
+        private SignalBus _signalBus;
 
         /// <summary> Событие, вызываемое при изменении инвентаря (добавление, удаление предметов). </summary>
         public event Action InventoryUpdated;
 
-        /// <summary> Событие при сборе предмета. Передает сам предмет. </summary>
-        public event Action<InventoryItem> ItemCollected;
-
         /// <summary> Внедрение зависимостей Zenject. </summary>
-        /// <param name="notificationManager"> Менеджер уведомлений о подборе предмета. </param>
+        /// <param name="signalBus"> Сигнальная шина Zenject для отправки событий. </param>
+        /// <param name="inventoryProvider"> Провайдер инвентарей. </param>
         [Inject]
-        private void Construct(PickupNotificationManager notificationManager) =>
-            _notificationManager = notificationManager;
+        private void Construct(SignalBus signalBus, IInventoryProvider inventoryProvider)
+        {
+            _signalBus = signalBus;
+            _inventoryProvider = inventoryProvider;
+        }
 
         /// <summary> Инициализация слотов и ссылки на инвентарь игрока. </summary>
-        private void Awake() => _inventorySlots = new ItemStack[InventorySize];
+        private void Awake()
+        {
+            _inventorySlots = new ItemStack[InventorySize];
+            _inventoryProvider?.Register(this);
+        }
 
         /// <summary> При старте вызываем событие обновление инвентаря. </summary>
         /// <remarks> После восстановления состояния нужно разослать событие. </remarks>
         private void Start() => InventoryUpdated?.Invoke();
+
+        /// <summary> При уничтожении объекта отвязать инвентарь. </summary>
+        private void OnDestroy() => _inventoryProvider?.Unregister(this);
 
         /// <summary> Есть ли место для предмета в инвентаре? </summary>
         public bool HasSpaceFor(InventoryItem item) => FindSlot(item) >= 0;
@@ -52,23 +66,21 @@ namespace FlavorfulStory.InventorySystem
         /// <summary> Найти индекс существующего стака предметов этого типа. </summary>
         /// <param name="item"> Предмет, для которого нужно найти стак. </param>
         /// <returns> Возвращает индекс стака предмета. Если стак для предмета не найден, возвращает -1. </returns>
-        private int FindStackIndex(InventoryItem item)
-        {
-            if (!item.IsStackable) return -1;
-            return Array.FindIndex(
-                _inventorySlots,
-                slot => ReferenceEquals(slot.Item, item) && slot.Number < item.StackSize);
-        }
+        private int FindStackIndex(InventoryItem item) => item.IsStackable
+            ? Array.FindIndex(_inventorySlots,
+                itemStack => ReferenceEquals(itemStack.Item, item) && itemStack.Number < item.StackSize)
+            : -1;
 
         /// <summary> Найти индекс свободного слота в инвентаре. </summary>
         /// <returns> Возвращает индекс свободного слота в инвентаре.
         /// Если все слоты заполнены, то возвращает -1. </returns>
-        private int FindEmptySlot() => Array.FindIndex(_inventorySlots, slot => !slot.Item);
+        private int FindEmptySlot() => Array.FindIndex(_inventorySlots, itemStack => !itemStack.Item);
 
         /// <summary> Есть ли экземпляр этого предмета в инвентаре? </summary>
         /// <param name="item"> Предмет. </param>
         /// <returns> Возвращает True - если предмет есть в инвентаре, False - в противном случае. </returns>
-        public bool HasItem(InventoryItem item) => _inventorySlots.Any(slot => ReferenceEquals(slot.Item, item));
+        public bool HasItem(InventoryItem item) =>
+            _inventorySlots.Any(itemStack => ReferenceEquals(itemStack.Item, item));
 
         /// <summary> Получить предмет инвентаря и его количество в заданном слоте. </summary>
         /// <param name="slotIndex"> Индекс слота, из которого нужно получить предмет. </param>
@@ -84,8 +96,11 @@ namespace FlavorfulStory.InventorySystem
         /// <param name="item"> Предмет инвентаря. </param>
         /// <returns> Возвращает общее количество заданного предмета в инвентаре. </returns>
         public int GetItemNumber(InventoryItem item) =>
-            _inventorySlots.Where(slot => slot.Item == item).Sum(slot => slot.Number);
+            _inventorySlots.Where(itemStack => itemStack.Item == item).Sum(itemStack => itemStack.Number);
 
+        /// <summary> Удаляет указанное количество предметов из инвентаря. </summary>
+        /// <param name="item"> Предмет, который нужно удалить. </param>
+        /// <param name="number"> Количество предметов для удаления. </param>
         public void RemoveItem(InventoryItem item, int number)
         {
             if (!HasItem(item))
@@ -161,10 +176,7 @@ namespace FlavorfulStory.InventorySystem
                 remainingNumber -= addAmount;
             }
 
-            // TODO: ПЕРЕДЕЛАТЬ НА EVENT. Inventory не должен знать о _notificationManager
-            _notificationManager.ShowNotification(item.Icon, number, item.ItemName, item.ItemName);
-
-            ItemCollected?.Invoke(item);
+            if (Type == InventoryType.Player) _signalBus.Fire(new ItemCollectedSignal(new ItemStack(item, number)));
             InventoryUpdated?.Invoke();
             return true;
         }
@@ -242,6 +254,8 @@ namespace FlavorfulStory.InventorySystem
                 _inventorySlots[i].Item = ItemDatabase.GetItemFromID(slotRecords[i].ItemID);
                 _inventorySlots[i].Number = slotRecords[i].Number;
             }
+
+            InventoryUpdated?.Invoke(); // TODO: DELETE
         }
 
         #endregion

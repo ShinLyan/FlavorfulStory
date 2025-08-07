@@ -29,14 +29,20 @@ namespace FlavorfulStory.QuestSystem
         /// <summary> Сервис выброса предметов в игровой мир. </summary>
         private IItemDropService _itemDropService;
 
+        /// <summary> Сигнальная шина Zenject для отправки и получения событий. </summary>
+        private SignalBus _signalBus;
+
         /// <summary> Внедряет зависимости через Zenject. </summary>
         /// <param name="questExecutionContext"> Контекст выполнения квестов. </param>
         /// <param name="itemDropService"> Сервис выброса предметов в игровой мир. </param>
+        /// <param name="signalBus"> Сигнальная шина Zenject для отправки и получения событий. </param>
         [Inject]
-        private void Construct(QuestExecutionContext questExecutionContext, IItemDropService itemDropService)
+        private void Construct(QuestExecutionContext questExecutionContext, IItemDropService itemDropService,
+            SignalBus signalBus)
         {
             _context = questExecutionContext;
             _itemDropService = itemDropService;
+            _signalBus = signalBus;
         }
 
         /// <summary> Инициализируем статусы квестов, которые были заданы через Inspector. </summary>
@@ -55,8 +61,7 @@ namespace FlavorfulStory.QuestSystem
             _questStatuses.Add(questStatus);
             OnQuestListUpdated?.Invoke();
 
-            // TODO: Заменить на нормальную логику NotificationManager
-            FindFirstObjectByType<QuestNotificationView>(FindObjectsInactive.Include).Show(quest.QuestName);
+            _signalBus.Fire(new QuestAddedSignal(quest.QuestName));
         }
 
         /// <summary> Проверяет, есть ли уже этот квест в списке. </summary>
