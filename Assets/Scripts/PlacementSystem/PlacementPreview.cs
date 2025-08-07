@@ -27,7 +27,7 @@ namespace FlavorfulStory.PlacementSystem
             if (_previewObject) ClearPreviewObject();
 
             _previewObject = Instantiate(placeable, transform);
-            _previewObject.SetCollidersEnabled(true);
+            _previewObject.SetCollidersEnabled(false);
 
             ApplyPreviewMaterial(_previewObject.gameObject);
             ConfigureCellIndicator(_previewObject.Size);
@@ -87,7 +87,7 @@ namespace FlavorfulStory.PlacementSystem
 
         private void ClearPreviewObject()
         {
-            _previewObject.SetCollidersEnabled(false);
+            _previewObject.SetCollidersEnabled(true);
             Destroy(_previewObject.gameObject);
             _previewObject = null;
         }

@@ -23,7 +23,7 @@ namespace FlavorfulStory.PlacementSystem
         {
             if (Layer == PlacementLayer.Floor) return;
 
-            foreach (var collider in GetComponentsInChildren<Collider>()) collider.enabled = !enabled;
+            foreach (var collider in GetComponentsInChildren<Collider>()) collider.enabled = enabled;
         }
 
         /// <summary> Визуализирует занимаемую область объекта в редакторе через Gizmos. </summary>
