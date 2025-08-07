@@ -1,4 +1,5 @@
 using FlavorfulStory.Actions;
+using FlavorfulStory.Audio;
 using FlavorfulStory.CursorSystem;
 using FlavorfulStory.InputSystem;
 using FlavorfulStory.InteractionSystem;
@@ -7,6 +8,7 @@ using FlavorfulStory.InventorySystem.DropSystem;
 using FlavorfulStory.InventorySystem.UI;
 using FlavorfulStory.PlacementSystem;
 using FlavorfulStory.Stats;
+using FlavorfulStory.Tools;
 using FlavorfulStory.Utils;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -52,6 +54,8 @@ namespace FlavorfulStory.Player
 
         [SerializeField] private PlacementController _placementController;
 
+        private ToolUsageService _toolUsageService;
+
         #region Tools
 
         /// <summary> Обработчик инструмента. </summary>
@@ -93,13 +97,18 @@ namespace FlavorfulStory.Player
             _playerMover = GetComponent<PlayerMover>();
             _animator = GetComponent<Animator>();
 
+
             _interactionController = GetComponentInChildren<InteractionController>();
             _interactionController.StartInteractionAction = () => SetBusyState(true);
             _interactionController.EndInteractionAction = () => SetBusyState(false);
 
             _toolHandler = GetComponent<ToolHandler>();
             _toolHandler.UnequipAction = () => SetBusyState(false);
+
+
             PlayerModel.SetPositionProvider(() => transform.position);
+
+            _toolUsageService = new ToolUsageService(_toolHandler.HitableLayers);
         }
 
         /// <summary> Обновление состояния игрока. </summary>
@@ -123,7 +132,7 @@ namespace FlavorfulStory.Player
         /// <returns> True, если взаимодействие было обработано. </returns>
         private bool InteractWithComponent()
         {
-            var hits = PhysicsUtils.SphereCastAllSorted(CameraUtils.GetMouseRay());
+            var hits = PhysicsUtils.SphereCastAllSorted(CameraUtils.GetMouseRay()); // TODO: Вынести отсюда
             foreach (var hit in hits)
             {
                 var cursorInteractables = hit.transform.GetComponents<ICursorInteractable>();
@@ -152,10 +161,9 @@ namespace FlavorfulStory.Player
                 _toolbar.SelectItem(i);
 
                 // TODO: баг если кликнуть на тулбар слот, то это не срабатывает, а только если кликнуть хоткей
-                if (_toolbar.SelectedItem is PlaceableItem placeable)
+                if (_toolbar.SelectedItem is PlaceableItem placeable && _placementController)
                     _placementController.EnterPlacementMode(PlacementModeType.Place, placeable.Prefab);
-                else
-                    _placementController.ExitCurrentMode(); // если убрал — отключаем сетку
+                else if (_placementController) _placementController.ExitCurrentMode(); // если убрал — отключаем сетку
 
                 break;
             }
@@ -164,58 +172,53 @@ namespace FlavorfulStory.Player
         /// <summary> Обработка доступных действий выбранного предмета из панели быстрого доступа. </summary>
         private void HandleToolbarUseInput()
         {
-            if (!CurrentItem) return;
+            if (!CurrentItem || IsToolUseBlocked) return;
 
-            if (CurrentItem is IUsable usable && !IsToolUseBlocked) HandleCurrentItemUse(usable);
+            if (CurrentItem is Tool tool)
+                if ((Input.GetMouseButton(0) && tool.UseActionType == UseActionType.LeftClick) ||
+                    (Input.GetMouseButton(1) && tool.UseActionType == UseActionType.RightClick))
+                    TryUseTool(tool);
 
-            if (CurrentItem.CanBeDropped && !IsToolUseBlocked) HandleCurrentItemDrop();
+            if (CurrentItem is EdibleInventoryItem edible)
+                if ((Input.GetMouseButton(0) && edible.UseActionType == UseActionType.LeftClick) ||
+                    (Input.GetMouseButton(1) && edible.UseActionType == UseActionType.RightClick))
+                    ConsumeEdibleItem(edible);
+
+            if (CurrentItem.CanBeDropped && InputWrapper.GetButtonDown(InputButton.DropCurrentItem))
+                HandleCurrentItemDrop();
         }
 
-        /// <summary> Обработка использования предмета из панели быстрого доступа. </summary>
-        private void HandleCurrentItemUse(IUsable usable)
+        private void TryUseTool(Tool tool)
         {
-            if ((Input.GetMouseButton(0) && usable.UseActionType == UseActionType.LeftClick) ||
-                (Input.GetMouseButton(1) && usable.UseActionType == UseActionType.RightClick))
-                BeginInteraction(usable);
+            if (!_toolUsageService.TryUseTool(this, tool)) return;
+
+            _toolHandler.Equip(tool);
+            SetBusyState(true);
+            _toolCooldownTimer = PlayerModel.ToolCooldown;
         }
 
         /// <summary> Обработка выброса предмета из панели быстрого доступа. </summary>
         private void HandleCurrentItemDrop()
         {
             const float DropItemForce = 2.5f;
-            if (InputWrapper.GetButtonDown(InputButton.DropCurrentItem))
-                _itemDropService.DropFromInventory(_playerInventory, _toolbar.SelectedItemIndex,
-                    _dropPoint.transform.position, _dropPoint.forward * DropItemForce);
+            _itemDropService.DropFromInventory(_playerInventory, _toolbar.SelectedItemIndex,
+                _dropPoint.transform.position, _dropPoint.forward * DropItemForce);
         }
 
-        /// <summary> Начать взаимодействие с предметом. </summary>
-        /// <param name="usable"> Используемый предмет. </param>
-        private void BeginInteraction(IUsable usable)
+        /// <summary> Съесть съедобный предмет и применить его эффект к игроку. </summary>
+        /// <param name="edible"></param>
+        private void ConsumeEdibleItem(EdibleInventoryItem edible)
         {
-            if (usable == null) return;
-
-            // TODO: ЧТО-то непонятное тут происходит. ПОФИКСИТЬ. ПЛЮС ПОЧЕМУ-то НЕ УНИЧТОЖАЕТСЯ ХЛЕБ ЕСЛИ СЪЕСТЬ ЕГО
-            StartUsingItem(usable);
-            if (usable is EdibleInventoryItem) ConsumeEdibleItem();
-            _toolCooldownTimer = PlayerModel.ToolCooldown;
-        }
-
-        /// <summary> Начать использование предмета. </summary>
-        /// <param name="usable"> Используемый предмет. </param>
-        private void StartUsingItem(IUsable usable)
-        {
-            if (!usable.Use(this, _toolHandler.HitableLayers)) return;
-
-            _toolHandler.Equip(CurrentItem as Tool);
-            SetBusyState(true);
-        }
-
-        /// <summary> Съесть используемый предмет. </summary>
-        private void ConsumeEdibleItem()
-        {
+            // TODO: БАГА не удаляется предмет
             _playerInventory.RemoveFromSlot(_toolbar.SelectedItemIndex, 1);
             InputWrapper.UnblockPlayerInput();
             SetBusyState(false);
+
+            SfxPlayer.Play(edible.SfxType);
+
+            // TODO: На будущее
+            //Eat(player.GetComponent<PlayerStats>());
+            Debug.Log("🍎 Ем вкусную еду. Восстановил HP и энергию.");
         }
 
         /// <summary> Задать состояние занятости игрока. </summary>
