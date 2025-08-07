@@ -10,6 +10,10 @@ namespace FlavorfulStory.InventorySystem
     /// <summary> Инвентарь игрока с настраиваемым количеством слотов. </summary>
     public class Inventory : MonoBehaviour, IPredicateEvaluator, ISaveable
     {
+        /// <summary> Тип инвентаря. </summary>
+        [field: Tooltip("Тип инвентаря."), SerializeField]
+        public InventoryType Type { get; private set; }
+
         /// <summary> Количество слотов в инвентаре. </summary>
         [field: Tooltip("Количество слотов в инвентаре."), SerializeField]
         public int InventorySize { get; private set; }
@@ -17,23 +21,38 @@ namespace FlavorfulStory.InventorySystem
         /// <summary> Предметы инвентаря. </summary>
         private ItemStack[] _inventorySlots;
 
-        /// <summary> Событие, вызываемое при изменении инвентаря (добавление, удаление предметов). </summary>
-        public event Action InventoryUpdated;
+        /// <summary> Провайдер инвентарей. </summary>
+        private IInventoryProvider _inventoryProvider;
 
         /// <summary> Сигнальная шина Zenject для отправки и получения событий. </summary>
         private SignalBus _signalBus;
 
+        /// <summary> Событие, вызываемое при изменении инвентаря (добавление, удаление предметов). </summary>
+        public event Action InventoryUpdated;
+
         /// <summary> Внедрение зависимостей Zenject. </summary>
         /// <param name="signalBus"> Сигнальная шина Zenject для отправки событий. </param>
+        /// <param name="inventoryProvider"> Провайдер инвентарей. </param>
         [Inject]
-        private void Construct(SignalBus signalBus) => _signalBus = signalBus;
+        private void Construct(SignalBus signalBus, IInventoryProvider inventoryProvider)
+        {
+            _signalBus = signalBus;
+            _inventoryProvider = inventoryProvider;
+        }
 
         /// <summary> Инициализация слотов и ссылки на инвентарь игрока. </summary>
-        private void Awake() => _inventorySlots = new ItemStack[InventorySize];
+        private void Awake()
+        {
+            _inventorySlots = new ItemStack[InventorySize];
+            _inventoryProvider?.Register(this);
+        }
 
         /// <summary> При старте вызываем событие обновление инвентаря. </summary>
         /// <remarks> После восстановления состояния нужно разослать событие. </remarks>
         private void Start() => InventoryUpdated?.Invoke();
+
+        /// <summary> При уничтожении объекта отвязать инвентарь. </summary>
+        private void OnDestroy() => _inventoryProvider?.Unregister(this);
 
         /// <summary> Есть ли место для предмета в инвентаре? </summary>
         public bool HasSpaceFor(InventoryItem item) => FindSlot(item) >= 0;
@@ -157,7 +176,7 @@ namespace FlavorfulStory.InventorySystem
                 remainingNumber -= addAmount;
             }
 
-            _signalBus.Fire(new ItemCollectedSignal(new ItemStack(item, number)));
+            if (Type == InventoryType.Player) _signalBus.Fire(new ItemCollectedSignal(new ItemStack(item, number)));
             InventoryUpdated?.Invoke();
             return true;
         }
@@ -235,6 +254,8 @@ namespace FlavorfulStory.InventorySystem
                 _inventorySlots[i].Item = ItemDatabase.GetItemFromID(slotRecords[i].ItemID);
                 _inventorySlots[i].Number = slotRecords[i].Number;
             }
+
+            InventoryUpdated?.Invoke(); // TODO: DELETE
         }
 
         #endregion

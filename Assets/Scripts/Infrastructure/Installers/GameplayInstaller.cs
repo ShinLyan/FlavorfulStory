@@ -90,6 +90,8 @@ namespace FlavorfulStory.Infrastructure.Installers
             Container.Bind<PickupSpawner>().FromComponentsInHierarchy().AsCached();
             Container.Bind<IItemDropService>().To<ItemDropService>().AsSingle();
             Container.Bind<ISaveable>().To<ItemDropService>().FromResolve();
+            Container.Bind<IInventoryProvider>().To<InventoryProvider>().AsSingle().NonLazy();
+            Container.Bind<InventoryTransferService>().AsSingle();
         }
 
         /// <summary> Установить зависимости, связанные с системой диалогов. </summary>
@@ -121,6 +123,7 @@ namespace FlavorfulStory.Infrastructure.Installers
             Container.Bind<ConfirmationWindowView>().FromComponentInHierarchy().AsSingle();
             Container.Bind<SummaryView>().FromComponentInHierarchy().AsSingle();
             Container.Bind<RepairableBuildingView>().FromComponentInHierarchy().AsSingle();
+            Container.Bind<InventoryExchangeWindow>().FromComponentInHierarchy().AsSingle();
 
             Container.Bind<IGameFactory<InventorySlotView>>().To<InventorySlotViewFactory>().AsSingle()
                 .WithArguments(_inventorySlotViewPrefab);

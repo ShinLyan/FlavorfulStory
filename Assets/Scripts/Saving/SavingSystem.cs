@@ -108,7 +108,8 @@ namespace FlavorfulStory.Saving
         {
             if (state == null) return;
 
-            foreach (var saveable in Object.FindObjectsByType<SaveableEntity>(FindObjectsSortMode.None))
+            foreach (var saveable in
+                     Object.FindObjectsByType<SaveableEntity>(FindObjectsInactive.Include, FindObjectsSortMode.None))
             {
                 string id = saveable.UniqueIdentifier;
                 if (state.TryGetValue(id, out object value)) saveable.RestoreState(value);
