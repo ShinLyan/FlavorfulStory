@@ -7,10 +7,8 @@ namespace FlavorfulStory.PlacementSystem
         [SerializeField] private GameObject _gridIndicator;
         [SerializeField] private Material _previewMaterialPrefab;
 
-        private GameObject _previewObject;
-
+        private PlaceableObject _previewObject;
         private Material _previewMaterialInstance;
-
         private Renderer _gridIndicatorRenderer;
 
         private const float PreviewYOffset = 0.05f;
@@ -24,18 +22,20 @@ namespace FlavorfulStory.PlacementSystem
             _gridIndicator.SetActive(false);
         }
 
-        public void StartShowingPlacementPreview(GameObject prefab, Vector2Int size)
+        public void StartShowingPlacementPreview(PlaceableObject placeable)
         {
-            ClearPreviewObject();
+            if (_previewObject) ClearPreviewObject();
 
-            _previewObject = Instantiate(prefab, transform);
-            ApplyPreviewMaterial(_previewObject);
-            ConfigureCellIndicator(size);
+            _previewObject = Instantiate(placeable, transform);
+            _previewObject.SetCollidersEnabled(true);
+
+            ApplyPreviewMaterial(_previewObject.gameObject);
+            ConfigureCellIndicator(_previewObject.Size);
         }
 
         public void StartShowingRemovePreview()
         {
-            ClearPreviewObject();
+            if (_previewObject) ClearPreviewObject();
 
             SetPreviewColor(false);
             ConfigureCellIndicator(Vector2Int.one);
@@ -87,9 +87,8 @@ namespace FlavorfulStory.PlacementSystem
 
         private void ClearPreviewObject()
         {
-            if (!_previewObject) return;
-
-            Destroy(_previewObject);
+            _previewObject.SetCollidersEnabled(false);
+            Destroy(_previewObject.gameObject);
             _previewObject = null;
         }
     }

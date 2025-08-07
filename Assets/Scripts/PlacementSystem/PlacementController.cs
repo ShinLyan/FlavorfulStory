@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using FlavorfulStory.GridSystem;
-using FlavorfulStory.InventorySystem;
 using UnityEngine;
 
 namespace FlavorfulStory.PlacementSystem
@@ -43,12 +42,12 @@ namespace FlavorfulStory.PlacementSystem
             _modes[PlacementModeType.Remove] = new RemovingMode(_positionProvider, _placementPreview, _gridLayers);
         }
 
-        public void EnterPlacementMode(PlacementModeType mode, PlaceableItem item = null)
+        public void EnterPlacementMode(PlacementModeType mode, PlaceableObject placeableObject)
         {
             if (!_modes.TryGetValue(mode, out var modeInstance)) return;
 
-            if (mode == PlacementModeType.Place && item is not null && modeInstance is PlacementMode placementMode)
-                placementMode.Item = item;
+            if (placeableObject && modeInstance is PlacementMode placementMode)
+                placementMode.PlaceableObject = placeableObject;
 
             ActivateMode(modeInstance);
         }
@@ -93,7 +92,7 @@ namespace FlavorfulStory.PlacementSystem
         private void LateUpdate()
         {
             if (Input.GetKeyDown(KeyCode.M) && _currentMode is not RemovingMode)
-                EnterPlacementMode(PlacementModeType.Remove);
+                EnterPlacementMode(PlacementModeType.Remove, null);
         }
     }
 }

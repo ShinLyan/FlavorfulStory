@@ -2,9 +2,10 @@ using UnityEngine;
 
 namespace FlavorfulStory.PlacementSystem
 {
+    /// <summary> Объект, который может быть размещён в игровом мире. </summary>
     public class PlaceableObject : MonoBehaviour
     {
-        /// <summary> Занимаемый размер объекта в тайлах. </summary>
+        /// <summary> Занимаемый размер объекта в тайлах (по X и Z). </summary>
         [field: SerializeField, Tooltip("Занимаемый размер объекта в тайлах.")]
         public Vector2Int Size { get; private set; } = Vector2Int.one;
 
@@ -15,7 +16,17 @@ namespace FlavorfulStory.PlacementSystem
         /// <summary> Можно ли вращать объект при размещении? </summary>
         // [field: SerializeField, Tooltip("Можно ли вращать объект при размещении?")]
         // public bool IsRotatable { get; private set; } = true;
-        
+
+        /// <summary> Включает или отключает все коллайдеры дочерних компонентов. </summary>
+        /// <param name="enabled"> <c>true</c> – включить коллайдеры, <c>false</c> – выключить. </param>
+        public void SetCollidersEnabled(bool enabled)
+        {
+            if (Layer == PlacementLayer.Floor) return;
+
+            foreach (var collider in GetComponentsInChildren<Collider>()) collider.enabled = !enabled;
+        }
+
+        /// <summary> Визуализирует занимаемую область объекта в редакторе через Gizmos. </summary>
         private void OnDrawGizmos()
         {
             var origin = transform.position;
@@ -31,10 +42,10 @@ namespace FlavorfulStory.PlacementSystem
                 Gizmos.DrawCube(cellCenter, new Vector3(1f, 0.1f, 1f));
             }
         }
-        
+
         // [field: SerializeField, Tooltip("Можно ли взаимодействовать с объектом (сундук, магазин и т.д.).")]
         // public bool IsInteractable { get; private set; }
-        
+
         //
         // /// <summary> Метод вызывается при окончательной установке объекта в мир. </summary>
         // public void ConfirmPlacement()

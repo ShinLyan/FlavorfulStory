@@ -153,7 +153,7 @@ namespace FlavorfulStory.Player
 
                 // TODO: баг если кликнуть на тулбар слот, то это не срабатывает, а только если кликнуть хоткей
                 if (_toolbar.SelectedItem is PlaceableItem placeable)
-                    _placementController.EnterPlacementMode(PlacementModeType.Place, placeable);
+                    _placementController.EnterPlacementMode(PlacementModeType.Place, placeable.Prefab);
                 else
                     _placementController.ExitCurrentMode(); // если убрал — отключаем сетку
 

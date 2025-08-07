@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using FlavorfulStory.Audio;
 using FlavorfulStory.GridSystem;
-using FlavorfulStory.InventorySystem;
 using UnityEngine;
 
 namespace FlavorfulStory.PlacementSystem
@@ -13,8 +12,7 @@ namespace FlavorfulStory.PlacementSystem
         private readonly PlacementPreview _placementPreview;
         private readonly Dictionary<PlacementLayer, PlacementGridData> _gridLayers;
 
-        public PlaceableItem Item { get; set; }
-        private PlaceableObject Placeable => Item?.Prefab;
+        public PlaceableObject PlaceableObject { get; set; }
 
         public PlacementMode(IGridPositionProvider positionProvider, PlacementPreview placementPreview,
             Dictionary<PlacementLayer, PlacementGridData> gridLayers)
@@ -24,13 +22,13 @@ namespace FlavorfulStory.PlacementSystem
             _gridLayers = gridLayers;
         }
 
-        public void Enter() => _placementPreview.StartShowingPlacementPreview(Placeable.gameObject, Placeable.Size);
+        public void Enter() => _placementPreview.StartShowingPlacementPreview(PlaceableObject);
 
         public void Exit() => _placementPreview.StopShowingPreview();
 
         public void Apply(Vector3Int gridPosition)
         {
-            if (!Placeable || !CanPlace(gridPosition, Placeable.Size, Placeable.Layer))
+            if (!PlaceableObject || !CanPlace(gridPosition, PlaceableObject.Size, PlaceableObject.Layer))
             {
                 SfxPlayer.Play(SfxType.PlacementError);
                 return;
@@ -38,10 +36,10 @@ namespace FlavorfulStory.PlacementSystem
 
             SfxPlayer.Play(SfxType.PlacementSuccess);
 
-            var instance = Object.Instantiate(Placeable.gameObject);
+            var instance = Object.Instantiate(PlaceableObject.gameObject);
             instance.transform.position = _positionProvider.GridToWorld(gridPosition);
 
-            _gridLayers[Placeable.Layer].AddObjectAt(gridPosition, Placeable.Size, instance);
+            _gridLayers[PlaceableObject.Layer].AddObjectAt(gridPosition, PlaceableObject.Size, instance);
 
             _placementPreview.UpdatePosition(_positionProvider.GridToWorld(gridPosition), false);
         }
@@ -51,9 +49,9 @@ namespace FlavorfulStory.PlacementSystem
 
         public void Refresh(Vector3Int gridPosition)
         {
-            if (!Placeable) return;
+            if (!PlaceableObject) return;
 
-            bool isValid = CanPlace(gridPosition, Placeable.Size, Placeable.Layer);
+            bool isValid = CanPlace(gridPosition, PlaceableObject.Size, PlaceableObject.Layer);
             _placementPreview.UpdatePosition(_positionProvider.GridToWorld(gridPosition), isValid);
         }
     }
