@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using FlavorfulStory.GridSystem;
 using FlavorfulStory.ResourceContainer;
 using FlavorfulStory.Saving;
 using GD.MinMaxSlider;
@@ -43,10 +44,6 @@ namespace FlavorfulStory.ObjectManagement
         [Tooltip("Минимальное расстояние между заспавненными объектами."), SerializeField, Range(1f, 50f)]
         public int _minSpacing;
 
-        /// <summary> Равномерное ли распределение объектов по сетке? </summary>
-        [Tooltip("Равномерное ли распределение объектов по сетке?"), SerializeField]
-        private bool _evenSpread;
-
         /// <summary> Слой препятствий, с которыми объекты не должны пересекаться. </summary>
         [Header("Основные настройки спавна")]
         [Tooltip("Слой препятствий, с которыми объекты не должны пересекаться."), SerializeField]
@@ -66,40 +63,45 @@ namespace FlavorfulStory.ObjectManagement
         /// <summary> Контейнер зависимостей Zenject. </summary>
         private DiContainer _container;
 
-        /// <summary> Внедрить контейнер зависимостей. </summary>
-        /// <param name="container"> Контейнер Zenject. </param>
-        [Inject]
-        private void Construct(DiContainer container) => _container = container;
+        /// <summary> Провайдер позиции на гриде. </summary>
+        private IGridPositionProvider _gridPositionProvider;
 
         #endregion
 
-        /// <summary> Запуск процесса спавна при старте сцены. </summary>
-        private void Start() => SpawnFromConfig();
-
-        /// <summary> Спавнит объекты на основе конфигурации. </summary>
-        private void SpawnFromConfig()
+        /// <summary> Внедрить контейнер зависимостей. </summary>
+        /// <param name="container"> Контейнер Zenject. </param>
+        /// <param name="gridPositionProvider"> </param>
+        [Inject]
+        private void Construct(DiContainer container, IGridPositionProvider gridPositionProvider)
         {
-            if (_spawnedObjects.Count != 0) return;
-
-            if (_evenSpread)
-                SpawnEvenSpread();
-            else
-                SpawnRandomly();
+            _container = container;
+            _gridPositionProvider = gridPositionProvider;
         }
 
-        /// <summary> Спавнит объекты равномерно по сетке. </summary>
-        //  Пояснения по формулам см. здесь: https://www.youtube.com/watch?v=rSKMYc1CQHE&t=122s
-        private void SpawnEvenSpread()
+        /// <summary> Запуск процесса спавна при старте сцены. </summary>
+        private void Start()
         {
-            int objectsPerRow = (int)Mathf.Sqrt(_spawnObjectsNumber);
-            int objectsPerColumn = (_spawnObjectsNumber - 1) / objectsPerRow + 1;
-            for (int i = 0; i < _spawnObjectsNumber; i++)
+            if (_spawnedObjects.Count == 0) SpawnObjects();
+        }
+
+        /// <summary> Спавнит объекты случайным образом в заданной зоне спавна. </summary>
+        private void SpawnObjects()
+        {
+            int iterations = 0;
+            while (_spawnedObjects.Count < _spawnObjectsNumber && iterations < _maxIterations)
             {
-                float x = (i / (float)objectsPerRow - objectsPerColumn / 2f + 0.5f) * _minSpacing;
-                float z = (i % objectsPerRow - objectsPerRow / 2f + 0.5f) * _minSpacing;
-                var offset = _widthSpawnArea > _lengthSpawnArea ? new Vector3(x, 0, z) : new Vector3(z, 0, x);
-                SpawnObject(transform.position + offset, Random.value * 360f, GetRandomScale());
+                var _grid = _gridPositionProvider;
+                var randWorld = GetRandomWorldPosition(transform.position);
+                var gridPos = _grid.WorldToGrid(randWorld);
+                var snappedPos = _grid.GridToWorld(gridPos);
+
+                if (CanSpawnAtPosition(snappedPos)) SpawnObject(snappedPos, Random.Range(0, 360f), GetRandomScale());
+
+                iterations++;
             }
+
+            if (_spawnedObjects.Count != _spawnObjectsNumber)
+                Debug.LogError($"Не удалось заспавнить все объекты: {name}");
         }
 
         /// <summary> Спавнит объект в заданной позиции с заданными параметрами масштаба и вращения. </summary>
@@ -130,35 +132,18 @@ namespace FlavorfulStory.ObjectManagement
             _spawnedObjects.Remove(monoBehaviour.gameObject);
         }
 
+        /// <summary> Генерирует случайную точку в пределах зоны спавна. </summary>
+        /// <param name="center"> Центр зоны спавна. </param>
+        /// <returns> Случайная точка в пределах зоны спавна. </returns>
+        private Vector3 GetRandomWorldPosition(Vector3 center) => new(
+            Random.Range(center.x - _widthSpawnArea * 0.5f, center.x + _widthSpawnArea * 0.5f),
+            0f,
+            Random.Range(center.z - _lengthSpawnArea * 0.5f, center.z + _lengthSpawnArea * 0.5f)
+        );
+
         /// <summary> Получает случайный коэффициент масштабирования. </summary>
         /// <returns> Коэффициент масштабирования в виде вектора. </returns>
         private Vector3 GetRandomScale() => Vector3.one * Random.Range(_scaleVariation.x, _scaleVariation.y);
-
-        /// <summary> Спавнит объекты случайным образом в заданной зоне спвна. </summary>
-        private void SpawnRandomly()
-        {
-            int iterations = 0;
-            while (_spawnedObjects.Count < _spawnObjectsNumber && iterations < _maxIterations)
-            {
-                var position = GetRandomPosition(transform.position);
-                if (CanSpawnAtPosition(position)) SpawnObject(position, Random.Range(0, 360f), GetRandomScale());
-
-                iterations++;
-            }
-
-            if (_spawnedObjects.Count != _spawnObjectsNumber)
-                Debug.LogError(
-                    $"Превышен лимит итераций у {name}! Увеличьте зону спавна или уменьшите количество объектов");
-        }
-
-        /// <summary> Генерирует случайную точку в пределах зоны спавна. </summary>
-        /// <param name="areaCenterPosition"> Центр зоны спавна. </param>
-        /// <returns> Случайная точка в пределах зоны спавна. </returns>
-        private Vector3 GetRandomPosition(Vector3 areaCenterPosition) => new(
-            Random.Range(areaCenterPosition.x - _widthSpawnArea * 0.5f, areaCenterPosition.x + _widthSpawnArea * 0.5f),
-            0f,
-            Random.Range(areaCenterPosition.z - _lengthSpawnArea * 0.5f, areaCenterPosition.z + _lengthSpawnArea * 0.5f)
-        );
 
         /// <summary> Проверяет возможность спавна объекта в заданной позиции. </summary>
         /// <param name="position"> Позиция для проверки. </param>
@@ -236,8 +221,11 @@ namespace FlavorfulStory.ObjectManagement
         /// <summary> Отображает визуализацию зоны спавна в редакторе. </summary>
         private void OnDrawGizmosSelected()
         {
-            Gizmos.color = _spawnAreaVisualizationColor;
-            Gizmos.DrawWireCube(transform.position, new Vector3(_widthSpawnArea, 0f, _lengthSpawnArea));
+            var color = new Color(_spawnAreaVisualizationColor.r, _spawnAreaVisualizationColor.g,
+                _spawnAreaVisualizationColor.b, 0.3f);
+            Gizmos.color = color;
+
+            Gizmos.DrawCube(transform.position, new Vector3(_widthSpawnArea, 0f, _lengthSpawnArea));
         }
 #endif
 

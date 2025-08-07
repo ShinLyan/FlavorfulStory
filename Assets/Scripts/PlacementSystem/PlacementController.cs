@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using FlavorfulStory.GridSystem;
 using UnityEngine;
+using Zenject;
 
 namespace FlavorfulStory.PlacementSystem
 {
@@ -16,16 +17,15 @@ namespace FlavorfulStory.PlacementSystem
         private IPlacementMode _currentMode;
         private Vector3Int _lastGridPosition;
 
-        // TODO: Заменить на Zenject
-        [SerializeField] private Camera _sceneCamera;
-        [SerializeField] private Grid _grid;
-        private IGridPositionProvider _positionProvider;
+        /// <summary> Провайдер позиции на гриде. </summary>
+        private IGridPositionProvider _gridPositionProvider;
+
+        [Inject]
+        private void Construct(IGridPositionProvider gridPositionProvider) =>
+            _gridPositionProvider = gridPositionProvider;
 
         private void Awake()
         {
-            // TODO: Заменить на Zenject
-            _positionProvider = new GridPositionProvider(_sceneCamera, _grid);
-
             InitializeGridLayers();
             InitializeModes();
         }
@@ -38,8 +38,8 @@ namespace FlavorfulStory.PlacementSystem
 
         private void InitializeModes()
         {
-            _modes[PlacementModeType.Place] = new PlacementMode(_positionProvider, _placementPreview, _gridLayers);
-            _modes[PlacementModeType.Remove] = new RemovingMode(_positionProvider, _placementPreview, _gridLayers);
+            _modes[PlacementModeType.Place] = new PlacementMode(_gridPositionProvider, _placementPreview, _gridLayers);
+            _modes[PlacementModeType.Remove] = new RemovingMode(_gridPositionProvider, _placementPreview, _gridLayers);
         }
 
         public void EnterPlacementMode(PlacementModeType mode, PlaceableObject placeableObject)
@@ -73,7 +73,7 @@ namespace FlavorfulStory.PlacementSystem
 
         private void Update()
         {
-            if (_currentMode == null || !_positionProvider.TryGetCursorGridPosition(out var gridPosition)) return;
+            if (_currentMode == null || !_gridPositionProvider.TryGetCursorGridPosition(out var gridPosition)) return;
 
             RefreshCursor(gridPosition);
 

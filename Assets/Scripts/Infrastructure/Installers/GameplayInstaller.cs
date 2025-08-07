@@ -3,6 +3,7 @@ using FlavorfulStory.BuildingRepair.UI;
 using FlavorfulStory.DialogueSystem;
 using FlavorfulStory.DialogueSystem.UI;
 using FlavorfulStory.Economy;
+using FlavorfulStory.GridSystem;
 using FlavorfulStory.Infrastructure.Factories;
 using FlavorfulStory.InventorySystem;
 using FlavorfulStory.InventorySystem.DropSystem;
@@ -182,6 +183,9 @@ namespace FlavorfulStory.Infrastructure.Installers
             Container.Bind<SleepTrigger>().FromComponentInHierarchy().AsSingle();
 
             Container.BindInterfacesAndSelfTo<DayEndManager>().AsSingle();
+
+            Container.Bind<Grid>().FromComponentInHierarchy().AsSingle();
+            Container.Bind<IGridPositionProvider>().To<GridPositionProvider>().AsSingle();
         }
     }
 }
