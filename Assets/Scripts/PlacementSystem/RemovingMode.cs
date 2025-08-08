@@ -8,7 +8,7 @@ namespace FlavorfulStory.PlacementSystem
 {
     public class RemovingMode : IPlacementMode
     {
-        private readonly IGridPositionProvider _positionProvider;
+        private readonly GridPositionProvider _positionProvider;
         private readonly PlacementPreview _placementPreview;
         private readonly Dictionary<PlacementLayer, PlacementGridData> _gridLayers;
 
@@ -20,7 +20,7 @@ namespace FlavorfulStory.PlacementSystem
             PlacementLayer.Floor // базовый слой
         };
 
-        public RemovingMode(IGridPositionProvider positionProvider, PlacementPreview placementPreview,
+        public RemovingMode(GridPositionProvider positionProvider, PlacementPreview placementPreview,
             Dictionary<PlacementLayer, PlacementGridData> gridLayers)
         {
             _positionProvider = positionProvider;

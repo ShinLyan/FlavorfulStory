@@ -188,7 +188,7 @@ namespace FlavorfulStory.Infrastructure.Installers
             Container.BindInterfacesAndSelfTo<DayEndManager>().AsSingle();
 
             Container.Bind<Grid>().FromComponentInHierarchy().AsSingle();
-            Container.Bind<IGridPositionProvider>().To<GridPositionProvider>().AsSingle();
+            Container.Bind<GridPositionProvider>().AsSingle();
             Container.BindInterfacesAndSelfTo<GridSelectionService>().AsSingle().WithArguments(_gridIndicator);
         }
     }

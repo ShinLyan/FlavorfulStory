@@ -18,10 +18,10 @@ namespace FlavorfulStory.PlacementSystem
         private Vector3Int _lastGridPosition;
 
         /// <summary> Провайдер позиции на гриде. </summary>
-        private IGridPositionProvider _gridPositionProvider;
+        private GridPositionProvider _gridPositionProvider;
 
         [Inject]
-        private void Construct(IGridPositionProvider gridPositionProvider) =>
+        private void Construct(GridPositionProvider gridPositionProvider) =>
             _gridPositionProvider = gridPositionProvider;
 
         private void Awake()

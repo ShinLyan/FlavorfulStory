@@ -62,25 +62,12 @@ namespace FlavorfulStory.ResourceContainer
         /// <summary> Событие, вызываемое при полном разрушении объекта. </summary>
         public event Action<IDestroyable> OnObjectDestroyed;
 
+        #endregion
+
         /// <summary> Внедрение зависимостей Zenject. </summary>
         /// <param name="itemDropService"> Сервис выброса предметов в мир. </param>
         [Inject]
         private void Construct(IItemDropService itemDropService) => _itemDropService = itemDropService;
-
-        #endregion
-
-        /// <summary> Рассчитать индекс текущей стадии объекта. </summary>
-        /// <returns> Индекс текущей стадии. </returns>
-        private int CalculateCurrentGradeIndex()
-        {
-            for (int i = 0, cumulativeHits = 0; i < _stages.Count; i++)
-            {
-                cumulativeHits += _stages[i].RequiredHits;
-                if (HitsTaken < cumulativeHits) return i;
-            }
-
-            return _stages.Count - 1;
-        }
 
         /// <summary> Инициализация объекта. </summary>
         private void Awake() => Initialize();
@@ -99,6 +86,19 @@ namespace FlavorfulStory.ResourceContainer
             _objectSwitcher.Initialize();
             HitsTaken = hitsTaken;
             _objectSwitcher.SwitchTo(_currentGradeIndex);
+        }
+
+        /// <summary> Рассчитать индекс текущей стадии объекта. </summary>
+        /// <returns> Индекс текущей стадии. </returns>
+        private int CalculateCurrentGradeIndex()
+        {
+            for (int i = 0, cumulativeHits = 0; i < _stages.Count; i++)
+            {
+                cumulativeHits += _stages[i].RequiredHits;
+                if (HitsTaken < cumulativeHits) return i;
+            }
+
+            return _stages.Count - 1;
         }
 
         #region DestroyBehaviour
@@ -128,7 +128,6 @@ namespace FlavorfulStory.ResourceContainer
         private void DropResourcesForCurrentGrade()
         {
             const float ResourceDropForce = 5f;
-
             foreach (var itemStack in _stages[_currentGradeIndex].Items)
                 _itemDropService.Drop(itemStack, GetDropPosition(), Vector3.up * ResourceDropForce);
         }

@@ -8,13 +8,13 @@ namespace FlavorfulStory.PlacementSystem
     /// <summary> Режим размещения объекта. </summary>
     public class PlacementMode : IPlacementMode
     {
-        private readonly IGridPositionProvider _positionProvider;
+        private readonly GridPositionProvider _positionProvider;
         private readonly PlacementPreview _placementPreview;
         private readonly Dictionary<PlacementLayer, PlacementGridData> _gridLayers;
 
         public PlaceableObject PlaceableObject { get; set; }
 
-        public PlacementMode(IGridPositionProvider positionProvider, PlacementPreview placementPreview,
+        public PlacementMode(GridPositionProvider positionProvider, PlacementPreview placementPreview,
             Dictionary<PlacementLayer, PlacementGridData> gridLayers)
         {
             _positionProvider = positionProvider;

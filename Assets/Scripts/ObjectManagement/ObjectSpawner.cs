@@ -64,7 +64,7 @@ namespace FlavorfulStory.ObjectManagement
         private DiContainer _container;
 
         /// <summary> Провайдер позиции на гриде. </summary>
-        private IGridPositionProvider _gridPositionProvider;
+        private GridPositionProvider _gridPositionProvider;
 
         #endregion
 
@@ -72,7 +72,7 @@ namespace FlavorfulStory.ObjectManagement
         /// <param name="container"> Контейнер Zenject. </param>
         /// <param name="gridPositionProvider"> </param>
         [Inject]
-        private void Construct(DiContainer container, IGridPositionProvider gridPositionProvider)
+        private void Construct(DiContainer container, GridPositionProvider gridPositionProvider)
         {
             _container = container;
             _gridPositionProvider = gridPositionProvider;
@@ -90,10 +90,9 @@ namespace FlavorfulStory.ObjectManagement
             int iterations = 0;
             while (_spawnedObjects.Count < _spawnObjectsNumber && iterations < _maxIterations)
             {
-                var _grid = _gridPositionProvider;
                 var randWorld = GetRandomWorldPosition(transform.position);
-                var gridPos = _grid.WorldToGrid(randWorld);
-                var snappedPos = _grid.GridToWorld(gridPos);
+                var gridPos = _gridPositionProvider.WorldToGrid(randWorld);
+                var snappedPos = _gridPositionProvider.GetCellCenterWorld(gridPos);
 
                 if (CanSpawnAtPosition(snappedPos)) SpawnObject(snappedPos, Random.Range(0, 360f), GetRandomScale());
 

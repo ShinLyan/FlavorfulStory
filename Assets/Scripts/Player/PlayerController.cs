@@ -1,6 +1,7 @@
 using FlavorfulStory.Actions;
 using FlavorfulStory.Audio;
 using FlavorfulStory.CursorSystem;
+using FlavorfulStory.GridSystem;
 using FlavorfulStory.InputSystem;
 using FlavorfulStory.InteractionSystem;
 using FlavorfulStory.InventorySystem;
@@ -75,6 +76,9 @@ namespace FlavorfulStory.Player
         /// <summary> Текущий выбранный предмет из панели быстрого доступа. </summary>
         private InventoryItem CurrentItem => _toolbar?.SelectedItem;
 
+        private GridSelectionService _gridSelectionService;
+        private GridPositionProvider _gridPositionProvider;
+
         #endregion
 
         /// <summary> Внедрение зависимости — инвентарь игрока. </summary>
@@ -82,11 +86,15 @@ namespace FlavorfulStory.Player
         /// <param name="toolbar"> </param>
         /// <param name="itemDropService"> Сервис выброса предметов в игровой мир. </param>
         [Inject]
-        private void Construct(Inventory inventory, Toolbar toolbar, IItemDropService itemDropService)
+        private void Construct(Inventory inventory, Toolbar toolbar, IItemDropService itemDropService,
+            GridSelectionService gridSelectionService, GridPositionProvider gridPositionProvider)
         {
             _playerInventory = inventory;
             _toolbar = toolbar;
             _itemDropService = itemDropService;
+
+            _gridSelectionService = gridSelectionService;
+            _gridPositionProvider = gridPositionProvider;
             //     _placementController = placementController; // TODO Перевести на Zenject
         }
 
@@ -116,8 +124,30 @@ namespace FlavorfulStory.Player
         {
             HandleInput();
             if (_toolCooldownTimer > 0f) _toolCooldownTimer -= Time.deltaTime;
+
+            if (CurrentItem is Tool)
+                UpdateToolGridHighlight();
+            else
+                _gridSelectionService.HideGridIndicator();
+
             if (InteractWithComponent()) return;
             CursorController.SetCursor(CursorType.Default);
+        }
+
+        private void UpdateToolGridHighlight()
+        {
+            if (!RaycastUtils.TryGetScreenPointToWorld(
+                    InputWrapper.GetMousePosition(),
+                    ~(1 << gameObject.layer),
+                    out var worldPosition))
+            {
+                _gridSelectionService.HideGridIndicator();
+                return;
+            }
+
+            var gridPosition = _gridPositionProvider.WorldToGrid(worldPosition);
+            var snappedWorld = _gridPositionProvider.GridToWorld(gridPosition);
+            _gridSelectionService.ShowGridIndicator(snappedWorld, Vector2Int.one, true);
         }
 
         /// <summary> Обработка пользовательского ввода. </summary>
@@ -190,7 +220,14 @@ namespace FlavorfulStory.Player
 
         private void TryUseTool(Tool tool)
         {
-            if (!_toolUsageService.TryUseTool(this, tool)) return;
+            if (!RaycastUtils.TryGetScreenPointToWorld(
+                    InputWrapper.GetMousePosition(),
+                    ~(1 << gameObject.layer),
+                    out var worldPos))
+                return;
+
+            var gridPos = _gridPositionProvider.WorldToGrid(worldPos);
+            if (!_toolUsageService.TryUseTool(this, tool, _gridPositionProvider.GetCellCenterWorld(gridPos))) return;
 
             _toolHandler.Equip(tool);
             SetBusyState(true);

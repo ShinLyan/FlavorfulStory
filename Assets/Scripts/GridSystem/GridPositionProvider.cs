@@ -5,7 +5,7 @@ using UnityEngine.EventSystems;
 namespace FlavorfulStory.GridSystem
 {
     /// <summary> Провайдер позиции на гриде. </summary>
-    public class GridPositionProvider : IGridPositionProvider
+    public class GridPositionProvider
     {
         /// <summary> Камера, используемая для преобразования координат мыши в мир. </summary>
         private Camera _mainCamera;
@@ -15,6 +15,12 @@ namespace FlavorfulStory.GridSystem
 
         /// <summary> Слой, на который можно размещать объекты. </summary>
         private static readonly int PlacementLayerMask = LayerMask.GetMask("Placement");
+
+        /// <summary> Размер клетки в гриде. </summary>
+        private const float CellSize = 1f;
+
+        /// <summary> Половина размера клетки. </summary>
+        public static readonly Vector3 CellHalfExtents = new(0.5f, 0.5f, 0.5f);
 
         /// <summary> Камера, используемая для преобразования координат мыши в мир. </summary>
         private Camera MainCamera
@@ -60,5 +66,19 @@ namespace FlavorfulStory.GridSystem
         /// <param name="worldPosition"> Позиция в мировых координатах. </param>
         /// <returns> Позиция в координатах грида. </returns>
         public Vector3Int WorldToGrid(Vector3 worldPosition) => _grid.WorldToCell(worldPosition);
+
+        /// <summary> Получить центр ячейки по её координатам. </summary>
+        /// <param name="gridPosition"> Позиция в гриде. </param>
+        /// <returns> Центр ячейки по её координатам. </returns>
+        public Vector3 GetCellCenterWorld(Vector3Int gridPosition)
+        {
+            var worldOrigin = _grid.CellToWorld(gridPosition);
+            return worldOrigin + new Vector3(CellSize, 0f, CellSize) * 0.5f;
+        }
+
+        /// <summary> Переводит количество клеток в мировое расстояние. </summary>
+        /// <param name="cellsCount"> Количество клеток. </param>
+        /// <returns> Мировое расстояние в клетках. </returns>
+        public static float CellsToWorldDistance(int cellsCount) => cellsCount * CellSize;
     }
 }

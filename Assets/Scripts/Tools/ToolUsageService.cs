@@ -1,9 +1,10 @@
-﻿using FlavorfulStory.InputSystem;
+﻿using FlavorfulStory.Audio;
+using FlavorfulStory.GridSystem;
+using FlavorfulStory.InputSystem;
 using FlavorfulStory.InventorySystem;
 using FlavorfulStory.Player;
 using FlavorfulStory.ResourceContainer;
 using FlavorfulStory.Stats;
-using FlavorfulStory.Utils;
 using UnityEngine;
 
 namespace FlavorfulStory.Tools
@@ -12,57 +13,83 @@ namespace FlavorfulStory.Tools
     {
         private readonly LayerMask _hitableLayers;
 
-        /// <summary> Максимальная дистанция взаимодействия инструментом. </summary>
-        private const float MaxInteractionDistance = 2f;
+        /// <summary> Максимальная дистанция взаимодействия инструментом (в клетках). </summary>
+        private const int MaxDistanceInCells = 2;
 
-        /// <summary> Радиус использования инструмента. </summary>
-        private const float UseRadius = 1.5f;
+        public ToolUsageService(LayerMask hitableLayers) => _hitableLayers = hitableLayers;
 
-        public ToolUsageService(LayerMask hitableLayers) { _hitableLayers = hitableLayers; }
-
-        public bool TryUseTool(PlayerController player, Tool tool)
+        public bool TryUseTool(PlayerController player, Tool tool, Vector3 targetCellCenter)
         {
-            if (!RaycastUtils.TryGetScreenPointToWorld(
-                    InputWrapper.GetMousePosition(),
-                    ~(1 << player.gameObject.layer),
-                    out var targetPosition))
-                return false;
-
             var stamina = player.GetComponent<PlayerStats>().GetStat<Stamina>();
-            if (stamina == null || stamina.CurrentValue < tool.StaminaCost)
-                // TODO: Показываем уведомление о нехватке стамины и проигрываем звук
-                return false;
+            if (stamina == null || stamina.CurrentValue < tool.StaminaCost) return false;
 
-            bool didHit = UseToolInDirection(targetPosition, player, tool);
-            if (!didHit) return false;
+            // Ограничиваем позицию до диапазона 2 клеток от игрока
+            var clampedTarget = ClampTargetToRange(player.transform.position, targetCellCenter, MaxDistanceInCells);
 
-            player.RotateTowards(targetPosition);
+            DrawDebugHit(clampedTarget);
+
+            bool hitSuccessful = TryHit(clampedTarget, tool);
+
+            player.RotateTowards(clampedTarget);
             player.TriggerAnimation($"Use{tool.ToolType}");
             InputWrapper.BlockPlayerInput();
+
+            if (!hitSuccessful) return true;
+
+            stamina.ChangeValue(-tool.StaminaCost);
+            SfxPlayer.Play(tool.SfxType);
 
             return true;
         }
 
-        /// <summary> Использовать инструмент в заданном направлении. </summary>
-        /// <param name="targetPosition"> Целевая позиция для взаимодействия. </param>
-        /// <param name="player"> Контроллер игрока. </param>
-        private bool UseToolInDirection(Vector3 targetPosition, PlayerController player, Tool tool)
+        /// <summary> Ограничивает целевую точку до радиуса в клетках от игрока. </summary>
+        private static Vector3 ClampTargetToRange(Vector3 playerPos, Vector3 target, int maxCells)
         {
-            var origin = player.transform.position;
-            var direction = (targetPosition - origin).normalized;
-            var interactionCenter = origin + direction * (MaxInteractionDistance / 2);
+            var direction = target - playerPos;
+            float maxDistance = GridPositionProvider.CellsToWorldDistance(maxCells);
 
-            //TODO: Тута бага. Получает удар только первый блжайшй. Плохой рейкаст сферой по ударяемым прколам!!!
-            var hitColliders = Physics.OverlapSphere(interactionCenter, UseRadius, _hitableLayers);
-            foreach (var collider in hitColliders)
-                if (collider.transform.parent.TryGetComponent<IHitable>(out var hitable))
-                {
-                    hitable.TakeHit(tool.ToolType);
-                    player.GetComponent<PlayerStats>().GetStat<Stamina>().ChangeValue(-tool.StaminaCost);
-                    return true;
-                }
+            if (direction.magnitude <= maxDistance) return target;
 
-            return hitColliders.Length > 0;
+            return playerPos + direction.normalized * maxDistance;
+        }
+
+        private bool TryHit(Vector3 cellCenter, Tool tool)
+        {
+            var hits = Physics.OverlapBox(cellCenter, GridPositionProvider.CellHalfExtents,
+                Quaternion.identity, _hitableLayers);
+            foreach (var collider in hits)
+            {
+                var hitable = collider.GetComponentInParent<IHitable>();
+                if (hitable == null) continue;
+
+                hitable.TakeHit(tool.ToolType);
+                return true;
+            }
+
+            return false;
+        }
+
+        private void DrawDebugHit(Vector3 center)
+        {
+            var color = Color.magenta;
+            float duration = 1f;
+
+            // ⬆ вертикальный луч из центра ячейки
+            Debug.DrawRay(center, Vector3.up * 2f, color, duration);
+
+            // ⬜ квадрат вокруг центра ячейки (Y=0)
+            Vector3[] corners =
+            {
+                center + new Vector3(-0.5f, 0, -0.5f),
+                center + new Vector3(-0.5f, 0, 0.5f),
+                center + new Vector3(0.5f, 0, 0.5f),
+                center + new Vector3(0.5f, 0, -0.5f)
+            };
+
+            Debug.DrawLine(corners[0], corners[1], color, duration);
+            Debug.DrawLine(corners[1], corners[2], color, duration);
+            Debug.DrawLine(corners[2], corners[3], color, duration);
+            Debug.DrawLine(corners[3], corners[0], color, duration);
         }
     }
 }
