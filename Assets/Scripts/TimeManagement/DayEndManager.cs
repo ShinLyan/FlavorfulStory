@@ -1,13 +1,13 @@
-﻿using System;
+﻿using UnityEngine;
+using Unity.Cinemachine;
+using System;
 using Cysharp.Threading.Tasks;
+using Zenject;
 using DG.Tweening;
 using FlavorfulStory.Player;
 using FlavorfulStory.SceneManagement;
 using FlavorfulStory.UI;
 using FlavorfulStory.UI.Animation;
-using Unity.Cinemachine;
-using UnityEngine;
-using Zenject;
 
 namespace FlavorfulStory.TimeManagement
 {

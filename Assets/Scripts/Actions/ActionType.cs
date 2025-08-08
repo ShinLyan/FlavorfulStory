@@ -20,5 +20,8 @@
 
         /// <summary> Получить деньги. </summary>
         GetMoney
+
+        /// <summary> Открыть сундук / прилавок. </summary>
+        Open
     }
 }

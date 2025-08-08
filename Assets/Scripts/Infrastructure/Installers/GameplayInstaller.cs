@@ -9,6 +9,8 @@ using FlavorfulStory.InventorySystem.DropSystem;
 using FlavorfulStory.InventorySystem.EquipmentSystem;
 using FlavorfulStory.InventorySystem.PickupSystem;
 using FlavorfulStory.InventorySystem.UI;
+using FlavorfulStory.Notifications;
+using FlavorfulStory.Notifications.UI;
 using FlavorfulStory.Player;
 using FlavorfulStory.QuestSystem;
 using FlavorfulStory.QuestSystem.Objectives;
@@ -25,7 +27,7 @@ using Unity.Cinemachine;
 using UnityEngine;
 using Zenject;
 
-namespace FlavorfulStory.Installers
+namespace FlavorfulStory.Infrastructure.Installers
 {
     /// <summary> Установщик зависимостей, необходимых для игрового процесса. </summary>
     public class GameplayInstaller : MonoInstaller
@@ -63,6 +65,8 @@ namespace FlavorfulStory.Installers
             BindDialogue();
             BindQuests();
             BindUI();
+            DeclareSignals();
+            BindNotifications();
             BindSystems();
         }
 
@@ -91,11 +95,12 @@ namespace FlavorfulStory.Installers
         private void BindInventory()
         {
             Container.Bind<Inventory>().FromInstance(_playerInventory).AsSingle();
-            Container.Bind<PickupNotificationManager>().FromComponentInHierarchy().AsSingle();
             Container.Bind<PickupFactory>().AsSingle();
             Container.Bind<PickupSpawner>().FromComponentsInHierarchy().AsCached();
             Container.Bind<IItemDropService>().To<ItemDropService>().AsSingle();
             Container.Bind<ISaveable>().To<ItemDropService>().FromResolve();
+            Container.Bind<IInventoryProvider>().To<InventoryProvider>().AsSingle().NonLazy();
+            Container.Bind<InventoryTransferService>().AsSingle();
         }
 
         /// <summary> Установить зависимости, связанные с системой диалогов. </summary>
@@ -127,6 +132,7 @@ namespace FlavorfulStory.Installers
             Container.Bind<ConfirmationWindowView>().FromComponentInHierarchy().AsSingle();
             Container.Bind<SummaryView>().FromComponentInHierarchy().AsSingle();
             Container.Bind<RepairableBuildingView>().FromComponentInHierarchy().AsSingle();
+            Container.Bind<InventoryExchangeWindow>().FromComponentInHierarchy().AsSingle();
 
             Container.Bind<IGameFactory<InventorySlotView>>().To<InventorySlotViewFactory>().AsSingle()
                 .WithArguments(_inventorySlotViewPrefab);
@@ -138,6 +144,9 @@ namespace FlavorfulStory.Installers
             Container.Bind<CanvasGroupFader>().WithId("HUD").FromInstance(_hudFader).AsSingle();
 
             Container.Bind<ItemTooltipView>().FromInstance(_itemTooltipPrefab).AsSingle();
+
+            Container.Bind<NotificationAnchorLocator>().FromComponentInHierarchy().AsSingle();
+            Container.BindInterfacesAndSelfTo<NotificationService>().AsSingle();
         }
 
         /// <summary> Установить зависимости, связанные с системой отображения тултипов действий. </summary>
@@ -149,6 +158,22 @@ namespace FlavorfulStory.Installers
             Container.BindInterfacesAndSelfTo<ActionTooltipController>().AsSingle().NonLazy();
             Container.Bind<IActionTooltipViewSpawner>().To<ActionTooltipViewSpawner>().FromComponentInHierarchy()
                 .AsSingle();
+        }
+
+        /// <summary> Объявление сигналов. </summary>
+        private void DeclareSignals()
+        {
+            Container.DeclareSignal<NightStartedSignal>();
+            Container.DeclareSignal<ItemCollectedSignal>();
+            Container.DeclareSignal<QuestAddedSignal>();
+        }
+
+        /// <summary> Установить зависимости, связанные с уведомлениями. </summary>
+        private void BindNotifications()
+        {
+            Container.BindInterfacesTo<SignalNotifier<NightStartedSignal>>().AsSingle();
+            Container.BindInterfacesTo<SignalNotifier<ItemCollectedSignal>>().AsSingle();
+            Container.BindInterfacesTo<SignalNotifier<QuestAddedSignal>>().AsSingle();
         }
 
         /// <summary> Установить зависимости, связанные с системами и логикой. </summary>

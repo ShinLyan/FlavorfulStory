@@ -15,23 +15,31 @@ namespace FlavorfulStory.QuestSystem.Objectives
         /// <summary> Контекст, предоставляющий доступ к системам, необходимым для выполнения действий квеста. </summary>
         private readonly QuestExecutionContext _context;
 
+        /// <summary> Сигнальная шина Zenject. </summary>
+        private readonly SignalBus _signalBus;
+
         /// <summary> Создаёт сервис и сохраняет переданный контекст. </summary>
+        /// <param name="signalBus"> Сигнальная шина Zenject. </param>
         /// <param name="questExecutionContext"> Контекст выполнения квестов. </param>
-        public ObjectiveProgressService(QuestExecutionContext questExecutionContext) =>
+        public ObjectiveProgressService(SignalBus signalBus, QuestExecutionContext questExecutionContext)
+        {
+            _signalBus = signalBus;
             _context = questExecutionContext;
+        }
 
         /// <summary> Подписывается на события, влияющие на прогресс целей. </summary>
         public void Initialize()
         {
-            _context.Inventory.ItemCollected += OnItemCollected;
-            _context.PlayerSpeaker.OnDialogueCompleted += OnDialogueCompleted;
-            WorldTime.OnDayEnded += OnDayEnded;
-            RepairableBuilding.OnRepairCompleted += OnRepairCompleted;
+            _signalBus.Subscribe<ItemCollectedSignal>(OnItemCollected);
+            _context.PlayerSpeaker.OnDialogueCompleted += OnDialogueCompleted; // TODO: Переписать на SignalBus
+            WorldTime.OnDayEnded += OnDayEnded; // TODO: Переписать на SignalBus
+            RepairableBuilding.OnRepairCompleted += OnRepairCompleted; // TODO: Переписать на SignalBus
         }
 
         /// <summary> Обработчик события сбора предмета. </summary>
-        /// <param name="item"> Собранный предмет. </param>
-        private void OnItemCollected(InventoryItem item) => CheckProgressForParamsType<HaveObjectiveParams>(item);
+        /// <param name="signal"></param>
+        private void OnItemCollected(ItemCollectedSignal signal) =>
+            CheckProgressForParamsType<HaveObjectiveParams>(signal.ItemStack);
 
         /// <summary> Обработчик завершения диалога — завершает взаимодействие с NPC. </summary>
         /// <param name="npcName"> Имя NPC. </param>
