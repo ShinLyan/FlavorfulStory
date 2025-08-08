@@ -36,11 +36,6 @@ namespace FlavorfulStory.AI.FiniteStateMachine.ShopStates
                 Context?.Set(ContextType.PurchaseItem, itemStack);
             }
 
-            // //TODO: тестовый предмет, переделать на предмет с полки
-            // var item = ItemDatabase.GetItemFromID("460b1671-464a-4d0f-94a8-fe034fcb7ea2");
-            // item.PickupPrefab.GetComponent<Rigidbody>().useGravity = false;
-            // var itemStack = new ItemStack { Item = item, Number = 1 };
-
             var accessiblePoint = _shopLocation.CashRegister.GetAccessiblePoint();
             _shopLocation.CashRegister.SetPointOccupancy(accessiblePoint, true);
 

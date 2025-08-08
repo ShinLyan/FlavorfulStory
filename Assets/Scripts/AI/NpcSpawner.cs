@@ -1,200 +1,169 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using FlavorfulStory.EditorTools.Attributes;
+﻿using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using FlavorfulStory.Infrastructure;
 using FlavorfulStory.SceneManagement;
 using FlavorfulStory.TimeManagement;
 using UnityEngine;
+using UnityEngine.AI;
 using Zenject;
-using Random = UnityEngine.Random;
 
 namespace FlavorfulStory.AI
 {
-    /// <summary> Компонент для спавна неинтерактивных NPC в игровом мире. </summary>
+    /// <summary> Отвечает за спавн и деспавн NPC в игре. </summary>
     public class NpcSpawner : MonoBehaviour
     {
-        /// <summary> Массив префабов NPC для случайного выбора при спавне. </summary>
+        /// <summary> Данные точек спавна NPC. </summary>
+        [SerializeField] private NpcSpawnData[] _spawnData;
+
+        /// <summary> Префабы NPC. </summary>
         [SerializeField] private NonInteractableNpc.NonInteractableNpc[] _npcPrefabs;
 
-        /// <summary> Точки спавна, в которых могут появляться NPC. </summary>
-        [SerializeField] private NpcSpawnPoint[] _spawnPoints;
-
-        /// <summary> Интервал между спавнами NPC в секундах. </summary>
-        [SerializeField, SteppedRange(5f, 120f, 5f)]
-        private float _spawnInterval = 30f;
-
-        /// <summary> Максимальное количество одновременно активных NPC. </summary>
-        [SerializeField, Range(0, 20)] private int _maxTotalCharacters = 10;
-
-        /// <summary> Трансформ, к которому будут привязаны созданные NPC. </summary>
+        /// <summary> Родительский объект для NPC. </summary>
         [SerializeField] private Transform _parentTransform;
 
-        /// <summary> Время одного тика в секундах. </summary>
-        private const int TickTime = 5;
+        /// <summary> Максимальное количество NPC. </summary>
+        [SerializeField] private int _maxNpcCount = 5;
 
-        /// <summary> Интервал спавна, переведенный в тики. </summary>
-        private int SpawnIntervalInTicks => (int)_spawnInterval / TickTime;
+        /// <summary> Интервал спавна в минутах. </summary>
+        [SerializeField] private int _spawnIntervalInMinutes = 60;
 
-        /// <summary> Список активных NPC на сцене. </summary>
-        private readonly List<NonInteractableNpc.NonInteractableNpc> _activeCharacters = new();
+        /// <summary> Количество минут в одном тике времени. </summary>
+        private const int MinutesInTick = 5;
 
-        /// <summary> Флаг, указывающий, активен ли процесс спавна. </summary>
-        private readonly bool _isSpawning = true;
-
-        /// <summary> Контейнер для инъекции зависимостей. </summary>
+        /// <summary> DI контейнер. </summary>
         private DiContainer _diContainer;
 
-        /// <summary> Менеджер локаций для управления местоположениями. </summary>
+        /// <summary> Пул объектов NPC. </summary>
+        private ObjectPool<NonInteractableNpc.NonInteractableNpc> _npcPool;
+
+        /// <summary> Список активных NPC. </summary>
+        private readonly List<NonInteractableNpc.NonInteractableNpc> _activeCharacters = new();
+
+        /// <summary> Интервал спавна в тиках. </summary>
+        private int _spawnIntervalInTicks;
+
+        /// <summary> Счетчик тиков. </summary>
+        private int _tickCounter;
+
+        /// <summary> Флаг паузы времени. </summary>
+        private bool _isTimePaused;
+
+        /// <summary> Флаг активности спавна. </summary>
+        private bool _isSpawning = true;
+
+        /// <summary> Менеджер локаций. </summary>
         private LocationManager _locationManager;
 
-        /// <summary> Инициализирует необходимые зависимости для спавнера NPC. </summary>
-        /// <param name="diContainer"> Контейнер зависимостей для инъекций объектов. </param>
-        /// <param name="locationManager"> Менеджер местоположения для управления сценами. </param>
+        /// <summary> Внедрение зависимостей. </summary>
         [Inject]
-        private void Construct(DiContainer diContainer, LocationManager locationManager)
+        public void Construct(DiContainer diContainer, LocationManager locationManager)
         {
             _diContainer = diContainer;
             _locationManager = locationManager;
         }
 
-        /// <summary> Пул объектов для переиспользования NPC. </summary>
-        private ObjectPool<NonInteractableNpc.NonInteractableNpc> _npcPool;
-
-        /// <summary> Флаг, указывающий, приостановлено ли время в игре. </summary>
-        private bool _isTimePaused;
-
-        /// <summary> Счетчик тиков для отслеживания интервала спавна. </summary>
-        private int _tickCounter;
-
-        /// <summary> Инициализация подписок на события времени. </summary>
+        /// <summary> Инициализация при загрузке. </summary>
         private void Awake()
         {
-            WorldTime.OnDayEnded += _ => StartCoroutine(DespawnAllNpcCoroutine());
+            _spawnIntervalInTicks = _spawnIntervalInMinutes / MinutesInTick;
+
+            _npcPool = new ObjectPool<NonInteractableNpc.NonInteractableNpc>(
+                CreateNpc,
+                npc => npc.gameObject.SetActive(true),
+                npc => npc.gameObject.SetActive(false)
+            );
+
+            WorldTime.OnDayEnded += _ => DespawnAllNpcCoroutine().Forget();
             WorldTime.OnTimePaused += () => _isTimePaused = true;
             WorldTime.OnTimeUnpaused += () => _isTimePaused = false;
             WorldTime.OnTimeTick += OnTimeTickHandler;
         }
 
-        /// <summary> Проверяет наличие необходимых данных и создает пул объектов для NPC. </summary>
-        private void Start()
-        {
-            if (_spawnPoints == null || _spawnPoints.Length == 0)
-            {
-                Debug.LogError("No spawn points assigned!", this);
-                return;
-            }
-
-            if (_npcPrefabs == null || _npcPrefabs.Length == 0)
-            {
-                Debug.LogError("No NPC prefabs assigned!", this);
-                return;
-            }
-
-            _npcPool = new ObjectPool<NonInteractableNpc.NonInteractableNpc>(
-                CreateNpc,
-                npc => npc.gameObject.SetActive(true),
-                npc => npc.gameObject.SetActive(false),
-                actionOnDestroy: npc => Destroy(npc.gameObject),
-                defaultCapacity: _maxTotalCharacters,
-                maxSize: _maxTotalCharacters
-            );
-        }
-
-        /// <summary> Создает новый экземпляр NPC для пула объектов. </summary>
-        /// <returns> Новый экземпляр NPC. </returns>
+        /// <summary> Создает нового NPC. </summary>
         private NonInteractableNpc.NonInteractableNpc CreateNpc()
         {
-            var npcSpawnPoint = _spawnPoints[Random.Range(0, _spawnPoints.Length)];
-            var pos = npcSpawnPoint.GetRandomPosition();
-
             var prefab = _npcPrefabs[Random.Range(0, _npcPrefabs.Length)];
-            var npc = _diContainer.InstantiatePrefabForComponent<NonInteractableNpc.NonInteractableNpc>(
-                prefab, pos, Quaternion.identity, _parentTransform
+            var npcInstance = _diContainer.InstantiatePrefabForComponent<NonInteractableNpc.NonInteractableNpc>(
+                prefab, _spawnData[0].spawnPoint.position, Quaternion.identity, _parentTransform
             );
-
-            // var npc = Instantiate(prefab, pos, Quaternion.identity, _parentTransform);
-            return npc;
+            npcInstance.gameObject.SetActive(false);
+            return npcInstance;
         }
 
-        /// <summary>  Обработчик события тика времени. Управляет спавном NPC на основе игрового времени. </summary>
-        /// <param name="gameTime"> Текущее игровое время. </param>
+        /// <summary> Обработчик тика времени. </summary>
         private void OnTimeTickHandler(DateTime gameTime)
         {
             if (!_isSpawning || _isTimePaused) return;
 
             _tickCounter++;
 
-            if (_tickCounter >= SpawnIntervalInTicks && CanSpawn())
+            if (_tickCounter >= _spawnIntervalInTicks && CanSpawn())
             {
                 SpawnNpcFromPool();
                 _tickCounter = 0;
             }
         }
 
-        /// <summary> Проверяет, можно ли создать нового NPC. </summary>
-        /// <returns> True, если количество активных NPC меньше максимального и время не приостановлено. </returns>
-        private bool CanSpawn() => _activeCharacters.Count < _maxTotalCharacters && !_isTimePaused;
+        /// <summary> Проверяет возможность спавна. </summary>
+        private bool CanSpawn() => _activeCharacters.Count < _maxNpcCount;
 
-        /// <summary> Извлекает NPC из пула и настраивает его для спавна. </summary>
+        /// <summary> Спавнит NPC из пула. </summary>
         private void SpawnNpcFromPool()
         {
-            var npc = _npcPool.Get();
-            var npcSpawnPoint = _spawnPoints[Random.Range(0, _spawnPoints.Length)];
-            var pos = npcSpawnPoint.GetRandomPosition();
+            int spawnIndex = Random.Range(0, _spawnData.Length);
+            var spawnData = _spawnData[spawnIndex];
 
-            npc.transform.position = pos;
-            npc.transform.rotation = Quaternion.identity;
+            int despawnIndex;
+            do
+            {
+                despawnIndex = Random.Range(0, _spawnData.Length);
+            } while (despawnIndex == spawnIndex);
+
+            var despawnData = _spawnData[despawnIndex];
+
+            var npc = _npcPool.Get();
+
+            npc.GetComponent<NavMeshAgent>().Warp(spawnData.spawnPoint.position);
+            npc.transform.rotation = spawnData.spawnPoint.rotation;
             _activeCharacters.Add(npc);
 
             npc.OnReachedDespawnPoint += () => DespawnNpc(npc);
-            npc.SetDespawnPoint(GetRandomDespawnPoint(npcSpawnPoint).transform.position);
-            StartCoroutine(SetDestinationAfterInit(npc));
+            npc.SetDespawnPoint(despawnData.despawnPoint.position);
+
+            SetDestinationAfterInit(npc).Forget();
         }
 
-        /// <summary>  Устанавливает пункт назначения для созданного NPC после его инициализации. </summary>
-        /// <param name="npc"> NPC, для которого устанавливается пункт назначения. </param>
-        /// <returns> Корутина для установки пункта назначения. </returns>
-        private IEnumerator SetDestinationAfterInit(NonInteractableNpc.NonInteractableNpc npc)
+        /// <summary> Деспавнит NPC. </summary>
+        private void DespawnNpc(NonInteractableNpc.NonInteractableNpc npc)
         {
-            yield return null;
+            _activeCharacters.Remove(npc);
+            _npcPool.Release(npc);
+        }
+
+        /// <summary> Устанавливает цель NPC после инициализации. </summary>
+        private async UniTaskVoid SetDestinationAfterInit(NonInteractableNpc.NonInteractableNpc npc)
+        {
+            var agent = npc.GetComponent<NavMeshAgent>();
+
+            while (agent == null || !agent.isOnNavMesh) await UniTask.Yield();
+
             var loc = _locationManager.GetLocationByName(LocationName.NewShop);
             npc.SetDestination(loc.transform.position);
         }
 
-        /// <summary> Возвращает NPC в пул и удаляет из списка активных. </summary>
-        /// <param name="npc"> NPC для деспавна. </param>
-        private void DespawnNpc(NonInteractableNpc.NonInteractableNpc npc)
+        /// <summary> Деспавнит всех NPC. </summary>
+        private async UniTaskVoid DespawnAllNpcCoroutine()
         {
-            if (_activeCharacters.Contains(npc))
+            _isSpawning = false;
+
+            foreach (var npc in new List<NonInteractableNpc.NonInteractableNpc>(_activeCharacters))
             {
-                _activeCharacters.Remove(npc);
-                _npcPool.Release(npc);
+                DespawnNpc(npc);
+                await UniTask.Yield();
             }
-        }
 
-        /// <summary> Корутина для деспавна всех активных NPC с пропуском одного кадра.
-        /// Используется при окончании дня для очистки мира от NPC. </summary>
-        /// <returns> Корутина для выполнения деспавна. </returns>
-        private IEnumerator DespawnAllNpcCoroutine()
-        {
-            yield return null;
-            foreach (var npc in _activeCharacters.ToArray()) DespawnNpc(npc);
-        }
-
-        /// <summary> Получает случайную точку деспавна, исключая указанную точку. </summary>
-        /// <param name="excludePoint"> Точка, которую следует исключить из выбора. </param>
-        /// <returns> Случайная точка деспавна. </returns>
-        private NpcSpawnPoint GetRandomDespawnPoint(NpcSpawnPoint excludePoint)
-        {
-            if (_spawnPoints.Length == 1) return _spawnPoints[0];
-
-            NpcSpawnPoint result;
-            do
-            {
-                result = _spawnPoints[Random.Range(0, _spawnPoints.Length)];
-            } while (result == excludePoint && _spawnPoints.Length > 1);
-
-            return result;
+            _isSpawning = true;
+            _tickCounter = 0;
         }
     }
 }
