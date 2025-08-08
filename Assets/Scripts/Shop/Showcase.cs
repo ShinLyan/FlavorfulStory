@@ -1,7 +1,11 @@
+using FlavorfulStory.InventorySystem;
+
 namespace FlavorfulStory.Shop
 {
-    public class
-        Showcase : ShopObject //TODO: заглушка, в будущем будет содержать логику для управления полками магазина
+    public class Showcase : ShopObject
     {
+        public Inventory Inventory { get; private set; }
+
+        private void Awake() => Inventory = GetComponent<Inventory>();
     }
 }

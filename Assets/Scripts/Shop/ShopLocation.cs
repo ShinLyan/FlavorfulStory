@@ -24,11 +24,7 @@ namespace FlavorfulStory.Shop
 
         /// <summary> Возвращает случайную доступную мебель. </summary>
         /// <returns> Доступная мебель или null, если все мебель занята. </returns>
-        public Furniture GetAvailableFurniture() => GetRandomObject(_furnitures);
-
-        /// <summary> Возвращает случайную доступную полку. </summary>
-        /// <returns> Доступная полка или null, если все полки заняты. </returns>
-        public Showcase GetAvailableShowcase() => GetRandomObject(_showcases);
+        public Furniture GetAvailableFurniture() => GetRandomAvailableObject(_furnitures);
 
         /// <summary> Получает массив доступных (незанятых) объектов из переданного массива. </summary>
         /// <typeparam name="T"> Тип объекта, производный от ShopObject. </typeparam>
@@ -48,7 +44,7 @@ namespace FlavorfulStory.Shop
         /// <typeparam name="T"> Тип объекта, наследующийся от ShopObject. </typeparam>
         /// <param name="objects"> Массив объектов для выбора. </param>
         /// <returns> Случайный свободный объект типа T, или null, если все объекты заняты. </returns>
-        private static T GetRandomObject<T>(T[] objects) where T : ShopObject
+        private static T GetRandomAvailableObject<T>(T[] objects) where T : ShopObject
         {
             var availableObjects = GetAvailableObjects(objects);
 
@@ -57,12 +53,36 @@ namespace FlavorfulStory.Shop
             return availableObjects[Random.Range(0, availableObjects.Length)];
         }
 
-        /// <summary> Проверяет, пусты ли все доступные полки. </summary>
-        /// <returns> True, если все доступные полки пусты, иначе false. </returns>
-        public bool AreAvailableShowcasesEmpty()
+        public bool HasAvailableShowcaseWithItems()
         {
-            // TODO: Реализация проверки, есть ли на полках товары
-            return GetAvailableObjects(_showcases).Length == 0;
+            var availableShowcases = GetAvailableObjects(_showcases);
+
+            foreach (var showcase in availableShowcases)
+                for (int i = 0; i < showcase.Inventory.InventorySize; i++)
+                    if (showcase.Inventory.GetItemInSlot(i) != null)
+                        return true;
+
+            return false;
+        }
+
+
+        public Showcase GetRandomAvailableShowcaseWithItems()
+        {
+            var availableShowcases = GetAvailableObjects(_showcases)
+                .Where(showcase =>
+                {
+                    if (showcase.Inventory == null) return false;
+
+                    for (int i = 0; i < showcase.Inventory.InventorySize; i++)
+                        if (showcase.Inventory.GetItemInSlot(i) != null)
+                            return true;
+                    return false;
+                })
+                .ToArray();
+
+            if (availableShowcases.Length == 0) return null;
+
+            return availableShowcases[Random.Range(0, availableShowcases.Length)];
         }
 
         /// <summary> Проверяет, занята ли вся мебель в магазине. </summary>

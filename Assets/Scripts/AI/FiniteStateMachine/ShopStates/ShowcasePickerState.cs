@@ -25,7 +25,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine.ShopStates
         public override void Enter()
         {
             base.Enter();
-            var availableShowcase = _shopLocation.GetAvailableShowcase();
+            var availableShowcase = _shopLocation.GetRandomAvailableShowcaseWithItems();
 
             if (!availableShowcase) return;
 

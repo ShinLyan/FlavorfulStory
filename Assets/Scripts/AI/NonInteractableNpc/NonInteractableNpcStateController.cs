@@ -160,7 +160,7 @@ namespace FlavorfulStory.AI.NonInteractableNpc
         {
             var shopLocation = (ShopLocation)_locationManager.GetLocationByName(LocationName.NewShop);
 
-            bool areShowcasesAvailable = !shopLocation.AreAvailableShowcasesEmpty();
+            bool areShowcasesAvailable = shopLocation.HasAvailableShowcaseWithItems();
             bool areFurnitureAvailable = !shopLocation.AreAllFurnitureOccupied();
 
             var availableOptions = new List<(StateName sequenceName, float weight)>();
