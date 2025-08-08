@@ -19,7 +19,7 @@
         Build,
 
         /// <summary> Получить деньги. </summary>
-        GetMoney
+        GetMoney,
 
         /// <summary> Открыть сундук / прилавок. </summary>
         Open

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using FlavorfulStory.AI.NonInteractableNpc;
 using FlavorfulStory.InventorySystem;
 using FlavorfulStory.Shop;
@@ -28,19 +29,22 @@ namespace FlavorfulStory.AI.FiniteStateMachine.ShopStates
         {
             base.Enter();
 
-            // if (Context != null && Context.TryGet<ShopObject>(ContextType.SelectedObject, out var showcase))
-            // var item = showcase.Items[Random.Range(0, showcase.Items.Count)]; //TODO
+            if (Context != null && Context.TryGet<ShopObject>(ContextType.SelectedObject, out var showcase))
+            {
+                var showcaseInventory = showcase.gameObject.GetComponent<Inventory>();
+                var itemStack = GetRandomStackFromInventory(showcaseInventory);
+                Context?.Set(ContextType.PurchaseItem, itemStack);
+            }
 
-            //TODO: тестовый предмет, переделать на предмет с полки
-            var item = ItemDatabase.GetItemFromID("460b1671-464a-4d0f-94a8-fe034fcb7ea2");
-            item.PickupPrefab.GetComponent<Rigidbody>().useGravity = false;
-            var itemStack = new ItemStack { Item = item, Number = 1 };
+            // //TODO: тестовый предмет, переделать на предмет с полки
+            // var item = ItemDatabase.GetItemFromID("460b1671-464a-4d0f-94a8-fe034fcb7ea2");
+            // item.PickupPrefab.GetComponent<Rigidbody>().useGravity = false;
+            // var itemStack = new ItemStack { Item = item, Number = 1 };
 
             var accessiblePoint = _shopLocation.CashRegister.GetAccessiblePoint();
             _shopLocation.CashRegister.SetPointOccupancy(accessiblePoint, true);
 
             Context?.Set(ContextType.CashDeskPoint, accessiblePoint);
-            Context?.Set(ContextType.PurchaseItem, itemStack);
             Context?.Set(ContextType.AnimationType, _shopLocation.CashRegister.InteractableObjectAnimation);
             Context?.Set(ContextType.AnimationTime, 3f);
 
@@ -52,5 +56,21 @@ namespace FlavorfulStory.AI.FiniteStateMachine.ShopStates
         /// <summary> Возвращает статус завершения состояния. </summary>
         /// <returns> Всегда возвращает true, так как состояние завершается сразу после входа. </returns>
         public override bool IsComplete() => true;
+
+        private static ItemStack GetRandomStackFromInventory(Inventory inventory)
+        {
+            var nonEmptySlots = new List<int>();
+
+            for (int i = 0; i < inventory.InventorySize; i++)
+            {
+                var stackSlot = inventory.GetItemStackInSlot(i);
+                if (stackSlot.Item != null && stackSlot.Number > 0) nonEmptySlots.Add(i);
+            }
+
+            int randomIndex = Random.Range(0, nonEmptySlots.Count);
+            var stack = inventory.GetItemStackInSlot(nonEmptySlots[randomIndex]);
+            inventory.RemoveFromSlot(randomIndex);
+            return stack;
+        }
     }
 }
