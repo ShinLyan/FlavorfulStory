@@ -105,16 +105,18 @@ namespace FlavorfulStory.Player
         private void Update()
         {
             HandleInput();
-            if (CurrentItem is Tool)
-                UpdateToolGridHighlight();
+
+            if (CurrentItem is Tool tool)
+                UpdateToolGridHighlight(tool);
             else
                 _gridSelectionService.HideGridIndicator();
 
             if (InteractWithComponent()) return;
+
             CursorController.SetCursor(CursorType.Default);
         }
 
-        private void UpdateToolGridHighlight()
+        private void UpdateToolGridHighlight(Tool tool)
         {
             if (!RaycastUtils.TryGetScreenPointToWorld(
                     InputWrapper.GetMousePosition(),
@@ -126,8 +128,13 @@ namespace FlavorfulStory.Player
             }
 
             var gridPosition = _gridPositionProvider.WorldToGrid(worldPosition);
-            var snappedWorld = _gridPositionProvider.GridToWorld(gridPosition);
-            _gridSelectionService.ShowGridIndicator(snappedWorld, Vector2Int.one, true);
+            var cellCenter = _gridPositionProvider.GridToWorld(gridPosition);
+
+            bool canHit = _toolUsageService.TryGetValidHitableAt(tool, cellCenter, out _);
+            if (canHit)
+                _gridSelectionService.ShowGridIndicator(cellCenter, Vector2Int.one, true);
+            else
+                _gridSelectionService.HideGridIndicator();
         }
 
         /// <summary> Обработка пользовательского ввода. </summary>
