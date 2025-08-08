@@ -53,6 +53,8 @@ namespace FlavorfulStory.Shop
             return availableObjects[Random.Range(0, availableObjects.Length)];
         }
 
+        /// <summary> Проверяет наличие доступных прилавков с товарами. </summary>
+        /// <returns> True, если есть прилавки с товарами, иначе False. </returns>
         public bool HasAvailableShowcaseWithItems()
         {
             var availableShowcases = GetAvailableObjects(_showcases);
@@ -65,7 +67,8 @@ namespace FlavorfulStory.Shop
             return false;
         }
 
-
+        /// <summary> Получает случайный прилавок с товарами. </summary>
+        /// <returns> Случайный прилавок с товарами или null, если таких нет. </returns>
         public Showcase GetRandomAvailableShowcaseWithItems()
         {
             var availableShowcases = GetAvailableObjects(_showcases)

@@ -55,6 +55,8 @@ namespace FlavorfulStory.AI
         private LocationManager _locationManager;
 
         /// <summary> Внедрение зависимостей. </summary>
+        /// <param name="diContainer"> DI контейнер. </param>
+        /// <param name="locationManager"> Менеджер локаций. </param>
         [Inject]
         public void Construct(DiContainer diContainer, LocationManager locationManager)
         {
@@ -62,7 +64,7 @@ namespace FlavorfulStory.AI
             _locationManager = locationManager;
         }
 
-        /// <summary> Инициализация при загрузке. </summary>
+        /// <summary> Инициализация компонента. </summary>
         private void Awake()
         {
             _spawnIntervalInTicks = _spawnIntervalInMinutes / MinutesInTick;
@@ -79,7 +81,8 @@ namespace FlavorfulStory.AI
             WorldTime.OnTimeTick += OnTimeTickHandler;
         }
 
-        /// <summary> Создает нового NPC. </summary>
+        /// <summary> Создает экземпляр NPC. </summary>
+        /// <returns> Созданный NPC. </returns>
         private NonInteractableNpc.NonInteractableNpc CreateNpc()
         {
             var prefab = _npcPrefabs[Random.Range(0, _npcPrefabs.Length)];
@@ -90,7 +93,8 @@ namespace FlavorfulStory.AI
             return npcInstance;
         }
 
-        /// <summary> Обработчик тика времени. </summary>
+        /// <summary> Обрабатывает тик времени. </summary>
+        /// <param name="gameTime"> Текущее игровое время. </param>
         private void OnTimeTickHandler(DateTime gameTime)
         {
             if (!_isSpawning || _isTimePaused) return;
@@ -104,7 +108,8 @@ namespace FlavorfulStory.AI
             }
         }
 
-        /// <summary> Проверяет возможность спавна. </summary>
+        /// <summary> Проверяет возможность спавна нового NPC. </summary>
+        /// <returns> True если можно спавнить, иначе False. </returns>
         private bool CanSpawn() => _activeCharacters.Count < _maxNpcCount;
 
         /// <summary> Спавнит NPC из пула. </summary>
@@ -133,7 +138,8 @@ namespace FlavorfulStory.AI
             SetDestinationAfterInit(npc).Forget();
         }
 
-        /// <summary> Деспавнит NPC. </summary>
+        /// <summary> Деспавнит указанного NPC. </summary>
+        /// <param name="npc"> NPC для деспавна. </param>
         private void DespawnNpc(NonInteractableNpc.NonInteractableNpc npc)
         {
             _activeCharacters.Remove(npc);
@@ -141,6 +147,7 @@ namespace FlavorfulStory.AI
         }
 
         /// <summary> Устанавливает цель NPC после инициализации. </summary>
+        /// <param name="npc"> NPC для установки цели. </param>
         private async UniTaskVoid SetDestinationAfterInit(NonInteractableNpc.NonInteractableNpc npc)
         {
             var agent = npc.GetComponent<NavMeshAgent>();
@@ -151,7 +158,7 @@ namespace FlavorfulStory.AI
             npc.SetDestination(loc.transform.position);
         }
 
-        /// <summary> Деспавнит всех NPC. </summary>
+        /// <summary> Деспавнит всех активных NPC. </summary>
         private async UniTaskVoid DespawnAllNpcCoroutine()
         {
             _isSpawning = false;
