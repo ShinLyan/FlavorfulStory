@@ -1068,6 +1068,14 @@ MonoBehaviour:
   _itemTooltipPrefab: {fileID: 2854061102189743673, guid: 72a92f06e03e44842a818171ff12827c,
     type: 3}
   _gridIndicator: {fileID: 5979543692782108587}
+  _toolMappings:
+  - <ToolType>k__BackingField: 0
+    <ToolPrefab>k__BackingField: {fileID: 4980252261769648602}
+  - <ToolType>k__BackingField: 1
+    <ToolPrefab>k__BackingField: {fileID: 3053217597740043451}
+  _hitableLayers:
+    serializedVersion: 2
+    m_Bits: 321
 --- !u!114 &4263631543844983472
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2151,9 +2159,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 19fc28a888c18ce4a82d521912c49df1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &3053217597740043451 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6331576733661776045, guid: 50bac7ab5e92c0c42b2f011229fcb264,
+    type: 3}
+  m_PrefabInstance: {fileID: 9043635164215608342}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &4093647008887884715 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4994206146913357757, guid: 50bac7ab5e92c0c42b2f011229fcb264,
+    type: 3}
+  m_PrefabInstance: {fileID: 9043635164215608342}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &4980252261769648602 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4079165392563477964, guid: 50bac7ab5e92c0c42b2f011229fcb264,
     type: 3}
   m_PrefabInstance: {fileID: 9043635164215608342}
   m_PrefabAsset: {fileID: 0}

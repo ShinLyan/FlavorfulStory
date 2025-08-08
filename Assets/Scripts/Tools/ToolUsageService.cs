@@ -1,75 +1,120 @@
-﻿using FlavorfulStory.Audio;
+﻿using System;
+using System.Linq;
+using Cysharp.Threading.Tasks;
+using FlavorfulStory.Audio;
 using FlavorfulStory.GridSystem;
 using FlavorfulStory.InputSystem;
-using FlavorfulStory.InventorySystem;
 using FlavorfulStory.Player;
 using FlavorfulStory.ResourceContainer;
-using FlavorfulStory.Stats;
 using UnityEngine;
 
 namespace FlavorfulStory.Tools
 {
+    /// <summary> Сервис для использования инструментов игроком. </summary>
     public class ToolUsageService
     {
+        /// <summary> Маппинг типов инструментов на соответствующие префабы для отображения. </summary>
+        private readonly ToolPrefabMapping[] _toolMappings;
+
+        /// <summary> Слой, по которому осуществляется попадание при использовании инструмента. </summary>
         private readonly LayerMask _hitableLayers;
+
+        /// <summary> Игрок, использующий инструмент. </summary>
+        private readonly PlayerController _player;
+
+        /// <summary> Находится ли инструмент на перезарядке? </summary>
+        private bool _isOnCooldown;
+
+        /// <summary> Текущий отображаемый инструмент, прикреплённый к руке игрока. </summary>
+        private GameObject _activeTool;
 
         /// <summary> Максимальная дистанция взаимодействия инструментом (в клетках). </summary>
         private const int MaxDistanceInCells = 2;
 
-        public ToolUsageService(LayerMask hitableLayers) => _hitableLayers = hitableLayers;
+        /// <summary> Задержка между использованиями инструмента (в секундах). </summary>
+        private const float CooldownSeconds = 1f;
 
-        public bool TryUseTool(PlayerController player, Tool tool, Vector3 targetCellCenter)
+        /// <summary> Конструктор сервиса использования инструментов. </summary>
+        /// <param name="toolMappings"> Маппинг типов инструментов на соответствующие префабы для отображения. </param>
+        /// <param name="hitableLayers"> Слой, по которому осуществляется попадание при использовании. </param>
+        /// <param name="player"> Игрок, использующий инструмент. </param>
+        public ToolUsageService(ToolPrefabMapping[] toolMappings, LayerMask hitableLayers, PlayerController player)
         {
-            var stamina = player.GetComponent<PlayerStats>().GetStat<Stamina>();
-            if (stamina == null || stamina.CurrentValue < tool.StaminaCost) return false;
+            _toolMappings = toolMappings;
+            _hitableLayers = hitableLayers;
+            _player = player;
+        }
 
-            // Ограничиваем позицию до диапазона 2 клеток от игрока
-            var clampedTarget = ClampTargetToRange(player.transform.position, targetCellCenter, MaxDistanceInCells);
+        /// <summary> Попробовать использовать инструмент в указанной клетке. </summary>
+        /// <param name="tool"> Инструмент, который используется. </param>
+        /// <param name="cellCenter"> Центр клетки, в которую целимся. </param>
+        /// <returns> Успешно ли произошло попадание. </returns>
+        public bool TryUseTool(Tool tool, Vector3 cellCenter)
+        {
+            if (_isOnCooldown) return false;
 
+            var clampedTarget = ClampTargetToRange(_player.transform.position, cellCenter, MaxDistanceInCells);
             DrawDebugHit(clampedTarget);
 
-            bool hitSuccessful = TryHit(clampedTarget, tool);
+            bool hitSuccessful = TryGetValidHitableAt(tool, clampedTarget, out var hitable);
+            if (hitSuccessful)
+            {
+                hitable.TakeHit();
+                SfxPlayer.Play(hitable.SfxType);
+            }
 
-            player.RotateTowards(clampedTarget);
-            player.TriggerAnimation($"Use{tool.ToolType}");
-            InputWrapper.BlockPlayerInput();
-
-            if (!hitSuccessful) return true;
-
-            stamina.ChangeValue(-tool.StaminaCost);
+            _player.RotateTowards(clampedTarget);
+            _player.TriggerAnimation($"Use{tool.ToolType}");
+            _player.SetBusyState(true);
             SfxPlayer.Play(tool.SfxType);
 
-            return true;
+            EquipTool(tool);
+            StartCooldownAsync().Forget();
+
+            return hitSuccessful;
         }
 
         /// <summary> Ограничивает целевую точку до радиуса в клетках от игрока. </summary>
+        /// <param name="playerPos"> Позиция игрока в мировых координатах. </param>
+        /// <param name="target"> Исходная целевая позиция (куда игрок хочет применить инструмент). </param>
+        /// <param name="maxCells"> Максимальная дистанция в клетках, на которую можно применять инструмент. </param>
+        /// <returns> Целевая позиция, ограниченная радиусом действия инструмента. </returns>
         private static Vector3 ClampTargetToRange(Vector3 playerPos, Vector3 target, int maxCells)
         {
             var direction = target - playerPos;
             float maxDistance = GridPositionProvider.CellsToWorldDistance(maxCells);
-
-            if (direction.magnitude <= maxDistance) return target;
-
-            return playerPos + direction.normalized * maxDistance;
+            return direction.magnitude <= maxDistance ? target : playerPos + direction.normalized * maxDistance;
         }
 
-        private bool TryHit(Vector3 cellCenter, Tool tool)
+        /// <summary> Попробовать получить подходящий для удара объект в указанной клетке. </summary>
+        /// <param name="tool"> Инструмент в руках игрока. </param>
+        /// <param name="cellCenter"> Центр клетки. </param>
+        /// <param name="hitable"> Найденный IHitable (если есть). </param>
+        /// <returns> True, если найден подходящий IHitable. </returns>
+        public bool TryGetValidHitableAt(Tool tool, Vector3 cellCenter, out IHitable hitable)
         {
+            hitable = null;
+
             var hits = Physics.OverlapBox(cellCenter, GridPositionProvider.CellHalfExtents,
                 Quaternion.identity, _hitableLayers);
+
             foreach (var collider in hits)
             {
-                var hitable = collider.GetComponentInParent<IHitable>();
-                if (hitable == null) continue;
+                var candidate = collider.GetComponentInParent<IHitable>();
+                if (candidate == null) continue;
 
-                hitable.TakeHit(tool.ToolType);
+                if (!candidate.CanBeHitBy(tool.ToolType, tool.ToolLevel)) continue;
+
+                hitable = candidate;
                 return true;
             }
 
             return false;
         }
 
-        private void DrawDebugHit(Vector3 center)
+        /// <summary> Отрисовывает в сцене отладочную визуализацию клетки, в которую был произведён удар. </summary>
+        /// <param name="center"> Центр ячейки, в которую был направлен удар. </param>
+        private static void DrawDebugHit(Vector3 center)
         {
             var color = Color.magenta;
             float duration = 1f;
@@ -90,6 +135,47 @@ namespace FlavorfulStory.Tools
             Debug.DrawLine(corners[1], corners[2], color, duration);
             Debug.DrawLine(corners[2], corners[3], color, duration);
             Debug.DrawLine(corners[3], corners[0], color, duration);
+        }
+
+        /// <summary> Запускает перезарядку между ударами инструмента и завершает использование. </summary>
+        private async UniTaskVoid StartCooldownAsync()
+        {
+            _isOnCooldown = true;
+
+            await UniTask.Delay(TimeSpan.FromSeconds(CooldownSeconds));
+
+            UnequipTool();
+
+            _player.SetBusyState(false);
+            _isOnCooldown = false;
+        }
+
+        /// <summary> Активирует отображение инструмента в руке игрока на основе его типа. </summary>
+        /// <param name="tool"> Инструмент, который нужно отобразить. </param>
+        /// <remarks> Также блокирует прокрутку мыши, чтобы исключить случайную смену предмета. </remarks>
+        private void EquipTool(Tool tool)
+        {
+            if (_activeTool) return;
+
+            var prefab = _toolMappings.FirstOrDefault(mapping => mapping.ToolType == tool.ToolType)?.ToolPrefab;
+            if (!prefab) return;
+
+            _activeTool = prefab;
+            _activeTool.SetActive(true);
+
+            InputWrapper.BlockInput(InputButton.MouseScroll);
+        }
+
+        /// <summary> Отключает отображение текущего инструмента и разблокирует управление игроком. </summary>
+        /// <remarks> Также разблокирует ввод (прокрутку мыши и движение). </remarks>
+        private void UnequipTool()
+        {
+            if (!_activeTool) return;
+
+            _activeTool.SetActive(false);
+            _activeTool = null;
+
+            InputWrapper.UnblockPlayerInput();
         }
     }
 }

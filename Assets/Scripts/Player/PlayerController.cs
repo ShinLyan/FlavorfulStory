@@ -12,15 +12,12 @@ using FlavorfulStory.Stats;
 using FlavorfulStory.Tools;
 using FlavorfulStory.Utils;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using Zenject;
 
 namespace FlavorfulStory.Player
 {
-    /// <summary> Контроллер игрока, отвечающий за управление,
-    /// использование предметов и взаимодействие с окружением. </summary>
-    [RequireComponent(typeof(PlayerMover), typeof(Animator), typeof(ToolHandler))]
-    [RequireComponent(typeof(PlayerStats))]
+    /// <summary> Контроллер игрока, отвечающий за всё управление персонажем. </summary>
+    [RequireComponent(typeof(PlayerMover), typeof(Animator), typeof(PlayerStats))]
     public class PlayerController : MonoBehaviour
     {
         #region Fields and Properties
@@ -28,6 +25,8 @@ namespace FlavorfulStory.Player
         /// <summary> Трансформ выброса предмета. </summary>
         /// <remarks> Прокидывается в <see cref="IItemDropService"/>. </remarks>
         [SerializeField] private Transform _dropPoint;
+
+        [SerializeField] private PlacementController _placementController; // TODO: ZENJECT
 
         /// <summary> Инвентарь игрока. </summary>
         private Inventory _playerInventory;
@@ -41,43 +40,26 @@ namespace FlavorfulStory.Player
         /// <summary> Статы игрока. </summary>
         private PlayerStats _playerStats;
 
-        /// <summary> Занят ли игрок? </summary>
-        private bool _isBusy;
-
         /// <summary> Передвижение игрока. </summary>
         private PlayerMover _playerMover;
 
-        /// <summary> Аниматор игрока. </summary>
-        private Animator _animator;
+        /// <summary> Занят ли игрок? </summary>
+        private bool _isBusy;
 
         /// <summary> Взаимодействие игрока с объектами. </summary>
         private InteractionController _interactionController;
 
-        [SerializeField] private PlacementController _placementController;
-
         private ToolUsageService _toolUsageService;
 
-        #region Tools
+        /// <summary> Аниматор игрока. </summary>
+        private Animator _animator; // TODO: DELETE
 
-        /// <summary> Обработчик инструмента. </summary>
-        private ToolHandler _toolHandler;
+        private GridSelectionService _gridSelectionService;
 
-        /// <summary> Таймер перезарядки использования инструмента. </summary>
-        private float _toolCooldownTimer;
-
-        /// <summary> Можно ли использовать инструмент? </summary>
-        private bool CanUseTool => _toolCooldownTimer <= 0f;
-
-        /// <summary> Заблокировано ли использование предмета? </summary>
-        private bool IsToolUseBlocked => !CanUseTool || _isBusy || EventSystem.current.IsPointerOverGameObject();
-
-        #endregion
+        private GridPositionProvider _gridPositionProvider;
 
         /// <summary> Текущий выбранный предмет из панели быстрого доступа. </summary>
         private InventoryItem CurrentItem => _toolbar?.SelectedItem;
-
-        private GridSelectionService _gridSelectionService;
-        private GridPositionProvider _gridPositionProvider;
 
         #endregion
 
@@ -85,9 +67,13 @@ namespace FlavorfulStory.Player
         /// <param name="inventory"> Инвентарь игрока. </param>
         /// <param name="toolbar"> </param>
         /// <param name="itemDropService"> Сервис выброса предметов в игровой мир. </param>
+        /// <param name="gridSelectionService"></param>
+        /// <param name="gridPositionProvider"></param>
+        /// <param name="toolUsageService"></param>
         [Inject]
         private void Construct(Inventory inventory, Toolbar toolbar, IItemDropService itemDropService,
-            GridSelectionService gridSelectionService, GridPositionProvider gridPositionProvider)
+            GridSelectionService gridSelectionService, GridPositionProvider gridPositionProvider,
+            ToolUsageService toolUsageService)
         {
             _playerInventory = inventory;
             _toolbar = toolbar;
@@ -96,6 +82,8 @@ namespace FlavorfulStory.Player
             _gridSelectionService = gridSelectionService;
             _gridPositionProvider = gridPositionProvider;
             //     _placementController = placementController; // TODO Перевести на Zenject
+
+            _toolUsageService = toolUsageService;
         }
 
         /// <summary> Инициализация компонентов. </summary>
@@ -110,21 +98,13 @@ namespace FlavorfulStory.Player
             _interactionController.StartInteractionAction = () => SetBusyState(true);
             _interactionController.EndInteractionAction = () => SetBusyState(false);
 
-            _toolHandler = GetComponent<ToolHandler>();
-            _toolHandler.UnequipAction = () => SetBusyState(false);
-
-
             PlayerModel.SetPositionProvider(() => transform.position);
-
-            _toolUsageService = new ToolUsageService(_toolHandler.HitableLayers);
         }
 
         /// <summary> Обновление состояния игрока. </summary>
         private void Update()
         {
             HandleInput();
-            if (_toolCooldownTimer > 0f) _toolCooldownTimer -= Time.deltaTime;
-
             if (CurrentItem is Tool)
                 UpdateToolGridHighlight();
             else
@@ -154,7 +134,7 @@ namespace FlavorfulStory.Player
         private void HandleInput()
         {
             HandleToolbarSelectionInput();
-            HandleToolbarUseInput();
+            if (CurrentItem) HandleToolbarUseInput();
             HandleMovementInput();
         }
 
@@ -202,17 +182,21 @@ namespace FlavorfulStory.Player
         /// <summary> Обработка доступных действий выбранного предмета из панели быстрого доступа. </summary>
         private void HandleToolbarUseInput()
         {
-            if (!CurrentItem || IsToolUseBlocked) return;
-
             if (CurrentItem is Tool tool)
-                if ((Input.GetMouseButton(0) && tool.UseActionType == UseActionType.LeftClick) ||
-                    (Input.GetMouseButton(1) && tool.UseActionType == UseActionType.RightClick))
-                    TryUseTool(tool);
+            {
+                bool leftClick = Input.GetMouseButton(0) && tool.UseActionType == UseActionType.LeftClick;
+                bool rightClick = Input.GetMouseButton(1) && tool.UseActionType == UseActionType.RightClick;
+
+                if (leftClick || rightClick) TryUseTool(tool);
+            }
 
             if (CurrentItem is EdibleInventoryItem edible)
-                if ((Input.GetMouseButton(0) && edible.UseActionType == UseActionType.LeftClick) ||
-                    (Input.GetMouseButton(1) && edible.UseActionType == UseActionType.RightClick))
-                    ConsumeEdibleItem(edible);
+            {
+                bool leftClick = Input.GetMouseButton(0) && edible.UseActionType == UseActionType.LeftClick;
+                bool rightClick = Input.GetMouseButton(1) && edible.UseActionType == UseActionType.RightClick;
+
+                if (leftClick || rightClick) ConsumeEdibleItem(edible);
+            }
 
             if (CurrentItem.CanBeDropped && InputWrapper.GetButtonDown(InputButton.DropCurrentItem))
                 HandleCurrentItemDrop();
@@ -220,18 +204,24 @@ namespace FlavorfulStory.Player
 
         private void TryUseTool(Tool tool)
         {
+            var stamina = _playerStats.GetStat<Stamina>();
+            if (stamina == null || stamina.CurrentValue < tool.StaminaCost)
+                // TODO: Показываем уведомление / звук о нехватке стамины
+                return;
+
             if (!RaycastUtils.TryGetScreenPointToWorld(
                     InputWrapper.GetMousePosition(),
                     ~(1 << gameObject.layer),
-                    out var worldPos))
+                    out var worldPosition))
                 return;
 
-            var gridPos = _gridPositionProvider.WorldToGrid(worldPos);
-            if (!_toolUsageService.TryUseTool(this, tool, _gridPositionProvider.GetCellCenterWorld(gridPos))) return;
+            var gridPosision = _gridPositionProvider.WorldToGrid(worldPosition);
+            var center = _gridPositionProvider.GetCellCenterWorld(gridPosision);
 
-            _toolHandler.Equip(tool);
-            SetBusyState(true);
-            _toolCooldownTimer = PlayerModel.ToolCooldown;
+            bool hitSuccessful = _toolUsageService.TryUseTool(tool, center);
+            if (!hitSuccessful) return;
+
+            stamina.ChangeValue(-tool.StaminaCost);
         }
 
         /// <summary> Обработка выброса предмета из панели быстрого доступа. </summary>

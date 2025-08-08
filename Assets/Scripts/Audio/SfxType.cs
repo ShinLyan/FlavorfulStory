@@ -36,8 +36,11 @@
         PlacementError,
 
         /// <summary> Звук при удалении размещённого объекта. </summary>
-        RemoveObject
+        RemoveObject,
 
         #endregion
+
+        /// <summary> Взмах инструментом (топор, кирка). </summary>
+        ToolSwing
     }
 }

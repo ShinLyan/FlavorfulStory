@@ -19,6 +19,7 @@ using FlavorfulStory.Saving;
 using FlavorfulStory.SceneManagement;
 using FlavorfulStory.Shop;
 using FlavorfulStory.TimeManagement;
+using FlavorfulStory.Tools;
 using FlavorfulStory.TooltipSystem;
 using FlavorfulStory.TooltipSystem.ActionTooltips;
 using FlavorfulStory.UI;
@@ -58,6 +59,15 @@ namespace FlavorfulStory.Infrastructure.Installers
 
         /// <summary> Индикатор клетки на гриде. </summary>
         [SerializeField] private GameObject _gridIndicator;
+
+        /// <summary> Сопоставления типов инструментов с их префабами для визуализации в руке игрока. </summary>
+        [Tooltip("Сопоставления типов инструментов с их префабами для визуализации в руке игрока."), SerializeField]
+        private ToolPrefabMapping[] _toolMappings;
+
+        /// <summary> Слои, по которым производится удар с помощью инструмента. </summary>
+        [Tooltip("Слои, по которым производится удар с помощью инструмента. " +
+                 "Выбирать Default, Obstacle, Terrain"), SerializeField]
+        private LayerMask _hitableLayers;
 
         /// <summary> Выполняет установку всех зависимостей, необходимых для сцены. </summary>
         public override void InstallBindings()
@@ -190,6 +200,8 @@ namespace FlavorfulStory.Infrastructure.Installers
             Container.Bind<Grid>().FromComponentInHierarchy().AsSingle();
             Container.Bind<GridPositionProvider>().AsSingle();
             Container.BindInterfacesAndSelfTo<GridSelectionService>().AsSingle().WithArguments(_gridIndicator);
+
+            Container.Bind<ToolUsageService>().AsSingle().WithArguments(_toolMappings, _hitableLayers);
         }
     }
 }

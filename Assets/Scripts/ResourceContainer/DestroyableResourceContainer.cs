@@ -2,10 +2,10 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using FlavorfulStory.Actions;
 using FlavorfulStory.Audio;
 using FlavorfulStory.InventorySystem.DropSystem;
 using FlavorfulStory.ObjectManagement;
+using FlavorfulStory.Tools;
 using UnityEngine;
 using Zenject;
 using Random = UnityEngine.Random;
@@ -14,7 +14,7 @@ namespace FlavorfulStory.ResourceContainer
 {
     /// <summary> Добываемый объект. </summary>
     [RequireComponent(typeof(ObjectSwitcher))]
-    public class DestroyableResourceContainer : MonoBehaviour, IHitable, IDestroyable
+    public class DestroyableResourceContainer : MonoBehaviour, IDestroyable, IHitable
     {
         #region Fields and Properties
 
@@ -24,11 +24,7 @@ namespace FlavorfulStory.ResourceContainer
 
         /// <summary> Задержка перед окончательным уничтожением объекта. </summary>
         [Tooltip("Задержка перед окончательным уничтожением объекта."), SerializeField]
-        private float _destroyDelay = 4f;
-
-        /// <summary> Тип инструмента, необходимого для разрушения. </summary>
-        [Tooltip("Тип инструмента, необходимого для разрушения."), SerializeField]
-        private ToolType[] _toolsToBeHit;
+        private float _destroyDelay;
 
         /// <summary> Сервис выброса предметов в мир. </summary>
         private IItemDropService _itemDropService;
@@ -136,7 +132,7 @@ namespace FlavorfulStory.ResourceContainer
         /// <returns> Позиция дропа. </returns>
         private Vector3 GetDropPosition()
         {
-            const float DropOffsetRange = 2f; // Диапазон случайного смещения по осям X и Z
+            const float DropOffsetRange = 2f;
             float offsetX = Random.Range(-DropOffsetRange, DropOffsetRange);
             float offsetZ = Random.Range(-DropOffsetRange, DropOffsetRange);
             return transform.position + new Vector3(offsetX, 1, offsetZ);
@@ -144,18 +140,32 @@ namespace FlavorfulStory.ResourceContainer
 
         #endregion
 
-        #region HitBehaviour
+        #region IHitable
 
-        /// <summary> Тип проигрываемого звука. </summary>
-        [field: SerializeField] public SfxType SfxType { private get; set; }
+        /// <summary> Тип инструмента, необходимого для разрушения. </summary>
+        [field: Tooltip("Тип инструмента, необходимого для разрушения."), SerializeField]
+        public ToolType RequiredToolType { get; private set; }
 
-        /// <summary> Получить удар. </summary>
-        /// <param name="toolType"> Тип инструмента, которым наносится удар. </param>
-        public void TakeHit(ToolType toolType)
+        /// <summary> Минимальный уровень инструмента, необходимый для нанесения урона. </summary>
+        [field: Tooltip("Минимальный уровень инструмента для нанесения урона."), SerializeField, Range(1f, 3f)]
+        public int RequiredToolLevel { get; private set; }
+
+        /// <summary> Тип звукового эффекта, проигрываемого при ударе. </summary>
+        [field: Tooltip("Тип звукового эффекта, проигрываемого при ударе."), SerializeField]
+        public SfxType SfxType { get; private set; }
+
+        /// <summary> Может ли указанный инструмент нанести урон этому объекту? </summary>
+        /// <param name="toolType"> Тип инструмента. </param>
+        /// <param name="toolLevel"> Уровень инструмента. </param>
+        /// <returns> <c>true</c>, если удар возможен; иначе <c>false</c>. </returns>
+        public bool CanBeHitBy(ToolType toolType, int toolLevel) =>
+            toolType == RequiredToolType && toolLevel >= RequiredToolLevel;
+
+        /// <summary> Применяет удар к объекту. </summary>
+        public void TakeHit()
         {
-            if (IsDestroyed || !_toolsToBeHit.Contains(toolType)) return;
+            if (IsDestroyed) return;
 
-            SfxPlayer.Play(SfxType);
             HitsTaken++;
             if (HitsTaken >= _hitsToDestroy)
             {
