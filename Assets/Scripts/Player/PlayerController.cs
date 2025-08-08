@@ -1,14 +1,13 @@
-using FlavorfulStory.Actions;
-using FlavorfulStory.Audio;
 using FlavorfulStory.CursorSystem;
 using FlavorfulStory.GridSystem;
 using FlavorfulStory.InputSystem;
 using FlavorfulStory.InteractionSystem;
 using FlavorfulStory.InventorySystem;
 using FlavorfulStory.InventorySystem.DropSystem;
-using FlavorfulStory.InventorySystem.UI;
-using FlavorfulStory.PlacementSystem;
 using FlavorfulStory.Stats;
+using FlavorfulStory.TimeManagement;
+using FlavorfulStory.Toolbar;
+using FlavorfulStory.Toolbar.UI;
 using FlavorfulStory.Tools;
 using FlavorfulStory.Utils;
 using UnityEngine;
@@ -17,7 +16,7 @@ using Zenject;
 namespace FlavorfulStory.Player
 {
     /// <summary> Контроллер игрока, отвечающий за всё управление персонажем. </summary>
-    [RequireComponent(typeof(PlayerMover), typeof(Animator), typeof(PlayerStats))]
+    [RequireComponent(typeof(PlayerMover), typeof(Animator))]
     public class PlayerController : MonoBehaviour
     {
         #region Fields and Properties
@@ -26,13 +25,11 @@ namespace FlavorfulStory.Player
         /// <remarks> Прокидывается в <see cref="IItemDropService"/>. </remarks>
         [SerializeField] private Transform _dropPoint;
 
-        [SerializeField] private PlacementController _placementController; // TODO: ZENJECT
-
         /// <summary> Инвентарь игрока. </summary>
         private Inventory _playerInventory;
 
         /// <summary> Панель быстрого доступа. </summary>
-        private Toolbar _toolbar;
+        private ToolbarView _toolbarView;
 
         /// <summary> Сервис выброса предметов. </summary>
         private IItemDropService _itemDropService;
@@ -49,50 +46,33 @@ namespace FlavorfulStory.Player
         /// <summary> Взаимодействие игрока с объектами. </summary>
         private InteractionController _interactionController;
 
-        private ToolUsageService _toolUsageService;
-
         /// <summary> Аниматор игрока. </summary>
         private Animator _animator; // TODO: DELETE
 
-        private GridSelectionService _gridSelectionService;
-
-        private GridPositionProvider _gridPositionProvider;
-
-        /// <summary> Текущий выбранный предмет из панели быстрого доступа. </summary>
-        private InventoryItem CurrentItem => _toolbar?.SelectedItem;
+        private SignalBus _signalBus;
 
         #endregion
 
-        /// <summary> Внедрение зависимости — инвентарь игрока. </summary>
-        /// <param name="inventory"> Инвентарь игрока. </param>
-        /// <param name="toolbar"> </param>
-        /// <param name="itemDropService"> Сервис выброса предметов в игровой мир. </param>
-        /// <param name="gridSelectionService"></param>
-        /// <param name="gridPositionProvider"></param>
-        /// <param name="toolUsageService"></param>
         [Inject]
-        private void Construct(Inventory inventory, Toolbar toolbar, IItemDropService itemDropService,
-            GridSelectionService gridSelectionService, GridPositionProvider gridPositionProvider,
-            ToolUsageService toolUsageService)
+        private void Construct(SignalBus signalBus, Inventory inventory, PlayerStats playerStats,
+            ToolbarView toolbarView,
+            IItemDropService itemDropService, ToolUsageService toolUsageService,
+            GridPositionProvider gridPositionProvider)
         {
+            _signalBus = signalBus;
+
             _playerInventory = inventory;
-            _toolbar = toolbar;
+            _playerStats = playerStats;
+
+            _toolbarView = toolbarView;
             _itemDropService = itemDropService;
-
-            _gridSelectionService = gridSelectionService;
-            _gridPositionProvider = gridPositionProvider;
-            //     _placementController = placementController; // TODO Перевести на Zenject
-
-            _toolUsageService = toolUsageService;
         }
 
         /// <summary> Инициализация компонентов. </summary>
         private void Awake()
         {
-            _playerStats = GetComponent<PlayerStats>();
             _playerMover = GetComponent<PlayerMover>();
             _animator = GetComponent<Animator>();
-
 
             _interactionController = GetComponentInChildren<InteractionController>();
             _interactionController.StartInteractionAction = () => SetBusyState(true);
@@ -104,45 +84,21 @@ namespace FlavorfulStory.Player
         /// <summary> Обновление состояния игрока. </summary>
         private void Update()
         {
-            HandleInput();
+            if (WorldTime.IsPaused) return;
 
-            if (CurrentItem is Tool tool)
-                UpdateToolGridHighlight(tool);
-            else
-                _gridSelectionService.HideGridIndicator();
+            HandleInput();
 
             if (InteractWithComponent()) return;
 
             CursorController.SetCursor(CursorType.Default);
         }
 
-        private void UpdateToolGridHighlight(Tool tool)
-        {
-            if (!RaycastUtils.TryGetScreenPointToWorld(
-                    InputWrapper.GetMousePosition(),
-                    ~(1 << gameObject.layer),
-                    out var worldPosition))
-            {
-                _gridSelectionService.HideGridIndicator();
-                return;
-            }
-
-            var gridPosition = _gridPositionProvider.WorldToGrid(worldPosition);
-            var cellCenter = _gridPositionProvider.GridToWorld(gridPosition);
-
-            bool canHit = _toolUsageService.TryGetValidHitableAt(tool, cellCenter, out _);
-            if (canHit)
-                _gridSelectionService.ShowGridIndicator(cellCenter, Vector2Int.one, true);
-            else
-                _gridSelectionService.HideGridIndicator();
-        }
-
         /// <summary> Обработка пользовательского ввода. </summary>
         private void HandleInput()
         {
-            HandleToolbarSelectionInput();
-            if (CurrentItem) HandleToolbarUseInput();
-            HandleMovementInput();
+            HandleToolbarSelection();
+            HandleCurrentItemDrop();
+            HandleMovement();
         }
 
         /// <summary> Взаимодействие с компонентами через курсор. </summary>
@@ -165,7 +121,7 @@ namespace FlavorfulStory.Player
         }
 
         /// <summary> Обработка выбора предмета на панели быстрого доступа. </summary>
-        private void HandleToolbarSelectionInput()
+        private void HandleToolbarSelection()
         {
             if (_isBusy) return;
 
@@ -175,101 +131,24 @@ namespace FlavorfulStory.Player
                 var key = i == 9 ? KeyCode.Alpha0 : KeyCode.Alpha1 + i;
                 if (!Input.GetKeyDown(key)) continue;
 
-                _toolbar.SelectItem(i);
-
-                // TODO: баг если кликнуть на тулбар слот, то это не срабатывает, а только если кликнуть хоткей
-                if (_toolbar.SelectedItem is PlaceableItem placeable && _placementController)
-                    _placementController.EnterPlacementMode(PlacementModeType.Place, placeable.Prefab);
-                else if (_placementController) _placementController.ExitCurrentMode(); // если убрал — отключаем сетку
-
+                _signalBus.Fire(new ToolbarHotkeyPressedSignal(i));
                 break;
             }
-        }
-
-        /// <summary> Обработка доступных действий выбранного предмета из панели быстрого доступа. </summary>
-        private void HandleToolbarUseInput()
-        {
-            if (CurrentItem is Tool tool)
-            {
-                bool leftClick = Input.GetMouseButton(0) && tool.UseActionType == UseActionType.LeftClick;
-                bool rightClick = Input.GetMouseButton(1) && tool.UseActionType == UseActionType.RightClick;
-
-                if (leftClick || rightClick) TryUseTool(tool);
-            }
-
-            if (CurrentItem is EdibleInventoryItem edible)
-            {
-                bool leftClick = Input.GetMouseButton(0) && edible.UseActionType == UseActionType.LeftClick;
-                bool rightClick = Input.GetMouseButton(1) && edible.UseActionType == UseActionType.RightClick;
-
-                if (leftClick || rightClick) ConsumeEdibleItem(edible);
-            }
-
-            if (CurrentItem.CanBeDropped && InputWrapper.GetButtonDown(InputButton.DropCurrentItem))
-                HandleCurrentItemDrop();
-        }
-
-        private void TryUseTool(Tool tool)
-        {
-            var stamina = _playerStats.GetStat<Stamina>();
-            if (stamina == null || stamina.CurrentValue < tool.StaminaCost)
-                // TODO: Показываем уведомление / звук о нехватке стамины
-                return;
-
-            if (!RaycastUtils.TryGetScreenPointToWorld(
-                    InputWrapper.GetMousePosition(),
-                    ~(1 << gameObject.layer),
-                    out var worldPosition))
-                return;
-
-            var gridPosision = _gridPositionProvider.WorldToGrid(worldPosition);
-            var center = _gridPositionProvider.GetCellCenterWorld(gridPosision);
-
-            bool hitSuccessful = _toolUsageService.TryUseTool(tool, center);
-            if (!hitSuccessful) return;
-
-            stamina.ChangeValue(-tool.StaminaCost);
         }
 
         /// <summary> Обработка выброса предмета из панели быстрого доступа. </summary>
         private void HandleCurrentItemDrop()
         {
+            if (!InputWrapper.GetButtonDown(InputButton.DropCurrentItem) || !_toolbarView.SelectedItem.CanBeDropped)
+                return;
+
             const float DropItemForce = 2.5f;
-            _itemDropService.DropFromInventory(_playerInventory, _toolbar.SelectedItemIndex,
+            _itemDropService.DropFromInventory(_playerInventory, _toolbarView.SelectedItemIndex,
                 _dropPoint.transform.position, _dropPoint.forward * DropItemForce);
         }
 
-        /// <summary> Съесть съедобный предмет и применить его эффект к игроку. </summary>
-        /// <param name="edible"></param>
-        private void ConsumeEdibleItem(EdibleInventoryItem edible)
-        {
-            // TODO: БАГА не удаляется предмет
-            _playerInventory.RemoveFromSlot(_toolbar.SelectedItemIndex, 1);
-            InputWrapper.UnblockPlayerInput();
-            SetBusyState(false);
-
-            SfxPlayer.Play(edible.SfxType);
-
-            // TODO: На будущее
-            //Eat(player.GetComponent<PlayerStats>());
-            Debug.Log("🍎 Ем вкусную еду. Восстановил HP и энергию.");
-        }
-
-        /// <summary> Задать состояние занятости игрока. </summary>
-        /// <param name="state"> Состояние. </param>
-        /// <remarks> Когда игрок занят - не может использовать инструмент или взаимодействовать с окружением. </remarks>
-        public void SetBusyState(bool state)
-        {
-            _isBusy = state;
-            _toolbar.SetInteractableState(!state);
-            if (state)
-                InputWrapper.BlockAllInput();
-            else
-                InputWrapper.UnblockAllInput();
-        }
-
         /// <summary> Обработка передвижения. </summary>
-        private void HandleMovementInput()
+        private void HandleMovement()
         {
             var direction = new Vector3(
                 InputWrapper.GetAxisRaw(InputButton.Horizontal),
@@ -279,6 +158,19 @@ namespace FlavorfulStory.Player
 
             _playerMover.SetMoveDirection(direction);
             if (direction != Vector3.zero) _playerMover.SetLookRotation(direction);
+        }
+
+        /// <summary> Задать состояние занятости игрока. </summary>
+        /// <param name="isBusy"> Состояние. </param>
+        /// <remarks> Когда игрок занят - не может использовать инструмент или взаимодействовать с окружением. </remarks>
+        public void SetBusyState(bool isBusy)
+        {
+            _isBusy = isBusy;
+            _toolbarView.IsInteractable = !isBusy;
+            if (isBusy)
+                InputWrapper.BlockAllInput();
+            else
+                InputWrapper.UnblockAllInput();
         }
 
         /// <summary> Завершение взаимодействия. </summary>

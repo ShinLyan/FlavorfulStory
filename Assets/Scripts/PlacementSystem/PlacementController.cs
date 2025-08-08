@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using FlavorfulStory.GridSystem;
+using FlavorfulStory.TimeManagement;
 using UnityEngine;
 using Zenject;
 
@@ -8,21 +9,23 @@ namespace FlavorfulStory.PlacementSystem
 {
     public class PlacementController : MonoBehaviour
     {
-        [SerializeField] private GameObject _gridView;
-        [SerializeField] private PlacementPreview _placementPreview;
+        /// <summary> Провайдер позиции на гриде. </summary>
+        private GridPositionProvider _gridPositionProvider;
 
-        private readonly Dictionary<PlacementLayer, PlacementGridData> _gridLayers = new();
-        private readonly Dictionary<PlacementModeType, IPlacementMode> _modes = new();
+        private PlacementPreview _placementPreview;
 
         private IPlacementMode _currentMode;
         private Vector3Int _lastGridPosition;
 
-        /// <summary> Провайдер позиции на гриде. </summary>
-        private GridPositionProvider _gridPositionProvider;
+        private readonly Dictionary<PlacementLayer, PlacementGridData> _gridLayers = new();
+        private readonly Dictionary<PlacementModeType, IPlacementMode> _modes = new();
 
         [Inject]
-        private void Construct(GridPositionProvider gridPositionProvider) =>
+        private void Construct(GridPositionProvider gridPositionProvider, PlacementPreview placementPreview)
+        {
             _gridPositionProvider = gridPositionProvider;
+            _placementPreview = placementPreview;
+        }
 
         private void Awake()
         {
@@ -58,7 +61,6 @@ namespace FlavorfulStory.PlacementSystem
 
             _currentMode = mode;
             _currentMode.Enter();
-            _gridView.SetActive(true);
         }
 
         public void ExitCurrentMode()
@@ -67,13 +69,14 @@ namespace FlavorfulStory.PlacementSystem
 
             _currentMode.Exit();
             _currentMode = null;
-            _gridView.SetActive(false);
             _lastGridPosition = Vector3Int.zero;
         }
 
         private void Update()
         {
-            if (_currentMode == null || !_gridPositionProvider.TryGetCursorGridPosition(out var gridPosition)) return;
+            if (WorldTime.IsPaused || _currentMode == null ||
+                !_gridPositionProvider.TryGetCursorGridPosition(out var gridPosition))
+                return;
 
             RefreshCursor(gridPosition);
 

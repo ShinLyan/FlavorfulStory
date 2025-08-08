@@ -52,7 +52,11 @@ namespace FlavorfulStory.InventorySystem
         private void Start() => InventoryUpdated?.Invoke();
 
         /// <summary> При уничтожении объекта отвязать инвентарь. </summary>
-        private void OnDestroy() => _inventoryProvider?.Unregister(this);
+        private void OnDestroy()
+        {
+            _inventoryProvider?.Unregister(this);
+            InventoryUpdated = null;
+        }
 
         /// <summary> Есть ли место для предмета в инвентаре? </summary>
         public bool HasSpaceFor(InventoryItem item) => FindSlot(item) >= 0;
