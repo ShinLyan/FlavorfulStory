@@ -13,9 +13,7 @@ GameObject:
   - component: {fileID: -9086382434941903031}
   - component: {fileID: -7224571775252540193}
   - component: {fileID: 8899354503593919559}
-  - component: {fileID: 3452233814385004453}
   - component: {fileID: 3829864793704641259}
-  - component: {fileID: 2834186729858952054}
   m_Layer: 0
   m_Name: NPC
   m_TagString: Untagged
@@ -119,29 +117,6 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 1, z: 0}
---- !u!136 &3452233814385004453
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2558568035153998490}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 2
-  m_Height: 1
-  m_Direction: 1
-  m_Center: {x: 0, y: 1, z: 0}
 --- !u!54 &3829864793704641259
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -169,19 +144,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &2834186729858952054
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2558568035153998490}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3462b5bdf4db4a8394e0eda81165a4f2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _dialogue: {fileID: 0}
 --- !u!1 &4930828943317432825
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using FlavorfulStory.AI.FiniteStateMachine;
-using FlavorfulStory.Player;
 using FlavorfulStory.TimeManagement;
 using UnityEngine;
 using DateTime = FlavorfulStory.TimeManagement.DateTime;
@@ -10,7 +9,7 @@ namespace FlavorfulStory.AI.BaseNpc
 {
     /// <summary> Контроллер состояний конечного автомата NPC,
     /// управляющий переходами между различными состояниями персонажа. </summary>
-    public abstract class StateController : IDisposable, ICharacterCollisionHandler
+    public abstract class StateController : IDisposable
     {
         /// <summary> Текущее активное состояние персонажа. </summary>
         protected CharacterState _currentState;
@@ -21,10 +20,6 @@ namespace FlavorfulStory.AI.BaseNpc
         /// <summary> Контроллер анимации NPC для управления анимационными состояниями. </summary>
         protected readonly NpcAnimationController _animationController;
 
-        /// <summary> Контроллер игрока для взаимодействия. </summary>
-        protected readonly PlayerController _playerController;
-
-
         /// <summary> Transform NPC для определения позиции. </summary>
         protected readonly Transform _npcTransform;
 
@@ -34,14 +29,12 @@ namespace FlavorfulStory.AI.BaseNpc
 
         /// <summary> Инициализирует новый экземпляр контроллера состояний. </summary>
         /// <param name="npcAnimationController"> Контроллер анимации NPC. </param>
-        /// <param name="playerController"> Контроллерн игрока. </param>
         /// <param name="npcTransform"> Transform NPC для определения позиции. </param>
-        protected StateController(NpcAnimationController npcAnimationController, PlayerController playerController,
+        protected StateController(NpcAnimationController npcAnimationController,
             Transform npcTransform)
         {
             _nameToCharacterStates = new Dictionary<StateName, CharacterState>();
             _animationController = npcAnimationController;
-            _playerController = playerController;
             _npcTransform = npcTransform;
         }
 
@@ -90,13 +83,5 @@ namespace FlavorfulStory.AI.BaseNpc
             _currentState = next;
             _currentState?.Enter();
         }
-
-        /// <summary> Вызывается при входе игрока в триггер NPC. Переводит NPC в состояние ожидания. </summary>
-        /// <param name="other"> Коллайдер, вошедший в триггер. </param>
-        public abstract void OnTriggerEntered(Collider other);
-
-        /// <summary> Вызывается при выходе игрока из триггера NPC. Переводит NPC в состояние движения. </summary>
-        /// <param name="other"> Коллайдер, вышедший из триггера. </param>
-        public abstract void OnTriggerExited(Collider other);
     }
 }

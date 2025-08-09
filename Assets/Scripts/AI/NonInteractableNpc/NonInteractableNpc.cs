@@ -50,7 +50,6 @@ namespace FlavorfulStory.AI.NonInteractableNpc
                 _locationManager,
                 _animationController,
                 _transactionService,
-                _playerController,
                 transform,
                 GetComponent<NpcSpriteIndicator>()
             );

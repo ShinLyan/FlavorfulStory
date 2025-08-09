@@ -13,7 +13,7 @@ namespace FlavorfulStory.AI.InteractableNpc
 {
     /// <summary> Контроллер состояний конечного автомата NPC,
     /// управляющий переходами между различными состояниями персонажа. </summary>
-    public class InteractableNpcStateController : StateController
+    public class InteractableNpcStateController : StateController, ICharacterCollisionHandler
     {
         /// <summary> Обработчик расписания NPC </summary>
         private readonly NpcScheduleHandler _scheduleHandler;
@@ -27,6 +27,10 @@ namespace FlavorfulStory.AI.InteractableNpc
         /// <summary> Контроллер движения для интерактивного NPC. </summary>
         private readonly InteractableNpcMovementController _npcMovementController;
 
+
+        /// <summary> Контроллер игрока для взаимодействия. </summary>
+        protected readonly PlayerController _playerController;
+
         /// <summary> Инициализирует новый экземпляр контроллера состояний. </summary>
         /// <param name="npcSchedule"> Расписание NPC. </param>
         /// <param name="npcMovementController"> Контроллер движения NPC. </param>
@@ -37,11 +41,12 @@ namespace FlavorfulStory.AI.InteractableNpc
         public InteractableNpcStateController(NpcSchedule npcSchedule,
             InteractableNpcMovementController npcMovementController, NpcAnimationController npcAnimationController,
             NpcScheduleHandler scheduleHandler, Transform npcTransform, PlayerController playerController)
-            : base(npcAnimationController, playerController, npcTransform)
+            : base(npcAnimationController, npcTransform)
         {
             _sortedScheduleParams = npcSchedule.GetSortedScheduleParams();
             _scheduleHandler = scheduleHandler;
             _npcMovementController = npcMovementController;
+            _playerController = playerController;
             Initialize();
         }
 
@@ -121,9 +126,11 @@ namespace FlavorfulStory.AI.InteractableNpc
             OnCurrentScheduleParamsChanged?.Invoke(suitable);
         }
 
+        #region ICharacterCollisionHandler
+
         /// <summary> Вызывается при входе игрока в триггер NPC. Переводит NPC в состояние ожидания. </summary>
         /// <param name="other"> Коллайдер, вошедший в триггер. </param>
-        public override void OnTriggerEntered(Collider other)
+        public void OnTriggerEntered(Collider other)
         {
             SetState(StateName.Waiting);
             _animationController.TriggerAnimation(AnimationType.Idle);
@@ -131,10 +138,12 @@ namespace FlavorfulStory.AI.InteractableNpc
 
         /// <summary> Вызывается при выходе игрока из триггера NPC. Переводит NPC в состояние движения. </summary>
         /// <param name="other"> Коллайдер, вышедший из триггера. </param>
-        public override void OnTriggerExited(Collider other)
+        public void OnTriggerExited(Collider other)
         {
             SetState(StateName.Movement);
             _animationController.TriggerAnimation(AnimationType.Locomotion);
         }
+
+        #endregion
     }
 }

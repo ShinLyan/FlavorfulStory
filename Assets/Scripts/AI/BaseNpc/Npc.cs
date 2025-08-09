@@ -1,21 +1,13 @@
-﻿using FlavorfulStory.DialogueSystem;
-using FlavorfulStory.Player;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.AI;
-using Zenject;
 
 namespace FlavorfulStory.AI.BaseNpc
 {
     /// <summary> Базовый абстрактный класс для всех NPC персонажей в игре </summary>
     /// <remarks> Требует наличия компонентов NavMeshAgent и Animator на GameObject </remarks>
     [RequireComponent(typeof(CapsuleCollider), typeof(NavMeshAgent), typeof(Animator))]
-    [RequireComponent(typeof(NpcSpeaker))]
     public abstract class Npc : MonoBehaviour
     {
-        /// <summary> Информация о персонаже. </summary>
-        [field: SerializeField]
-        public NpcInfo NpcInfo { get; private set; }
-
         /// <summary> Контроллер состояний, управляющий переключением между состояниями NPC. </summary>
         protected StateController _stateController;
 
@@ -25,20 +17,12 @@ namespace FlavorfulStory.AI.BaseNpc
         /// <summary> Контроллер анимации NPC для воспроизведения состояний анимации. </summary>
         protected NpcAnimationController _animationController;
 
-        /// <summary> Контроллер игрока, используемый для взаимодействия NPC с игроком. </summary>
-        [Inject] protected PlayerController _playerController;
-
-        /// <summary> Обработчик столкновений для взаимодействия с игроком. </summary>
-        private NpcCollisionHandler _collisionHandler;
-
         /// <summary> Вызывается при создании объекта, может быть переопределен в наследниках </summary>
         protected virtual void Awake()
         {
             _animationController = CreateAnimationController();
             _movementController = CreateMovementController();
             _stateController = CreateStateController();
-
-            _collisionHandler = new NpcCollisionHandler(_stateController);
         }
 
         protected virtual void OnDestroy()
@@ -67,14 +51,5 @@ namespace FlavorfulStory.AI.BaseNpc
         /// <returns> Новый экземпляр StateController. </returns>
         /// <remarks> Должен быть реализован в наследниках. </remarks>
         protected abstract StateController CreateStateController();
-
-
-        /// <summary> Обрабатывает вход другого объекта в триггер коллизии NPC. </summary>
-        /// <param name="other"> Коллайдер, вошедший в триггер. </param>
-        private void OnTriggerEnter(Collider other) => _collisionHandler?.HandleTriggerEnter(other);
-
-        /// <summary> Обрабатывает выход другого объекта из триггера коллизии NPC. </summary>
-        /// <param name="other"> Коллайдер, покинувший триггер. </param>
-        private void OnTriggerExit(Collider other) => _collisionHandler?.HandleTriggerExit(other);
     }
 }
