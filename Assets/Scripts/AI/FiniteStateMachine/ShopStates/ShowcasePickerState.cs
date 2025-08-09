@@ -36,7 +36,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine.ShopStates
 
             var point = availableShowcase.GetAccessiblePoint();
 
-            _movementController.SetPoint(point); //TODO: добавить поворот в сторону точки
+            _movementController.SetPoint(point);
         }
 
         /// <summary> Возвращает статус завершения состояния. </summary>

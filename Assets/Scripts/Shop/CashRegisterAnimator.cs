@@ -4,19 +4,29 @@ using UnityEngine;
 
 namespace FlavorfulStory.Shop
 {
-    /// <summary> Отвечает за визуальную часть кассы: анимации текста, показ монетки, триггер игрока. </summary>
+    /// <summary> Управляет визуальными эффектами кассы. </summary>
     [RequireComponent(typeof(Collider))]
     public class CashRegisterAnimator : MonoBehaviour
     {
+        /// <summary> Текст с количеством денег. </summary>
         [SerializeField] private TMP_Text _moneyAmountText;
 
+        /// <summary> Объект монетки. </summary>
         [SerializeField] public GameObject _coin;
 
+        /// <summary> Ссылка на кассу. </summary>
         private CashRegister _cashRegister;
+
+        /// <summary> Анимация прозрачности текста. </summary>
         private Tween _textFadeTween;
+
+        /// <summary> Анимация масштаба текста. </summary>
         private Tween _textScaleTween;
+
+        /// <summary> Флаг нахождения игрока в триггере. </summary>
         private bool _playerInTrigger;
 
+        /// <summary> Инициализация компонента. </summary>
         private void Awake()
         {
             _cashRegister = GetComponent<CashRegister>();
@@ -26,10 +36,16 @@ namespace FlavorfulStory.Shop
             InitializeTextTransparency(0f);
         }
 
+        /// <summary> Обновляет текст с количеством денег. </summary>
+        /// <param name="amount"> Новое количество денег. </param>
         private void UpdateAmountText(int amount) => _moneyAmountText.text = amount.ToString();
 
+        /// <summary> Обновляет состояние монетки. </summary>
+        /// <param name="amount"> Текущее количество денег. </param>
         private void UpdateCoinState(int amount) => _coin.SetActive(amount > 0 && !_playerInTrigger);
 
+        /// <summary> Обрабатывает вход в триггер. </summary>
+        /// <param name="other"> Коллайдер вошедшего объекта. </param>
         private void OnTriggerEnter(Collider other)
         {
             if (!other.CompareTag("Player")) return;
@@ -39,6 +55,8 @@ namespace FlavorfulStory.Shop
             ShowText(true);
         }
 
+        /// <summary> Обрабатывает выход из триггера. </summary>
+        /// <param name="other"> Коллайдер вышедшего объекта. </param>
         private void OnTriggerExit(Collider other)
         {
             if (!other.CompareTag("Player")) return;
@@ -48,12 +66,17 @@ namespace FlavorfulStory.Shop
             UpdateCoinState(_cashRegister.Amount);
         }
 
+        /// <summary> Устанавливает прозрачность текста. </summary>
+        /// <param name="alpha"> Значение прозрачности. </param>
         private void InitializeTextTransparency(float alpha)
         {
             var color = _moneyAmountText.color;
             _moneyAmountText.color = new Color(color.r, color.g, color.b, alpha);
         }
 
+        /// <summary> Показывает/скрывает текст с анимацией. </summary>
+        /// <param name="show"> Показать текст. </param>
+        /// <param name="duration"> Длительность анимации. </param>
         private void ShowText(bool show, float duration = 0.3f)
         {
             _textFadeTween?.Kill();
@@ -82,6 +105,8 @@ namespace FlavorfulStory.Shop
             }
         }
 
+        /// <summary> Переключает видимость монетки. </summary>
+        /// <param name="show"> Показать монетку. </param>
         public void ToggleCoin(bool show) => _coin.SetActive(show);
     }
 }
