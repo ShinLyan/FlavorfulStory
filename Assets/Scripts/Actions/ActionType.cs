@@ -18,6 +18,9 @@
         /// <summary> Строительство или установка объекта. </summary>
         Build,
 
+        /// <summary> Получить деньги. </summary>
+        GetMoney,
+
         /// <summary> Открыть сундук / прилавок. </summary>
         Open
     }

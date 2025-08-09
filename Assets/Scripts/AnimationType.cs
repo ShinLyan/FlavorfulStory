@@ -31,6 +31,9 @@
         Special2,
 
         /// <summary> Анимация специального действия 3. </summary>
-        Special3
+        Special3,
+
+        /// <summary> Анимация размышления. </summary>
+        Thinking
     }
 }

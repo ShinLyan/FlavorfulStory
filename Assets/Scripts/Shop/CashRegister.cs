@@ -1,15 +1,79 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using FlavorfulStory.Actions;
+using FlavorfulStory.AI.BaseNpc;
+using FlavorfulStory.Audio;
 using FlavorfulStory.Economy;
+using FlavorfulStory.InteractionSystem;
+using FlavorfulStory.Player;
 using FlavorfulStory.Saving;
+using FlavorfulStory.TooltipSystem.ActionTooltips;
+using UnityEditor;
 using UnityEngine;
+using Zenject;
+using Random = UnityEngine.Random;
 
 namespace FlavorfulStory.Shop
 {
-    /// <summary> Касса магазина, реализующая хранение валюты и сохранение её состояния. </summary>
-    public class CashRegister : MonoBehaviour, ICurrencyStorage, ISaveable
+    /// <summary> Касса магазина — хранит валюту, точки доступа, умеет взаимодействовать и сохраняться. </summary>
+    [RequireComponent(typeof(CashRegisterAnimator))]
+    public class CashRegister : ShopObject, ICurrencyStorage, ISaveable, IInteractable
     {
+        /// <summary> Словарь доступности точек доступа к кассе. </summary>
+        private Dictionary<Transform, bool> _accessPointsAvailability;
+
+        /// <summary> Сервис транзакций, отвечающий за покупку и продажу предметов. </summary>
+        private TransactionService _transactionService;
+
+        private CashRegisterAnimator _cashRegisterAnimator;
+
+        [Inject]
+        private void Construct(TransactionService transactionService) => _transactionService = transactionService;
+
+        private void Awake() => _cashRegisterAnimator = GetComponent<CashRegisterAnimator>();
+
         /// <summary> Инициализирует значение золота при запуске. </summary>
-        private void Start() => OnAmountChanged?.Invoke(Amount);
+        private void Start()
+        {
+            InitializeAccessPoints();
+            OnAmountChanged?.Invoke(Amount);
+        }
+
+        /// <summary> Инициализирует словарь доступности точек доступа, устанавливая все точки как свободные. </summary>
+        private void InitializeAccessPoints()
+        {
+            _accessPointsAvailability = new Dictionary<Transform, bool>();
+            foreach (var point in _accessiblePositions) _accessPointsAvailability.Add(point, false);
+        }
+
+        /// <summary> Возвращает случайную свободную точку доступа и помечает её как занятую. </summary>
+        /// <returns> Transform свободной точки доступа или null, если все точки заняты. </returns>
+        public override DestinationPoint GetAccessiblePoint()
+        {
+            var freePoints = _accessPointsAvailability
+                .Where(x => !x.Value)
+                .Select(x => x.Key)
+                .ToList();
+
+            if (freePoints.Count == 0) return null;
+            var randomPosition = freePoints[Random.Range(0, freePoints.Count)];
+
+            return new DestinationPoint(randomPosition.position, randomPosition.rotation);
+        }
+
+        /// <summary> Освобождает указанную точку доступа, делая её доступной для использования. </summary>
+        /// <param name="point"> Transform точки доступа для освобождения. </param>
+        /// <param name="isOccupied">  </param>
+        public void SetPointOccupancy(Vector3 point, bool isOccupied)
+        {
+            var keysToUpdate = _accessPointsAvailability
+                .Where(kvp => kvp.Key.position == point)
+                .Select(kvp => kvp.Key)
+                .ToList();
+
+            foreach (var key in keysToUpdate) _accessPointsAvailability[key] = isOccupied;
+        }
 
         #region ICurrencyStorage
 
@@ -41,6 +105,38 @@ namespace FlavorfulStory.Shop
 
         #endregion
 
+        #region IInteractable
+
+        /// <summary> Описание действия с объектом. </summary>
+        public ActionTooltipData ActionTooltip => new("E", ActionType.GetMoney, "from Cash Desk");
+
+        /// <summary> Возвращает возможность взаимодействия с объектом. </summary>
+        public bool IsInteractionAllowed => true;
+
+        /// <summary> Вычисляет расстояние до указанного трансформа. </summary>
+        /// <param name="otherTransform"> Трансформ, до которого вычисляется расстояние. </param>
+        /// <returns> Расстояние до объекта. </returns>
+        public float GetDistanceTo(Transform otherTransform) =>
+            Vector3.Distance(transform.position, otherTransform.position);
+
+        /// <summary> Начинает взаимодействие с кассой. </summary>
+        /// <param name="player"> Контроллер игрока. </param>
+        public void BeginInteraction(PlayerController player)
+        {
+            player.SetBusyState(false);
+            if (Amount <= 0) return;
+
+            _transactionService.TransferMoneyFromCashRegisterToPlayer();
+            _cashRegisterAnimator.ToggleCoin(false);
+            SfxPlayer.Play(SfxType.CashRegister);
+        }
+
+        /// <summary> Завершает взаимодействие с кассой. </summary>
+        /// <param name="player"> Контроллер игрока. </param>
+        public void EndInteraction(PlayerController player) { }
+
+        #endregion
+
         #region ISaveable
 
         /// <summary> Структура, представляющая сериализуемое состояние кассы. </summary>
@@ -65,5 +161,45 @@ namespace FlavorfulStory.Shop
         }
 
         #endregion
+
+#if UNITY_EDITOR
+        /// <summary> Отрисовывает гизмо кассы с детализированной информацией о состоянии каждой точки доступа. </summary>
+        protected override void OnDrawGizmosSelected()
+        {
+            base.OnDrawGizmosSelected();
+
+            if (_accessiblePositions == null) return;
+
+            Color occupiedPointColor = new(1f, 0.3f, 0.3f, 0.8f);
+            Color freePointColor = new(0.3f, 1f, 0.3f, 0.8f);
+            const float PointLabelHeight = 0.5f;
+            const int LabelFontSize = 11;
+
+            var labelStyle = new GUIStyle
+            {
+                fontSize = LabelFontSize,
+                normal = new GUIStyleState { textColor = Color.white },
+                alignment = TextAnchor.MiddleCenter,
+                richText = true
+            };
+
+            foreach (var point in _accessiblePositions)
+            {
+                if (!point) continue;
+
+                bool isOccupied = _accessPointsAvailability != null &&
+                                  _accessPointsAvailability.ContainsKey(point) &&
+                                  _accessPointsAvailability[point];
+
+                Gizmos.color = isOccupied ? occupiedPointColor : freePointColor;
+                Gizmos.DrawLine(transform.position, point.position);
+
+                string statusText = isOccupied ? "<color=#ff3333>Occupied</color>" : "<color=#33ff33>Free</color>";
+                var labelPosition = point.position + Vector3.up * PointLabelHeight;
+
+                Handles.Label(labelPosition, statusText, labelStyle);
+            }
+        }
+#endif
     }
 }

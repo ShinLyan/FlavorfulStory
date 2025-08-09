@@ -105,12 +105,12 @@ namespace FlavorfulStory.TimeManagement
         /// Управляет последовательностью: пауза времени → затухание → сводка → продолжение. </summary>
         private async UniTask EndDayRoutine()
         {
-            WorldTime.Pause();
-
             await _fader.Show().AsyncWaitForCompletion();
             _locationManager.EnableLocation(LocationName.RockyIsland);
             await ResetCamera();
             _summaryView.Show();
+
+            WorldTime.Pause();
 
             bool continuePressed = false;
             _summaryView.OnContinuePressed = () => continuePressed = true;

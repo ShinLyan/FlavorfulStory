@@ -1,5 +1,4 @@
 using System;
-using FlavorfulStory.SceneManagement;
 using UnityEngine;
 
 namespace FlavorfulStory.AI.Scheduling
@@ -16,11 +15,6 @@ namespace FlavorfulStory.AI.Scheduling
         /// <summary> Минута, в которую NPC начнет движение в указанную точку. </summary>
         [field: Tooltip("Минута, в которую NPC начнет движение в указанную точку."), SerializeField, Range(0, 59)]
         public int Minutes { get; set; }
-
-        /// <summary> Название сцены, в которой находится указанная точка. </summary>
-        [field: Header("Scene Settings")]
-        [field: Tooltip("Название сцены, в которой находится указанная точка."), SerializeField]
-        public LocationName LocationName { get; set; }
 
         /// <summary> Координаты, в которые должен прийти NPC. </summary>
         [field: Tooltip("Координаты, в которые должен прийти NPC."), SerializeField]

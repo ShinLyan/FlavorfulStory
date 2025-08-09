@@ -243,13 +243,13 @@ namespace FlavorfulStory.Player
         public void TriggerAnimation(AnimationType animationType)
         {
             string animationName = animationType.ToString();
-            _animator.SetTrigger(Animator.StringToHash(animationName));
+            _animator.SetTrigger(animationName);
         }
 
         /// <summary> Запустить анимацию. </summary>
         /// <param name="animationName"> Тип проигрываемой анимации.</param>
         public void TriggerAnimation(string animationName) =>
-            _animator.SetTrigger(Animator.StringToHash(animationName));
+            _animator.SetTrigger(animationName);
 
         /// <summary> Повернуть игрока в направлении указанной позиции. </summary>
         /// <param name="position"> Позиция для поворота. </param>
