@@ -73,9 +73,6 @@ GameObject:
   - component: {fileID: 4358150499255224099}
   - component: {fileID: 5121881434942179207}
   - component: {fileID: 5867880977297999417}
-  - component: {fileID: 4019889353849009360}
-  - component: {fileID: 8271833279430460401}
-  - component: {fileID: 6642025541439772633}
   m_Layer: 0
   m_Name: Props_Furniture_BarCounter
   m_TagString: Untagged
@@ -151,67 +148,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &4019889353849009360
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3058386065948068584}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1.9650692, y: 1.0138948, z: 0.7581633}
-  m_Center: {x: 0.97721404, y: 0.5168755, z: 1.3750987}
---- !u!65 &8271833279430460401
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3058386065948068584}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 2.2, y: 1.0138948, z: 1}
-  m_Center: {x: 0.97721404, y: 0.5168755, z: 1.3750987}
---- !u!114 &6642025541439772633
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3058386065948068584}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ec94a14b4b9d41c6829ca071b8449c87, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _accessiblePositions:
-  - {fileID: 250533886169119623}
-  - {fileID: 1793417203054193545}
-  - {fileID: 1990341943044111406}
-  <InteractableObjectAnimation>k__BackingField: 7
-  _coin: {fileID: 2918774610261378282}
-  _moneyAmountText: {fileID: 4431874254866082364}
 --- !u!1 &3974647522235812466
 GameObject:
   m_ObjectHideFlags: 0
@@ -252,6 +188,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 621464303452856891}
+  - component: {fileID: 955130521777824042}
+  - component: {fileID: 2533428686932231189}
+  - component: {fileID: 6276666782773818123}
   m_Layer: 0
   m_Name: CashRegister
   m_TagString: Untagged
@@ -281,6 +220,67 @@ Transform:
   - {fileID: 501020837723820131}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &955130521777824042
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5458627584190748074}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1.9947917, y: 1, z: 0.809119}
+  m_Center: {x: -0.02080214, y: 0, z: -0.2313019}
+--- !u!65 &2533428686932231189
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5458627584190748074}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 2.08, y: 1, z: 0.89}
+  m_Center: {x: -0.02080214, y: 0, z: -0.2313019}
+--- !u!114 &6276666782773818123
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5458627584190748074}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ec94a14b4b9d41c6829ca071b8449c87, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _accessiblePositions:
+  - {fileID: 250533886169119623}
+  - {fileID: 1793417203054193545}
+  - {fileID: 1990341943044111406}
+  <InteractableObjectAnimation>k__BackingField: 7
+  _coin: {fileID: 2918774610261378282}
+  _moneyAmountText: {fileID: 4431874254866082364}
 --- !u!1 &8190566671652854790
 GameObject:
   m_ObjectHideFlags: 0

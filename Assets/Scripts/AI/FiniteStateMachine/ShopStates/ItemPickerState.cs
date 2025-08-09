@@ -15,13 +15,17 @@ namespace FlavorfulStory.AI.FiniteStateMachine.ShopStates
         /// <summary> Контроллер движения неинтерактивного NPC. </summary>
         private readonly NonInteractableNpcMovementController _movementController;
 
+        private readonly NpcSpriteIndicator _spriteIndicator;
+
         /// <summary> Инициализирует новый экземпляр состояния выбора предмета. </summary>
         /// <param name="npcMovementController"> Контроллер движения для управления перемещением NPC. </param>
         /// <param name="shopLocation"> Локация магазина для получения информации о кассе. </param>
-        public ItemPickerState(NonInteractableNpcMovementController npcMovementController, ShopLocation shopLocation)
+        public ItemPickerState(NonInteractableNpcMovementController npcMovementController, ShopLocation shopLocation,
+            NpcSpriteIndicator spriteIndicator)
         {
             _shopLocation = shopLocation;
             _movementController = npcMovementController;
+            _spriteIndicator = spriteIndicator;
         }
 
         /// <summary> Выполняет вход в состояние, освобождает полку и устанавливает цель движения к кассе. </summary>
@@ -31,9 +35,10 @@ namespace FlavorfulStory.AI.FiniteStateMachine.ShopStates
 
             if (Context != null && Context.TryGet<ShopObject>(ContextType.SelectedObject, out var showcase))
             {
-                var showcaseInventory = showcase.gameObject.GetComponent<Inventory>();
+                var showcaseInventory = ((Showcase)showcase).Inventory;
                 var itemStack = GetRandomStackFromInventory(showcaseInventory);
                 Context?.Set(ContextType.PurchaseItem, itemStack);
+                _spriteIndicator.ShowSprite();
             }
 
             var accessiblePoint = _shopLocation.CashRegister.GetAccessiblePoint();
@@ -59,7 +64,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine.ShopStates
             for (int i = 0; i < inventory.InventorySize; i++)
             {
                 var stackSlot = inventory.GetItemStackInSlot(i);
-                if (stackSlot.Item != null && stackSlot.Number > 0) nonEmptySlots.Add(i);
+                if (stackSlot.Item && stackSlot.Number > 0) nonEmptySlots.Add(i);
             }
 
             int randomIndex = Random.Range(0, nonEmptySlots.Count);

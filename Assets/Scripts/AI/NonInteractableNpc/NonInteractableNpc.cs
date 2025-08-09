@@ -11,6 +11,7 @@ using Zenject;
 namespace FlavorfulStory.AI.NonInteractableNpc
 {
     /// <summary> Неинтерактивный NPC, который может перемещаться и выполнять последовательности действий. </summary>
+    [RequireComponent(typeof(NpcSpriteIndicator))]
     public class NonInteractableNpc : Npc
     {
         /// <summary> Контроллер передвижений для неинтерктивного НПС. </summary>
@@ -50,7 +51,8 @@ namespace FlavorfulStory.AI.NonInteractableNpc
                 _animationController,
                 _transactionService,
                 _playerController,
-                transform
+                transform,
+                GetComponent<NpcSpriteIndicator>()
             );
             return _nonInteractableNpcStateController;
         }
@@ -73,16 +75,17 @@ namespace FlavorfulStory.AI.NonInteractableNpc
         public void SetDespawnPoint(Vector3 destination) =>
             (_stateController as NonInteractableNpcStateController)?.SetDespawnPoint(destination);
 
+#if UNITY_EDITOR
         protected virtual void OnDrawGizmosSelected()
         {
             if (_stateController != null)
             {
                 Gizmos.color = Color.yellow;
                 var labelPosition = transform.position + Vector3.up * 2.5f;
-#if UNITY_EDITOR
+
                 Handles.Label(labelPosition, _stateController.CurrentStateName.ToString());
-#endif
             }
         }
+#endif
     }
 }
