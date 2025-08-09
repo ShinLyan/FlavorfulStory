@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using FlavorfulStory.Actions;
+using FlavorfulStory.InteractionSystem;
+using FlavorfulStory.Toolbar;
 using Zenject;
 
 namespace FlavorfulStory.TooltipSystem.ActionTooltips

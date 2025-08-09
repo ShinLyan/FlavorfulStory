@@ -15,7 +15,7 @@ namespace FlavorfulStory.ObjectManagement
         /// <param name="position"> Глобальная позиция в мировых координатах. </param>
         /// <param name="rotationY"> Угол поворота вокруг оси Y. </param>
         /// <param name="scale"> Масштаб. </param>
-        /// <param name="hitsTaken"> Количество нанесенных ударов. </param>
+        /// <param name="data"> Дополнительные данные. </param>
         protected override GameObject SpawnObject(Vector3 position, float rotationY, Vector3 scale, object data = null)
         {
             var obj = base.SpawnObject(position, rotationY, scale);

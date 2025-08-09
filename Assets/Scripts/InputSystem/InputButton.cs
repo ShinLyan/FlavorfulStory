@@ -49,6 +49,12 @@
         MousePosition,
 
         /// <summary> Выбросить текущий предмет в руках. </summary>
-        DropCurrentItem
+        DropCurrentItem,
+
+        /// <summary> Левая кнопка мыши. </summary>
+        LeftMouse,
+
+        /// <summary> Правая кнопка мыши. </summary>
+        RightMouse
     }
 }

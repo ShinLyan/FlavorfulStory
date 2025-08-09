@@ -3,21 +3,29 @@ using FlavorfulStory.BuildingRepair.UI;
 using FlavorfulStory.DialogueSystem;
 using FlavorfulStory.DialogueSystem.UI;
 using FlavorfulStory.Economy;
+using FlavorfulStory.GridSystem;
 using FlavorfulStory.Infrastructure.Factories;
+using FlavorfulStory.InteractionSystem;
 using FlavorfulStory.InventorySystem;
 using FlavorfulStory.InventorySystem.DropSystem;
 using FlavorfulStory.InventorySystem.EquipmentSystem;
+using FlavorfulStory.InventorySystem.ItemUsage;
 using FlavorfulStory.InventorySystem.PickupSystem;
 using FlavorfulStory.InventorySystem.UI;
 using FlavorfulStory.Notifications;
 using FlavorfulStory.Notifications.UI;
+using FlavorfulStory.PlacementSystem;
 using FlavorfulStory.Player;
 using FlavorfulStory.QuestSystem;
 using FlavorfulStory.QuestSystem.Objectives;
 using FlavorfulStory.Saving;
 using FlavorfulStory.SceneManagement;
 using FlavorfulStory.Shop;
+using FlavorfulStory.Stats;
 using FlavorfulStory.TimeManagement;
+using FlavorfulStory.Toolbar;
+using FlavorfulStory.Toolbar.UI;
+using FlavorfulStory.Tools;
 using FlavorfulStory.TooltipSystem;
 using FlavorfulStory.TooltipSystem.ActionTooltips;
 using FlavorfulStory.UI;
@@ -55,19 +63,44 @@ namespace FlavorfulStory.Infrastructure.Installers
         /// <summary> Префаб всплывающей подсказки для предмета. </summary>
         [SerializeField] private ItemTooltipView _itemTooltipPrefab;
 
+        /// <summary> Индикатор клетки на гриде. </summary>
+        [SerializeField] private GameObject _gridIndicator;
+
+        /// <summary> Сопоставления типов инструментов с их префабами для визуализации в руке игрока. </summary>
+        [Tooltip("Сопоставления типов инструментов с их префабами для визуализации в руке игрока."), SerializeField]
+        private ToolPrefabMapping[] _toolMappings;
+
+        /// <summary> Слои, по которым производится удар с помощью инструмента. </summary>
+        [Tooltip("Слои, по которым производится удар с помощью инструмента. " +
+                 "Выбирать Default, Obstacle, Terrain"), SerializeField]
+        private LayerMask _hitableLayers;
+
         /// <summary> Выполняет установку всех зависимостей, необходимых для сцены. </summary>
         public override void InstallBindings()
         {
             SignalBusInstaller.Install(Container);
+            DeclareSignals();
 
             BindPlayer();
             BindInventory();
             BindDialogue();
             BindQuests();
             BindUI();
-            DeclareSignals();
             BindNotifications();
             BindSystems();
+        }
+
+        /// <summary> Объявление сигналов. </summary>
+        private void DeclareSignals()
+        {
+            Container.DeclareSignal<NightStartedSignal>();
+            Container.DeclareSignal<ItemCollectedSignal>();
+            Container.DeclareSignal<QuestAddedSignal>();
+
+            Container.DeclareSignal<ToolbarSlotSelectedSignal>();
+            Container.DeclareSignal<ToolbarHotkeyPressedSignal>();
+            Container.DeclareSignal<ConsumeSelectedItemSignal>();
+            Container.DeclareSignal<ClosestInteractableChangedSignal>();
         }
 
         /// <summary> Установить зависимости, связанные с игроком. </summary>
@@ -75,6 +108,7 @@ namespace FlavorfulStory.Infrastructure.Installers
         {
             Container.Bind<PlayerController>().FromComponentInHierarchy().AsSingle();
             Container.Bind<Equipment>().FromComponentInHierarchy().AsSingle();
+            Container.Bind<PlayerStats>().FromComponentInHierarchy().AsSingle();
 
             Container.Bind<PlayerWalletView>().FromComponentInHierarchy().AsSingle();
 
@@ -130,7 +164,7 @@ namespace FlavorfulStory.Infrastructure.Installers
             Container.Bind<IGameFactory<ResourceRequirementView>>().To<ResourceRequirementViewFactory>().AsSingle()
                 .WithArguments(_requirementViewPrefab);
 
-            Container.Bind<Toolbar>().FromComponentInHierarchy().AsSingle();
+            Container.Bind<ToolbarView>().FromComponentInHierarchy().AsSingle();
 
             Container.Bind<CanvasGroupFader>().WithId("HUD").FromInstance(_hudFader).AsSingle();
 
@@ -143,20 +177,9 @@ namespace FlavorfulStory.Infrastructure.Installers
         /// <summary> Установить зависимости, связанные с системой отображения тултипов действий. </summary>
         private void BindActionTooltipSystem()
         {
-            Container.DeclareSignal<ToolbarSlotSelectedSignal>();
-            Container.DeclareSignal<ClosestInteractableChangedSignal>();
-
             Container.BindInterfacesAndSelfTo<ActionTooltipController>().AsSingle().NonLazy();
             Container.Bind<IActionTooltipViewSpawner>().To<ActionTooltipViewSpawner>().FromComponentInHierarchy()
                 .AsSingle();
-        }
-
-        /// <summary> Объявление сигналов. </summary>
-        private void DeclareSignals()
-        {
-            Container.DeclareSignal<NightStartedSignal>();
-            Container.DeclareSignal<ItemCollectedSignal>();
-            Container.DeclareSignal<QuestAddedSignal>();
         }
 
         /// <summary> Установить зависимости, связанные с уведомлениями. </summary>
@@ -182,6 +205,21 @@ namespace FlavorfulStory.Infrastructure.Installers
             Container.Bind<SleepTrigger>().FromComponentInHierarchy().AsSingle();
 
             Container.BindInterfacesAndSelfTo<DayEndManager>().AsSingle();
+
+            Container.Bind<Grid>().FromComponentInHierarchy().AsSingle();
+            Container.Bind<GridPositionProvider>().AsSingle();
+            Container.BindInterfacesAndSelfTo<GridSelectionService>().AsSingle().WithArguments(_gridIndicator);
+
+            // TOOLS
+            Container.Bind<ToolUsageService>().AsSingle().WithArguments(_toolMappings, _hitableLayers);
+            Container.BindInterfacesAndSelfTo<ToolHighlightHandler>().AsSingle();
+
+            Container.Bind<PlacementController>().FromComponentInHierarchy().AsSingle();
+            Container.Bind<PlacementPreview>().FromComponentInHierarchy().AsSingle();
+
+            Container.BindInterfacesTo<ToolUseController>().AsSingle();
+            Container.BindInterfacesTo<EdibleUseController>().AsSingle();
+            Container.BindInterfacesTo<PlaceableUseController>().AsSingle();
         }
     }
 }
