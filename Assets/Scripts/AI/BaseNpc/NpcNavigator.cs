@@ -14,7 +14,7 @@ namespace FlavorfulStory.AI.BaseNpc
         private readonly NavMeshAgent _navMeshAgent;
 
         /// <summary> Текущая целевая точка расписания. </summary>
-        private Vector3 _currentTargetPoint;
+        private DestinationPoint _currentTargetPoint;
 
         /// <summary> Флаг, указывающий что NPC не двигается. </summary>
         protected bool _isNotMoving;
@@ -53,7 +53,7 @@ namespace FlavorfulStory.AI.BaseNpc
 
         /// <summary> Обновляет состояние навигации каждый кадр. </summary>
         /// <remarks> Проверяет достижение цели и обновляет состояние NPC. </remarks>
-        public virtual void Update()
+        public void Update()
         {
             if (_navMeshAgent.isOnOffMeshLink)
             {
@@ -65,13 +65,13 @@ namespace FlavorfulStory.AI.BaseNpc
 
             if (_isNotMoving) return;
 
-            var offset = _npcTransform.position - _currentTargetPoint;
+            var offset = _npcTransform.position - _currentTargetPoint.Position;
             offset.y = 0;
             float sqrDistance = offset.sqrMagnitude;
 
             if (sqrDistance <= ArrivalDistance)
             {
-                // _navMeshAgent.transform.rotation = Quaternion.Euler(_currentTargetPoint.Rotation);
+                _navMeshAgent.transform.rotation = _currentTargetPoint.Rotation;
                 OnDestinationReached?.Invoke();
                 Stop();
             }
@@ -87,16 +87,16 @@ namespace FlavorfulStory.AI.BaseNpc
             if (!warpToSpawn) return;
 
             _navMeshAgent.Warp(_spawnPosition);
-            _currentTargetPoint = Vector3.zero;
+            _currentTargetPoint = new DestinationPoint(Vector3.zero, Quaternion.identity);
         }
 
-        public void MoveTo(Vector3 point)
+        public void MoveTo(DestinationPoint point)
         {
             _currentTargetPoint = point;
             _isNotMoving = false;
             ResumeAgent();
 
-            _navMeshAgent.SetDestination(point);
+            _navMeshAgent.SetDestination(point.Position);
         }
 
         /// <summary> Переключает движение агента. </summary>

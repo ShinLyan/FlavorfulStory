@@ -40,8 +40,13 @@ namespace FlavorfulStory.AI.InteractableNpc
         /// <remarks> Если текущая точка расписания существует, инициирует движение к ней. </remarks>
         public override void MoveToPoint()
         {
-            if (_scheduleHandler.CurrentPoint != null)
-                _interactableNavigator.MoveTo(_scheduleHandler.CurrentPoint.Position);
+            var point = _scheduleHandler.CurrentPoint;
+            if (point != null)
+            {
+                var movePoint = new DestinationPoint(_scheduleHandler.CurrentPoint.Position,
+                    Quaternion.Euler(_scheduleHandler.CurrentPoint.Rotation));
+                _interactableNavigator.MoveTo(movePoint);
+            }
         }
     }
 }

@@ -24,7 +24,7 @@ namespace FlavorfulStory.AI.InteractableNpc
             if (_isNotMoving) return;
 
             Stop();
-            MoveTo(point.Position);
+            MoveTo(new DestinationPoint(point.Position, Quaternion.Euler(point.Rotation)));
         }
     }
 }

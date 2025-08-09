@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
+using FlavorfulStory.AI.BaseNpc;
 using FlavorfulStory.Infrastructure;
 using FlavorfulStory.SceneManagement;
 using FlavorfulStory.TimeManagement;
@@ -133,7 +134,7 @@ namespace FlavorfulStory.AI
             _activeCharacters.Add(npc);
 
             npc.OnReachedDespawnPoint += () => DespawnNpc(npc);
-            npc.SetDespawnPoint(despawnData.despawnPoint.position);
+            npc.SetDespawnPoint(new DestinationPoint(despawnData.despawnPoint.position, Quaternion.identity));
 
             SetDestinationAfterInit(npc).Forget();
         }
@@ -155,7 +156,7 @@ namespace FlavorfulStory.AI
             while (agent == null || !agent.isOnNavMesh) await UniTask.Yield();
 
             var loc = _locationManager.GetLocationByName(LocationName.NewShop);
-            npc.SetDestination(loc.transform.position);
+            npc.SetDestination(new DestinationPoint(loc.transform.position, Quaternion.identity));
         }
 
         /// <summary> Деспавнит всех активных NPC. </summary>

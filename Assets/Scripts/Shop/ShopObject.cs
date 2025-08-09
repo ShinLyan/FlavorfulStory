@@ -1,3 +1,4 @@
+using FlavorfulStory.AI.BaseNpc;
 using UnityEditor;
 using UnityEngine;
 
@@ -16,8 +17,11 @@ namespace FlavorfulStory.Shop
 
         /// <summary> Возвращает случайную доступную позицию для взаимодействия с объектом. </summary>
         /// <returns> Transform случайной доступной позиции. </returns>
-        public virtual Transform GetAccessiblePoint() =>
-            _accessiblePositions[Random.Range(0, _accessiblePositions.Length)];
+        public virtual DestinationPoint GetAccessiblePoint()
+        {
+            var randomPosition = _accessiblePositions[Random.Range(0, _accessiblePositions.Length)];
+            return new DestinationPoint(randomPosition.position, randomPosition.rotation);
+        }
 
 #if UNITY_EDITOR
         /// <summary> Отрисовывает гизмо объекта при выборе в редакторе. </summary>
@@ -26,10 +30,10 @@ namespace FlavorfulStory.Shop
             Color occupiedColor = new(1f, 0.3f, 0.3f, 1f); // Красный с прозрачностью
             Color freeColor = new(0.3f, 1f, 0.3f, 1f); // Зелёный с прозрачностью
             Color accessPointColor = new(0.3f, 0.3f, 1f, 1f);
-            const float mainGizmoSize = 3f;
+            const float MainGizmoSize = 3f;
 
             Gizmos.color = IsOccupied ? occupiedColor : freeColor;
-            Gizmos.DrawWireSphere(transform.position, mainGizmoSize);
+            Gizmos.DrawWireSphere(transform.position, MainGizmoSize);
 
             if (_accessiblePositions != null)
             {

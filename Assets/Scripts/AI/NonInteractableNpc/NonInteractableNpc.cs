@@ -58,7 +58,7 @@ namespace FlavorfulStory.AI.NonInteractableNpc
 
         /// <summary> Устанавливает цель для перемещения NPC с автоматическим запуском случайной последовательности по прибытии. </summary>
         /// <param name="destination"> Целевая позиция для перемещения. </param>
-        public void SetDestination(Vector3 destination)
+        public void SetDestination(DestinationPoint destination)
         {
             _nonInteractableNpcMovementController.SetPoint(destination);
             _nonInteractableNpcStateController.ForceSetState(StateName.Movement);
@@ -71,7 +71,7 @@ namespace FlavorfulStory.AI.NonInteractableNpc
 
         /// <summary> Устанавливает точку исчезновения для неинтерактивного NPC. </summary>
         /// <param name="destination"> Координаты точки, где NPC должен исчезнуть. </param>
-        public void SetDespawnPoint(Vector3 destination) =>
+        public void SetDespawnPoint(DestinationPoint destination) =>
             (_stateController as NonInteractableNpcStateController)?.SetDespawnPoint(destination);
 
 #if UNITY_EDITOR

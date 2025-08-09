@@ -8,7 +8,7 @@ namespace FlavorfulStory.AI.NonInteractableNpc
     public class NonInteractableNpcMovementController : NpcMovementController
     {
         /// <summary> Текущая точка расписания для перемещения. </summary>
-        private Vector3 _currentPoint;
+        private DestinationPoint _currentPoint;
 
         /// <summary> Инициализирует новый экземпляр контроллера движения неинтерактивного NPC. </summary>
         /// <param name="navMeshAgent"> Агент навигационной сетки для перемещения. </param>
@@ -17,7 +17,7 @@ namespace FlavorfulStory.AI.NonInteractableNpc
         public NonInteractableNpcMovementController(NavMeshAgent navMeshAgent, Transform transform,
             NpcAnimationController animationController) : base(navMeshAgent, transform, animationController)
         {
-            _currentPoint = Vector3.zero;
+            _currentPoint = new DestinationPoint(Vector3.zero, Quaternion.identity);
 
             _navigator.OnDestinationReached += () =>
             {
@@ -31,6 +31,6 @@ namespace FlavorfulStory.AI.NonInteractableNpc
 
         /// <summary> Устанавливает новую целевую точку для перемещения агента. </summary>
         /// <param name="newPoint"> Новая позиция в мировых координатах. </param>
-        public void SetPoint(Vector3 newPoint) => _currentPoint = newPoint;
+        public void SetPoint(DestinationPoint newPoint) => _currentPoint = newPoint;
     }
 }

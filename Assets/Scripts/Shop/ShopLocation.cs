@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using FlavorfulStory.SceneManagement;
 using UnityEngine;
+using DestinationPoint = FlavorfulStory.AI.BaseNpc.DestinationPoint;
 using Random = UnityEngine.Random;
 
 namespace FlavorfulStory.Shop
@@ -96,26 +97,28 @@ namespace FlavorfulStory.Shop
         /// расстояния от объектов магазина. </summary>
         /// <param name="maxAttempts"> Максимальное количество попыток генерации точки. </param>
         /// <returns> Случайная позиция на навигационной сетке или Vector3.zero. </returns>
-        public override Vector3 GetRandomPointOnNavMesh(int maxAttempts = 20)
+        public override DestinationPoint GetRandomPointOnNavMesh(int maxAttempts = 20)
         {
             for (int i = 0; i < maxAttempts; i++)
             {
-                var position = base.GetRandomPointOnNavMesh(maxAttempts);
-                if (position == Vector3.zero) continue;
+                var pointOnNavMesh = base.GetRandomPointOnNavMesh(maxAttempts);
+                if (pointOnNavMesh.Position == Vector3.zero) continue;
 
                 bool isValidPosition = _showcases.All(showcase =>
-                    !(Vector3.Distance(position, showcase.transform.position) < MinDistance));
+                    !(Vector3.Distance(pointOnNavMesh.Position, showcase.transform.position) < MinDistance));
 
                 if (!isValidPosition) continue;
 
                 if (_furnitures.All(furniture =>
-                        Vector3.Distance(position, furniture.transform.position) < MinDistance))
+                        Vector3.Distance(pointOnNavMesh.Position, furniture.transform.position) < MinDistance))
                     isValidPosition = false;
 
-                if (isValidPosition) return position;
+                if (isValidPosition)
+                    return new DestinationPoint(pointOnNavMesh.Position,
+                        Quaternion.Euler(0f, Random.Range(0f, 360f), 0f));
             }
 
-            return Vector3.zero;
+            return new DestinationPoint();
         }
     }
 }

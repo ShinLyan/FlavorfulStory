@@ -1,3 +1,4 @@
+using FlavorfulStory.AI.BaseNpc;
 using Unity.AI.Navigation;
 using UnityEngine;
 using UnityEngine.AI;
@@ -41,7 +42,7 @@ namespace FlavorfulStory.SceneManagement
         /// <summary> Находит случайную точку на NavMesh в пределах локации. </summary>
         /// <param name="maxAttempts"> Максимальное количество попыток поиска точки. По умолчанию 20. </param>
         /// <returns> Случайная позиция на NavMesh. Возвращает Vector3.zero, если точка не найдена. </returns>
-        public virtual Vector3 GetRandomPointOnNavMesh(int maxAttempts = 20)
+        public virtual DestinationPoint GetRandomPointOnNavMesh(int maxAttempts = 20)
         {
             Bounds searchBounds;
 
@@ -52,22 +53,23 @@ namespace FlavorfulStory.SceneManagement
             else
             {
                 Debug.LogWarning("Не удалось найти точку на NavMesh.");
-                return Vector3.zero;
+                return new DestinationPoint();
             }
 
             for (int i = 0; i < maxAttempts; i++)
             {
-                Vector3 randomPoint = new Vector3(
+                var randomPoint = new Vector3(
                     Random.Range(searchBounds.min.x, searchBounds.max.x),
                     searchBounds.center.y,
                     Random.Range(searchBounds.min.z, searchBounds.max.z)
                 );
 
-                if (NavMesh.SamplePosition(randomPoint, out NavMeshHit hit, 2f, NavMesh.AllAreas)) return hit.position;
+                if (NavMesh.SamplePosition(randomPoint, out var hit, 2f, NavMesh.AllAreas))
+                    return new DestinationPoint(hit.position, Quaternion.identity);
             }
 
             Debug.LogWarning("Не удалось найти точку на NavMesh.");
-            return Vector3.zero;
+            return new DestinationPoint();
         }
     }
 }

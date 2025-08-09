@@ -42,15 +42,15 @@ namespace FlavorfulStory.AI.FiniteStateMachine.ShopStates
             }
 
             var accessiblePoint = _shopLocation.CashRegister.GetAccessiblePoint();
-            _shopLocation.CashRegister.SetPointOccupancy(accessiblePoint, true);
+            _shopLocation.CashRegister.SetPointOccupancy(accessiblePoint.Position, true);
 
             Context?.Set(ContextType.CashDeskPoint, accessiblePoint);
             Context?.Set(ContextType.AnimationType, _shopLocation.CashRegister.InteractableObjectAnimation);
             Context?.Set(ContextType.AnimationTime, 3f);
 
-            _movementController.SetPoint(accessiblePoint.position); //TODO: добавить поворот в сторону точки
+            _movementController.SetPoint(accessiblePoint);
             _movementController.OnDestinationReached +=
-                () => _shopLocation.CashRegister.SetPointOccupancy(accessiblePoint, false);
+                () => _shopLocation.CashRegister.SetPointOccupancy(accessiblePoint.Position, false);
         }
 
         /// <summary> Возвращает статус завершения состояния. </summary>

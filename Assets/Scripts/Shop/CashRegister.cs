@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using FlavorfulStory.Actions;
+using FlavorfulStory.AI.BaseNpc;
 using FlavorfulStory.Audio;
 using FlavorfulStory.Economy;
 using FlavorfulStory.InteractionSystem;
@@ -48,7 +49,7 @@ namespace FlavorfulStory.Shop
 
         /// <summary> Возвращает случайную свободную точку доступа и помечает её как занятую. </summary>
         /// <returns> Transform свободной точки доступа или null, если все точки заняты. </returns>
-        public override Transform GetAccessiblePoint()
+        public override DestinationPoint GetAccessiblePoint()
         {
             var freePoints = _accessPointsAvailability
                 .Where(x => !x.Value)
@@ -56,16 +57,22 @@ namespace FlavorfulStory.Shop
                 .ToList();
 
             if (freePoints.Count == 0) return null;
+            var randomPosition = freePoints[Random.Range(0, freePoints.Count)];
 
-            return freePoints[Random.Range(0, freePoints.Count)];
+            return new DestinationPoint(randomPosition.position, randomPosition.rotation);
         }
 
         /// <summary> Освобождает указанную точку доступа, делая её доступной для использования. </summary>
         /// <param name="point"> Transform точки доступа для освобождения. </param>
         /// <param name="isOccupied">  </param>
-        public void SetPointOccupancy(Transform point, bool isOccupied)
+        public void SetPointOccupancy(Vector3 point, bool isOccupied)
         {
-            if (point) _accessPointsAvailability[point] = isOccupied;
+            var keysToUpdate = _accessPointsAvailability
+                .Where(kvp => kvp.Key.position == point)
+                .Select(kvp => kvp.Key)
+                .ToList();
+
+            foreach (var key in keysToUpdate) _accessPointsAvailability[key] = isOccupied;
         }
 
         #region ICurrencyStorage

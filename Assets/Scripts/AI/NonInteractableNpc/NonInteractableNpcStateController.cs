@@ -27,7 +27,7 @@ namespace FlavorfulStory.AI.NonInteractableNpc
         private bool _hadVisitedFurnitureAfterPurchase;
 
         /// <summary> Точка, в которой NPC должен исчезнуть. </summary>
-        private Vector3 _despawnPoint;
+        private DestinationPoint _despawnPoint;
 
         /// <summary> Сервис для обработки транзакций и торговых операций. </summary>
         private readonly TransactionService _transactionService;
@@ -55,7 +55,7 @@ namespace FlavorfulStory.AI.NonInteractableNpc
             _purchaseIndicator = npcPurchaseIndicator;
 
             _hadVisitedFurnitureAfterPurchase = false;
-            _despawnPoint = Vector3.zero;
+            _despawnPoint = new DestinationPoint();
 
             Initialize();
         }
@@ -226,7 +226,7 @@ namespace FlavorfulStory.AI.NonInteractableNpc
 
         /// <summary> Устанавливает точку исчезновения для NPC. </summary>
         /// <param name="destination"> Координаты точки, где NPC должен исчезнуть. </param>
-        public void SetDespawnPoint(Vector3 destination) => _despawnPoint = destination;
+        public void SetDespawnPoint(DestinationPoint destination) => _despawnPoint = destination;
 
         /// <summary> Принудительно устанавливает состояние NPC по строковому типу. </summary>
         /// <param name="stateName"> Строковое представление типа состояния для установки. </param>
