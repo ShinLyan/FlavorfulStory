@@ -32,7 +32,7 @@ namespace FlavorfulStory.AI.NonInteractableNpc
         /// <summary> Сервис для обработки транзакций и торговых операций. </summary>
         private readonly TransactionService _transactionService;
 
-        private readonly NpcSpriteIndicator _spriteIndicator;
+        private readonly NpcPurchaseIndicator _purchaseIndicator;
 
         #endregion
 
@@ -42,17 +42,17 @@ namespace FlavorfulStory.AI.NonInteractableNpc
         /// <param name="npcAnimationController"> Контроллер анимации NPC для управления анимациями персонажа. </param>
         /// <param name="transactionService"> Сервис для транзакций. </param>
         /// <param name="npcTransform"> Transform NPC для определения позиции. </param>
-        /// <param name="npcSpriteIndicator">  </param>
+        /// <param name="npcPurchaseIndicator">  </param>
         public NonInteractableNpcStateController(NonInteractableNpcMovementController npcMovementController,
             LocationManager locationManager, NpcAnimationController npcAnimationController,
             TransactionService transactionService, Transform npcTransform,
-            NpcSpriteIndicator npcSpriteIndicator)
+            NpcPurchaseIndicator npcPurchaseIndicator)
             : base(npcAnimationController, npcTransform)
         {
             _npcMovementController = npcMovementController;
             _locationManager = locationManager;
             _transactionService = transactionService;
-            _spriteIndicator = npcSpriteIndicator;
+            _purchaseIndicator = npcPurchaseIndicator;
 
             _hadVisitedFurnitureAfterPurchase = false;
             _despawnPoint = Vector3.zero;
@@ -80,9 +80,9 @@ namespace FlavorfulStory.AI.NonInteractableNpc
             _nameToCharacterStates.Add(StateName.FurniturePicker,
                 new FurniturePickerState(_npcMovementController, shopLocation));
             _nameToCharacterStates.Add(StateName.ItemPicker,
-                new ItemPickerState(_npcMovementController, shopLocation, _spriteIndicator));
+                new ItemPickerState(_npcMovementController, shopLocation, _purchaseIndicator));
             _nameToCharacterStates.Add(StateName.Payment,
-                new PaymentState(_locationManager, _transactionService, _spriteIndicator));
+                new PaymentState(_locationManager, _transactionService, _purchaseIndicator));
             _nameToCharacterStates.Add(StateName.RandomPointPicker,
                 new RandomPointPickerState(_npcMovementController, shopLocation));
             _nameToCharacterStates.Add(StateName.ShowcasePicker,

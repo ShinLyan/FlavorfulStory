@@ -15,17 +15,17 @@ namespace FlavorfulStory.AI.FiniteStateMachine.ShopStates
         /// <summary> Контроллер движения неинтерактивного NPC. </summary>
         private readonly NonInteractableNpcMovementController _movementController;
 
-        private readonly NpcSpriteIndicator _spriteIndicator;
+        private readonly NpcPurchaseIndicator _purchaseIndicator;
 
         /// <summary> Инициализирует новый экземпляр состояния выбора предмета. </summary>
         /// <param name="npcMovementController"> Контроллер движения для управления перемещением NPC. </param>
         /// <param name="shopLocation"> Локация магазина для получения информации о кассе. </param>
         public ItemPickerState(NonInteractableNpcMovementController npcMovementController, ShopLocation shopLocation,
-            NpcSpriteIndicator spriteIndicator)
+            NpcPurchaseIndicator purchaseIndicator)
         {
             _shopLocation = shopLocation;
             _movementController = npcMovementController;
-            _spriteIndicator = spriteIndicator;
+            _purchaseIndicator = purchaseIndicator;
         }
 
         /// <summary> Выполняет вход в состояние, освобождает полку и устанавливает цель движения к кассе. </summary>
@@ -38,7 +38,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine.ShopStates
                 var showcaseInventory = ((Showcase)showcase).Inventory;
                 var itemStack = GetRandomStackFromInventory(showcaseInventory);
                 Context?.Set(ContextType.PurchaseItem, itemStack);
-                _spriteIndicator.ShowSprite();
+                _purchaseIndicator.ShowModel();
             }
 
             var accessiblePoint = _shopLocation.CashRegister.GetAccessiblePoint();

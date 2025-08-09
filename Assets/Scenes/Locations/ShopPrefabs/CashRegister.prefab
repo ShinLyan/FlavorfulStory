@@ -191,6 +191,7 @@ GameObject:
   - component: {fileID: 955130521777824042}
   - component: {fileID: 2533428686932231189}
   - component: {fileID: 6276666782773818123}
+  - component: {fileID: 4489152861738310057}
   m_Layer: 0
   m_Name: CashRegister
   m_TagString: Untagged
@@ -279,8 +280,21 @@ MonoBehaviour:
   - {fileID: 1793417203054193545}
   - {fileID: 1990341943044111406}
   <InteractableObjectAnimation>k__BackingField: 7
-  _coin: {fileID: 2918774610261378282}
+--- !u!114 &4489152861738310057
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5458627584190748074}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8920caf9f1f74edba159a23839e19fb8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
   _moneyAmountText: {fileID: 4431874254866082364}
+  _cashRegister: {fileID: 0}
+  _coin: {fileID: 2918774610261378282}
 --- !u!1 &8190566671652854790
 GameObject:
   m_ObjectHideFlags: 0

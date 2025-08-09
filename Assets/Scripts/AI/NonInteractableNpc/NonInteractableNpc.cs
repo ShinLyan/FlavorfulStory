@@ -11,7 +11,7 @@ using Zenject;
 namespace FlavorfulStory.AI.NonInteractableNpc
 {
     /// <summary> Неинтерактивный NPC, который может перемещаться и выполнять последовательности действий. </summary>
-    [RequireComponent(typeof(NpcSpriteIndicator))]
+    [RequireComponent(typeof(NpcPurchaseIndicator))]
     public class NonInteractableNpc : Npc
     {
         /// <summary> Контроллер передвижений для неинтерктивного НПС. </summary>
@@ -51,7 +51,7 @@ namespace FlavorfulStory.AI.NonInteractableNpc
                 _animationController,
                 _transactionService,
                 transform,
-                GetComponent<NpcSpriteIndicator>()
+                GetComponent<NpcPurchaseIndicator>()
             );
             return _nonInteractableNpcStateController;
         }

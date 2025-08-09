@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using DG.Tweening;
 using FlavorfulStory.Actions;
 using FlavorfulStory.Audio;
 using FlavorfulStory.Economy;
@@ -9,7 +8,6 @@ using FlavorfulStory.InteractionSystem;
 using FlavorfulStory.Player;
 using FlavorfulStory.Saving;
 using FlavorfulStory.TooltipSystem.ActionTooltips;
-using TMPro;
 using UnityEditor;
 using UnityEngine;
 using Zenject;
@@ -17,7 +15,8 @@ using Random = UnityEngine.Random;
 
 namespace FlavorfulStory.Shop
 {
-    /// <summary> Касса магазина, реализующая хранение валюты и сохранение её состояния. </summary>
+    /// <summary> Касса магазина — хранит валюту, точки доступа, умеет взаимодействовать и сохраняться. </summary>
+    [RequireComponent(typeof(CashRegisterAnimator))]
     public class CashRegister : ShopObject, ICurrencyStorage, ISaveable, IInteractable
     {
         /// <summary> Словарь доступности точек доступа к кассе. </summary>
@@ -26,46 +25,18 @@ namespace FlavorfulStory.Shop
         /// <summary> Сервис транзакций, отвечающий за покупку и продажу предметов. </summary>
         private TransactionService _transactionService;
 
-        /// <summary> Монетка. </summary>
-        [SerializeField] private GameObject _coin;
+        private CashRegisterAnimator _cashRegisterAnimator;
 
-        /// <summary> Текстовое отображение денег в кассе. </summary>
-        [SerializeField] private TMP_Text _moneyAmountText;
-
-        /// <summary> Флаг, указывающий находится ли игрок в триггере кассы. </summary>
-        private bool _playerInTrigger;
-
-        /// <summary> Tween-анимация для эффекта исчезновения текста. </summary>
-        private Tween _textFadeTween;
-
-        /// <summary> Tween-анимация для эффекта масштабирования текста. </summary>
-        private Tween _textScaleTween;
-
-        /// <summary> Внедрение зависимостей Zenject. </summary>
-        /// <param name="transactionService"> Сервис транзакций. </param>
         [Inject]
         private void Construct(TransactionService transactionService) => _transactionService = transactionService;
 
-        /// <summary> Инициализация компонента при загрузке. </summary>
-        private void Awake()
-        {
-            _playerInTrigger = false;
-
-            OnAmountChanged += amount =>
-            {
-                _coin.SetActive(amount > 0 && !_playerInTrigger);
-                _moneyAmountText.text = amount.ToString();
-            };
-        }
+        private void Awake() => _cashRegisterAnimator = GetComponent<CashRegisterAnimator>();
 
         /// <summary> Инициализирует значение золота при запуске. </summary>
         private void Start()
         {
             InitializeAccessPoints();
             OnAmountChanged?.Invoke(Amount);
-
-            var color = _moneyAmountText.color;
-            _moneyAmountText.color = new Color(color.r, color.g, color.b, 0f);
         }
 
         /// <summary> Инициализирует словарь доступности точек доступа, устанавливая все точки как свободные. </summary>
@@ -86,72 +57,16 @@ namespace FlavorfulStory.Shop
 
             if (freePoints.Count == 0) return null;
 
-            var randomPoint = freePoints[Random.Range(0, freePoints.Count)];
-            return randomPoint;
+            return freePoints[Random.Range(0, freePoints.Count)];
         }
 
         /// <summary> Освобождает указанную точку доступа, делая её доступной для использования. </summary>
         /// <param name="point"> Transform точки доступа для освобождения. </param>
+        /// <param name="isOccupied">  </param>
         public void SetPointOccupancy(Transform point, bool isOccupied)
         {
             if (point) _accessPointsAvailability[point] = isOccupied;
         }
-
-        /// <summary> Обработчик входа объекта в триггер кассы. </summary>
-        /// <param name="other"> Коллайдер вошедшего объекта. </param>
-        private void OnTriggerEnter(Collider other)
-        {
-            if (other.CompareTag("Player"))
-            {
-                _playerInTrigger = true;
-                _coin.SetActive(false);
-                _moneyAmountText.gameObject.SetActive(true);
-                AnimateTextObjectPopUp(true);
-            }
-        }
-
-        /// <summary> Обработчик выхода объекта из триггера кассы. </summary>
-        /// <param name="other"> Коллайдер вышедшего объекта. </param>
-        private void OnTriggerExit(Collider other)
-        {
-            if (other.CompareTag("Player"))
-            {
-                _playerInTrigger = false;
-                AnimateTextObjectPopUp(false);
-
-                if (Amount > 0) _coin.SetActive(true);
-            }
-        }
-
-        /// <summary> Показывает или скрывает объект текста с анимацией. </summary>
-        private void AnimateTextObjectPopUp(bool show, float duration = 0.3f)
-        {
-            _textFadeTween?.Kill();
-            _textScaleTween?.Kill();
-
-            const float minScaleValue = 0.8f;
-            if (show)
-            {
-                _moneyAmountText.gameObject.SetActive(show);
-
-                _moneyAmountText.color = new Color(1f, 1f, 1f, 0f);
-                _moneyAmountText.transform.localScale = Vector3.one * minScaleValue;
-
-                _textFadeTween = _moneyAmountText.DOFade(1f, duration).SetEase(Ease.OutSine);
-                _textScaleTween = _moneyAmountText.transform
-                    .DOScale(1f, duration)
-                    .SetEase(Ease.OutBack);
-            }
-            else
-            {
-                _textFadeTween = _moneyAmountText.DOFade(0f, duration).SetEase(Ease.InSine);
-                _textScaleTween = _moneyAmountText.transform
-                    .DOScale(minScaleValue, duration)
-                    .SetEase(Ease.InBack)
-                    .OnComplete(() => { _moneyAmountText.gameObject.SetActive(show); });
-            }
-        }
-
 
         #region ICurrencyStorage
 
@@ -205,7 +120,7 @@ namespace FlavorfulStory.Shop
             if (Amount <= 0) return;
 
             _transactionService.TransferMoneyFromCashRegisterToPlayer();
-            _coin.SetActive(false);
+            _cashRegisterAnimator.ToggleCoin(false);
             SfxPlayer.Play(SfxType.CashRegister);
         }
 
@@ -248,15 +163,14 @@ namespace FlavorfulStory.Shop
 
             if (_accessiblePositions == null) return;
 
-            // Константы для гизмо
             Color occupiedPointColor = new(1f, 0.3f, 0.3f, 0.8f);
             Color freePointColor = new(0.3f, 1f, 0.3f, 0.8f);
-            const float pointLabelHeight = 0.5f;
-            const int labelFontSize = 11;
+            const float PointLabelHeight = 0.5f;
+            const int LabelFontSize = 11;
 
             var labelStyle = new GUIStyle
             {
-                fontSize = labelFontSize,
+                fontSize = LabelFontSize,
                 normal = new GUIStyleState { textColor = Color.white },
                 alignment = TextAnchor.MiddleCenter,
                 richText = true
@@ -274,7 +188,7 @@ namespace FlavorfulStory.Shop
                 Gizmos.DrawLine(transform.position, point.position);
 
                 string statusText = isOccupied ? "<color=#ff3333>Occupied</color>" : "<color=#33ff33>Free</color>";
-                var labelPosition = point.position + Vector3.up * pointLabelHeight;
+                var labelPosition = point.position + Vector3.up * PointLabelHeight;
 
                 Handles.Label(labelPosition, statusText, labelStyle);
             }
