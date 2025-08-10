@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace FlavorfulStory.InventorySystem
@@ -8,7 +9,7 @@ namespace FlavorfulStory.InventorySystem
     {
         /// <summary> Список всех инвентарей в игре. </summary>
         private readonly List<Inventory> _inventories;
-
+        
         /// <summary> Создать провайдер с переданным списком инвентарей. </summary>
         public InventoryProvider(List<Inventory> inventories) => _inventories = inventories;
 

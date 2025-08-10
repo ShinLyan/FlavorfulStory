@@ -18,6 +18,7 @@ namespace FlavorfulStory.Crafting
     {
         //TODO: комм
         [Inject] private ICraftingRecipeProvider _recipeProvider;
+        [Inject] private IInventoryProvider _inventoryProvider;
         
         /// <summary> Поле для ввода имени рецепта (фильтр). </summary>
         [Header("Recipe Previews")]
@@ -230,10 +231,9 @@ namespace FlavorfulStory.Crafting
             _recipeName.text = _currentRecipe.RecipeName;
             SetupRequirements();
 
-            bool canCraft = 
-                CraftingProcessor.CanCraft(_currentRecipe, _craftCount, _playerInventory) == CraftingResult.Success;
-            
+            bool canCraft = CraftingProcessor.CanCraft(_currentRecipe, _craftCount, _playerInventory) == CraftingResult.Success;
             bool stationBusy = _craftingStation != null && !_craftingStation.IsInteractionAllowed;
+
             _craftButton.interactable = canCraft && !stationBusy;
         }
 
@@ -269,16 +269,20 @@ namespace FlavorfulStory.Crafting
         /// <returns> Словарь ресурсов с информацией. </returns>
         private Dictionary<InventoryItem, (int available, int required)> CalculateItemStates()
         {
-            var result = new Dictionary<InventoryItem, (int available, int required)>();
+            var res = new Dictionary<InventoryItem, (int available, int required)>();
+            var chests = _inventoryProvider.GetAll(InventoryType.Chest);
 
             foreach (var input in _currentRecipe.InputItems)
             {
                 int required = input.Number * _craftCount;
-                int available = _playerInventory.GetItemNumber(input.Item);
-                result[input.Item] = (available, required);
-            }
 
-            return result;
+                int inPlayer = _playerInventory.GetItemNumber(input.Item);
+                int inChests = chests.Sum(inv => inv.GetItemNumber(input.Item));
+
+                int availableTotal = inPlayer + inChests;
+                res[input.Item] = (availableTotal, required);
+            }
+            return res;
         }
 
         /// <summary> Переключает отображение заблокированных рецептов. </summary>

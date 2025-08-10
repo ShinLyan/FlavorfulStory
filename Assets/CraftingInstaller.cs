@@ -1,4 +1,5 @@
 using FlavorfulStory.Crafting;
+using FlavorfulStory.InventorySystem;
 using Zenject;
 
 namespace FlavorfulStory
@@ -12,7 +13,7 @@ namespace FlavorfulStory
                 .AsSingle()
                 .NonLazy();
 
-            // Инициализацию статики лучше вынести в IInitializable, чтобы не делать Resolve в InstallBindings
+            //TODO: Инициализацию статики лучше вынести в IInitializable, чтобы не делать Resolve в InstallBindings
             Container.Bind<IInitializable>().To<CraftingBootstrap>().AsSingle();
         }
     }
@@ -20,7 +21,16 @@ namespace FlavorfulStory
     public sealed class CraftingBootstrap : IInitializable
     {
         private readonly ICraftingRecipeProvider _provider;
-        public CraftingBootstrap(ICraftingRecipeProvider provider) => _provider = provider;
-        public void Initialize() => CraftingProcessor.Init(_provider);
+        private readonly IInventoryProvider _inventoryProvider;
+
+        public CraftingBootstrap(
+            ICraftingRecipeProvider provider,
+            IInventoryProvider inventoryProvider)
+        {
+            _provider = provider;
+            _inventoryProvider = inventoryProvider;
+        }
+
+        public void Initialize() => CraftingProcessor.Init(_provider, _inventoryProvider);
     }
 }
