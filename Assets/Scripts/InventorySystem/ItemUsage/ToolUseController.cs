@@ -33,23 +33,23 @@ namespace FlavorfulStory.InventorySystem.ItemUsage
         }
 
         /// <summary> Покадровая обработка активного инструмента. </summary>
-        /// <param name="item"> Текущий активный инструмент. </param>
-        protected override void TickItem(Tool item)
+        /// <param name="tool"> Текущий активный инструмент. </param>
+        protected override void TickItem(Tool tool)
         {
-            bool leftClick = InputWrapper.GetLeftMouseButton() && item.UseActionType == UseActionType.LeftClick;
-            bool rightClick = InputWrapper.GetRightMouseButton() && item.UseActionType == UseActionType.RightClick;
+            bool leftClick = InputWrapper.GetLeftMouseButton() && tool.UseActionType == UseActionType.LeftClick;
+            bool rightClick = InputWrapper.GetRightMouseButton() && tool.UseActionType == UseActionType.RightClick;
             if (!leftClick && !rightClick) return;
 
             var stamina = _playerStats.GetStat<Stamina>();
-            if (stamina == null || stamina.CurrentValue < item.StaminaCost)
+            if (stamina == null || stamina.CurrentValue < tool.StaminaCost)
                 // TODO: Показываем уведомление / звук о нехватке стамины
                 return;
 
             if (!_gridPositionProvider.TryGetCursorGridPosition(out var gridPosition)) return;
 
             var cellCenter = _gridPositionProvider.GetCellCenterWorld(gridPosition);
-            bool success = _toolUsageService.TryUseTool(item, cellCenter);
-            if (success) stamina.ChangeValue(-item.StaminaCost);
+            bool success = _toolUsageService.TryUseTool(tool, cellCenter);
+            if (success) stamina.ChangeValue(-tool.StaminaCost);
         }
     }
 }

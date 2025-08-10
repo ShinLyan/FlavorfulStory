@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using Zenject;
 
 namespace FlavorfulStory.GridSystem
@@ -12,11 +13,11 @@ namespace FlavorfulStory.GridSystem
         /// <summary> Рендерер индикатора, используется для изменения цвета и текстуры. </summary>
         private Renderer _gridIndicatorRenderer;
 
-        /// <summary> Цвет индикатора при валидной позиции размещения. </summary>
-        public static readonly Color ValidColor = new(1f, 1f, 1f, 0.5f);
-
-        /// <summary> Цвет индикатора при невалидной позиции размещения. </summary>
-        public static readonly Color InvalidColor = new(1f, 0f, 0f, 0.5f);
+        private static readonly Dictionary<GridIndicatorState, Color> _stateColors = new()
+        {
+            { GridIndicatorState.ValidTarget, new Color(1f, 1f, 1f, 0.5f) },
+            { GridIndicatorState.InvalidTarget, new Color(0.85f, 0.1f, 0.6f, 0.55f) }
+        };
 
         /// <summary> Конструктор, принимающий объект-индикатор. </summary>
         /// <param name="gridIndicator"> Префаб или объект-индикатор для отображения на гриде. </param>
@@ -29,21 +30,26 @@ namespace FlavorfulStory.GridSystem
             HideGridIndicator();
         }
 
-        /// <summary> Показать индикатор на выбранной позиции с указанным размером и валидностью. </summary>
+        /// <summary> Показать индикатор на выбранной позиции с указанным размером и цветом. </summary>
         /// <param name="worldPosition"> Позиция в мире, где должен появиться индикатор. </param>
         /// <param name="size"> Размер (в клетках грида), который должен отобразиться. </param>
-        /// <param name="isValid"> Является ли текущая позиция допустимой для размещения. </param>
-        public void ShowGridIndicator(Vector3 worldPosition, Vector2Int size, bool isValid)
+        /// <param name="state"> Состояние индикатора. </param>
+        public void ShowGridIndicator(Vector3 worldPosition, Vector2Int size, GridIndicatorState state)
         {
             _gridIndicator.transform.position = worldPosition;
             _gridIndicator.transform.localScale = new Vector3(size.x, 1f, size.y);
             _gridIndicatorRenderer.material.mainTextureScale = size;
-            _gridIndicatorRenderer.material.color = isValid ? ValidColor : InvalidColor;
-
+            _gridIndicatorRenderer.material.color = GetColorForState(state);
             _gridIndicator.SetActive(true);
         }
 
         /// <summary> Скрывает индикатор. </summary>
         public void HideGridIndicator() => _gridIndicator.SetActive(false);
+
+        /// <summary> Получить цвет для указанного состояния индикатора. </summary>
+        /// <param name="state"></param>
+        /// <returns></returns>
+        public static Color GetColorForState(GridIndicatorState state) =>
+            _stateColors.TryGetValue(state, out var color) ? color : Color.white;
     }
 }

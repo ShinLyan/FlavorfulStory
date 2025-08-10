@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Linq;
+using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using FlavorfulStory.Audio;
 using FlavorfulStory.GridSystem;
@@ -13,14 +13,17 @@ namespace FlavorfulStory.Tools
     /// <summary> Сервис для использования инструментов игроком. </summary>
     public class ToolUsageService
     {
-        /// <summary> Маппинг типов инструментов на соответствующие префабы для отображения. </summary>
-        private readonly ToolPrefabMapping[] _toolMappings;
+        /// <summary> Словарь, сопоставляющий тип инструмента с его префабом. </summary>
+        private readonly Dictionary<ToolType, GameObject> _toolPrefabs;
 
         /// <summary> Слой, по которому осуществляется попадание при использовании инструмента. </summary>
         private readonly LayerMask _hitableLayers;
 
         /// <summary> Игрок, использующий инструмент. </summary>
         private readonly PlayerController _player;
+
+        /// <summary> Буфер коллайдеров для поиска объектов, которые можно ударить. </summary>
+        private readonly Collider[] _hitsBuffer = new Collider[10];
 
         /// <summary> Находится ли инструмент на перезарядке? </summary>
         private bool _isOnCooldown;
@@ -29,10 +32,16 @@ namespace FlavorfulStory.Tools
         private GameObject _activeTool;
 
         /// <summary> Максимальная дистанция взаимодействия инструментом (в клетках). </summary>
-        private const int MaxDistanceInCells = 2;
+        public const int MaxDistanceInCells = 2;
 
         /// <summary> Задержка между использованиями инструмента (в секундах). </summary>
         private const float CooldownSeconds = 1f;
+
+        /// <summary> Событие, вызываемое в момент начала использования инструмента. </summary>
+        public event Action<Vector3> ToolUseStarted;
+
+        /// <summary> Событие, вызываемое после завершения использования инструмента. </summary>
+        public event Action ToolUseFinished;
 
         /// <summary> Конструктор сервиса использования инструментов. </summary>
         /// <param name="toolMappings"> Маппинг типов инструментов на соответствующие префабы для отображения. </param>
@@ -40,9 +49,16 @@ namespace FlavorfulStory.Tools
         /// <param name="player"> Игрок, использующий инструмент. </param>
         public ToolUsageService(ToolPrefabMapping[] toolMappings, LayerMask hitableLayers, PlayerController player)
         {
-            _toolMappings = toolMappings;
             _hitableLayers = hitableLayers;
             _player = player;
+
+            _toolPrefabs = new Dictionary<ToolType, GameObject>();
+            foreach (var toolPrefabMapping in toolMappings)
+            {
+                if (toolPrefabMapping == null) continue;
+
+                _toolPrefabs[toolPrefabMapping.ToolType] = toolPrefabMapping.ToolPrefab;
+            }
         }
 
         /// <summary> Попробовать использовать инструмент в указанной клетке. </summary>
@@ -53,37 +69,33 @@ namespace FlavorfulStory.Tools
         {
             if (_isOnCooldown) return false;
 
-            var clampedTarget = ClampTargetToRange(_player.transform.position, cellCenter, MaxDistanceInCells);
-            DrawDebugHit(clampedTarget);
+            var target = ClampTargetToRange(_player.transform.position, cellCenter, MaxDistanceInCells);
+            DrawDebugHit(target);
+            ToolUseStarted?.Invoke(target);
 
-            bool hitSuccessful = TryGetValidHitableAt(tool, clampedTarget, out var hitable);
+            bool hitSuccessful = TryGetValidHitableAt(tool, target, out var hitable);
             if (hitSuccessful)
             {
                 hitable.TakeHit();
                 SfxPlayer.Play(hitable.SfxType);
             }
 
-            _player.RotateTowards(clampedTarget);
-            _player.TriggerAnimation($"Use{tool.ToolType}");
-            _player.SetBusyState(true);
-            SfxPlayer.Play(tool.SfxType);
+            BeginUse(tool, target);
 
-            EquipTool(tool);
             StartCooldownAsync().Forget();
-
             return hitSuccessful;
         }
 
         /// <summary> Ограничивает целевую точку до радиуса в клетках от игрока. </summary>
-        /// <param name="playerPos"> Позиция игрока в мировых координатах. </param>
+        /// <param name="playerPosition"> Позиция игрока в мировых координатах. </param>
         /// <param name="target"> Исходная целевая позиция (куда игрок хочет применить инструмент). </param>
         /// <param name="maxCells"> Максимальная дистанция в клетках, на которую можно применять инструмент. </param>
         /// <returns> Целевая позиция, ограниченная радиусом действия инструмента. </returns>
-        private static Vector3 ClampTargetToRange(Vector3 playerPos, Vector3 target, int maxCells)
+        private static Vector3 ClampTargetToRange(Vector3 playerPosition, Vector3 target, int maxCells)
         {
-            var direction = target - playerPos;
+            var direction = target - playerPosition;
             float maxDistance = GridPositionProvider.CellsToWorldDistance(maxCells);
-            return direction.magnitude <= maxDistance ? target : playerPos + direction.normalized * maxDistance;
+            return direction.magnitude <= maxDistance ? target : playerPosition + direction.normalized * maxDistance;
         }
 
         /// <summary> Попробовать получить подходящий для удара объект в указанной клетке. </summary>
@@ -95,15 +107,13 @@ namespace FlavorfulStory.Tools
         {
             hitable = null;
 
-            var hits = Physics.OverlapBox(cellCenter, GridPositionProvider.CellHalfExtents,
+            int count = Physics.OverlapBoxNonAlloc(cellCenter, GridPositionProvider.CellHalfExtents, _hitsBuffer,
                 Quaternion.identity, _hitableLayers);
 
-            foreach (var collider in hits)
+            for (int i = 0; i < count; i++)
             {
-                var candidate = collider.GetComponentInParent<IHitable>();
-                if (candidate == null) continue;
-
-                if (!candidate.CanBeHitBy(tool.ToolType, tool.ToolLevel)) continue;
+                var candidate = _hitsBuffer[i].GetComponentInParent<IHitable>();
+                if (candidate == null || !candidate.CanBeHitBy(tool.ToolType, tool.ToolLevel)) continue;
 
                 hitable = candidate;
                 return true;
@@ -112,12 +122,33 @@ namespace FlavorfulStory.Tools
             return false;
         }
 
+        /// <summary> Выполняет подготовительные действия при начале использования инструмента. </summary>
+        /// <param name="tool"> Инструмент, который используется. </param>
+        /// <param name="target"> Мировая позиция цели удара. </param>
+        private void BeginUse(Tool tool, Vector3 target)
+        {
+            _player.RotateTowards(target);
+            _player.TriggerAnimation($"Use{tool.ToolType}");
+            _player.SetBusyState(true);
+            SfxPlayer.Play(tool.SfxType);
+            EquipTool(tool);
+        }
+
+        /// <summary> Завершает процесс использования инструмента. </summary>
+        private void EndUse()
+        {
+            UnequipTool();
+            _player.SetBusyState(false);
+            ToolUseFinished?.Invoke();
+        }
+
         /// <summary> Отрисовывает в сцене отладочную визуализацию клетки, в которую был произведён удар. </summary>
         /// <param name="center"> Центр ячейки, в которую был направлен удар. </param>
         private static void DrawDebugHit(Vector3 center)
         {
+#if UNITY_EDITOR
             var color = Color.magenta;
-            float duration = 1f;
+            const float duration = 1f;
 
             // ⬆ вертикальный луч из центра ячейки
             Debug.DrawRay(center, Vector3.up * 2f, color, duration);
@@ -135,6 +166,7 @@ namespace FlavorfulStory.Tools
             Debug.DrawLine(corners[1], corners[2], color, duration);
             Debug.DrawLine(corners[2], corners[3], color, duration);
             Debug.DrawLine(corners[3], corners[0], color, duration);
+#endif
         }
 
         /// <summary> Запускает перезарядку между ударами инструмента и завершает использование. </summary>
@@ -144,10 +176,8 @@ namespace FlavorfulStory.Tools
 
             await UniTask.Delay(TimeSpan.FromSeconds(CooldownSeconds));
 
-            UnequipTool();
-
-            _player.SetBusyState(false);
             _isOnCooldown = false;
+            EndUse();
         }
 
         /// <summary> Активирует отображение инструмента в руке игрока на основе его типа. </summary>
@@ -157,8 +187,7 @@ namespace FlavorfulStory.Tools
         {
             if (_activeTool) return;
 
-            var prefab = _toolMappings.FirstOrDefault(mapping => mapping.ToolType == tool.ToolType)?.ToolPrefab;
-            if (!prefab) return;
+            if (!_toolPrefabs.TryGetValue(tool.ToolType, out var prefab) || !prefab) return;
 
             _activeTool = prefab;
             _activeTool.SetActive(true);

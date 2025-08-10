@@ -70,7 +70,8 @@ namespace FlavorfulStory.PlacementSystem
             }
 
             var size = _previewObject ? _previewObject.Size : Vector2Int.one;
-            _gridSelectionService.ShowGridIndicator(position, size, isValid);
+            _gridSelectionService.ShowGridIndicator(position, size,
+                isValid ? GridIndicatorState.ValidTarget : GridIndicatorState.InvalidTarget);
         }
 
         /// <summary> Применить материал предпросмотра ко всем рендерерам объекта. </summary>
@@ -88,8 +89,9 @@ namespace FlavorfulStory.PlacementSystem
         /// <summary> Установить цвет предпросмотра в зависимости от валидности размещения. </summary>
         /// <param name="isValid"> true – зелёный, false – красный. </param>
         private void SetPreviewColor(bool isValid) =>
-            _previewMaterialInstance.color =
-                isValid ? GridSelectionService.ValidColor : GridSelectionService.InvalidColor;
+            _previewMaterialInstance.color = isValid
+                ? GridSelectionService.GetColorForState(GridIndicatorState.ValidTarget)
+                : GridSelectionService.GetColorForState(GridIndicatorState.InvalidTarget);
 
         /// <summary> Удалить объект предпросмотра и вернуть коллайдеры. </summary>
         private void ClearPreviewObject()
