@@ -121,7 +121,7 @@ namespace FlavorfulStory.Installers
 
             Container.Bind<ConfirmationWindowView>().FromComponentInHierarchy().AsSingle();
             Container.Bind<SummaryView>().FromComponentInHierarchy().AsSingle();
-            Container.Bind<RepairableBuildingView>().FromComponentInHierarchy().AsSingle();
+            Container.Bind<RepairableBuildingWindow>().FromComponentInHierarchy().AsSingle();
 
             Container.Bind<IGameFactory<InventorySlotView>>().To<InventorySlotViewFactory>().AsSingle()
                 .WithArguments(_inventorySlotViewPrefab);

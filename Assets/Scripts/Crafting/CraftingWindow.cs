@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -15,6 +16,9 @@ namespace FlavorfulStory.Crafting
     /// <summary> Окно крафта, отображающее рецепты, требования и управление процессом. </summary>
     public class CraftingWindow : MonoBehaviour
     {
+        //TODO: комм
+        [Inject] private ICraftingRecipeProvider _recipeProvider;
+        
         /// <summary> Поле для ввода имени рецепта (фильтр). </summary>
         [Header("Recipe Previews")]
         [SerializeField] private TMP_InputField _recipeNameInput;
@@ -89,14 +93,21 @@ namespace FlavorfulStory.Crafting
         [Inject]
         private void Construct(Inventory inventory) => _playerInventory = inventory;
 
-        /// <summary> Проверяет ввод и закрывает окно по кнопке меню. </summary>
+        /// <summary> Проверить ввод пользователя и закрыть окно при необходимости. </summary>
         private void Update()
         {
             if (!_isOpen || !InputWrapper.GetButtonDown(InputButton.SwitchGameMenu)) return;
 
-            StartCoroutine(BlockGameMenuForOneFrame());
             Close();
+            BlockGameMenuForOneFrame().Forget();
+        }
+
+        /// <summary> Заблокировать кнопку игрового меню на один кадр. </summary>
+        private static async UniTaskVoid BlockGameMenuForOneFrame() // TODO: УДАЛИТЬ КОСТЫЛЬ НА WINDOW FABRIC
+        {
             InputWrapper.BlockInput(InputButton.SwitchGameMenu);
+            await UniTask.Yield();
+            InputWrapper.UnblockAllInput();
         }
 
         //TODO: Завести DTO/Контекст под 3 экшена?
@@ -104,14 +115,14 @@ namespace FlavorfulStory.Crafting
         /// <param name="recipeData"> Список рецептов. </param>
         /// <param name="onCraftRequested"> Делегат на запуск крафта. </param>
         /// <param name="onCloseRequested"> Делегат на закрытие окна. </param>
-        public void Setup(IEnumerable<CraftingRecipe> recipeData, Action<CraftingRecipe, int> onCraftRequested,
+        public void Setup(Action<CraftingRecipe, int> onCraftRequested,
             Action onCloseRequested)
         {
             Initialize();
-            _recipeData = recipeData;
+            _recipeData = _recipeProvider.All;
             _onCraftRequested = onCraftRequested;
             _onCloseRequested = onCloseRequested;
-
+            
             SetupViews(_recipeData.ToList());
             UpdateRecipeViews();
             
@@ -124,8 +135,8 @@ namespace FlavorfulStory.Crafting
         {
             string recipeNamePrefix = _recipeNameInput.text.Trim();
 
-            var query = _recipeData
-                .Where(recipe => _showLockedRecipes || !recipe.IsLocked);
+            var query = 
+                _recipeData.Where(r => _showLockedRecipes || _recipeProvider.IsUnlocked(r.RecipeID));
 
             if (!string.IsNullOrEmpty(recipeNamePrefix))
                 query = query.Where(recipe => recipe.RecipeName.StartsWith
@@ -134,8 +145,8 @@ namespace FlavorfulStory.Crafting
                 ));
 
             var filtered = query
-                .OrderBy(recipe => recipe.IsLocked)
-                .ThenBy(recipe => recipe.RecipeName)
+                .OrderBy(r => !_recipeProvider.IsUnlocked(r.RecipeID)) // открытые первыми
+                .ThenBy(r => r.RecipeName)
                 .ToList();
 
             SetupViews(filtered);
@@ -158,6 +169,7 @@ namespace FlavorfulStory.Crafting
             _noRecipesFoundText.gameObject.SetActive(false);
             _lockedRecipesToggle.onValueChanged.AddListener(ToggleLockedRecipes);
             _isOpen = false;
+            _recipeProvider.RecipeUnlocked += (_) => UpdateRecipeViews();
 
             _initialized = true;
         }
@@ -274,9 +286,12 @@ namespace FlavorfulStory.Crafting
         public void Open()
         {
             Initialize();
+            
             _isOpen = true;
             gameObject.SetActive(true);
             WorldTime.Pause();
+            InputWrapper.BlockAllInput();
+            InputWrapper.UnblockInput(InputButton.SwitchGameMenu);
             UpdateCraftCountText();
         }
 
@@ -288,15 +303,6 @@ namespace FlavorfulStory.Crafting
             WorldTime.Unpause();
             InputWrapper.UnblockAllInput();
             _onCloseRequested?.Invoke();
-        }
-
-        /// <summary> Блокирует кнопку меню на один кадр. </summary>
-        /// <returns> Корутина для задержки. </returns>
-        private static IEnumerator BlockGameMenuForOneFrame()
-        {
-            InputWrapper.BlockInput(InputButton.SwitchGameMenu);
-            yield return null;
-            InputWrapper.UnblockAllInput();
         }
 
         /// <summary> Увеличивает количество создаваемых наборов. </summary>

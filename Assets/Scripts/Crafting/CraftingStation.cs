@@ -18,6 +18,9 @@ namespace FlavorfulStory.Crafting
         /// <summary> Инвентарь игрока, участвующий в крафте. </summary>
         private Inventory _playerInventory;
 
+        //todo: КОММ
+        private ICraftingRecipeProvider _recipeProvider;
+        
         /// <summary> Описание действия с объектом. </summary>        
         public ActionTooltipData ActionTooltip => new ("E", ActionType.Craft, "at Crafting Station");
 
@@ -27,11 +30,16 @@ namespace FlavorfulStory.Crafting
         /// <summary> Внедряет зависимости окна крафта и инвентаря игрока. </summary>
         /// <param name="craftingWindow"> Окно крафта. </param>
         /// <param name="playerInventory"> Инвентарь игрока. </param>
+        /// /// <param name="recipeProvider"> Провайдер рецептов. </param>
         [Inject]
-        private void Construct(CraftingWindow craftingWindow, Inventory playerInventory)
+        private void Construct(
+            CraftingWindow craftingWindow,
+            Inventory playerInventory,
+            ICraftingRecipeProvider recipeProvider)
         {
             _craftingWindow = craftingWindow;
             _playerInventory = playerInventory;
+            _recipeProvider = recipeProvider;
         }
 
         /// <summary> Возвращает расстояние до игрока. </summary>
@@ -45,7 +53,6 @@ namespace FlavorfulStory.Crafting
         public void BeginInteraction(PlayerController player)
         {
             _craftingWindow.Setup(
-                CraftingRecipeProvider.GetAllRecipes(),
                 OnCraftRequested,
                 () => EndInteraction(player)
             );

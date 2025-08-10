@@ -215,14 +215,16 @@ namespace FlavorfulStory.InventorySystem
                 return;
             }
 
-            var slot = _inventorySlots[slotIndex];
+            ref var slot = ref _inventorySlots[slotIndex]; 
             if (!slot.Item || slot.Number <= 0)
             {
                 Debug.LogError($"Attempted to remove from empty slot {slotIndex}");
                 return;
             }
+            
+            int toRemove = Math.Min(number, slot.Number);
+            slot.Number -= toRemove;
 
-            slot.Number -= number;
             if (slot.Number <= 0) ClearSlot(slotIndex);
 
             InventoryUpdated?.Invoke();

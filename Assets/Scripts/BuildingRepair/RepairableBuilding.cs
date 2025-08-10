@@ -35,7 +35,7 @@ namespace FlavorfulStory.BuildingRepair
         private List<int> _investedResources;
 
         /// <summary> Представление интерфейса ремонта здания. </summary>
-        private RepairableBuildingView _view;
+        private RepairableBuildingWindow _repairableBuildingWindow;
 
         /// <summary> Завершен ли ремонт здания? </summary>
         private bool _isRepairCompleted;
@@ -56,12 +56,12 @@ namespace FlavorfulStory.BuildingRepair
 
         /// <summary> Внедрение зависимостей Zenject. </summary>
         /// <param name="inventory"> Инвентарь игрока. </param>
-        /// <param name="view"> Визуальное представление ремонта зданий. </param>
+        /// <param name="RepairableBuildingWindow"> Визуальное представление ремонта зданий. </param>
         [Inject]
-        private void Construct(Inventory inventory, RepairableBuildingView view)
+        private void Construct(Inventory inventory, RepairableBuildingWindow RepairableBuildingWindow)
         {
             _playerInventory = inventory;
-            _view = view;
+            _repairableBuildingWindow = RepairableBuildingWindow;
         }
 
         /// <summary> Инициализация компонента. </summary>
@@ -96,14 +96,14 @@ namespace FlavorfulStory.BuildingRepair
         /// <param name="player"> Игрок, который начал взаимодействие. </param>
         public void BeginInteraction(PlayerController player)
         {
-            _onStageUpdated += _view.UpdateView;
-            OnRepairCompleted += _view.DisplayCompletionMessage;
+            _onStageUpdated += _repairableBuildingWindow.UpdateView;
+            OnRepairCompleted += _repairableBuildingWindow.DisplayCompletionMessage;
 
-            _view.Show(CurrentStage, _investedResources, AddResource, ReturnResource, Build,
+            _repairableBuildingWindow.Show(CurrentStage, _investedResources, AddResource, ReturnResource, Build,
                 () =>
                 {
-                    _onStageUpdated -= _view.UpdateView;
-                    OnRepairCompleted -= _view.DisplayCompletionMessage;
+                    _onStageUpdated -= _repairableBuildingWindow.UpdateView;
+                    OnRepairCompleted -= _repairableBuildingWindow.DisplayCompletionMessage;
                     EndInteraction(player);
                 }
             );

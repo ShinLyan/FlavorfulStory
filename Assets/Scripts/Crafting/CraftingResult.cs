@@ -10,6 +10,9 @@
         NotEnoughResources,
 
         /// <summary> Недостаточно места в инвентаре для результата. </summary>
-        NotEnoughSpace
+        NotEnoughSpace,
+        
+        /// <summary> Рецепт закрыт. </summary>
+        Locked,
     }
 }

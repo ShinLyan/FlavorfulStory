@@ -37,9 +37,6 @@ namespace FlavorfulStory.Crafting
         /// <summary> Формирует описание рецепта. </summary>
         /// <param name="recipe"> Рецепт для отображения. </param>
         /// <returns> Строку описания. </returns>
-        private string BuildDescription(CraftingRecipe recipe)
-        {
-            return recipe.Description;
-        }
+        private string BuildDescription(CraftingRecipe recipe) => recipe.Description;
     }
 }

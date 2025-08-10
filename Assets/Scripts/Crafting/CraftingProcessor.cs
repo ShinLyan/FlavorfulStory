@@ -8,6 +8,11 @@ namespace FlavorfulStory.Crafting
     /// <summary> Класс, отвечающий за выполнение рецепта, валидацию и распределение предметов. </summary>
     public static class CraftingProcessor
     {
+        //TODO: комм
+        private static ICraftingRecipeProvider _provider;
+        
+        public static void Init(ICraftingRecipeProvider provider) => _provider = provider;
+        
         /// <summary> Выполняет рецепт крафта, проверяя условия и добавляя предметы в инвентарь. </summary>
         /// <param name="recipe"> Рецепт крафта. </param>
         /// <param name="count"> Количество создаваемых наборов. </param>
@@ -39,9 +44,14 @@ namespace FlavorfulStory.Crafting
         /// <returns> <see cref="CraftingResult"/>: результат проверки крафта. </returns>
         public static CraftingResult CanCraft(CraftingRecipe recipe, int count, Inventory inventory)
         {
-            if (!PlayerHasEnoughItems(recipe, count, inventory)) return CraftingResult.NotEnoughResources;
+            if (_provider != null && !_provider.IsUnlocked(recipe.RecipeID))
+                return CraftingResult.Locked;
 
-            if (!PlayerHasSpaceForCraftedItems(recipe, count, inventory)) return CraftingResult.NotEnoughSpace;
+            if (!PlayerHasEnoughItems(recipe, count, inventory))
+                return CraftingResult.NotEnoughResources;
+
+            if (!PlayerHasSpaceForCraftedItems(recipe, count, inventory))
+                return CraftingResult.NotEnoughSpace;
 
             return CraftingResult.Success;
         }

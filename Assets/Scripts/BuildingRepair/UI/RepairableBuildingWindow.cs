@@ -15,7 +15,7 @@ using FlavorfulStory.TimeManagement;
 namespace FlavorfulStory.BuildingRepair.UI
 {
     /// <summary> Визуальное представление ремонта зданий. </summary>
-    public class RepairableBuildingView : MonoBehaviour
+    public class RepairableBuildingWindow : MonoBehaviour
     {
         #region Fields and Properties
 
@@ -190,7 +190,6 @@ namespace FlavorfulStory.BuildingRepair.UI
         {
             _isOpen = false;
             gameObject.SetActive(false);
-
             WorldTime.Unpause();
             InputWrapper.UnblockAllInput();
 
