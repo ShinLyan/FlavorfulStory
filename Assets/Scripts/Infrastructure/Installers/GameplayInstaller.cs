@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using FlavorfulStory.Crafting;
 using FlavorfulStory.BuildingRepair.UI;
 using FlavorfulStory.DialogueSystem;
 using FlavorfulStory.DialogueSystem.UI;
@@ -10,6 +9,8 @@ using FlavorfulStory.InventorySystem.DropSystem;
 using FlavorfulStory.InventorySystem.EquipmentSystem;
 using FlavorfulStory.InventorySystem.PickupSystem;
 using FlavorfulStory.InventorySystem.UI;
+using FlavorfulStory.Notifications;
+using FlavorfulStory.Notifications.UI;
 using FlavorfulStory.Player;
 using FlavorfulStory.QuestSystem;
 using FlavorfulStory.QuestSystem.Objectives;
@@ -26,7 +27,7 @@ using Unity.Cinemachine;
 using UnityEngine;
 using Zenject;
 
-namespace FlavorfulStory.Installers
+namespace FlavorfulStory.Infrastructure.Installers
 {
     /// <summary> Установщик зависимостей, необходимых для игрового процесса. </summary>
     public class GameplayInstaller : MonoInstaller
@@ -38,7 +39,7 @@ namespace FlavorfulStory.Installers
         [SerializeField] private InventorySlotView _inventorySlotViewPrefab;
 
         /// <summary> Префаб отображения требования ресурса. </summary>
-        [SerializeField] private ItemRequirementView _requirementViewPrefab;
+        [SerializeField] private ResourceRequirementView _requirementViewPrefab;
 
         /// <summary> Префаб кнопки в списке квестов. </summary>
         [SerializeField] private QuestListButton _questListButtonPrefab;
@@ -67,6 +68,8 @@ namespace FlavorfulStory.Installers
             BindDialogue();
             BindQuests();
             BindUI();
+            DeclareSignals();
+            BindNotifications();
             BindSystems();
         }
 
@@ -86,11 +89,12 @@ namespace FlavorfulStory.Installers
         private void BindInventory()
         {
             Container.Bind<Inventory>().FromInstance(_playerInventory).AsSingle();
-            Container.Bind<PickupNotificationManager>().FromComponentInHierarchy().AsSingle();
             Container.Bind<PickupFactory>().AsSingle();
             Container.Bind<PickupSpawner>().FromComponentsInHierarchy().AsCached();
             Container.Bind<IItemDropService>().To<ItemDropService>().AsSingle();
             Container.Bind<ISaveable>().To<ItemDropService>().FromResolve();
+            Container.Bind<IInventoryProvider>().To<InventoryProvider>().AsSingle().NonLazy();
+            Container.Bind<InventoryTransferService>().AsSingle();
         }
 
         /// <summary> Установить зависимости, связанные с системой диалогов. </summary>
@@ -121,11 +125,12 @@ namespace FlavorfulStory.Installers
 
             Container.Bind<ConfirmationWindowView>().FromComponentInHierarchy().AsSingle();
             Container.Bind<SummaryView>().FromComponentInHierarchy().AsSingle();
-            Container.Bind<RepairableBuildingWindow>().FromComponentInHierarchy().AsSingle();
+            Container.Bind<RepairableBuildingView>().FromComponentInHierarchy().AsSingle();
+            Container.Bind<InventoryExchangeWindow>().FromComponentInHierarchy().AsSingle();
 
             Container.Bind<IGameFactory<InventorySlotView>>().To<InventorySlotViewFactory>().AsSingle()
                 .WithArguments(_inventorySlotViewPrefab);
-            Container.Bind<IGameFactory<ItemRequirementView>>().To<ResourceRequirementViewFactory>().AsSingle()
+            Container.Bind<IGameFactory<ResourceRequirementView>>().To<ResourceRequirementViewFactory>().AsSingle()
                 .WithArguments(_requirementViewPrefab);
 
             Container.Bind<Toolbar>().FromComponentInHierarchy().AsSingle();
@@ -134,6 +139,9 @@ namespace FlavorfulStory.Installers
 
             Container.Bind<ItemTooltipView>().FromInstance(_itemTooltipPrefab).AsSingle();
             Container.Bind<RecipeTooltipView>().FromInstance(_recipeTooltipPrefab).AsSingle();
+
+            Container.Bind<NotificationAnchorLocator>().FromComponentInHierarchy().AsSingle();
+            Container.BindInterfacesAndSelfTo<NotificationService>().AsSingle();
         }
 
         /// <summary> Установить зависимости, связанные с системой отображения тултипов действий. </summary>
@@ -146,6 +154,22 @@ namespace FlavorfulStory.Installers
             Container.Bind<IActionTooltipViewSpawner>().To<ActionTooltipViewSpawner>().FromComponentInHierarchy()
                 .AsSingle();
             Container.Bind<CraftingWindow>().FromComponentInHierarchy().AsSingle();
+        }
+
+        /// <summary> Объявление сигналов. </summary>
+        private void DeclareSignals()
+        {
+            Container.DeclareSignal<NightStartedSignal>();
+            Container.DeclareSignal<ItemCollectedSignal>();
+            Container.DeclareSignal<QuestAddedSignal>();
+        }
+
+        /// <summary> Установить зависимости, связанные с уведомлениями. </summary>
+        private void BindNotifications()
+        {
+            Container.BindInterfacesTo<SignalNotifier<NightStartedSignal>>().AsSingle();
+            Container.BindInterfacesTo<SignalNotifier<ItemCollectedSignal>>().AsSingle();
+            Container.BindInterfacesTo<SignalNotifier<QuestAddedSignal>>().AsSingle();
         }
 
         /// <summary> Установить зависимости, связанные с системами и логикой. </summary>

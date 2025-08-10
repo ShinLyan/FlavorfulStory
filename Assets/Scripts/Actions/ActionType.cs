@@ -20,5 +20,8 @@
         
         /// <summary> Создание предметов. </summary>
         Craft,
+
+        /// <summary> Открыть сундук / прилавок. </summary>
+        Open
     }
 }
