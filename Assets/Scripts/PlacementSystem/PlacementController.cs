@@ -20,6 +20,8 @@ namespace FlavorfulStory.PlacementSystem
         private readonly Dictionary<PlacementLayer, PlacementGridData> _gridLayers = new();
         private readonly Dictionary<PlacementModeType, IPlacementMode> _modes = new();
 
+        private Action _onApplySuccess;
+
         [Inject]
         private void Construct(GridPositionProvider gridPositionProvider, PlacementPreview placementPreview)
         {
@@ -45,13 +47,14 @@ namespace FlavorfulStory.PlacementSystem
             _modes[PlacementModeType.Remove] = new RemovingMode(_gridPositionProvider, _placementPreview, _gridLayers);
         }
 
-        public void EnterPlacementMode(PlacementModeType mode, PlaceableObject placeableObject)
+        public void EnterPlacementMode(PlacementModeType mode, PlaceableObject placeableObject, Action onApplySuccess)
         {
             if (!_modes.TryGetValue(mode, out var modeInstance)) return;
 
             if (placeableObject && modeInstance is PlacementMode placementMode)
                 placementMode.PlaceableObject = placeableObject;
 
+            _onApplySuccess = onApplySuccess;
             ActivateMode(modeInstance);
         }
 
@@ -80,7 +83,7 @@ namespace FlavorfulStory.PlacementSystem
 
             RefreshCursor(gridPosition);
 
-            if (Input.GetMouseButtonDown(0)) _currentMode.Apply(gridPosition);
+            if (Input.GetMouseButtonDown(0) && _currentMode.TryApply(gridPosition)) _onApplySuccess?.Invoke();
         }
 
         private void RefreshCursor(Vector3Int gridPosition)
@@ -95,7 +98,7 @@ namespace FlavorfulStory.PlacementSystem
         private void LateUpdate()
         {
             if (Input.GetKeyDown(KeyCode.M) && _currentMode is not RemovingMode)
-                EnterPlacementMode(PlacementModeType.Remove, null);
+                EnterPlacementMode(PlacementModeType.Remove, null, null);
         }
     }
 }

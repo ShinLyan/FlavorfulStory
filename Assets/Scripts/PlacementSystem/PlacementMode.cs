@@ -26,12 +26,12 @@ namespace FlavorfulStory.PlacementSystem
 
         public void Exit() => _placementPreview.StopShowingPreview();
 
-        public void Apply(Vector3Int gridPosition)
+        public bool TryApply(Vector3Int gridPosition)
         {
             if (!PlaceableObject || !CanPlace(gridPosition, PlaceableObject.Size, PlaceableObject.Layer))
             {
                 SfxPlayer.Play(SfxType.PlacementError);
-                return;
+                return false;
             }
 
             SfxPlayer.Play(SfxType.PlacementSuccess);
@@ -42,6 +42,7 @@ namespace FlavorfulStory.PlacementSystem
             _gridLayers[PlaceableObject.Layer].AddObjectAt(gridPosition, PlaceableObject.Size, instance);
 
             _placementPreview.UpdatePosition(_positionProvider.GridToWorld(gridPosition), false);
+            return true;
         }
 
         public void Refresh(Vector3Int gridPosition)

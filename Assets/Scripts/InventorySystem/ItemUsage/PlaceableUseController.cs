@@ -21,6 +21,8 @@ namespace FlavorfulStory.InventorySystem.ItemUsage
         /// <param name="current"> Новый выбранный предмет для размещения. </param>
         protected override void OnSelectedChanged(PlaceableItem previous, PlaceableItem current)
         {
+            if (!previous && !current) return;
+
             if (WorldTime.IsPaused)
             {
                 _placementController.ExitCurrentMode();
@@ -28,7 +30,8 @@ namespace FlavorfulStory.InventorySystem.ItemUsage
             }
 
             if (current)
-                _placementController.EnterPlacementMode(PlacementModeType.Place, current.Prefab);
+                _placementController.EnterPlacementMode(PlacementModeType.Place, current.Prefab,
+                    () => Fire(new ConsumeSelectedItemSignal(1)));
             else
                 _placementController.ExitCurrentMode();
         }

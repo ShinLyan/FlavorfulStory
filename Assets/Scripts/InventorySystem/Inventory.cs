@@ -196,7 +196,7 @@ namespace FlavorfulStory.InventorySystem
                 return;
             }
 
-            var slot = _inventorySlots[slotIndex];
+            ref var slot = ref _inventorySlots[slotIndex];
             if (!slot.Item || slot.Number <= 0)
             {
                 Debug.LogError($"Attempted to remove from empty slot {slotIndex}");

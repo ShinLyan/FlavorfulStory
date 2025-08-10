@@ -62,7 +62,6 @@ namespace FlavorfulStory.Toolbar.UI
         {
             if (!IsInteractable) return;
 
-            // БАГ, ПОЧЕМУ-то НЕ УДАЛЯЕТСЯ
             _playerInventory.RemoveFromSlot(SelectedItemIndex, signal.Amount);
             RedrawToolbar();
         }

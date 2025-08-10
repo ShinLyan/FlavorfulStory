@@ -32,7 +32,7 @@ namespace FlavorfulStory.PlacementSystem
 
         public void Exit() => _placementPreview.StopShowingPreview();
 
-        public void Apply(Vector3Int gridPosition)
+        public bool TryApply(Vector3Int gridPosition)
         {
             foreach (var layer in RemovalPriority)
             {
@@ -40,7 +40,7 @@ namespace FlavorfulStory.PlacementSystem
                 if (gridData.CanPlaceObjectAt(gridPosition, Vector2Int.one)) continue;
 
                 var target = gridData.GetPlacedObject(gridPosition);
-                if (!target) return;
+                if (!target) return false;
 
                 gridData.RemoveObjectAt(gridPosition);
                 Object.Destroy(target);
@@ -48,11 +48,12 @@ namespace FlavorfulStory.PlacementSystem
                 SfxPlayer.Play(SfxType.RemoveObject);
                 _placementPreview.UpdatePosition(_positionProvider.GridToWorld(gridPosition),
                     IsSelectionValid(gridPosition));
-                return;
+                return true;
             }
 
             SfxPlayer.Play(SfxType.PlacementError);
             _placementPreview.UpdatePosition(_positionProvider.GridToWorld(gridPosition), false);
+            return false;
         }
 
         public void Refresh(Vector3Int gridPosition) =>
