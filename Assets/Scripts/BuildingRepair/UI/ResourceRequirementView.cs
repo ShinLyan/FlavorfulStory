@@ -9,7 +9,7 @@ namespace FlavorfulStory.BuildingRepair.UI
 {
     /// <summary> Отображение информации о требуемых ресурсах для текущей стадии ремонта. </summary>
     /// <remarks> Управляет визуализацией и взаимодействием с кнопками добавления и возврата ресурса. </remarks>
-    public class ItemRequirementView : MonoBehaviour
+    public class ResourceRequirementView : MonoBehaviour
     {
         /// <summary> Иконка ресурса, отображаемая на панели. </summary>
         [SerializeField] private RepairResourceSlotView _resourceSlotView;

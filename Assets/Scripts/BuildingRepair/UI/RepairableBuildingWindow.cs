@@ -32,10 +32,10 @@ namespace FlavorfulStory.BuildingRepair.UI
         [SerializeField] private Button _buildButton;
 
         /// <summary> Пул для повторного использования требований к ремонту. </summary>
-        private ObjectPool<ItemRequirementView> _requirementPool;
+        private ObjectPool<ResourceRequirementView> _requirementPool;
 
         /// <summary> Список отображений требований ресурсов. </summary>
-        private readonly List<ItemRequirementView> _requirementViews = new();
+        private readonly List<ResourceRequirementView> _requirementViews = new();
 
         /// <summary> Открыто ли окно ремонта? </summary>
         private bool _isOpen;
@@ -53,19 +53,19 @@ namespace FlavorfulStory.BuildingRepair.UI
         private Action _onClose;
 
         /// <summary> Фабрика создания отображений требований ресурсов. </summary>
-        private IGameFactory<ItemRequirementView> _requirementViewFactory;
+        private IGameFactory<ResourceRequirementView> _requirementViewFactory;
 
         #endregion
 
         /// <summary> Внедрить фабрику создания отображений требований ресурсов. </summary>
         /// <param name="factory"> Фабрика создания отображений требований ресурсов. </param>
         [Inject]
-        private void Construct(IGameFactory<ItemRequirementView> factory) => _requirementViewFactory = factory;
+        private void Construct(IGameFactory<ResourceRequirementView> factory) => _requirementViewFactory = factory;
 
         /// <summary> Инициализация кэша вьюшек, если они уже присутствуют в иерархии. </summary>
         private void Awake()
         {
-            _requirementPool = new ObjectPool<ItemRequirementView>(
+            _requirementPool = new ObjectPool<ResourceRequirementView>(
                 () => _requirementViewFactory.Create(_requirementViewsContainer),
                 view =>
                 {

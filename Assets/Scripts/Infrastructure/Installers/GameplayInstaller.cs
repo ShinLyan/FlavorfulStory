@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using FlavorfulStory.BuildingRepair.UI;
+using FlavorfulStory.Crafting;
 using FlavorfulStory.DialogueSystem;
 using FlavorfulStory.DialogueSystem.UI;
 using FlavorfulStory.Economy;
@@ -125,7 +126,7 @@ namespace FlavorfulStory.Infrastructure.Installers
 
             Container.Bind<ConfirmationWindowView>().FromComponentInHierarchy().AsSingle();
             Container.Bind<SummaryView>().FromComponentInHierarchy().AsSingle();
-            Container.Bind<RepairableBuildingView>().FromComponentInHierarchy().AsSingle();
+            Container.Bind<RepairableBuildingWindow>().FromComponentInHierarchy().AsSingle();
             Container.Bind<InventoryExchangeWindow>().FromComponentInHierarchy().AsSingle();
 
             Container.Bind<IGameFactory<InventorySlotView>>().To<InventorySlotViewFactory>().AsSingle()
