@@ -112,16 +112,21 @@ namespace FlavorfulStory.Crafting
 
         //TODO: Завести DTO/Контекст под 3 экшена?
         /// <summary> Настраивает окно крафта с рецептами и делегатами. </summary>
-        /// <param name="recipeData"> Список рецептов. </param>
         /// <param name="onCraftRequested"> Делегат на запуск крафта. </param>
         /// <param name="onCloseRequested"> Делегат на закрытие окна. </param>
-        public void Setup(Action<CraftingRecipe, int> onCraftRequested,
-            Action onCloseRequested)
+        /// <param name="station"> Крафт-станция, для которой вызываем окно. </param>
+        public void Setup(
+            Action<CraftingRecipe, int> onCraftRequested,
+            Action onCloseRequested,
+            CraftingStation station)
         {
             Initialize();
             _recipeData = _recipeProvider.All;
             _onCraftRequested = onCraftRequested;
             _onCloseRequested = onCloseRequested;
+
+            _craftingStation = station;
+            _isCraftingInProgress = false;
             
             SetupViews(_recipeData.ToList());
             UpdateRecipeViews();
@@ -227,7 +232,9 @@ namespace FlavorfulStory.Crafting
 
             bool canCraft = 
                 CraftingProcessor.CanCraft(_currentRecipe, _craftCount, _playerInventory) == CraftingResult.Success;
-            _craftButton.interactable = canCraft && !_isCraftingInProgress;
+            
+            bool stationBusy = _craftingStation != null && !_craftingStation.IsInteractionAllowed;
+            _craftButton.interactable = canCraft && !stationBusy;
         }
 
         /// <summary> Устанавливает состояние процесса крафта. </summary>
@@ -303,6 +310,8 @@ namespace FlavorfulStory.Crafting
             WorldTime.Unpause();
             InputWrapper.UnblockAllInput();
             _onCloseRequested?.Invoke();
+            
+            _craftingStation = null;
         }
 
         /// <summary> Увеличивает количество создаваемых наборов. </summary>
@@ -320,5 +329,7 @@ namespace FlavorfulStory.Crafting
             UpdateCraftCountText();
             UpdateCraftInfo();
         }
+        
+        public void Refresh() => UpdateCraftInfo();
     }
 }

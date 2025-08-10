@@ -54,7 +54,8 @@ namespace FlavorfulStory.Crafting
         {
             _craftingWindow.Setup(
                 OnCraftRequested,
-                () => EndInteraction(player)
+                () => EndInteraction(player),
+                this
             );
 
             _craftingWindow.Open();
@@ -84,7 +85,7 @@ namespace FlavorfulStory.Crafting
             }
 
             IsInteractionAllowed = false;
-            _craftingWindow.SetCraftingInProgress(true);
+            _craftingWindow.Refresh();
 
             await CraftingProcessor.ExecuteRecipe(recipe, count, _playerInventory, () =>
             {

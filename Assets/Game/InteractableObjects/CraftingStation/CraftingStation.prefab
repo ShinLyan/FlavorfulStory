@@ -46,8 +46,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1918644163424281454}
-  - component: {fileID: 7544812923427070665}
   - component: {fileID: 5079117507024022132}
+  - component: {fileID: 7544812923427070665}
   m_Layer: 3
   m_Name: CraftingStation
   m_TagString: Untagged
@@ -72,21 +72,6 @@ Transform:
   - {fileID: 5866925443331379738}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &7544812923427070665
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4939102138000351801}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e9c9bea91e0b9174d8ed59ef161892a7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  <ActionDescription>k__BackingField:
-    <Action>k__BackingField: Use
-    <Target>k__BackingField: Crafting Shelf
 --- !u!65 &5079117507024022132
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -108,6 +93,18 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1.5, y: 1.5, z: 1}
   m_Center: {x: 0, y: 1, z: 0}
+--- !u!114 &7544812923427070665
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4939102138000351801}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9c9bea91e0b9174d8ed59ef161892a7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &8831898818964056870
 GameObject:
   m_ObjectHideFlags: 0
