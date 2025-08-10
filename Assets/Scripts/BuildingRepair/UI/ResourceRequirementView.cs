@@ -1,9 +1,9 @@
 using System;
-using FlavorfulStory.InventorySystem;
-using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 using Zenject;
+using FlavorfulStory.InventorySystem;
 
 namespace FlavorfulStory.BuildingRepair.UI
 {

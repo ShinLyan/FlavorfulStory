@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using FlavorfulStory.BuildingRepair.UI;
+using FlavorfulStory.Crafting;
 using FlavorfulStory.DialogueSystem;
 using FlavorfulStory.DialogueSystem.UI;
 using FlavorfulStory.Economy;
@@ -54,6 +55,9 @@ namespace FlavorfulStory.Infrastructure.Installers
 
         /// <summary> Префаб всплывающей подсказки для предмета. </summary>
         [SerializeField] private ItemTooltipView _itemTooltipPrefab;
+        
+        /// <summary> Префаб всплывающей подсказки для рецепта крафта. </summary>
+        [SerializeField] private RecipeTooltipView _recipeTooltipPrefab;
 
         /// <summary> Выполняет установку всех зависимостей, необходимых для сцены. </summary>
         public override void InstallBindings()
@@ -122,7 +126,7 @@ namespace FlavorfulStory.Infrastructure.Installers
 
             Container.Bind<ConfirmationWindowView>().FromComponentInHierarchy().AsSingle();
             Container.Bind<SummaryView>().FromComponentInHierarchy().AsSingle();
-            Container.Bind<RepairableBuildingView>().FromComponentInHierarchy().AsSingle();
+            Container.Bind<RepairableBuildingWindow>().FromComponentInHierarchy().AsSingle();
             Container.Bind<InventoryExchangeWindow>().FromComponentInHierarchy().AsSingle();
 
             Container.Bind<IGameFactory<InventorySlotView>>().To<InventorySlotViewFactory>().AsSingle()
@@ -135,6 +139,7 @@ namespace FlavorfulStory.Infrastructure.Installers
             Container.Bind<CanvasGroupFader>().WithId("HUD").FromInstance(_hudFader).AsSingle();
 
             Container.Bind<ItemTooltipView>().FromInstance(_itemTooltipPrefab).AsSingle();
+            Container.Bind<RecipeTooltipView>().FromInstance(_recipeTooltipPrefab).AsSingle();
 
             Container.Bind<NotificationAnchorLocator>().FromComponentInHierarchy().AsSingle();
             Container.BindInterfacesAndSelfTo<NotificationService>().AsSingle();
@@ -149,6 +154,7 @@ namespace FlavorfulStory.Infrastructure.Installers
             Container.BindInterfacesAndSelfTo<ActionTooltipController>().AsSingle().NonLazy();
             Container.Bind<IActionTooltipViewSpawner>().To<ActionTooltipViewSpawner>().FromComponentInHierarchy()
                 .AsSingle();
+            Container.Bind<CraftingWindow>().FromComponentInHierarchy().AsSingle();
         }
 
         /// <summary> Объявление сигналов. </summary>

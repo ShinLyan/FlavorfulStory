@@ -17,6 +17,9 @@
 
         /// <summary> Строительство или установка объекта. </summary>
         Build,
+        
+        /// <summary> Создание предметов. </summary>
+        Craft,
 
         /// <summary> Открыть сундук / прилавок. </summary>
         Open

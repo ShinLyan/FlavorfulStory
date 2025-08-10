@@ -19,6 +19,9 @@ namespace FlavorfulStory.Player
     [RequireComponent(typeof(PlayerStats))]
     public class PlayerController : MonoBehaviour
     {
+        private ICraftingRecipeUnlocker _recipeUnlocker;
+        public ICraftingRecipeUnlocker RecipeUnlocker => _recipeUnlocker;
+        
         #region Fields and Properties
 
         /// <summary> Трансформ выброса предмета. </summary>
@@ -74,12 +77,18 @@ namespace FlavorfulStory.Player
         /// <param name="inventory"> Инвентарь игрока. </param>
         /// <param name="toolbar"> </param>
         /// <param name="itemDropService"> Сервис выброса предметов в игровой мир. </param>
+        /// /// <param name="recipeUnlocker"> Разблокиратор крафт-рецептов. </param>
         [Inject]
-        private void Construct(Inventory inventory, Toolbar toolbar, IItemDropService itemDropService)
+        private void Construct(
+            Inventory inventory,
+            Toolbar toolbar,
+            IItemDropService itemDropService,
+            ICraftingRecipeUnlocker recipeUnlocker)
         {
             _playerInventory = inventory;
             _toolbar = toolbar;
             _itemDropService = itemDropService;
+            _recipeUnlocker = recipeUnlocker;
         }
 
         /// <summary> Инициализация компонентов. </summary>
@@ -119,16 +128,19 @@ namespace FlavorfulStory.Player
         /// <returns> True, если взаимодействие было обработано. </returns>
         private bool InteractWithComponent()
         {
-            var hits = PhysicsUtils.SphereCastAllSorted(CameraUtils.GetMouseRay());
-            foreach (var hit in hits)
+            if (PhysicsUtils.SphereCastAllSortedNonAlloc(CameraUtils.GetMouseRay(), out var hits) > 0)
             {
-                var cursorInteractables = hit.transform.GetComponents<ICursorInteractable>();
-                foreach (var cursorInteractable in cursorInteractables)
-                    if (cursorInteractable.TryInteractWithCursor(this))
-                    {
-                        CursorController.SetCursor(cursorInteractable.CursorType);
-                        return true;
-                    }
+                foreach (var hit in hits)
+                {
+                    if (hit.collider == null) break; // словили мусор из буффера
+                    var cursorInteractables = hit.transform.GetComponents<ICursorInteractable>();
+                    foreach (var cursorInteractable in cursorInteractables)
+                        if (cursorInteractable.TryInteractWithCursor(this))
+                        {
+                            CursorController.SetCursor(cursorInteractable.CursorType);
+                            return true;
+                        }
+                }
             }
 
             return false;
@@ -158,11 +170,13 @@ namespace FlavorfulStory.Player
 
             if (CurrentItem is IUsable usable && !IsToolUseBlocked) HandleCurrentItemUse(usable);
 
+            if (CurrentItem == null) return;
+            
             if (CurrentItem.CanBeDropped && !IsToolUseBlocked) HandleCurrentItemDrop();
         }
 
         /// <summary> Обработка использования предмета из панели быстрого доступа. </summary>
-        private void HandleCurrentItemUse(IUsable usable)
+        private void HandleCurrentItemUse(IUsable usable)   
         {
             if ((Input.GetMouseButton(0) && usable.UseActionType == UseActionType.LeftClick) ||
                 (Input.GetMouseButton(1) && usable.UseActionType == UseActionType.RightClick))
@@ -186,7 +200,8 @@ namespace FlavorfulStory.Player
 
             // TODO: ЧТО-то непонятное тут происходит. ПОФИКСИТЬ. ПЛЮС ПОЧЕМУ-то НЕ УНИЧТОЖАЕТСЯ ХЛЕБ ЕСЛИ СЪЕСТЬ ЕГО
             StartUsingItem(usable);
-            if (usable is EdibleInventoryItem) ConsumeEdibleItem();
+            if (usable is EdibleInventoryItem || usable is CraftingRecipeInventoryItem)
+                ConsumeCurrentItem();
             _toolCooldownTimer = PlayerModel.ToolCooldown;
         }
 
@@ -200,8 +215,7 @@ namespace FlavorfulStory.Player
             SetBusyState(true);
         }
 
-        /// <summary> Съесть используемый предмет. </summary>
-        private void ConsumeEdibleItem()
+        private void ConsumeCurrentItem()
         {
             _playerInventory.RemoveFromSlot(_toolbar.SelectedItemIndex, 1);
             InputWrapper.UnblockPlayerInput();

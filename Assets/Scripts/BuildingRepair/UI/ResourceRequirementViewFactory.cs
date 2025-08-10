@@ -1,5 +1,5 @@
-﻿using FlavorfulStory.Infrastructure.Factories;
-using Zenject;
+﻿using Zenject;
+using FlavorfulStory.Infrastructure.Factories;
 
 namespace FlavorfulStory.BuildingRepair.UI
 {

@@ -1,6 +1,6 @@
-﻿using FlavorfulStory.InventorySystem;
-using UnityEngine;
+﻿using UnityEngine;
 using Zenject;
+using FlavorfulStory.InventorySystem;
 
 namespace FlavorfulStory.TooltipSystem
 {

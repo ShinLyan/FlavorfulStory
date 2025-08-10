@@ -1,21 +1,21 @@
+using UnityEngine.UI;
+using UnityEngine;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using TMPro;
+using Zenject;
 using Cysharp.Threading.Tasks;
 using FlavorfulStory.Infrastructure;
 using FlavorfulStory.Infrastructure.Factories;
 using FlavorfulStory.InputSystem;
 using FlavorfulStory.InventorySystem;
 using FlavorfulStory.TimeManagement;
-using TMPro;
-using UnityEngine;
-using UnityEngine.UI;
-using Zenject;
 
 namespace FlavorfulStory.BuildingRepair.UI
 {
     /// <summary> Визуальное представление ремонта зданий. </summary>
-    public class RepairableBuildingView : MonoBehaviour
+    public class RepairableBuildingWindow : MonoBehaviour
     {
         #region Fields and Properties
 
@@ -190,7 +190,6 @@ namespace FlavorfulStory.BuildingRepair.UI
         {
             _isOpen = false;
             gameObject.SetActive(false);
-
             WorldTime.Unpause();
             InputWrapper.UnblockAllInput();
 

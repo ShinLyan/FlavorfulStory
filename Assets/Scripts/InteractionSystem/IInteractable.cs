@@ -1,6 +1,6 @@
-﻿using FlavorfulStory.Player;
+﻿using UnityEngine;
+using FlavorfulStory.Player;
 using FlavorfulStory.TooltipSystem.ActionTooltips;
-using UnityEngine;
 
 namespace FlavorfulStory.InteractionSystem
 {
