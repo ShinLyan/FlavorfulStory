@@ -16,7 +16,7 @@ namespace FlavorfulStory.GridSystem
         private static readonly Dictionary<GridIndicatorState, Color> _stateColors = new()
         {
             { GridIndicatorState.ValidTarget, new Color(1f, 1f, 1f, 0.5f) },
-            { GridIndicatorState.InvalidTarget, new Color(0.85f, 0.1f, 0.6f, 0.55f) }
+            { GridIndicatorState.InvalidTarget, new Color(245f / 255f, 152f / 255f, 159f / 255f, 0.8f) }
         };
 
         /// <summary> Конструктор, принимающий объект-индикатор. </summary>

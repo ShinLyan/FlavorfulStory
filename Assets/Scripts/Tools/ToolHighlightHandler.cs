@@ -33,6 +33,8 @@ namespace FlavorfulStory.Tools
 
         private Vector3 _lockedCenterWorld;
 
+        private GridIndicatorState _lockedState;
+
         /// <summary> Конструктор с внедрением зависимостей. </summary>
         /// <param name="signalBus"> Шина сигналов Zenject. </param>
         /// <param name="gridSelectionService"> Сервис отображения индикатора выбранной клетки. </param>
@@ -67,12 +69,13 @@ namespace FlavorfulStory.Tools
             if (!_activeTool) _ownsIndicator = false;
         }
 
-        private void OnToolUseStarted(Vector3 centerWorld)
+        private void OnToolUseStarted(Vector3 centerWorld, GridIndicatorState state)
         {
             if (!_activeTool) return;
 
             _isLocked = true;
             _lockedCenterWorld = centerWorld;
+            _lockedState = state;
         }
 
         private void OnToolUseFinished()
@@ -92,14 +95,14 @@ namespace FlavorfulStory.Tools
         /// <summary> Отображает индикатор на валидной клетке под курсором. </summary>
         public void LateTick()
         {
-            // Во время удара — держим индикатор на зафиксированном центре
             if (_isLocked)
             {
-                ShowAtCenter(_lockedCenterWorld, GetIndicatorState(_lockedCenterWorld));
+                var lockedGrid = _gridPositionProvider.WorldToGrid(_lockedCenterWorld);
+                var lockedCenter = _gridPositionProvider.GetCellCenterWorld(lockedGrid);
+                ShowAtCenter(lockedCenter, _lockedState);
                 return;
             }
 
-            // В обычном режиме подсветка только если цель валидна и в радиусе
             if (!_activeTool || !_gridPositionProvider.TryGetCursorGridPosition(out var gridPosition))
             {
                 Hide();
@@ -107,27 +110,25 @@ namespace FlavorfulStory.Tools
             }
 
             var center = _gridPositionProvider.GetCellCenterWorld(gridPosition);
-
-            // 1) Подходит ли инструмент к цели?
-            bool canHitByType = _toolUsageService.TryGetValidHitableAt(_activeTool, center, out _);
-            if (!canHitByType)
+            if (!_toolUsageService.TryGetValidHitableAt(_activeTool, center, out _) || !IsWithinChebyshevRange(center))
             {
                 Hide();
                 return;
             }
 
-            // 2) В радиусе ли?
-            float maxDist = GridPositionProvider.CellsToWorldDistance(ToolUsageService.MaxDistanceInCells);
-            var delta = center - _player.transform.position;
-            delta.y = 0f;
-            if (delta.sqrMagnitude > maxDist * maxDist)
-            {
-                Hide();
-                return;
-            }
-
-            // ОК — показываем как ValidTarget (белый)
             ShowAtCenter(center, GridIndicatorState.ValidTarget);
+        }
+
+        private bool IsWithinChebyshevRange(Vector3 targetCenterWorld)
+        {
+            var playerGrid = _gridPositionProvider.WorldToGrid(_player.transform.position);
+            var targetGrid = _gridPositionProvider.WorldToGrid(targetCenterWorld);
+
+            int dx = Mathf.Abs(targetGrid.x - playerGrid.x);
+            int dy = Mathf.Abs(targetGrid.y - playerGrid.y);
+
+            // 2 клетки в любую сторону, включая диагональ
+            return Mathf.Max(dx, dy) <= ToolUsageService.MaxDistanceInCells;
         }
 
         private void ShowAtCenter(Vector3 centerWorld, GridIndicatorState state)
@@ -136,20 +137,6 @@ namespace FlavorfulStory.Tools
             var origin = new Vector3(centerWorld.x - half.x, 0f, centerWorld.z - half.z);
             _gridSelectionService.ShowGridIndicator(origin, Vector2Int.one, state);
             _ownsIndicator = true;
-        }
-
-        private GridIndicatorState GetIndicatorState(Vector3 center)
-        {
-            if (!_toolUsageService.TryGetValidHitableAt(_activeTool, center, out _))
-                return GridIndicatorState.InvalidTarget;
-
-            float maxDist = GridPositionProvider.CellsToWorldDistance(ToolUsageService.MaxDistanceInCells);
-            var delta = center - _player.transform.position;
-            delta.y = 0f;
-
-            return delta.sqrMagnitude <= maxDist * maxDist
-                ? GridIndicatorState.ValidTarget
-                : GridIndicatorState.InvalidTarget;
         }
 
         public void Dispose()

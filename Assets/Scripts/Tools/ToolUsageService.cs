@@ -38,7 +38,7 @@ namespace FlavorfulStory.Tools
         private const float CooldownSeconds = 1f;
 
         /// <summary> Событие, вызываемое в момент начала использования инструмента. </summary>
-        public event Action<Vector3> ToolUseStarted;
+        public event Action<Vector3, GridIndicatorState> ToolUseStarted;
 
         /// <summary> Событие, вызываемое после завершения использования инструмента. </summary>
         public event Action ToolUseFinished;
@@ -69,9 +69,7 @@ namespace FlavorfulStory.Tools
         {
             if (_isOnCooldown) return false;
 
-            var target = ClampTargetToRange(_player.transform.position, cellCenter, MaxDistanceInCells);
-            DrawDebugHit(target);
-            ToolUseStarted?.Invoke(target);
+            var target = ClampTargetToChebyshevRange(_player.transform.position, cellCenter, MaxDistanceInCells);
 
             bool hitSuccessful = TryGetValidHitableAt(tool, target, out var hitable);
             if (hitSuccessful)
@@ -80,22 +78,29 @@ namespace FlavorfulStory.Tools
                 SfxPlayer.Play(hitable.SfxType);
             }
 
-            BeginUse(tool, target);
+            var state = hitSuccessful ? GridIndicatorState.ValidTarget : GridIndicatorState.InvalidTarget;
+            ToolUseStarted?.Invoke(target, state);
 
+            BeginUse(tool, target);
             StartCooldownAsync().Forget();
+
             return hitSuccessful;
         }
 
-        /// <summary> Ограничивает целевую точку до радиуса в клетках от игрока. </summary>
+        /// <summary> Ограничивает целевую точку квадратом Чебышёва с радиусом maxCells (включая диагонали). </summary>
         /// <param name="playerPosition"> Позиция игрока в мировых координатах. </param>
         /// <param name="target"> Исходная целевая позиция (куда игрок хочет применить инструмент). </param>
         /// <param name="maxCells"> Максимальная дистанция в клетках, на которую можно применять инструмент. </param>
         /// <returns> Целевая позиция, ограниченная радиусом действия инструмента. </returns>
-        private static Vector3 ClampTargetToRange(Vector3 playerPosition, Vector3 target, int maxCells)
+        private static Vector3 ClampTargetToChebyshevRange(Vector3 playerPosition, Vector3 target, int maxCells)
         {
-            var direction = target - playerPosition;
-            float maxDistance = GridPositionProvider.CellsToWorldDistance(maxCells);
-            return direction.magnitude <= maxDistance ? target : playerPosition + direction.normalized * maxDistance;
+            float cell = GridPositionProvider.CellsToWorldDistance(1);
+            float max = cell * maxCells;
+
+            float dx = Mathf.Clamp(target.x - playerPosition.x, -max, max);
+            float dz = Mathf.Clamp(target.z - playerPosition.z, -max, max);
+
+            return new Vector3(playerPosition.x + dx, target.y, playerPosition.z + dz);
         }
 
         /// <summary> Попробовать получить подходящий для удара объект в указанной клетке. </summary>
@@ -140,33 +145,6 @@ namespace FlavorfulStory.Tools
             UnequipTool();
             _player.SetBusyState(false);
             ToolUseFinished?.Invoke();
-        }
-
-        /// <summary> Отрисовывает в сцене отладочную визуализацию клетки, в которую был произведён удар. </summary>
-        /// <param name="center"> Центр ячейки, в которую был направлен удар. </param>
-        private static void DrawDebugHit(Vector3 center)
-        {
-#if UNITY_EDITOR
-            var color = Color.magenta;
-            const float duration = 1f;
-
-            // ⬆ вертикальный луч из центра ячейки
-            Debug.DrawRay(center, Vector3.up * 2f, color, duration);
-
-            // ⬜ квадрат вокруг центра ячейки (Y=0)
-            Vector3[] corners =
-            {
-                center + new Vector3(-0.5f, 0, -0.5f),
-                center + new Vector3(-0.5f, 0, 0.5f),
-                center + new Vector3(0.5f, 0, 0.5f),
-                center + new Vector3(0.5f, 0, -0.5f)
-            };
-
-            Debug.DrawLine(corners[0], corners[1], color, duration);
-            Debug.DrawLine(corners[1], corners[2], color, duration);
-            Debug.DrawLine(corners[2], corners[3], color, duration);
-            Debug.DrawLine(corners[3], corners[0], color, duration);
-#endif
         }
 
         /// <summary> Запускает перезарядку между ударами инструмента и завершает использование. </summary>
