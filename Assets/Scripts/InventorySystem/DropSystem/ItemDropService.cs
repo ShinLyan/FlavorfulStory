@@ -13,6 +13,12 @@ namespace FlavorfulStory.InventorySystem.DropSystem
         /// <summary> Задержка перед возможностью подбора предмета. </summary>
         private const float PickupDelay = 1.5f;
 
+        /// <summary> Сила, с которой выбрасываются ресурсы вверх при спавне. </summary>
+        private const float ResourceDropForceValue = 5f;
+
+        /// <summary> Вектор силы, прикладываемый при выбросе ресурса (по умолчанию — вверх). </summary>
+        public static readonly Vector3 ResourceDropForce = Vector3.up * ResourceDropForceValue;
+
         /// <summary> Контейнер, в котором спавнятся все выброшенные предметы. </summary>
         private Transform _container;
 
@@ -58,8 +64,6 @@ namespace FlavorfulStory.InventorySystem.DropSystem
         /// <returns> Ссылка на созданный Pickup. </returns>
         private Pickup Spawn(ItemStack itemStack, Vector3 position, float pickupDelay = 1f)
         {
-            if (!_container) Debug.LogError($"{nameof(ItemDropService)}.{nameof(Spawn)}: Container is not set)");
-
             var pickup = _pickupFactory.Create(itemStack, position, pickupDelay, _container);
             if (pickup) _spawnedPickups.Add(pickup);
             return pickup;
@@ -131,7 +135,7 @@ namespace FlavorfulStory.InventorySystem.DropSystem
             foreach (var record in records)
             {
                 var item = ItemDatabase.GetItemFromID(record.ItemID);
-                var itemStack = new ItemStack { Item = item, Number = record.Quantity };
+                var itemStack = new ItemStack(item, record.Quantity);
                 if (item) Spawn(itemStack, record.Position.ToVector());
             }
         }

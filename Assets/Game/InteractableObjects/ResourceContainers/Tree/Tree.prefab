@@ -9,10 +9,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3368727472200560402}
+  - component: {fileID: 8789084175571030685}
   - component: {fileID: 6591250779327283467}
   - component: {fileID: 8044469358630156836}
   - component: {fileID: 4185133068772401190}
-  - component: {fileID: 8789084175571030685}
   m_Layer: 6
   m_Name: Tree
   m_TagString: Untagged
@@ -36,6 +36,22 @@ Transform:
   - {fileID: 1883867307573778705}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!208 &8789084175571030685
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2504854051262580730}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 0.5, y: 0.5, z: 0.5}
+  m_MoveThreshold: 0.1
+  m_Carve: 0
+  m_CarveOnlyStationary: 1
+  m_Center: {x: 0.5, y: 0.55, z: 0.65}
+  m_TimeToStationary: 0.5
 --- !u!114 &6591250779327283467
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -87,24 +103,9 @@ MonoBehaviour:
       <Number>k__BackingField: 10
     <RequiredHits>k__BackingField: 5
   _destroyDelay: 0
-  _toolsToBeHit: 00000000
+  <RequiredToolType>k__BackingField: 0
+  <RequiredToolLevel>k__BackingField: 1
   <SfxType>k__BackingField: 0
---- !u!208 &8789084175571030685
-NavMeshObstacle:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2504854051262580730}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Shape: 1
-  m_Extents: {x: 0.5, y: 0.5, z: 0.5}
-  m_MoveThreshold: 0.1
-  m_Carve: 0
-  m_CarveOnlyStationary: 1
-  m_Center: {x: 0.16, y: -0.22, z: 0.35}
-  m_TimeToStationary: 0.5
 --- !u!1001 &1885792759039754483
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -127,7 +128,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4356059539544546, guid: 41282c525de09854e95ed5d9f9c17fb5, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: 0.821
       objectReference: {fileID: 0}
     - target: {fileID: 4356059539544546, guid: 41282c525de09854e95ed5d9f9c17fb5, type: 3}
       propertyPath: m_LocalPosition.z
@@ -160,6 +161,16 @@ PrefabInstance:
     - target: {fileID: 4356059539544546, guid: 41282c525de09854e95ed5d9f9c17fb5, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 136912090096690544, guid: 41282c525de09854e95ed5d9f9c17fb5,
+        type: 3}
+      propertyPath: m_Center.x
+      value: 0.06
+      objectReference: {fileID: 0}
+    - target: {fileID: 136912090096690544, guid: 41282c525de09854e95ed5d9f9c17fb5,
+        type: 3}
+      propertyPath: m_Center.z
+      value: 0.21
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

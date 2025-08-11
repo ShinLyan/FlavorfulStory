@@ -83,6 +83,16 @@ namespace FlavorfulStory.InputSystem
         public static float GetAxisRaw(InputButton axis) =>
             !_allowedButtons[axis] ? 0.0f : Input.GetAxisRaw(axis.ToString());
 
+        /// <summary> Проверяет нажатие левой кнопки мыши в текущем кадре. </summary>
+        /// <returns> True, если кнопка была нажата в текущем кадре. </returns>
+        public static bool GetLeftMouseButton() =>
+            _allowedButtons[InputButton.LeftMouse] && Input.GetMouseButton(0);
+
+        /// <summary> Проверяет нажатие правой кнопки мыши в текущем кадре. </summary>
+        /// <returns> True, если кнопка была нажата в текущем кадре. </returns>
+        public static bool GetRightMouseButton() =>
+            _allowedButtons[InputButton.RightMouse] && Input.GetMouseButton(1);
+
         /// <summary> Получает значение прокрутки колеса мыши. </summary>
         /// <returns> Целочисленное значение прокрутки колеса мыши. </returns>
         public static int GetMouseScrollDelta() =>

@@ -52,7 +52,11 @@ namespace FlavorfulStory.InventorySystem
         private void Start() => InventoryUpdated?.Invoke();
 
         /// <summary> При уничтожении объекта отвязать инвентарь. </summary>
-        private void OnDestroy() => _inventoryProvider?.Unregister(this);
+        private void OnDestroy()
+        {
+            _inventoryProvider?.Unregister(this);
+            InventoryUpdated = null;
+        }
 
         /// <summary> Есть ли место для предмета в инвентаре? </summary>
         public bool HasSpaceFor(InventoryItem item) => FindSlot(item) >= 0;
@@ -192,7 +196,7 @@ namespace FlavorfulStory.InventorySystem
                 return;
             }
 
-            var slot = _inventorySlots[slotIndex];
+            ref var slot = ref _inventorySlots[slotIndex];
             if (!slot.Item || slot.Number <= 0)
             {
                 Debug.LogError($"Attempted to remove from empty slot {slotIndex}");

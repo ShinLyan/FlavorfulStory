@@ -25,6 +25,22 @@
         Eat,
 
         /// <summary> Звук строительства. </summary>
-        Build
+        Build,
+
+        #region PlacementSystem
+
+        /// <summary> Звук при корректном размещении объекта. </summary>
+        PlacementSuccess,
+
+        /// <summary> Звук при некорректном размещении объекта. </summary>
+        PlacementError,
+
+        /// <summary> Звук при удалении размещённого объекта. </summary>
+        RemoveObject,
+
+        #endregion
+
+        /// <summary> Взмах инструментом (топор, кирка). </summary>
+        ToolSwing
     }
 }
