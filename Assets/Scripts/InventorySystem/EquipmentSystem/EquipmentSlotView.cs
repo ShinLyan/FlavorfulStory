@@ -29,9 +29,9 @@ namespace FlavorfulStory.InventorySystem.EquipmentSystem
         private void Start() => UpdateView();
 
         /// <summary> Обновление отображения слота экипировки. </summary>
-        private void UpdateView() => _itemStackView.UpdateView(new ItemStack { Item = GetItem(), Number = 1 });
+        private void UpdateView() => _itemStackView.UpdateView(new ItemStack(GetItem(), 1));
 
-        /// <summary> Получение максимально допустимого количества предметов, которые могут быть добавлены в слот. </summary>
+        /// <summary> Получение максимально допустимого количества предметов. </summary>
         /// <param name="item"> Проверяемый предмет. </param>
         /// <returns> 1, если предмет подходит для экипировки, иначе 0. </returns>
         public int GetMaxAcceptableItemsNumber(InventoryItem item)
@@ -46,10 +46,8 @@ namespace FlavorfulStory.InventorySystem.EquipmentSystem
         /// <summary> Добавление предмета в слот экипировки. </summary>
         /// <param name="item"> Предмет, который нужно экипировать. </param>
         /// <param name="number"> Количество добавляемых предметов (всегда 1). </param>
-        public void AddItems(InventoryItem item, int number)
-        {
+        public void AddItems(InventoryItem item, int number) =>
             _equipment.AddItem(_equipmentType, item as EquipableItem);
-        }
 
         /// <summary> Получение предмета, находящегося в текущем слоте экипировки. </summary>
         /// <returns> Экипированный предмет, если он есть, иначе null. </returns>

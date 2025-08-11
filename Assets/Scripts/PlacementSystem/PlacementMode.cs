@@ -17,6 +17,9 @@ namespace FlavorfulStory.PlacementSystem
         /// <summary> Словарь слоев размещения и данных по занятым ячейкам. </summary>
         private readonly Dictionary<PlacementLayer, PlacementGridData> _gridLayers;
 
+        /// <summary> Буфер коллайдеров для поиска объектов, которые можно ударить. </summary>
+        private readonly Collider[] _hitsBuffer = new Collider[10];
+
         /// <summary> Объект, который будет размещен. </summary>
         public PlaceableObject PlaceableObject { get; set; }
 
@@ -51,10 +54,10 @@ namespace FlavorfulStory.PlacementSystem
 
             SfxPlayer.Play(SfxType.PlacementSuccess);
 
-            var instance = Object.Instantiate(PlaceableObject.gameObject);
+            var instance = Object.Instantiate(PlaceableObject);
             instance.transform.position = _positionProvider.GridToWorld(gridPosition);
 
-            _gridLayers[PlaceableObject.Layer].AddObjectAt(gridPosition, PlaceableObject.Size, instance);
+            _gridLayers[PlaceableObject.Layer].AddObjectAt(gridPosition, instance);
 
             _placementPreview.UpdatePosition(_positionProvider.GridToWorld(gridPosition), false);
             return true;
@@ -73,31 +76,45 @@ namespace FlavorfulStory.PlacementSystem
         /// <summary> Проверяет, можно ли разместить объект в данной позиции и слое. </summary>
         /// <param name="position"> Позиция в координатах грида. </param>
         /// <param name="size"> Размер объекта в клетках. </param>
-        /// <param name="layer"> Слой размещения. </param>
+        /// <param name="placingLayer"> Слой размещения. </param>
         /// <returns> <c>true</c>, если размещение допустимо. </returns>
-        private bool CanPlace(Vector3Int position, Vector2Int size, PlacementLayer layer) =>
-            _gridLayers[layer].CanPlaceObjectAt(position, size) &&
-            (layer == PlacementLayer.Floor || !HasBlockingColliders(position, size));
+        private bool CanPlace(Vector3Int position, Vector2Int size, PlacementLayer placingLayer) =>
+            _gridLayers[placingLayer].CanPlaceObjectAt(position, size) &&
+            !HasBlockingColliders(position, size, placingLayer);
 
         /// <summary> Проверяет наличие коллайдеров, мешающих размещению. </summary>
         /// <param name="position"> Позиция в координатах грида. </param>
         /// <param name="size"> Размер проверяемой области в клетках. </param>
+        /// <param name="placingLayer"> Слой размещения. </param>
         /// <returns> <c>true</c>, если есть блокирующие коллайдеры. </returns>
-        private bool HasBlockingColliders(Vector3Int position, Vector2Int size)
+        /// <remarks> Floor можно класть под все PlaceableObject, кроме другого Floor.
+        /// Не Floor можно класть на Floor, но нельзя пересекать другие PlaceableObject
+        /// и любые посторонние коллайдеры.</remarks>
+        private bool HasBlockingColliders(Vector3Int position, Vector2Int size, PlacementLayer placingLayer)
         {
             var worldPosition = _positionProvider.GridToWorld(position);
             var center = worldPosition + new Vector3(size.x / 2f, 1f, size.y / 2f);
             var halfExtents = new Vector3(size.x / 2f, 1.5f, size.y / 2f);
 
-            var colliders = Physics.OverlapBox(center, halfExtents, Quaternion.identity);
-            foreach (var collider in colliders)
+            int hitCount = Physics.OverlapBoxNonAlloc(center, halfExtents, _hitsBuffer, Quaternion.identity);
+            for (int i = 0; i < hitCount; i++)
             {
-                if (collider.isTrigger ||
+                var collider = _hitsBuffer[i];
+                if (!collider || collider.isTrigger ||
                     collider.GetComponentInParent<PlacementPreview>() ||
-                    (collider.TryGetComponent<PlaceableObject>(out var obj) && obj.Layer == PlacementLayer.Floor) ||
                     collider.gameObject.layer == LayerMask.NameToLayer("Terrain"))
                     continue;
 
+                var placeable = collider.GetComponentInParent<PlaceableObject>();
+                if (!placeable) return true;
+
+                if (placingLayer == PlacementLayer.Floor)
+                {
+                    if (placeable.Layer == PlacementLayer.Floor) return true;
+                    continue;
+                }
+
+                if (placeable.Layer == PlacementLayer.Floor) continue;
                 return true;
             }
 

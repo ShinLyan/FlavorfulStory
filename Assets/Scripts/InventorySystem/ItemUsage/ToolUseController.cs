@@ -10,7 +10,7 @@ namespace FlavorfulStory.InventorySystem.ItemUsage
     /// <summary> Контроллер, обрабатывающий использование инструментов игроком. </summary>
     public class ToolUseController : ItemUseController<Tool>
     {
-        /// <summary> Сервис, выполняющий логику использования инструментов (атака, проверка попаданий и т. д.). </summary>
+        /// <summary> Сервис, выполняющий логику использования инструментов. </summary>
         private readonly ToolUsageService _toolUsageService;
 
         /// <summary> Провайдер для определения позиции курсора в координатах грида. </summary>
@@ -23,7 +23,7 @@ namespace FlavorfulStory.InventorySystem.ItemUsage
         /// <param name="signalBus"> Шина сигналов для отслеживания смены выбранного предмета. </param>
         /// <param name="toolUsageService"> Сервис для выполнения логики взаимодействия инструментом с окружением. </param>
         /// <param name="gridPositionProvider"> Провайдер получения позиции курсора в гриде. </param>
-        /// <param name="playerStats"> Статы игрока для проверки наличия ресурсов (например, стамины). </param>
+        /// <param name="playerStats"> Статы игрока для проверки наличия ресурсов. </param>
         public ToolUseController(SignalBus signalBus, ToolUsageService toolUsageService,
             GridPositionProvider gridPositionProvider, PlayerStats playerStats) : base(signalBus)
         {
@@ -48,8 +48,8 @@ namespace FlavorfulStory.InventorySystem.ItemUsage
             if (!_gridPositionProvider.TryGetCursorGridPosition(out var gridPosition)) return;
 
             var cellCenter = _gridPositionProvider.GetCellCenterWorld(gridPosition);
-            bool success = _toolUsageService.TryUseTool(tool, cellCenter);
-            if (success) stamina.ChangeValue(-tool.StaminaCost);
+            bool success = _toolUsageService.TryUseTool(tool, cellCenter, out bool isDismantle);
+            if (success && !isDismantle) stamina.ChangeValue(-tool.StaminaCost);
         }
     }
 }

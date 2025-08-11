@@ -123,9 +123,8 @@ namespace FlavorfulStory.ResourceContainer
         /// <summary> Выбросить ресурсы для текущей стадии объекта. </summary>
         private void DropResourcesForCurrentGrade()
         {
-            const float ResourceDropForce = 5f;
             foreach (var itemStack in _stages[_currentGradeIndex].Items)
-                _itemDropService.Drop(itemStack, GetDropPosition(), Vector3.up * ResourceDropForce);
+                _itemDropService.Drop(itemStack, GetDropPosition(), ItemDropService.ResourceDropForce);
         }
 
         /// <summary> Получить позицию дропа. </summary>

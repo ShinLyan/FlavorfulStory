@@ -26,6 +26,10 @@ namespace FlavorfulStory.Tools
         [field: Tooltip("Стоимость использования по выносливости."), SerializeField]
         public float StaminaCost { get; private set; }
 
+        /// <summary> Удаляет ли инструмент размещаемые объекты при ударе? </summary>
+        [field: Tooltip("Удаляет ли инструмент размещаемые объекты при ударе?"), SerializeField]
+        public bool CanDismantlePlaceables { get; private set; }
+
         /// <summary> Тип SFX использования. </summary>
         [field: Tooltip("Тип SFX использования."), SerializeField]
         public SfxType SfxType { get; private set; }

@@ -4,22 +4,19 @@ using UnityEngine;
 
 namespace FlavorfulStory.PlacementSystem
 {
-    /// <summary> Хранит данные о размещённых объектах на гриде
-    /// и предоставляет методы для проверки и изменения состояния. </summary>
+    /// <summary> Данные о размещённых объектах на гриде. </summary>
     public class PlacementGridData
     {
-        /// <summary> Словарь размещённых объектов, ключ – позиция клетки, значение – данные о размещении. </summary>
-        private readonly Dictionary<Vector3Int, PlacementData> _placedObjects = new();
+        /// <summary> Словарь размещённых объектов, ключ – позиция клетки, значение – PlaceableObject. </summary>
+        private readonly Dictionary<Vector3Int, PlaceableObject> _placedObjects = new();
 
         /// <summary> Добавляет объект в указанные позиции грида. </summary>
         /// <param name="gridPosition"> Левая нижняя позиция объекта на гриде. </param>
-        /// <param name="objectSize"> Размер объекта в клетках. </param>
-        /// <param name="instance"> Экземпляр объекта в сцене. </param>
-        public void AddObjectAt(Vector3Int gridPosition, Vector2Int objectSize, GameObject instance)
+        /// <param name="instance"> Размещаемый объект в сцене. </param>
+        public void AddObjectAt(Vector3Int gridPosition, PlaceableObject instance)
         {
-            var positions = CalculatePositions(gridPosition, objectSize);
-            var data = new PlacementData(positions, instance);
-            foreach (var position in positions) _placedObjects[position] = data;
+            var positions = CalculatePositions(gridPosition, instance.Size);
+            foreach (var position in positions) _placedObjects[position] = instance;
         }
 
         /// <summary> Вычисляет все позиции грида, занимаемые объектом указанного размера. </summary>
@@ -28,12 +25,12 @@ namespace FlavorfulStory.PlacementSystem
         /// <returns> Список координат клеток, которые занимает объект. </returns>
         private static List<Vector3Int> CalculatePositions(Vector3Int gridPosition, Vector2Int objectSize)
         {
-            var returnValue = new List<Vector3Int>();
+            var positions = new List<Vector3Int>(objectSize.x * objectSize.y);
             for (int x = 0; x < objectSize.x; x++)
             for (int y = 0; y < objectSize.y; y++)
-                returnValue.Add(gridPosition + new Vector3Int(x, 0, y));
+                positions.Add(gridPosition + new Vector3Int(x, 0, y));
 
-            return returnValue;
+            return positions;
         }
 
         /// <summary> Проверяет, можно ли разместить объект в указанной позиции грида. </summary>
@@ -49,33 +46,17 @@ namespace FlavorfulStory.PlacementSystem
         /// <summary> Получает объект, размещённый в указанной позиции грида. </summary>
         /// <param name="gridPosition"> Позиция клетки грида. </param>
         /// <returns> Экземпляр объекта или null, если клетка пуста. </returns>
-        public GameObject GetPlacedObject(Vector3Int gridPosition) =>
-            _placedObjects.TryGetValue(gridPosition, out var placementData) ? placementData.Instance : null;
+        public PlaceableObject GetPlacedObject(Vector3Int gridPosition) =>
+            _placedObjects.GetValueOrDefault(gridPosition);
 
         /// <summary> Удаляет объект, размещённый в указанной позиции грида. </summary>
         /// <param name="gridPosition"> Позиция клетки грида, в которой находится объект. </param>
         public void RemoveObjectAt(Vector3Int gridPosition)
         {
-            foreach (var position in _placedObjects[gridPosition].OccupiedPositions) _placedObjects.Remove(position);
-        }
-    }
+            if (!_placedObjects.TryGetValue(gridPosition, out var instance)) return;
 
-    /// <summary> Данные о размещении объекта на гриде. </summary>
-    public class PlacementData // TODO: ВОЗМОЖНО УДАЛИТЬ
-    {
-        /// <summary> Список клеток грида, которые занимает объект. </summary>
-        public List<Vector3Int> OccupiedPositions { get; }
-
-        /// <summary> Экземпляр объекта в сцене. </summary>
-        public GameObject Instance { get; }
-
-        /// <summary> Создаёт данные о размещении объекта. </summary>
-        /// <param name="occupiedPositions"> Клетки грида, которые занимает объект. </param>
-        /// <param name="instance"> Экземпляр объекта в сцене. </param>
-        public PlacementData(List<Vector3Int> occupiedPositions, GameObject instance)
-        {
-            OccupiedPositions = occupiedPositions;
-            Instance = instance;
+            var occupied = _placedObjects.Where(pair => pair.Value == instance).Select(pair => pair.Key).ToList();
+            foreach (var pos in occupied) _placedObjects.Remove(pos);
         }
     }
 }

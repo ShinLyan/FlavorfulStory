@@ -50,6 +50,29 @@ namespace FlavorfulStory.PlacementSystem
         /// <returns> True — если объект найден и удалён; False — если удалить нечего. </returns>
         public bool TryApply(Vector3Int gridPosition)
         {
+            if (TryRemoveAtSilent(gridPosition, out var removed))
+            {
+                Object.Destroy(removed);
+                SfxPlayer.Play(SfxType.RemoveObject);
+
+                _placementPreview.UpdatePosition(_positionProvider.GridToWorld(gridPosition),
+                    IsSelectionValid(gridPosition));
+                return true;
+            }
+
+            SfxPlayer.Play(SfxType.PlacementError);
+            _placementPreview.UpdatePosition(_positionProvider.GridToWorld(gridPosition), false);
+            return false;
+        }
+
+        /// <summary> Попробовать выполнить удаление без звуков и обновления превью. </summary>
+        /// <param name="gridPosition"> Позиция ячейки в координатах грида. </param>
+        /// <param name="removedPlaceable"> Найденный и удалённый объект, либо null. </param>
+        /// <returns> <c>true</c> — если объект был найден и удалён; <c>false</c> — если удалить нечего. </returns>
+        public bool TryRemoveAtSilent(Vector3Int gridPosition, out PlaceableObject removedPlaceable)
+        {
+            removedPlaceable = null;
+
             foreach (var layer in RemovalPriority)
             {
                 if (!_gridLayers.TryGetValue(layer, out var gridData)) continue;
@@ -59,16 +82,10 @@ namespace FlavorfulStory.PlacementSystem
                 if (!target) return false;
 
                 gridData.RemoveObjectAt(gridPosition);
-                Object.Destroy(target);
-
-                SfxPlayer.Play(SfxType.RemoveObject);
-                _placementPreview.UpdatePosition(_positionProvider.GridToWorld(gridPosition),
-                    IsSelectionValid(gridPosition));
+                removedPlaceable = target;
                 return true;
             }
 
-            SfxPlayer.Play(SfxType.PlacementError);
-            _placementPreview.UpdatePosition(_positionProvider.GridToWorld(gridPosition), false);
             return false;
         }
 

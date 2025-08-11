@@ -63,12 +63,13 @@ namespace FlavorfulStory.PlacementSystem
         }
 
         /// <summary> Включает указанный режим работы системы размещения объектов. </summary>
-        /// <param name="mode"> Тип режима (размещение или удаление). </param>
+        /// <param name="modeType"> Тип режима (размещение или удаление). </param>
         /// <param name="placeableObject"> Объект для размещения (актуально только для режима размещения). </param>
         /// <param name="onApplySuccess"> Действие, вызываемое при успешном применении. </param>
-        public void EnterPlacementMode(PlacementModeType mode, PlaceableObject placeableObject, Action onApplySuccess)
+        public void EnterPlacementMode(PlacementModeType modeType, PlaceableObject placeableObject,
+            Action onApplySuccess)
         {
-            if (!_modes.TryGetValue(mode, out var modeInstance)) return;
+            if (!_modes.TryGetValue(modeType, out var modeInstance)) return;
 
             if (placeableObject && modeInstance is PlacementMode placementMode)
                 placementMode.PlaceableObject = placeableObject;
@@ -97,6 +98,21 @@ namespace FlavorfulStory.PlacementSystem
             _lastGridPosition = Vector3Int.zero;
         }
 
+        /// <summary> Попробовать удалить объект в ячейке. </summary>
+        /// <param name="cellCenter"> Центр ячейки, в которой нужно удалить объект. </param>
+        /// <param name="removedPlaceable"> Удаленный объект. </param>
+        /// <returns> <c>true</c> - если объект был удалён, <c>false</c> - не был удалён. </returns>
+        public bool TryRemoveAt(Vector3 cellCenter, out PlaceableObject removedPlaceable)
+        {
+            var gridPosition = _gridPositionProvider.WorldToGrid(cellCenter);
+            removedPlaceable = null;
+
+            if (_modes.TryGetValue(PlacementModeType.Remove, out var mode) && mode is RemovingMode removing)
+                return removing.TryRemoveAtSilent(gridPosition, out removedPlaceable);
+
+            return false;
+        }
+
         /// <summary> Обрабатывает ввод пользователя и обновляет предпросмотр в зависимости от позиции курсора. </summary>
         private void Update()
         {
@@ -117,13 +133,6 @@ namespace FlavorfulStory.PlacementSystem
 
             _currentMode.Refresh(gridPosition);
             _lastGridPosition = gridPosition;
-        }
-
-        /// <summary> Отладочный метод для быстрой смены режима на удаление. </summary>
-        private void LateUpdate()
-        {
-            if (Input.GetKeyDown(KeyCode.M) && _currentMode is not RemovingMode)
-                EnterPlacementMode(PlacementModeType.Remove, null, null);
         }
     }
 }

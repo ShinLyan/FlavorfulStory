@@ -6,12 +6,16 @@ namespace FlavorfulStory.PlacementSystem
     public class PlaceableObject : MonoBehaviour
     {
         /// <summary> Занимаемый размер объекта в тайлах (по X и Z). </summary>
-        [field: SerializeField, Tooltip("Занимаемый размер объекта в тайлах.")]
+        [field: Tooltip("Занимаемый размер объекта в тайлах."), SerializeField]
         public Vector2Int Size { get; private set; } = Vector2Int.one;
 
         /// <summary> Слой, на котором размещается объект. </summary>
-        [field: SerializeField, Tooltip("Слой, на котором размещается объект.")]
+        [field: Tooltip("Слой, на котором размещается объект."), SerializeField]
         public PlacementLayer Layer { get; private set; }
+
+        /// <summary> Предмет инвентаря, который можно разместить в игровом мире. </summary>
+        [field: Tooltip("Предмет инвентаря, который можно разместить в игровом мире."), SerializeField]
+        public PlaceableItem PlaceableItem { get; private set; }
 
         /// <summary> Можно ли вращать объект при размещении? </summary>
         // [field: SerializeField, Tooltip("Можно ли вращать объект при размещении?")]

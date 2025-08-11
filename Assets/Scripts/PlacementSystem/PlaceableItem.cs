@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace FlavorfulStory.PlacementSystem
 {
-    /// <summary> Предмет инвентаря, который можно разместить в игровом мире (мебель, здание и т.д.) </summary>
+    /// <summary> Предмет инвентаря, который можно разместить в игровом мире. </summary>
     [CreateAssetMenu(menuName = "FlavorfulStory/Inventory/Placeable Item")]
     public class PlaceableItem : InventoryItem
     {
