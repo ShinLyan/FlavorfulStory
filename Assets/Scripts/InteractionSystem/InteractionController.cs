@@ -4,7 +4,6 @@ using System.Linq;
 using FlavorfulStory.InputSystem;
 using FlavorfulStory.Player;
 using FlavorfulStory.ResourceContainer;
-using FlavorfulStory.TooltipSystem.ActionTooltips;
 using UnityEngine;
 using Zenject;
 
@@ -65,7 +64,7 @@ namespace FlavorfulStory.InteractionSystem
             if (newClosest == _closestInteractable) return;
 
             _closestInteractable = newClosest;
-            _signalBus.Fire(new ClosestInteractableChangedSignal { ClosestInteractable = _closestInteractable });
+            _signalBus.Fire(new ClosestInteractableChangedSignal(_closestInteractable));
         }
 
         /// <summary> Определяет ближайший объект для взаимодействия из доступных. </summary>

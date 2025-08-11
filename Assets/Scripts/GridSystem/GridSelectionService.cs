@@ -13,6 +13,7 @@ namespace FlavorfulStory.GridSystem
         /// <summary> Рендерер индикатора, используется для изменения цвета и текстуры. </summary>
         private Renderer _gridIndicatorRenderer;
 
+        /// <summary> Словарь цветов, используемых для различных состояний индикатора грида. </summary>
         private static readonly Dictionary<GridIndicatorState, Color> _stateColors = new()
         {
             { GridIndicatorState.ValidTarget, new Color(1f, 1f, 1f, 0.5f) },
@@ -33,7 +34,7 @@ namespace FlavorfulStory.GridSystem
         /// <summary> Показать индикатор на выбранной позиции с указанным размером и цветом. </summary>
         /// <param name="worldPosition"> Позиция в мире, где должен появиться индикатор. </param>
         /// <param name="size"> Размер (в клетках грида), который должен отобразиться. </param>
-        /// <param name="state"> Состояние индикатора. </param>
+        /// <param name="state"> Состояние, определяющее цвет индикатора (валидная или невалидная цель). </param>
         public void ShowGridIndicator(Vector3 worldPosition, Vector2Int size, GridIndicatorState state)
         {
             _gridIndicator.transform.position = worldPosition;
@@ -47,8 +48,8 @@ namespace FlavorfulStory.GridSystem
         public void HideGridIndicator() => _gridIndicator.SetActive(false);
 
         /// <summary> Получить цвет для указанного состояния индикатора. </summary>
-        /// <param name="state"></param>
-        /// <returns></returns>
+        /// <param name="state"> Состояние, определяющее цвет индикатора (валидная или невалидная цель). </param>
+        /// <returns> Цвет, соответствующий переданному состоянию, либо белый по умолчанию. </returns>
         public static Color GetColorForState(GridIndicatorState state) =>
             _stateColors.TryGetValue(state, out var color) ? color : Color.white;
     }

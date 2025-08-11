@@ -1,5 +1,4 @@
 using FlavorfulStory.CursorSystem;
-using FlavorfulStory.GridSystem;
 using FlavorfulStory.InputSystem;
 using FlavorfulStory.InteractionSystem;
 using FlavorfulStory.InventorySystem;
@@ -49,15 +48,21 @@ namespace FlavorfulStory.Player
         /// <summary> Аниматор игрока. </summary>
         private Animator _animator; // TODO: DELETE
 
+        /// <summary> Сигнальная шина Zenject. </summary>
         private SignalBus _signalBus;
 
         #endregion
 
+        /// <summary> Внедрение зависимостей Zenject. </summary>
+        /// <param name="signalBus"> Шина сигналов Zenject для отправки событий. </param>
+        /// <param name="inventory"> Инвентарь игрока. </param>
+        /// <param name="playerStats"> Статы игрока. </param>
+        /// <param name="toolbarView"> Панель быстрого доступа игрока. </param>
+        /// <param name="itemDropService"> Сервис выброса предметов из инвентаря. </param>
+        /// <param name="toolUsageService"> Сервис использования инструментов. </param>
         [Inject]
         private void Construct(SignalBus signalBus, Inventory inventory, PlayerStats playerStats,
-            ToolbarView toolbarView,
-            IItemDropService itemDropService, ToolUsageService toolUsageService,
-            GridPositionProvider gridPositionProvider)
+            ToolbarView toolbarView, IItemDropService itemDropService, ToolUsageService toolUsageService)
         {
             _signalBus = signalBus;
 
@@ -88,7 +93,7 @@ namespace FlavorfulStory.Player
 
             HandleInput();
 
-            if (InteractWithComponent()) return;
+            if (InteractWithComponent()) return; // TODO: Удалить
 
             CursorController.SetCursor(CursorType.Default);
         }

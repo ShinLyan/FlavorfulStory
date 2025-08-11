@@ -70,7 +70,7 @@ namespace FlavorfulStory.ObjectManagement
 
         /// <summary> Внедрить контейнер зависимостей. </summary>
         /// <param name="container"> Контейнер Zenject. </param>
-        /// <param name="gridPositionProvider"> </param>
+        /// <param name="gridPositionProvider"> Провайдер позиции на гриде. </param>
         [Inject]
         private void Construct(DiContainer container, GridPositionProvider gridPositionProvider)
         {

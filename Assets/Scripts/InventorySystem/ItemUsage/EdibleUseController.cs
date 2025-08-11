@@ -1,7 +1,6 @@
 ﻿using FlavorfulStory.Actions;
 using FlavorfulStory.Audio;
 using FlavorfulStory.InputSystem;
-using UnityEngine;
 using Zenject;
 
 namespace FlavorfulStory.InventorySystem.ItemUsage
@@ -23,7 +22,7 @@ namespace FlavorfulStory.InventorySystem.ItemUsage
 
             Fire(new ConsumeSelectedItemSignal(1));
             SfxPlayer.Play(item.SfxType);
-            Debug.Log("🍎 Ем вкусную еду. Восстановил HP и энергию.");
+            // TODO: Восстановил HP / энергию
         }
     }
 }

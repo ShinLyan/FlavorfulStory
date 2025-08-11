@@ -6,7 +6,7 @@ namespace FlavorfulStory.CursorSystem
     /// <summary> Контроллер для управления типом курсора. </summary>
     /// <remarks> Загружает данные курсоров из ресурсов и предоставляет метод для установки подходящего курсора
     /// в зависимости от контекста (например, диалог, взаимодействие, атака и т.п.). </remarks>
-    public static class CursorController
+    public static class CursorController // TODO: Перевести на Zenject
     {
         /// <summary> Словарь курсоров для быстрого доступа. </summary>
         private static readonly Dictionary<CursorType, CursorMapping> _cursors;

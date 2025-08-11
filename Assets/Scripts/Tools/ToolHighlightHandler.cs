@@ -16,11 +16,13 @@ namespace FlavorfulStory.Tools
         /// <summary> Сервис отображения индикатора выбранной клетки грида. </summary>
         private readonly GridSelectionService _gridSelectionService;
 
+        /// <summary> Провайдер координат и позиций клеток грида. </summary>
         private readonly GridPositionProvider _gridPositionProvider;
 
         /// <summary> Сервис, выполняющий проверку возможности применения инструмента. </summary>
         private readonly ToolUsageService _toolUsageService;
 
+        /// <summary> Игрок, относительно которого проверяется дистанция удара и направление взгляда. </summary>
         private readonly PlayerController _player;
 
         /// <summary> Текущий выбранный инструмент из панели быстрого доступа. </summary>
@@ -29,18 +31,21 @@ namespace FlavorfulStory.Tools
         /// <summary> Флаг, указывающий, что именно этот класс сейчас управляет отображением индикатора. </summary>
         private bool _ownsIndicator;
 
+        /// <summary> Флаг, блокирующий динамическое обновление индикатора. </summary>
         private bool _isLocked;
 
+        /// <summary> Центр клетки в мировых координатах, на котором зафиксирован индикатор во время удара. </summary>
         private Vector3 _lockedCenterWorld;
 
+        /// <summary> Состояние индикатора, зафиксированное во время удара. </summary>
         private GridIndicatorState _lockedState;
 
         /// <summary> Конструктор с внедрением зависимостей. </summary>
         /// <param name="signalBus"> Шина сигналов Zenject. </param>
         /// <param name="gridSelectionService"> Сервис отображения индикатора выбранной клетки. </param>
-        /// <param name="gridPositionProvider"></param>
+        /// <param name="gridPositionProvider"> Провайдер для получения и конвертации координат клеток грида. </param>
         /// <param name="toolUsageService"> Сервис проверки и применения инструментов. </param>
-        /// <param name="player"></param>
+        /// <param name="player"> Контроллер игрока, необходимый для проверки расстояния до цели. </param>
         public ToolHighlightHandler(SignalBus signalBus, GridSelectionService gridSelectionService,
             GridPositionProvider gridPositionProvider, ToolUsageService toolUsageService, PlayerController player)
         {
@@ -51,7 +56,7 @@ namespace FlavorfulStory.Tools
             _player = player;
         }
 
-        /// <summary> Выполняет инициализацию — подписку на событие выбора предмета в тулбаре. </summary>
+        /// <summary> Выполняет инициализацию. </summary>
         public void Initialize()
         {
             _signalBus.Subscribe<ToolbarSlotSelectedSignal>(OnToolbarItemChanged);
@@ -69,6 +74,9 @@ namespace FlavorfulStory.Tools
             if (!_activeTool) _ownsIndicator = false;
         }
 
+        /// <summary> Обработчик начала использования инструмента. </summary>
+        /// <param name="centerWorld"> Центр клетки в мировых координатах. </param>
+        /// <param name="state"> Состояние индикатора (валидная / невалидная цель). </param>
         private void OnToolUseStarted(Vector3 centerWorld, GridIndicatorState state)
         {
             if (!_activeTool) return;
@@ -78,12 +86,14 @@ namespace FlavorfulStory.Tools
             _lockedState = state;
         }
 
+        /// <summary> Обработчик завершения использования инструмента. </summary>
         private void OnToolUseFinished()
         {
             _isLocked = false;
             Hide();
         }
 
+        /// <summary> Скрывает выделение сеткой. </summary>
         private void Hide()
         {
             if (!_ownsIndicator) return;
@@ -119,6 +129,9 @@ namespace FlavorfulStory.Tools
             ShowAtCenter(center, GridIndicatorState.ValidTarget);
         }
 
+        /// <summary> Проверяет, находится ли цель в пределах допустимой дистанции Чебышева от игрока. </summary>
+        /// <param name="targetCenterWorld"> Центр целевой клетки в мировых координатах. </param>
+        /// <returns> True, если цель находится в пределах досягаемости. </returns>
         private bool IsWithinChebyshevRange(Vector3 targetCenterWorld)
         {
             var playerGrid = _gridPositionProvider.WorldToGrid(_player.transform.position);
@@ -131,6 +144,9 @@ namespace FlavorfulStory.Tools
             return Mathf.Max(dx, dy) <= ToolUsageService.MaxDistanceInCells;
         }
 
+        /// <summary> Отображает индикатор в заданном центре клетки с указанным состоянием. </summary>
+        /// <param name="centerWorld"> Центр клетки в мировых координатах. </param>
+        /// <param name="state"> Состояние индикатора. </param>
         private void ShowAtCenter(Vector3 centerWorld, GridIndicatorState state)
         {
             var half = GridPositionProvider.CellHalfExtents;
@@ -139,6 +155,7 @@ namespace FlavorfulStory.Tools
             _ownsIndicator = true;
         }
 
+        /// <summary> Освобождает ресурсы. </summary>
         public void Dispose()
         {
             _signalBus.Unsubscribe<ToolbarSlotSelectedSignal>(OnToolbarItemChanged);

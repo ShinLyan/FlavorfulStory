@@ -1,10 +1,13 @@
 ﻿namespace FlavorfulStory.PlacementSystem
 {
+    /// <summary> Тип режима размещения объекта. </summary>
     public enum PlacementModeType
     {
-        Place,
+        /// <summary> Размещение нового объекта. </summary>
+        Place, 
 
-        Remove
+        /// <summary> Удаление существующего объекта. </summary>
+        Remove 
 
         // future: Rotate, Inspect, Move, etc.
     }

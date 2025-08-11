@@ -86,7 +86,6 @@ namespace FlavorfulStory.Infrastructure.Installers
             BindDialogue();
             BindQuests();
             BindUI();
-            BindNotifications();
             BindSystems();
         }
 
@@ -126,6 +125,12 @@ namespace FlavorfulStory.Infrastructure.Installers
             Container.Bind<ISaveable>().To<ItemDropService>().FromResolve();
             Container.Bind<IInventoryProvider>().To<InventoryProvider>().AsSingle().NonLazy();
             Container.Bind<InventoryTransferService>().AsSingle();
+
+            Container.Bind<ToolUsageService>().AsSingle().WithArguments(_toolMappings, _hitableLayers);
+            Container.BindInterfacesAndSelfTo<ToolHighlightHandler>().AsSingle();
+            Container.BindInterfacesTo<ToolUseController>().AsSingle();
+            Container.BindInterfacesTo<EdibleUseController>().AsSingle();
+            Container.BindInterfacesTo<PlaceableUseController>().AsSingle();
         }
 
         /// <summary> Установить зависимости, связанные с системой диалогов. </summary>
@@ -153,6 +158,7 @@ namespace FlavorfulStory.Infrastructure.Installers
         private void BindUI()
         {
             BindActionTooltipSystem();
+            BindNotifications();
 
             Container.Bind<ConfirmationWindowView>().FromComponentInHierarchy().AsSingle();
             Container.Bind<SummaryView>().FromComponentInHierarchy().AsSingle();
@@ -206,20 +212,23 @@ namespace FlavorfulStory.Infrastructure.Installers
 
             Container.BindInterfacesAndSelfTo<DayEndManager>().AsSingle();
 
+            BindGridSystem();
+            BindPlacementSystem();
+        }
+
+        /// <summary> Установить зависимости, связанные с системой грида. </summary>
+        private void BindGridSystem()
+        {
             Container.Bind<Grid>().FromComponentInHierarchy().AsSingle();
             Container.Bind<GridPositionProvider>().AsSingle();
             Container.BindInterfacesAndSelfTo<GridSelectionService>().AsSingle().WithArguments(_gridIndicator);
+        }
 
-            // TOOLS
-            Container.Bind<ToolUsageService>().AsSingle().WithArguments(_toolMappings, _hitableLayers);
-            Container.BindInterfacesAndSelfTo<ToolHighlightHandler>().AsSingle();
-
+        /// <summary> Установить зависимости, связанные с системой размещения объектов. </summary>
+        private void BindPlacementSystem()
+        {
             Container.Bind<PlacementController>().FromComponentInHierarchy().AsSingle();
             Container.Bind<PlacementPreview>().FromComponentInHierarchy().AsSingle();
-
-            Container.BindInterfacesTo<ToolUseController>().AsSingle();
-            Container.BindInterfacesTo<EdibleUseController>().AsSingle();
-            Container.BindInterfacesTo<PlaceableUseController>().AsSingle();
         }
     }
 }
