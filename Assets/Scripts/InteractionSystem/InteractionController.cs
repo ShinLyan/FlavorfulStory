@@ -6,6 +6,7 @@ using FlavorfulStory.Player;
 using FlavorfulStory.ResourceContainer;
 using UnityEngine;
 using Zenject;
+using Object = UnityEngine.Object;
 
 namespace FlavorfulStory.InteractionSystem
 {
@@ -50,12 +51,21 @@ namespace FlavorfulStory.InteractionSystem
         /// <summary> Определяет ближайший объект и обрабатывает ввод на взаимодействие. </summary>
         private void Update()
         {
-            if (_availableInteractables.Count > 0) UpdateClosestInteractable();
+            if (_availableInteractables.Count > 0)
+            {
+                ClearInvalidInteractables();
+                UpdateClosestInteractable();
+            }
 
             if (_closestInteractable == null || !InputWrapper.GetButtonDown(InputButton.Interact)) return;
-
             BeginInteraction();
         }
+
+        /// <summary> Удалить уничтоженные объекты из списка. </summary>
+        private void ClearInvalidInteractables() =>
+            _availableInteractables.RemoveAll(interactable => !IsUnityAlive(interactable));
+
+        private static bool IsUnityAlive(IInteractable interactable) => interactable as Object;
 
         /// <summary> Обновить ближайший интерактивный объект. </summary>
         private void UpdateClosestInteractable()

@@ -144,7 +144,8 @@ namespace FlavorfulStory.Player
         /// <summary> Обработка выброса предмета из панели быстрого доступа. </summary>
         private void HandleCurrentItemDrop()
         {
-            if (!InputWrapper.GetButtonDown(InputButton.DropCurrentItem) || !_toolbarView.SelectedItem.CanBeDropped)
+            if (!InputWrapper.GetButtonDown(InputButton.DropCurrentItem) || !_toolbarView.SelectedItem ||
+                !_toolbarView.SelectedItem.CanBeDropped)
                 return;
 
             const float DropItemForce = 2.5f;

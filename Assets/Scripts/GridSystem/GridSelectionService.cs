@@ -37,7 +37,9 @@ namespace FlavorfulStory.GridSystem
         /// <param name="state"> Состояние, определяющее цвет индикатора (валидная или невалидная цель). </param>
         public void ShowGridIndicator(Vector3 worldPosition, Vector2Int size, GridIndicatorState state)
         {
-            _gridIndicator.transform.position = worldPosition;
+            var position = worldPosition;
+            position.y = 0.015f;
+            _gridIndicator.transform.position = position;
             _gridIndicator.transform.localScale = new Vector3(size.x, 1f, size.y);
             _gridIndicatorRenderer.material.mainTextureScale = size;
             _gridIndicatorRenderer.material.color = GetColorForState(state);
