@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &-7223135853868520076
+--- !u!114 &-4286529189826811272
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -10,16 +10,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 32aa36d444184fea8fe8116a186a18de, type: 3}
-  m_Name: d13a717f-d0d7-4dc3-99dd-f81afaf3773f
+  m_Name: eb58c76f-c42f-4362-9097-dcad91e10471
   m_EditorClassIdentifier: 
   <IsPlayerSpeaking>k__BackingField: 0
-  <Text>k__BackingField: "\u0434\u043E 17_\u043F\u043E\u043D\u0435\u0434\u0435\u043B\u044C\u043D\u0438\u043A"
+  <Text>k__BackingField: "\u041F\u0440\u0438\u0432\u0435\u0442\u0441\u0442\u0432\u0443\u044E"
   <ChildNodes>k__BackingField:
-  - 9af362c9-e790-44c1-88fe-6e147bbaa254
+  - 19d0fe32-cf9c-444d-ad78-f5be83d244d7
   <Rect>k__BackingField:
     serializedVersion: 2
-    x: 277
-    y: 151
+    x: 0
+    y: 0
     width: 200
     height: 100
   <EnterActionName>k__BackingField: 
@@ -36,30 +36,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2a68b60154ae481c9936879aa8e46c42, type: 3}
-  m_Name: FelianaTest_before_monday_1
+  m_Name: FelianaTest_greetingDialogue
   m_EditorClassIdentifier: 
   <NpcName>k__BackingField: 2
-  <DialogueType>k__BackingField: 2
-  Conditions:
-  - rid: 56856002631041146
-  - rid: 56856002631041156
+  <DialogueType>k__BackingField: 1
+  Conditions: []
   _nodes:
-  - {fileID: -7223135853868520076}
-  - {fileID: 3823964211823037872}
+  - {fileID: -4286529189826811272}
+  - {fileID: 3943323853988689263}
   references:
     version: 2
-    RefIds:
-    - rid: 56856002631041146
-      type: {class: TimeOfDayDialogueCondition, ns: FlavorfulStory.DialogueSystem.Conditions,
-        asm: Assembly-CSharp}
-      data:
-        <TimeOfDay>k__BackingField: 0
-    - rid: 56856002631041156
-      type: {class: DayOfWeekDialogueCondition, ns: FlavorfulStory.DialogueSystem.Conditions,
-        asm: Assembly-CSharp}
-      data:
-        <DayOfWeek>k__BackingField: 1
---- !u!114 &3823964211823037872
+    RefIds: []
+--- !u!114 &3943323853988689263
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -69,15 +57,15 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 32aa36d444184fea8fe8116a186a18de, type: 3}
-  m_Name: 9af362c9-e790-44c1-88fe-6e147bbaa254
+  m_Name: 19d0fe32-cf9c-444d-ad78-f5be83d244d7
   m_EditorClassIdentifier: 
   <IsPlayerSpeaking>k__BackingField: 1
-  <Text>k__BackingField: "\u041F\u043E\u043D"
+  <Text>k__BackingField: "\u0417\u0434\u0430\u0440\u043E\u0432\u0430!"
   <ChildNodes>k__BackingField: []
   <Rect>k__BackingField:
     serializedVersion: 2
-    x: 471
-    y: 149
+    x: 233
+    y: 2
     width: 200
     height: 100
   <EnterActionName>k__BackingField: 

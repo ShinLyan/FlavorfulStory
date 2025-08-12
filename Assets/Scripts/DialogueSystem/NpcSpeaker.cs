@@ -3,6 +3,7 @@ using FlavorfulStory.AI;
 using FlavorfulStory.CursorSystem;
 using FlavorfulStory.InteractionSystem;
 using FlavorfulStory.Player;
+using FlavorfulStory.TimeManagement;
 using FlavorfulStory.TooltipSystem.ActionTooltips;
 using UnityEngine;
 using Zenject;
@@ -24,6 +25,9 @@ namespace FlavorfulStory.DialogueSystem
         /// <summary> Сервис диалогов. </summary>
         private DialogueService _dialogueService;
 
+        /// <summary> Количество проигранных контекстных диалогов. </summary>
+        private int _timesContextTalked;
+
         /// <summary> Внедрение зависимостей Zenject. </summary>
         /// <param name="playerSpeaker"> Компонент диалогов игрока. </param>
         /// <param name="playerController"> Контроллер игрока. </param>
@@ -44,6 +48,7 @@ namespace FlavorfulStory.DialogueSystem
             NpcInfo = GetComponent<Npc>().NpcInfo;
 
             _playerSpeaker.OnDialogueCompleted += OnDialogueCompleted;
+            WorldTime.OnDayEnded += _ => _timesContextTalked = 0;
         }
 
         /// <summary> Обработчик завершения диалога — завершает взаимодействие с NPC. </summary>
@@ -72,7 +77,11 @@ namespace FlavorfulStory.DialogueSystem
             if (!IsInteractionAllowed) return;
 
             IsInteractionAllowed = false;
-            _playerSpeaker.StartDialogue(this, _dialogueService.GetRandomWeightedDialogue(NpcInfo.NpcName));
+
+            var dialogue = _dialogueService.GetDialogue(NpcInfo.NpcName);
+            _playerSpeaker.StartDialogue(this, dialogue);
+
+            if (dialogue.DialogueType == DialogueType.Context) _timesContextTalked++;
         }
 
         /// <summary> Завершает взаимодействие с NPC. </summary>
@@ -80,7 +89,7 @@ namespace FlavorfulStory.DialogueSystem
         public void EndInteraction(PlayerController player)
         {
             player.SetBusyState(false);
-            IsInteractionAllowed = true;
+            IsInteractionAllowed = _timesContextTalked < 3;
         }
 
         #endregion

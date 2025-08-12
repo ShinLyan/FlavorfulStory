@@ -1,0 +1,48 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 117c81b660034043a189d64323bfafe8, type: 3}
+  m_Name: TestDialogueQuest
+  m_EditorClassIdentifier: 
+  <QuestGiver>k__BackingField: {fileID: 11400000, guid: f86a80addd769f448ac4dfb94a1f4690,
+    type: 2}
+  <QuestName>k__BackingField: TestDialogue
+  <QuestDescription>k__BackingField: TestDialogue
+  <QuestType>k__BackingField: 0
+  _stages:
+  - _objectives:
+    - <Reference>k__BackingField: 581c507a-b2a5-4436-8abd-e8ac2b227052
+      <Description>k__BackingField: "\u041F\u043E\u0433\u043E\u0432\u043E\u0440\u0438
+        \u0441 \u0424\u0435\u043B\u0438\u0430\u043D\u043E\u0439"
+      <Type>k__BackingField: 1
+      <Params>k__BackingField:
+        rid: 56856010821206125
+    _onStageCompleteActions:
+    - rid: 56856010821206137
+  _rewards: []
+  references:
+    version: 2
+    RefIds:
+    - rid: 56856010821206125
+      type: {class: TalkObjectiveParams, ns: FlavorfulStory.QuestSystem.Objectives.Params,
+        asm: Assembly-CSharp}
+      data:
+        <NpcName>k__BackingField: 2
+        <Dialogue>k__BackingField: {fileID: 11400000, guid: dc2ac966cfc1741f2808bdb0db57ca27,
+          type: 2}
+    - rid: 56856010821206137
+      type: {class: GiveItemAction, ns: FlavorfulStory.QuestSystem.TriggerActions,
+        asm: Assembly-CSharp}
+      data:
+        _itemToGive:
+          <Item>k__BackingField: {fileID: 11400000, guid: c105c0283ae6d95488d48924be055535,
+            type: 2}
+          <Number>k__BackingField: 50

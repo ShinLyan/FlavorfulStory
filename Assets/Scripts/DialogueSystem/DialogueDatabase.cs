@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using FlavorfulStory.AI;
 using UnityEngine;
 
@@ -29,10 +30,16 @@ namespace FlavorfulStory.DialogueSystem
             }
         }
 
-        /// <summary> Получает все диалоги для указанного NPC. </summary>
+        /// <summary> Получает все диалоги указанного типа для данного NPC. </summary>
         /// <param name="npcName"> Имя NPC для поиска диалогов. </param>
+        /// <param name="dialogueType"> Тип диалогов. </param>
         /// <returns> Список диалогов или пустой список, если диалогов не найдено. </returns>
-        public static List<Dialogue> GetDialoguesFromName(NpcName npcName) =>
-            _dialoguesByNpc.TryGetValue(npcName, out var dialogues) ? dialogues : new List<Dialogue>();
+        public static List<Dialogue> GetDialoguesFromNameAndType(NpcName npcName, DialogueType dialogueType)
+        {
+            if (_dialoguesByNpc.TryGetValue(npcName, out var dialogues))
+                return dialogues.Where(d => d.DialogueType == dialogueType).ToList();
+
+            return new List<Dialogue>();
+        }
     }
 }

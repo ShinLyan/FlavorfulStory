@@ -16,6 +16,10 @@ namespace FlavorfulStory.DialogueSystem
         [field: SerializeField]
         public NpcName NpcName { get; private set; }
 
+        /// <summary> Тип диалога. </summary>
+        [field: SerializeField]
+        public DialogueType DialogueType { get; private set; }
+
         /// <summary> Список условий, которые должны выполняться для доступности диалога. </summary>
         [SerializeReference] public List<DialogueCondition> Conditions = new();
 
