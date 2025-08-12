@@ -12,9 +12,6 @@ namespace FlavorfulStory.DialogueSystem
     /// <summary> Компонент, позволяющий NPC инициировать диалог при взаимодействии с игроком. </summary>
     public class NpcSpeaker : MonoBehaviour, IInteractable, ICursorInteractable
     {
-        /// <summary> Диалог, который будет запущен при взаимодействии с NPC. </summary>
-        [SerializeField] private Dialogue _dialogue;
-
         /// <summary> Компонент диалогов игрока. </summary>
         private PlayerSpeaker _playerSpeaker;
 
@@ -24,14 +21,20 @@ namespace FlavorfulStory.DialogueSystem
         /// <summary> Информация о NPC. </summary>
         public NpcInfo NpcInfo { get; private set; }
 
+        /// <summary> Сервис диалогов. </summary>
+        private DialogueService _dialogueService;
+
         /// <summary> Внедрение зависимостей Zenject. </summary>
         /// <param name="playerSpeaker"> Компонент диалогов игрока. </param>
         /// <param name="playerController"> Контроллер игрока. </param>
+        /// <param name="dialogueService"> Сервис диалогов. </param>
         [Inject]
-        private void Construct(PlayerSpeaker playerSpeaker, PlayerController playerController)
+        private void Construct(PlayerSpeaker playerSpeaker, PlayerController playerController,
+            DialogueService dialogueService)
         {
             _playerSpeaker = playerSpeaker;
             _playerController = playerController;
+            _dialogueService = dialogueService;
         }
 
         /// <summary> Инициализация свойств класса. </summary>
@@ -69,7 +72,7 @@ namespace FlavorfulStory.DialogueSystem
             if (!IsInteractionAllowed) return;
 
             IsInteractionAllowed = false;
-            _playerSpeaker.StartDialogue(this, _dialogue);
+            _playerSpeaker.StartDialogue(this, _dialogueService.GetRandomWeightedDialogue(NpcInfo.NpcName));
         }
 
         /// <summary> Завершает взаимодействие с NPC. </summary>
@@ -95,8 +98,6 @@ namespace FlavorfulStory.DialogueSystem
         /// <returns> True, если взаимодействие обработано. </returns>
         public bool TryInteractWithCursor(PlayerController controller)
         {
-            if (!_dialogue) return false;
-
             if (PlayerModel.IsPlayerInRange(transform.position) && Input.GetMouseButtonDown(1))
             {
                 BeginInteraction(controller);

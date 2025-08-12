@@ -24,6 +24,8 @@ MonoBehaviour:
     height: 100
   <EnterActionName>k__BackingField: 
   <ExitActionName>k__BackingField: 
+  _condition:
+    _and: []
 --- !u!114 &-6071055185219614125
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -48,6 +50,8 @@ MonoBehaviour:
     height: 100
   <EnterActionName>k__BackingField: 
   <ExitActionName>k__BackingField: 
+  _condition:
+    _and: []
 --- !u!114 &-5439297537706077486
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -75,6 +79,8 @@ MonoBehaviour:
     height: 100
   <EnterActionName>k__BackingField: 
   <ExitActionName>k__BackingField: 
+  _condition:
+    _and: []
 --- !u!114 &-2622510441503988176
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -99,6 +105,8 @@ MonoBehaviour:
     height: 100
   <EnterActionName>k__BackingField: 
   <ExitActionName>k__BackingField: 
+  _condition:
+    _and: []
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -111,6 +119,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2a68b60154ae481c9936879aa8e46c42, type: 3}
   m_Name: DirkDialogue
   m_EditorClassIdentifier: 
+  <NpcName>k__BackingField: 0
+  Conditions:
+  - rid: 56856002631041129
+  - rid: 56856002631041130
+  - rid: 56856002631041131
   _nodes:
   - {fileID: -5439297537706077486}
   - {fileID: -7151618664348682456}
@@ -120,6 +133,24 @@ MonoBehaviour:
   - {fileID: 711281152378904938}
   - {fileID: -6071055185219614125}
   - {fileID: -2622510441503988176}
+  references:
+    version: 2
+    RefIds:
+    - rid: 56856002631041129
+      type: {class: WeatherDialogueCondition, ns: FlavorfulStory.DialogueSystem.Conditions,
+        asm: Assembly-CSharp}
+      data:
+        <Weather>k__BackingField: 2
+    - rid: 56856002631041130
+      type: {class: DayOfWeekDialogueCondition, ns: FlavorfulStory.DialogueSystem.Conditions,
+        asm: Assembly-CSharp}
+      data:
+        <DayOfWeek>k__BackingField: 0
+    - rid: 56856002631041131
+      type: {class: TimeOfDayDialogueCondition, ns: FlavorfulStory.DialogueSystem.Conditions,
+        asm: Assembly-CSharp}
+      data:
+        <TimeOfDay>k__BackingField: 0
 --- !u!114 &711281152378904938
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -144,6 +175,8 @@ MonoBehaviour:
     height: 100
   <EnterActionName>k__BackingField: 
   <ExitActionName>k__BackingField: 
+  _condition:
+    _and: []
 --- !u!114 &1659229038562118222
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -168,6 +201,8 @@ MonoBehaviour:
     height: 100
   <EnterActionName>k__BackingField: 
   <ExitActionName>k__BackingField: 
+  _condition:
+    _and: []
 --- !u!114 &3841009922958701211
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -193,6 +228,8 @@ MonoBehaviour:
     height: 100
   <EnterActionName>k__BackingField: 
   <ExitActionName>k__BackingField: 
+  _condition:
+    _and: []
 --- !u!114 &6889824215155871103
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -217,3 +254,5 @@ MonoBehaviour:
     height: 100
   <EnterActionName>k__BackingField: 
   <ExitActionName>k__BackingField: 
+  _condition:
+    _and: []

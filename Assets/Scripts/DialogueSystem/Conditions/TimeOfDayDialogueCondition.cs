@@ -1,0 +1,29 @@
+using System;
+using FlavorfulStory.TimeManagement;
+using UnityEngine;
+
+namespace FlavorfulStory.DialogueSystem.Conditions
+{
+    /// <summary> Условие диалога, проверяющее время суток. </summary>
+    [Serializable]
+    public class TimeOfDayDialogueCondition : DialogueCondition
+    {
+        /// <summary> Требуемое время суток для выполнения условия. </summary>
+        [field: SerializeField]
+        public TimeOfDay TimeOfDay { get; private set; } = TimeOfDay.Any;
+
+        /// <summary> Проверяет соответствие текущего времени суток условию. </summary>
+        /// <returns> True, если текущее время соответствует условию. </returns>
+        public override bool MatchesCurrentState()
+        {
+            var currentTime = WorldTime.CurrentGameTime.Hour < 17 ? TimeOfDay.Before17 : TimeOfDay.After17;
+            return TimeOfDay == TimeOfDay.Any || TimeOfDay == currentTime;
+        }
+
+        /// <summary> Получает вес условия из конфигурации. </summary>
+        /// <param name="config"> Конфигурация весов диалогов. </param>
+        /// <returns> Вес условия. </returns>
+        public override int GetWeight(DialogueWeightsConfig config) =>
+            TimeOfDay != TimeOfDay.Any ? config.TimeOfDayWeight : 0;
+    }
+}
