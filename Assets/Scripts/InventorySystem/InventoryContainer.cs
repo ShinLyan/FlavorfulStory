@@ -9,7 +9,7 @@ using Zenject;
 namespace FlavorfulStory.InventorySystem
 {
     /// <summary> Объект-сундук, с которым можно взаимодействовать для обмена предметами. </summary>
-    [RequireComponent(typeof(Inventory))]
+    [RequireComponent(typeof(Inventory), typeof(Collider))]
     public class InventoryContainer : MonoBehaviour, IInteractable
     {
         /// <summary> Окно для обмена предметами между инвентарями. </summary>

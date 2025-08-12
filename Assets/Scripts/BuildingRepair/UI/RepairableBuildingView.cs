@@ -53,14 +53,14 @@ namespace FlavorfulStory.BuildingRepair.UI
         private Action _onClose;
 
         /// <summary> Фабрика создания отображений требований ресурсов. </summary>
-        private IGameFactory<ResourceRequirementView> _requirementViewFactory;
+        private IPrefabFactory<ResourceRequirementView> _requirementViewFactory;
 
         #endregion
 
         /// <summary> Внедрить фабрику создания отображений требований ресурсов. </summary>
         /// <param name="factory"> Фабрика создания отображений требований ресурсов. </param>
         [Inject]
-        private void Construct(IGameFactory<ResourceRequirementView> factory) => _requirementViewFactory = factory;
+        private void Construct(IPrefabFactory<ResourceRequirementView> factory) => _requirementViewFactory = factory;
 
         /// <summary> Инициализация кэша вьюшек, если они уже присутствуют в иерархии. </summary>
         private void Awake()

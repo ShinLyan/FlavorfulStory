@@ -18,6 +18,7 @@ using FlavorfulStory.PlacementSystem;
 using FlavorfulStory.Player;
 using FlavorfulStory.QuestSystem;
 using FlavorfulStory.QuestSystem.Objectives;
+using FlavorfulStory.QuestSystem.UI;
 using FlavorfulStory.Saving;
 using FlavorfulStory.SceneManagement;
 using FlavorfulStory.Shop;
@@ -40,12 +41,6 @@ namespace FlavorfulStory.Infrastructure.Installers
     /// <summary> Установщик зависимостей, необходимых для игрового процесса. </summary>
     public class GameplayInstaller : MonoInstaller
     {
-        /// <summary> Инвентарь игрока. </summary>
-        [SerializeField] private Inventory _playerInventory;
-
-        /// <summary> Префаб отображения ячейки инвентаря. </summary>
-        [SerializeField] private InventorySlotView _inventorySlotViewPrefab;
-
         /// <summary> Префаб отображения требования ресурса. </summary>
         [SerializeField] private ResourceRequirementView _requirementViewPrefab;
 
@@ -63,17 +58,26 @@ namespace FlavorfulStory.Infrastructure.Installers
         /// <summary> Префаб всплывающей подсказки для предмета. </summary>
         [SerializeField] private ItemTooltipView _itemTooltipPrefab;
 
+        /// <summary> Инвентарь игрока. </summary>
+        [Header("Inventory")]
+        [SerializeField] private Inventory _playerInventory;
+
+        /// <summary> Префаб отображения ячейки инвентаря. </summary>
+        [SerializeField] private InventorySlotView _inventorySlotViewPrefab;
+
         /// <summary> Индикатор клетки на гриде. </summary>
+        [Header("Placement System")]
         [SerializeField] private GameObject _gridIndicator;
 
+        /// <summary> Родительский контейнер для размещаемых объектов. </summary>
+        [SerializeField] private Transform _placeableContainer;
+
         /// <summary> Сопоставления типов инструментов с их префабами для визуализации в руке игрока. </summary>
-        [Tooltip("Сопоставления типов инструментов с их префабами для визуализации в руке игрока."), SerializeField]
-        private ToolPrefabMapping[] _toolMappings;
+        [Header("Tools")]
+        [SerializeField] private ToolPrefabMapping[] _toolMappings;
 
         /// <summary> Слои, по которым производится удар с помощью инструмента. </summary>
-        [Tooltip("Слои, по которым производится удар с помощью инструмента. " +
-                 "Выбирать Default, Obstacle, Terrain"), SerializeField]
-        private LayerMask _hitableLayers;
+        [SerializeField] private LayerMask _hitableLayers;
 
         /// <summary> Выполняет установку всех зависимостей, необходимых для сцены. </summary>
         public override void InstallBindings()
@@ -146,7 +150,7 @@ namespace FlavorfulStory.Infrastructure.Installers
         {
             Container.Bind<QuestList>().FromComponentInHierarchy().AsSingle();
             Container.Bind<IQuestList>().To<QuestList>().FromResolve();
-            Container.Bind<IGameFactory<QuestListButton>>().To<QuestListButtonFactory>().AsSingle()
+            Container.Bind<IPrefabFactory<QuestListButton>>().To<Factories.PrefabFactory<QuestListButton>>().AsSingle()
                 .WithArguments(_questListButtonPrefab);
             Container.Bind<QuestDescriptionView>().FromComponentInHierarchy().AsSingle();
 
@@ -165,9 +169,10 @@ namespace FlavorfulStory.Infrastructure.Installers
             Container.Bind<RepairableBuildingView>().FromComponentInHierarchy().AsSingle();
             Container.Bind<InventoryExchangeWindow>().FromComponentInHierarchy().AsSingle();
 
-            Container.Bind<IGameFactory<InventorySlotView>>().To<InventorySlotViewFactory>().AsSingle()
-                .WithArguments(_inventorySlotViewPrefab);
-            Container.Bind<IGameFactory<ResourceRequirementView>>().To<ResourceRequirementViewFactory>().AsSingle()
+            Container.Bind<IPrefabFactory<InventorySlotView>>().To<Factories.PrefabFactory<InventorySlotView>>()
+                .AsSingle().WithArguments(_inventorySlotViewPrefab);
+            Container.Bind<IPrefabFactory<ResourceRequirementView>>()
+                .To<Factories.PrefabFactory<ResourceRequirementView>>().AsSingle()
                 .WithArguments(_requirementViewPrefab);
 
             Container.Bind<ToolbarView>().FromComponentInHierarchy().AsSingle();
@@ -227,8 +232,9 @@ namespace FlavorfulStory.Infrastructure.Installers
         /// <summary> Установить зависимости, связанные с системой размещения объектов. </summary>
         private void BindPlacementSystem()
         {
-            Container.Bind<PlacementController>().FromComponentInHierarchy().AsSingle();
             Container.Bind<PlacementPreview>().FromComponentInHierarchy().AsSingle();
+            Container.Bind<IPrefabFactory<PlaceableObject>>().To<Factories.PrefabFactory<PlaceableObject>>().AsSingle();
+            Container.BindInterfacesAndSelfTo<PlacementController>().AsSingle().WithArguments(_placeableContainer);
         }
     }
 }

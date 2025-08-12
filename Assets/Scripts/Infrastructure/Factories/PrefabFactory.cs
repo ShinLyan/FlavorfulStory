@@ -5,7 +5,7 @@ using Zenject;
 namespace FlavorfulStory.Infrastructure.Factories
 {
     /// <summary> Базовый класс фабрики объектов, поддерживающий создание и уничтожение компонентов. </summary>
-    public abstract class GameFactoryBase<T> : IGameFactory<T> where T : Component
+    public class PrefabFactory<T> : IPrefabFactory<T> where T : Component
     {
         /// <summary> Контейнер зависимостей Zenject. </summary>
         private readonly DiContainer _container;
@@ -19,27 +19,33 @@ namespace FlavorfulStory.Infrastructure.Factories
         /// <summary> Создать экземпляр фабрики. </summary>
         /// <param name="container"> Контейнер зависимостей. </param>
         /// <param name="prefab"> Префаб компонента. </param>
-        protected GameFactoryBase(DiContainer container, T prefab)
+        protected PrefabFactory(DiContainer container, T prefab = null)
         {
             _container = container;
             _prefab = prefab;
         }
 
-        /// <summary> Создать новый экземпляр компонента. </summary>
+        /// <summary> Создать экземпляр префаба. </summary>
         /// <param name="parent"> Родительский трансформ (необязательно). </param>
-        /// <returns> Созданный экземпляр компонента. </returns>
-        public virtual T Create(Transform parent = null)
+        /// <returns> Созданный экземпляр префаба. </returns>
+        public virtual T Create(Transform parent = null) => Create(_prefab, parent);
+
+        /// <summary> Создать экземпляр префаба. </summary>
+        /// <param name="prefab"> Префаб, который нужно создать. </param>
+        /// <param name="parent"> Родительский трансформ (необязательно). </param>
+        /// <returns> Созданный экземпляр префаба. </returns>
+        public virtual T Create(T prefab, Transform parent = null)
         {
-            var instance = _container.InstantiatePrefabForComponent<T>(_prefab, parent);
+            var instance = _container.InstantiatePrefabForComponent<T>(prefab, parent);
             _spawnedObjects.Add(instance);
             return instance;
         }
 
-        /// <summary> Удалить ранее созданный экземпляр компонента. </summary>
-        /// <param name="obj"> Объект для удаления. </param>
-        public virtual void Despawn(T obj)
+        /// <summary> Удалить ранее созданный экземпляр префаба. </summary>
+        /// <param name="prefab"> Префаб для удаления. </param>
+        public virtual void Despawn(T prefab)
         {
-            if (_spawnedObjects.Remove(obj)) Object.Destroy(obj.gameObject);
+            if (_spawnedObjects.Remove(prefab)) Object.Destroy(prefab.gameObject);
         }
     }
 }
