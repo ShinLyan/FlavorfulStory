@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using FlavorfulStory.Infrastructure.Factories;
 using FlavorfulStory.InventorySystem;
 using FlavorfulStory.Saving;
@@ -40,7 +39,10 @@ namespace FlavorfulStory.PlacementSystem
         private void RegisterScenePlaceables()
         {
             foreach (var placeable in GetAllPlaceableObjects())
+            {
+                placeable.transform.SetParent(_container);
                 _placementController.RegisterPlacedObject(placeable.transform.position, placeable);
+            }
         }
 
         /// <summary> Получить все размещённые объекты на сцене. </summary>
@@ -52,7 +54,7 @@ namespace FlavorfulStory.PlacementSystem
 
         /// <summary> Структура данных для сериализации размещённых объектов. </summary>
         [Serializable]
-        private readonly struct PlaceableSaveData
+        private readonly struct PlaceableObjectSaveRecord
         {
             /// <summary> ID предмета, связанного с объектом. </summary>
             public string ItemID { get; }
@@ -63,33 +65,58 @@ namespace FlavorfulStory.PlacementSystem
             /// <summary> Поворот объекта. </summary>
             public SerializableVector3 Rotation { get; }
 
+            /// <summary> Состояния компонентов. </summary>
+            public Dictionary<string, object> ComponentStates { get; }
+
             /// <summary> Конструктор структуры сохранения объекта. </summary>
             /// <param name="itemID"> ID предмета. </param>
             /// <param name="position"> Позиция в мире. </param>
             /// <param name="rotation"> Угол поворота. </param>
-            public PlaceableSaveData(string itemID, SerializableVector3 position, SerializableVector3 rotation)
+            /// <param name="componentStates"> Состояния компонентов. </param>
+            public PlaceableObjectSaveRecord(string itemID, SerializableVector3 position, SerializableVector3 rotation,
+                Dictionary<string, object> componentStates)
             {
                 ItemID = itemID;
                 Position = position;
                 Rotation = rotation;
+                ComponentStates = componentStates;
             }
         }
 
         /// <summary> Сохраняет текущее состояние размещённых объектов. </summary>
         /// <returns> Список данных объектов для сохранения. </returns>
-        public object CaptureState() => GetAllPlaceableObjects().Select(placeable =>
-            new PlaceableSaveData(placeable.PlaceableItem.ItemID, new SerializableVector3(placeable.transform.position),
-                new SerializableVector3(placeable.transform.eulerAngles))).ToList();
+        public object CaptureState()
+        {
+            var data = new List<PlaceableObjectSaveRecord>();
+
+            foreach (var placeable in GetAllPlaceableObjects())
+            {
+                var record = new PlaceableObjectSaveRecord(placeable.PlaceableItem.ItemID,
+                    new SerializableVector3(placeable.transform.position),
+                    new SerializableVector3(placeable.transform.eulerAngles),
+                    new Dictionary<string, object>());
+
+                foreach (var saveable in placeable.GetComponents<ISaveable>())
+                {
+                    string key = saveable.GetType().FullName;
+                    if (key != null) record.ComponentStates[key] = saveable.CaptureState();
+                }
+
+                data.Add(record);
+            }
+
+            return data;
+        }
 
         /// <summary> Восстанавливает состояние объектов из сохранённых данных. </summary>
         /// <param name="state"> Сохранённое состояние. </param>
         public void RestoreState(object state)
         {
-            if (state is not List<PlaceableSaveData> savedList) return;
+            if (state is not List<PlaceableObjectSaveRecord> records) return;
 
             DestroyAllScenePlaceables();
 
-            foreach (var record in savedList)
+            foreach (var record in records)
             {
                 var placeableItem = ItemDatabase.GetItemFromID(record.ItemID) as PlaceableItem;
                 if (!placeableItem) continue;
@@ -98,7 +125,13 @@ namespace FlavorfulStory.PlacementSystem
                 placeable.transform.SetPositionAndRotation(record.Position.ToVector(),
                     Quaternion.Euler(record.Rotation.ToVector()));
 
-                if (!placeable) continue;
+                foreach (var saveable in placeable.GetComponents<ISaveable>())
+                {
+                    string key = saveable.GetType().FullName;
+                    if (key != null && record.ComponentStates.TryGetValue(key, out object savedState))
+                        saveable.RestoreState(savedState);
+                }
+
                 _placementController.RegisterPlacedObject(placeable.transform.position, placeable);
             }
         }
