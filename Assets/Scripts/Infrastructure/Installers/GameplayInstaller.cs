@@ -10,10 +10,10 @@ using FlavorfulStory.InventorySystem;
 using FlavorfulStory.InventorySystem.DropSystem;
 using FlavorfulStory.InventorySystem.EquipmentSystem;
 using FlavorfulStory.InventorySystem.ItemUsage;
-using FlavorfulStory.InventorySystem.PickupSystem;
 using FlavorfulStory.InventorySystem.UI;
 using FlavorfulStory.Notifications;
 using FlavorfulStory.Notifications.UI;
+using FlavorfulStory.PickupSystem;
 using FlavorfulStory.PlacementSystem;
 using FlavorfulStory.Player;
 using FlavorfulStory.QuestSystem;
@@ -124,8 +124,9 @@ namespace FlavorfulStory.Infrastructure.Installers
         private void BindInventory()
         {
             Container.Bind<Inventory>().FromInstance(_playerInventory).AsSingle();
-            Container.Bind<PickupFactory>().AsSingle();
-            Container.Bind<PickupSpawner>().FromComponentsInHierarchy().AsCached();
+
+            Container.Bind<IPrefabFactory<Pickup>>().To<Factories.PrefabFactory<Pickup>>().AsSingle();
+
             Container.Bind<IItemDropService>().To<ItemDropService>().AsSingle();
             Container.Bind<ISaveable>().To<ItemDropService>().FromResolve();
             Container.Bind<IInventoryProvider>().To<InventoryProvider>().AsSingle().NonLazy();

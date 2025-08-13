@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using Zenject;
+using Object = UnityEngine.Object;
 
 namespace FlavorfulStory.Infrastructure.Factories
 {
@@ -25,18 +26,37 @@ namespace FlavorfulStory.Infrastructure.Factories
             _prefab = prefab;
         }
 
-        /// <summary> Создать экземпляр префаба. </summary>
-        /// <param name="parent"> Родительский трансформ (необязательно). </param>
+        /// <summary> Создать экземпляр префаба с параметрами. </summary>
+        /// <param name="prefab"> Префаб для создания (если null — используется prefab по умолчанию). </param>
+        /// <param name="position"> Позиция (если null — используется Vector3.zero). </param>
+        /// <param name="rotation"> Поворот (если null — используется Quaternion.identity). </param>
+        /// <param name="parentTransform"> Родительский трансформ (может быть null). </param>
         /// <returns> Созданный экземпляр префаба. </returns>
-        public virtual T Create(Transform parent = null) => Create(_prefab, parent);
-
-        /// <summary> Создать экземпляр префаба. </summary>
-        /// <param name="prefab"> Префаб, который нужно создать. </param>
-        /// <param name="parent"> Родительский трансформ (необязательно). </param>
-        /// <returns> Созданный экземпляр префаба. </returns>
-        public virtual T Create(T prefab, Transform parent = null)
+        public T Create(T prefab = null, Vector3? position = null, Quaternion? rotation = null,
+            Transform parentTransform = null)
         {
-            var instance = _container.InstantiatePrefabForComponent<T>(prefab, parent);
+            var prefabToCreate = prefab ? prefab : _prefab;
+            if (!prefabToCreate)
+            {
+                Debug.LogError($"[{nameof(PrefabFactory<T>)}] Cannot create instance.");
+                return null;
+            }
+
+            T instance;
+
+            if (position == null && rotation == null)
+            {
+                // UI
+                instance = _container.InstantiatePrefabForComponent<T>(prefabToCreate, parentTransform);
+            }
+            else
+            {
+                // World-space
+                var pos = position ?? Vector3.zero;
+                var rot = rotation ?? Quaternion.identity;
+                instance = _container.InstantiatePrefabForComponent<T>(prefabToCreate, pos, rot, parentTransform);
+            }
+
             _spawnedObjects.Add(instance);
             return instance;
         }

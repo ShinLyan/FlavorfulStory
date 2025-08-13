@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using FlavorfulStory.InventorySystem.PickupSystem;
+using FlavorfulStory.Infrastructure.Factories;
+using FlavorfulStory.PickupSystem;
 using FlavorfulStory.Saving;
 using UnityEngine;
 
@@ -23,14 +24,14 @@ namespace FlavorfulStory.InventorySystem.DropSystem
         private Transform _container;
 
         /// <summary> Фабрика создания объектов Pickup'ов. </summary>
-        private readonly PickupFactory _pickupFactory;
+        private readonly IPrefabFactory<Pickup> _pickupFactory;
 
         /// <summary> Список заспавненных Pickup для сохранения и очистки. </summary>
         private readonly List<Pickup> _spawnedPickups = new();
 
         /// <summary> Конструктор сервиса выброса предметов. </summary>
         /// <param name="pickupFactory"> Фабрика создания Pickup объектов. </param>
-        public ItemDropService(PickupFactory pickupFactory) => _pickupFactory = pickupFactory;
+        public ItemDropService(IPrefabFactory<Pickup> pickupFactory) => _pickupFactory = pickupFactory;
 
         /// <summary> Выбрасывает предмет в мир в указанной позиции с опциональной силой. </summary>
         /// <param name="itemStack"> Предмет и его количество для выбрасывания. </param>
@@ -64,8 +65,9 @@ namespace FlavorfulStory.InventorySystem.DropSystem
         /// <returns> Ссылка на созданный Pickup. </returns>
         private Pickup Spawn(ItemStack itemStack, Vector3 position, float pickupDelay = 1f)
         {
-            var pickup = _pickupFactory.Create(itemStack, position, pickupDelay, _container);
-            if (pickup) _spawnedPickups.Add(pickup);
+            var pickup = _pickupFactory.Create(itemStack.Item.PickupPrefab, position, parentTransform: _container);
+            pickup.Setup(itemStack, pickupDelay);
+            _spawnedPickups.Add(pickup);
             return pickup;
         }
 

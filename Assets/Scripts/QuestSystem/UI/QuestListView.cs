@@ -46,7 +46,7 @@ namespace FlavorfulStory.QuestSystem.UI
         private void Start()
         {
             _pool = new ObjectPool<QuestListButton>(
-                () => _questListButtonFactory.Create(transform),
+                () => _questListButtonFactory.Create(parentTransform: transform),
                 questListButton => questListButton.gameObject.SetActive(true),
                 questListButton => questListButton.gameObject.SetActive(false)
             );

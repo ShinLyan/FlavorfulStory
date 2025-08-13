@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace FlavorfulStory.InventorySystem.PickupSystem
+namespace FlavorfulStory.PickupSystem
 {
     /// <summary> Автоматический подбор предметов при пересечении триггера. </summary>
     [RequireComponent(typeof(Pickup))]

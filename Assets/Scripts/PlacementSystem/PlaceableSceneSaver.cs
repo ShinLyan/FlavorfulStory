@@ -121,7 +121,7 @@ namespace FlavorfulStory.PlacementSystem
                 var placeableItem = ItemDatabase.GetItemFromID(record.ItemID) as PlaceableItem;
                 if (!placeableItem) continue;
 
-                var placeable = _placeableFactory.Create(placeableItem.Prefab, _container);
+                var placeable = _placeableFactory.Create(placeableItem.Prefab, parentTransform: _container);
                 placeable.transform.SetPositionAndRotation(record.Position.ToVector(),
                     Quaternion.Euler(record.Rotation.ToVector()));
 
