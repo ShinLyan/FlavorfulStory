@@ -14,8 +14,8 @@ Material:
   m_ValidKeywords:
   - _ADVANCED_LIGHTING
   - _NORMALMAP
-  m_InvalidKeywords:
-  - _ENVIRONMENTREFLECTIONS_ON
+  - _SPECULARHIGHLIGHTS_OFF
+  m_InvalidKeywords: []
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -27,8 +27,24 @@ Material:
     serializedVersion: 3
     m_TexEnvs: []
     m_Ints: []
-    m_Floats: []
-    m_Colors: []
+    m_Floats:
+    - _BendPushStrength: 1
+    - _ColorMapHeight: 1
+    - _ColorMapStrength: 1
+    - _EnvironmentReflections: 1
+    - _NormalFlattening: 1
+    - _OcclusionStrength: 0.737
+    - _Smoothness: 0.458
+    - _SpecularHighlights: 0
+    - _TranslucencyDirect: 1
+    - _TranslucencyFalloff: 3.86
+    - _TranslucencyIndirect: 0.546
+    - _TranslucencyOffset: 0.336
+    - _VertexDarkening: 0.587
+    m_Colors:
+    - _BaseColor: {r: 0.39552116, g: 0.5764706, b: 0.27450985, a: 1}
+    - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
+    - _HueVariation: {r: 0, g: 0, b: 0, a: 0.15}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
 --- !u!114 &5473917896841254419
