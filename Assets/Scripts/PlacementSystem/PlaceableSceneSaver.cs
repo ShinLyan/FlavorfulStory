@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using FlavorfulStory.GridSystem;
 using FlavorfulStory.Infrastructure.Factories;
 using FlavorfulStory.InventorySystem;
 using FlavorfulStory.Saving;
@@ -17,9 +16,6 @@ namespace FlavorfulStory.PlacementSystem
         /// <summary> Родительский контейнер для размещаемых объектов. </summary>
         [SerializeField] private Transform _container;
 
-        /// <summary> Провайдер координат грида. </summary>
-        private GridPositionProvider _gridPositionProvider;
-
         /// <summary> Контроллер размещения объектов. </summary>
         private PlacementController _placementController;
 
@@ -27,14 +23,12 @@ namespace FlavorfulStory.PlacementSystem
         private IPrefabFactory<PlaceableObject> _placeableFactory;
 
         /// <summary> Внедрение зависимостей Zenject. </summary>
-        /// <param name="gridPositionProvider"> Провайдер координат грида. </param>
         /// <param name="placementController"> Контроллер размещения. </param>
         /// <param name="placeableFactory"> Фабрика для создания объектов. </param>
         [Inject]
-        private void Construct(GridPositionProvider gridPositionProvider, PlacementController placementController,
+        private void Construct(PlacementController placementController,
             IPrefabFactory<PlaceableObject> placeableFactory)
         {
-            _gridPositionProvider = gridPositionProvider;
             _placementController = placementController;
             _placeableFactory = placeableFactory;
         }
@@ -46,10 +40,7 @@ namespace FlavorfulStory.PlacementSystem
         private void RegisterScenePlaceables()
         {
             foreach (var placeable in GetAllPlaceableObjects())
-            {
-                var gridPosition = _gridPositionProvider.WorldToGrid(placeable.transform.position);
-                _placementController.RegisterPlacedObject(gridPosition, placeable);
-            }
+                _placementController.RegisterPlacedObject(placeable.transform.position, placeable);
         }
 
         /// <summary> Получить все размещённые объекты на сцене. </summary>
@@ -108,9 +99,7 @@ namespace FlavorfulStory.PlacementSystem
                     Quaternion.Euler(record.Rotation.ToVector()));
 
                 if (!placeable) continue;
-
-                var gridPosition = _gridPositionProvider.WorldToGrid(placeable.transform.position);
-                _placementController.RegisterPlacedObject(gridPosition, placeable);
+                _placementController.RegisterPlacedObject(placeable.transform.position, placeable);
             }
         }
 
@@ -119,9 +108,7 @@ namespace FlavorfulStory.PlacementSystem
         {
             foreach (var placeable in GetAllPlaceableObjects())
             {
-                var gridPosition = _gridPositionProvider.WorldToGrid(placeable.transform.position);
-                _placementController.UnregisterPlacedObject(gridPosition, placeable);
-
+                _placementController.UnregisterPlacedObject(placeable.transform.position, placeable);
                 Destroy(placeable.gameObject);
             }
         }

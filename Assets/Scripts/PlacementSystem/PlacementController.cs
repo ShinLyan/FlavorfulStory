@@ -121,17 +121,23 @@ namespace FlavorfulStory.PlacementSystem
             return false;
         }
 
-        /// <summary> Регистрирует объект в системе размещения по указанной позиции. </summary>
-        /// <param name="gridPosition"> Позиция ячейки грида. </param>
+        /// <summary> Регистрирует объект в системе размещения по мировой позиции. </summary>
+        /// <param name="worldPosition"> Позиция в мировых координатах. </param>
         /// <param name="placeableObject"> Объект для регистрации. </param>
-        public void RegisterPlacedObject(Vector3Int gridPosition, PlaceableObject placeableObject) =>
+        public void RegisterPlacedObject(Vector3 worldPosition, PlaceableObject placeableObject)
+        {
+            var gridPosition = _gridPositionProvider.WorldToGrid(worldPosition);
             _gridLayers[placeableObject.Layer].AddObjectAt(gridPosition, placeableObject);
+        }
 
         /// <summary> Удаляет объект из системы размещения. </summary>
-        /// <param name="gridPosition"> Позиция ячейки грида. </param>
+        /// <param name="worldPosition"> Позиция в мировых координатах. </param>
         /// <param name="placeableObject"> Объект для удаления. </param>
-        public void UnregisterPlacedObject(Vector3Int gridPosition, PlaceableObject placeableObject) =>
+        public void UnregisterPlacedObject(Vector3 worldPosition, PlaceableObject placeableObject)
+        {
+            var gridPosition = _gridPositionProvider.WorldToGrid(worldPosition);
             _gridLayers[placeableObject.Layer].RemoveObjectAt(gridPosition);
+        }
 
         /// <summary> Обрабатывает обновление предпросмотра и клик размещения. </summary>
         public void Tick()

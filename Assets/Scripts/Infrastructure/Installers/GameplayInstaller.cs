@@ -99,6 +99,7 @@ namespace FlavorfulStory.Infrastructure.Installers
             Container.DeclareSignal<NightStartedSignal>();
             Container.DeclareSignal<ItemCollectedSignal>();
             Container.DeclareSignal<QuestAddedSignal>();
+            Container.DeclareSignal<DismantleDeniedSignal>();
 
             Container.DeclareSignal<ToolbarSlotSelectedSignal>();
             Container.DeclareSignal<ToolbarHotkeyPressedSignal>();
@@ -199,6 +200,7 @@ namespace FlavorfulStory.Infrastructure.Installers
             Container.BindInterfacesTo<SignalNotifier<NightStartedSignal>>().AsSingle();
             Container.BindInterfacesTo<SignalNotifier<ItemCollectedSignal>>().AsSingle();
             Container.BindInterfacesTo<SignalNotifier<QuestAddedSignal>>().AsSingle();
+            Container.BindInterfacesTo<SignalNotifier<DismantleDeniedSignal>>().AsSingle();
         }
 
         /// <summary> Установить зависимости, связанные с системами и логикой. </summary>

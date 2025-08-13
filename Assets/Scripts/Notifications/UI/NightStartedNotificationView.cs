@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace FlavorfulStory.Notifications.UI
 {
-    /// <summary> UI-элемент уведомления о наступлении ночи. </summary>
+    /// <summary> Отображение уведомления о наступлении ночи. </summary>
     public class NightStartedNotificationView : BaseNotificationView
     {
         /// <summary> Текстовое поле с сообщением. </summary>
@@ -16,7 +16,7 @@ namespace FlavorfulStory.Notifications.UI
         {
             if (data is not NightStartedSignal notificationData) return;
 
-            _messageText.text = "Night had fallen. It's already 18 o'clock";
+            _messageText.text = $"Night had fallen. It's already {notificationData.Time.Hour} o'clock";
         }
     }
 }
