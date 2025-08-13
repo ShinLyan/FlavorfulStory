@@ -90,7 +90,7 @@ namespace FlavorfulStory.InventorySystem.UI
         {
             if (index < _slots.Count) return _slots[index];
 
-            var slot = _slotFactory.Create(_slotsContainer);
+            var slot = _slotFactory.Create(parentTransform: _slotsContainer);
             _slots.Add(slot);
             return slot;
         }
