@@ -1,7 +1,8 @@
-﻿using UnityEngine;
+﻿using FlavorfulStory.InventorySystem;
+using UnityEngine;
 using Zenject;
 
-namespace FlavorfulStory.InventorySystem.PickupSystem
+namespace FlavorfulStory.PickupSystem
 {
     /// <summary> Отвечает за механику подбора предметов игроком. </summary>
     /// <remarks> Скрипт должен быть размещен на специальном префабе, содержащем данные о предмете. </remarks>
@@ -60,6 +61,7 @@ namespace FlavorfulStory.InventorySystem.PickupSystem
 #if UNITY_EDITOR
 
         #region Debug
+
         /// <summary> Проводит настройку параметров в инспекторе. </summary>
         private void OnValidate()
         {

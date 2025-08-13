@@ -1,8 +1,9 @@
-﻿using FlavorfulStory.Saving;
+﻿using FlavorfulStory.InventorySystem;
+using FlavorfulStory.Saving;
 using UnityEngine;
 using Zenject;
 
-namespace FlavorfulStory.InventorySystem.PickupSystem
+namespace FlavorfulStory.PickupSystem
 {
     /// <summary> Отвечает за создание объектов Pickup, которые появляются при первой загрузке уровня. </summary>
     /// <remarks> Автоматически создает префаб для заданного предмета инвентаря. </remarks>
@@ -44,7 +45,7 @@ namespace FlavorfulStory.InventorySystem.PickupSystem
 
         /// <summary> Восстанавливает состояние объекта при загрузке. </summary>
         /// <param name="state"> Сохраненное состояние объекта. </param>
-        public void RestoreState(object state) => _isPickedUp = state is true;
+        public void RestoreState(object state) => _isPickedUp = (bool)state;
 
         #endregion
     }

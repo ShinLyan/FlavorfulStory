@@ -1,7 +1,8 @@
-﻿using UnityEngine;
+﻿using FlavorfulStory.InventorySystem;
+using UnityEngine;
 using Zenject;
 
-namespace FlavorfulStory.InventorySystem.PickupSystem
+namespace FlavorfulStory.PickupSystem
 {
     /// <summary> Фабрика для создания экземпляров предметов, доступных для подбора. </summary>
     public class PickupFactory

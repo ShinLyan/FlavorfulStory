@@ -1,5 +1,5 @@
 ﻿using System;
-using FlavorfulStory.InventorySystem.PickupSystem;
+using FlavorfulStory.PickupSystem;
 using UnityEngine;
 
 namespace FlavorfulStory.InventorySystem
