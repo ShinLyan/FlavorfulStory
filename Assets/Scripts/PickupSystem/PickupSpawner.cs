@@ -54,7 +54,7 @@ namespace FlavorfulStory.PickupSystem
         public void RestoreState(object state)
         {
             _isPickedUp = (bool)state;
-            if (_isPickedUp && _instance) DestroyPickup();
+            if (_isPickedUp && _instance) DestroyPickup(); // TODO: Пересмотреть после фикса SavingSystem
         }
 
         /// <summary> Уничтожить пикап. </summary>
