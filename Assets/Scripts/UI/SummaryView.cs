@@ -1,53 +1,72 @@
 ﻿using System;
+using System.Threading;
+using Cysharp.Threading.Tasks;
+using DG.Tweening;
 using FlavorfulStory.InputSystem;
+using FlavorfulStory.UI.Animation;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Zenject;
 
 namespace FlavorfulStory.UI
 {
-    /// <summary> Отображение сводки дня. </summary>
+    /// <summary> Отображение сводки дня с анимациями. </summary>
     public class SummaryView : MonoBehaviour
     {
-        /// <summary> Основной контейнер UI сводки. </summary>
-        [SerializeField] private GameObject _content; // TODO: ПО УМОЛЧАНИЮ ВЫКЛЮЧАТЬ ВЕСЬ VIEW, УДАЛИТЬ CONTENT
-
-        /// <summary> Текстовый элемент для отображения сводной информации. </summary>
         [SerializeField] private TMP_Text _summaryText;
-
-        /// <summary> Кнопка для продолжения после просмотра сводки. </summary>
         [SerializeField] private Button _continueButton;
-
-        /// <summary> Камера, используемая для отображения сводки (активируется при показе UI). </summary>
         [SerializeField] private GameObject _camera;
 
-        /// <summary> Текст сводки по умолчанию, отображается при отсутствии специального контента. </summary>
         public const string DefaultSummaryText = "BEST SUMMARY EVER";
 
-        /// <summary> Событие, вызываемое при нажатии кнопки продолжения. </summary>
+        private CanvasGroupFader _hudFader;
+
+        private CanvasGroupFader _fader;
+
         public Action OnContinuePressed;
 
-        /// <summary> Подписка на нажатие кнопки. </summary>
-        private void Awake() => _continueButton.onClick.AddListener(() => OnContinuePressed?.Invoke());
+        [Inject]
+        public void Construct([Inject(Id = "HUD")] CanvasGroupFader hudFader) { _hudFader = hudFader; }
 
-        /// <summary> Устанавливает текст сводки. </summary>
-        /// <param name="text">Текст для отображения в сводке.</param>
-        public void SetSummary(string text) => _summaryText.text = text;
-
-        /// <summary> Показывает UI сводки и блокирует пользовательский ввод. </summary>
-        public void Show()
+        private void Awake()
         {
-            _content.SetActive(true);
-            _camera.SetActive(true);
-            InputWrapper.BlockAllInput();
+            _fader = GetComponent<CanvasGroupFader>();
+            _continueButton.onClick.AddListener(() => OnContinuePressed?.Invoke());
         }
 
-        /// <summary> Скрывает UI сводки и разблокирует пользовательский ввод. </summary>
-        public void Hide()
+        public void SetSummary(string text) => _summaryText.text = text;
+
+        /// <summary> Показывает UI сводки с анимацией. </summary>
+        public async UniTask ShowWithAnimation()
         {
-            _content.SetActive(false);
+            InputWrapper.BlockAllInput();
+
+            gameObject.SetActive(true);
+            _camera.SetActive(true);
+
+            _fader.Show();
+            await _hudFader.Hide().AsyncWaitForCompletion();
+        }
+
+        /// <summary> Ждёт нажатия кнопки продолжения с анимацией. </summary>
+        public async UniTask WaitForContinue(CancellationToken token = default)
+        {
+            bool continuePressed = false;
+            OnContinuePressed = () => continuePressed = true;
+
+            await UniTask.WaitUntil(() => continuePressed, cancellationToken: token);
+            await _hudFader.Hide().AsyncWaitForCompletion();
+        }
+
+        /// <summary> Скрывает UI сводки с анимацией. </summary>
+        public async UniTask HideWithAnimation()
+        {
+            await _fader.Hide().AsyncWaitForCompletion();
+            gameObject.SetActive(false);
             _camera.SetActive(false);
             InputWrapper.UnblockAllInput();
+            await _hudFader.Show().AsyncWaitForCompletion();
         }
     }
 }

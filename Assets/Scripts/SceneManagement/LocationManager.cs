@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Cysharp.Threading.Tasks;
 using FlavorfulStory.Player;
+using FlavorfulStory.Saving;
 using UnityEngine;
 using Zenject;
 
@@ -9,7 +11,7 @@ namespace FlavorfulStory.SceneManagement
 {
     /// <summary> Менеджер локаций. </summary>
     /// <remarks> Отвечает за активацию и деактивацию локаций. </remarks>
-    public class LocationManager : IInitializable
+    public class LocationManager : IInitializable, IDisposable
     {
         /// <summary> Контроллер игрока. </summary>
         private readonly PlayerController _playerController;
@@ -41,17 +43,28 @@ namespace FlavorfulStory.SceneManagement
                 if (!_locationByName.TryAdd(location.LocationName, location))
                     Debug.LogError($"Дубликат локации: {location.LocationName} в {location.name}");
 
-            UpdateActiveLocation();
+            SavingSystem.OnLoadCompleted += HandleSaveLoadCompleted;
         }
+
+        public void Dispose() => SavingSystem.OnLoadCompleted -= UpdateActiveLocation;
 
         /// <summary> Активирует локацию, в которой находится игрок, и деактивирует все остальные. </summary>
         public void UpdateActiveLocation()
         {
+            if (!_playerController) return;
+
             var playerPosition = _playerController.transform.position;
             var currentLocation = FindLocationByPosition(playerPosition);
             foreach (var location in _locations) location.SetActive(location == currentLocation);
 
             if (currentLocation) OnLocationChanged?.Invoke(currentLocation);
+        }
+
+        private async void HandleSaveLoadCompleted()
+        {
+            await UniTask.Yield();
+
+            UpdateActiveLocation();
         }
 
         /// <summary> Найти локацию по текущей позиции игрока в мире. </summary>
