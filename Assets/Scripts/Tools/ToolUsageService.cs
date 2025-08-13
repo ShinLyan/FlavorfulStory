@@ -9,6 +9,7 @@ using FlavorfulStory.PlacementSystem;
 using FlavorfulStory.Player;
 using FlavorfulStory.ResourceContainer;
 using UnityEngine;
+using Zenject;
 using Object = UnityEngine.Object;
 
 namespace FlavorfulStory.Tools
@@ -37,6 +38,9 @@ namespace FlavorfulStory.Tools
         /// <summary> Находится ли инструмент на перезарядке? </summary>
         private bool _isOnCooldown;
 
+        /// <summary> Сигнальная шина Zenject. </summary>
+        private readonly SignalBus _signalBus;
+
         /// <summary> Максимальная дистанция взаимодействия инструментом (в клетках). </summary>
         public const int MaxDistanceInCells = 2;
 
@@ -55,14 +59,16 @@ namespace FlavorfulStory.Tools
         /// <param name="player"> Игрок, использующий инструмент. </param>
         /// <param name="placementController"> Контроллер размещение объектов. </param>
         /// <param name="itemDropService"> Сервис выброса предметов в игровой мир. </param>
+        /// <param name="signalBus"> Сигнальная шина Zenject. </param>
         public ToolUsageService(ToolPrefabMapping[] toolMappings, LayerMask hitableLayers, PlayerController player,
-            PlacementController placementController, IItemDropService itemDropService)
+            PlacementController placementController, IItemDropService itemDropService, SignalBus signalBus)
         {
             _toolPresenter = new ToolPresenter(toolMappings);
             _hitableLayers = hitableLayers;
             _player = player;
             _placementController = placementController;
             _itemDropService = itemDropService;
+            _signalBus = signalBus;
         }
 
         /// <summary> Попробовать использовать инструмент в указанной клетке. </summary>
@@ -144,6 +150,13 @@ namespace FlavorfulStory.Tools
         private bool TryDismantleAt(Vector3 cellCenter)
         {
             if (!_placementController.TryRemoveAt(cellCenter, out var removedPlaceable)) return false;
+
+            if (removedPlaceable.TryGetComponent(out ICanBeDismantled restriction) && !restriction.CanBeDismantled)
+            {
+                _placementController.RegisterPlacedObject(removedPlaceable.transform.position, removedPlaceable);
+                _signalBus.Fire(new DismantleDeniedSignal(restriction.DismantleDeniedReason));
+                return false;
+            }
 
             _itemDropService.Drop(new ItemStack(removedPlaceable.PlaceableItem, 1), cellCenter,
                 ItemDropService.ResourceDropForce);

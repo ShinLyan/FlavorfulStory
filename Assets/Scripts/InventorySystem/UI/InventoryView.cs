@@ -14,7 +14,7 @@ namespace FlavorfulStory.InventorySystem.UI
         private Inventory _inventory;
 
         /// <summary> Фабрика для создания отображений ячеек инвентаря. </summary>
-        private IGameFactory<InventorySlotView> _slotFactory;
+        private IPrefabFactory<InventorySlotView> _slotFactory;
 
         /// <summary> Список отображений ячеек инвентаря. </summary>
         private readonly List<InventorySlotView> _slots = new();
@@ -26,7 +26,7 @@ namespace FlavorfulStory.InventorySystem.UI
         /// <param name="inventory"> Инвентарь игрока. </param>
         /// <param name="slotFactory"> Фабрика отображений ячеек. </param>
         [Inject]
-        private void Construct(Inventory inventory, IGameFactory<InventorySlotView> slotFactory)
+        private void Construct(Inventory inventory, IPrefabFactory<InventorySlotView> slotFactory)
         {
             _inventory = inventory;
             _slotFactory = slotFactory;

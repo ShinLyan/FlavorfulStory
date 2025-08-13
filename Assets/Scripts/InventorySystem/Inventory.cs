@@ -27,6 +27,9 @@ namespace FlavorfulStory.InventorySystem
         /// <summary> Сигнальная шина Zenject для отправки и получения событий. </summary>
         private SignalBus _signalBus;
 
+        /// <summary> Инвентарь пуст? </summary>
+        public bool IsEmpty => _inventorySlots.All(itemStack => !itemStack.Item || itemStack.Number <= 0);
+
         /// <summary> Событие, вызываемое при изменении инвентаря (добавление, удаление предметов). </summary>
         public event Action InventoryUpdated;
 

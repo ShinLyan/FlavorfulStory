@@ -60,12 +60,30 @@ namespace FlavorfulStory.InventorySystem.PickupSystem
 #if UNITY_EDITOR
 
         #region Debug
-
-        /// <summary> Обновляет радиус коллайдера при изменении радиуса подбора в инспекторе. </summary>
+        /// <summary> Проводит настройку параметров в инспекторе. </summary>
         private void OnValidate()
         {
+            UpdatePickupRadius();
+            IgnorePlayerOnChildColliders();
+        }
+
+        /// <summary> Обновляет радиус триггер-коллайдера. </summary>
+        private void UpdatePickupRadius()
+        {
             var sphereCollider = GetComponent<SphereCollider>();
-            sphereCollider.radius = _pickupRadius;
+            if (sphereCollider) sphereCollider.radius = _pickupRadius;
+        }
+
+        /// <summary> Настраивает игнорирование дочерних коллизий слоя игрока. </summary>
+        private void IgnorePlayerOnChildColliders()
+        {
+            int playerLayer = 1 << LayerMask.NameToLayer("Player");
+            foreach (var collider in GetComponentsInChildren<Collider>(true))
+            {
+                if (collider.gameObject == gameObject) continue;
+
+                collider.excludeLayers = playerLayer;
+            }
         }
 
         #endregion

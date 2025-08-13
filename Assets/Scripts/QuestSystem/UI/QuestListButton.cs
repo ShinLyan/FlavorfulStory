@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
 
-namespace FlavorfulStory.QuestSystem
+namespace FlavorfulStory.QuestSystem.UI
 {
     /// <summary> Кнопка в списке квестов, открывающая описание выбранного квеста. </summary>
     public class QuestListButton : CustomButton
