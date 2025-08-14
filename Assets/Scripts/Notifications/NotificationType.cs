@@ -10,6 +10,9 @@
         NightStarted,
 
         /// <summary> Уведомление о добавлении нового квеста. </summary>
-        QuestAdded
+        QuestAdded,
+
+        /// <summary> Уведомление о невозможности разрушить объект. </summary>
+        DismantleDenied
     }
 }

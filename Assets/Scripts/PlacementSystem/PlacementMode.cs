@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using FlavorfulStory.Audio;
 using FlavorfulStory.GridSystem;
+using FlavorfulStory.Infrastructure.Factories;
 using UnityEngine;
 
 namespace FlavorfulStory.PlacementSystem
@@ -17,6 +18,12 @@ namespace FlavorfulStory.PlacementSystem
         /// <summary> Словарь слоев размещения и данных по занятым ячейкам. </summary>
         private readonly Dictionary<PlacementLayer, PlacementGridData> _gridLayers;
 
+        /// <summary> Контейнер, в который будет помещён созданный объект. </summary>
+        private readonly Transform _container;
+
+        /// <summary> Фабрика для создания экземпляров размещаемых объектов. </summary>
+        private readonly IPrefabFactory<PlaceableObject> _placeableFactory;
+
         /// <summary> Буфер коллайдеров для поиска объектов, которые можно ударить. </summary>
         private readonly Collider[] _hitsBuffer = new Collider[10];
 
@@ -27,12 +34,17 @@ namespace FlavorfulStory.PlacementSystem
         /// <param name="positionProvider"> Провайдер координат грида. </param>
         /// <param name="placementPreview"> Превью размещаемого объекта. </param>
         /// <param name="gridLayers"> Словарь данных по слоям размещения. </param>
+        /// <param name="container"> Родитель для создаваемых объектов. </param>
+        /// <param name="placeableFactory"> Фабрика размещаемых объектов. </param>
         public PlacementMode(GridPositionProvider positionProvider, PlacementPreview placementPreview,
-            Dictionary<PlacementLayer, PlacementGridData> gridLayers)
+            Dictionary<PlacementLayer, PlacementGridData> gridLayers, Transform container,
+            IPrefabFactory<PlaceableObject> placeableFactory)
         {
             _positionProvider = positionProvider;
             _placementPreview = placementPreview;
             _gridLayers = gridLayers;
+            _container = container;
+            _placeableFactory = placeableFactory;
         }
 
         /// <summary> Вход в режим — начать показ превью размещения. </summary>
@@ -54,12 +66,12 @@ namespace FlavorfulStory.PlacementSystem
 
             SfxPlayer.Play(SfxType.PlacementSuccess);
 
-            var instance = Object.Instantiate(PlaceableObject);
+            var instance = _placeableFactory.Create(PlaceableObject, parentTransform: _container);
             instance.transform.position = _positionProvider.GridToWorld(gridPosition);
 
             _gridLayers[PlaceableObject.Layer].AddObjectAt(gridPosition, instance);
-
             _placementPreview.UpdatePosition(_positionProvider.GridToWorld(gridPosition), false);
+
             return true;
         }
 

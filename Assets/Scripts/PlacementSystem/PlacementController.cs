@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using FlavorfulStory.GridSystem;
+using FlavorfulStory.Infrastructure.Factories;
 using FlavorfulStory.InputSystem;
 using FlavorfulStory.TimeManagement;
 using UnityEngine;
@@ -9,19 +10,19 @@ using Zenject;
 namespace FlavorfulStory.PlacementSystem
 {
     /// <summary> Контроллер режима размещения и удаления объектов на гриде. </summary>
-    public class PlacementController : MonoBehaviour
+    public class PlacementController : ITickable
     {
         /// <summary> Провайдер координат курсора на гриде. </summary>
-        private GridPositionProvider _gridPositionProvider;
+        private readonly GridPositionProvider _gridPositionProvider;
 
         /// <summary> Сервис отображения предпросмотра размещаемого или удаляемого объекта. </summary>
-        private PlacementPreview _placementPreview;
+        private readonly PlacementPreview _placementPreview;
 
-        /// <summary> Текущий активный режим размещения или удаления. </summary>
-        private IPlacementMode _currentMode;
+        /// <summary> Родительский контейнер для размещаемых объектов. </summary>
+        private readonly Transform _placeableContainer;
 
-        /// <summary> Последняя позиция курсора на гриде, для оптимизации обновления предпросмотра. </summary>
-        private Vector3Int _lastGridPosition;
+        /// <summary> Фабрика для создания объектов размещения. </summary>
+        private readonly IPrefabFactory<PlaceableObject> _placeableFactory;
 
         /// <summary> Слои грида с размещёнными объектами. </summary>
         private readonly Dictionary<PlacementLayer, PlacementGridData> _gridLayers = new();
@@ -29,22 +30,28 @@ namespace FlavorfulStory.PlacementSystem
         /// <summary> Доступные режимы размещения/удаления, сопоставленные с их типами. </summary>
         private readonly Dictionary<PlacementModeType, IPlacementMode> _modes = new();
 
+        /// <summary> Текущий активный режим размещения или удаления. </summary>
+        private IPlacementMode _currentMode;
+
+        /// <summary> Последняя позиция курсора на гриде, для оптимизации обновления предпросмотра. </summary>
+        private Vector3Int _lastGridPosition;
+
         /// <summary> Действие, вызываемое при успешном применении действия (размещение или удаление). </summary>
         private Action _onApplySuccess;
 
-        /// <summary> Внедрение зависимостей через Zenject. </summary>
+        /// <summary> Конструктор с параметрами. </summary>
         /// <param name="gridPositionProvider"> Провайдер координат грида. </param>
         /// <param name="placementPreview"> Сервис предпросмотра размещения. </param>
-        [Inject]
-        private void Construct(GridPositionProvider gridPositionProvider, PlacementPreview placementPreview)
+        /// <param name="placeableContainer"> Родительский контейнер для размещаемых объектов. </param>
+        /// <param name="placeableFactory"> Фабрика для создания объектов размещения. </param>
+        public PlacementController(GridPositionProvider gridPositionProvider, PlacementPreview placementPreview,
+            Transform placeableContainer, IPrefabFactory<PlaceableObject> placeableFactory)
         {
             _gridPositionProvider = gridPositionProvider;
             _placementPreview = placementPreview;
-        }
+            _placeableContainer = placeableContainer;
+            _placeableFactory = placeableFactory;
 
-        /// <summary> Инициализация контроллера – создаёт слои и регистрирует режимы. </summary>
-        private void Awake()
-        {
             InitializeGridLayers();
             InitializeModes();
         }
@@ -59,7 +66,8 @@ namespace FlavorfulStory.PlacementSystem
         /// <summary> Инициализирует доступные режимы (размещение и удаление). </summary>
         private void InitializeModes()
         {
-            _modes[PlacementModeType.Place] = new PlacementMode(_gridPositionProvider, _placementPreview, _gridLayers);
+            _modes[PlacementModeType.Place] = new PlacementMode(_gridPositionProvider, _placementPreview, _gridLayers,
+                _placeableContainer, _placeableFactory);
             _modes[PlacementModeType.Remove] = new RemovingMode(_gridPositionProvider, _placementPreview, _gridLayers);
         }
 
@@ -114,8 +122,26 @@ namespace FlavorfulStory.PlacementSystem
             return false;
         }
 
-        /// <summary> Обрабатывает ввод пользователя и обновляет предпросмотр в зависимости от позиции курсора. </summary>
-        private void Update()
+        /// <summary> Регистрирует объект в системе размещения по мировой позиции. </summary>
+        /// <param name="worldPosition"> Позиция в мировых координатах. </param>
+        /// <param name="placeableObject"> Объект для регистрации. </param>
+        public void RegisterPlacedObject(Vector3 worldPosition, PlaceableObject placeableObject)
+        {
+            var gridPosition = _gridPositionProvider.WorldToGrid(worldPosition);
+            _gridLayers[placeableObject.Layer].AddObjectAt(gridPosition, placeableObject);
+        }
+
+        /// <summary> Удаляет объект из системы размещения. </summary>
+        /// <param name="worldPosition"> Позиция в мировых координатах. </param>
+        /// <param name="placeableObject"> Объект для удаления. </param>
+        public void UnregisterPlacedObject(Vector3 worldPosition, PlaceableObject placeableObject)
+        {
+            var gridPosition = _gridPositionProvider.WorldToGrid(worldPosition);
+            _gridLayers[placeableObject.Layer].RemoveObjectAt(gridPosition);
+        }
+
+        /// <summary> Обрабатывает обновление предпросмотра и клик размещения. </summary>
+        public void Tick()
         {
             if (WorldTime.IsPaused || _currentMode == null ||
                 !_gridPositionProvider.TryGetCursorGridPosition(out var gridPosition))

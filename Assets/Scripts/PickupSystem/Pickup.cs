@@ -1,7 +1,8 @@
-﻿using UnityEngine;
+﻿using FlavorfulStory.InventorySystem;
+using UnityEngine;
 using Zenject;
 
-namespace FlavorfulStory.InventorySystem.PickupSystem
+namespace FlavorfulStory.PickupSystem
 {
     /// <summary> Отвечает за механику подбора предметов игроком. </summary>
     /// <remarks> Скрипт должен быть размещен на специальном префабе, содержащем данные о предмете. </remarks>
@@ -61,11 +62,30 @@ namespace FlavorfulStory.InventorySystem.PickupSystem
 
         #region Debug
 
-        /// <summary> Обновляет радиус коллайдера при изменении радиуса подбора в инспекторе. </summary>
+        /// <summary> Проводит настройку параметров в инспекторе. </summary>
         private void OnValidate()
         {
+            UpdatePickupRadius();
+            IgnorePlayerOnChildColliders();
+        }
+
+        /// <summary> Обновляет радиус триггер-коллайдера. </summary>
+        private void UpdatePickupRadius()
+        {
             var sphereCollider = GetComponent<SphereCollider>();
-            sphereCollider.radius = _pickupRadius;
+            if (sphereCollider) sphereCollider.radius = _pickupRadius;
+        }
+
+        /// <summary> Настраивает игнорирование дочерних коллизий слоя игрока. </summary>
+        private void IgnorePlayerOnChildColliders()
+        {
+            int playerLayer = 1 << LayerMask.NameToLayer("Player");
+            foreach (var collider in GetComponentsInChildren<Collider>(true))
+            {
+                if (collider.gameObject == gameObject) continue;
+
+                collider.excludeLayers = playerLayer;
+            }
         }
 
         #endregion
