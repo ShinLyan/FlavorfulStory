@@ -21,9 +21,9 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         /// <returns> true, если значение найдено и соответствует типу T; иначе false. </returns>
         public bool TryGet<T>(ContextType key, out T value)
         {
-            if (_data.TryGetValue(key, out object objValue) && objValue is T)
+            if (_data.TryGetValue(key, out object objValue) && objValue is T value1)
             {
-                value = (T)objValue;
+                value = value1;
                 return true;
             }
 
@@ -32,6 +32,6 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         }
 
         /// <summary> Очищает весь контекст, удаляя все сохранённые данные. </summary>
-        public void Clear() => _data.Clear();
+        public void Clear() => _data.Clear(); // TODO: НИГДЕ НЕ ИСПОЛЬЗУЕТСЯ
     }
 }

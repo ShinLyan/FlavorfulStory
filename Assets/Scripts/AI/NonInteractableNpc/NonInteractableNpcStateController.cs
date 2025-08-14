@@ -13,7 +13,7 @@ namespace FlavorfulStory.AI.NonInteractableNpc
 {
     /// <summary> Контроллер состояний конечного автомата NPC,
     /// управляющий переходами между различными состояниями персонажа. </summary>
-    public class NonInteractableNpcStateController : StateController
+    public class NonInteractableNpcStateController : NpcStateController
     {
         #region Fields
 
@@ -27,11 +27,14 @@ namespace FlavorfulStory.AI.NonInteractableNpc
         private bool _hadVisitedFurnitureAfterPurchase;
 
         /// <summary> Точка, в которой NPC должен исчезнуть. </summary>
-        private DestinationPoint _despawnPoint;
+        private NpcDestinationPoint _despawnPoint;
 
         /// <summary> Сервис для обработки транзакций и торговых операций. </summary>
         private readonly TransactionService _transactionService;
 
+        /// <summary>
+        /// 
+        /// </summary>
         private readonly NpcPurchaseIndicator _purchaseIndicator;
 
         #endregion
@@ -55,7 +58,7 @@ namespace FlavorfulStory.AI.NonInteractableNpc
             _purchaseIndicator = npcPurchaseIndicator;
 
             _hadVisitedFurnitureAfterPurchase = false;
-            _despawnPoint = new DestinationPoint();
+            _despawnPoint = new NpcDestinationPoint();
 
             Initialize();
         }
@@ -74,7 +77,6 @@ namespace FlavorfulStory.AI.NonInteractableNpc
         {
             var shopLocation = (ShopLocation)_locationManager.GetLocationByName(LocationName.NewShop);
 
-            _nameToCharacterStates.Add(StateName.Idle, new IdleState());
             _nameToCharacterStates.Add(StateName.Movement, new MovementState(_npcMovementController));
             _nameToCharacterStates.Add(StateName.Animation, new AnimationState(_animationController));
             _nameToCharacterStates.Add(StateName.FurniturePicker,
@@ -93,26 +95,22 @@ namespace FlavorfulStory.AI.NonInteractableNpc
         /// <summary> Создает все последовательности состояний для различных сценариев поведения NPC. </summary>
         private void CreateSequences()
         {
-            _nameToCharacterStates.Add(StateName.RandomPointSequence, new SequenceState(
-                new[]
-                {
-                    _nameToCharacterStates[StateName.RandomPointPicker],
-                    _nameToCharacterStates[StateName.Movement],
-                    _nameToCharacterStates[StateName.Animation]
-                }));
+            _nameToCharacterStates.Add(StateName.RandomPointSequence, new SequenceState(new[]
+            {
+                _nameToCharacterStates[StateName.RandomPointPicker],
+                _nameToCharacterStates[StateName.Movement],
+                _nameToCharacterStates[StateName.Animation]
+            }));
 
-            _nameToCharacterStates.Add(StateName.FurnitureSequence, new SequenceState(
-                new[]
-                {
-                    _nameToCharacterStates[StateName.FurniturePicker],
-                    _nameToCharacterStates[StateName.Movement],
-                    _nameToCharacterStates[StateName.Animation],
-                    _nameToCharacterStates[StateName.ReleaseObject]
-                }));
+            _nameToCharacterStates.Add(StateName.FurnitureSequence, new SequenceState(new[]
+            {
+                _nameToCharacterStates[StateName.FurniturePicker],
+                _nameToCharacterStates[StateName.Movement],
+                _nameToCharacterStates[StateName.Animation],
+                _nameToCharacterStates[StateName.ReleaseObject]
+            }));
 
-
-            _nameToCharacterStates.Add(StateName.BuyItemSequence, new SequenceState(
-                new[]
+            _nameToCharacterStates.Add(StateName.BuyItemSequence, new SequenceState(new[]
                 {
                     _nameToCharacterStates[StateName.ShowcasePicker],
                     _nameToCharacterStates[StateName.Movement],
@@ -125,15 +123,14 @@ namespace FlavorfulStory.AI.NonInteractableNpc
                     _nameToCharacterStates[StateName.ReleaseObject]
                 })
             );
-            _nameToCharacterStates.Add(StateName.RefuseItemSequence, new SequenceState(
-                new[]
-                {
-                    _nameToCharacterStates[StateName.ShowcasePicker],
-                    _nameToCharacterStates[StateName.Movement],
-                    _nameToCharacterStates[StateName.Animation],
-                    _nameToCharacterStates[StateName.ReleaseObject]
-                }));
 
+            _nameToCharacterStates.Add(StateName.RefuseItemSequence, new SequenceState(new[]
+            {
+                _nameToCharacterStates[StateName.ShowcasePicker],
+                _nameToCharacterStates[StateName.Movement],
+                _nameToCharacterStates[StateName.Animation],
+                _nameToCharacterStates[StateName.ReleaseObject]
+            }));
 
             ((SequenceState)_nameToCharacterStates[StateName.BuyItemSequence]).OnSequenceEnded +=
                 HandleAfterPurchaseTransition;
@@ -225,8 +222,8 @@ namespace FlavorfulStory.AI.NonInteractableNpc
         }
 
         /// <summary> Устанавливает точку исчезновения для NPC. </summary>
-        /// <param name="destination"> Координаты точки, где NPC должен исчезнуть. </param>
-        public void SetDespawnPoint(DestinationPoint destination) => _despawnPoint = destination;
+        /// <param name="npcDestination"> Координаты точки, где NPC должен исчезнуть. </param>
+        public void SetDespawnPoint(NpcDestinationPoint npcDestination) => _despawnPoint = npcDestination;
 
         /// <summary> Принудительно устанавливает состояние NPC по строковому типу. </summary>
         /// <param name="stateName"> Строковое представление типа состояния для установки. </param>

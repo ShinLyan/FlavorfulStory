@@ -37,12 +37,6 @@ namespace FlavorfulStory.AI
         /// <summary> Инициализация компонента. </summary>
         private void Awake()
         {
-            if (_model == null)
-            {
-                Debug.LogError($"Model is not assigned on {gameObject.name}");
-                return;
-            }
-
             _defaultScale = _model.transform.localScale;
             _model.transform.localScale = _defaultScale * _startScale;
             _model.SetActive(false);

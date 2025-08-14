@@ -15,11 +15,15 @@ namespace FlavorfulStory.AI.FiniteStateMachine.ShopStates
         /// <summary> Контроллер движения неинтерактивного NPC. </summary>
         private readonly NonInteractableNpcMovementController _movementController;
 
+        /// <summary>
+        /// 
+        /// </summary>
         private readonly NpcPurchaseIndicator _purchaseIndicator;
 
         /// <summary> Инициализирует новый экземпляр состояния выбора предмета. </summary>
         /// <param name="npcMovementController"> Контроллер движения для управления перемещением NPC. </param>
         /// <param name="shopLocation"> Локация магазина для получения информации о кассе. </param>
+        /// <param name="purchaseIndicator"></param>
         public ItemPickerState(NonInteractableNpcMovementController npcMovementController, ShopLocation shopLocation,
             NpcPurchaseIndicator purchaseIndicator)
         {
@@ -57,6 +61,11 @@ namespace FlavorfulStory.AI.FiniteStateMachine.ShopStates
         /// <returns> Всегда возвращает true, так как состояние завершается сразу после входа. </returns>
         public override bool IsComplete() => true;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="inventory"></param>
+        /// <returns></returns>
         private static ItemStack GetRandomStackFromInventory(Inventory inventory)
         {
             var nonEmptySlots = new List<int>();

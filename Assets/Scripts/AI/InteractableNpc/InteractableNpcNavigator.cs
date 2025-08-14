@@ -19,12 +19,12 @@ namespace FlavorfulStory.AI.InteractableNpc
         /// <param name="point"> Новая точка расписания. </param>
         /// <remarks> Если NPC не находится в состоянии покоя, останавливает текущее движение
         /// и начинает движение к новой точке. </remarks>
-        public void OnSchedulePointChanged(SchedulePoint point)
+        public void OnSchedulePointChanged(NpcSchedulePoint point)
         {
             if (_isNotMoving) return;
 
             Stop();
-            MoveTo(new DestinationPoint(point.Position, Quaternion.Euler(point.Rotation)));
+            MoveTo(new NpcDestinationPoint(point.Position, Quaternion.Euler(point.Rotation)));
         }
     }
 }

@@ -13,23 +13,22 @@ namespace FlavorfulStory.AI.InteractableNpc
 {
     /// <summary> Контроллер состояний конечного автомата NPC,
     /// управляющий переходами между различными состояниями персонажа. </summary>
-    public class InteractableNpcStateController : StateController, ICharacterCollisionHandler
+    public class InteractableNpcStateController : NpcStateController, ICharacterCollisionHandler
     {
         /// <summary> Обработчик расписания NPC </summary>
         private readonly NpcScheduleHandler _scheduleHandler;
 
         /// <summary> Событие, вызываемое при изменении текущих параметров расписания. </summary>
-        private event Action<ScheduleParams> OnCurrentScheduleParamsChanged;
+        private event Action<NpcScheduleParams> OnCurrentScheduleParamsChanged;
 
         /// <summary> Отсортированные параметры расписания для быстрого поиска подходящего. </summary>
-        private readonly IEnumerable<ScheduleParams> _sortedScheduleParams;
+        private readonly IEnumerable<NpcScheduleParams> _sortedScheduleParams;
 
         /// <summary> Контроллер движения для интерактивного NPC. </summary>
         private readonly InteractableNpcMovementController _npcMovementController;
 
-
         /// <summary> Контроллер игрока для взаимодействия. </summary>
-        protected readonly PlayerController _playerController;
+        private readonly PlayerController _playerController;
 
         /// <summary> Инициализирует новый экземпляр контроллера состояний. </summary>
         /// <param name="npcSchedule"> Расписание NPC. </param>
@@ -70,7 +69,6 @@ namespace FlavorfulStory.AI.InteractableNpc
         /// <remarks> Создает состояния взаимодействия, движения, рутины и ожидания, настраивает связи между ними. </remarks>
         protected override void InitializeStates()
         {
-            _nameToCharacterStates.Add(StateName.Interaction, new InteractionState());
             _nameToCharacterStates.Add(StateName.Movement, new MovementState(_npcMovementController));
             _nameToCharacterStates.Add(StateName.Routine, new RoutineState(_animationController));
             _nameToCharacterStates.Add(StateName.Waiting, new WaitingState(_playerController, _npcTransform));
@@ -86,6 +84,10 @@ namespace FlavorfulStory.AI.InteractableNpc
             _scheduleHandler.OnSchedulePointChanged += OnSchedulePointChanged;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="currentTime"></param>
         protected override void OnReset(DateTime currentTime)
         {
             PrioritizeSchedule(currentTime);
@@ -101,14 +103,19 @@ namespace FlavorfulStory.AI.InteractableNpc
 
         /// <summary> Обрабатывает изменение точки расписания и переключает состояние на движение если необходимо. </summary>
         /// <param name="newPoint"> Новая точка расписания. </param>
-        private void OnSchedulePointChanged(SchedulePoint newPoint)
+        private void OnSchedulePointChanged(NpcSchedulePoint newPoint)
         {
-            if (_currentState is WaitingState) return;
-
-            if (_currentState is MovementState)
-                _currentState.Enter();
-            else
-                SetState(StateName.Movement);
+            switch (_currentState)
+            {
+                case WaitingState:
+                    return;
+                case MovementState:
+                    _currentState.Enter();
+                    break;
+                default:
+                    SetState(StateName.Movement);
+                    break;
+            }
 
             _animationController.TriggerAnimation(AnimationType.Locomotion);
         }

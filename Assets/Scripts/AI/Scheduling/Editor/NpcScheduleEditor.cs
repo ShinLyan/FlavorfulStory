@@ -1,11 +1,11 @@
+#if UNITY_EDITOR
+
 using System;
 using FlavorfulStory.TimeManagement;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.AI;
 using DayOfWeek = FlavorfulStory.TimeManagement.DayOfWeek;
-
-#if UNITY_EDITOR
 
 namespace FlavorfulStory.AI.Scheduling.Editor
 {
@@ -19,7 +19,6 @@ namespace FlavorfulStory.AI.Scheduling.Editor
 
         /// <summary> Флаг, указывающий, что NavMesh был закэширован. </summary>
         private bool _isNavMeshCached;
-
 
         /// <summary> Отрисовывает элементы в сцене: точки маршрута, линии между ними, метки с информацией, 
         /// инструменты для перемещения и вращения выбранной точки. </summary>
@@ -224,13 +223,13 @@ namespace FlavorfulStory.AI.Scheduling.Editor
                     Undo.RecordObject(demonstrator.Schedule, "Add Parameter");
 
                     var newParams = demonstrator.Schedule.Params != null
-                        ? new ScheduleParams[demonstrator.Schedule.Params.Length + 1]
-                        : new ScheduleParams[1];
+                        ? new NpcScheduleParams[demonstrator.Schedule.Params.Length + 1]
+                        : new NpcScheduleParams[1];
 
                     if (demonstrator.Schedule.Params != null)
                         Array.Copy(demonstrator.Schedule.Params, newParams, demonstrator.Schedule.Params.Length);
 
-                    newParams[^1] = new ScheduleParams();
+                    newParams[^1] = new NpcScheduleParams();
                     demonstrator.Schedule.Params = newParams;
                     demonstrator.SetNewValForParamIndex(newParams.Length - 1);
 
@@ -247,7 +246,7 @@ namespace FlavorfulStory.AI.Scheduling.Editor
 
                         if (demonstrator.Schedule.Params is { Length: > 0 })
                         {
-                            var newParams = new ScheduleParams[demonstrator.Schedule.Params.Length - 1];
+                            var newParams = new NpcScheduleParams[demonstrator.Schedule.Params.Length - 1];
                             Array.Copy(demonstrator.Schedule.Params, newParams, newParams.Length);
                             demonstrator.Schedule.Params = newParams;
                             demonstrator.SetNewValForParamIndex(
@@ -255,7 +254,7 @@ namespace FlavorfulStory.AI.Scheduling.Editor
                         }
                         else
                         {
-                            demonstrator.Schedule.Params = Array.Empty<ScheduleParams>();
+                            demonstrator.Schedule.Params = Array.Empty<NpcScheduleParams>();
                         }
 
                         EditorUtility.SetDirty(demonstrator.Schedule);
@@ -288,14 +287,14 @@ namespace FlavorfulStory.AI.Scheduling.Editor
 
         /// <summary> Отображает редактор для выбора сезонов. </summary>
         /// <param name="param"> Параметр расписания, в который записываются выбранные значения. </param>
-        private static void ShowSeasonsEdit(ScheduleParams param)
+        private static void ShowSeasonsEdit(NpcScheduleParams param)
         {
             param.Seasons = (Season)EditorGUILayout.EnumFlagsField("Seasons", param.Seasons);
         }
 
         /// <summary> Отображает редактор для выбора дней недели. </summary>
         /// <param name="param"> Параметр расписания, в который записываются выбранные значения. </param>
-        private static void ShowDayOfWeekEdit(ScheduleParams param)
+        private static void ShowDayOfWeekEdit(NpcScheduleParams param)
         {
             param.DayOfWeek = (DayOfWeek)EditorGUILayout.EnumFlagsField("Day of Week", param.DayOfWeek);
         }
@@ -346,14 +345,14 @@ namespace FlavorfulStory.AI.Scheduling.Editor
 
         /// <summary> Отображает слайдер для настройки уровня отношений (Hearts). </summary>
         /// <param name="param"> Параметр расписания, в который записываются выбранные значения. </param>
-        private static void ShowHeartsEdit(ScheduleParams param)
+        private static void ShowHeartsEdit(NpcScheduleParams param)
         {
             param.Hearts = EditorGUILayout.IntSlider("Hearts", param.Hearts, 0, 12);
         }
 
         /// <summary> Отображает переключатель для условия дождя. </summary>
         /// <param name="param"> Параметр расписания, в который записываются выбранные значения. </param>
-        private static void ShowIsRainingEdit(ScheduleParams param)
+        private static void ShowIsRainingEdit(NpcScheduleParams param)
         {
             param.IsRaining = EditorGUILayout.Toggle("Raining", param.IsRaining);
         }
@@ -405,10 +404,10 @@ namespace FlavorfulStory.AI.Scheduling.Editor
         private static void AddSchedulePoint(NpcScheduleDemonstrator demonstrator)
         {
             var currentParam = demonstrator.Schedule.Params[demonstrator.SelectedParamIndex];
-            var newPath = new SchedulePoint[currentParam.Path.Length + 1];
+            var newPath = new NpcSchedulePoint[currentParam.Path.Length + 1];
             currentParam.Path.CopyTo(newPath, 0);
 
-            newPath[^1] = new SchedulePoint
+            newPath[^1] = new NpcSchedulePoint
             {
                 Hour = 12,
                 Minutes = 0,
@@ -429,7 +428,7 @@ namespace FlavorfulStory.AI.Scheduling.Editor
         private static void DeleteLastSchedulePoint(NpcScheduleDemonstrator demonstrator)
         {
             var currentParam = demonstrator.Schedule.Params[demonstrator.SelectedParamIndex];
-            var newPath = new SchedulePoint[currentParam.Path.Length - 1];
+            var newPath = new NpcSchedulePoint[currentParam.Path.Length - 1];
 
             Array.Copy(currentParam.Path, newPath, currentParam.Path.Length - 1);
 

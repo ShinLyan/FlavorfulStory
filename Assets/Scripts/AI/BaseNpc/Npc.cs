@@ -9,7 +9,7 @@ namespace FlavorfulStory.AI.BaseNpc
     public abstract class Npc : MonoBehaviour
     {
         /// <summary> Контроллер состояний, управляющий переключением между состояниями NPC. </summary>
-        protected StateController _stateController;
+        protected NpcStateController _stateController;
 
         /// <summary> Контроллер движения NPC для управления навигацией и перемещением. </summary>
         protected NpcMovementController _movementController;
@@ -25,6 +25,9 @@ namespace FlavorfulStory.AI.BaseNpc
             _stateController = CreateStateController();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         protected virtual void OnDestroy()
         {
             _animationController.Dispose();
@@ -50,6 +53,6 @@ namespace FlavorfulStory.AI.BaseNpc
         /// <summary> Создает контроллер состояний для NPC. </summary>
         /// <returns> Новый экземпляр StateController. </returns>
         /// <remarks> Должен быть реализован в наследниках. </remarks>
-        protected abstract StateController CreateStateController();
+        protected abstract NpcStateController CreateStateController();
     }
 }

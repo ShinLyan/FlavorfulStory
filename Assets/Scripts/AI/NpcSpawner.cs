@@ -134,7 +134,7 @@ namespace FlavorfulStory.AI
             _activeCharacters.Add(npc);
 
             npc.OnReachedDespawnPoint += () => DespawnNpc(npc);
-            npc.SetDespawnPoint(new DestinationPoint(despawnData.despawnPoint.position, Quaternion.identity));
+            npc.SetDespawnPoint(new NpcDestinationPoint(despawnData.despawnPoint.position, Quaternion.identity));
 
             SetDestinationAfterInit(npc).Forget();
         }
@@ -153,10 +153,10 @@ namespace FlavorfulStory.AI
         {
             var agent = npc.GetComponent<NavMeshAgent>();
 
-            while (agent == null || !agent.isOnNavMesh) await UniTask.Yield();
+            while (!agent || !agent.isOnNavMesh) await UniTask.Yield();
 
             var loc = _locationManager.GetLocationByName(LocationName.NewShop);
-            npc.SetDestination(new DestinationPoint(loc.transform.position, Quaternion.identity));
+            npc.SetDestination(new NpcDestinationPoint(loc.transform.position, Quaternion.identity));
         }
 
         /// <summary> Деспавнит всех активных NPC. </summary>

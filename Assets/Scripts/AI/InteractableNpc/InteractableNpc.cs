@@ -17,9 +17,8 @@ namespace FlavorfulStory.AI.InteractableNpc
         [Tooltip("Расписание NPC, определяющее его поведение и маршруты."), SerializeField]
         protected NpcSchedule _npcSchedule;
 
-
         /// <summary> Информация о персонаже. </summary>
-        [field: SerializeField]
+        [field: Tooltip("Информация о персонаже."), SerializeField]
         public NpcInfo NpcInfo { get; private set; }
 
         /// <summary> Обработчик расписания NPC </summary>
@@ -48,29 +47,14 @@ namespace FlavorfulStory.AI.InteractableNpc
 
         /// <summary> Создает контроллер движения для интерактивного NPC. </summary>
         /// <returns> Новый экземпляр InteractableNpcMovementController. </returns>
-        protected override NpcMovementController CreateMovementController()
-        {
-            return new InteractableNpcMovementController(
-                GetComponent<NavMeshAgent>(),
-                transform,
-                _animationController,
-                _npcScheduleHandler
-            );
-        }
+        protected override NpcMovementController CreateMovementController() => new InteractableNpcMovementController(
+            GetComponent<NavMeshAgent>(), transform, _animationController, _npcScheduleHandler);
 
         /// <summary> Создает контроллер состояний для интерактивного NPC. </summary>
         /// <returns> Новый экземпляр StateControllerInteractableNpc. </returns>
-        protected override StateController CreateStateController()
-        {
-            return new InteractableNpcStateController(
-                _npcSchedule,
-                _movementController as InteractableNpcMovementController,
-                _animationController,
-                _npcScheduleHandler,
-                transform,
-                _playerController
-            );
-        }
+        protected override NpcStateController CreateStateController() => new InteractableNpcStateController(
+            _npcSchedule, _movementController as InteractableNpcMovementController, _animationController,
+            _npcScheduleHandler, transform, _playerController);
 
         /// <summary> Обрабатывает вход другого объекта в триггер коллизии NPC. </summary>
         /// <param name="other"> Коллайдер, вошедший в триггер. </param>

@@ -41,12 +41,11 @@ namespace FlavorfulStory.AI.InteractableNpc
         public override void MoveToPoint()
         {
             var point = _scheduleHandler.CurrentPoint;
-            if (point != null)
-            {
-                var movePoint = new DestinationPoint(_scheduleHandler.CurrentPoint.Position,
-                    Quaternion.Euler(_scheduleHandler.CurrentPoint.Rotation));
-                _interactableNavigator.MoveTo(movePoint);
-            }
+            if (point == null) return;
+
+            var movePoint = new NpcDestinationPoint(_scheduleHandler.CurrentPoint.Position,
+                Quaternion.Euler(_scheduleHandler.CurrentPoint.Rotation));
+            _interactableNavigator.MoveTo(movePoint);
         }
     }
 }

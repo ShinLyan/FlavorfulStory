@@ -5,7 +5,7 @@ namespace FlavorfulStory.AI.Scheduling
 {
     /// <summary> Точка расписания для NPC, определяющая, куда и когда он должен переместиться. </summary>
     [Serializable]
-    public class SchedulePoint
+    public class NpcSchedulePoint
     {
         /// <summary> Час, в который NPC начнет движение в указанную точку. </summary>
         [field: Header("Start Time")]

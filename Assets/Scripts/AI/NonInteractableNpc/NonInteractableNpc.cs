@@ -43,7 +43,7 @@ namespace FlavorfulStory.AI.NonInteractableNpc
 
         /// <summary> Создает контроллер состояний для неинтерактивного NPC. </summary>
         /// <returns> Экземпляр контроллера состояний неинтерактивного NPC. </returns>
-        protected override StateController CreateStateController()
+        protected override NpcStateController CreateStateController()
         {
             _nonInteractableNpcStateController = new NonInteractableNpcStateController(
                 _movementController as NonInteractableNpcMovementController,
@@ -56,11 +56,12 @@ namespace FlavorfulStory.AI.NonInteractableNpc
             return _nonInteractableNpcStateController;
         }
 
-        /// <summary> Устанавливает цель для перемещения NPC с автоматическим запуском случайной последовательности по прибытии. </summary>
-        /// <param name="destination"> Целевая позиция для перемещения. </param>
-        public void SetDestination(DestinationPoint destination)
+        /// <summary> Устанавливает цель для перемещения NPC с автоматическим запуском
+        /// случайной последовательности по прибытии. </summary>
+        /// <param name="npcDestination"> Целевая позиция для перемещения. </param>
+        public void SetDestination(NpcDestinationPoint npcDestination)
         {
-            _nonInteractableNpcMovementController.SetPoint(destination);
+            _nonInteractableNpcMovementController.SetPoint(npcDestination);
             _nonInteractableNpcStateController.ForceSetState(StateName.Movement);
             _nonInteractableNpcMovementController.OnDestinationReached += () =>
             {
@@ -70,21 +71,22 @@ namespace FlavorfulStory.AI.NonInteractableNpc
         }
 
         /// <summary> Устанавливает точку исчезновения для неинтерактивного NPC. </summary>
-        /// <param name="destination"> Координаты точки, где NPC должен исчезнуть. </param>
-        public void SetDespawnPoint(DestinationPoint destination) =>
-            (_stateController as NonInteractableNpcStateController)?.SetDespawnPoint(destination);
+        /// <param name="npcDestination"> Координаты точки, где NPC должен исчезнуть. </param>
+        public void SetDespawnPoint(NpcDestinationPoint npcDestination) =>
+            (_stateController as NonInteractableNpcStateController)?.SetDespawnPoint(npcDestination);
 
 #if UNITY_EDITOR
-        protected virtual void OnDrawGizmosSelected()
-        {
-            if (_stateController != null)
-            {
-                Gizmos.color = Color.yellow;
-                var labelPosition = transform.position + Vector3.up * 2.5f;
 
-                Handles.Label(labelPosition, _stateController.CurrentStateName.ToString());
-            }
+        protected void OnDrawGizmosSelected()
+        {
+            if (_stateController == null) return;
+
+            Gizmos.color = Color.yellow;
+            var labelPosition = transform.position + Vector3.up * 2.5f;
+
+            Handles.Label(labelPosition, _stateController.CurrentStateName.ToString());
         }
+
 #endif
     }
 }

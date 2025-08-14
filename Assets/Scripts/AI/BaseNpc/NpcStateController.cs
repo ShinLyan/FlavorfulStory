@@ -9,7 +9,7 @@ namespace FlavorfulStory.AI.BaseNpc
 {
     /// <summary> Контроллер состояний конечного автомата NPC,
     /// управляющий переходами между различными состояниями персонажа. </summary>
-    public abstract class StateController : IDisposable
+    public abstract class NpcStateController : IDisposable
     {
         /// <summary> Текущее активное состояние персонажа. </summary>
         protected CharacterState _currentState;
@@ -30,7 +30,7 @@ namespace FlavorfulStory.AI.BaseNpc
         /// <summary> Инициализирует новый экземпляр контроллера состояний. </summary>
         /// <param name="npcAnimationController"> Контроллер анимации NPC. </param>
         /// <param name="npcTransform"> Transform NPC для определения позиции. </param>
-        protected StateController(NpcAnimationController npcAnimationController,
+        protected NpcStateController(NpcAnimationController npcAnimationController,
             Transform npcTransform)
         {
             _nameToCharacterStates = new Dictionary<StateName, CharacterState>();
@@ -38,6 +38,9 @@ namespace FlavorfulStory.AI.BaseNpc
             _npcTransform = npcTransform;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public void Dispose() => UnsubscribeFromEvents();
 
         /// <summary> Выполняет полную инициализацию контроллера состояний. </summary>

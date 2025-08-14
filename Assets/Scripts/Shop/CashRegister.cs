@@ -26,14 +26,18 @@ namespace FlavorfulStory.Shop
         /// <summary> Сервис транзакций, отвечающий за покупку и продажу предметов. </summary>
         private TransactionService _transactionService;
 
+        /// <summary> Аниматор кассы. </summary>
         private CashRegisterAnimator _cashRegisterAnimator;
 
+        /// <summary> Выполнить внедрение зависимостей. </summary>
+        /// <param name="transactionService"> Сервис транзакций магазина. </param>
         [Inject]
         private void Construct(TransactionService transactionService) => _transactionService = transactionService;
 
+        /// <summary> Выполнить инициализацию компонента. </summary>
         private void Awake() => _cashRegisterAnimator = GetComponent<CashRegisterAnimator>();
 
-        /// <summary> Инициализирует значение золота при запуске. </summary>
+        /// <summary> Запустить инициализацию состояния кассы. </summary>
         private void Start()
         {
             InitializeAccessPoints();
@@ -49,28 +53,22 @@ namespace FlavorfulStory.Shop
 
         /// <summary> Возвращает случайную свободную точку доступа и помечает её как занятую. </summary>
         /// <returns> Transform свободной точки доступа или null, если все точки заняты. </returns>
-        public override DestinationPoint GetAccessiblePoint()
+        public override NpcDestinationPoint GetAccessiblePoint()
         {
-            var freePoints = _accessPointsAvailability
-                .Where(x => !x.Value)
-                .Select(x => x.Key)
-                .ToList();
-
+            var freePoints = _accessPointsAvailability.Where(pair => !pair.Value).Select(pair => pair.Key).ToList();
             if (freePoints.Count == 0) return null;
-            var randomPosition = freePoints[Random.Range(0, freePoints.Count)];
 
-            return new DestinationPoint(randomPosition.position, randomPosition.rotation);
+            var randomPosition = freePoints[Random.Range(0, freePoints.Count)];
+            return new NpcDestinationPoint(randomPosition.position, randomPosition.rotation);
         }
 
         /// <summary> Освобождает указанную точку доступа, делая её доступной для использования. </summary>
         /// <param name="point"> Transform точки доступа для освобождения. </param>
-        /// <param name="isOccupied">  </param>
+        /// <param name="isOccupied"> <c>true</c> — если занята; <c>false</c> — если свободна. </param>
         public void SetPointOccupancy(Vector3 point, bool isOccupied)
         {
-            var keysToUpdate = _accessPointsAvailability
-                .Where(kvp => kvp.Key.position == point)
-                .Select(kvp => kvp.Key)
-                .ToList();
+            var keysToUpdate = _accessPointsAvailability.Where(pair => pair.Key.position == point)
+                .Select(pair => pair.Key).ToList();
 
             foreach (var key in keysToUpdate) _accessPointsAvailability[key] = isOccupied;
         }
@@ -93,7 +91,7 @@ namespace FlavorfulStory.Shop
 
         /// <summary> Пытается потратить указанное количество золота. </summary>
         /// <param name="value"> Сумма, которую нужно потратить. </param>
-        /// <returns> true, если золото было успешно потрачено; иначе — false. </returns>
+        /// <returns> <c>true</c>, если золото было успешно потрачено; иначе — <c>false</c>. </returns>
         public bool TrySpend(int value)
         {
             if (Amount < value) return false;
@@ -141,21 +139,25 @@ namespace FlavorfulStory.Shop
 
         /// <summary> Структура, представляющая сериализуемое состояние кассы. </summary>
         [Serializable]
-        private struct RegisterData
+        private readonly struct CashRegisterData
         {
             /// <summary> Количество золота. </summary>
-            public int Gold;
+            public int Gold { get; }
+
+            /// <summary> Конструктор с параметрами. </summary>
+            /// <param name="gold"> Количество золота. </param>
+            public CashRegisterData(int gold) => Gold = gold;
         }
 
         /// <summary> Сохраняет текущее состояние кассы. </summary>
         /// <returns> Объект состояния для сериализации. </returns>
-        public object CaptureState() => new RegisterData { Gold = Amount };
+        public object CaptureState() => new CashRegisterData(Amount);
 
         /// <summary> Восстанавливает состояние кассы из сериализованных данных. </summary>
         /// <param name="state"> Объект состояния, полученный при сохранении. </param>
         public void RestoreState(object state)
         {
-            if (state is not RegisterData data) return;
+            if (state is not CashRegisterData data) return;
 
             Amount = data.Gold;
         }
@@ -163,6 +165,7 @@ namespace FlavorfulStory.Shop
         #endregion
 
 #if UNITY_EDITOR
+
         /// <summary> Отрисовывает гизмо кассы с детализированной информацией о состоянии каждой точки доступа. </summary>
         protected override void OnDrawGizmosSelected()
         {
@@ -200,6 +203,7 @@ namespace FlavorfulStory.Shop
                 Handles.Label(labelPosition, statusText, labelStyle);
             }
         }
+
 #endif
     }
 }

@@ -19,6 +19,10 @@ namespace FlavorfulStory.AI.FiniteStateMachine.ShopStates
         /// <summary> Контроллер анимаций NPC, используемый для управления анимациями. </summary>
         private readonly NpcAnimationController _npcAnimationController;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="npcAnimationController"></param>
         public AnimationState(NpcAnimationController npcAnimationController)
         {
             _npcAnimationController = npcAnimationController;
@@ -54,6 +58,9 @@ namespace FlavorfulStory.AI.FiniteStateMachine.ShopStates
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public override void Exit() => _npcAnimationController.TriggerAnimation(AnimationType.Locomotion);
 
         /// <summary> Возвращает статус завершения анимации. </summary>

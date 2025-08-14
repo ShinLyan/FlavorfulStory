@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
+using FlavorfulStory.AI.BaseNpc;
 using FlavorfulStory.SceneManagement;
 using UnityEngine;
-using DestinationPoint = FlavorfulStory.AI.BaseNpc.DestinationPoint;
 using Random = UnityEngine.Random;
 
 namespace FlavorfulStory.Shop
@@ -11,8 +11,7 @@ namespace FlavorfulStory.Shop
     public class ShopLocation : Location
     {
         /// <summary> Касса магазина для обслуживания покупателей. </summary>
-        [field: SerializeField]
-        public CashRegister CashRegister { get; private set; }
+        [field: SerializeField] public CashRegister CashRegister { get; private set; }
 
         /// <summary> Массив полок в магазине. </summary>
         [SerializeField] private Showcase[] _showcases;
@@ -62,7 +61,7 @@ namespace FlavorfulStory.Shop
 
             foreach (var showcase in availableShowcases)
                 for (int i = 0; i < showcase.Inventory.InventorySize; i++)
-                    if (showcase.Inventory.GetItemInSlot(i) != null)
+                    if (showcase.Inventory.GetItemInSlot(i))
                         return true;
 
             return false;
@@ -72,21 +71,19 @@ namespace FlavorfulStory.Shop
         /// <returns> Случайный прилавок с товарами или null, если таких нет. </returns>
         public Showcase GetRandomAvailableShowcaseWithItems()
         {
-            var availableShowcases = GetAvailableObjects(_showcases)
-                .Where(showcase =>
-                {
-                    if (showcase.Inventory == null) return false;
+            var availableShowcases = GetAvailableObjects(_showcases).Where(showcase =>
+            {
+                if (!showcase.Inventory) return false;
 
-                    for (int i = 0; i < showcase.Inventory.InventorySize; i++)
-                        if (showcase.Inventory.GetItemInSlot(i) != null)
-                            return true;
-                    return false;
-                })
-                .ToArray();
+                for (int i = 0; i < showcase.Inventory.InventorySize; i++)
+                    if (showcase.Inventory.GetItemInSlot(i))
+                        return true;
+                return false;
+            }).ToArray();
 
-            if (availableShowcases.Length == 0) return null;
-
-            return availableShowcases[Random.Range(0, availableShowcases.Length)];
+            return availableShowcases.Length == 0
+                ? null
+                : availableShowcases[Random.Range(0, availableShowcases.Length)];
         }
 
         /// <summary> Проверяет, занята ли вся мебель в магазине. </summary>
@@ -97,7 +94,7 @@ namespace FlavorfulStory.Shop
         /// расстояния от объектов магазина. </summary>
         /// <param name="maxAttempts"> Максимальное количество попыток генерации точки. </param>
         /// <returns> Случайная позиция на навигационной сетке или Vector3.zero. </returns>
-        public override DestinationPoint GetRandomPointOnNavMesh(int maxAttempts = 20)
+        public override NpcDestinationPoint GetRandomPointOnNavMesh(int maxAttempts = 20)
         {
             for (int i = 0; i < maxAttempts; i++)
             {
@@ -114,11 +111,11 @@ namespace FlavorfulStory.Shop
                     isValidPosition = false;
 
                 if (isValidPosition)
-                    return new DestinationPoint(pointOnNavMesh.Position,
+                    return new NpcDestinationPoint(pointOnNavMesh.Position,
                         Quaternion.Euler(0f, Random.Range(0f, 360f), 0f));
             }
 
-            return new DestinationPoint();
+            return new NpcDestinationPoint();
         }
     }
 }

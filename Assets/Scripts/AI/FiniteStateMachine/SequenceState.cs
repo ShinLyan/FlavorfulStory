@@ -40,23 +40,22 @@ namespace FlavorfulStory.AI.FiniteStateMachine
 
             _currentState.Update();
 
-            if (_currentState.IsComplete())
+            if (!_currentState.IsComplete()) return;
+
+            Context = _currentState.Context;
+            _currentState.Exit();
+
+            if (_currentStateIndex == _states.Count - 1)
             {
-                Context = _currentState.Context;
-                _currentState.Exit();
-
-                if (_currentStateIndex == _states.Count - 1)
-                {
-                    Back();
-                    return;
-                }
-
-                _currentStateIndex += 1;
-
-                _currentState = _states[_currentStateIndex];
-                _currentState.SetContext(Context);
-                _currentState.Enter();
+                Back();
+                return;
             }
+
+            _currentStateIndex += 1;
+
+            _currentState = _states[_currentStateIndex];
+            _currentState.SetContext(Context);
+            _currentState.Enter();
         }
 
         /// <summary> Возвращает индекс к началу последовательности и вызывает событие завершения. </summary>

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using FlavorfulStory.AI.FiniteStateMachine.InteractableStates;
 using FlavorfulStory.AI.Scheduling;
 using FlavorfulStory.TimeManagement;
 using DateTime = FlavorfulStory.TimeManagement.DateTime;
@@ -8,16 +7,16 @@ using DateTime = FlavorfulStory.TimeManagement.DateTime;
 namespace FlavorfulStory.AI.InteractableNpc
 {
     /// <summary> Обработчик расписания NPC, который управляет временными точками расписания персонажа. </summary>
-    public class NpcScheduleHandler : IScheduleDependable, IDisposable
+    public class NpcScheduleHandler : IDisposable
     {
         /// <summary> Стек текущих точек расписания, отсортированных по времени. </summary>
-        private Stack<SchedulePoint> _currentPath;
+        private Stack<NpcSchedulePoint> _currentPath;
 
         /// <summary> Текущая активная точка расписания NPC. </summary>
-        public SchedulePoint CurrentPoint { get; private set; }
+        public NpcSchedulePoint CurrentPoint { get; private set; }
 
         /// <summary> Событие, вызываемое при изменении точки расписания. </summary>
-        public event Action<SchedulePoint> OnSchedulePointChanged;
+        public event Action<NpcSchedulePoint> OnSchedulePointChanged;
 
         /// <summary> Инициализирует новый экземпляр обработчика расписания и подписывается на события времени. </summary>
         public NpcScheduleHandler()
@@ -26,6 +25,9 @@ namespace FlavorfulStory.AI.InteractableNpc
             WorldTime.OnDayEnded += Reset;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public void Dispose()
         {
             WorldTime.OnTimeTick -= UpdateSchedulePoint;
@@ -33,18 +35,18 @@ namespace FlavorfulStory.AI.InteractableNpc
         }
 
         /// <summary> Устанавливает параметры текущего расписания для NPC. </summary>
-        /// <param name="scheduleParams"> Параметры расписания для установки. </param>
-        public void SetCurrentScheduleParams(ScheduleParams scheduleParams) =>
-            _currentPath = scheduleParams?.GetSortedSchedulePointsStack();
+        /// <param name="npcScheduleParams"> Параметры расписания для установки. </param>
+        public void SetCurrentScheduleParams(NpcScheduleParams npcScheduleParams) =>
+            _currentPath = npcScheduleParams?.GetSortedSchedulePointsStack();
 
         /// <summary> Получает следующую точку расписания без удаления её из стека. </summary>
         /// <returns> Следующая точка расписания или null, если стек пуст. </returns>
-        private SchedulePoint GetNextSchedulePoint() =>
+        private NpcSchedulePoint GetNextSchedulePoint() =>
             _currentPath == null || _currentPath.Count == 0 ? null : _currentPath.Peek();
 
         /// <summary> Извлекает следующую точку расписания из стека. </summary>
         /// <returns> Следующая точка расписания или null, если стек пуст. </returns>
-        private SchedulePoint PopNextSchedulePoint() =>
+        private NpcSchedulePoint PopNextSchedulePoint() =>
             _currentPath == null || _currentPath.Count == 0 ? null : _currentPath.Pop();
 
         /// <summary> Обновляет текущую точку расписания при изменении игрового времени. </summary>

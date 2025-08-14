@@ -8,15 +8,13 @@ namespace FlavorfulStory.AI.BaseNpc
     /// <summary> Навигатор для управления перемещением NPC с поддержкой варп-переходов между локациями. </summary>
     public class NpcNavigator
     {
-        #region Fields
-
         /// <summary> Unity NavMeshAgent для навигации по NavMesh. </summary>
         private readonly NavMeshAgent _navMeshAgent;
 
         /// <summary> Текущая целевая точка расписания. </summary>
-        private DestinationPoint _currentTargetPoint;
+        private NpcDestinationPoint _currentTargetPoint;
 
-        /// <summary> Флаг, указывающий что NPC не двигается. </summary>
+        /// <summary> NPC не двигается? </summary>
         protected bool _isNotMoving;
 
         /// <summary> Transform объекта NPC. </summary>
@@ -36,8 +34,6 @@ namespace FlavorfulStory.AI.BaseNpc
 
         /// <summary> Событие, вызываемое при достижении пункта назначения. </summary>
         public Action OnDestinationReached;
-
-        #endregion
 
         /// <summary> Инициализирует новый экземпляр навигатора NPC. </summary>
         /// <param name="navMeshAgent"> NavMeshAgent для навигации. </param>
@@ -87,10 +83,10 @@ namespace FlavorfulStory.AI.BaseNpc
             if (!warpToSpawn) return;
 
             _navMeshAgent.Warp(_spawnPosition);
-            _currentTargetPoint = new DestinationPoint(Vector3.zero, Quaternion.identity);
+            _currentTargetPoint = new NpcDestinationPoint(Vector3.zero, Quaternion.identity);
         }
 
-        public void MoveTo(DestinationPoint point)
+        public void MoveTo(NpcDestinationPoint point)
         {
             _currentTargetPoint = point;
             _isNotMoving = false;
@@ -112,6 +108,6 @@ namespace FlavorfulStory.AI.BaseNpc
         private void StopAgent() => ToggleAgentMovement(true);
 
         /// <summary> Возобновляет движение агента. </summary>
-        protected void ResumeAgent() => ToggleAgentMovement(false);
+        private void ResumeAgent() => ToggleAgentMovement(false);
     }
 }

@@ -10,6 +10,9 @@ namespace FlavorfulStory.Shop
         /// <summary> Массив доступных позиций для взаимодействия с объектом. </summary>
         [SerializeField] protected Transform[] _accessiblePositions;
 
+        /// <summary>
+        /// 
+        /// </summary>
         [field: SerializeField] public AnimationType InteractableObjectAnimation { get; private set; }
 
         /// <summary> Указывает, занят ли объект в данный момент. </summary>
@@ -17,13 +20,14 @@ namespace FlavorfulStory.Shop
 
         /// <summary> Возвращает случайную доступную позицию для взаимодействия с объектом. </summary>
         /// <returns> Transform случайной доступной позиции. </returns>
-        public virtual DestinationPoint GetAccessiblePoint()
+        public virtual NpcDestinationPoint GetAccessiblePoint()
         {
             var randomPosition = _accessiblePositions[Random.Range(0, _accessiblePositions.Length)];
-            return new DestinationPoint(randomPosition.position, randomPosition.rotation);
+            return new NpcDestinationPoint(randomPosition.position, randomPosition.rotation);
         }
 
 #if UNITY_EDITOR
+
         /// <summary> Отрисовывает гизмо объекта при выборе в редакторе. </summary>
         protected virtual void OnDrawGizmosSelected()
         {
@@ -49,6 +53,7 @@ namespace FlavorfulStory.Shop
                 IsOccupied ? "Occupied" : "Free",
                 style);
         }
+
 #endif
     }
 }

@@ -2,9 +2,20 @@ using FlavorfulStory.Shop;
 
 namespace FlavorfulStory.AI.FiniteStateMachine.ShopStates
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class ReleaseObjectState : CharacterState
     {
+        /// <summary>
+        /// 
+        /// </summary>
         private readonly ShopLocation _shopLocation;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="shopLocation"></param>
         public ReleaseObjectState(ShopLocation shopLocation) => _shopLocation = shopLocation;
 
         /// <summary> Выполняет вход в состояние. </summary>

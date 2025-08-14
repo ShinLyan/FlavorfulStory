@@ -11,7 +11,7 @@ namespace FlavorfulStory.AI.Scheduling
 {
     /// <summary> Параметры расписания для NPC. </summary>
     [Serializable]
-    public class ScheduleParams
+    public class NpcScheduleParams
     {
         /// <summary> Сезоны, в которые будет выполняться расписание. </summary>]
         [field: Header("Limitations")]
@@ -39,31 +39,29 @@ namespace FlavorfulStory.AI.Scheduling
         /// <summary> Массив точек маршрута, которые NPC должен посетить в рамках расписания. </summary>
         [field: Header("Path")]
         [field: Tooltip("Массив точек маршрута, которые NPC должен посетить в рамках расписания."), SerializeField]
-        public SchedulePoint[] Path { get; set; }
+        public NpcSchedulePoint[] Path { get; set; }
 
-        public ScheduleParams()
+        /// <summary> Конструктор по умолчанию. </summary>
+        public NpcScheduleParams()
         {
             Seasons = new Season();
             DayOfWeek = new DayOfWeek();
             Dates = Array.Empty<Vector2Int>();
             Hearts = 0;
             IsRaining = false;
-            Path = Array.Empty<SchedulePoint>();
+            Path = Array.Empty<NpcSchedulePoint>();
         }
 
         /// <summary> Возвращает стек точек расписания, отсортированных по времени (от самого раннего к позднему). </summary>
-        public Stack<SchedulePoint> GetSortedSchedulePointsStack()
+        public Stack<NpcSchedulePoint> GetSortedSchedulePointsStack()
         {
-            if (Path == null || Path.Length == 0) return new Stack<SchedulePoint>();
+            if (Path == null || Path.Length == 0) return new Stack<NpcSchedulePoint>();
 
-            var sortedPoints = Path
-                .OrderBy(p => p.Hour)
-                .ThenBy(p => p.Minutes)
-                .ToArray();
-
+            var sortedPoints = Path.OrderBy(schedulePoint => schedulePoint.Hour)
+                .ThenBy(schedulePoint => schedulePoint.Minutes).ToArray();
             Array.Reverse(sortedPoints);
 
-            return new Stack<SchedulePoint>(sortedPoints);
+            return new Stack<NpcSchedulePoint>(sortedPoints);
         }
 
         /// <summary> Удовлетворяют ли текущие условия требованиям расписания? </summary>

@@ -5,7 +5,7 @@ namespace FlavorfulStory.AI.BaseNpc
 {
     /// <summary> Точка назначения для перемещения NPC. </summary>
     [Serializable]
-    public class DestinationPoint
+    public class NpcDestinationPoint
     {
         /// <summary> Позиция точки назначения. </summary>
         public Vector3 Position;
@@ -14,7 +14,7 @@ namespace FlavorfulStory.AI.BaseNpc
         public Quaternion Rotation;
 
         /// <summary> Создает точку назначения с нулевыми значениями. </summary>
-        public DestinationPoint()
+        public NpcDestinationPoint()
         {
             Position = Vector3.zero;
             Rotation = Quaternion.identity;
@@ -23,7 +23,7 @@ namespace FlavorfulStory.AI.BaseNpc
         /// <summary> Создает точку назначения с заданными параметрами. </summary>
         /// <param name="position"> Позиция точки назначения. </param>
         /// <param name="rotation"> Поворот в точке назначения. </param>
-        public DestinationPoint(Vector3 position, Quaternion rotation)
+        public NpcDestinationPoint(Vector3 position, Quaternion rotation)
         {
             Position = position;
             Rotation = rotation;

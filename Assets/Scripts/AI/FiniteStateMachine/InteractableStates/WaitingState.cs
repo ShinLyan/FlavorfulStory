@@ -24,8 +24,8 @@ namespace FlavorfulStory.AI.FiniteStateMachine.InteractableStates
         /// <summary> Обновляет поведение NPC: поворачивает его к игроку. </summary>
         public override void Update()
         {
-            _npcTransform.rotation =
-                Quaternion.LookRotation(_playerController.transform.position - _npcTransform.position);
+            _npcTransform.rotation = Quaternion.LookRotation(
+                _playerController.transform.position - _npcTransform.position);
         }
     }
 }

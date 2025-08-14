@@ -15,9 +15,6 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         /// <summary> Состояние перемещения. </summary>
         Movement,
 
-        /// <summary> Состояние взаимодействия с объектами или персонажами. </summary>
-        Interaction,
-
         /// <summary> Состояние воспроизведения анимации. </summary>
         Animation,
 

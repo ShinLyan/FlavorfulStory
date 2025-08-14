@@ -10,7 +10,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine.InteractableStates
         private readonly NpcAnimationController _animationController;
 
         /// <summary> Текущая точка расписания, в которой находится NPC. </summary>
-        private SchedulePoint _currentPoint;
+        private NpcSchedulePoint _currentPoint;
 
         /// <summary> Инициализирует новое состояние рутины с заданными зависимостями. </summary>
         /// <param name="animationController"> Контроллер анимации для воспроизведения анимаций. </param>
@@ -36,6 +36,6 @@ namespace FlavorfulStory.AI.FiniteStateMachine.InteractableStates
 
         /// <summary> Устанавливает новую текущую точку расписания и переключает состояние на движение. </summary>
         /// <param name="newCurrentPont"> Новая текущая точка расписания. </param>
-        public void SetNewCurrentPoint(SchedulePoint newCurrentPont) => _currentPoint = newCurrentPont;
+        public void SetNewCurrentPoint(NpcSchedulePoint newCurrentPont) => _currentPoint = newCurrentPont;
     }
 }

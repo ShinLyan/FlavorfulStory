@@ -13,11 +13,15 @@ namespace FlavorfulStory.AI.FiniteStateMachine.ShopStates
         /// <summary> Сервис для обработки транзакций и торговых операций. </summary>
         private readonly TransactionService _transactionService;
 
+        /// <summary>
+        /// 
+        /// </summary>
         private readonly NpcPurchaseIndicator _purchaseIndicator;
 
         /// <summary> Инициализирует новый экземпляр состояния оплаты. </summary>
         /// <param name="locationManager"> Локация магазина для доступа к кассе. </param>\
         /// <param name="transactionService"> Сервис для обработки транзакций. </param>
+        /// <param name="purchaseIndicator"></param>
         public PaymentState(LocationManager locationManager, TransactionService transactionService,
             NpcPurchaseIndicator purchaseIndicator)
         {
@@ -31,12 +35,11 @@ namespace FlavorfulStory.AI.FiniteStateMachine.ShopStates
         {
             base.Enter();
 
-            if (Context != null && Context.TryGet<ItemStack>(ContextType.PurchaseItem, out var itemStack))
-            {
-                bool playerInLocation = _locationManager.IsPlayerInLocation(LocationName.NewShop);
-                _transactionService.SellToNpc(itemStack, playerInLocation);
-                _purchaseIndicator.HideModel();
-            }
+            if (Context == null || !Context.TryGet<ItemStack>(ContextType.PurchaseItem, out var itemStack)) return;
+
+            bool playerInLocation = _locationManager.IsPlayerInLocation(LocationName.NewShop);
+            _transactionService.SellToNpc(itemStack, playerInLocation);
+            _purchaseIndicator.HideModel();
         }
 
         /// <summary> Возвращает статус завершения состояния. </summary>
