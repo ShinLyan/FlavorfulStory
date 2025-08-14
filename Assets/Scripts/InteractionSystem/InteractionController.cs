@@ -36,6 +36,9 @@ namespace FlavorfulStory.InteractionSystem
         /// <summary> Шина сигналов для отправки уведомлений другим системам. </summary>
         private SignalBus _signalBus;
 
+        /// <summary> Максимальное расстояние для взаимодействия с объектами. </summary>
+        public const float InteractionDistance = 1.8f;
+
         #endregion
 
         /// <summary> Внедрение зависимостей Zenject. </summary>

@@ -8,19 +8,19 @@ namespace FlavorfulStory.InventorySystem.DropSystem
     /// <summary> Целевой контейнер для предметов, выбрасываемых из инвентаря. </summary>
     public class ItemDropTarget : MonoBehaviour, IDragDestination<InventoryItem>
     {
-        /// <summary> Контроллер игрока. </summary>
-        private PlayerController _playerController;
+        /// <summary> Провайдер позиции игрока. </summary>
+        private IPlayerPositionProvider _playerPositionProvider;
 
         /// <summary> Выбрасыватель предметов. </summary>
         private IItemDropService _itemDropService;
 
         /// <summary> Внедрение зависимостей Zenject. </summary>
-        /// <param name="playerController"> Контроллер игрока. </param>
+        /// <param name="playerPositionProvider"> Провайдер позиции игрока. </param>
         /// <param name="itemDropService"> Выбрасыватель предметов. </param>
         [Inject]
-        private void Construct(PlayerController playerController, IItemDropService itemDropService)
+        private void Construct(IPlayerPositionProvider playerPositionProvider, IItemDropService itemDropService)
         {
-            _playerController = playerController;
+            _playerPositionProvider = playerPositionProvider;
             _itemDropService = itemDropService;
         }
 
@@ -35,6 +35,6 @@ namespace FlavorfulStory.InventorySystem.DropSystem
         /// <param name="item"> Тип добавляемого элемента. </param>
         /// <param name="number"> Количество добавляемых элементов. </param>
         public void AddItems(InventoryItem item, int number) =>
-            _itemDropService.Drop(new ItemStack(item, number), _playerController.transform.position);
+            _itemDropService.Drop(new ItemStack(item, number), _playerPositionProvider.GetPlayerPosition());
     }
 }

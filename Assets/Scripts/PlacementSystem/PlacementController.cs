@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using FlavorfulStory.GridSystem;
 using FlavorfulStory.Infrastructure.Factories;
+using FlavorfulStory.InputSystem;
 using FlavorfulStory.TimeManagement;
 using UnityEngine;
 using Zenject;
@@ -148,7 +149,7 @@ namespace FlavorfulStory.PlacementSystem
 
             RefreshCursor(gridPosition);
 
-            if (Input.GetMouseButtonDown(0) && _currentMode.TryApply(gridPosition)) _onApplySuccess?.Invoke();
+            if (InputWrapper.GetLeftMouseButtonDown() && _currentMode.TryApply(gridPosition)) _onApplySuccess?.Invoke();
         }
 
         /// <summary> Обновляет предпросмотр размещения, если позиция курсора изменилась. </summary>

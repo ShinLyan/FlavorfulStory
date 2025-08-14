@@ -1,8 +1,10 @@
-﻿using FlavorfulStory.Saving;
+﻿using FlavorfulStory.Infrastructure.Factories;
+using FlavorfulStory.InventorySystem;
+using FlavorfulStory.Saving;
 using UnityEngine;
 using Zenject;
 
-namespace FlavorfulStory.InventorySystem.PickupSystem
+namespace FlavorfulStory.PickupSystem
 {
     /// <summary> Отвечает за создание объектов Pickup, которые появляются при первой загрузке уровня. </summary>
     /// <remarks> Автоматически создает префаб для заданного предмета инвентаря. </remarks>
@@ -10,18 +12,21 @@ namespace FlavorfulStory.InventorySystem.PickupSystem
     {
         /// <summary> Предмет, который будет заспавнен в сцене. </summary>
         [Tooltip("Предмет, который будет заспавнен в сцене."), SerializeField]
-        private ItemStack _inventorySlot;
+        private ItemStack _itemStack;
 
         /// <summary> Был ли предмет собран? </summary>
         private bool _isPickedUp;
 
+        /// <summary> Экземпляр заспавненного пикапа. </summary>
+        private Pickup _instance;
+
         /// <summary> Фабрика для создания экземпляров предметов, доступных для подбора. </summary>
-        private PickupFactory _pickupFactory;
+        private IPrefabFactory<Pickup> _pickupFactory;
 
         /// <summary> Фабрика для создания экземпляров предметов, доступных для подбора. </summary>
         /// <param name="pickupFactory"> Фабрика для создания экземпляров предметов, доступных для подбора. </param>
         [Inject]
-        private void Construct(PickupFactory pickupFactory) => _pickupFactory = pickupFactory;
+        private void Construct(IPrefabFactory<Pickup> pickupFactory) => _pickupFactory = pickupFactory;
 
         /// <summary> Создает предмет при загрузке сцены. </summary>
         private void Start()
@@ -32,19 +37,32 @@ namespace FlavorfulStory.InventorySystem.PickupSystem
         /// <summary> Создает объект Pickup на сцене. </summary>
         private void SpawnPickup()
         {
-            _pickupFactory.Create(_inventorySlot, transform.position, 0f, transform);
+            _instance = _pickupFactory.Create(_itemStack.Item.PickupPrefab, transform.position,
+                Quaternion.identity, transform);
+            _instance.Setup(_itemStack, 0f);
             _isPickedUp = true;
         }
 
         #region Saving
 
         /// <summary> Сохраняет состояние объекта (собран предмет или нет). </summary>
-        /// <returns> true, если предмет был собран, иначе false. </returns>
+        /// <returns> <c>true</c>, если предмет был собран, иначе <c>false</c>. </returns>
         public object CaptureState() => _isPickedUp;
 
         /// <summary> Восстанавливает состояние объекта при загрузке. </summary>
         /// <param name="state"> Сохраненное состояние объекта. </param>
-        public void RestoreState(object state) => _isPickedUp = state is true;
+        public void RestoreState(object state)
+        {
+            _isPickedUp = (bool)state;
+            if (_isPickedUp && _instance) DestroyPickup(); // TODO: Пересмотреть после фикса SavingSystem
+        }
+
+        /// <summary> Уничтожить пикап. </summary>
+        private void DestroyPickup()
+        {
+            Destroy(_instance.gameObject);
+            _instance = null;
+        }
 
         #endregion
     }

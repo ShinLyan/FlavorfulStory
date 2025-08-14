@@ -33,17 +33,17 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         /// <param name="npcMovementController"> Контроллер движения NPC. </param>
         /// <param name="npcAnimationController"> Контроллер анимации NPC. </param>
         /// <param name="scheduleHandler"> Обработчик расписания NPC. </param>
-        /// <param name="playerController"> Контроллер игрока для взаимодействия. </param>
+        /// <param name="playerPositionProvider"> Провайдер позиции игрока. </param>
         /// <param name="npcTransform"> Transform NPC для определения позиции. </param>
         public StateController(NpcSchedule npcSchedule, NpcMovementController npcMovementController,
             NpcAnimationController npcAnimationController, NpcScheduleHandler scheduleHandler,
-            PlayerController playerController, Transform npcTransform)
+            IPlayerPositionProvider playerPositionProvider, Transform npcTransform)
         {
             _typeToCharacterStates = new Dictionary<Type, CharacterState>();
 
             _sortedScheduleParams = npcSchedule.GetSortedScheduleParams();
             _animationController = npcAnimationController;
-            InitializeStates(npcMovementController, scheduleHandler, npcAnimationController, playerController,
+            InitializeStates(npcMovementController, scheduleHandler, npcAnimationController, playerPositionProvider,
                 npcTransform);
 
             OnCurrentScheduleParamsChanged += npcMovementController.SetCurrentScheduleParams;
@@ -55,18 +55,16 @@ namespace FlavorfulStory.AI.FiniteStateMachine
         /// <param name="movementController"> Контроллер движения для состояния движения. </param>
         /// <param name="scheduleHandler"> Обработчик расписания для связи с состояниями. </param>
         /// <param name="animationController"> Контроллер анимации для состояний. </param>
-        /// <param name="playerController"> Контроллер игрока для состояния ожидания. </param>
+        /// <param name="playerPositionProvider"> Провайдер позиции игрока. </param>
         /// <param name="npcTransform"> Transform NPC для передачи в состояния. </param>
-        private void InitializeStates(NpcMovementController movementController,
-            NpcScheduleHandler scheduleHandler,
-            NpcAnimationController animationController,
-            PlayerController playerController,
+        private void InitializeStates(NpcMovementController movementController, NpcScheduleHandler scheduleHandler,
+            NpcAnimationController animationController, IPlayerPositionProvider playerPositionProvider,
             Transform npcTransform)
         {
             var states = new CharacterState[]
             {
                 new InteractionState(), new MovementState(movementController),
-                new RoutineState(animationController), new WaitingState(playerController, npcTransform)
+                new RoutineState(animationController), new WaitingState(playerPositionProvider, npcTransform)
             };
 
             foreach (var state in states)

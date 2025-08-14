@@ -36,13 +36,14 @@ namespace FlavorfulStory.AI
         /// <summary> Обработчик коллизий NPC для взаимодействия с игроком и триггерами. </summary>
         private NpcCollisionHandler _collisionHandler;
 
-        /// <summary> Контроллер игрока, необходимый NPC для взаимодействия и логики состояний. </summary>
-        private PlayerController _playerController;
+        /// <summary> Провайдер позиции игрока. </summary>
+        private IPlayerPositionProvider _playerPositionProvider;
 
-        /// <summary> Внедряет зависимость от контроллера игрока. </summary>
-        /// <param name="playerController"> Ссылка на компонент игрока. </param>
+        /// <summary> Внедряет зависимость Zenject. </summary>
+        /// <param name="playerPositionProvider"> Провайдер позиции игрока. </param>
         [Inject]
-        private void Construct(PlayerController playerController) => _playerController = playerController;
+        private void Construct(IPlayerPositionProvider playerPositionProvider) =>
+            _playerPositionProvider = playerPositionProvider;
 
         /// <summary> Инициализация компонентов, подписка на события времени. </summary>
         private void Awake()
@@ -67,14 +68,8 @@ namespace FlavorfulStory.AI
                 _npcScheduleHandler
             );
 
-            _stateController = new StateController(
-                _npcSchedule,
-                _movementController,
-                _animationController,
-                _npcScheduleHandler,
-                _playerController,
-                transform
-            );
+            _stateController = new StateController(_npcSchedule, _movementController, _animationController,
+                _npcScheduleHandler, _playerPositionProvider, transform);
 
             _collisionHandler = new NpcCollisionHandler(_stateController);
         }

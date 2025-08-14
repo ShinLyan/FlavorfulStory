@@ -1,9 +1,11 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Object = UnityEngine.Object;
 
 namespace FlavorfulStory.Saving
 {
@@ -11,6 +13,9 @@ namespace FlavorfulStory.Saving
     public static class SavingSystem
     {
         #region Public Methods
+
+        /// <summary> Событие, вызываемое после завершения загрузки сцены. </summary>
+        public static event Action OnLoadCompleted;
 
         /// <summary> Загрузка последней сцены. </summary>
         /// <param name="saveFile"> Название файла с сохранением. </param>
@@ -114,6 +119,8 @@ namespace FlavorfulStory.Saving
                 string id = saveable.UniqueIdentifier;
                 if (state.TryGetValue(id, out object value)) saveable.RestoreState(value);
             }
+
+            OnLoadCompleted?.Invoke();
         }
 
         #endregion

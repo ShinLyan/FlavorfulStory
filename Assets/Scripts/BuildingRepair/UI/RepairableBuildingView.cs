@@ -66,7 +66,7 @@ namespace FlavorfulStory.BuildingRepair.UI
         private void Awake()
         {
             _requirementPool = new ObjectPool<ResourceRequirementView>(
-                () => _requirementViewFactory.Create(_requirementViewsContainer),
+                () => _requirementViewFactory.Create(parentTransform: _requirementViewsContainer),
                 view =>
                 {
                     view.gameObject.SetActive(true);
