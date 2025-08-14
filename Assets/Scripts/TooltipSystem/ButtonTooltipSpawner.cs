@@ -8,10 +8,11 @@ namespace FlavorfulStory.TooltipSystem
     [RequireComponent(typeof(Button))]
     public class ButtonTooltipSpawner : TooltipSpawner
     {
+        /// <summary> Информация о кнопке. </summary>
+        [SerializeField] private string _info;
+
         /// <summary> Компонент кнопки, для которой показывается тултип. </summary>
         private Button _button;
-
-        [SerializeField] private string _info;
 
         /// <summary> Внедряет префаб тултипа кнопки. </summary>
         /// <param name="buttonTooltipPrefab"> Префаб тултипа кнопки. </param>
@@ -25,7 +26,7 @@ namespace FlavorfulStory.TooltipSystem
 
         /// <summary> Можно ли создать тултип? </summary>
         /// <returns> <c>true</c>, если кнопка активна и тултип можно создать; иначе <c>false</c>. </returns>
-        protected override bool CanCreateTooltip() => _button != null && _button.interactable;
+        protected override bool CanCreateTooltip() => _button && _button.interactable;
 
         /// <summary> Обновляет содержимое тултипа на основе кнопки. </summary>
         /// <param name="tooltip"> Заспавненный префаб тултипа для обновления. </param>

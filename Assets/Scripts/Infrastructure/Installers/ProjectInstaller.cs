@@ -11,16 +11,18 @@ namespace FlavorfulStory.Infrastructure.Installers
     public class ProjectInstaller : MonoInstaller
     {
         /// <summary> Префаб компонента Fader, используемого для управления затемнением UI. </summary>
-        [Header("UI")] [SerializeField] private GameObject _faderPrefab;
-
-        /// <summary> Префаб источника звука для воспроизведения звуковых эффектов (SFX). </summary>
-        [Header("Audio")] [SerializeField] private AudioSource _sfxPrefab;
-
-        /// <summary> Хранилище всех доступных SFX-данных. </summary>
-        [SerializeField] private SfxDatabase _sfxDatabase;
+        [Header("UI")]
+        [SerializeField] private GameObject _faderPrefab;
 
         /// <summary> Префаб всплывающей подсказки для кнопки. </summary>
         [SerializeField] private ButtonTooltipView _buttonTooltipPrefab;
+
+        /// <summary> Префаб источника звука для воспроизведения звуковых эффектов (SFX). </summary>
+        [Header("Audio")]
+        [SerializeField] private AudioSource _sfxPrefab;
+
+        /// <summary> Хранилище всех доступных SFX-данных. </summary>
+        [SerializeField] private SfxDatabase _sfxDatabase;
 
         /// <summary> Вызывает методы для привязки зависимостей. </summary>
         public override void InstallBindings()
