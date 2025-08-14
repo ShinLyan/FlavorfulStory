@@ -82,8 +82,6 @@ namespace FlavorfulStory.Player
             _interactionController = GetComponentInChildren<InteractionController>();
             _interactionController.StartInteractionAction = () => SetBusyState(true);
             _interactionController.EndInteractionAction = () => SetBusyState(false);
-
-            PlayerModel.SetPositionProvider(() => transform.position);
         }
 
         /// <summary> Обновление состояния игрока. </summary>

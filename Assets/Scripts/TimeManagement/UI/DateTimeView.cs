@@ -1,7 +1,7 @@
 using TMPro;
 using UnityEngine;
 
-namespace FlavorfulStory.TimeManagement
+namespace FlavorfulStory.TimeManagement.UI
 {
     /// <summary> Отображение текущего времени в UI. </summary>
     public class DateTimeView : MonoBehaviour

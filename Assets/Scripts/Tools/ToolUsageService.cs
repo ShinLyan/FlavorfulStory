@@ -23,8 +23,11 @@ namespace FlavorfulStory.Tools
         /// <summary> Слой, по которому осуществляется попадание при использовании инструмента. </summary>
         private readonly LayerMask _hitableLayers;
 
-        /// <summary> Игрок, использующий инструмент. </summary>
-        private readonly PlayerController _player;
+        /// <summary> Провайдер позиции игрока. </summary>
+        private readonly IPlayerPositionProvider _playerPositionProvider;
+
+        /// <summary> Контроллер игрока. </summary>
+        private readonly PlayerController _playerController;
 
         /// <summary> Контроллер размещение объектов. </summary>
         private readonly PlacementController _placementController;
@@ -56,16 +59,19 @@ namespace FlavorfulStory.Tools
         /// <summary> Конструктор сервиса использования инструментов. </summary>
         /// <param name="toolMappings"> Массив структур, сопоставляющих <see cref="ToolType"/> с его префабом. </param>
         /// <param name="hitableLayers"> Слой, по которому осуществляется попадание при использовании. </param>
-        /// <param name="player"> Игрок, использующий инструмент. </param>
+        /// <param name="playerPositionProvider"> Провайдер позиции игрока. </param>
+        /// <param name="playerController"> Контроллер игрока. </param>
         /// <param name="placementController"> Контроллер размещение объектов. </param>
         /// <param name="itemDropService"> Сервис выброса предметов в игровой мир. </param>
         /// <param name="signalBus"> Сигнальная шина Zenject. </param>
-        public ToolUsageService(ToolPrefabMapping[] toolMappings, LayerMask hitableLayers, PlayerController player,
+        public ToolUsageService(ToolPrefabMapping[] toolMappings, LayerMask hitableLayers,
+            IPlayerPositionProvider playerPositionProvider, PlayerController playerController,
             PlacementController placementController, IItemDropService itemDropService, SignalBus signalBus)
         {
             _toolPresenter = new ToolPresenter(toolMappings);
             _hitableLayers = hitableLayers;
-            _player = player;
+            _playerPositionProvider = playerPositionProvider;
+            _playerController = playerController;
             _placementController = placementController;
             _itemDropService = itemDropService;
             _signalBus = signalBus;
@@ -81,7 +87,8 @@ namespace FlavorfulStory.Tools
             isDismantle = false;
             if (_isOnCooldown) return false;
 
-            var target = ClampTargetToChebyshevRange(_player.transform.position, cellCenter, MaxDistanceInCells);
+            var target = ClampTargetToChebyshevRange(_playerPositionProvider.GetPlayerPosition(),
+                cellCenter, MaxDistanceInCells);
 
             bool hitSuccessful = TryGetValidHitableAt(tool, target, out var hitable);
             if (hitSuccessful)
@@ -170,9 +177,9 @@ namespace FlavorfulStory.Tools
         /// <param name="target"> Мировая позиция цели удара. </param>
         private void BeginUse(Tool tool, Vector3 target)
         {
-            _player.RotateTowards(target);
-            _player.TriggerAnimation($"Use{tool.ToolType}");
-            _player.SetBusyState(true);
+            _playerController.RotateTowards(target);
+            _playerController.TriggerAnimation($"Use{tool.ToolType}");
+            _playerController.SetBusyState(true);
             SfxPlayer.Play(tool.SfxType);
             _toolPresenter.EquipTool(tool);
 
@@ -183,7 +190,7 @@ namespace FlavorfulStory.Tools
         private void EndUse()
         {
             _toolPresenter.UnequipTool();
-            _player.SetBusyState(false);
+            _playerController.SetBusyState(false);
             ToolUseFinished?.Invoke();
 
             InputWrapper.UnblockPlayerInput();
