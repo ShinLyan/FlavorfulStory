@@ -105,6 +105,8 @@ namespace FlavorfulStory.Infrastructure.Installers
         /// <summary> Установить зависимости, связанные с игроком. </summary>
         private void BindPlayer()
         {
+            Container.Bind<IPlayerPositionProvider>().To<PlayerPositionProvider>().AsSingle();
+
             Container.Bind<PlayerController>().FromComponentInHierarchy().AsSingle();
             Container.Bind<Equipment>().FromComponentInHierarchy().AsSingle();
             Container.Bind<PlayerStats>().FromComponentInHierarchy().AsSingle();
