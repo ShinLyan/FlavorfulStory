@@ -1,5 +1,6 @@
 ﻿using FlavorfulStory.Audio;
 using FlavorfulStory.SceneManagement;
+using FlavorfulStory.TooltipSystem;
 using FlavorfulStory.UI.Animation;
 using UnityEngine;
 using Zenject;
@@ -12,6 +13,9 @@ namespace FlavorfulStory.Infrastructure.Installers
         /// <summary> Префаб компонента Fader, используемого для управления затемнением UI. </summary>
         [Header("UI")]
         [SerializeField] private GameObject _faderPrefab;
+
+        /// <summary> Префаб всплывающей подсказки для кнопки. </summary>
+        [SerializeField] private ButtonTooltipView _buttonTooltipPrefab;
 
         /// <summary> Префаб источника звука для воспроизведения звуковых эффектов (SFX). </summary>
         [Header("Audio")]
@@ -34,6 +38,8 @@ namespace FlavorfulStory.Infrastructure.Installers
                 sfxSource.gameObject.name = "SFX";
                 return new SfxPlayer(sfxSource, _sfxDatabase.SfxList);
             }).AsSingle().NonLazy();
+
+            Container.Bind<ButtonTooltipView>().FromInstance(_buttonTooltipPrefab).AsSingle();
         }
     }
 }

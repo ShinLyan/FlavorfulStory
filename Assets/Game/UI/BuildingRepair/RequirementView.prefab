@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 8119559991041388890}
   - component: {fileID: 6493702981426936176}
   - component: {fileID: 6896033617434537092}
+  - component: {fileID: 7040995384521798060}
   m_Layer: 5
   m_Name: AddResourceButton
   m_TagString: Untagged
@@ -121,6 +122,19 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &7040995384521798060
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 346537172583375172}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b4f10b6314f14c3f83eba9c5a4d01a56, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _info: Add
 --- !u!1 &746803291399139315
 GameObject:
   m_ObjectHideFlags: 0
@@ -197,6 +211,7 @@ GameObject:
   - component: {fileID: 5310658231423747575}
   - component: {fileID: 5577401144237942476}
   - component: {fileID: 303901440932444748}
+  - component: {fileID: 5425839851834427126}
   m_Layer: 5
   m_Name: ReturnResourceButton
   m_TagString: Untagged
@@ -306,6 +321,19 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &5425839851834427126
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1624765912782899941}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b4f10b6314f14c3f83eba9c5a4d01a56, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _info: Return
 --- !u!1 &3336740871693969319
 GameObject:
   m_ObjectHideFlags: 0
