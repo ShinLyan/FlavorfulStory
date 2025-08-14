@@ -8,7 +8,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
 
-namespace FlavorfulStory.UI
+namespace FlavorfulStory.TimeManagement.UI
 {
     /// <summary> Отображение сводки дня с анимациями. </summary>
     public class SummaryView : MonoBehaviour

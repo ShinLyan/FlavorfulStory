@@ -2,7 +2,7 @@
 using Cysharp.Threading.Tasks;
 using FlavorfulStory.Player;
 using FlavorfulStory.SceneManagement;
-using FlavorfulStory.UI;
+using FlavorfulStory.TimeManagement.UI;
 using UnityEngine;
 using Zenject;
 
@@ -11,7 +11,7 @@ namespace FlavorfulStory.TimeManagement
     /// <summary> Управляет процессом завершения игрового дня.. </summary>
     public class DayEndManager : IInitializable, IDisposable
     {
-        /// <summary> Вью для отображения сводки дня. </summary>
+        /// <summary> Отображение сводки дня. </summary>
         private readonly SummaryView _summaryView;
 
         /// <summary> Контроллер игрока. </summary>

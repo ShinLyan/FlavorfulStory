@@ -14,6 +14,7 @@ namespace FlavorfulStory.Saving
     {
         #region Public Methods
 
+        /// <summary> Событие, вызываемое после завершения загрузки сцены. </summary>
         public static event Action OnLoadCompleted;
 
         /// <summary> Загрузка последней сцены. </summary>

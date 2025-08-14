@@ -23,7 +23,7 @@ namespace FlavorfulStory.DialogueSystem
         private PlayerController _playerController; // TODO: Возможно удалить
 
         /// <summary> Провайдер позиции игрока. </summary>
-        private PlayerPositionProvider _playerPositionProvider;
+        private IPlayerPositionProvider _playerPositionProvider;
 
         /// <summary> Информация о NPC. </summary>
         public NpcInfo NpcInfo { get; private set; }
@@ -34,7 +34,7 @@ namespace FlavorfulStory.DialogueSystem
         /// <param name="playerPositionProvider"> Провайдер позиции игрока. </param>
         [Inject]
         private void Construct(PlayerSpeaker playerSpeaker, PlayerController playerController,
-            PlayerPositionProvider playerPositionProvider)
+            IPlayerPositionProvider playerPositionProvider)
         {
             _playerSpeaker = playerSpeaker;
             _playerController = playerController;

@@ -118,11 +118,11 @@ namespace FlavorfulStory.InventorySystem.DropSystem
         public object CaptureState()
         {
             _spawnedPickups.RemoveAll(pickup => !pickup);
-            return _spawnedPickups.Select(p => new DropSaveData
+            return _spawnedPickups.Select(pickup => new DropSaveData
             {
-                ItemID = p.Item.ItemID,
-                Position = new SerializableVector3(p.transform.position),
-                Quantity = p.Number
+                ItemID = pickup.Item.ItemID,
+                Position = new SerializableVector3(pickup.transform.position),
+                Quantity = pickup.Number
             }).ToList();
         }
 
