@@ -26,7 +26,7 @@ namespace FlavorfulStory.TooltipSystem
 
         /// <summary> Можно ли создать тултип? </summary>
         /// <returns> <c>true</c>, если кнопка активна и тултип можно создать; иначе <c>false</c>. </returns>
-        protected override bool CanCreateTooltip() => _button && _button.interactable;
+        protected override bool CanCreateTooltip() => _button;
 
         /// <summary> Обновляет содержимое тултипа на основе кнопки. </summary>
         /// <param name="tooltip"> Заспавненный префаб тултипа для обновления. </param>
