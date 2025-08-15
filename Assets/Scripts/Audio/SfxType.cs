@@ -31,8 +31,7 @@
         CashRegister,
 
         /// <summary> Звук покупки. </summary>
-        Buy
-        Build,
+        Buy,
 
         #region PlacementSystem
 

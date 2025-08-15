@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using FlavorfulStory.AI.BaseNpc;
+using FlavorfulStory.AI.FiniteStateMachine;
 using FlavorfulStory.AI.FSM;
 using FlavorfulStory.AI.FSM.InteractableStates;
 using FlavorfulStory.AI.Scheduling;
@@ -28,7 +29,7 @@ namespace FlavorfulStory.AI.InteractableNpc
         private readonly InteractableNpcMovementController _npcMovementController;
 
         /// <summary> Контроллер игрока для взаимодействия. </summary>
-        private readonly PlayerController _playerController;
+        private readonly IPlayerPositionProvider _playerPositionProvider;
 
         /// <summary> Инициализирует новый экземпляр контроллера состояний. </summary>
         /// <param name="npcSchedule"> Расписание NPC. </param>
@@ -36,16 +37,16 @@ namespace FlavorfulStory.AI.InteractableNpc
         /// <param name="npcAnimationController"> Контроллер анимации NPC. </param>
         /// <param name="scheduleHandler"> Обработчик расписания NPC. </param>
         /// <param name="npcTransform"> Transform NPC для определения позиции. </param>
-        /// <param name="playerController"> Контроллер игрока. </param>
+        /// <param name="playerPositionProvider"> Контроллер игрока. </param>
         public InteractableNpcStateController(NpcSchedule npcSchedule,
             InteractableNpcMovementController npcMovementController, NpcAnimationController npcAnimationController,
-            NpcScheduleHandler scheduleHandler, Transform npcTransform, PlayerController playerController)
+            NpcScheduleHandler scheduleHandler, Transform npcTransform, IPlayerPositionProvider playerPositionProvider)
             : base(npcAnimationController, npcTransform)
         {
             _sortedScheduleParams = npcSchedule.GetSortedScheduleParams();
             _scheduleHandler = scheduleHandler;
             _npcMovementController = npcMovementController;
-            _playerController = playerController;
+            _playerPositionProvider = playerPositionProvider;
             Initialize();
         }
 
@@ -71,7 +72,7 @@ namespace FlavorfulStory.AI.InteractableNpc
         {
             _nameToCharacterStates.Add(StateName.Movement, new MovementState(_npcMovementController));
             _nameToCharacterStates.Add(StateName.Routine, new RoutineState(_animationController));
-            _nameToCharacterStates.Add(StateName.Waiting, new WaitingState(_playerController, _npcTransform));
+            _nameToCharacterStates.Add(StateName.Waiting, new WaitingState(_playerPositionProvider, _npcTransform));
 
             foreach (var state in _nameToCharacterStates.Values)
             {

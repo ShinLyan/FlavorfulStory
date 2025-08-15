@@ -27,8 +27,8 @@ namespace FlavorfulStory.AI.InteractableNpc
         /// <summary> Обработчик столкновений для взаимодействия с игроком. </summary>
         private NpcCollisionHandler _collisionHandler;
 
-        /// <summary> Контроллер игрока, используемый для взаимодействия NPC с игроком. </summary>
-        private PlayerController _playerController;
+        /// <summary> Провайдер позиции игрока. </summary>
+        private IPlayerPositionProvider _playerPositionProvider;
 
         /// <summary> Контроллер движения персонажа. </summary>
         private InteractableNpcMovementController _movementController;
@@ -43,9 +43,10 @@ namespace FlavorfulStory.AI.InteractableNpc
         protected override NpcStateController StateController => _stateController;
 
         /// <summary> Внедряет зависимости Zenject. </summary>
-        /// <param name="playerController"> Контроллер игрока. </param>
+        /// <param name="playerPositionProvider"> Провайдер позиции игрока. </param>
         [Inject]
-        private void Construct(PlayerController playerController) => _playerController = playerController;
+        private void Construct(IPlayerPositionProvider playerPositionProvider) =>
+            _playerPositionProvider = playerPositionProvider;
 
         /// <summary> Выполняет инициализацию компонентов NPC. </summary>
         protected override void Awake()
@@ -56,7 +57,7 @@ namespace FlavorfulStory.AI.InteractableNpc
             _movementController = new InteractableNpcMovementController(GetComponent<NavMeshAgent>(), transform,
                 AnimationController, _npcScheduleHandler);
             _stateController = new InteractableNpcStateController(_npcSchedule, _movementController,
-                AnimationController, _npcScheduleHandler, transform, _playerController);
+                AnimationController, _npcScheduleHandler, transform, _playerPositionProvider);
             _collisionHandler = new NpcCollisionHandler(_stateController);
         }
 
