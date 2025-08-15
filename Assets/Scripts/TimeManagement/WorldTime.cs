@@ -24,7 +24,7 @@ namespace FlavorfulStory.TimeManagement
         public static DateTime CurrentGameTime { get; private set; }
 
         /// <summary> Игра на паузе? </summary>
-        private static bool _isPaused;
+        public static bool IsPaused { get; private set; }
 
         /// <summary> Раз в сколько игровых минут происходит тик времени. </summary>
         private const float TimeBetweenTicks = 5f;
@@ -74,7 +74,7 @@ namespace FlavorfulStory.TimeManagement
         private void OnDestroy()
         {
             CurrentGameTime = default;
-            _isPaused = false;
+            IsPaused = false;
 
             OnTimeUpdated = null;
             OnDayEnded = null;
@@ -86,7 +86,7 @@ namespace FlavorfulStory.TimeManagement
         /// <summary> Обновить игровое время при отсутствии паузы. </summary>
         private void Update()
         {
-            if (_isPaused) return;
+            if (IsPaused) return;
 
             var previousTime = CurrentGameTime;
             CurrentGameTime = CurrentGameTime.AddMinutes(Time.deltaTime * _timeScale);
@@ -119,14 +119,14 @@ namespace FlavorfulStory.TimeManagement
         /// <summary> Поставить игровое время на паузу. </summary>
         public static void Pause()
         {
-            _isPaused = true;
+            IsPaused = true;
             OnTimePaused?.Invoke();
         }
 
         /// <summary> Снять паузу с игрового времени. </summary>
         public static void Unpause()
         {
-            _isPaused = false;
+            IsPaused = false;
             OnTimeUnpaused?.Invoke();
         }
 

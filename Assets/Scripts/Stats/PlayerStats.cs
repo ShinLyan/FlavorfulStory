@@ -18,7 +18,7 @@ namespace FlavorfulStory.Stats
         private readonly Dictionary<Type, CharacterStat> _stats = new();
 
         /// <summary> Инициализация базовых статов игрока. </summary>
-        private void Awake()
+        private void Start()
         {
             if (_stats.Count != 0) return;
 
@@ -109,6 +109,8 @@ namespace FlavorfulStory.Stats
         public void RestoreState(object state)
         {
             if (state is not StatsData data) return;
+
+            _stats.Clear();
 
             Register<Health>(new Health(data.HpCurrentValue, data.HpMaxValue), _healthView);
             Register<Stamina>(new Stamina(data.StaminaCurrentValue, data.StaminaMaxValue), _staminaView);

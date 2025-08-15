@@ -3,7 +3,7 @@ using FlavorfulStory.InventorySystem.UI;
 using FlavorfulStory.TooltipSystem;
 using UnityEngine;
 
-namespace FlavorfulStory.QuestSystem
+namespace FlavorfulStory.QuestSystem.UI
 {
     /// <summary> Представление слота награды за квест. </summary>
     [RequireComponent(typeof(ItemTooltipSpawner))]

@@ -1,7 +1,7 @@
 ﻿using TMPro;
 using UnityEngine;
 
-namespace FlavorfulStory.QuestSystem
+namespace FlavorfulStory.QuestSystem.UI
 {
     /// <summary> Отображение цели квеста. </summary>
     public class QuestObjectiveView : MonoBehaviour

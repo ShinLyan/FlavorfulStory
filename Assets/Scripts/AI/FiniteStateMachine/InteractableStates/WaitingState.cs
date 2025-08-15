@@ -1,23 +1,23 @@
 using FlavorfulStory.Player;
 using UnityEngine;
 
-namespace FlavorfulStory.AI.FSM.InteractableStates
+namespace FlavorfulStory.AI.FiniteStateMachine
 {
     /// <summary> Состояние ожидания NPC, в котором персонаж не выполняет активных действий. </summary>
     public class WaitingState : CharacterState
     {
-        /// <summary> Ссылка на контроллер игрока, используемая для определения его позиции. </summary>
-        private readonly PlayerController _playerController;
+        /// <summary> Провайдер позиции игрока. </summary>
+        private readonly IPlayerPositionProvider _playerPositionProvider;
 
         /// <summary> Трансформ NPC, необходимый для поворота в сторону игрока. </summary>
         private readonly Transform _npcTransform;
 
         /// <summary> Конструктор состояния ожидания NPC. </summary>
-        /// <param name="playerController"> Ссылка на контроллер игрока. </param>
+        /// <param name="playerPositionProvider"> Провайдер позиции игрока. </param>
         /// <param name="npcTransform"> Трансформ NPC, к которому применяется поворот. </param>
-        public WaitingState(PlayerController playerController, Transform npcTransform)
+        public WaitingState(IPlayerPositionProvider playerPositionProvider, Transform npcTransform)
         {
-            _playerController = playerController;
+            _playerPositionProvider = playerPositionProvider;
             _npcTransform = npcTransform;
         }
 
@@ -25,7 +25,7 @@ namespace FlavorfulStory.AI.FSM.InteractableStates
         public override void Update()
         {
             _npcTransform.rotation = Quaternion.LookRotation(
-                _playerController.transform.position - _npcTransform.position);
+                _playerPositionProvider.GetPlayerPosition() - _npcTransform.position);
         }
     }
 }

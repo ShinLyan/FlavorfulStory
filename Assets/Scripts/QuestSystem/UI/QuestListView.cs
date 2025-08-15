@@ -5,13 +5,13 @@ using FlavorfulStory.Infrastructure.Factories;
 using UnityEngine;
 using Zenject;
 
-namespace FlavorfulStory.QuestSystem
+namespace FlavorfulStory.QuestSystem.UI
 {
     /// <summary> Отвечает за отображение и управление списком кнопок квестов. </summary>
     public class QuestListView : MonoBehaviour
     {
         /// <summary> Фабрика для создания кнопок квестов. </summary>
-        private IGameFactory<QuestListButton> _questListButtonFactory;
+        private IPrefabFactory<QuestListButton> _questListButtonFactory;
 
         /// <summary> Список всех квестов игрока. </summary>
         private IQuestList _questList;
@@ -26,7 +26,7 @@ namespace FlavorfulStory.QuestSystem
         /// <param name="factory"> Фабрика кнопок квестов. </param>
         /// <param name="questList"> Компонент списка квестов. </param>
         [Inject]
-        private void Construct(IGameFactory<QuestListButton> factory, IQuestList questList)
+        private void Construct(IPrefabFactory<QuestListButton> factory, IQuestList questList)
         {
             _questListButtonFactory = factory;
             _questList = questList;
@@ -46,7 +46,7 @@ namespace FlavorfulStory.QuestSystem
         private void Start()
         {
             _pool = new ObjectPool<QuestListButton>(
-                () => _questListButtonFactory.Create(transform),
+                () => _questListButtonFactory.Create(parentTransform: transform),
                 questListButton => questListButton.gameObject.SetActive(true),
                 questListButton => questListButton.gameObject.SetActive(false)
             );

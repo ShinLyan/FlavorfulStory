@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Cysharp.Threading.Tasks;
 using FlavorfulStory.Player;
+using FlavorfulStory.Saving;
 using UnityEngine;
 using Zenject;
 
@@ -9,10 +11,10 @@ namespace FlavorfulStory.SceneManagement
 {
     /// <summary> Менеджер локаций. </summary>
     /// <remarks> Отвечает за активацию и деактивацию локаций. </remarks>
-    public class LocationManager : IInitializable
+    public class LocationManager : IInitializable, IDisposable
     {
-        /// <summary> Контроллер игрока. </summary>
-        private readonly PlayerController _playerController;
+        /// <summary> Провайдер позиции игрока. </summary>
+        private readonly IPlayerPositionProvider _playerPositionProvider;
 
         /// <summary> Список всех локаций в сцене. </summary>
         private readonly List<Location> _locations;
@@ -23,38 +25,50 @@ namespace FlavorfulStory.SceneManagement
         /// <summary> Событие при смене локации. </summary>
         public event Action<Location> OnLocationChanged;
 
-        /// <summary> Конструктор с внедрением зависимостей. </summary>
-        /// <param name="playerController"> Контроллер игрока. </param>
+        /// <summary> Создать менеджер локаций. </summary>
+        /// <param name="playerPositionProvider">  Провайдер позиции игрока. </param>
         /// <param name="locations"> Список всех доступных локаций. </param>
-        public LocationManager(PlayerController playerController, List<Location> locations)
+        public LocationManager(IPlayerPositionProvider playerPositionProvider, List<Location> locations)
         {
-            _playerController = playerController;
+            _playerPositionProvider = playerPositionProvider;
             _locations = locations;
-
             _locationByName = new Dictionary<LocationName, Location>();
         }
 
-        /// <summary> При инициализации активирует текущую локацию игрока. </summary>
+        /// <summary> Инициализировать менеджер. </summary>
         public void Initialize()
         {
             foreach (var location in _locations)
                 if (!_locationByName.TryAdd(location.LocationName, location))
                     Debug.LogError($"Дубликат локации: {location.LocationName} в {location.name}");
 
+            SavingSystem.OnLoadCompleted += OnLoadCompleted;
+        }
+
+        /// <summary> Отписаться от событий и освободить ресурсы. </summary>
+        public void Dispose() => SavingSystem.OnLoadCompleted -= OnLoadCompleted;
+
+        /// <summary> Обработать завершение загрузки состояния. </summary>
+        private void OnLoadCompleted() => OnLoadCompletedAsync().Forget();
+
+        /// <summary> Асинхронно активировать текущую локацию после загрузки. </summary>
+        private async UniTaskVoid OnLoadCompletedAsync()
+        {
+            await UniTask.Yield();
             UpdateActiveLocation();
         }
 
-        /// <summary> Активирует локацию, в которой находится игрок, и деактивирует все остальные. </summary>
+        /// <summary> Активировать локацию, в которой находится игрок, и отключить остальные. </summary>
         public void UpdateActiveLocation()
         {
-            var playerPosition = _playerController.transform.position;
+            var playerPosition = _playerPositionProvider.GetPlayerPosition();
             var currentLocation = FindLocationByPosition(playerPosition);
             foreach (var location in _locations) location.SetActive(location == currentLocation);
 
             if (currentLocation) OnLocationChanged?.Invoke(currentLocation);
         }
 
-        /// <summary> Найти локацию по текущей позиции игрока в мире. </summary>
+        /// <summary> Найти локацию по позиции в мировом пространстве. </summary>
         /// <param name="position"> Позиция игрока в мире. </param>
         /// <returns> Локация, в которой находится игрок. </returns>
         private Location FindLocationByPosition(Vector3 position) =>
