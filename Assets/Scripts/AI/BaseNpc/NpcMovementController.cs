@@ -41,7 +41,7 @@ namespace FlavorfulStory.AI.BaseNpc
 
         /// <summary> Обновляет движение NPC каждый кадр.
         /// Рассчитывает скорость анимации на основе скорости NavMeshAgent и обновляет навигатор. </summary>
-        public void UpdateMovement()
+        public void Update()
         {
             float speed = Mathf.Clamp01(_agent.velocity.magnitude) * 0.5f;
             _animationController.SetSpeed(speed);

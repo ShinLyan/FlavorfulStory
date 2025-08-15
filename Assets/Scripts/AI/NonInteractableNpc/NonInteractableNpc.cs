@@ -12,48 +12,48 @@ namespace FlavorfulStory.AI.NonInteractableNpc
 {
     /// <summary> Неинтерактивный NPC, который может перемещаться и выполнять последовательности действий. </summary>
     [RequireComponent(typeof(NpcPurchaseIndicator))]
-    public class NonInteractableNpc : Npc
+    public sealed class NonInteractableNpc : Npc
     {
-        /// <summary> Контроллер передвижений для неинтерктивного НПС. </summary>
-        private NonInteractableNpcMovementController _nonInteractableNpcMovementController;
+        /// <summary> Контроллер передвижений для неинтерактивного НПС. </summary>
+        private NonInteractableNpcMovementController _movementController;
 
         /// <summary> Стейт-контроллер для неинтерктивного НПС. </summary>
-        private NonInteractableNpcStateController _nonInteractableNpcStateController;
+        private NonInteractableNpcStateController _stateController;
 
         /// <summary> Менеджер локаций для управления переходами между локациями. </summary>
-        [Inject] private LocationManager _locationManager;
+        private LocationManager _locationManager;
 
         /// <summary> Сервис для транзакций. </summary>
-        [Inject] private TransactionService _transactionService;
+        private TransactionService _transactionService;
+
+        /// <summary> Возвращает контроллер движения NPC. </summary>
+        protected override NpcMovementController MovementController => _movementController;
+
+        /// <summary> Возвращает контроллер состояний NPC. </summary>
+        protected override NpcStateController StateController => _stateController;
 
         /// <summary> Событие, вызываемое при достижении NPC точки спавна для уничтожения. </summary>
         public Action OnReachedDespawnPoint;
 
-        /// <summary> Создает контроллер движения для неинтерактивного NPC. </summary>
-        /// <returns> Экземпляр контроллера движения неинтерактивного NPC. </returns>
-        protected override NpcMovementController CreateMovementController()
+        /// <summary> Внедряет зависимости Zenject. </summary>
+        /// <param name="locationManager"> Менеджер локаций. </param>
+        /// <param name="transactionService"> Сервис транзакций. </param>
+        [Inject]
+        private void Construct(LocationManager locationManager, TransactionService transactionService)
         {
-            _nonInteractableNpcMovementController = new NonInteractableNpcMovementController(
-                GetComponent<NavMeshAgent>(),
-                transform,
-                _animationController
-            );
-            return _nonInteractableNpcMovementController;
+            _locationManager = locationManager;
+            _transactionService = transactionService;
         }
 
-        /// <summary> Создает контроллер состояний для неинтерактивного NPC. </summary>
-        /// <returns> Экземпляр контроллера состояний неинтерактивного NPC. </returns>
-        protected override NpcStateController CreateStateController()
+        /// <summary> Выполняет инициализацию компонентов NPC. </summary>
+        protected override void Awake()
         {
-            _nonInteractableNpcStateController = new NonInteractableNpcStateController(
-                _movementController as NonInteractableNpcMovementController,
-                _locationManager,
-                _animationController,
-                _transactionService,
-                transform,
-                GetComponent<NpcPurchaseIndicator>()
-            );
-            return _nonInteractableNpcStateController;
+            base.Awake();
+
+            _movementController = new NonInteractableNpcMovementController(GetComponent<NavMeshAgent>(),
+                transform, AnimationController);
+            _stateController = new NonInteractableNpcStateController(_movementController, _locationManager,
+                AnimationController, _transactionService, transform, GetComponent<NpcPurchaseIndicator>());
         }
 
         /// <summary> Устанавливает цель для перемещения NPC с автоматическим запуском
@@ -61,30 +61,30 @@ namespace FlavorfulStory.AI.NonInteractableNpc
         /// <param name="npcDestination"> Целевая позиция для перемещения. </param>
         public void SetDestination(NpcDestinationPoint npcDestination)
         {
-            _nonInteractableNpcMovementController.SetPoint(npcDestination);
-            _nonInteractableNpcStateController.ForceSetState(StateName.Movement);
-            _nonInteractableNpcMovementController.OnDestinationReached += () =>
+            _movementController.SetPoint(npcDestination);
+            _stateController.ForceSetState(StateName.Movement);
+            _movementController.OnDestinationReached += () =>
             {
-                _nonInteractableNpcStateController.ForceSetState(StateName.Idle);
-                _nonInteractableNpcStateController.StartRandomSequence();
+                _stateController.ForceSetState(StateName.Idle);
+                _stateController.StartRandomSequence();
             };
         }
 
         /// <summary> Устанавливает точку исчезновения для неинтерактивного NPC. </summary>
         /// <param name="npcDestination"> Координаты точки, где NPC должен исчезнуть. </param>
         public void SetDespawnPoint(NpcDestinationPoint npcDestination) =>
-            (_stateController as NonInteractableNpcStateController)?.SetDespawnPoint(npcDestination);
+            (StateController as NonInteractableNpcStateController)?.SetDespawnPoint(npcDestination);
 
 #if UNITY_EDITOR
 
-        protected void OnDrawGizmosSelected()
+        private void OnDrawGizmosSelected()
         {
-            if (_stateController == null) return;
+            if (StateController == null) return;
 
             Gizmos.color = Color.yellow;
             var labelPosition = transform.position + Vector3.up * 2.5f;
 
-            Handles.Label(labelPosition, _stateController.CurrentStateName.ToString());
+            Handles.Label(labelPosition, StateController.CurrentStateName.ToString());
         }
 
 #endif

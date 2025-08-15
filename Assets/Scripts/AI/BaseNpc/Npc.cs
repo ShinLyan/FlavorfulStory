@@ -8,48 +8,29 @@ namespace FlavorfulStory.AI.BaseNpc
     public abstract class Npc : MonoBehaviour
     {
         /// <summary> Контроллер анимации NPC для воспроизведения состояний анимации. </summary>
-        protected NpcAnimationController _animationController;
+        protected NpcAnimationController AnimationController { get; private set; }
 
         /// <summary> Контроллер состояний, управляющий переключением между состояниями NPC. </summary>
-        protected NpcStateController _stateController;
+        protected abstract NpcStateController StateController { get; }
 
         /// <summary> Контроллер движения NPC для управления навигацией и перемещением. </summary>
-        protected NpcMovementController _movementController;
+        protected abstract NpcMovementController MovementController { get; }
 
         /// <summary> Вызывается при создании объекта, может быть переопределен в наследниках </summary>
-        protected virtual void Awake()
-        {
-            _animationController = CreateAnimationController();
-            _movementController = CreateMovementController();
-            _stateController = CreateStateController();
-        }
+        protected virtual void Awake() => AnimationController = new NpcAnimationController(GetComponent<Animator>());
 
         /// <summary> Освобождает ресурсы при уничтожении объекта. </summary>
         protected virtual void OnDestroy()
         {
-            _animationController.Dispose();
-            _stateController.Dispose();
+            AnimationController?.Dispose();
+            StateController?.Dispose();
         }
 
         /// <summary> Обновляет логику состояний и движения NPC каждый кадр. </summary>
-        protected void Update()
+        protected virtual void Update()
         {
-            _movementController.UpdateMovement();
-            _stateController.Update();
+            MovementController?.Update();
+            StateController?.Update();
         }
-
-        /// <summary> Создает контроллер анимации для NPC. </summary>
-        /// <returns> Новый экземпляр NpcAnimationController. </returns>
-        private NpcAnimationController CreateAnimationController() => new(GetComponent<Animator>());
-
-        /// <summary> Создает контроллер движения для NPC. </summary>
-        /// <returns> Новый экземпляр NpcMovementController. </returns>
-        /// <remarks> Должен быть реализован в наследниках. </remarks>
-        protected abstract NpcMovementController CreateMovementController();
-
-        /// <summary> Создает контроллер состояний для NPC. </summary>
-        /// <returns> Новый экземпляр StateController. </returns>
-        /// <remarks> Должен быть реализован в наследниках. </remarks>
-        protected abstract NpcStateController CreateStateController();
     }
 }

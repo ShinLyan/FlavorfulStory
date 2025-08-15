@@ -11,15 +11,15 @@ namespace FlavorfulStory.AI.InteractableNpc
     /// <summary> NPC с возможностью взаимодействия с игроком. </summary>
     /// <remarks> Требует наличия компонента NpcCollisionHandler для обработки столкновений. </remarks>
     [RequireComponent(typeof(CapsuleCollider), typeof(NpcSpeaker))]
-    public class InteractableNpc : Npc
+    public sealed class InteractableNpc : Npc
     {
-        /// <summary> Расписание NPC, определяющее его поведение и маршруты. </summary>
-        [Tooltip("Расписание NPC, определяющее его поведение и маршруты."), SerializeField]
-        protected NpcSchedule _npcSchedule;
-
         /// <summary> Информация о персонаже. </summary>
         [field: Tooltip("Информация о персонаже."), SerializeField]
         public NpcInfo NpcInfo { get; private set; }
+
+        /// <summary> Расписание NPC, определяющее его поведение и маршруты. </summary>
+        [Tooltip("Расписание NPC, определяющее его поведение и маршруты."), SerializeField]
+        private NpcSchedule _npcSchedule;
 
         /// <summary> Обработчик расписания NPC </summary>
         private NpcScheduleHandler _npcScheduleHandler;
@@ -28,33 +28,45 @@ namespace FlavorfulStory.AI.InteractableNpc
         private NpcCollisionHandler _collisionHandler;
 
         /// <summary> Контроллер игрока, используемый для взаимодействия NPC с игроком. </summary>
-        [Inject] protected PlayerController _playerController;
+        private PlayerController _playerController;
 
-        /// <summary> Инициализирует компонент обработчика столкновений. </summary>
+        /// <summary> Контроллер движения персонажа. </summary>
+        private InteractableNpcMovementController _movementController;
+
+        /// <summary> Контроллер состояний персонажа. </summary>
+        private InteractableNpcStateController _stateController;
+
+        /// <summary> Возвращает контроллер движения для базового NPC. </summary>
+        protected override NpcMovementController MovementController => _movementController;
+
+        /// <summary> Возвращает контроллер состояний для базового NPC. </summary>
+        protected override NpcStateController StateController => _stateController;
+
+        /// <summary> Внедряет зависимости Zenject. </summary>
+        /// <param name="playerController"> Контроллер игрока. </param>
+        [Inject]
+        private void Construct(PlayerController playerController) => _playerController = playerController;
+
+        /// <summary> Выполняет инициализацию компонентов NPC. </summary>
         protected override void Awake()
         {
-            _npcScheduleHandler = new NpcScheduleHandler();
             base.Awake();
-            _collisionHandler = new NpcCollisionHandler(_stateController as ICharacterCollisionHandler);
+
+            _npcScheduleHandler = new NpcScheduleHandler();
+            _movementController = new InteractableNpcMovementController(GetComponent<NavMeshAgent>(), transform,
+                AnimationController, _npcScheduleHandler);
+            _stateController = new InteractableNpcStateController(_npcSchedule, _movementController,
+                AnimationController, _npcScheduleHandler, transform, _playerController);
+            _collisionHandler = new NpcCollisionHandler(_stateController);
         }
 
         /// <summary> Отписка от событий при уничтожении. </summary>
         protected override void OnDestroy()
         {
             base.OnDestroy();
+
             _npcScheduleHandler.Dispose();
         }
-
-        /// <summary> Создает контроллер движения для интерактивного NPC. </summary>
-        /// <returns> Новый экземпляр InteractableNpcMovementController. </returns>
-        protected override NpcMovementController CreateMovementController() => new InteractableNpcMovementController(
-            GetComponent<NavMeshAgent>(), transform, _animationController, _npcScheduleHandler);
-
-        /// <summary> Создает контроллер состояний для интерактивного NPC. </summary>
-        /// <returns> Новый экземпляр StateControllerInteractableNpc. </returns>
-        protected override NpcStateController CreateStateController() => new InteractableNpcStateController(
-            _npcSchedule, _movementController as InteractableNpcMovementController, _animationController,
-            _npcScheduleHandler, transform, _playerController);
 
         /// <summary> Обрабатывает вход другого объекта в триггер коллизии NPC. </summary>
         /// <param name="other"> Коллайдер, вошедший в триггер. </param>
