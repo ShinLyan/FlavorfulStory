@@ -1,6 +1,6 @@
 using FlavorfulStory.Shop;
 
-namespace FlavorfulStory.AI.FiniteStateMachine.ShopStates
+namespace FlavorfulStory.AI.FSM.ShopStates
 {
     /// <summary>
     /// 

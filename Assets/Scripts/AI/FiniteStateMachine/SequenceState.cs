@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace FlavorfulStory.AI.FiniteStateMachine
+namespace FlavorfulStory.AI.FSM
 {
     /// <summary> Состояние, которое выполняет последовательность других состояний. </summary>
     public class SequenceState : CharacterState

@@ -1,6 +1,6 @@
 ﻿using System;
 using FlavorfulStory.AI.BaseNpc;
-using FlavorfulStory.AI.FiniteStateMachine;
+using FlavorfulStory.AI.FSM;
 using FlavorfulStory.Economy;
 using FlavorfulStory.SceneManagement;
 using UnityEditor;

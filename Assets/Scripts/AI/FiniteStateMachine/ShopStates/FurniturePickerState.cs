@@ -1,7 +1,7 @@
 using FlavorfulStory.AI.NonInteractableNpc;
 using FlavorfulStory.Shop;
 
-namespace FlavorfulStory.AI.FiniteStateMachine.ShopStates
+namespace FlavorfulStory.AI.FSM.ShopStates
 {
     /// <summary> Состояние для выбора мебели и перемещения к ней персонажа. </summary>
     public class FurniturePickerState : CharacterState

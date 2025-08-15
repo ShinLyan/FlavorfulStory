@@ -1,6 +1,6 @@
 using System;
 
-namespace FlavorfulStory.AI.FiniteStateMachine
+namespace FlavorfulStory.AI.FSM
 {
     /// <summary> Абстрактный базовый класс для всех состояний, используемых в конечном автомате (FSM). </summary>
     public abstract class CharacterState

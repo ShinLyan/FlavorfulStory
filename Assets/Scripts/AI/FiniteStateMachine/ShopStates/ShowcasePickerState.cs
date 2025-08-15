@@ -1,7 +1,7 @@
 using FlavorfulStory.AI.NonInteractableNpc;
 using FlavorfulStory.Shop;
 
-namespace FlavorfulStory.AI.FiniteStateMachine.ShopStates
+namespace FlavorfulStory.AI.FSM.ShopStates
 {
     /// <summary> Состояние для выбора доступной полки и перемещения к ней. </summary>
     public class ShowcasePickerState : CharacterState

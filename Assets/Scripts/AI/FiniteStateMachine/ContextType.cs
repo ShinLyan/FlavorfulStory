@@ -1,4 +1,4 @@
-namespace FlavorfulStory.AI.FiniteStateMachine
+namespace FlavorfulStory.AI.FSM
 {
     /// <summary> Типы контекстных данных, используемых для передачи между состояниями конечного автомата. </summary>
     public enum ContextType

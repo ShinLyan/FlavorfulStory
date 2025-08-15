@@ -3,19 +3,18 @@ using UnityEngine.AI;
 
 namespace FlavorfulStory.AI.BaseNpc
 {
-    /// <summary> Базовый абстрактный класс для всех NPC персонажей в игре </summary>
-    /// <remarks> Требует наличия компонентов NavMeshAgent и Animator на GameObject </remarks>
+    /// <summary> Базовый класс для всех NPC. </summary>
     [RequireComponent(typeof(CapsuleCollider), typeof(NavMeshAgent), typeof(Animator))]
     public abstract class Npc : MonoBehaviour
     {
+        /// <summary> Контроллер анимации NPC для воспроизведения состояний анимации. </summary>
+        protected NpcAnimationController _animationController;
+
         /// <summary> Контроллер состояний, управляющий переключением между состояниями NPC. </summary>
         protected NpcStateController _stateController;
 
         /// <summary> Контроллер движения NPC для управления навигацией и перемещением. </summary>
         protected NpcMovementController _movementController;
-
-        /// <summary> Контроллер анимации NPC для воспроизведения состояний анимации. </summary>
-        protected NpcAnimationController _animationController;
 
         /// <summary> Вызывается при создании объекта, может быть переопределен в наследниках </summary>
         protected virtual void Awake()
@@ -25,9 +24,7 @@ namespace FlavorfulStory.AI.BaseNpc
             _stateController = CreateStateController();
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
+        /// <summary> Освобождает ресурсы при уничтожении объекта. </summary>
         protected virtual void OnDestroy()
         {
             _animationController.Dispose();
@@ -37,8 +34,8 @@ namespace FlavorfulStory.AI.BaseNpc
         /// <summary> Обновляет логику состояний и движения NPC каждый кадр. </summary>
         protected void Update()
         {
-            _stateController.Update();
             _movementController.UpdateMovement();
+            _stateController.Update();
         }
 
         /// <summary> Создает контроллер анимации для NPC. </summary>

@@ -4,7 +4,7 @@ using FlavorfulStory.InventorySystem;
 using FlavorfulStory.Shop;
 using UnityEngine;
 
-namespace FlavorfulStory.AI.FiniteStateMachine.ShopStates
+namespace FlavorfulStory.AI.FSM.ShopStates
 {
     /// <summary> Состояние для выбора предмета и перемещения к кассе. </summary>
     public class ItemPickerState : CharacterState

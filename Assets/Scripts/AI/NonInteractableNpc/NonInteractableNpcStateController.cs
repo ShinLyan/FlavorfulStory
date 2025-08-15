@@ -1,13 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using FlavorfulStory.AI.BaseNpc;
-using FlavorfulStory.AI.FiniteStateMachine;
-using FlavorfulStory.AI.FiniteStateMachine.ShopStates;
+using FlavorfulStory.AI.FSM;
+using FlavorfulStory.AI.FSM.ShopStates;
 using FlavorfulStory.Economy;
 using FlavorfulStory.SceneManagement;
 using FlavorfulStory.Shop;
 using UnityEngine;
-using AnimationState = FlavorfulStory.AI.FiniteStateMachine.ShopStates.AnimationState;
+using AnimationState = FlavorfulStory.AI.FSM.ShopStates.AnimationState;
 
 namespace FlavorfulStory.AI.NonInteractableNpc
 {

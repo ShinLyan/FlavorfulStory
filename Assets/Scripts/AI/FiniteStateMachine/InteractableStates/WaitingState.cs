@@ -1,7 +1,7 @@
 using FlavorfulStory.Player;
 using UnityEngine;
 
-namespace FlavorfulStory.AI.FiniteStateMachine.InteractableStates
+namespace FlavorfulStory.AI.FSM.InteractableStates
 {
     /// <summary> Состояние ожидания NPC, в котором персонаж не выполняет активных действий. </summary>
     public class WaitingState : CharacterState

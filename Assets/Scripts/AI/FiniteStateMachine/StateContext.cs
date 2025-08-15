@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace FlavorfulStory.AI.FiniteStateMachine
+namespace FlavorfulStory.AI.FSM
 {
     /// <summary> Контекст состояния для хранения и передачи данных между состояниями. </summary>
     public class StateContext

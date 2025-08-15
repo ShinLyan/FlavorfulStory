@@ -1,7 +1,7 @@
 using FlavorfulStory.AI.NonInteractableNpc;
 using FlavorfulStory.Shop;
 
-namespace FlavorfulStory.AI.FiniteStateMachine.ShopStates
+namespace FlavorfulStory.AI.FSM.ShopStates
 {
     /// <summary> Состояние для выбора случайной точки на навигационной сетке и перемещения к ней. </summary>
     public class RandomPointPickerState : CharacterState

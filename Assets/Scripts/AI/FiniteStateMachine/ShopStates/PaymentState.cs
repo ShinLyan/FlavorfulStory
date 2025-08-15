@@ -2,7 +2,7 @@ using FlavorfulStory.Economy;
 using FlavorfulStory.InventorySystem;
 using FlavorfulStory.SceneManagement;
 
-namespace FlavorfulStory.AI.FiniteStateMachine.ShopStates
+namespace FlavorfulStory.AI.FSM.ShopStates
 {
     /// <summary> Состояние для обработки оплаты товаров у кассы. </summary>
     public class PaymentState : CharacterState

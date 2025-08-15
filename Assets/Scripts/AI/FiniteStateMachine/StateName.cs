@@ -1,4 +1,4 @@
-namespace FlavorfulStory.AI.FiniteStateMachine
+namespace FlavorfulStory.AI.FSM
 {
     /// <summary> Перечисление возможных состояний конечного автомата NPC. </summary>
     public enum StateName

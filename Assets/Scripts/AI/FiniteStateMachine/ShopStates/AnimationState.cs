@@ -2,7 +2,7 @@ using FlavorfulStory.AI.BaseNpc;
 using FlavorfulStory.TimeManagement;
 using UnityEngine;
 
-namespace FlavorfulStory.AI.FiniteStateMachine.ShopStates
+namespace FlavorfulStory.AI.FSM.ShopStates
 {
     /// <summary> Состояние анимации персонажа с таймером для управления завершением. </summary>
     public class AnimationState : CharacterState

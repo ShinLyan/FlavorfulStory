@@ -1,7 +1,7 @@
 using FlavorfulStory.AI.BaseNpc;
 using FlavorfulStory.TimeManagement;
 
-namespace FlavorfulStory.AI.FiniteStateMachine
+namespace FlavorfulStory.AI.FSM
 {
     /// <summary> Состояние движения персонажа, отвечающее за перемещение NPC к назначенным точкам. </summary>
     public class MovementState : CharacterState
