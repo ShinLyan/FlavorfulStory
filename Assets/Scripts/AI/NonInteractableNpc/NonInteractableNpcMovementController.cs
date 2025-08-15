@@ -17,13 +17,15 @@ namespace FlavorfulStory.AI.NonInteractableNpc
         public NonInteractableNpcMovementController(NavMeshAgent navMeshAgent, Transform transform,
             NpcAnimationController animationController) : base(navMeshAgent, transform, animationController)
         {
-            _currentPoint = new NpcDestinationPoint(Vector3.zero, Quaternion.identity);
+            _currentPoint = new NpcDestinationPoint();
+            _navigator.OnDestinationReached += HandleDestinationReached;
+        }
 
-            _navigator.OnDestinationReached += () =>
-            {
-                OnDestinationReached?.Invoke();
-                OnDestinationReached = null;
-            };
+        /// <summary> Обработка события, вызываемое при достижении пункта назначения. </summary>
+        private void HandleDestinationReached()
+        {
+            OnDestinationReached?.Invoke();
+            OnDestinationReached = null;
         }
 
         /// <summary> Запускает перемещение к текущей установленной точке. </summary>

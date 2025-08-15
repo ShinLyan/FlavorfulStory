@@ -1,4 +1,5 @@
 ﻿using FlavorfulStory.AI.BaseNpc;
+using FlavorfulStory.AI.Scheduling;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -10,9 +11,6 @@ namespace FlavorfulStory.AI.InteractableNpc
         /// <summary> Обработчик расписания NPC. </summary>
         private readonly NpcScheduleHandler _scheduleHandler;
 
-        /// <summary> Навигатор для интерактивного NPC с расширенной функциональностью. </summary>
-        private readonly InteractableNpcNavigator _interactableNavigator;
-
         /// <summary> Инициализирует новый экземпляр контроллера движения для интерактивного NPC. </summary>
         /// <param name="navMeshAgent"> NavMeshAgent для навигации. </param>
         /// <param name="transform"> Transform NPC. </param>
@@ -23,18 +21,8 @@ namespace FlavorfulStory.AI.InteractableNpc
             : base(navMeshAgent, transform, animationController)
         {
             _scheduleHandler = scheduleHandler;
-            _interactableNavigator = (InteractableNpcNavigator)_navigator;
-
-            _interactableNavigator.OnDestinationReached += () => OnDestinationReached?.Invoke();
-            _scheduleHandler.OnSchedulePointChanged += _interactableNavigator.OnSchedulePointChanged;
+            _scheduleHandler.OnSchedulePointChanged += OnSchedulePointChanged;
         }
-
-        /// <summary> Создает специализированный навигатор для интерактивного NPC. </summary>
-        /// <param name="agent"> NavMeshAgent для навигации. </param>
-        /// <param name="transform"> Transform NPC. </param>
-        /// <returns> Новый экземпляр InteractableNpcNavigator. </returns>
-        protected override NpcNavigator CreateNavigator(NavMeshAgent agent, Transform transform) =>
-            new InteractableNpcNavigator(agent, transform);
 
         /// <summary> Перемещает NPC к текущей точке расписания. </summary>
         /// <remarks> Если текущая точка расписания существует, инициирует движение к ней. </remarks>
@@ -43,9 +31,21 @@ namespace FlavorfulStory.AI.InteractableNpc
             var point = _scheduleHandler.CurrentPoint;
             if (point == null) return;
 
-            var movePoint = new NpcDestinationPoint(_scheduleHandler.CurrentPoint.Position,
-                Quaternion.Euler(_scheduleHandler.CurrentPoint.Rotation));
-            _interactableNavigator.MoveTo(movePoint);
+            var destination = new NpcDestinationPoint(point.Position, Quaternion.Euler(point.Rotation));
+            _navigator.MoveTo(destination);
+        }
+
+        /// <summary> Обрабатывает изменение точки расписания. </summary>
+        /// <param name="point"> Новая точка расписания. </param>
+        /// <remarks> Если NPC не находится в состоянии покоя, останавливает текущее движение
+        /// и начинает движение к новой точке. </remarks>
+        private void OnSchedulePointChanged(NpcSchedulePoint point)
+        {
+            if (!_navigator.IsMoving) return;
+
+            Stop();
+            var destination = new NpcDestinationPoint(point.Position, Quaternion.Euler(point.Rotation));
+            _navigator.MoveTo(destination);
         }
     }
 }
