@@ -27,16 +27,19 @@ namespace FlavorfulStory.PlacementSystem
             PlacementLayer.Floor
         };
 
+        private readonly PlaceableObjectProvider _placeableObjectProvider;
+
         /// <summary> Конструктор режима удаления. </summary>
         /// <param name="positionProvider"> Провайдер позиционирования на гриде. </param>
         /// <param name="placementPreview"> Компонент предпросмотра. </param>
         /// <param name="gridLayers"> Карта слоёв размещения с их данными. </param>
         public RemovingMode(GridPositionProvider positionProvider, PlacementPreview placementPreview,
-            Dictionary<PlacementLayer, PlacementGridData> gridLayers)
+            Dictionary<PlacementLayer, PlacementGridData> gridLayers, PlaceableObjectProvider placeableObjectProvider)
         {
             _positionProvider = positionProvider;
             _placementPreview = placementPreview;
             _gridLayers = gridLayers;
+            _placeableObjectProvider = placeableObjectProvider;
         }
 
         /// <summary> Вход в режим — показать превью удаления. </summary>
@@ -52,6 +55,7 @@ namespace FlavorfulStory.PlacementSystem
         {
             if (TryRemoveAtSilent(gridPosition, out var removed))
             {
+                _placeableObjectProvider.Unregister(removed);
                 Object.Destroy(removed);
                 SfxPlayer.Play(SfxType.RemoveObject);
 
@@ -83,6 +87,7 @@ namespace FlavorfulStory.PlacementSystem
 
                 gridData.RemoveObjectAt(gridPosition);
                 removedPlaceable = target;
+                _placeableObjectProvider.Unregister(removedPlaceable);
                 return true;
             }
 

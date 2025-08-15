@@ -61,22 +61,20 @@ namespace FlavorfulStory.Infrastructure.Installers
         [SerializeField] private ItemTooltipView _itemTooltipPrefab;
 
         /// <summary> Инвентарь игрока. </summary>
-        [Header("Inventory")]
-        [SerializeField] private Inventory _playerInventory;
+        [Header("Inventory")] [SerializeField] private Inventory _playerInventory;
 
         /// <summary> Префаб отображения ячейки инвентаря. </summary>
         [SerializeField] private InventorySlotView _inventorySlotViewPrefab;
 
         /// <summary> Индикатор клетки на гриде. </summary>
-        [Header("Placement System")]
-        [SerializeField] private GameObject _gridIndicator;
+        [Header("Placement System")] [SerializeField]
+        private GameObject _gridIndicator;
 
         /// <summary> Родительский контейнер для размещаемых объектов. </summary>
         [SerializeField] private Transform _placeableContainer;
 
         /// <summary> Сопоставления типов инструментов с их префабами для визуализации в руке игрока. </summary>
-        [Header("Tools")]
-        [SerializeField] private ToolPrefabMapping[] _toolMappings;
+        [Header("Tools")] [SerializeField] private ToolPrefabMapping[] _toolMappings;
 
         /// <summary> Слои, по которым производится удар с помощью инструмента. </summary>
         [SerializeField] private LayerMask _hitableLayers;
@@ -199,6 +197,8 @@ namespace FlavorfulStory.Infrastructure.Installers
             Container.Bind<PlacementPreview>().FromComponentInHierarchy().AsSingle();
             Container.Bind<IPrefabFactory<PlaceableObject>>().To<Factories.PrefabFactory<PlaceableObject>>().AsSingle();
             Container.BindInterfacesAndSelfTo<PlacementController>().AsSingle().WithArguments(_placeableContainer);
+
+            Container.Bind<PlaceableObjectProvider>().AsSingle();
         }
 
         /// <summary> Установить зависимости, связанные с игроком. </summary>
