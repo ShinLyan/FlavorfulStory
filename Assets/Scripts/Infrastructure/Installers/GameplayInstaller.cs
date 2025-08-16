@@ -61,22 +61,20 @@ namespace FlavorfulStory.Infrastructure.Installers
         [SerializeField] private ItemTooltipView _itemTooltipPrefab;
 
         /// <summary> Инвентарь игрока. </summary>
-        [Header("Inventory")]
-        [SerializeField] private Inventory _playerInventory;
+        [Header("Inventory")] [SerializeField] private Inventory _playerInventory;
 
         /// <summary> Префаб отображения ячейки инвентаря. </summary>
         [SerializeField] private InventorySlotView _inventorySlotViewPrefab;
 
         /// <summary> Индикатор клетки на гриде. </summary>
-        [Header("Placement System")]
-        [SerializeField] private GameObject _gridIndicator;
+        [Header("Placement System")] [SerializeField]
+        private GameObject _gridIndicator;
 
         /// <summary> Родительский контейнер для размещаемых объектов. </summary>
         [SerializeField] private Transform _placeableContainer;
 
         /// <summary> Сопоставления типов инструментов с их префабами для визуализации в руке игрока. </summary>
-        [Header("Tools")]
-        [SerializeField] private ToolPrefabMapping[] _toolMappings;
+        [Header("Tools")] [SerializeField] private ToolPrefabMapping[] _toolMappings;
 
         /// <summary> Слои, по которым производится удар с помощью инструмента. </summary>
         [SerializeField] private LayerMask _hitableLayers;
@@ -141,8 +139,11 @@ namespace FlavorfulStory.Infrastructure.Installers
         private void BindEconomy()
         {
             Container.Bind<PlayerWalletView>().FromComponentInHierarchy().AsSingle();
-            Container.Bind<ICurrencyStorage>().WithId("Player").To<PlayerWallet>().AsSingle();
-            Container.Bind<ICurrencyStorage>().WithId("Register").To<CashRegister>().AsSingle();
+            Container.Bind<ICurrencyStorage>().WithId("Player").To<PlayerWallet>().FromComponentsInHierarchy()
+                .AsSingle();
+            Container.Bind<ICurrencyStorage>().WithId("Register").To<CashRegister>().FromComponentsInHierarchy()
+                .AsSingle();
+            Container.Bind<TransactionService>().AsSingle();
         }
 
         /// <summary> Установить зависимости, связанные с системой грида. </summary>

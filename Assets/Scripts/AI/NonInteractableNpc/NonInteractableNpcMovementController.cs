@@ -1,0 +1,52 @@
+﻿using FlavorfulStory.AI.BaseNpc;
+using UnityEngine;
+using UnityEngine.AI;
+using Zenject;
+
+namespace FlavorfulStory.AI.NonInteractableNpc
+{
+    /// <summary> Контроллер движения для неинтерактивного NPC с поддержкой точек расписания. </summary>
+    public class NonInteractableNpcMovementController : NpcMovementController, IInitializable
+    {
+        /// <summary> Текущая точка расписания для перемещения. </summary>
+        private NpcDestinationPoint _currentPoint;
+
+        /// <summary> Инициализирует новый экземпляр контроллера движения неинтерактивного NPC. </summary>
+        /// <param name="navMeshAgent"> Агент навигационной сетки для перемещения. </param>
+        /// <param name="transform"> Трансформ объекта NPC. </param>
+        /// <param name="animationController"> Контроллер анимации для управления анимациями движения. </param>
+        public NonInteractableNpcMovementController(NavMeshAgent navMeshAgent, Transform transform,
+            NpcAnimationController animationController) : base(navMeshAgent, transform, animationController)
+        {
+            _currentPoint = new NpcDestinationPoint();
+        }
+
+        /// <summary> Инициализация объекта. </summary>
+        public override void Initialize()
+        {
+            base.Initialize();
+            _navigator.OnDestinationReached += HandleDestinationReached;
+        }
+
+        /// <summary> Освобождает ресурсы при уничтожении объекта. </summary>
+        public override void Dispose()
+        {
+            base.Dispose();
+            _navigator.OnDestinationReached -= HandleDestinationReached;
+        }
+
+        /// <summary> Обработка события, вызываемое при достижении пункта назначения. </summary>
+        private void HandleDestinationReached()
+        {
+            OnDestinationReached?.Invoke();
+            OnDestinationReached = null;
+        }
+
+        /// <summary> Запускает перемещение к текущей установленной точке. </summary>
+        public override void MoveToPoint() => _navigator.MoveTo(_currentPoint);
+
+        /// <summary> Устанавливает новую целевую точку для перемещения агента. </summary>
+        /// <param name="newPoint"> Новая позиция в мировых координатах. </param>
+        public void SetPoint(NpcDestinationPoint newPoint) => _currentPoint = newPoint;
+    }
+}
