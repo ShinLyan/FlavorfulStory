@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using FlavorfulStory.AI.FSM;
 using FlavorfulStory.TimeManagement;
 using UnityEngine;
+using Zenject;
 using DateTime = FlavorfulStory.TimeManagement.DateTime;
 
 namespace FlavorfulStory.AI.BaseNpc
 {
     /// <summary> Контроллер состояний конечного автомата NPC,
     /// управляющий переходами между различными состояниями персонажа. </summary>
-    public abstract class NpcStateController : IDisposable
+    public abstract class NpcStateController : IInitializable, IDisposable
     {
         /// <summary> Текущее активное состояние персонажа. </summary>
         protected CharacterState _currentState;
@@ -40,26 +41,19 @@ namespace FlavorfulStory.AI.BaseNpc
 
         /// <summary> Выполняет полную инициализацию контроллера состояний. </summary>
         /// <remarks> Инициализирует состояния, подписывается на события и сбрасывает систему к начальному состоянию. </remarks>
-        protected void Initialize()
+        public virtual void Initialize()
         {
             InitializeStates();
-            SubscribeToEvents();
+            WorldTime.OnDayEnded += OnReset;
             OnReset(WorldTime.CurrentGameTime);
         }
 
         /// <summary> Освобождает ресурсы при уничтожении объекта. </summary>
-        public void Dispose() => UnsubscribeFromEvents();
+        public virtual void Dispose() => WorldTime.OnDayEnded -= OnReset;
 
         /// <summary> Инициализирует все доступные состояния персонажа и настраивает связи между ними. </summary>
         /// <remarks> Должен быть реализован в наследниках. </remarks>
         protected abstract void InitializeStates();
-
-        /// <summary> Подписывается на события. </summary>
-        /// <remarks> Может быть переопределен в наследниках для дополнительных подписок. </remarks>
-        protected virtual void SubscribeToEvents() => WorldTime.OnDayEnded += OnReset;
-
-        /// <summary> Подписывается на события. </summary>
-        protected virtual void UnsubscribeFromEvents() => WorldTime.OnDayEnded -= OnReset;
 
         /// <summary> Сбрасывает систему состояний при смене дня или инициализации. </summary>
         /// <param name="currentTime"> Текущее игровое время. </param>

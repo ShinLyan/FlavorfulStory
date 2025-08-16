@@ -154,6 +154,7 @@ namespace FlavorfulStory.AI
             var agent = npc.GetComponent<NavMeshAgent>();
 
             while (!agent || !agent.isOnNavMesh) await UniTask.Yield();
+            await UniTask.Yield();
 
             var loc = _locationManager.GetLocationByName(LocationName.NewShop);
             npc.SetDestination(new NpcDestinationPoint(loc.transform.position, Quaternion.identity));

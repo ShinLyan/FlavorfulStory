@@ -57,8 +57,6 @@ namespace FlavorfulStory.AI.NonInteractableNpc
 
             _hadVisitedFurnitureAfterPurchase = false;
             _despawnPoint = new NpcDestinationPoint();
-
-            Initialize();
         }
 
         /// <summary> Инициализирует все состояния и последовательности NPC. </summary>

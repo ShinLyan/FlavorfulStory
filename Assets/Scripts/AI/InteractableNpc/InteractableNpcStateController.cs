@@ -47,21 +47,20 @@ namespace FlavorfulStory.AI.InteractableNpc
             _scheduleHandler = scheduleHandler;
             _npcMovementController = npcMovementController;
             _playerPositionProvider = playerPositionProvider;
-            Initialize();
         }
 
-        /// <summary> Подписывается на события системы времени и расписания. </summary>
-        protected override void SubscribeToEvents()
+        /// <summary> Инициализация объекта. </summary>
+        public override void Initialize()
         {
-            base.SubscribeToEvents();
             _scheduleHandler.OnSchedulePointChanged += OnSchedulePointChanged;
             OnCurrentScheduleParamsChanged += _scheduleHandler.SetCurrentScheduleParams;
+            base.Initialize();
         }
 
-        /// <summary> Отписка от событий при уничтожении. </summary>
-        protected override void UnsubscribeFromEvents()
+        /// <summary> Освобождает ресурсы при уничтожении объекта. </summary>
+        public override void Dispose()
         {
-            base.UnsubscribeFromEvents();
+            base.Dispose();
             _scheduleHandler.OnSchedulePointChanged -= OnSchedulePointChanged;
             OnCurrentScheduleParamsChanged -= _scheduleHandler.SetCurrentScheduleParams;
         }
@@ -81,8 +80,6 @@ namespace FlavorfulStory.AI.InteractableNpc
                 if (state is ICurrentSchedulePointDependable dependable)
                     _scheduleHandler.OnSchedulePointChanged += dependable.SetNewCurrentPoint;
             }
-
-            _scheduleHandler.OnSchedulePointChanged += OnSchedulePointChanged;
         }
 
         /// <summary> Действия при сбросе контроллера. </summary>

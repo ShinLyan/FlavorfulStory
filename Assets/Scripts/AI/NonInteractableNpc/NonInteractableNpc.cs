@@ -52,7 +52,6 @@ namespace FlavorfulStory.AI.NonInteractableNpc
 
             _movementController = new NonInteractableNpcMovementController(GetComponent<NavMeshAgent>(),
                 transform, AnimationController);
-            _movementController.Initialize();
 
             _stateController = new NonInteractableNpcStateController(_movementController, _locationManager,
                 AnimationController, _transactionService, transform, GetComponent<NpcPurchaseIndicator>());

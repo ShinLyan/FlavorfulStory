@@ -54,20 +54,27 @@ namespace FlavorfulStory.AI.InteractableNpc
             base.Awake();
 
             _npcScheduleHandler = new NpcScheduleHandler();
-            _npcScheduleHandler.Initialize();
 
             _movementController = new InteractableNpcMovementController(GetComponent<NavMeshAgent>(), transform,
                 AnimationController, _npcScheduleHandler);
+
             _stateController = new InteractableNpcStateController(_npcSchedule, _movementController,
                 AnimationController, _npcScheduleHandler, transform, _playerPositionProvider);
+
             _collisionHandler = new NpcCollisionHandler(_stateController);
+        }
+
+        /// <summary> Инициализация объекта. </summary>
+        protected override void Start()
+        {
+            _npcScheduleHandler.Initialize();
+            base.Start();
         }
 
         /// <summary> Отписка от событий при уничтожении. </summary>
         protected override void OnDestroy()
         {
             base.OnDestroy();
-
             _npcScheduleHandler.Dispose();
         }
 

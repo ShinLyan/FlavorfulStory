@@ -21,7 +21,21 @@ namespace FlavorfulStory.AI.InteractableNpc
             : base(navMeshAgent, transform, animationController)
         {
             _scheduleHandler = scheduleHandler;
+        }
+
+
+        /// <summary> Инициализация объекта. </summary>
+        public override void Initialize()
+        {
+            base.Initialize();
             _scheduleHandler.OnSchedulePointChanged += OnSchedulePointChanged;
+        }
+
+        /// <summary> Освобождает ресурсы при уничтожении объекта. </summary>
+        public override void Dispose()
+        {
+            base.Dispose();
+            _scheduleHandler.OnSchedulePointChanged -= OnSchedulePointChanged;
         }
 
         /// <summary> Перемещает NPC к текущей точке расписания. </summary>

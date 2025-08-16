@@ -1,12 +1,13 @@
 ﻿using System;
 using UnityEngine;
 using UnityEngine.AI;
+using Zenject;
 
 namespace FlavorfulStory.AI.BaseNpc
 {
     /// <summary> Контроллер движения NPC, который управляет навигацией, анимацией и расписанием персонажа.
     /// Реализует интерфейс IScheduleDependable для работы с системой расписания. </summary>
-    public abstract class NpcMovementController
+    public abstract class NpcMovementController : IInitializable, IDisposable
     {
         /// <summary> Контроллер анимации NPC. </summary>
         private readonly NpcAnimationController _animationController;
@@ -30,8 +31,13 @@ namespace FlavorfulStory.AI.BaseNpc
             _agent = navMeshAgent;
             _animationController = animationController;
             _navigator = new NpcNavigator(_agent, transform);
-            _navigator.OnDestinationReached += () => OnDestinationReached?.Invoke();
         }
+
+        /// <summary> Инициализация объекта. </summary>
+        public virtual void Initialize() => _navigator.OnDestinationReached += () => OnDestinationReached?.Invoke();
+
+        /// <summary> Освобождает ресурсы при уничтожении объекта. </summary>
+        public virtual void Dispose() { }
 
         /// <summary> Обновляет движение NPC каждый кадр.
         /// Рассчитывает скорость анимации на основе скорости NavMeshAgent и обновляет навигатор. </summary>
