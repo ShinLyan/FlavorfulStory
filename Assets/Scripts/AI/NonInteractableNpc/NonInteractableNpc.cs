@@ -52,6 +52,8 @@ namespace FlavorfulStory.AI.NonInteractableNpc
 
             _movementController = new NonInteractableNpcMovementController(GetComponent<NavMeshAgent>(),
                 transform, AnimationController);
+            _movementController.Initialize();
+
             _stateController = new NonInteractableNpcStateController(_movementController, _locationManager,
                 AnimationController, _transactionService, transform, GetComponent<NpcPurchaseIndicator>());
         }
@@ -62,10 +64,10 @@ namespace FlavorfulStory.AI.NonInteractableNpc
         public void SetDestination(NpcDestinationPoint npcDestination)
         {
             _movementController.SetPoint(npcDestination);
-            _stateController.ForceSetState(StateName.Movement);
+            _stateController.ForceSetState(NpcStateName.Movement);
             _movementController.OnDestinationReached += () =>
             {
-                _stateController.ForceSetState(StateName.Idle);
+                _stateController.ForceSetState(NpcStateName.Idle);
                 _stateController.StartRandomSequence();
             };
         }
@@ -84,7 +86,7 @@ namespace FlavorfulStory.AI.NonInteractableNpc
             Gizmos.color = Color.yellow;
             var labelPosition = transform.position + Vector3.up * 2.5f;
 
-            Handles.Label(labelPosition, StateController.CurrentStateName.ToString());
+            Handles.Label(labelPosition, StateController.CurrentNpcStateName.ToString());
         }
 
 #endif

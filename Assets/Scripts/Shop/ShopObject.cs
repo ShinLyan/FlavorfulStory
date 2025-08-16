@@ -10,17 +10,16 @@ namespace FlavorfulStory.Shop
         /// <summary> Массив доступных позиций для взаимодействия с объектом. </summary>
         [SerializeField] protected Transform[] _accessiblePositions;
 
-        /// <summary>
-        /// 
-        /// </summary>
-        [field: SerializeField] public AnimationType InteractableObjectAnimation { get; private set; }
+        /// <summary> Анимация, которая будет включаться у объекта для НПС. </summary>
+        [field: SerializeField]
+        public AnimationType InteractableObjectAnimation { get; private set; }
 
         /// <summary> Указывает, занят ли объект в данный момент. </summary>
         public bool IsOccupied { get; set; }
 
         /// <summary> Возвращает случайную доступную позицию для взаимодействия с объектом. </summary>
         /// <returns> Transform случайной доступной позиции. </returns>
-        public virtual NpcDestinationPoint GetAccessiblePoint()
+        public virtual NpcDestinationPoint? GetAccessiblePoint()
         {
             var randomPosition = _accessiblePositions[Random.Range(0, _accessiblePositions.Length)];
             return new NpcDestinationPoint(randomPosition.position, randomPosition.rotation);

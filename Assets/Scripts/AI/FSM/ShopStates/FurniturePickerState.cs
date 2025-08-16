@@ -1,5 +1,6 @@
 using FlavorfulStory.AI.NonInteractableNpc;
 using FlavorfulStory.Shop;
+using UnityEngine;
 
 namespace FlavorfulStory.AI.FSM.ShopStates
 {
@@ -30,13 +31,16 @@ namespace FlavorfulStory.AI.FSM.ShopStates
             if (!furniture) return;
 
             furniture.IsOccupied = true;
-            Context?.Set<ShopObject>(ContextType.SelectedObject, furniture);
-            Context?.Set(ContextType.AnimationType, furniture.InteractableObjectAnimation);
-            Context?.Set(ContextType.AnimationTime, 3f);
+            Context?.Set<ShopObject>(FsmContextType.SelectedObject, furniture);
+            Context?.Set(FsmContextType.AnimationType, furniture.InteractableObjectAnimation);
+            Context?.Set(FsmContextType.AnimationTime, 3f);
 
             var accessiblePoint = furniture.GetAccessiblePoint();
 
-            _movementController.SetPoint(accessiblePoint);
+            if (accessiblePoint.HasValue)
+                _movementController.SetPoint(accessiblePoint.Value);
+            else
+                Debug.LogWarning("No accessible point found for the furniture!");
         }
 
         /// <summary> Возвращает статус завершения состояния. </summary>

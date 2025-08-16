@@ -88,7 +88,7 @@ namespace FlavorfulStory.AI
         {
             var prefab = _npcPrefabs[Random.Range(0, _npcPrefabs.Length)];
             var npcInstance = _diContainer.InstantiatePrefabForComponent<NonInteractableNpc.NonInteractableNpc>(
-                prefab, _spawnData[0].spawnPoint.position, Quaternion.identity, _parentTransform
+                prefab, _spawnData[0].SpawnPoint.position, Quaternion.identity, _parentTransform
             );
             npcInstance.gameObject.SetActive(false);
             return npcInstance;
@@ -129,12 +129,12 @@ namespace FlavorfulStory.AI
 
             var npc = _npcPool.Get();
 
-            npc.GetComponent<NavMeshAgent>().Warp(spawnData.spawnPoint.position);
-            npc.transform.rotation = spawnData.spawnPoint.rotation;
+            npc.GetComponent<NavMeshAgent>().Warp(spawnData.SpawnPoint.position);
+            npc.transform.rotation = spawnData.SpawnPoint.rotation;
             _activeCharacters.Add(npc);
 
             npc.OnReachedDespawnPoint += () => DespawnNpc(npc);
-            npc.SetDespawnPoint(new NpcDestinationPoint(despawnData.despawnPoint.position, Quaternion.identity));
+            npc.SetDespawnPoint(new NpcDestinationPoint(despawnData.DespawnPoint.position, Quaternion.identity));
 
             SetDestinationAfterInit(npc).Forget();
         }

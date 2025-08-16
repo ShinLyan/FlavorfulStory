@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using FlavorfulStory.AI.NonInteractableNpc;
 using FlavorfulStory.InventorySystem;
 using FlavorfulStory.Shop;
@@ -15,9 +16,7 @@ namespace FlavorfulStory.AI.FSM.ShopStates
         /// <summary> Контроллер движения неинтерактивного NPC. </summary>
         private readonly NonInteractableNpcMovementController _movementController;
 
-        /// <summary>
-        /// 
-        /// </summary>
+        /// <summary> Индикатор купленного товара у НПС. </summary>
         private readonly NpcPurchaseIndicator _purchaseIndicator;
 
         /// <summary> Инициализирует новый экземпляр состояния выбора предмета. </summary>
@@ -37,35 +36,40 @@ namespace FlavorfulStory.AI.FSM.ShopStates
         {
             base.Enter();
 
-            if (Context != null && Context.TryGet<ShopObject>(ContextType.SelectedObject, out var showcase))
+            if (Context != null && Context.TryGet<ShopObject>(FsmContextType.SelectedObject, out var showcase))
             {
                 var showcaseInventory = ((Showcase)showcase).Inventory;
                 var itemStack = GetRandomStackFromInventory(showcaseInventory);
-                Context?.Set(ContextType.PurchaseItem, itemStack);
-                _purchaseIndicator.ShowModel();
+                Context?.Set(FsmContextType.PurchaseItem, itemStack);
+                _purchaseIndicator.ShowModel().Forget();
             }
 
             var accessiblePoint = _shopLocation.CashRegister.GetAccessiblePoint();
-            _shopLocation.CashRegister.SetPointOccupancy(accessiblePoint.Position, true);
 
-            Context?.Set(ContextType.CashDeskPoint, accessiblePoint);
-            Context?.Set(ContextType.AnimationType, _shopLocation.CashRegister.InteractableObjectAnimation);
-            Context?.Set(ContextType.AnimationTime, 3f);
+            if (accessiblePoint.HasValue)
+            {
+                Context?.Set(FsmContextType.CashDeskPoint, accessiblePoint);
+                Context?.Set(FsmContextType.AnimationType, _shopLocation.CashRegister.InteractableObjectAnimation);
+                Context?.Set(FsmContextType.AnimationTime, 3f);
 
-            _movementController.SetPoint(accessiblePoint);
-            _movementController.OnDestinationReached +=
-                () => _shopLocation.CashRegister.SetPointOccupancy(accessiblePoint.Position, false);
+                _shopLocation.CashRegister.SetPointOccupancy(accessiblePoint.Value.Position, true);
+                _movementController.SetPoint(accessiblePoint.Value);
+                _movementController.OnDestinationReached +=
+                    () => _shopLocation.CashRegister.SetPointOccupancy(accessiblePoint.Value.Position, false);
+            }
+            else
+            {
+                Debug.LogWarning("No accessible point found for the ShowCase!");
+            }
         }
 
         /// <summary> Возвращает статус завершения состояния. </summary>
         /// <returns> Всегда возвращает true, так как состояние завершается сразу после входа. </returns>
         public override bool IsComplete() => true;
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="inventory"></param>
-        /// <returns></returns>
+        /// <summary> Полуичть рандомный стак из инвенторя. </summary>
+        /// <param name="inventory"> Инвентарь. </param>
+        /// <returns> Стак предметов. </returns>
         private static ItemStack GetRandomStackFromInventory(Inventory inventory)
         {
             var nonEmptySlots = new List<int>();

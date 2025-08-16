@@ -54,6 +54,8 @@ namespace FlavorfulStory.AI.InteractableNpc
             base.Awake();
 
             _npcScheduleHandler = new NpcScheduleHandler();
+            _npcScheduleHandler.Initialize();
+
             _movementController = new InteractableNpcMovementController(GetComponent<NavMeshAgent>(), transform,
                 AnimationController, _npcScheduleHandler);
             _stateController = new InteractableNpcStateController(_npcSchedule, _movementController,

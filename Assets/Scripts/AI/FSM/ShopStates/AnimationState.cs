@@ -39,10 +39,10 @@ namespace FlavorfulStory.AI.FSM.ShopStates
 
             if (Context == null) return;
 
-            if (Context.TryGet<AnimationType>(ContextType.AnimationType, out var animationType))
+            if (Context.TryGet<AnimationType>(FsmContextType.AnimationType, out var animationType))
                 _npcAnimationController.TriggerAnimation(animationType);
 
-            if (Context.TryGet(ContextType.AnimationTime, out float animationTime)) _timer = animationTime;
+            if (Context.TryGet(FsmContextType.AnimationTime, out float animationTime)) _timer = animationTime;
         }
 
         /// <summary> Обновляет состояние анимации каждый кадр, уменьшая таймер. </summary>

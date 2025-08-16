@@ -1,11 +1,12 @@
 ﻿using FlavorfulStory.AI.BaseNpc;
 using UnityEngine;
 using UnityEngine.AI;
+using Zenject;
 
 namespace FlavorfulStory.AI.NonInteractableNpc
 {
     /// <summary> Контроллер движения для неинтерактивного NPC с поддержкой точек расписания. </summary>
-    public class NonInteractableNpcMovementController : NpcMovementController
+    public class NonInteractableNpcMovementController : NpcMovementController, IInitializable
     {
         /// <summary> Текущая точка расписания для перемещения. </summary>
         private NpcDestinationPoint _currentPoint;
@@ -18,8 +19,10 @@ namespace FlavorfulStory.AI.NonInteractableNpc
             NpcAnimationController animationController) : base(navMeshAgent, transform, animationController)
         {
             _currentPoint = new NpcDestinationPoint();
-            _navigator.OnDestinationReached += HandleDestinationReached;
         }
+
+        /// <summary> Инициализация объекта. </summary>
+        public void Initialize() => _navigator.OnDestinationReached += HandleDestinationReached;
 
         /// <summary> Обработка события, вызываемое при достижении пункта назначения. </summary>
         private void HandleDestinationReached()

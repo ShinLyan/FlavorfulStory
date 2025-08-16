@@ -70,9 +70,9 @@ namespace FlavorfulStory.AI.InteractableNpc
         /// <remarks> Создает состояния взаимодействия, движения, рутины и ожидания, настраивает связи между ними. </remarks>
         protected override void InitializeStates()
         {
-            _nameToCharacterStates.Add(StateName.Movement, new MovementState(_npcMovementController));
-            _nameToCharacterStates.Add(StateName.Routine, new RoutineState(_animationController));
-            _nameToCharacterStates.Add(StateName.Waiting, new WaitingState(_playerPositionProvider, _npcTransform));
+            _nameToCharacterStates.Add(NpcStateName.Movement, new MovementState(_npcMovementController));
+            _nameToCharacterStates.Add(NpcStateName.Routine, new RoutineState(_animationController));
+            _nameToCharacterStates.Add(NpcStateName.Waiting, new WaitingState(_playerPositionProvider, _npcTransform));
 
             foreach (var state in _nameToCharacterStates.Values)
             {
@@ -85,10 +85,8 @@ namespace FlavorfulStory.AI.InteractableNpc
             _scheduleHandler.OnSchedulePointChanged += OnSchedulePointChanged;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="currentTime"></param>
+        /// <summary> Действия при сбросе контроллера. </summary>
+        /// <param name="currentTime"> Текущее время. </param>
         protected override void OnReset(DateTime currentTime)
         {
             PrioritizeSchedule(currentTime);
@@ -99,7 +97,7 @@ namespace FlavorfulStory.AI.InteractableNpc
         protected override void ResetStates()
         {
             foreach (var state in _nameToCharacterStates.Values) state.Reset();
-            SetState(StateName.Routine);
+            SetState(NpcStateName.Routine);
         }
 
         /// <summary> Обрабатывает изменение точки расписания и переключает состояние на движение если необходимо. </summary>
@@ -114,7 +112,7 @@ namespace FlavorfulStory.AI.InteractableNpc
                     _currentState.Enter();
                     break;
                 default:
-                    SetState(StateName.Movement);
+                    SetState(NpcStateName.Movement);
                     break;
             }
 
@@ -140,7 +138,7 @@ namespace FlavorfulStory.AI.InteractableNpc
         /// <param name="other"> Коллайдер, вошедший в триггер. </param>
         public void OnTriggerEntered(Collider other)
         {
-            SetState(StateName.Waiting);
+            SetState(NpcStateName.Waiting);
             _animationController.TriggerAnimation(AnimationType.Idle);
         }
 
@@ -148,7 +146,7 @@ namespace FlavorfulStory.AI.InteractableNpc
         /// <param name="other"> Коллайдер, вышедший из триггера. </param>
         public void OnTriggerExited(Collider other)
         {
-            SetState(StateName.Movement);
+            SetState(NpcStateName.Movement);
             _animationController.TriggerAnimation(AnimationType.Locomotion);
         }
 

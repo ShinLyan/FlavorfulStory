@@ -24,7 +24,7 @@ namespace FlavorfulStory.AI.FSM.ShopStates
             base.Enter();
             if (Context == null) return;
 
-            if (Context.TryGet<ShopObject>(ContextType.SelectedObject, out var shopObject))
+            if (Context.TryGet<ShopObject>(FsmContextType.SelectedObject, out var shopObject))
                 shopObject.IsOccupied = false;
 
             // if (Context.TryGet<Transform>(ContextType.CashDeskPoint, out var point))

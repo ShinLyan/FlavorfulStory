@@ -6,7 +6,7 @@ namespace FlavorfulStory.AI.FSM
     public abstract class CharacterState
     {
         /// <summary> Событие, вызываемое для запроса перехода к другому состоянию. </summary>
-        public event Action<StateName> OnStateChangeRequested;
+        public event Action<NpcStateName> OnStateChangeRequested;
 
         /// <summary> Контекст состояния, содержащий общие данные и зависимости. </summary>
         public StateContext Context { get; protected set; }
@@ -28,8 +28,8 @@ namespace FlavorfulStory.AI.FSM
         public virtual void Reset() { }
 
         /// <summary> Запросить смену состояния. </summary>
-        /// <param name="stateName"> Тип состояния, на которое требуется перейти. </param>
-        protected void RequestStateChange(StateName stateName) => OnStateChangeRequested?.Invoke(stateName);
+        /// <param name="npcStateName"> Тип состояния, на которое требуется перейти. </param>
+        protected void RequestStateChange(NpcStateName npcStateName) => OnStateChangeRequested?.Invoke(npcStateName);
 
         /// <summary> Проверяет, завершено ли состояние. </summary>
         public virtual bool IsComplete() => false;

@@ -15,7 +15,7 @@ namespace FlavorfulStory.AI.BaseNpc
         protected CharacterState _currentState;
 
         /// <summary> Словарь для быстрого доступа к состояниям по их типу. </summary>
-        protected readonly Dictionary<StateName, CharacterState> _nameToCharacterStates;
+        protected readonly Dictionary<NpcStateName, CharacterState> _nameToCharacterStates;
 
         /// <summary> Контроллер анимации NPC для управления анимационными состояниями. </summary>
         protected readonly NpcAnimationController _animationController;
@@ -25,7 +25,7 @@ namespace FlavorfulStory.AI.BaseNpc
 
         /// <summary> Имя текущего стейта. </summary>
         /// <remarks> Для дебага. </remarks>
-        public StateName CurrentStateName { get; private set; }
+        public NpcStateName CurrentNpcStateName { get; private set; }
 
         /// <summary> Инициализирует новый экземпляр контроллера состояний. </summary>
         /// <param name="npcAnimationController"> Контроллер анимации NPC. </param>
@@ -33,15 +33,10 @@ namespace FlavorfulStory.AI.BaseNpc
         protected NpcStateController(NpcAnimationController npcAnimationController,
             Transform npcTransform)
         {
-            _nameToCharacterStates = new Dictionary<StateName, CharacterState>();
+            _nameToCharacterStates = new Dictionary<NpcStateName, CharacterState>();
             _animationController = npcAnimationController;
             _npcTransform = npcTransform;
         }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public void Dispose() => UnsubscribeFromEvents();
 
         /// <summary> Выполняет полную инициализацию контроллера состояний. </summary>
         /// <remarks> Инициализирует состояния, подписывается на события и сбрасывает систему к начальному состоянию. </remarks>
@@ -51,6 +46,9 @@ namespace FlavorfulStory.AI.BaseNpc
             SubscribeToEvents();
             OnReset(WorldTime.CurrentGameTime);
         }
+
+        /// <summary> Освобождает ресурсы при уничтожении объекта. </summary>
+        public void Dispose() => UnsubscribeFromEvents();
 
         /// <summary> Инициализирует все доступные состояния персонажа и настраивает связи между ними. </summary>
         /// <remarks> Должен быть реализован в наследниках. </remarks>
@@ -75,12 +73,12 @@ namespace FlavorfulStory.AI.BaseNpc
         protected abstract void ResetStates();
 
         /// <summary> Устанавливает новое состояние персонажа по типу. </summary>
-        /// <param name="stateName"> Тип состояния для установки. </param>
-        protected void SetState(StateName stateName)
+        /// <param name="npcStateName"> Тип состояния для установки. </param>
+        protected void SetState(NpcStateName npcStateName)
         {
-            if (!_nameToCharacterStates.TryGetValue(stateName, out var next) || _currentState == next) return;
+            if (!_nameToCharacterStates.TryGetValue(npcStateName, out var next) || _currentState == next) return;
 
-            CurrentStateName = stateName;
+            CurrentNpcStateName = npcStateName;
 
             _currentState?.Exit();
             _currentState = next;

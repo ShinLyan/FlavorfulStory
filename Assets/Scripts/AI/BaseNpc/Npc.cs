@@ -17,7 +17,11 @@ namespace FlavorfulStory.AI.BaseNpc
         protected abstract NpcMovementController MovementController { get; }
 
         /// <summary> Вызывается при создании объекта, может быть переопределен в наследниках </summary>
-        protected virtual void Awake() => AnimationController = new NpcAnimationController(GetComponent<Animator>());
+        protected virtual void Awake()
+        {
+            AnimationController = new NpcAnimationController(GetComponent<Animator>());
+            AnimationController.Initialize();
+        }
 
         /// <summary> Освобождает ресурсы при уничтожении объекта. </summary>
         protected virtual void OnDestroy()

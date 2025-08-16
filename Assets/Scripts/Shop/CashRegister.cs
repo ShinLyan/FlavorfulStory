@@ -53,7 +53,7 @@ namespace FlavorfulStory.Shop
 
         /// <summary> Возвращает случайную свободную точку доступа и помечает её как занятую. </summary>
         /// <returns> Transform свободной точки доступа или null, если все точки заняты. </returns>
-        public override NpcDestinationPoint GetAccessiblePoint()
+        public override NpcDestinationPoint? GetAccessiblePoint()
         {
             var freePoints = _accessPointsAvailability.Where(pair => !pair.Value).Select(pair => pair.Key).ToList();
             if (freePoints.Count == 0) return null;

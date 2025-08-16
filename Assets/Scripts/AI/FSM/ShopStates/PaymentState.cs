@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using FlavorfulStory.Economy;
 using FlavorfulStory.InventorySystem;
 using FlavorfulStory.SceneManagement;
@@ -13,9 +14,7 @@ namespace FlavorfulStory.AI.FSM.ShopStates
         /// <summary> Сервис для обработки транзакций и торговых операций. </summary>
         private readonly TransactionService _transactionService;
 
-        /// <summary>
-        /// 
-        /// </summary>
+        /// <summary> Индикатор купленного товара у НПС. </summary>
         private readonly NpcPurchaseIndicator _purchaseIndicator;
 
         /// <summary> Инициализирует новый экземпляр состояния оплаты. </summary>
@@ -35,11 +34,11 @@ namespace FlavorfulStory.AI.FSM.ShopStates
         {
             base.Enter();
 
-            if (Context == null || !Context.TryGet<ItemStack>(ContextType.PurchaseItem, out var itemStack)) return;
+            if (Context == null || !Context.TryGet<ItemStack>(FsmContextType.PurchaseItem, out var itemStack)) return;
 
             bool playerInLocation = _locationManager.IsPlayerInLocation(LocationName.NewShop);
             _transactionService.SellToNpc(itemStack, playerInLocation);
-            _purchaseIndicator.HideModel();
+            _purchaseIndicator.HideModel().Forget();
         }
 
         /// <summary> Возвращает статус завершения состояния. </summary>

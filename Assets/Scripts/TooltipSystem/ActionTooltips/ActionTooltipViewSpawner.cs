@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using FlavorfulStory.Infrastructure;
-using FlavorfulStory.Utils.FlavorfulStory.Utils;
+using FlavorfulStory.Utils;
 using UnityEngine;
 
 namespace FlavorfulStory.TooltipSystem.ActionTooltips

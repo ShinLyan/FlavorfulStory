@@ -1,5 +1,6 @@
 using FlavorfulStory.AI.NonInteractableNpc;
 using FlavorfulStory.Shop;
+using UnityEngine;
 
 namespace FlavorfulStory.AI.FSM.ShopStates
 {
@@ -30,13 +31,16 @@ namespace FlavorfulStory.AI.FSM.ShopStates
             if (!availableShowcase) return;
 
             availableShowcase.IsOccupied = true;
-            Context?.Set<ShopObject>(ContextType.SelectedObject, availableShowcase);
-            Context?.Set(ContextType.AnimationType, availableShowcase.InteractableObjectAnimation);
-            Context?.Set(ContextType.AnimationTime, 3f);
+            Context?.Set<ShopObject>(FsmContextType.SelectedObject, availableShowcase);
+            Context?.Set(FsmContextType.AnimationType, availableShowcase.InteractableObjectAnimation);
+            Context?.Set(FsmContextType.AnimationTime, 3f);
 
             var point = availableShowcase.GetAccessiblePoint();
 
-            _movementController.SetPoint(point);
+            if (point.HasValue)
+                _movementController.SetPoint(point.Value);
+            else
+                Debug.LogWarning("No accessible point found for the ShowCase!");
         }
 
         /// <summary> Возвращает статус завершения состояния. </summary>

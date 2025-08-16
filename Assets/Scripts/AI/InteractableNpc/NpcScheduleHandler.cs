@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using FlavorfulStory.AI.Scheduling;
 using FlavorfulStory.TimeManagement;
+using Zenject;
 using DateTime = FlavorfulStory.TimeManagement.DateTime;
 
 namespace FlavorfulStory.AI.InteractableNpc
 {
     /// <summary> Обработчик расписания NPC, который управляет временными точками расписания персонажа. </summary>
-    public class NpcScheduleHandler : IDisposable
+    public class NpcScheduleHandler : IInitializable, IDisposable
     {
         /// <summary> Стек текущих точек расписания, отсортированных по времени. </summary>
         private Stack<NpcSchedulePoint> _currentPath;
@@ -19,15 +20,15 @@ namespace FlavorfulStory.AI.InteractableNpc
         public event Action<NpcSchedulePoint> OnSchedulePointChanged;
 
         /// <summary> Инициализирует новый экземпляр обработчика расписания и подписывается на события времени. </summary>
-        public NpcScheduleHandler()
+        public NpcScheduleHandler() { }
+
+        public void Initialize()
         {
             WorldTime.OnTimeTick += UpdateSchedulePoint;
             WorldTime.OnDayEnded += Reset;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
+        /// <summary> Освобождает ресурсы при уничтожении объекта. </summary>
         public void Dispose()
         {
             WorldTime.OnTimeTick -= UpdateSchedulePoint;

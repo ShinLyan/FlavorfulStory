@@ -1,11 +1,12 @@
 ﻿using System;
 using FlavorfulStory.TimeManagement;
 using UnityEngine;
+using Zenject;
 
 namespace FlavorfulStory.AI.BaseNpc
 {
     /// <summary> Контроллер анимации NPC, управляющий всеми анимационными состояниями персонажа. </summary>
-    public class NpcAnimationController : IDisposable
+    public class NpcAnimationController : IInitializable, IDisposable
     {
         /// <summary> Компонент Animator для управления анимациями. </summary>
         private readonly Animator _animator;
@@ -15,17 +16,16 @@ namespace FlavorfulStory.AI.BaseNpc
 
         /// <summary> Инициализирует контроллер анимации с заданным компонентом Animator. </summary>
         /// <param name="animator"> Компонент Animator для управления анимациями NPC. </param>
-        public NpcAnimationController(Animator animator)
-        {
-            _animator = animator;
+        public NpcAnimationController(Animator animator) => _animator = animator;
 
+        /// <summary> Инициализация объекта. </summary>
+        public void Initialize()
+        {
             WorldTime.OnTimePaused += PauseAnimation;
             WorldTime.OnTimeUnpaused += ContinueAnimation;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
+        /// <summary> Освобождает ресурсы при уничтожении объекта. </summary>
         public void Dispose()
         {
             WorldTime.OnTimePaused -= PauseAnimation;

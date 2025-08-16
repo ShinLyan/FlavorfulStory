@@ -1,7 +1,7 @@
 namespace FlavorfulStory.AI.FSM
 {
     /// <summary> Перечисление возможных состояний конечного автомата NPC. </summary>
-    public enum StateName
+    public enum NpcStateName
     {
         /// <summary> Состояние бездействия. </summary>
         Idle,
