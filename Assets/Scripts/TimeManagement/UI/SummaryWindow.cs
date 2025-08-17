@@ -5,19 +5,21 @@ using FlavorfulStory.InputSystem;
 using FlavorfulStory.UI.Animation;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 using Zenject;
 
 namespace FlavorfulStory.TimeManagement.UI
 {
     /// <summary> Отображение сводки дня с анимациями. </summary>
-    public class SummaryView : MonoBehaviour
+    public class SummaryWindow : BaseWindow
     {
         /// <summary> Текст для отображения сводки. </summary>
         [SerializeField] private TMP_Text _summaryText;
 
-        /// <summary> Кнопка продолжения игры. </summary>
-        [SerializeField] private Button _continueButton;
+        /// <summary> Кнопка закрытия окна. </summary>
+        /// <remarks> При закрытия окна - игра продолжается. </remarks>
+        [SerializeField] private Button _closeButton;
 
         /// <summary> Камера для отображения сводки. </summary>
         [SerializeField] private GameObject _camera;
@@ -43,7 +45,7 @@ namespace FlavorfulStory.TimeManagement.UI
         private void Awake()
         {
             _fader = GetComponent<CanvasGroupFader>();
-            _continueButton.onClick.AddListener(() => OnContinuePressed?.Invoke());
+            _closeButton.onClick.AddListener(() => OnContinuePressed?.Invoke());
         }
 
         /// <summary> Устанавливает текст сводки. </summary>

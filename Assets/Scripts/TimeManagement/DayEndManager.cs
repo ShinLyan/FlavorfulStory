@@ -12,7 +12,7 @@ namespace FlavorfulStory.TimeManagement
     public class DayEndManager : IInitializable, IDisposable
     {
         /// <summary> Отображение сводки дня. </summary>
-        private readonly SummaryView _summaryView;
+        private readonly SummaryWindow _summaryWindow;
 
         /// <summary> Контроллер игрока. </summary>
         private readonly PlayerController _playerController;
@@ -30,14 +30,14 @@ namespace FlavorfulStory.TimeManagement
         private Action _onCompleteCallback;
 
         /// <summary> Инициализирует менеджер окончания дня. </summary>
-        /// <param name="summaryView"> Вью для отображения итогов дня. </param>
+        /// <param name="summaryWindow"> Вью для отображения итогов дня. </param>
         /// <param name="playerController"> Контроллер игрока. </param>
         /// <param name="sleepTrigger"> Триггер сна для определения позиции. </param>
         /// <param name="locationManager"> Менеджер управления локациями. </param>
-        public DayEndManager(SummaryView summaryView, PlayerController playerController, SleepTrigger sleepTrigger,
+        public DayEndManager(SummaryWindow summaryWindow, PlayerController playerController, SleepTrigger sleepTrigger,
             LocationManager locationManager)
         {
-            _summaryView = summaryView;
+            _summaryWindow = summaryWindow;
             _playerController = playerController;
             _sleepTriggerPosition = sleepTrigger.transform.position;
             _locationManager = locationManager;
@@ -73,7 +73,7 @@ namespace FlavorfulStory.TimeManagement
             if (!isExhausted) WorldTime.BeginNewDay(6);
 
             await EndDayRoutine();
-            _summaryView.HideWithAnimation().Forget();
+            _summaryWindow.HideWithAnimation().Forget();
             await RestorePlayerState(_sleepTriggerPosition, isExhausted);
 
             onComplete?.Invoke();
@@ -103,9 +103,9 @@ namespace FlavorfulStory.TimeManagement
         /// <summary> Показывает сводку и ожидает продолжения. </summary>
         private async UniTask ShowSummaryAndWaitForContinue()
         {
-            _summaryView.SetSummary(SummaryView.DefaultSummaryText);
-            await _summaryView.ShowWithAnimation();
-            await _summaryView.WaitForContinue();
+            _summaryWindow.SetSummary(SummaryWindow.DefaultSummaryText);
+            await _summaryWindow.ShowWithAnimation();
+            await _summaryWindow.WaitForContinue();
         }
     }
 }

@@ -5,8 +5,8 @@ using UnityEngine;
 namespace FlavorfulStory.Notifications.Configs
 {
     /// <summary> Глобальные настройки системы уведомлений. </summary>
-    [CreateAssetMenu(menuName = "FlavorfulStory/Notifications/SystemSettings")]
-    public class NotificationSystemSettings : ScriptableObject
+    [CreateAssetMenu(menuName = "FlavorfulStory/StaticData/Notifications/Settings")]
+    public class NotificationsSettings : ScriptableObject
     {
         /// <summary> Время перемещения уведомлений при перестроении. </summary>
         [field: SerializeField, Tooltip("Время перемещения уведомлений.")]
