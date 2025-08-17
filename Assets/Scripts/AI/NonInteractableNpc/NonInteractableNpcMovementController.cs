@@ -21,18 +21,10 @@ namespace FlavorfulStory.AI.NonInteractableNpc
         }
 
         /// <summary> Инициализация объекта. </summary>
-        public override void Initialize()
-        {
-            base.Initialize();
-            _navigator.OnDestinationReached += HandleDestinationReached;
-        }
+        public override void Initialize() => _navigator.OnDestinationReached += HandleDestinationReached;
 
         /// <summary> Освобождает ресурсы при уничтожении объекта. </summary>
-        public override void Dispose()
-        {
-            base.Dispose();
-            _navigator.OnDestinationReached -= HandleDestinationReached;
-        }
+        public override void Dispose() => _navigator.OnDestinationReached -= HandleDestinationReached;
 
         /// <summary> Обработка события, вызываемое при достижении пункта назначения. </summary>
         private void HandleDestinationReached()

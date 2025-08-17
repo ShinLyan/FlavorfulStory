@@ -31,14 +31,14 @@ namespace FlavorfulStory.Shop
         /// <typeparam name="T"> Тип объекта, производный от ShopObject. </typeparam>
         /// <param name="objects"> Массив объектов магазина для фильтрации. </param>
         /// <returns> Массив доступных объектов. </returns>
-        private static T[] GetAvailableObjects<T>(T[] objects) where T : ShopObject
+        private static List<T> GetAvailableObjects<T>(T[] objects) where T : ShopObject
         {
             var availableObjects = new List<T>();
             foreach (var obj in objects)
                 if (!obj.IsOccupied)
                     availableObjects.Add(obj);
 
-            return availableObjects.ToArray();
+            return availableObjects;
         }
 
         /// <summary> Получает случайный свободный объект из массива объектов магазина. </summary>
@@ -49,9 +49,9 @@ namespace FlavorfulStory.Shop
         {
             var availableObjects = GetAvailableObjects(objects);
 
-            if (availableObjects.Length == 0) return null;
+            if (availableObjects.Count == 0) return null;
 
-            return availableObjects[Random.Range(0, availableObjects.Length)];
+            return availableObjects[Random.Range(0, availableObjects.Count)];
         }
 
         /// <summary> Проверяет наличие доступных прилавков с товарами. </summary>
@@ -89,7 +89,7 @@ namespace FlavorfulStory.Shop
 
         /// <summary> Проверяет, занята ли вся мебель в магазине. </summary>
         /// <returns> True, если вся мебель занята, иначе false. </returns>
-        public bool HasAvailableFurniture() => GetAvailableObjects(_furnitures).Length > 0;
+        public bool HasAvailableFurniture() => GetAvailableObjects(_furnitures).Count > 0;
 
         /// <summary> Генерирует случайную точку на навигационной сетке с учетом минимального
         /// расстояния от объектов магазина. </summary>

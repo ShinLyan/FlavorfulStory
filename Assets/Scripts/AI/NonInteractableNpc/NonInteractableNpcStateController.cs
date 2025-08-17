@@ -156,7 +156,7 @@ namespace FlavorfulStory.AI.NonInteractableNpc
             var shopLocation = (ShopLocation)_locationManager.GetLocationByName(LocationName.NewShop);
 
             bool areShowcasesAvailable = shopLocation.HasAvailableShowcaseWithItems();
-            bool areFurnitureAvailable = !shopLocation.HasAvailableFurniture();
+            bool areFurnitureAvailable = shopLocation.HasAvailableFurniture();
 
             var availableOptions = new List<(NpcStateName sequenceName, float weight)>();
 
@@ -170,13 +170,9 @@ namespace FlavorfulStory.AI.NonInteractableNpc
 
             availableOptions.Add((NpcStateName.RandomPointSequence, 25f));
 
-            if (availableOptions.Count == 0) return NpcStateName.Idle;
-
             float totalWeight = availableOptions.Sum(x => x.weight);
             float randomValue = Random.Range(0f, totalWeight);
             float currentWeight = 0f;
-
-            Debug.Log($"random = {randomValue}, total weight = {totalWeight}, options = {availableOptions.Count}");
 
             foreach (var option in availableOptions)
             {
@@ -200,15 +196,9 @@ namespace FlavorfulStory.AI.NonInteractableNpc
             }
             else
             {
-                GoToDespawnPoint();
+                _npcMovementController.SetPoint(_despawnPoint);
+                SetState(NpcStateName.Movement);
             }
-        }
-
-        /// <summary> Отправляет NPC в точку деспавна. </summary>
-        private void GoToDespawnPoint()
-        {
-            _npcMovementController.SetPoint(_despawnPoint);
-            SetState(NpcStateName.Movement);
         }
 
         /// <summary> Обрабатывает переход после завершения последовательности с мебелью. </summary>

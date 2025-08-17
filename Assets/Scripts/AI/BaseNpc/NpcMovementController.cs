@@ -34,10 +34,10 @@ namespace FlavorfulStory.AI.BaseNpc
         }
 
         /// <summary> Инициализация объекта. </summary>
-        public virtual void Initialize() => _navigator.OnDestinationReached += () => OnDestinationReached?.Invoke();
+        public abstract void Initialize();
 
         /// <summary> Освобождает ресурсы при уничтожении объекта. </summary>
-        public virtual void Dispose() { }
+        public abstract void Dispose();
 
         /// <summary> Обновляет движение NPC каждый кадр.
         /// Рассчитывает скорость анимации на основе скорости NavMeshAgent и обновляет навигатор. </summary>

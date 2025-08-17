@@ -27,16 +27,19 @@ namespace FlavorfulStory.AI.InteractableNpc
         /// <summary> Инициализация объекта. </summary>
         public override void Initialize()
         {
-            base.Initialize();
             _scheduleHandler.OnSchedulePointChanged += OnSchedulePointChanged;
+            _navigator.OnDestinationReached += HandleDestinationReached;
         }
 
         /// <summary> Освобождает ресурсы при уничтожении объекта. </summary>
         public override void Dispose()
         {
-            base.Dispose();
             _scheduleHandler.OnSchedulePointChanged -= OnSchedulePointChanged;
+            _navigator.OnDestinationReached -= HandleDestinationReached;
         }
+
+        /// <summary> Обработка события, вызываемое при достижении пункта назначения. </summary>
+        private void HandleDestinationReached() => OnDestinationReached?.Invoke();
 
         /// <summary> Перемещает NPC к текущей точке расписания. </summary>
         /// <remarks> Если текущая точка расписания существует, инициирует движение к ней. </remarks>

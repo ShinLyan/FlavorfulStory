@@ -99,8 +99,7 @@ namespace FlavorfulStory.AI.BaseNpc
         /// <param name="isStopped"> True — остановить агента; False — продолжить движение. </param>
         private void SetAgentStopped(bool isStopped)
         {
-            _agent.isStopped = isStopped;
-            _agent.velocity = isStopped ? Vector3.zero : _agent.velocity;
+            if (_agent.isOnNavMesh) _agent.isStopped = isStopped;
         }
     }
 }
