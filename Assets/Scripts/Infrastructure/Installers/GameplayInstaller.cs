@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using FlavorfulStory.AI.NonInteractableNpc;
 using FlavorfulStory.BuildingRepair.UI;
 using FlavorfulStory.DialogueSystem;
 using FlavorfulStory.DialogueSystem.UI;
@@ -264,6 +265,9 @@ namespace FlavorfulStory.Infrastructure.Installers
         {
             Container.Bind<GlobalLightSystem>().FromComponentInHierarchy().AsSingle();
             Container.Bind<CinemachineCamera>().FromInstance(_teleportVirtualCamera).AsSingle();
+
+            Container.Bind<IPrefabFactory<NonInteractableNpc>>().To<Factories.PrefabFactory<NonInteractableNpc>>()
+                .AsSingle();
         }
     }
 }

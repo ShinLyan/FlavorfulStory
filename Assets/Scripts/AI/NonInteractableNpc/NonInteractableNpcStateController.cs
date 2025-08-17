@@ -73,6 +73,7 @@ namespace FlavorfulStory.AI.NonInteractableNpc
         {
             var shopLocation = (ShopLocation)_locationManager.GetLocationByName(LocationName.NewShop);
 
+            _nameToCharacterStates.Add(NpcStateName.Idle, new IdleState());
             _nameToCharacterStates.Add(NpcStateName.Movement, new MovementState(_npcMovementController));
             _nameToCharacterStates.Add(NpcStateName.Animation, new AnimationState(_animationController));
             _nameToCharacterStates.Add(NpcStateName.FurniturePicker,
@@ -155,7 +156,7 @@ namespace FlavorfulStory.AI.NonInteractableNpc
             var shopLocation = (ShopLocation)_locationManager.GetLocationByName(LocationName.NewShop);
 
             bool areShowcasesAvailable = shopLocation.HasAvailableShowcaseWithItems();
-            bool areFurnitureAvailable = !shopLocation.AreAllFurnitureOccupied();
+            bool areFurnitureAvailable = !shopLocation.HasAvailableFurniture();
 
             var availableOptions = new List<(NpcStateName sequenceName, float weight)>();
 
@@ -175,6 +176,8 @@ namespace FlavorfulStory.AI.NonInteractableNpc
             float randomValue = Random.Range(0f, totalWeight);
             float currentWeight = 0f;
 
+            Debug.Log($"random = {randomValue}, total weight = {totalWeight}, options = {availableOptions.Count}");
+
             foreach (var option in availableOptions)
             {
                 currentWeight += option.weight;
@@ -188,7 +191,7 @@ namespace FlavorfulStory.AI.NonInteractableNpc
         private void HandleAfterPurchaseTransition()
         {
             var shopLocation = (ShopLocation)_locationManager.GetLocationByName(LocationName.NewShop);
-            bool isFurnitureAvailable = !shopLocation.AreAllFurnitureOccupied();
+            bool isFurnitureAvailable = !shopLocation.HasAvailableFurniture();
 
             if (isFurnitureAvailable && Random.Range(0, 2) == 0 && !_hadVisitedFurnitureAfterPurchase)
             {

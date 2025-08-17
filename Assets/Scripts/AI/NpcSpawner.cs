@@ -2,19 +2,21 @@
 using Cysharp.Threading.Tasks;
 using FlavorfulStory.AI.BaseNpc;
 using FlavorfulStory.Infrastructure;
+using FlavorfulStory.Infrastructure.Factories;
 using FlavorfulStory.SceneManagement;
 using FlavorfulStory.TimeManagement;
 using UnityEngine;
 using UnityEngine.AI;
 using Zenject;
+using DateTime = FlavorfulStory.TimeManagement.DateTime;
+using Random = UnityEngine.Random;
 
 namespace FlavorfulStory.AI
 {
-    /// <summary> Отвечает за спавн и деспавн NPC в игре. </summary>
+    /// <summary> Управляет спавном и деспавном NPC. </summary>
     public class NpcSpawner : MonoBehaviour
     {
-        /// <summary> Данные точек спавна NPC. </summary>
-        [SerializeField] private NpcSpawnData[] _spawnData;
+        [Header("Спавн")] [SerializeField] private NpcSpawnData[] _spawnData;
 
         /// <summary> Префабы NPC. </summary>
         [SerializeField] private NonInteractableNpc.NonInteractableNpc[] _npcPrefabs;
@@ -22,8 +24,8 @@ namespace FlavorfulStory.AI
         /// <summary> Родительский объект для NPC. </summary>
         [SerializeField] private Transform _parentTransform;
 
-        /// <summary> Максимальное количество NPC. </summary>
-        [SerializeField] private int _maxNpcCount = 5;
+        [Header("Ограничения")] [SerializeField]
+        private int _maxNpcCount = 5;
 
         /// <summary> Интервал спавна в минутах. </summary>
         [SerializeField] private int _spawnIntervalInMinutes = 60;
@@ -31,10 +33,7 @@ namespace FlavorfulStory.AI
         /// <summary> Количество минут в одном тике времени. </summary>
         private const int MinutesInTick = 5;
 
-        /// <summary> DI контейнер. </summary>
-        private DiContainer _diContainer;
-
-        /// <summary> Пул объектов NPC. </summary>
+        private IPrefabFactory<NonInteractableNpc.NonInteractableNpc> _npcFactory;
         private ObjectPool<NonInteractableNpc.NonInteractableNpc> _npcPool;
 
         /// <summary> Список активных NPC. </summary>
@@ -55,20 +54,23 @@ namespace FlavorfulStory.AI
         /// <summary> Менеджер локаций. </summary>
         private LocationManager _locationManager;
 
-        /// <summary> Внедрение зависимостей. </summary>
-        /// <param name="diContainer"> DI контейнер. </param>
-        /// <param name="locationManager"> Менеджер локаций. </param>
         [Inject]
-        public void Construct(DiContainer diContainer, LocationManager locationManager)
+        public void Construct(IPrefabFactory<NonInteractableNpc.NonInteractableNpc> npcFactory,
+            LocationManager locationManager)
         {
-            _diContainer = diContainer;
+            _npcFactory = npcFactory;
             _locationManager = locationManager;
         }
 
-        /// <summary> Инициализация компонента. </summary>
         private void Awake()
         {
-            _spawnIntervalInTicks = _spawnIntervalInMinutes / MinutesInTick;
+            if (_spawnData == null || _spawnData.Length < 2)
+            {
+                Debug.LogError("NpcSpawner: требуется минимум 2 точки спавна/деспавна.");
+                _isSpawning = false;
+            }
+
+            _spawnIntervalInTicks = Mathf.Max(1, _spawnIntervalInMinutes / MinutesInTick);
 
             _npcPool = new ObjectPool<NonInteractableNpc.NonInteractableNpc>(
                 CreateNpc,
@@ -76,27 +78,25 @@ namespace FlavorfulStory.AI
                 npc => npc.gameObject.SetActive(false)
             );
 
-            WorldTime.OnDayEnded += _ => DespawnAllNpcCoroutine().Forget();
-            WorldTime.OnTimePaused += () => _isTimePaused = true;
-            WorldTime.OnTimeUnpaused += () => _isTimePaused = false;
+            WorldTime.OnDayEnded += HandleDayEnded;
+            WorldTime.OnTimePaused += HandlePause;
+            WorldTime.OnTimeUnpaused += HandleUnpause;
             WorldTime.OnTimeTick += OnTimeTickHandler;
         }
 
-        /// <summary> Создает экземпляр NPC. </summary>
-        /// <returns> Созданный NPC. </returns>
-        private NonInteractableNpc.NonInteractableNpc CreateNpc()
+        private void OnDestroy()
         {
-            var prefab = _npcPrefabs[Random.Range(0, _npcPrefabs.Length)];
-            var npcInstance = _diContainer.InstantiatePrefabForComponent<NonInteractableNpc.NonInteractableNpc>(
-                prefab, _spawnData[0].SpawnPoint.position, Quaternion.identity, _parentTransform
-            );
-            npcInstance.gameObject.SetActive(false);
-            return npcInstance;
+            WorldTime.OnDayEnded -= HandleDayEnded;
+            WorldTime.OnTimePaused -= HandlePause;
+            WorldTime.OnTimeUnpaused -= HandleUnpause;
+            WorldTime.OnTimeTick -= OnTimeTickHandler;
         }
 
-        /// <summary> Обрабатывает тик времени. </summary>
-        /// <param name="gameTime"> Текущее игровое время. </param>
-        private void OnTimeTickHandler(DateTime gameTime)
+        private void HandleDayEnded(DateTime _) => DespawnAllNpcCoroutine().Forget();
+        private void HandlePause() => _isTimePaused = true;
+        private void HandleUnpause() => _isTimePaused = false;
+
+        private void OnTimeTickHandler(DateTime _)
         {
             if (!_isSpawning || _isTimePaused) return;
 
@@ -109,65 +109,98 @@ namespace FlavorfulStory.AI
             }
         }
 
-        /// <summary> Проверяет возможность спавна нового NPC. </summary>
-        /// <returns> True если можно спавнить, иначе False. </returns>
         private bool CanSpawn() => _activeCharacters.Count < _maxNpcCount;
 
-        /// <summary> Спавнит NPC из пула. </summary>
-        private void SpawnNpcFromPool()
+        /// <summary>
+        /// Создание объекта для пула: создаём сразу в одной из точек спавна (не в нуле) и без подписки на деспавн.
+        /// </summary>
+        private NonInteractableNpc.NonInteractableNpc CreateNpc()
         {
             int spawnIndex = Random.Range(0, _spawnData.Length);
-            var spawnData = _spawnData[spawnIndex];
-
             int despawnIndex;
             do
             {
                 despawnIndex = Random.Range(0, _spawnData.Length);
             } while (despawnIndex == spawnIndex);
 
+            var spawnData = _spawnData[spawnIndex];
+            var despawnData = _spawnData[despawnIndex];
+
+            var prefab = _npcPrefabs[Random.Range(0, _npcPrefabs.Length)];
+
+            var npcInstance = _npcFactory.Create(prefab, spawnData.SpawnPoint.position, spawnData.SpawnPoint.rotation,
+                _parentTransform);
+
+            SetupNpc(npcInstance, spawnData, despawnData, true);
+
+            return npcInstance;
+        }
+
+        private void SpawnNpcFromPool()
+        {
+            int spawnIndex = Random.Range(0, _spawnData.Length);
+            int despawnIndex;
+            do
+            {
+                despawnIndex = Random.Range(0, _spawnData.Length);
+            } while (despawnIndex == spawnIndex);
+
+            var spawnData = _spawnData[spawnIndex];
             var despawnData = _spawnData[despawnIndex];
 
             var npc = _npcPool.Get();
 
-            npc.GetComponent<NavMeshAgent>().Warp(spawnData.SpawnPoint.position);
-            npc.transform.rotation = spawnData.SpawnPoint.rotation;
-            _activeCharacters.Add(npc);
+            SetupNpc(npc, spawnData, despawnData, false);
 
-            npc.OnReachedDespawnPoint += () => DespawnNpc(npc);
-            npc.SetDespawnPoint(new NpcDestinationPoint(despawnData.DespawnPoint.position, Quaternion.identity));
+            _activeCharacters.Add(npc);
 
             SetDestinationAfterInit(npc).Forget();
         }
 
-        /// <summary> Деспавнит указанного NPC. </summary>
-        /// <param name="npc"> NPC для деспавна. </param>
         private void DespawnNpc(NonInteractableNpc.NonInteractableNpc npc)
         {
             _activeCharacters.Remove(npc);
             _npcPool.Release(npc);
         }
 
-        /// <summary> Устанавливает цель NPC после инициализации. </summary>
-        /// <param name="npc"> NPC для установки цели. </param>
-        private async UniTaskVoid SetDestinationAfterInit(NonInteractableNpc.NonInteractableNpc npc)
+        /// <summary>
+        /// Общий метод: назначает точки спавна/деспавна и безопасно подписывает обработчик,
+        /// может вызываться и для только что созданного, и для взятого из пула NPC.
+        /// </summary>
+        private void SetupNpc(NonInteractableNpc.NonInteractableNpc npc, NpcSpawnData spawnData,
+            NpcSpawnData despawnData, bool subscribeDespawnHandler)
+        {
+            var agent = npc.GetComponent<NavMeshAgent>();
+            agent.Warp(spawnData.SpawnPoint.position);
+            npc.transform.rotation = spawnData.SpawnPoint.rotation;
+
+            npc.SetDespawnPoint(new NpcDestinationPoint(despawnData.DespawnPoint.position, Quaternion.identity));
+            if (subscribeDespawnHandler) npc.OnReachedDespawnPoint += () => DespawnNpc(npc);
+        }
+
+        private async UniTask SetDestinationAfterInit(NonInteractableNpc.NonInteractableNpc npc)
         {
             var agent = npc.GetComponent<NavMeshAgent>();
 
-            while (!agent || !agent.isOnNavMesh) await UniTask.Yield();
+            if (!agent.isOnNavMesh)
+            {
+                Debug.LogWarning($"NPC {npc.name} could not be placed on NavMesh");
+                return;
+            }
+
             await UniTask.Yield();
 
             var loc = _locationManager.GetLocationByName(LocationName.NewShop);
             npc.SetDestination(new NpcDestinationPoint(loc.transform.position, Quaternion.identity));
         }
 
-        /// <summary> Деспавнит всех активных NPC. </summary>
-        private async UniTaskVoid DespawnAllNpcCoroutine()
+        private async UniTask DespawnAllNpcCoroutine()
         {
             _isSpawning = false;
 
-            foreach (var npc in new List<NonInteractableNpc.NonInteractableNpc>(_activeCharacters))
+            for (int i = _activeCharacters.Count - 1; i >= 0; i--)
             {
-                DespawnNpc(npc);
+                DespawnNpc(_activeCharacters[i]);
                 await UniTask.Yield();
             }
 

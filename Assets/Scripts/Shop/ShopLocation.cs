@@ -11,7 +11,8 @@ namespace FlavorfulStory.Shop
     public class ShopLocation : Location
     {
         /// <summary> Касса магазина для обслуживания покупателей. </summary>
-        [field: SerializeField] public CashRegister CashRegister { get; private set; }
+        [field: SerializeField]
+        public CashRegister CashRegister { get; private set; }
 
         /// <summary> Массив полок в магазине. </summary>
         [SerializeField] private Showcase[] _showcases;
@@ -88,7 +89,7 @@ namespace FlavorfulStory.Shop
 
         /// <summary> Проверяет, занята ли вся мебель в магазине. </summary>
         /// <returns> True, если вся мебель занята, иначе false. </returns>
-        public bool AreAllFurnitureOccupied() => GetAvailableObjects(_furnitures).Length == 0;
+        public bool HasAvailableFurniture() => GetAvailableObjects(_furnitures).Length > 0;
 
         /// <summary> Генерирует случайную точку на навигационной сетке с учетом минимального
         /// расстояния от объектов магазина. </summary>

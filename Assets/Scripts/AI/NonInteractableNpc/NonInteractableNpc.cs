@@ -73,8 +73,11 @@ namespace FlavorfulStory.AI.NonInteractableNpc
 
         /// <summary> Устанавливает точку исчезновения для неинтерактивного NPC. </summary>
         /// <param name="npcDestination"> Координаты точки, где NPC должен исчезнуть. </param>
-        public void SetDespawnPoint(NpcDestinationPoint npcDestination) =>
-            (StateController as NonInteractableNpcStateController)?.SetDespawnPoint(npcDestination);
+        public void SetDespawnPoint(NpcDestinationPoint npcDestination)
+        {
+            _stateController.SetDespawnPoint(npcDestination);
+            OnReachedDespawnPoint += () => _stateController.ForceSetState(NpcStateName.Idle);
+        }
 
 #if UNITY_EDITOR
 

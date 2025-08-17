@@ -70,7 +70,11 @@ namespace FlavorfulStory.AI.BaseNpc
         /// <param name="npcStateName"> Тип состояния для установки. </param>
         protected void SetState(NpcStateName npcStateName)
         {
-            if (!_nameToCharacterStates.TryGetValue(npcStateName, out var next) || _currentState == next) return;
+            if (!_nameToCharacterStates.TryGetValue(npcStateName, out var next))
+            {
+                Debug.LogWarning($"{npcStateName} state does not exist.");
+                return;
+            }
 
             CurrentNpcStateName = npcStateName;
 
