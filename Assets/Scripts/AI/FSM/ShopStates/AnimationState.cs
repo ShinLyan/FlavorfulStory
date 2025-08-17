@@ -10,31 +10,27 @@ namespace FlavorfulStory.AI.FSM.ShopStates
         /// <summary> Таймер для отслеживания времени выполнения анимации. </summary>
         private float _timer;
 
-        /// <summary> Флаг, указывающий завершена ли анимация. </summary>
+        /// <summary> Флаг завершения анимации. </summary>
         private bool _isAnimationComplete;
 
-        /// <summary> Флаг, указывающий находится ли игра в режиме паузы. </summary>
+        /// <summary> Флаг паузы игры. </summary>
         private bool _isPaused;
 
-        /// <summary> Контроллер анимаций NPC, используемый для управления анимациями. </summary>
+        /// <summary> Контроллер анимаций NPC. </summary>
         private readonly NpcAnimationController _npcAnimationController;
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="npcAnimationController"></param>
+        /// <summary> Инициализирует состояние анимации. </summary>
+        /// <param name="npcAnimationController"> Контроллер анимаций NPC. </param>
         public AnimationState(NpcAnimationController npcAnimationController)
         {
             _npcAnimationController = npcAnimationController;
-
-            WorldTime.OnTimePaused += () => _isPaused = true;
-            WorldTime.OnTimeUnpaused += () => _isPaused = false;
         }
 
-        /// <summary> Инициализирует состояние анимации при входе. </summary>
+        /// <summary> Выполняется при входе в состояние. </summary>
         public override void Enter()
         {
             base.Enter();
+            WorldTime.OnTimePaused += HandlePause;
             _isAnimationComplete = false;
 
             if (Context == null) return;
@@ -45,7 +41,7 @@ namespace FlavorfulStory.AI.FSM.ShopStates
             if (Context.TryGet(FsmContextType.AnimationTime, out float animationTime)) _timer = animationTime;
         }
 
-        /// <summary> Обновляет состояние анимации каждый кадр, уменьшая таймер. </summary>
+        /// <summary> Обновляет состояние каждый кадр. </summary>
         public override void Update()
         {
             if (_isPaused) return;
@@ -53,18 +49,23 @@ namespace FlavorfulStory.AI.FSM.ShopStates
             if (!_isAnimationComplete && _timer > 0)
             {
                 _timer -= Time.deltaTime;
-
                 if (_timer <= 0) _isAnimationComplete = true;
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        public override void Exit() => _npcAnimationController.TriggerAnimation(AnimationType.Locomotion);
+        /// <summary> Выполняется при выходе из состояния. </summary>
+        public override void Exit()
+        {
+            WorldTime.OnTimeUnpaused += HandleUnpause;
+            _npcAnimationController.TriggerAnimation(AnimationType.Locomotion);
+        }
 
-        /// <summary> Возвращает статус завершения анимации. </summary>
-        /// <returns> true, если анимация завершена; иначе false. </returns>
+        /// <summary> Проверяет завершение состояния. </summary>
+        /// <returns> True если анимация завершена. </returns>
         public override bool IsComplete() => _isAnimationComplete;
+
+        private void HandlePause() => _isPaused = true;
+
+        private void HandleUnpause() => _isPaused = false;
     }
 }

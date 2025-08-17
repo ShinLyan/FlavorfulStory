@@ -86,7 +86,7 @@ namespace FlavorfulStory.AI.NonInteractableNpc
                 new RandomPointPickerState(_npcMovementController, shopLocation));
             _nameToCharacterStates.Add(NpcStateName.ShowcasePicker,
                 new ShowcasePickerState(_npcMovementController, shopLocation));
-            _nameToCharacterStates.Add(NpcStateName.ReleaseObject, new ReleaseObjectState(shopLocation));
+            _nameToCharacterStates.Add(NpcStateName.ReleaseObject, new ReleaseObjectState());
         }
 
         /// <summary> Создает все последовательности состояний для различных сценариев поведения NPC. </summary>

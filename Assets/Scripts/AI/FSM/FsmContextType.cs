@@ -3,9 +3,6 @@ namespace FlavorfulStory.AI.FSM
     /// <summary> Типы контекстных данных, используемых для передачи между состояниями конечного автомата. </summary>
     public enum FsmContextType
     {
-        /// <summary> Точка кассы для совершения платежа. </summary>
-        CashDeskPoint,
-
         /// <summary> Покупаемый предмет. </summary>
         PurchaseItem,
 

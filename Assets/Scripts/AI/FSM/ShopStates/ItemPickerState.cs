@@ -48,7 +48,6 @@ namespace FlavorfulStory.AI.FSM.ShopStates
 
             if (accessiblePoint.HasValue)
             {
-                Context?.Set(FsmContextType.CashDeskPoint, accessiblePoint);
                 Context?.Set(FsmContextType.AnimationType, _shopLocation.CashRegister.InteractableObjectAnimation);
                 Context?.Set(FsmContextType.AnimationTime, 3f);
 

@@ -19,6 +19,7 @@ namespace FlavorfulStory.AI.BaseNpc
         /// <summary> Вызывается при создании объекта, может быть переопределен в наследниках </summary>
         protected virtual void Awake() => AnimationController = new NpcAnimationController(GetComponent<Animator>());
 
+        /// <summary> Инициализация объектов. </summary>
         protected virtual void Start()
         {
             AnimationController.Initialize();
@@ -37,8 +38,8 @@ namespace FlavorfulStory.AI.BaseNpc
         /// <summary> Обновляет логику состояний и движения NPC каждый кадр. </summary>
         protected virtual void Update()
         {
-            MovementController?.Update();
-            StateController?.Update();
+            MovementController.Update();
+            StateController.Update();
         }
     }
 }
