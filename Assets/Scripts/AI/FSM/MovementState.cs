@@ -9,9 +9,6 @@ namespace FlavorfulStory.AI.FSM
         /// <summary> Контроллер движения NPC для управления навигацией. </summary>
         private readonly NpcMovementController _movementController;
 
-        /// <summary> Находится ли персонаж в данный момент в состоянии движения? </summary>
-        private bool _isInState;
-
         /// <summary> Флаг завершения состояния движения. Устанавливается в true при достижении цели. </summary>
         private bool _isComplete;
 
@@ -21,9 +18,6 @@ namespace FlavorfulStory.AI.FSM
         {
             _isComplete = false;
             _movementController = movementController;
-
-            WorldTime.OnTimePaused += StopMovementOnPause;
-            WorldTime.OnTimeUnpaused += ContinueMovementOnUnpause;
         }
 
         /// <summary> Входит в состояние движения и начинает перемещение к текущей точке расписания. </summary>
@@ -31,17 +25,21 @@ namespace FlavorfulStory.AI.FSM
         {
             base.Enter();
             _movementController.MoveToPoint();
-            _isInState = true;
             _movementController.OnDestinationReached += OnCompleteMovement;
+
+            WorldTime.OnTimePaused += StopMovementOnPause;
+            WorldTime.OnTimeUnpaused += ContinueMovementOnUnpause;
         }
 
         /// <summary> Выходит из состояния движения и останавливает NPC. </summary>
         public override void Exit()
         {
             _movementController.Stop();
-            _isInState = false;
             _isComplete = false;
             _movementController.OnDestinationReached -= OnCompleteMovement;
+
+            WorldTime.OnTimePaused -= StopMovementOnPause;
+            WorldTime.OnTimeUnpaused -= ContinueMovementOnUnpause;
         }
 
         /// <summary> Сбрасывает состояние движения, мгновенно останавливая NPC. </summary>
@@ -56,16 +54,10 @@ namespace FlavorfulStory.AI.FSM
         }
 
         /// <summary> Останавливает движение NPC при паузе игрового времени, если персонаж находится в состоянии движения. </summary>
-        private void StopMovementOnPause()
-        {
-            if (_isInState) _movementController.Stop();
-        }
+        private void StopMovementOnPause() { _movementController.Stop(); }
 
         /// <summary> Возобновляет движение NPC при снятии паузы игрового времени, если персонаж находится в состоянии движения. </summary>
-        private void ContinueMovementOnUnpause()
-        {
-            if (_isInState) _movementController.MoveToPoint();
-        }
+        private void ContinueMovementOnUnpause() { _movementController.MoveToPoint(); }
 
         /// <summary> Проверяет, завершено ли выполнение состояния движения. </summary>
         /// <returns> true, если персонаж достиг точки назначения; иначе false. </returns>
