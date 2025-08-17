@@ -17,6 +17,7 @@ namespace FlavorfulStory.TimeManagement
         [Tooltip("Сколько игровых минут проходит за реальную секунду."), SerializeField, SteppedRange(-100f, 1000f, 5f)]
         private float _timeScale = 1f;
 
+        /// <summary> Множитель скорости. </summary>
         public static float MovementSpeedMultiplier { get; private set; } = 1f;
 
         /// <summary> Сигнальная шина Zenject для отправки и получения событий. </summary>
@@ -90,12 +91,12 @@ namespace FlavorfulStory.TimeManagement
         {
             if (IsPaused) return;
 
-            const float baseScale = 5f;
-            const float maxScale = 1000f;
-            const float maxMultiplier = 10f;
+            const float BaseScale = 5f;
+            const float MaxScale = 1000f;
+            const float MaxMultiplier = 10f;
 
-            float t = Mathf.InverseLerp(baseScale, maxScale, Mathf.Max(baseScale, _timeScale));
-            MovementSpeedMultiplier = Mathf.Lerp(1f, maxMultiplier, Mathf.Pow(t, 0.01f));
+            float t = Mathf.InverseLerp(BaseScale, MaxScale, Mathf.Max(BaseScale, _timeScale));
+            MovementSpeedMultiplier = Mathf.Lerp(1f, MaxMultiplier, Mathf.Pow(t, 0.01f));
 
             var previousTime = CurrentGameTime;
             CurrentGameTime = CurrentGameTime.AddMinutes(Time.deltaTime * _timeScale);
