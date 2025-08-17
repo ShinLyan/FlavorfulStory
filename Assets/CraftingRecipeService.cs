@@ -21,6 +21,7 @@ namespace FlavorfulStory
         }
         
         /// <summary> Инициализация базы (вызовите в инсталлере / бутстрапе один раз). </summary>
+        /// 
         private void WarmUp()
         {
             _db.Clear();

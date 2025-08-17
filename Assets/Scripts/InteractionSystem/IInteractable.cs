@@ -27,5 +27,15 @@ namespace FlavorfulStory.InteractionSystem
         /// <param name="player"> Игрок, завершивший взаимодействие. </param>
         /// <remarks> Например, закрытие UI, сброс состояний, завершение анимаций. </remarks>
         void EndInteraction(PlayerController player);
+        
+        /// <summary> Завершает взаимодействие. </summary>
+        /// <param name="player"> Игрок, завершивший взаимодействие. </param>
+        /// <remarks> Например, закрытие UI, сброс состояний, завершение анимаций. </remarks>
+        void OnInteractionTriggerEnter() {}
+
+        /// <summary> Завершает взаимодействие. </summary>
+        /// <param name="player"> Игрок, завершивший взаимодействие. </param>
+        /// <remarks> Например, закрытие UI, сброс состояний, завершение анимаций. </remarks>
+        void OnInteractionTriggerExit() { }
     }
 }

@@ -252,6 +252,7 @@ namespace FlavorfulStory.Player
         /// <remarks> Метод подписан на событие в анимации игрока (Gather_interaction). </remarks>
         private void EndInteraction() => _interactionController.EndInteraction();
 
+        //TODO: Я бы вынес эти мемтоды в какой-нибудь CharacterAnimator. Чтобы и игрок, и NPC имели один этот компонент
         /// <summary> Запустить анимацию. </summary>
         /// <param name="animationType"> Тип проигрываемой анимации.</param>
         public void TriggerAnimation(AnimationType animationType)

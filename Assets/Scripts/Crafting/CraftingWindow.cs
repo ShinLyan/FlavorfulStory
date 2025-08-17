@@ -18,6 +18,7 @@ namespace FlavorfulStory.Crafting
     {
         //TODO: комм
         [Inject] private ICraftingRecipeProvider _recipeProvider;
+        [Inject] private ICraftingRecipeUnlocker _recipeUnlocker;
         [Inject] private IInventoryProvider _inventoryProvider;
         
         /// <summary> Поле для ввода имени рецепта (фильтр). </summary>
@@ -175,7 +176,7 @@ namespace FlavorfulStory.Crafting
             _noRecipesFoundText.gameObject.SetActive(false);
             _lockedRecipesToggle.onValueChanged.AddListener(ToggleLockedRecipes);
             _isOpen = false;
-            _recipeProvider.RecipeUnlocked += (_) => UpdateRecipeViews();
+            _recipeUnlocker.RecipeUnlocked += (_) => UpdateRecipeViews();
 
             _initialized = true;
         }

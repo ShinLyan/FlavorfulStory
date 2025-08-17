@@ -15,6 +15,8 @@ namespace FlavorfulStory
 
             //TODO: Инициализацию статики лучше вынести в IInitializable, чтобы не делать Resolve в InstallBindings
             Container.Bind<IInitializable>().To<CraftingBootstrap>().AsSingle();
+            Container.Bind<RecipeUnlockedNotificationWindow>().FromComponentInHierarchy().AsSingle();
+            Container.BindInterfacesTo<RecipeUnlockedNotificationPresenter>().AsSingle();
         }
     }
     

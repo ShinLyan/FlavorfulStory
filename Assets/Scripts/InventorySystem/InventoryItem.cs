@@ -5,6 +5,7 @@ using UnityEngine;
 namespace FlavorfulStory.InventorySystem
 {
     // TODO: сделать абстрактным, когда все типы предметов будут реализованы
+    // TODO: сделать норм. сравнение через IEquatable, например
     /// <summary> ScriptableObject, представляющий предмет, который может быть помещен в инвентарь. </summary>
     [CreateAssetMenu(menuName = "FlavorfulStory/Inventory/Item")]
     public class InventoryItem : ScriptableObject, ISerializationCallbackReceiver

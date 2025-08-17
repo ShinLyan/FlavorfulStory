@@ -9,6 +9,5 @@ namespace FlavorfulStory
         IReadOnlyList<CraftingRecipe> All { get; }
         CraftingRecipe GetById(string id);
         bool IsUnlocked(string id);
-        event Action<CraftingRecipe> RecipeUnlocked;
     }
 }

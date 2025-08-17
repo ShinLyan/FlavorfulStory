@@ -10,6 +10,9 @@ namespace FlavorfulStory.Crafting
         /// <summary> Уникальный идентификатор рецепта. </summary>
         [field: Tooltip("ID рецепта."), SerializeField]
         public string RecipeID { get; private set; }
+        
+        //TODO: Comm
+        [field: SerializeField] public RecipeDomain Domain { get; private set; }
 
         /// <summary> Указывает, открыт ли рецепт. </summary>
         [field: Tooltip("Открыт ли рецепт?"), SerializeField]
@@ -39,5 +42,11 @@ namespace FlavorfulStory.Crafting
         /// <summary> Иконка рецепта. </summary>
         [field: Tooltip("Спрайт крафта рецепта."), SerializeField]
         public Sprite Sprite { get; private set; }
+        
+        //TODO: Вынести в HelperUtils либо в OnValidate()
+        public bool IsProcessorRecipe =>
+            Domain == RecipeDomain.Processing &&
+            InputItems != null && InputItems.Count == 1 &&
+            OutputItems != null && OutputItems.Count == 1;
     }
 }

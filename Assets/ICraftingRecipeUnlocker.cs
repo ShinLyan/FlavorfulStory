@@ -1,4 +1,5 @@
-﻿using FlavorfulStory.Crafting;
+﻿using System;
+using FlavorfulStory.Crafting;
 
 namespace FlavorfulStory
 {
@@ -6,5 +7,6 @@ namespace FlavorfulStory
     {
         bool Unlock(string id);
         bool Unlock(CraftingRecipe recipe);
+        event Action<CraftingRecipe> RecipeUnlocked;
     }
 }

@@ -82,6 +82,7 @@ namespace FlavorfulStory.InteractionSystem
             if (!other.TryGetComponent<IInteractable>(out var interactable)) return;
 
             _availableInteractables.Add(interactable);
+            interactable.OnInteractionTriggerEnter();
 
             if (other.TryGetComponent<IDestroyable>(out var destroyable))
                 destroyable.OnObjectDestroyed += RemoveInteractable;
@@ -94,6 +95,7 @@ namespace FlavorfulStory.InteractionSystem
             if (!other.TryGetComponent<IInteractable>(out var interactable)) return;
 
             _availableInteractables.Remove(interactable);
+            interactable.OnInteractionTriggerExit();
             UpdateClosestInteractable();
 
             if (other.TryGetComponent<IDestroyable>(out var destroyable))
