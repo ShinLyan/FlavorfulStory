@@ -1,6 +1,7 @@
 using System;
 using FlavorfulStory.InputSystem;
 using FlavorfulStory.Saving;
+using FlavorfulStory.TimeManagement;
 using UnityEngine;
 
 namespace FlavorfulStory.Player
@@ -68,7 +69,7 @@ namespace FlavorfulStory.Player
         /// <summary> Выполняет передвижение игрока в соответствии с направлением движения. </summary>
         private void Move()
         {
-            var moveForce = _moveSpeed * CountSpeedMultiplier() * _moveDirection;
+            var moveForce = _moveSpeed * CountSpeedMultiplier() * WorldTime.MovementSpeedMultiplier * _moveDirection;
             moveForce.y = _rigidbody.linearVelocity.y;
             _rigidbody.linearVelocity = moveForce;
         }

@@ -1,4 +1,5 @@
 ﻿using System;
+using FlavorfulStory.TimeManagement;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -28,6 +29,8 @@ namespace FlavorfulStory.AI.BaseNpc
         /// <summary> Событие, вызываемое при достижении пункта назначения. </summary>
         public Action OnDestinationReached;
 
+        private const float _defaultSpeed = 2.3f;
+
         /// <summary> Инициализирует компонент навигации для NPC. </summary>
         /// <param name="agent"> NavMeshAgent, управляющий движением. </param>
         /// <param name="transform"> Transform объекта NPC. </param>
@@ -46,6 +49,7 @@ namespace FlavorfulStory.AI.BaseNpc
         {
             HandleOffMeshLink();
             if (!IsMoving) return;
+            _agent.speed = _defaultSpeed * WorldTime.MovementSpeedMultiplier;
             HandleArrival();
         }
 
