@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace FlavorfulStory.AI
 {
-    /// <summary> Компонент для отображения 3D-индикатора над NPC. </summary>
+    /// <summary> Управляет 3D-индикатором покупки над NPC. </summary>
     public class NpcPurchaseIndicator : MonoBehaviour
     {
         /// <summary> 3D-модель индикатора. </summary>
@@ -22,17 +22,17 @@ namespace FlavorfulStory.AI
         private float _startScale = 0.8f;
 
         /// <summary> Скорость вращения. </summary>
-        [Tooltip("Скорость вращения в градусах в секунду.")] [SerializeField]
+        [Tooltip("Скорость вращения (градусов в секунду).")] [SerializeField]
         private float _rotationSpeed = 60f;
 
         /// <summary> Исходный масштаб модели. </summary>
         private Vector3 _defaultScale;
 
-        /// <summary> Текущая анимация. </summary>
+        /// <summary> Текущая анимация масштаба. </summary>
         private Tween _currentTween;
 
-        /// <summary> Флаг активности индикатора. </summary>
-        private bool _isActive;
+        /// <summary> Текущая анимация вращения. </summary>
+        private Tween _rotationTween;
 
         /// <summary> Инициализация компонента. </summary>
         private void Awake()
@@ -42,35 +42,50 @@ namespace FlavorfulStory.AI
             _model.SetActive(false);
         }
 
-        /// <summary> Обновление вращения. </summary>
-        private void Update()
-        {
-            if (_isActive && _model) _model.transform.Rotate(Vector3.up, _rotationSpeed * Time.deltaTime, Space.World);
-        }
+        /// <summary> Останавливает анимации при уничтожении. </summary>
+        private void OnDestroy() => KillAnimations();
 
-        /// <summary> Показать модель с анимацией появления. </summary>
+        /// <summary> Показывает индикатор с анимацией. </summary>
+        /// <returns> Задача анимации. </returns>
         public async UniTask ShowModel()
         {
-            _currentTween?.Kill();
+            KillAnimations();
             _model.SetActive(true);
             _model.transform.localScale = _defaultScale * _startScale;
 
-            _currentTween = _model.transform.DOScale(_defaultScale, _fadeDuration).SetEase(Ease.OutBack);
+            _currentTween = _model.transform
+                .DOScale(_defaultScale, _fadeDuration)
+                .SetEase(Ease.OutBack);
 
-            _isActive = true;
+            float rotationDuration = 360f / _rotationSpeed;
+            _rotationTween = _model.transform
+                .DOLocalRotate(new Vector3(0f, 360f, 0f), rotationDuration, RotateMode.FastBeyond360)
+                .SetEase(Ease.Linear)
+                .SetLoops(-1, LoopType.Restart)
+                .SetRelative();
+
             await _currentTween.AsyncWaitForCompletion();
         }
 
-        /// <summary> Скрыть модель с анимацией исчезновения. </summary>
+        /// <summary> Скрывает индикатор с анимацией. </summary>
+        /// <returns> Задача анимации. </returns>
         public async UniTask HideModel()
         {
-            _currentTween?.Kill();
+            KillAnimations();
+            _currentTween = _model.transform
+                .DOScale(_defaultScale * _startScale, _fadeDuration);
 
-            _currentTween = _model.transform.DOScale(_defaultScale * _startScale, _fadeDuration);
-
-            _isActive = false;
             await _currentTween.AsyncWaitForCompletion();
             _model.SetActive(false);
+        }
+
+        /// <summary> Останавливает все активные анимации. </summary>
+        private void KillAnimations()
+        {
+            _currentTween?.Kill(true);
+            _rotationTween?.Kill(true);
+            _currentTween = null;
+            _rotationTween = null;
         }
     }
 }

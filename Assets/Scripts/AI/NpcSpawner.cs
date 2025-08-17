@@ -215,6 +215,8 @@ namespace FlavorfulStory.AI
 
             await UniTask.Yield();
 
+            if (!npc || !npc.gameObject.activeInHierarchy) return;
+
             var loc = _locationManager.GetLocationByName(LocationName.NewShop);
             npc.SetDestination(new NpcDestinationPoint(loc.transform.position, Quaternion.identity));
         }
