@@ -4,10 +4,15 @@ using System.Text.RegularExpressions;
 
 namespace FlavorfulStory.Utils
 {
-    /// <summary> Универсальный конвертер enum-ов в строку с автоматическим форматированием CamelCase. </summary>
+    /// <summary> Конвертер enum-значений в строки. </summary>
     public static class EnumToStringConvertor
     {
-        /// <summary> Преобразует значение enum в строку, разделяя слова в CamelCase стиле. </summary>
+        /// <summary> Преобразует значение enum в строку по определённым правилам. </summary>
+        /// <typeparam name="TEnum"> Тип перечисления. </typeparam>
+        /// <param name="value"> Значение перечисления. </param>
+        /// <returns> Отформатированная строка с пробелами между словами, приведёнными к нижнему регистру,
+        /// с заглавной первой буквой. </returns>
+        /// <remarks> Enum value "Get money", после преобразования "Get money". </remarks>
         public static string ToDisplayName<TEnum>(this TEnum value) where TEnum : Enum
         {
             string name = value.ToString();
