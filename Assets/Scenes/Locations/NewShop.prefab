@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 3032480944333338034}
   - component: {fileID: 4283688554741052813}
   m_Layer: 0
-  m_Name: Cube (5)
+  m_Name: Wall
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -120,7 +120,7 @@ GameObject:
   - component: {fileID: 6736082449871343565}
   - component: {fileID: 1503365080586952145}
   m_Layer: 0
-  m_Name: Point Light (1)
+  m_Name: PointLight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -276,7 +276,7 @@ GameObject:
   - component: {fileID: 2647118973922304995}
   - component: {fileID: 8129486238768438700}
   m_Layer: 0
-  m_Name: Point Light (6)
+  m_Name: PointLight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -432,7 +432,7 @@ GameObject:
   - component: {fileID: 350139691073298540}
   - component: {fileID: 8804055416937709077}
   m_Layer: 0
-  m_Name: Plane (1)
+  m_Name: Ground
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -612,7 +612,7 @@ GameObject:
   - component: {fileID: 761242082164251806}
   - component: {fileID: 7533346739678899340}
   m_Layer: 0
-  m_Name: Cube
+  m_Name: Wall
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -720,7 +720,7 @@ GameObject:
   - component: {fileID: 8290192761921206733}
   - component: {fileID: 1467392648173271547}
   m_Layer: 0
-  m_Name: Cube (3)
+  m_Name: Wall
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -827,7 +827,7 @@ GameObject:
   - component: {fileID: 2901504682914834894}
   - component: {fileID: 1972211029350075678}
   m_Layer: 0
-  m_Name: Point Light (7)
+  m_Name: PointLight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -949,7 +949,7 @@ GameObject:
   - component: {fileID: 1450199522709028428}
   - component: {fileID: 1366975125696418768}
   m_Layer: 0
-  m_Name: Cube (1)
+  m_Name: Wall
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1056,7 +1056,7 @@ GameObject:
   - component: {fileID: 1855402602090074404}
   - component: {fileID: 5923432102099229130}
   m_Layer: 0
-  m_Name: Point Light (5)
+  m_Name: PointLight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1178,7 +1178,7 @@ GameObject:
   - component: {fileID: 2405272849015653859}
   - component: {fileID: 8368661304932194135}
   m_Layer: 0
-  m_Name: Cube (4)
+  m_Name: Wall
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1285,7 +1285,7 @@ GameObject:
   - component: {fileID: 5398264759766114831}
   - component: {fileID: 4029841896293864827}
   m_Layer: 0
-  m_Name: Point Light
+  m_Name: PointLight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1406,7 +1406,7 @@ GameObject:
   - component: {fileID: 7643544378883503999}
   - component: {fileID: 1179824789604654007}
   m_Layer: 0
-  m_Name: Point Light (4)
+  m_Name: PointLight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1527,7 +1527,7 @@ GameObject:
   - component: {fileID: 1090888210246752057}
   - component: {fileID: 6348047162509490444}
   m_Layer: 0
-  m_Name: Point Light (2)
+  m_Name: PointLight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1647,7 +1647,7 @@ GameObject:
   - component: {fileID: 8132270557723877048}
   - component: {fileID: 5902134210375282503}
   - component: {fileID: 1146438477560046307}
-  - component: {fileID: 3931061513242529119}
+  - component: {fileID: 7096488566545088476}
   m_Layer: 0
   m_Name: Plane
   m_TagString: Untagged
@@ -1668,7 +1668,7 @@ Transform:
   m_LocalScale: {x: 2, y: 1, z: 2}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 5164169224507854433}
+  m_Father: {fileID: 7093977126056513747}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &5902134210375282503
 MeshFilter:
@@ -1723,8 +1723,8 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &3931061513242529119
-MeshCollider:
+--- !u!65 &7096488566545088476
+BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -1741,10 +1741,9 @@ MeshCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
+  serializedVersion: 3
+  m_Size: {x: 10, y: 2.220446e-16, z: 10}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &7777746565995893986
 GameObject:
   m_ObjectHideFlags: 0
@@ -1757,7 +1756,7 @@ GameObject:
   - component: {fileID: 7129495260163375762}
   - component: {fileID: 5853126057505368006}
   m_Layer: 0
-  m_Name: Point Light (8)
+  m_Name: PointLight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1879,7 +1878,7 @@ GameObject:
   - component: {fileID: 7606858107776491902}
   - component: {fileID: 6358444628933873541}
   m_Layer: 0
-  m_Name: Cube (2)
+  m_Name: Wall
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2747,7 +2746,7 @@ PrefabInstance:
         type: 3}
       propertyPath: m_NavMeshData
       value: 
-      objectReference: {fileID: 23800000, guid: c2992dca1bdcb4c5593446866d06009b,
+      objectReference: {fileID: 23800000, guid: 15f8ce689d9a07d4c9abb83c9feba238,
         type: 2}
     - target: {fileID: 2884372944635847109, guid: b2808964eeb28489aaf58a26053d3450,
         type: 3}
@@ -2769,6 +2768,11 @@ PrefabInstance:
       propertyPath: m_Size.x
       value: 3.04
       objectReference: {fileID: 0}
+    - target: {fileID: 5627392868760275542, guid: b2808964eeb28489aaf58a26053d3450,
+        type: 3}
+      propertyPath: m_Name
+      value: NewShopNavMesh
+      objectReference: {fileID: 0}
     - target: {fileID: 6910280095379744750, guid: b2808964eeb28489aaf58a26053d3450,
         type: 3}
       propertyPath: _navMeshSurface
@@ -2783,10 +2787,6 @@ PrefabInstance:
     - {fileID: 6910280095379744750, guid: b2808964eeb28489aaf58a26053d3450, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects:
-    - targetCorrespondingSourceObject: {fileID: 5913683386031546684, guid: b2808964eeb28489aaf58a26053d3450,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 8132270557723877048}
     - targetCorrespondingSourceObject: {fileID: 8631590298874150798, guid: b2808964eeb28489aaf58a26053d3450,
         type: 3}
       insertIndex: -1
@@ -2807,6 +2807,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 2223722378742768946}
+    - targetCorrespondingSourceObject: {fileID: 8631590298874150798, guid: b2808964eeb28489aaf58a26053d3450,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8132270557723877048}
     - targetCorrespondingSourceObject: {fileID: 1410382569666742401, guid: b2808964eeb28489aaf58a26053d3450,
         type: 3}
       insertIndex: -1
@@ -2863,12 +2867,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a5ac11cc976e418e8d13136b07e1f52, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!4 &5164169224507854433 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 5913683386031546684, guid: b2808964eeb28489aaf58a26053d3450,
-    type: 3}
-  m_PrefabInstance: {fileID: 1565932403153809245}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &7093977126056513747 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8631590298874150798, guid: b2808964eeb28489aaf58a26053d3450,
