@@ -2,11 +2,13 @@ using FlavorfulStory.AI.BaseNpc;
 using Unity.AI.Navigation;
 using UnityEngine;
 using UnityEngine.AI;
+using Random = UnityEngine.Random;
 
 namespace FlavorfulStory.SceneManagement
 {
     /// <summary> Игровая локация, которая может быть активирована/деактивирована 
     /// и проверяет, находится ли точка внутри её границ. </summary>
+    [RequireComponent(typeof(BoxCollider))]
     public class Location : MonoBehaviour
     {
         /// <summary> Название игровой локации. </summary>
@@ -24,6 +26,12 @@ namespace FlavorfulStory.SceneManagement
         /// <summary> Поверхность NavMesh для данной локации. </summary> 
         [SerializeField] private NavMeshSurface _navMeshSurface;
 
+        /// <summary> Коллайдер, определяющий границы локации. </summary>
+        private BoxCollider _collider;
+
+        /// <summary> Выполняет инициализацию компонентов. </summary>
+        private void Awake() => _collider = GetComponent<BoxCollider>();
+
         /// <summary> Устанавливает активное состояние всех объектов из списка. </summary>
         /// <param name="isActive"> <c>true</c> — включить объекты; <c>false</c> — отключить. </param>
         public void SetActive(bool isActive)
@@ -36,8 +44,7 @@ namespace FlavorfulStory.SceneManagement
         /// <summary> Находится ли заданная позиция внутри границ локации? </summary>
         /// <param name="position"> Позиция в мировом пространстве. </param>
         /// <returns> <c>true</c>, если позиция внутри локации; иначе — <c>false</c>. </returns>
-        public bool IsPositionInLocation(Vector3 position) =>
-            TryGetComponent(out Collider component) && component.bounds.Contains(position);
+        public bool IsPositionInLocation(Vector3 position) => _collider.bounds.Contains(position);
 
         /// <summary> Находит случайную точку на NavMesh в пределах локации. </summary>
         /// <param name="maxAttempts"> Максимальное количество попыток поиска точки. По умолчанию 20. </param>
