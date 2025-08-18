@@ -8,11 +8,11 @@ namespace FlavorfulStory.AI
     public struct NpcSpawnData
     {
         /// <summary> Точка спавна NPC. </summary>
-        [field: SerializeField, Tooltip("Точка, где NPC будет появляться")]
+        [field: Tooltip("Точка, где NPC будет появляться."), SerializeField]
         public Transform SpawnPoint { get; private set; }
 
         /// <summary> Точка деспавна NPC. </summary>
-        [field: SerializeField, Tooltip("Точка, куда NPC должен прийти для деспавна")]
+        [field: Tooltip("Точка, куда NPC должен прийти для деспавна."), SerializeField]
         public Transform DespawnPoint { get; private set; }
     }
 }
