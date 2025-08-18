@@ -74,7 +74,7 @@ namespace FlavorfulStory.AI.NonInteractableNpc
             var shopLocation = (ShopLocation)_locationManager.GetLocationByName(LocationName.NewShop);
 
             _nameToCharacterStates.Add(NpcStateName.Idle, new IdleState());
-            _nameToCharacterStates.Add(NpcStateName.Movement, new MovementState(_npcMovementController));
+            _nameToCharacterStates.Add(NpcStateName.Movement, new MovementState(_npcMovementController, false));
             _nameToCharacterStates.Add(NpcStateName.Animation, new AnimationState(_animationController));
             _nameToCharacterStates.Add(NpcStateName.FurniturePicker,
                 new FurniturePickerState(_npcMovementController, shopLocation));

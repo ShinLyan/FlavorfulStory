@@ -12,12 +12,16 @@ namespace FlavorfulStory.AI.FSM
         /// <summary> Флаг завершения состояния движения. Устанавливается в true при достижении цели. </summary>
         private bool _isComplete;
 
+        private readonly bool _isInteractableNpc;
+
         /// <summary> Инициализирует новое состояние движения с заданным контроллером движения. </summary>
         /// <param name="movementController"> Контроллер движения для управления перемещением NPC. </param>
-        public MovementState(NpcMovementController movementController)
+        /// <param name="isInteractableNpc"> NPC интерактивный? </param>
+        public MovementState(NpcMovementController movementController, bool isInteractableNpc)
         {
             _isComplete = false;
             _movementController = movementController;
+            _isInteractableNpc = isInteractableNpc;
         }
 
         /// <summary> Входит в состояние движения и начинает перемещение к текущей точке расписания. </summary>
@@ -50,7 +54,7 @@ namespace FlavorfulStory.AI.FSM
         private void OnCompleteMovement()
         {
             _isComplete = true;
-            RequestStateChange(NpcStateName.Routine);
+            if (_isInteractableNpc) RequestStateChange(NpcStateName.Routine);
         }
 
         /// <summary> Останавливает движение NPC при паузе игрового времени, если персонаж находится в состоянии движения. </summary>

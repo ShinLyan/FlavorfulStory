@@ -69,7 +69,7 @@ namespace FlavorfulStory.AI.InteractableNpc
         /// <remarks> Создает состояния взаимодействия, движения, рутины и ожидания, настраивает связи между ними. </remarks>
         protected override void InitializeStates()
         {
-            _nameToCharacterStates.Add(NpcStateName.Movement, new MovementState(_npcMovementController));
+            _nameToCharacterStates.Add(NpcStateName.Movement, new MovementState(_npcMovementController, true));
             _nameToCharacterStates.Add(NpcStateName.Routine, new RoutineState(_animationController));
             _nameToCharacterStates.Add(NpcStateName.Waiting, new WaitingState(_playerPositionProvider, _npcTransform));
 

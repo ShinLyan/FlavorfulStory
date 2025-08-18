@@ -15,7 +15,10 @@ namespace FlavorfulStory.TimeManagement
         /// <summary> Сколько игровых минут проходит за реальную секунду. </summary>
         [Header("Time Scale")]
         [Tooltip("Сколько игровых минут проходит за реальную секунду."), SerializeField, SteppedRange(-100f, 1000f, 5f)]
-        private float _timeScale = 1f;
+        private float _timeScale = 5f;
+
+        /// <summary> Шаг времени. </summary>
+        public static float TimeScale { get; private set; }
 
         /// <summary> Множитель скорости. </summary>
         public static float MovementSpeedMultiplier { get; private set; } = 1f;
@@ -69,6 +72,7 @@ namespace FlavorfulStory.TimeManagement
         /// <summary> Вызвать начальное обновление интерфейса. </summary>
         private void Start()
         {
+            TimeScale = _timeScale;
             OnTimeUpdated?.Invoke(CurrentGameTime);
             OnTimeTick?.Invoke(CurrentGameTime);
         }
@@ -91,12 +95,8 @@ namespace FlavorfulStory.TimeManagement
         {
             if (IsPaused) return;
 
-            const float BaseScale = 5f;
-            const float MaxScale = 1000f;
-            const float MaxMultiplier = 10f;
-
-            float t = Mathf.InverseLerp(BaseScale, MaxScale, Mathf.Max(BaseScale, _timeScale));
-            MovementSpeedMultiplier = Mathf.Lerp(1f, MaxMultiplier, Mathf.Pow(t, 0.01f));
+            MovementSpeedMultiplier = CalculateMultiplayer();
+            TimeScale = _timeScale;
 
             var previousTime = CurrentGameTime;
             CurrentGameTime = CurrentGameTime.AddMinutes(Time.deltaTime * _timeScale);
@@ -112,6 +112,16 @@ namespace FlavorfulStory.TimeManagement
             OnTimeUpdated?.Invoke(CurrentGameTime);
 
             if (previousTime.Hour < DayEndHour && CurrentGameTime.Hour >= DayEndHour) BeginNewDay();
+        }
+
+        private float CalculateMultiplayer()
+        {
+            const float BaseScale = 5f;
+            const float MaxScale = 1000f;
+            const float MaxMultiplier = 10f;
+
+            float t = Mathf.InverseLerp(BaseScale, MaxScale, Mathf.Max(BaseScale, _timeScale));
+            return Mathf.Lerp(1f, MaxMultiplier, Mathf.Pow(t, 0.01f));
         }
 
         /// <summary> Обновить игровое время до начала следующего дня. </summary>

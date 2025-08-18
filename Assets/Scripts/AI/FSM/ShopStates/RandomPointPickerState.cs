@@ -1,5 +1,6 @@
 using FlavorfulStory.AI.NonInteractableNpc;
 using FlavorfulStory.Shop;
+using UnityEngine;
 
 namespace FlavorfulStory.AI.FSM.ShopStates
 {
@@ -28,10 +29,18 @@ namespace FlavorfulStory.AI.FSM.ShopStates
             base.Enter();
             var point = _shopLocation.GetRandomPointOnNavMesh();
 
-            Context?.Set(FsmContextType.AnimationType, AnimationType.Special1); //TODO: добавить анимацию обдумывания
-            Context?.Set(FsmContextType.AnimationTime, 3f);
+            if (point.HasValue)
+            {
+                //TODO: добавить анимацию обдумывания
+                Context?.Set(FsmContextType.AnimationType, AnimationType.Special1);
+                Context?.Set(FsmContextType.AnimationTime, 3f);
 
-            _movementController.SetPoint(point); //TODO: добавить поворот в сторону точки
+                _movementController.SetPoint(point.Value);
+            }
+            else
+            {
+                Debug.LogWarning("Didn't find any point for shop location");
+            }
         }
 
         /// <summary> Возвращает статус завершения состояния. </summary>

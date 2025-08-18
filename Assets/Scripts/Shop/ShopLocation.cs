@@ -2,7 +2,9 @@ using System.Collections.Generic;
 using System.Linq;
 using FlavorfulStory.AI.BaseNpc;
 using FlavorfulStory.SceneManagement;
+using Unity.AI.Navigation;
 using UnityEngine;
+using UnityEngine.AI;
 using Random = UnityEngine.Random;
 
 namespace FlavorfulStory.Shop
@@ -19,6 +21,9 @@ namespace FlavorfulStory.Shop
 
         /// <summary> Массив мебели в магазине. </summary>
         [SerializeField] private Furniture[] _furnitures;
+
+        /// <summary> Поверхность NavMesh для данной локации. </summary> 
+        [SerializeField] private NavMeshSurface _navMeshSurface;
 
         /// <summary> Минимальное расстояние от объектов магазина при генерации случайных точек. </summary>
         private const float MinDistance = 3f;
@@ -91,32 +96,55 @@ namespace FlavorfulStory.Shop
         /// <returns> True, если вся мебель занята, иначе false. </returns>
         public bool HasAvailableFurniture() => GetAvailableObjects(_furnitures).Count > 0;
 
-        /// <summary> Генерирует случайную точку на навигационной сетке с учетом минимального
-        /// расстояния от объектов магазина. </summary>
-        /// <param name="maxAttempts"> Максимальное количество попыток генерации точки. </param>
-        /// <returns> Случайная позиция на навигационной сетке или Vector3.zero. </returns>
-        public override NpcDestinationPoint GetRandomPointOnNavMesh(int maxAttempts = 20)
+        /// <summary> Проверяет, находится ли позиция на допустимом расстоянии от мебели и витрин. </summary>
+        private bool IsValidPosition(Vector3 position)
+        {
+            return _showcases.All(s => Vector3.Distance(position, s.transform.position) >= MinDistance) &&
+                   _furnitures.All(f => Vector3.Distance(position, f.transform.position) >= MinDistance) &&
+                   Vector3.Distance(position, CashRegister.transform.position) >= MinDistance;
+        }
+
+        /// <summary> Пытается найти случайную точку на NavMesh в пределах указанного числа попыток. </summary>
+        private static bool TryGetRandomPoint(Bounds bounds, out Vector3 result, int maxAttempts = 20)
         {
             for (int i = 0; i < maxAttempts; i++)
             {
-                var pointOnNavMesh = base.GetRandomPointOnNavMesh(maxAttempts);
-                if (pointOnNavMesh.Position == Vector3.zero) continue;
+                var randomPoint = new Vector3(
+                    Random.Range(bounds.min.x, bounds.max.x),
+                    bounds.center.y,
+                    Random.Range(bounds.min.z, bounds.max.z)
+                );
 
-                bool isValidPosition = _showcases.All(showcase =>
-                    !(Vector3.Distance(pointOnNavMesh.Position, showcase.transform.position) < MinDistance));
-
-                if (!isValidPosition) continue;
-
-                if (_furnitures.All(furniture =>
-                        Vector3.Distance(pointOnNavMesh.Position, furniture.transform.position) < MinDistance))
-                    isValidPosition = false;
-
-                if (isValidPosition)
-                    return new NpcDestinationPoint(pointOnNavMesh.Position,
-                        Quaternion.Euler(0f, Random.Range(0f, 360f), 0f));
+                if (NavMesh.SamplePosition(randomPoint, out var hit, 2f, NavMesh.AllAreas))
+                {
+                    result = hit.position;
+                    return true;
+                }
             }
 
-            return new NpcDestinationPoint();
+            result = Vector3.zero;
+            return false;
+        }
+
+
+        /// <summary> Генерирует случайную точку на NavMesh с учётом минимального расстояния от объектов магазина. </summary>
+        public NpcDestinationPoint? GetRandomPointOnNavMesh(int maxAttempts = 20)
+        {
+            if (!_navMeshSurface) return null;
+
+            var bounds = new Bounds(_navMeshSurface.transform.position, _navMeshSurface.size);
+
+            for (int i = 0; i < maxAttempts; i++)
+            {
+                if (!TryGetRandomPoint(bounds, out var point, 1)) continue;
+
+                if (!IsValidPosition(point)) continue;
+
+                var randomRotation = Quaternion.Euler(0f, Random.Range(0f, 360f), 0f);
+                return new NpcDestinationPoint(point, randomRotation);
+            }
+
+            return null;
         }
     }
 }

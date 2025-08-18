@@ -29,14 +29,10 @@ namespace FlavorfulStory.AI
         [SerializeField] private Transform _parentTransform;
 
         /// <summary> Максимальное количество NPC. </summary>
-        [Header("Spawn Settings")] [SerializeField]
-        private int _maxNpcCount = 5;
+        private const int MaxNpcCount = 10;
 
         /// <summary> Интервал спавна в минутах. </summary>
-        [SerializeField] private int _spawnIntervalInMinutes = 60;
-
-        /// <summary> Количество минут в одном тике времени. </summary>
-        private const int MinutesInTick = 5;
+        private const int SpawnIntervalInMinutes = 30;
 
         /// <summary> Фабрика для создания NPC. </summary>
         private IPrefabFactory<NonInteractableNpc.NonInteractableNpc> _npcFactory;
@@ -78,9 +74,6 @@ namespace FlavorfulStory.AI
             if (_spawnData == null || _spawnData.Length < 2)
                 Debug.LogError("NpcSpawner: требуется минимум 2 точки спавна/деспавна.");
 
-
-            _spawnIntervalInTicks = _spawnIntervalInMinutes / MinutesInTick;
-
             _npcPool = new ObjectPool<NonInteractableNpc.NonInteractableNpc>(
                 CreateNpc,
                 npc => npc.gameObject.SetActive(true),
@@ -119,6 +112,7 @@ namespace FlavorfulStory.AI
             if (_isTimePaused) return;
 
             _tickCounter++;
+            _spawnIntervalInTicks = SpawnIntervalInMinutes / (int)WorldTime.TimeScale;
 
             if (_tickCounter >= _spawnIntervalInTicks && CanSpawn())
             {
@@ -129,7 +123,7 @@ namespace FlavorfulStory.AI
 
         /// <summary> Проверяет возможность спавна нового NPC. </summary>
         /// <returns> True если можно спавнить, иначе False. </returns>
-        private bool CanSpawn() => _activeCharacters.Count < _maxNpcCount;
+        private bool CanSpawn() => _activeCharacters.Count < MaxNpcCount;
 
         /// <summary> Создает NPC для пула. </summary>
         /// <returns> Созданный NPC. </returns>

@@ -1,8 +1,4 @@
-using FlavorfulStory.AI.BaseNpc;
-using Unity.AI.Navigation;
 using UnityEngine;
-using UnityEngine.AI;
-using Random = UnityEngine.Random;
 
 namespace FlavorfulStory.SceneManagement
 {
@@ -23,9 +19,6 @@ namespace FlavorfulStory.SceneManagement
         [field: Tooltip("Является ли локация помещением?"), SerializeField]
         public bool IsRoom { get; private set; }
 
-        /// <summary> Поверхность NavMesh для данной локации. </summary> 
-        [SerializeField] private NavMeshSurface _navMeshSurface;
-
         /// <summary> Коллайдер, определяющий границы локации. </summary>
         private BoxCollider _collider;
 
@@ -45,38 +38,5 @@ namespace FlavorfulStory.SceneManagement
         /// <param name="position"> Позиция в мировом пространстве. </param>
         /// <returns> <c>true</c>, если позиция внутри локации; иначе — <c>false</c>. </returns>
         public bool IsPositionInLocation(Vector3 position) => _collider.bounds.Contains(position);
-
-        /// <summary> Находит случайную точку на NavMesh в пределах локации. </summary>
-        /// <param name="maxAttempts"> Максимальное количество попыток поиска точки. По умолчанию 20. </param>
-        /// <returns> Случайная позиция на NavMesh. Возвращает Vector3.zero, если точка не найдена. </returns>
-        public virtual NpcDestinationPoint GetRandomPointOnNavMesh(int maxAttempts = 20)
-        {
-            Bounds searchBounds;
-
-            if (_navMeshSurface)
-            {
-                searchBounds = new Bounds(_navMeshSurface.transform.position, _navMeshSurface.size);
-            }
-            else
-            {
-                Debug.LogWarning("Не удалось найти точку на NavMesh.");
-                return new NpcDestinationPoint();
-            }
-
-            for (int i = 0; i < maxAttempts; i++)
-            {
-                var randomPoint = new Vector3(
-                    Random.Range(searchBounds.min.x, searchBounds.max.x),
-                    searchBounds.center.y,
-                    Random.Range(searchBounds.min.z, searchBounds.max.z)
-                );
-
-                if (NavMesh.SamplePosition(randomPoint, out var hit, 2f, NavMesh.AllAreas))
-                    return new NpcDestinationPoint(hit.position, Quaternion.identity);
-            }
-
-            Debug.LogWarning("Не удалось найти точку на NavMesh.");
-            return new NpcDestinationPoint();
-        }
     }
 }
