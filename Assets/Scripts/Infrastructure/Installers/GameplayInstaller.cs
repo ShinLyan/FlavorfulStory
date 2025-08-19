@@ -118,7 +118,6 @@ namespace FlavorfulStory.Infrastructure.Installers
         /// <summary> Установить зависимости, связанные с ремонтом построек. </summary>
         private void BindBuildingRepair()
         {
-            Container.Bind<RepairableBuildingView>().FromComponentInHierarchy().AsSingle();
             Container.Bind<IPrefabFactory<ResourceRequirementView>>()
                 .To<Factories.PrefabFactory<ResourceRequirementView>>().AsSingle()
                 .WithArguments(_requirementViewPrefab);

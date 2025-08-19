@@ -1,12 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Cysharp.Threading.Tasks;
 using FlavorfulStory.Infrastructure;
 using FlavorfulStory.Infrastructure.Factories;
-using FlavorfulStory.InputSystem;
 using FlavorfulStory.InventorySystem;
-using FlavorfulStory.TimeManagement;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -15,7 +12,7 @@ using Zenject;
 namespace FlavorfulStory.BuildingRepair.UI
 {
     /// <summary> Визуальное представление ремонта зданий. </summary>
-    public class RepairableBuildingView : MonoBehaviour
+    public class RepairableBuildingWindow : BaseWindow
     {
         #region Fields and Properties
 
@@ -37,9 +34,6 @@ namespace FlavorfulStory.BuildingRepair.UI
         /// <summary> Список отображений требований ресурсов. </summary>
         private readonly List<ResourceRequirementView> _requirementViews = new();
 
-        /// <summary> Открыто ли окно ремонта? </summary>
-        private bool _isOpen;
-
         /// <summary> Делегат, вызываемый при добавлении ресурса. </summary>
         private Action<InventoryItem> _onAdd;
 
@@ -48,9 +42,6 @@ namespace FlavorfulStory.BuildingRepair.UI
 
         /// <summary> Делегат, вызываемый при нажатии кнопки постройки. </summary>
         private Action _onBuild;
-
-        /// <summary> Делегат, вызываемый при закрытии окна. </summary>
-        private Action _onClose;
 
         /// <summary> Фабрика создания отображений требований ресурсов. </summary>
         private IPrefabFactory<ResourceRequirementView> _requirementViewFactory;
@@ -98,39 +89,21 @@ namespace FlavorfulStory.BuildingRepair.UI
                 }
         }
 
-        /// <summary> Проверить ввод пользователя и закрыть окно при необходимости. </summary>
-        private void Update()
-        {
-            if (!_isOpen || !InputWrapper.GetButtonDown(InputButton.SwitchGameMenu)) return;
-
-            Close();
-            BlockGameMenuForOneFrame().Forget();
-        }
-
-        /// <summary> Заблокировать кнопку игрового меню на один кадр. </summary>
-        private static async UniTaskVoid BlockGameMenuForOneFrame() // TODO: УДАЛИТЬ КОСТЫЛЬ НА WINDOW FABRIC
-        {
-            InputWrapper.BlockInput(InputButton.SwitchGameMenu);
-            await UniTask.Yield();
-            InputWrapper.UnblockAllInput();
-        }
-
         /// <summary> Отобразить UI ремонта для указанного объекта. </summary>
         /// <param name="stage"> Объект ремонта. </param>
         /// <param name="investedResources"> Список вложенных ресурсов. </param>
         /// <param name="onAdd"> Обработчик добавления ресурсов. </param>
         /// <param name="onReturn"> Обработчик забирания ресурсов. </param>
         /// <param name="onBuild"> Обработчик подтверждения ремонта. </param>
-        /// <param name="onClose"> Обработчик закрытия окна ремонта. </param>
-        public void Show(RepairStage stage, List<int> investedResources,
-            Action<InventoryItem> onAdd, Action<InventoryItem> onReturn, Action onBuild, Action onClose)
+        public void Setup(RepairStage stage, List<int> investedResources,
+            Action<InventoryItem> onAdd, Action<InventoryItem> onReturn, Action onBuild)
         {
             _onAdd = onAdd;
             _onReturn = onReturn;
             _onBuild = onBuild;
-            _onClose = onClose;
+            
+            _buildButton.onClick.AddListener(_onBuild.Invoke);
 
-            Open();
             UpdateView(stage, investedResources);
         }
 
@@ -171,37 +144,22 @@ namespace FlavorfulStory.BuildingRepair.UI
         private static bool IsRepairPossible(RepairStage stage, List<int> investedResources) =>
             !stage.Requirements.Where((itemStack, i) => investedResources[i] < itemStack.Number).Any();
 
-        /// <summary> Открыть окно ремонта. </summary>
-        private void Open()
+        protected override void OnOpened()
         {
-            _isOpen = true;
-            gameObject.SetActive(true);
+            base.OnOpened();
             _requirementViewsContainer.gameObject.SetActive(true);
-
-            WorldTime.Pause();
-            InputWrapper.BlockAllInput();
-            InputWrapper.UnblockInput(InputButton.SwitchGameMenu);
-
-            if (_onBuild != null) _buildButton.onClick.AddListener(_onBuild.Invoke);
         }
 
-        /// <summary> Закрыть окно ремонта и сбросить состояние. </summary>
-        public void Close()
+        protected override void OnClosed()
         {
-            _isOpen = false;
-            gameObject.SetActive(false);
-
-            WorldTime.Unpause();
-            InputWrapper.UnblockAllInput();
-
-            if (_onBuild != null) _buildButton.onClick.RemoveListener(_onBuild.Invoke);
+            base.OnClosed();
             ClearView();
 
+            _buildButton.onClick.RemoveListener(_onBuild.Invoke);
+            
             _onAdd = null;
             _onReturn = null;
             _onBuild = null;
-
-            _onClose?.Invoke();
         }
 
         /// <summary> Отобразить сообщение об окончании ремонта. </summary>

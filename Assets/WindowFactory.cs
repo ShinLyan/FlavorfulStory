@@ -86,6 +86,7 @@ namespace FlavorfulStory
             // TODO: Актуализировать. Сначала проверка, затем yield return
             if (_windows.ConfirmationWindow) yield return _windows.ConfirmationWindow;
             if (_windows.SummaryWindow) yield return _windows.SummaryWindow;
+            if (_windows.RepairableBuildingWindow) yield return _windows.RepairableBuildingWindow;
         }
 
         private void EnsureWarmup()

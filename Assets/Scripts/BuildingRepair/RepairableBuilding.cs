@@ -34,9 +34,6 @@ namespace FlavorfulStory.BuildingRepair
         /// <summary> Количество вложенных ресурсов для текущей стадии ремонта. </summary>
         private List<int> _investedResources;
 
-        /// <summary> Представление интерфейса ремонта здания. </summary>
-        private RepairableBuildingView _view;
-
         /// <summary> Завершен ли ремонт здания? </summary>
         private bool _isRepairCompleted;
 
@@ -54,14 +51,16 @@ namespace FlavorfulStory.BuildingRepair
 
         #endregion
 
+        private IWindowService _windowService;
+        
         /// <summary> Внедрение зависимостей Zenject. </summary>
         /// <param name="inventory"> Инвентарь игрока. </param>
-        /// <param name="view"> Визуальное представление ремонта зданий. </param>
+        /// <param name="windowService"> Сервис окон. </param>
         [Inject]
-        private void Construct(Inventory inventory, RepairableBuildingView view)
+        private void Construct(Inventory inventory, IWindowService windowService)
         {
             _playerInventory = inventory;
-            _view = view;
+            _windowService = windowService;
         }
 
         /// <summary> Инициализация компонента. </summary>
@@ -96,17 +95,18 @@ namespace FlavorfulStory.BuildingRepair
         /// <param name="player"> Игрок, который начал взаимодействие. </param>
         public void BeginInteraction(PlayerController player)
         {
-            _onStageUpdated += _view.UpdateView;
-            OnRepairCompleted += _view.DisplayCompletionMessage;
+            var window = _windowService.GetWindow<RepairableBuildingWindow>();
+            _onStageUpdated += window.UpdateView;
+            OnRepairCompleted += window.DisplayCompletionMessage;
 
-            _view.Show(CurrentStage, _investedResources, AddResource, ReturnResource, Build,
-                () =>
-                {
-                    _onStageUpdated -= _view.UpdateView;
-                    OnRepairCompleted -= _view.DisplayCompletionMessage;
-                    EndInteraction(player);
-                }
-            );
+            window.Closed += () =>
+            {
+                _onStageUpdated -= window.UpdateView;
+                OnRepairCompleted -= window.DisplayCompletionMessage;
+                EndInteraction(player);
+            };
+            window.Setup(CurrentStage, _investedResources, AddResource, ReturnResource, Build);
+            window.Open();
         }
 
         /// <summary> Завершает взаимодействие. </summary>
