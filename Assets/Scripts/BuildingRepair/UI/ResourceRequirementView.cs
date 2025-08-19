@@ -82,13 +82,20 @@ namespace FlavorfulStory.BuildingRepair.UI
             _investedQuantity = investedNumber;
         }
 
+        public void Refresh(int investedQuantity)
+        {
+            _investedQuantity = investedQuantity;
+            UpdateView();
+            UpdateButtonsStates();
+        }
+        
         /// <summary> Обновить визуальное отображение информации о ресурсе. </summary>
         private void UpdateView()
         {
             _resourceSlotView.Setup(_resource);
             _quantityText.text = $"{_investedQuantity}/{_requiredQuantity}";
         }
-
+        
         /// <summary> Обновить состояние кнопок добавления и возврата ресурса. </summary>
         private void UpdateButtonsStates()
         {

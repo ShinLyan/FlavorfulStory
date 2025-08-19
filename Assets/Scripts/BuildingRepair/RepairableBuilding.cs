@@ -70,11 +70,9 @@ namespace FlavorfulStory.BuildingRepair
         private void Start()
         {
             _investedResources = CurrentStage.Requirements.Select(_ => 0).ToList();
+            
             _objectSwitcher.Initialize();
-
-            // На случай системы сохранения
-            int index = _isRepairCompleted ? _repairStageIndex + 1 : _repairStageIndex;
-            _objectSwitcher.SwitchTo(index);
+            _objectSwitcher.SwitchTo(GetVisualStageIndex());
         }
 
         #region IInteractable
@@ -140,7 +138,7 @@ namespace FlavorfulStory.BuildingRepair
         /// <param name="resource"> Ресурс, который будет добавлен в ремонт. </param>
         private void AddResource(InventoryItem resource)
         {
-            int index = CurrentStage.Requirements.FindIndex(requirement => requirement.Item.ItemID == resource.ItemID);
+            int index = FindRequirementIndex(resource);
             if (index == -1) return;
 
             var requirement = CurrentStage.Requirements[index];
@@ -159,8 +157,8 @@ namespace FlavorfulStory.BuildingRepair
         /// <param name="resource"> Ресурс, который возвращается в инвентарь. </param>
         private void ReturnResource(InventoryItem resource)
         {
-            int index = CurrentStage.Requirements.FindIndex(requirement => requirement.Item.ItemID == resource.ItemID);
-            if (index == -1) return;
+            int index = FindRequirementIndex(resource);
+            if (index < 0) return;
 
             int invested = _investedResources[index];
             if (invested <= 0 || !_playerInventory.HasSpaceFor(resource)) return;
@@ -171,6 +169,11 @@ namespace FlavorfulStory.BuildingRepair
             _onStageUpdated?.Invoke(CurrentStage, _investedResources);
         }
 
+        private int FindRequirementIndex(InventoryItem item) => 
+            CurrentStage.Requirements.FindIndex(itemStack => itemStack.Item.ItemID == item.ItemID);
+        
+        private int GetVisualStageIndex() => _isRepairCompleted ? _repairStageIndex + 1 : _repairStageIndex;
+        
         #region Saving
 
         /// <summary> Структура для сохранения состояния объекта ремонта. </summary>

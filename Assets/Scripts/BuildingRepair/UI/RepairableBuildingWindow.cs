@@ -82,11 +82,7 @@ namespace FlavorfulStory.BuildingRepair.UI
         private static void RegisterExistingViews<T>(Transform parent, ObjectPool<T> pool) where T : Component
         {
             foreach (Transform child in parent)
-                if (child.TryGetComponent<T>(out var component))
-                {
-                    component.gameObject.SetActive(false);
-                    pool.Release(component);
-                }
+                if (child.TryGetComponent<T>(out var view)) pool.Release(view);
         }
 
         /// <summary> Отобразить UI ремонта для указанного объекта. </summary>
@@ -112,18 +108,26 @@ namespace FlavorfulStory.BuildingRepair.UI
         /// <param name="investedResources"> Список вложенных ресурсов. </param>
         public void UpdateView(RepairStage stage, List<int> investedResources)
         {
-            ClearView();
-
-            for (int i = 0; i < stage.Requirements.Count; i++)
+            if (_requirementViews.Count == stage.Requirements.Count)
             {
-                var view = _requirementPool.Get();
-                view.transform.SetAsLastSibling();
-                view.Setup(stage.Requirements[i], investedResources[i]);
-
-                view.OnAddClicked += _onAdd;
-                view.OnReturnClicked += _onReturn;
-
-                _requirementViews.Add(view);
+                for (int i = 0; i < _requirementViews.Count; i++)
+                {
+                    var view = _requirementViews[i];
+                    view.Refresh(investedResources[i]);
+                }
+            }
+            else
+            {
+                ClearView();
+                for (int i = 0; i < stage.Requirements.Count; i++)
+                {
+                    var view = _requirementPool.Get();
+                    view.transform.SetAsLastSibling();
+                    view.Setup(stage.Requirements[i], investedResources[i]);
+                    view.OnAddClicked += _onAdd;
+                    view.OnReturnClicked += _onReturn;
+                    _requirementViews.Add(view);
+                }
             }
 
             _buildingNameText.text = stage.BuildingName;
@@ -141,8 +145,8 @@ namespace FlavorfulStory.BuildingRepair.UI
         /// <param name="stage"> Стадия ремонта. </param>
         /// <param name="investedResources"> Вложенные ресурсы. </param>
         /// <returns> <c>true</c>, если все ресурсы вложены; иначе <c>false</c>. </returns>
-        private static bool IsRepairPossible(RepairStage stage, List<int> investedResources) =>
-            !stage.Requirements.Where((itemStack, i) => investedResources[i] < itemStack.Number).Any();
+        private static bool IsRepairPossible(RepairStage stage, List<int> investedResources) 
+            => stage.Requirements.Select((itemStack, i) => investedResources[i] >= itemStack.Number).All(x => x);
 
         protected override void OnOpened()
         {
