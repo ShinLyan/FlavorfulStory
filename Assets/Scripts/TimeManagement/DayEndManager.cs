@@ -15,99 +15,91 @@ namespace FlavorfulStory.TimeManagement
         private readonly PlayerController _playerController;
 
         /// <summary> Позиция точки сна. </summary>
-        private readonly Vector3 _sleepTriggerPosition;
+        private readonly Vector3 _sleepPosition;
 
         /// <summary> Менеджер локаций. </summary>
         private readonly LocationManager _locationManager;
-
-        /// <summary> Флаг выполнения процесса сна. </summary>
-        private bool _isProcessingSleep;
-
-        /// <summary> Коллбэк завершения. </summary>
-        private Action _onCompleteCallback;
-
-        private IWindowService _windowService;
+        private readonly IWindowService _windowService;
         
-        /// <summary> Инициализирует менеджер окончания дня. </summary>
-        /// <param name="playerController"> Контроллер игрока. </param>
-        /// <param name="sleepTrigger"> Триггер сна для определения позиции. </param>
-        /// <param name="locationManager"> Менеджер управления локациями. </param>
-        /// <param name="windowService"> Сервис окон. </param>
+        private bool _isSleeping;
+
+        private const int DefaultDayStartHour = 6;
+        
         public DayEndManager(
-            PlayerController playerController, 
+            PlayerController playerController,
             SleepTrigger sleepTrigger,
             LocationManager locationManager,
             IWindowService windowService)
         {
             _playerController = playerController;
-            _sleepTriggerPosition = sleepTrigger.transform.position;
+            _sleepPosition = sleepTrigger.transform.position;
             _locationManager = locationManager;
             _windowService = windowService;
         }
 
-        /// <summary> Подписывается на события. </summary>
         public void Initialize() => WorldTime.OnDayEnded += OnDayEnded;
-
-        /// <summary> Отписывается от событий. </summary>
         public void Dispose() => WorldTime.OnDayEnded -= OnDayEnded;
 
-        /// <summary> Обрабатывает принудительное завершение дня. </summary>
-        /// <param name="date"> Текущая дата игрового времени. </param>
-        private void OnDayEnded(DateTime date) => ExhaustedSleep();
-
-        /// <summary> Запрашивает завершение дня. </summary>
-        /// <param name="onCompleteCallback"> Коллбэк, вызываемый по завершении процесса. </param>
-        public void RequestEndDay(Action onCompleteCallback) =>
-            ProcessSleepAsync(onCompleteCallback, false).Forget();
-
-        /// <summary> Обрабатывает принудительный сон при истощении. </summary>
-        private void ExhaustedSleep() =>
-            ProcessSleepAsync(null, true).Forget();
-
-        /// <summary> Выполняет процесс сна. </summary>
-        /// <param name="onComplete"> Коллбэк завершения. </param>
-        /// <param name="isExhausted"> Флаг принудительного сна. </param>
-        private async UniTaskVoid ProcessSleepAsync(Action onComplete, bool isExhausted)
+        public void RequestEndDay(Action onComplete)
         {
-            if (_isProcessingSleep) return;
-            _isProcessingSleep = true;
-
-            if (!isExhausted) WorldTime.BeginNewDay(6);
-
-            await EndDayRoutine();
-            _windowService.CloseWindow<SummaryWindow>();
-            await RestorePlayerState(_sleepTriggerPosition, isExhausted);
-
-            onComplete?.Invoke();
-            _isProcessingSleep = false;
+            ProcessSleepAsync(false).ContinueWith(() => onComplete?.Invoke()).Forget();
         }
 
-        /// <summary> Выполняет рутину завершения дня. </summary>
-        private async UniTask EndDayRoutine()
+        private void OnDayEnded(DateTime _) => ProcessSleepAsync(true).Forget();
+
+        private async UniTask ProcessSleepAsync(bool isExhausted)
         {
-            WorldTime.Pause();
+            if (_isSleeping) return;
+            
+            _isSleeping = true;
+
+            if (!isExhausted) WorldTime.BeginNewDay(DefaultDayStartHour);
+
+            await ExecuteSleepSequence(isExhausted);
+            _isSleeping = false;
+        }
+
+        private async UniTask ExecuteSleepSequence(bool isExhausted)
+        {
             _locationManager.EnableLocation(LocationName.RockyIsland);
-            await ShowSummaryAndWaitForContinue();
-            WorldTime.Unpause();
+
+            await ShowSummaryWindowAsync();
+            
+            _windowService.CloseWindow<SummaryWindow>();
+            RestorePlayer(isExhausted);
         }
 
-        /// <summary> Восстанавливает состояние игрока после сна. </summary>
-        /// <param name="targetPosition"> Целевая позиция для перемещения игрока. </param>
-        /// <param name="isExhausted"> Флаг состояния истощения. </param>
-        private async UniTask RestorePlayerState(Vector3 targetPosition, bool isExhausted)
+        private async UniTask ShowSummaryWindowAsync()
+        {
+            var window = _windowService.GetWindow<SummaryWindow>();
+            if (window == null) return;
+
+            window.SetSummary(SummaryWindow.DefaultSummaryText);
+            _windowService.OpenWindow<SummaryWindow>();
+
+            await WaitForWindowCloseAsync(window);
+        }
+
+        private void RestorePlayer(bool isExhausted)
         {
             _playerController.RestoreStatsAfterSleep(isExhausted);
-            _playerController.SetPosition(targetPosition);
-            await UniTask.Yield();
+            _playerController.SetPosition(_sleepPosition);
             _locationManager.UpdateActiveLocation();
         }
 
-        /// <summary> Показывает сводку и ожидает продолжения. </summary>
-        private async UniTask ShowSummaryAndWaitForContinue()
+        private static UniTask WaitForWindowCloseAsync(SummaryWindow window)
         {
-            _windowService.GetWindow<SummaryWindow>().SetSummary(SummaryWindow.DefaultSummaryText);;
-            _windowService.OpenWindow<SummaryWindow>();
-            await UniTask.Yield();
+            var tcs = new UniTaskCompletionSource();
+
+            void OnClosed()
+            {
+                window.Closed -= OnClosed;
+                tcs.TrySetResult();
+            }
+
+            window.Closed += OnClosed;
+
+            return tcs.Task;
         }
     }
 }
