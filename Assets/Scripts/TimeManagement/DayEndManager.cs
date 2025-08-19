@@ -11,9 +11,6 @@ namespace FlavorfulStory.TimeManagement
     /// <summary> Управляет процессом завершения игрового дня.. </summary>
     public class DayEndManager : IInitializable, IDisposable
     {
-        /// <summary> Отображение сводки дня. </summary>
-        private readonly SummaryWindow _summaryWindow;
-
         /// <summary> Контроллер игрока. </summary>
         private readonly PlayerController _playerController;
 
@@ -29,18 +26,23 @@ namespace FlavorfulStory.TimeManagement
         /// <summary> Коллбэк завершения. </summary>
         private Action _onCompleteCallback;
 
+        private IWindowService _windowService;
+        
         /// <summary> Инициализирует менеджер окончания дня. </summary>
-        /// <param name="summaryWindow"> Вью для отображения итогов дня. </param>
         /// <param name="playerController"> Контроллер игрока. </param>
         /// <param name="sleepTrigger"> Триггер сна для определения позиции. </param>
         /// <param name="locationManager"> Менеджер управления локациями. </param>
-        public DayEndManager(SummaryWindow summaryWindow, PlayerController playerController, SleepTrigger sleepTrigger,
-            LocationManager locationManager)
+        /// <param name="windowService"> Сервис окон. </param>
+        public DayEndManager(
+            PlayerController playerController, 
+            SleepTrigger sleepTrigger,
+            LocationManager locationManager,
+            IWindowService windowService)
         {
-            _summaryWindow = summaryWindow;
             _playerController = playerController;
             _sleepTriggerPosition = sleepTrigger.transform.position;
             _locationManager = locationManager;
+            _windowService = windowService;
         }
 
         /// <summary> Подписывается на события. </summary>
@@ -73,7 +75,7 @@ namespace FlavorfulStory.TimeManagement
             if (!isExhausted) WorldTime.BeginNewDay(6);
 
             await EndDayRoutine();
-            _summaryWindow.HideWithAnimation().Forget();
+            _windowService.CloseWindow<SummaryWindow>();
             await RestorePlayerState(_sleepTriggerPosition, isExhausted);
 
             onComplete?.Invoke();
@@ -103,9 +105,9 @@ namespace FlavorfulStory.TimeManagement
         /// <summary> Показывает сводку и ожидает продолжения. </summary>
         private async UniTask ShowSummaryAndWaitForContinue()
         {
-            _summaryWindow.SetSummary(SummaryWindow.DefaultSummaryText);
-            await _summaryWindow.ShowWithAnimation();
-            await _summaryWindow.WaitForContinue();
+            _windowService.GetWindow<SummaryWindow>().SetSummary(SummaryWindow.DefaultSummaryText);;
+            _windowService.OpenWindow<SummaryWindow>();
+            await UniTask.Yield();
         }
     }
 }

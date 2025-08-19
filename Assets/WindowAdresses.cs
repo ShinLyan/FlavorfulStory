@@ -7,5 +7,6 @@ namespace FlavorfulStory
     {
         //Все окна добавляются сюда
         [field: SerializeField] public GameObject ConfirmationWindow { get; private set; }
+        [field: SerializeField] public GameObject SummaryWindow { get; private set; }
     }
 }

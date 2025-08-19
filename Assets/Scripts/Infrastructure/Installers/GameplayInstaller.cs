@@ -232,7 +232,6 @@ namespace FlavorfulStory.Infrastructure.Installers
         /// <summary> Установить зависимости, связанные с системой времени. </summary>
         private void BindTimeManagement()
         {
-            Container.Bind<SummaryWindow>().FromComponentInHierarchy().AsSingle();
             Container.BindInterfacesAndSelfTo<DayEndManager>().AsSingle();
             Container.Bind<SleepTrigger>().FromComponentInHierarchy().AsSingle();
         }
