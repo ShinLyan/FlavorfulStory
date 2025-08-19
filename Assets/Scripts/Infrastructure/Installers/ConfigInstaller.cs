@@ -9,11 +9,13 @@ namespace FlavorfulStory.Infrastructure.Installers
     {
         [SerializeField] private WindowAdresses _windowAdresses;
         [SerializeField] private NotificationsSettings _notificationSettings;
+        [SerializeField] private OverlayFadeSettings _overlayFadeSettings;
         
         public override void InstallBindings()
         {
             Container.Bind<WindowAdresses>().FromInstance(_windowAdresses).AsSingle();
             Container.Bind<NotificationsSettings>().FromInstance(_notificationSettings).AsSingle();
+            Container.Bind<OverlayFadeSettings>().FromInstance(_overlayFadeSettings).AsSingle();
         }
     }
 }

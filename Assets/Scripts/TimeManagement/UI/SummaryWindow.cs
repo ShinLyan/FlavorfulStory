@@ -1,22 +1,22 @@
 ﻿using System;
+using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
-using FlavorfulStory.InputSystem;
-using FlavorfulStory.UI.Animation;
-using TMPro;
-using UnityEngine;
-using UnityEngine.Serialization;
-using UnityEngine.UI;
 using Zenject;
+using FlavorfulStory.UI.Animation;
+using FlavorfulStory.InputSystem;
 
 namespace FlavorfulStory.TimeManagement.UI
 {
+    //TODO: Довестьи до ума - не проебаться
     /// <summary> Отображение сводки дня с анимациями. </summary>
-    public class SummaryWindow : BaseWindow
+    public class SummaryWindow : MonoBehaviour
     {
         /// <summary> Текст для отображения сводки. </summary>
         [SerializeField] private TMP_Text _summaryText;
-
+        
         /// <summary> Кнопка закрытия окна. </summary>
         /// <remarks> При закрытия окна - игра продолжается. </remarks>
         [SerializeField] private Button _closeButton;

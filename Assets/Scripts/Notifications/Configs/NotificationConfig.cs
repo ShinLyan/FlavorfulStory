@@ -4,7 +4,7 @@ using UnityEngine;
 namespace FlavorfulStory.Notifications.Configs
 {
     /// <summary> Конфигурация отображения уведомления конкретного типа. </summary>
-    [CreateAssetMenu(menuName = "FlavorfulStory/StaticData/Notifications/NotificationConfig")]
+    [CreateAssetMenu(menuName = "FlavorfulStory/StaticData/UI/Notifications/NotificationConfig")]
     public class NotificationConfig : ScriptableObject
     {
         /// <summary> Тип уведомления, которому соответствует данная конфигурация. </summary>

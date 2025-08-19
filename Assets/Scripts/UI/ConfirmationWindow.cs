@@ -1,8 +1,4 @@
 ﻿using System;
-using DG.Tweening;
-using FlavorfulStory.InputSystem;
-using FlavorfulStory.TimeManagement;
-using FlavorfulStory.UI.Animation;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -10,8 +6,7 @@ using UnityEngine.UI;
 namespace FlavorfulStory.UI
 {
     /// <summary> Представляет UI-компонент для отображения окна подтверждения с кнопками "Да" и "Нет". </summary>
-    [RequireComponent(typeof(CanvasGroupFader))]
-    public class ConfirmationWindowView : MonoBehaviour
+    public class ConfirmationWindow : BaseWindow
     {
         /// <summary> Текстовый элемент для отображения заголовка диалога. </summary>
         [SerializeField] private TMP_Text _titleText;
@@ -24,12 +19,6 @@ namespace FlavorfulStory.UI
 
         /// <summary> Кнопка для отмены действия ("Нет"). </summary>
         [SerializeField] private Button _noButton;
-
-        /// <summary> Компонент для управления плавным появлением и исчезновением UI через CanvasGroup. </summary>
-        private CanvasGroupFader _fader;
-
-        /// <summary> Инициализация компонентов. </summary>
-        private void Awake() => _fader = GetComponent<CanvasGroupFader>();
 
         /// <summary> Настраивает диалог подтверждения с указанными параметрами. </summary>
         /// <param name="title"> Заголовок диалога. </param>
@@ -44,29 +33,10 @@ namespace FlavorfulStory.UI
             _yesButton.onClick.RemoveAllListeners();
             _noButton.onClick.RemoveAllListeners();
 
+            _yesButton.onClick.AddListener(Close);
             _yesButton.onClick.AddListener(() => onYes?.Invoke());
+            _noButton.onClick.AddListener(Close);
             _noButton.onClick.AddListener(() => onNo?.Invoke());
-        }
-
-        /// <summary> Показывает диалог подтверждения. </summary>
-        public void Show()
-        {
-            gameObject.SetActive(true);
-            InputWrapper.BlockAllInput();
-            WorldTime.Pause();
-
-            _fader.Show();
-        }
-
-        /// <summary> Скрывает диалог подтверждения. </summary>
-        public void Hide()
-        {
-            _fader.Hide().OnComplete(() =>
-            {
-                gameObject.SetActive(false);
-                InputWrapper.UnblockAllInput();
-                WorldTime.Unpause();
-            });
         }
     }
 }

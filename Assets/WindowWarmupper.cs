@@ -7,10 +7,7 @@ namespace FlavorfulStory
     {
         private readonly IWindowFactory _windowFactory;
 
-        public WindowWarmupper(IWindowFactory windowFactory)
-        {
-            _windowFactory = windowFactory;
-        }
+        public WindowWarmupper(IWindowFactory windowFactory) => _windowFactory = windowFactory;
 
         public void Initialize()
         {

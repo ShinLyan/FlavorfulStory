@@ -84,7 +84,7 @@ namespace FlavorfulStory
             // Тут должны быть все окна
             
             // TODO: Актуализировать. Сначала проверка, затем yield return
-            if (_windows.TestWindow) yield return _windows.TestWindow;
+            if (_windows.ConfirmationWindow) yield return _windows.ConfirmationWindow;
         }
 
         private void EnsureWarmup()

@@ -1,5 +1,8 @@
 ﻿using System;
+using FlavorfulStory.InputSystem;
+using FlavorfulStory.TimeManagement;
 using UnityEngine;
+using Zenject;
 
 namespace FlavorfulStory
 {
@@ -10,15 +13,24 @@ namespace FlavorfulStory
         public event Action Opened;
         public event Action Closed;
 
+        // Инжектим необязательно: на ранних сценах можно жить без гейта.
+        [InjectOptional] private IWindowOpenGate _openGate;
+        
         public void Open()
         {
-            if (IsOpened) return;
+            if (IsOpened)
+            {
+                transform.SetAsLastSibling();
+                return;
+            }
 
-            transform.SetAsLastSibling();
-            gameObject.SetActive(true);
-            IsOpened = true;
-            OnOpened();
-            Opened?.Invoke();
+            if (_openGate != null)
+            {
+                _openGate.RequestOpen(this, DoOpenImmediate);
+                return;
+            }
+
+            DoOpenImmediate();
         }
 
         public virtual void Close()
@@ -29,8 +41,18 @@ namespace FlavorfulStory
             IsOpened = false;
             OnClosed();
             Closed?.Invoke();
+            
         }
 
+        private void DoOpenImmediate()
+        {
+            transform.SetAsLastSibling();
+            gameObject.SetActive(true);
+            IsOpened = true;
+            OnOpened();
+            Opened?.Invoke();
+        }
+        
         protected virtual void OnOpened() { }
         protected virtual void OnClosed() { }
 

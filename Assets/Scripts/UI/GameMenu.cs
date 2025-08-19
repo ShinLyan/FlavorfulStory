@@ -64,7 +64,8 @@ namespace FlavorfulStory.UI
         /// смены вкладки и нажатия на кнопки вкладок. </summary>
         private void Update()
         {
-            HandleInputToSwitchMenu();
+            // TODO: Расскоментить + сделать адекватно
+            //HandleInputToSwitchMenu();
             HandleTabInput();
         }
 

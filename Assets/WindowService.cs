@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using FlavorfulStory.InputSystem;
+using FlavorfulStory.TimeManagement;
 using UnityEngine;
 
 namespace FlavorfulStory
@@ -8,11 +11,9 @@ namespace FlavorfulStory
     {
         private readonly IWindowFactory _windowFactory;
         private readonly Dictionary<Type, BaseWindow> _windows = new();
+        private readonly List<BaseWindow> _openedWindows = new();
 
-        public WindowService(IWindowFactory windowFactory)
-        {
-            _windowFactory = windowFactory;
-        }
+        public WindowService(IWindowFactory windowFactory) => _windowFactory = windowFactory;
 
         public event Action<BaseWindow> OnWindowOpened;
         public event Action<BaseWindow> OnWindowClosed;
@@ -28,7 +29,17 @@ namespace FlavorfulStory
             var window = GetWindow<TWindow>();
             if (!window) return null;
             
-            window.Open();
+            if (window.IsOpened)
+            {
+                _openedWindows.Remove(window);
+                _openedWindows.Add(window);
+                window.transform.SetAsLastSibling();
+            }
+            else
+            {
+                window.Open();
+            }
+
             return window;
         }
 
@@ -36,15 +47,24 @@ namespace FlavorfulStory
         {
             var window = GetWindow<TWindow>();
             if (!window) return;
+            
             window.Close();
         }
 
+        public void CloseTopWindow()
+        {
+            if (_openedWindows.Count == 0) return;
+    
+            var top = _openedWindows.Last();
+            top.Close();
+        }
+        
         public void CloseAllWindows()
         {
-            foreach (var window in _windows.Values)
-                window.Close();
+            var snapshot = _openedWindows.ToArray();
+            foreach (var window in snapshot) window.Close();
         }
-
+        
         public TWindow GetWindow<TWindow>() where TWindow : BaseWindow
         {
             if (_windows.TryGetValue(typeof(TWindow), out var baseWindow))
@@ -61,16 +81,34 @@ namespace FlavorfulStory
         public void TryAddWindow<TWindow>(TWindow window) where TWindow : BaseWindow
         {
             var type = window.GetType();
-            if (_windows.ContainsKey(type))
+            if (!_windows.TryAdd(type, window))
             {
                 Debug.LogWarning($"[Windows] Window type \"{type.Name}\" is already registered.");
                 return;
             }
 
-            _windows.Add(type, window);
-            
-            window.Opened += () => OnWindowOpened?.Invoke(window);
-            window.Closed += () => OnWindowClosed?.Invoke(window);
+            window.Opened += () =>
+            {
+                if (_openedWindows.Count == 0) //TODO: Переделать(вынести в IInputProvider(для UI)). Выглядить как наррушение SRP
+                {
+                    WorldTime.Pause();
+                    InputWrapper.BlockAllInput();
+                }
+                _openedWindows.Remove(window);
+                _openedWindows.Add(window);
+                OnWindowOpened?.Invoke(window);
+            };
+
+            window.Closed += () =>
+            {
+                _openedWindows.Remove(window);
+                if (_openedWindows.Count == 0) //TODO: Переделать(вынести в IInputProvider(для UI)). Выглядить как наррушение SRP
+                {
+                    WorldTime.Unpause();
+                    InputWrapper.UnblockAllInput();
+                }
+                OnWindowClosed?.Invoke(window);
+            };
         }
 
         public void Dispose()

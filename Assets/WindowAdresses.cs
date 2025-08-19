@@ -6,6 +6,6 @@ namespace FlavorfulStory
     public class WindowAdresses: ScriptableObject
     {
         //Все окна добавляются сюда
-        [field: SerializeField] public GameObject TestWindow { get; private set; }
+        [field: SerializeField] public GameObject ConfirmationWindow { get; private set; }
     }
 }

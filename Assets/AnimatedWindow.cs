@@ -1,6 +1,6 @@
-﻿using Cysharp.Threading.Tasks;
+﻿using UnityEngine;
+using Cysharp.Threading.Tasks;
 using DG.Tweening;
-using UnityEngine;
 
 namespace FlavorfulStory
 {
@@ -11,8 +11,8 @@ namespace FlavorfulStory
         [Header("Animation Settings")]
         [SerializeField] private RectTransform _container;
         [SerializeField] private CanvasGroup _canvasGroup;
-        [SerializeField] private float _animationDuration = 0.5f;
-        [SerializeField] private Ease _animationEase = Ease.InOutBack;
+        [SerializeField] private float _animationDuration;
+        [SerializeField] private Ease _animationEase;
         [SerializeField] private PanelAnimationDirection _direction = PanelAnimationDirection.Center;
 
         private Vector2 _offscreenPosition;
@@ -20,6 +20,7 @@ namespace FlavorfulStory
         private bool _isAnimating;
         private bool _isFirstOpen = true;
 
+        // TODO: Перевести на UniTaskVoid?
         protected override async void OnOpened()
         {
             if (_container == null || _canvasGroup == null)
@@ -68,13 +69,13 @@ namespace FlavorfulStory
             sequence.Join(_container.DOAnchorPos(_offscreenPosition, _animationDuration).SetEase(_animationEase));
             if (_direction == PanelAnimationDirection.Center)
                 sequence.Join(_container.DOScale(0.5f, _animationDuration).SetEase(_animationEase));
-
             await sequence.AsyncWaitForCompletion();
 
             base.Close();
             _isAnimating = false;
         }
 
+        // TODO: Перевести на UniTaskVoid?
         protected override async void OnClosed()
         {
             if (_isAnimating || _container == null || _canvasGroup == null) return;
@@ -87,7 +88,6 @@ namespace FlavorfulStory
             sequence.Join(_container.DOAnchorPos(_offscreenPosition, _animationDuration).SetEase(_animationEase));
             if (_direction == PanelAnimationDirection.Center)
                 sequence.Join(_container.DOScale(0.5f, _animationDuration).SetEase(_animationEase));
-
             await sequence.AsyncWaitForCompletion();
 
             _isAnimating = false;

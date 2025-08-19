@@ -30,7 +30,6 @@ using FlavorfulStory.Toolbar.UI;
 using FlavorfulStory.Tools;
 using FlavorfulStory.TooltipSystem;
 using FlavorfulStory.TooltipSystem.ActionTooltips;
-using FlavorfulStory.UI;
 using FlavorfulStory.UI.Animation;
 using FlavorfulStory.Visuals.Lightning;
 using Unity.Cinemachine;
@@ -53,9 +52,6 @@ namespace FlavorfulStory.Infrastructure.Installers
         /// <summary> Виртуальная камера при телепорте. </summary>
         /// <remarks> Используется для WarpPortal при смене локаций. </remarks>
         [SerializeField] private CinemachineCamera _teleportVirtualCamera;
-
-        /// <summary> Затемнитель интерфейса HUD. </summary>
-        [SerializeField] private CanvasGroupFader _hudFader;
 
         /// <summary> Префаб всплывающей подсказки для предмета. </summary>
         [SerializeField] private ItemTooltipView _itemTooltipPrefab;
@@ -102,7 +98,6 @@ namespace FlavorfulStory.Infrastructure.Installers
             BindStats();
             BindTimeManagement();
             BindTooltipSystem();
-            BindUI();
             BindOther();
         }
 
@@ -249,13 +244,6 @@ namespace FlavorfulStory.Infrastructure.Installers
             Container.Bind<IActionTooltipViewSpawner>().To<ActionTooltipViewSpawner>().FromComponentInHierarchy()
                 .AsSingle();
             Container.Bind<ItemTooltipView>().FromInstance(_itemTooltipPrefab).AsSingle();
-        }
-
-        /// <summary> Установить зависимости, связанные с пользовательским интерфейсом. </summary>
-        private void BindUI()
-        {
-            Container.Bind<CanvasGroupFader>().WithId("HUD").FromInstance(_hudFader).AsSingle();
-            Container.Bind<ConfirmationWindowView>().FromComponentInHierarchy().AsSingle();
         }
 
         /// <summary> Установить общие или прочие зависимости. </summary>

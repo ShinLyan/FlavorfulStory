@@ -73,6 +73,7 @@ namespace FlavorfulStory.AI.WarpGraphSystem
         private IEnumerator TeleportPlayer(PlayerController playerController) // TODO: Переписать на UniTask
         {
             InputWrapper.BlockAllInput();
+            //TODO: Перевести на UIFadeCoordinator или чет такое
             yield return _canvasGroupFader.Show().WaitForCompletion();
 
             if (_virtualCamera) _virtualCamera.enabled = false;
@@ -84,6 +85,7 @@ namespace FlavorfulStory.AI.WarpGraphSystem
             _locationManager.UpdateActiveLocation();
             if (_virtualCamera) _virtualCamera.enabled = true;
 
+            //TODO: Перевести на UIFadeCoordinator или чет такое
             yield return _canvasGroupFader.Hide().WaitForCompletion();
             InputWrapper.UnblockAllInput();
         }
