@@ -21,15 +21,12 @@ namespace FlavorfulStory.AI.FSM.ShopStates
 
         /// <summary> Инициализирует состояние анимации. </summary>
         /// <param name="npcAnimationController"> Контроллер анимаций NPC. </param>
-        public AnimationState(NpcAnimationController npcAnimationController)
-        {
+        public AnimationState(NpcAnimationController npcAnimationController) =>
             _npcAnimationController = npcAnimationController;
-        }
 
         /// <summary> Выполняется при входе в состояние. </summary>
         public override void Enter()
         {
-            base.Enter();
             WorldTime.OnTimePaused += HandlePause;
             _isAnimationComplete = false;
 
@@ -44,13 +41,10 @@ namespace FlavorfulStory.AI.FSM.ShopStates
         /// <summary> Обновляет состояние каждый кадр. </summary>
         public override void Update()
         {
-            if (_isPaused) return;
+            if (_isPaused || _isAnimationComplete || !(_timer > 0)) return;
 
-            if (!_isAnimationComplete && _timer > 0)
-            {
-                _timer -= Time.deltaTime;
-                if (_timer <= 0) _isAnimationComplete = true;
-            }
+            _timer -= Time.deltaTime;
+            if (_timer <= 0) _isAnimationComplete = true;
         }
 
         /// <summary> Выполняется при выходе из состояния. </summary>

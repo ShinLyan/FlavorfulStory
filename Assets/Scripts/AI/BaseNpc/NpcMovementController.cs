@@ -9,14 +9,14 @@ namespace FlavorfulStory.AI.BaseNpc
     /// Реализует интерфейс IScheduleDependable для работы с системой расписания. </summary>
     public abstract class NpcMovementController : IInitializable, IDisposable
     {
-        /// <summary> Контроллер анимации NPC. </summary>
-        private readonly NpcAnimationController _animationController;
-
         /// <summary> Unity NavMeshAgent для навигации по NavMesh. </summary>
         private readonly NavMeshAgent _agent;
 
         /// <summary> Навигатор для управления перемещением NPC. </summary>
         protected readonly NpcNavigator _navigator;
+
+        /// <summary> Контроллер анимации NPC. </summary>
+        private readonly NpcAnimationController _animationController;
 
         /// <summary> Событие, вызываемое при достижении пункта назначения. </summary>
         public Action OnDestinationReached;
@@ -29,8 +29,8 @@ namespace FlavorfulStory.AI.BaseNpc
             NpcAnimationController animationController)
         {
             _agent = navMeshAgent;
-            _animationController = animationController;
             _navigator = new NpcNavigator(_agent, transform);
+            _animationController = animationController;
         }
 
         /// <summary> Инициализация объекта. </summary>

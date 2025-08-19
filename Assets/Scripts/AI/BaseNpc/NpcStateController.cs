@@ -12,9 +12,6 @@ namespace FlavorfulStory.AI.BaseNpc
     /// управляющий переходами между различными состояниями персонажа. </summary>
     public abstract class NpcStateController : IInitializable, IDisposable
     {
-        /// <summary> Текущее активное состояние персонажа. </summary>
-        protected CharacterState _currentState;
-
         /// <summary> Словарь для быстрого доступа к состояниям по их типу. </summary>
         protected readonly Dictionary<NpcStateName, CharacterState> _nameToCharacterStates;
 
@@ -24,6 +21,9 @@ namespace FlavorfulStory.AI.BaseNpc
         /// <summary> Transform NPC для определения позиции. </summary>
         protected readonly Transform _npcTransform;
 
+        /// <summary> Текущее активное состояние персонажа. </summary>
+        protected CharacterState CurrentState { get; private set; }
+
         /// <summary> Имя текущего стейта. </summary>
         /// <remarks> Для дебага. </remarks>
         public NpcStateName CurrentNpcStateName { get; private set; }
@@ -31,8 +31,7 @@ namespace FlavorfulStory.AI.BaseNpc
         /// <summary> Инициализирует новый экземпляр контроллера состояний. </summary>
         /// <param name="npcAnimationController"> Контроллер анимации NPC. </param>
         /// <param name="npcTransform"> Transform NPC для определения позиции. </param>
-        protected NpcStateController(NpcAnimationController npcAnimationController,
-            Transform npcTransform)
+        protected NpcStateController(NpcAnimationController npcAnimationController, Transform npcTransform)
         {
             _nameToCharacterStates = new Dictionary<NpcStateName, CharacterState>();
             _animationController = npcAnimationController;
@@ -60,7 +59,7 @@ namespace FlavorfulStory.AI.BaseNpc
         protected virtual void OnReset(DateTime currentTime) => ResetStates();
 
         /// <summary> Обновляет текущее состояние персонажа каждый кадр. </summary>
-        public void Update() => _currentState?.Update();
+        public void Update() => CurrentState?.Update();
 
         /// <summary> Сбрасывает все состояния к начальному и устанавливает состояние рутины. </summary>
         /// <remarks> Может быть переопределен в наследниках для специфической логики сброса. </remarks>
@@ -78,9 +77,9 @@ namespace FlavorfulStory.AI.BaseNpc
 
             CurrentNpcStateName = npcStateName;
 
-            _currentState?.Exit();
-            _currentState = next;
-            _currentState?.Enter();
+            CurrentState?.Exit();
+            CurrentState = next;
+            CurrentState?.Enter();
         }
     }
 }

@@ -8,10 +8,10 @@ namespace FlavorfulStory.AI.BaseNpc
     public readonly struct NpcDestinationPoint
     {
         /// <summary> Позиция точки назначения. </summary>
-        public readonly Vector3 Position;
+        public Vector3 Position { get; }
 
         /// <summary> Поворот в точке назначения. </summary>
-        public readonly Quaternion Rotation;
+        public Quaternion Rotation { get; }
 
         /// <summary> Создает точку назначения с заданными параметрами. </summary>
         /// <param name="position"> Позиция точки назначения. </param>

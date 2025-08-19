@@ -5,11 +5,11 @@ namespace FlavorfulStory.AI.FSM
     /// <summary> Абстрактный базовый класс для всех состояний, используемых в конечном автомате (FSM). </summary>
     public abstract class CharacterState
     {
-        /// <summary> Событие, вызываемое для запроса перехода к другому состоянию. </summary>
-        public event Action<NpcStateName> OnStateChangeRequested;
-
         /// <summary> Контекст состояния, содержащий общие данные и зависимости. </summary>
         public StateContext Context { get; protected set; }
+
+        /// <summary> Событие, вызываемое для запроса перехода к другому состоянию. </summary>
+        public event Action<NpcStateName> OnStateChangeRequested;
 
         /// <summary> Устанавливает контекст состояния с общими данными и зависимостями. </summary>
         /// <param name="context"> Контекст состояния для установки. </param>

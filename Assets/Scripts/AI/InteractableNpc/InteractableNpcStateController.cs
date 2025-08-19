@@ -14,22 +14,22 @@ namespace FlavorfulStory.AI.InteractableNpc
 {
     /// <summary> Контроллер состояний конечного автомата NPC,
     /// управляющий переходами между различными состояниями персонажа. </summary>
-    public class InteractableNpcStateController : NpcStateController, ICharacterCollisionHandler
+    public sealed class InteractableNpcStateController : NpcStateController, ICharacterCollisionHandler
     {
-        /// <summary> Обработчик расписания NPC </summary>
-        private readonly NpcScheduleHandler _scheduleHandler;
-
-        /// <summary> Событие, вызываемое при изменении текущих параметров расписания. </summary>
-        private event Action<NpcScheduleParams> OnCurrentScheduleParamsChanged;
-
         /// <summary> Отсортированные параметры расписания для быстрого поиска подходящего. </summary>
         private readonly IEnumerable<NpcScheduleParams> _sortedScheduleParams;
+
+        /// <summary> Обработчик расписания NPC </summary>
+        private readonly NpcScheduleHandler _scheduleHandler;
 
         /// <summary> Контроллер движения для интерактивного NPC. </summary>
         private readonly InteractableNpcMovementController _npcMovementController;
 
         /// <summary> Контроллер игрока для взаимодействия. </summary>
         private readonly IPlayerPositionProvider _playerPositionProvider;
+
+        /// <summary> Событие, вызываемое при изменении текущих параметров расписания. </summary>
+        private event Action<NpcScheduleParams> OnCurrentScheduleParamsChanged;
 
         /// <summary> Инициализирует новый экземпляр контроллера состояний. </summary>
         /// <param name="npcSchedule"> Расписание NPC. </param>
@@ -101,12 +101,12 @@ namespace FlavorfulStory.AI.InteractableNpc
         /// <param name="newPoint"> Новая точка расписания. </param>
         private void OnSchedulePointChanged(NpcSchedulePoint newPoint)
         {
-            switch (_currentState)
+            switch (CurrentState)
             {
                 case WaitingState:
                     return;
                 case MovementState:
-                    _currentState.Enter();
+                    CurrentState.Enter();
                     break;
                 default:
                     SetState(NpcStateName.Movement);

@@ -34,8 +34,6 @@ namespace FlavorfulStory.AI.FSM.ShopStates
         /// <summary> Выполняет вход в состояние, освобождает полку и устанавливает цель движения к кассе. </summary>
         public override void Enter()
         {
-            base.Enter();
-
             if (Context != null && Context.TryGet<ShopObject>(FsmContextType.SelectedObject, out var showcase))
             {
                 var showcaseInventory = ((Showcase)showcase).Inventory;

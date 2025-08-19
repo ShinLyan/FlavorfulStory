@@ -25,7 +25,6 @@ namespace FlavorfulStory.AI.FSM.ShopStates
         /// <summary> Выполняет вход в состояние, выбирает доступную мебель и устанавливает цель движения. </summary>
         public override void Enter()
         {
-            base.Enter();
             var furniture = _shopLocation.GetAvailableFurniture();
 
             if (!furniture) return;

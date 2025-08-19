@@ -26,7 +26,6 @@ namespace FlavorfulStory.AI.FSM.ShopStates
         /// <summary> Выполняет вход в состояние, выбирает случайную точку и устанавливает цель движения. </summary>
         public override void Enter()
         {
-            base.Enter();
             var point = _shopLocation.GetRandomPointOnNavMesh();
 
             if (point.HasValue)

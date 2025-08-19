@@ -13,8 +13,7 @@ namespace FlavorfulStory.Shop
     public class ShopLocation : Location
     {
         /// <summary> Касса магазина для обслуживания покупателей. </summary>
-        [field: SerializeField]
-        public CashRegister CashRegister { get; private set; }
+        [field: SerializeField] public CashRegister CashRegister { get; private set; }
 
         /// <summary> Массив полок в магазине. </summary>
         [SerializeField] private Showcase[] _showcases;
@@ -53,10 +52,7 @@ namespace FlavorfulStory.Shop
         private static T GetRandomAvailableObject<T>(T[] objects) where T : ShopObject
         {
             var availableObjects = GetAvailableObjects(objects);
-
-            if (availableObjects.Count == 0) return null;
-
-            return availableObjects[Random.Range(0, availableObjects.Count)];
+            return availableObjects.Count == 0 ? null : availableObjects[Random.Range(0, availableObjects.Count)];
         }
 
         /// <summary> Проверяет наличие доступных прилавков с товарами. </summary>
@@ -97,12 +93,10 @@ namespace FlavorfulStory.Shop
         public bool HasAvailableFurniture() => GetAvailableObjects(_furnitures).Count > 0;
 
         /// <summary> Проверяет, находится ли позиция на допустимом расстоянии от мебели и витрин. </summary>
-        private bool IsValidPosition(Vector3 position)
-        {
-            return _showcases.All(s => Vector3.Distance(position, s.transform.position) >= MinDistance) &&
-                   _furnitures.All(f => Vector3.Distance(position, f.transform.position) >= MinDistance) &&
-                   Vector3.Distance(position, CashRegister.transform.position) >= MinDistance;
-        }
+        private bool IsValidPosition(Vector3 position) =>
+            _showcases.All(showcase => Vector3.Distance(position, showcase.transform.position) >= MinDistance) &&
+            _furnitures.All(furniture => Vector3.Distance(position, furniture.transform.position) >= MinDistance) &&
+            Vector3.Distance(position, CashRegister.transform.position) >= MinDistance;
 
         /// <summary> Пытается найти случайную точку на NavMesh в пределах указанного числа попыток. </summary>
         private static bool TryGetRandomPoint(Bounds bounds, out Vector3 result, int maxAttempts = 20)
@@ -125,7 +119,6 @@ namespace FlavorfulStory.Shop
             result = Vector3.zero;
             return false;
         }
-
 
         /// <summary> Генерирует случайную точку на NavMesh с учётом минимального расстояния от объектов магазина. </summary>
         public NpcDestinationPoint? GetRandomPointOnNavMesh(int maxAttempts = 20)

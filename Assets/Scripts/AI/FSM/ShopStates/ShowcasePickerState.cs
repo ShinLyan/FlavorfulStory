@@ -25,7 +25,6 @@ namespace FlavorfulStory.AI.FSM.ShopStates
         /// <summary> Выполняет вход в состояние, выбирает доступную полку и устанавливает цель движения. </summary>
         public override void Enter()
         {
-            base.Enter();
             var availableShowcase = _shopLocation.GetRandomAvailableShowcaseWithItems();
 
             if (!availableShowcase) return;

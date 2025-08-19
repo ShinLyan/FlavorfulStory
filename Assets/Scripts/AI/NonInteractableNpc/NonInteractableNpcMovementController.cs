@@ -15,10 +15,8 @@ namespace FlavorfulStory.AI.NonInteractableNpc
         /// <param name="transform"> Трансформ объекта NPC. </param>
         /// <param name="animationController"> Контроллер анимации для управления анимациями движения. </param>
         public NonInteractableNpcMovementController(NavMeshAgent navMeshAgent, Transform transform,
-            NpcAnimationController animationController) : base(navMeshAgent, transform, animationController)
-        {
+            NpcAnimationController animationController) : base(navMeshAgent, transform, animationController) =>
             _currentPoint = new NpcDestinationPoint();
-        }
 
         /// <summary> Инициализация объекта. </summary>
         public override void Initialize() => _navigator.OnDestinationReached += HandleDestinationReached;

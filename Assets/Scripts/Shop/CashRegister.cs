@@ -124,7 +124,7 @@ namespace FlavorfulStory.Shop
             player.SetBusyState(false);
             if (Amount <= 0) return;
 
-            _transactionService.TransferMoneyFromCashRegisterToPlayer();
+            _transactionService.TransferRegisterToPlayer();
             _cashRegisterAnimator.ToggleCoin(false);
             SfxPlayer.Play(SfxType.CashRegister);
         }

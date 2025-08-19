@@ -1,4 +1,5 @@
 using Cysharp.Threading.Tasks;
+using FlavorfulStory.Audio;
 using FlavorfulStory.Economy;
 using FlavorfulStory.InventorySystem;
 using FlavorfulStory.SceneManagement;
@@ -32,12 +33,10 @@ namespace FlavorfulStory.AI.FSM.ShopStates
         /// <summary> Выполняет вход в состояние, освобождает точку у кассы и обрабатывает оплату. </summary>
         public override void Enter()
         {
-            base.Enter();
-
             if (Context == null || !Context.TryGet<ItemStack>(FsmContextType.PurchaseItem, out var itemStack)) return;
 
-            bool playerInLocation = _locationManager.IsPlayerInLocation(LocationName.NewShop);
-            _transactionService.SellToNpc(itemStack, playerInLocation);
+            if (_locationManager.IsPlayerInLocation(LocationName.NewShop)) SfxPlayer.Play(SfxType.Buy);
+            _transactionService.ProcessNpcPurchase(itemStack);
             _purchaseIndicator.HideModel().Forget();
         }
 

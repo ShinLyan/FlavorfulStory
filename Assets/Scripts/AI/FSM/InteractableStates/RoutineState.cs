@@ -35,7 +35,7 @@ namespace FlavorfulStory.AI.FSM.InteractableStates
         }
 
         /// <summary> Устанавливает новую текущую точку расписания и переключает состояние на движение. </summary>
-        /// <param name="newCurrentPont"> Новая текущая точка расписания. </param>
-        public void SetNewCurrentPoint(NpcSchedulePoint newCurrentPont) => _currentPoint = newCurrentPont;
+        /// <param name="newCurrentPoint"> Новая текущая точка расписания. </param>
+        public void SetNewCurrentPoint(NpcSchedulePoint newCurrentPoint) => _currentPoint = newCurrentPoint;
     }
 }

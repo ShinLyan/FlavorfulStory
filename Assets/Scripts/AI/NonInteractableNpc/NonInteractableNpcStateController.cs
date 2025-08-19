@@ -13,21 +13,13 @@ namespace FlavorfulStory.AI.NonInteractableNpc
 {
     /// <summary> Контроллер состояний конечного автомата NPC,
     /// управляющий переходами между различными состояниями персонажа. </summary>
-    public class NonInteractableNpcStateController : NpcStateController
+    public sealed class NonInteractableNpcStateController : NpcStateController
     {
-        #region Fields
-
         /// <summary> Контроллер движения неинтерактивного NPC. </summary>
         private readonly NonInteractableNpcMovementController _npcMovementController;
 
         /// <summary> Менеджер локаций для получения информации о местоположениях. </summary>
         private readonly LocationManager _locationManager;
-
-        /// <summary> Флаг, указывающий, посещал ли NPC мебель после покупки. </summary>
-        private bool _hadVisitedFurnitureAfterPurchase;
-
-        /// <summary> Точка, в которой NPC должен исчезнуть. </summary>
-        private NpcDestinationPoint _despawnPoint;
 
         /// <summary> Сервис для обработки транзакций и торговых операций. </summary>
         private readonly TransactionService _transactionService;
@@ -35,7 +27,11 @@ namespace FlavorfulStory.AI.NonInteractableNpc
         /// <summary> Индикатор купленного товара у НПС. </summary>
         private readonly NpcPurchaseIndicator _purchaseIndicator;
 
-        #endregion
+        /// <summary> Флаг, указывающий, посещал ли NPC мебель после покупки. </summary>
+        private bool _hadVisitedFurnitureAfterPurchase;
+
+        /// <summary> Точка, в которой NPC должен исчезнуть. </summary>
+        private NpcDestinationPoint _despawnPoint;
 
         /// <summary> Инициализирует новый экземпляр контроллера состояний для неинтерактивного NPC. </summary>
         /// <param name="npcMovementController"> Контроллер движения NPC, отвечающий за перемещение персонажа. </param>
