@@ -26,19 +26,24 @@ namespace FlavorfulStory.Toolbar.UI
         /// <summary> Можно ли взаимодействовать? </summary>
         public bool IsInteractable { get; set; }
 
+        private IInventoryProvider _inventoryProvider;
+        
         /// <summary> Выбранный предмет. </summary>
         public InventoryItem SelectedItem => _slots[SelectedItemIndex].GetItem();
 
         /// <summary> Внедрение зависимостей Zenject. </summary>
         /// <param name="signalBus"> Сигнальная шина Zenject. </param>
-        /// <param name="inventory"> Инвентарь игрока. </param>
+        /// <param name="inventoryProvider"> Провайдер инвентарей. </param>
         [Inject]
-        private void Construct(SignalBus signalBus, Inventory inventory)
+        private void Construct(SignalBus signalBus, IInventoryProvider inventoryProvider, Inventory playerInventory)
         {
             _signalBus = signalBus;
-            _playerInventory = inventory;
+            _inventoryProvider = inventoryProvider;
+            _playerInventory = playerInventory;
         }
 
+        //public void Initialize() => _playerInventory = _inventoryProvider.GetPlayerInventory();
+        
         /// <summary> Инициализация полей и подписка на события слотов панели. </summary>
         private void Awake()
         {
@@ -73,6 +78,8 @@ namespace FlavorfulStory.Toolbar.UI
             RedrawToolbar();
             _slots[SelectedItemIndex].Select();
         }
+
+        private void OnDestroy() => _playerInventory.InventoryUpdated -= RedrawToolbar;
 
         /// <summary> Сбрасывает состояние выделения всех слотов панели инструментов. </summary>
         private void ResetToolbar()

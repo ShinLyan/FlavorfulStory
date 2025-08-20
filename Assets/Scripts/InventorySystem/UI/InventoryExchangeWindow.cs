@@ -1,15 +1,11 @@
-﻿using System;
-using Cysharp.Threading.Tasks;
-using FlavorfulStory.InputSystem;
-using FlavorfulStory.TimeManagement;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
 
 namespace FlavorfulStory.InventorySystem.UI
 {
     /// <summary> Окно обмена между двумя инвентарями (игрок и хранилище). </summary>
-    public class InventoryExchangeWindow : MonoBehaviour
+    public class InventoryExchangeWindow : BaseWindow
     {
         /// <summary> View для отображения второго инвентаря (например, сундука). </summary>
         [SerializeField] private InventoryView _otherInventoryView;
@@ -20,14 +16,14 @@ namespace FlavorfulStory.InventorySystem.UI
         /// <summary> Кнопка "Add to Existing" — переносит стакающиеся предметы. </summary>
         [SerializeField] private Button _addToExistingButton;
 
+        /// <summary> Кнопка "Add to Existing" — переносит стакающиеся предметы. </summary>
+        [SerializeField] private Button _closeButton;
+        
         /// <summary> Второй инвентарь (например, сундук). </summary>
         private Inventory _otherInventory;
 
         /// <summary> Инвентарь игрока. </summary>
         private Inventory _playerInventory;
-
-        /// <summary> Колбэк, вызываемый при закрытии окна. </summary>
-        private Action _onClose;
 
         /// <summary> Сервис для передачи предметов между инвентарями. </summary>
         private InventoryTransferService _transferService;
@@ -38,54 +34,34 @@ namespace FlavorfulStory.InventorySystem.UI
         private void Construct(InventoryTransferService transferService) => _transferService = transferService;
 
         /// <summary> Подписывает обработчик на кнопку переноса предметов. </summary>
-        private void Awake() => _addToExistingButton.onClick.AddListener(OnAddToExistingClicked);
-
-        /// <summary> Удаляет все подписки при уничтожении объекта. </summary>
-        private void OnDestroy() => _addToExistingButton.onClick.RemoveAllListeners();
-
-        /// <summary> Закрывает окно по нажатию кнопки выхода из меню (например, Escape). </summary>
-        private void Update()
+        private void Awake()
         {
-            if (!InputWrapper.GetButtonDown(InputButton.SwitchGameMenu)) return;
-
-            Hide();
-            BlockGameMenuForOneFrame().Forget();
+            _addToExistingButton.onClick.AddListener(OnAddToExistingClicked);
+            _closeButton.onClick.AddListener(Close);
         }
 
-        /// <summary> Открыть окно обмена между двумя инвентарями. </summary>
-        /// <param name="playerInventory"> Инвентарь игрока. </param>
-        /// <param name="otherInventory"> Инвентарь объекта (сундук и тд.). </param>
-        /// <param name="onClose"> Колбэк, вызываемый при закрытии окна. </param>
-        public void Show(Inventory playerInventory, Inventory otherInventory, Action onClose)
+        /// <summary> Удаляет все подписки при уничтожении объекта. </summary>
+        private void OnDestroy()
         {
-            gameObject.SetActive(true);
+            _addToExistingButton.onClick.RemoveListener(OnAddToExistingClicked);
+            _closeButton.onClick.RemoveListener(Close);
+        }
 
+        public void Setup(Inventory otherInventory, Inventory playerInventory)
+        {
             _otherInventory = otherInventory;
             _playerInventory = playerInventory;
 
             _otherInventoryView.Initialize(otherInventory);
             _playerInventoryView.Initialize(playerInventory);
-
-            _onClose = onClose;
-
-            WorldTime.Pause();
-            InputWrapper.BlockAllInput();
-            InputWrapper.UnblockInput(InputButton.SwitchGameMenu);
         }
 
-        /// <summary> Закрыть окно и вернуть управление игроку. </summary>
-        public void Hide()
+        protected override void OnClosed()
         {
-            gameObject.SetActive(false);
+            base.OnClosed();
 
             _otherInventory = null;
             _playerInventory = null;
-
-            _onClose?.Invoke();
-            _onClose = null;
-
-            WorldTime.Unpause();
-            InputWrapper.UnblockAllInput();
         }
 
         /// <summary> Обрабатывает нажатие на кнопку "Add to Existing". </summary>
@@ -99,14 +75,6 @@ namespace FlavorfulStory.InventorySystem.UI
                     () => { _playerInventory.RemoveFromSlot(slotIndex, stack.Number); });
                 _otherInventoryView.AnimateAdd(stack.Item);
             }
-        }
-
-        /// <summary> Блокирует кнопку выхода из окна на один кадр (предотвращает повторное закрытие). </summary>
-        private static async UniTaskVoid BlockGameMenuForOneFrame()
-        {
-            InputWrapper.BlockInput(InputButton.SwitchGameMenu);
-            await UniTask.Yield();
-            InputWrapper.UnblockAllInput();
         }
     }
 }

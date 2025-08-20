@@ -23,21 +23,15 @@ namespace FlavorfulStory.InventorySystem.UI
         private Transform _slotsContainer;
 
         /// <summary> Внедрить зависимости: инвентарь и фабрику отображений ячеек. </summary>
-        /// <param name="inventory"> Инвентарь игрока. </param>
         /// <param name="slotFactory"> Фабрика отображений ячеек. </param>
         [Inject]
-        private void Construct(Inventory inventory, IPrefabFactory<InventorySlotView> slotFactory)
-        {
-            _inventory = inventory;
-            _slotFactory = slotFactory;
-        }
+        private void Construct(IPrefabFactory<InventorySlotView> slotFactory) => _slotFactory = slotFactory;
 
         /// <summary> Инициализировать отображения и подписаться на обновление инвентаря. </summary>
         private void Awake()
         {
             _slotsContainer = transform;
             CacheInitialSlots();
-            Initialize(_inventory);
         }
 
         /// <summary> Сохранить существующие отображения ячеек, если они уже присутствуют в иерархии. </summary>

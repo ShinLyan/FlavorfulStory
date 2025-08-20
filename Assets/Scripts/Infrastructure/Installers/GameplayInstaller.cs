@@ -163,7 +163,6 @@ namespace FlavorfulStory.Infrastructure.Installers
             Container.Bind<IPrefabFactory<InventorySlotView>>().To<Factories.PrefabFactory<InventorySlotView>>()
                 .AsSingle()
                 .WithArguments(_inventorySlotViewPrefab);
-            Container.Bind<InventoryExchangeWindow>().FromComponentInHierarchy().AsSingle();
 
             Container.BindInterfacesTo<ToolUseController>().AsSingle();
             Container.BindInterfacesTo<EdibleUseController>().AsSingle();
