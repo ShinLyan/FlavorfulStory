@@ -8,21 +8,20 @@ namespace FlavorfulStory.AI
     public class NpcPurchaseIndicator : MonoBehaviour
     {
         /// <summary> 3D-модель индикатора. </summary>
-        [Tooltip("3D-модель индикатора, которую нужно анимировать.")] [SerializeField]
+        [Tooltip("3D-модель индикатора, которую нужно анимировать."), SerializeField]
         private GameObject _model;
 
         /// <summary> Длительность анимации. </summary>
         [Header("Настройки анимации")]
-        [Tooltip("Длительность анимации появления/исчезновения в секундах.")]
-        [SerializeField]
+        [Tooltip("Длительность анимации появления/исчезновения в секундах."), SerializeField]
         private float _fadeDuration = 0.6f;
 
         /// <summary> Начальный масштаб. </summary>
-        [Tooltip("Начальный масштаб при появлении.")] [SerializeField]
+        [Tooltip("Начальный масштаб при появлении."), SerializeField]
         private float _startScale = 0.8f;
 
         /// <summary> Скорость вращения. </summary>
-        [Tooltip("Скорость вращения (градусов в секунду).")] [SerializeField]
+        [Tooltip("Скорость вращения (градусов в секунду)."), SerializeField]
         private float _rotationSpeed = 60f;
 
         /// <summary> Исходный масштаб модели. </summary>

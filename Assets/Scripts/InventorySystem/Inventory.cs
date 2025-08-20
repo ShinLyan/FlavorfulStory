@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using FlavorfulStory.Core;
 using FlavorfulStory.Saving;
 using UnityEngine;
 using Zenject;
+using Random = UnityEngine.Random;
 
 namespace FlavorfulStory.InventorySystem
 {
@@ -218,6 +220,24 @@ namespace FlavorfulStory.InventorySystem
         {
             _inventorySlots[slotIndex].Item = null;
             _inventorySlots[slotIndex].Number = 0;
+        }
+
+        /// <summary> Полуичть рандомный стак из инвенторя. </summary>
+        /// <returns> Стак предметов. </returns>
+        public ItemStack GetRandomStack()
+        {
+            var nonEmptySlots = new List<int>();
+
+            for (int i = 0; i < InventorySize; i++)
+            {
+                var stackSlot = GetItemStackInSlot(i);
+                if (stackSlot.Item && stackSlot.Number > 0) nonEmptySlots.Add(i);
+            }
+
+            int randomIndex = Random.Range(0, nonEmptySlots.Count);
+            var stack = GetItemStackInSlot(nonEmptySlots[randomIndex]);
+            RemoveFromSlot(randomIndex);
+            return stack;
         }
 
         #region Saving

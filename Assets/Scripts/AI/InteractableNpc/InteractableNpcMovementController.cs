@@ -39,14 +39,7 @@ namespace FlavorfulStory.AI.InteractableNpc
 
         /// <summary> Перемещает NPC к текущей точке расписания. </summary>
         /// <remarks> Если текущая точка расписания существует, инициирует движение к ней. </remarks>
-        public override void MoveToPoint()
-        {
-            var point = _scheduleHandler.CurrentPoint;
-            if (point == null) return;
-
-            var destination = new NpcDestinationPoint(point.Position, Quaternion.Euler(point.Rotation));
-            _navigator.MoveTo(destination);
-        }
+        public override void MoveToPoint() => _navigator.MoveTo(_scheduleHandler.CurrentPoint.NpcDestinationPoint);
 
         /// <summary> Обрабатывает изменение точки расписания. </summary>
         /// <param name="point"> Новая точка расписания. </param>
@@ -57,8 +50,7 @@ namespace FlavorfulStory.AI.InteractableNpc
             if (!_navigator.IsMoving) return;
 
             Stop();
-            var destination = new NpcDestinationPoint(point.Position, Quaternion.Euler(point.Rotation));
-            _navigator.MoveTo(destination);
+            _navigator.MoveTo(point.NpcDestinationPoint);
         }
     }
 }

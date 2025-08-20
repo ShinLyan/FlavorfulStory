@@ -54,6 +54,6 @@ namespace FlavorfulStory.AI.BaseNpc
         private void ContinueAnimation() => _animator.speed = 1;
 
         /// <summary> Сбрасывает все параметры Animator к значениям по умолчанию. </summary>
-        public void Reset() => _animator.Rebind();
+        public void Reset() => _animator.SetTrigger(Animator.StringToHash(AnimationType.Locomotion.ToString()));
     }
 }

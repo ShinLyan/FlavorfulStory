@@ -42,23 +42,24 @@ namespace FlavorfulStory.AI.Scheduling.Editor
             for (int i = 0; i < param.Path.Length; i++)
             {
                 var pathPoint = param.Path[i];
-                var newPosition = GetSurfaceAdjustedPosition(pathPoint.Position, viewer);
-
-                if (pathPoint.Position != newPosition)
-                {
-                    pathPoint.Position = newPosition;
-                    EditorUtility.SetDirty(schedule);
-                }
+                // var newPosition = GetSurfaceAdjustedPosition(pathPoint.NpcDestinationPoint.Position, viewer);
+                //
+                // if (pathPoint.NpcDestinationPoint.Position != newPosition)
+                // {
+                //     pathPoint.SetTransform(newPosition, pathPoint.NpcDestinationPoint.Rotation);
+                //     EditorUtility.SetDirty(schedule);
+                // }
 
                 if (i < param.Path.Length - 1)
                 {
                     var next = param.Path[i + 1];
                     Handles.color = viewer.LineColor;
-                    Handles.DrawLine(pathPoint.Position, next.Position, viewer.LineThickness);
+                    Handles.DrawLine(pathPoint.NpcDestinationPoint.Position, next.NpcDestinationPoint.Position,
+                        viewer.LineThickness);
                 }
 
                 // Рисуем метку с фоном
-                var labelPosition = pathPoint.Position + Vector3.forward * viewer.SphereSize;
+                var labelPosition = pathPoint.NpcDestinationPoint.Position + Vector3.forward * viewer.SphereSize;
                 string labelContent =
                     $"{pathPoint.Hour:00}:{pathPoint.Minutes:00}\n{pathPoint.NpcAnimation}";
 
@@ -88,7 +89,8 @@ namespace FlavorfulStory.AI.Scheduling.Editor
                 }
 
                 Handles.color = i == viewer.SelectedPointIndex ? Color.green : Color.red;
-                Handles.SphereHandleCap(0, pathPoint.Position, Quaternion.identity, viewer.SphereSize,
+                Handles.SphereHandleCap(0, pathPoint.NpcDestinationPoint.Position, Quaternion.identity,
+                    viewer.SphereSize,
                     EventType.Repaint);
             }
 
@@ -96,15 +98,17 @@ namespace FlavorfulStory.AI.Scheduling.Editor
             if (viewer.SelectedPointIndex < 0 || viewer.SelectedPointIndex >= param.Path.Length) return;
 
             var point = param.Path[viewer.SelectedPointIndex];
-            var pos = point.Position;
-            var rot = Quaternion.Euler(point.Rotation);
+            var pos = point.NpcDestinationPoint.Position;
+            var rot = point.NpcDestinationPoint.Rotation;
+
+            if (rot == default || rot.Equals(new Quaternion(0, 0, 0, 0))) rot = Quaternion.identity;
 
             EditorGUI.BeginChangeCheck();
             var newPos = Handles.PositionHandle(pos, rot);
             if (EditorGUI.EndChangeCheck())
             {
                 Undo.RecordObject(schedule, "Move Schedule Point");
-                point.Position = newPos;
+                point.SetTransform(newPos, rot);
                 EditorUtility.SetDirty(schedule);
             }
 
@@ -113,7 +117,7 @@ namespace FlavorfulStory.AI.Scheduling.Editor
             if (EditorGUI.EndChangeCheck())
             {
                 Undo.RecordObject(schedule, "Rotate Schedule Point");
-                point.Rotation = newRot.eulerAngles;
+                point.SetTransform(newPos, newRot);
                 EditorUtility.SetDirty(schedule);
             }
         }
@@ -411,11 +415,12 @@ namespace FlavorfulStory.AI.Scheduling.Editor
             {
                 Hour = 12,
                 Minutes = 0,
-                NpcAnimation = AnimationType.Idle,
-                Position = currentParam.Path.Length > 0
-                    ? currentParam.Path[^1].Position + Vector3.forward
-                    : Vector3.zero
+                NpcAnimation = AnimationType.Idle
             };
+            var pos = currentParam.Path.Length > 0
+                ? currentParam.Path[^1].NpcDestinationPoint.Position + Vector3.forward
+                : Vector3.zero;
+            newPath[^1].SetTransform(pos, Quaternion.identity);
 
             Undo.RecordObject(demonstrator.Schedule, "Add Schedule Point");
             currentParam.Path = newPath;

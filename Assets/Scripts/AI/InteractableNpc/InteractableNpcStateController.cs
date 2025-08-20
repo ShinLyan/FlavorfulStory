@@ -7,6 +7,7 @@ using FlavorfulStory.AI.FSM;
 using FlavorfulStory.AI.FSM.InteractableStates;
 using FlavorfulStory.AI.Scheduling;
 using FlavorfulStory.Player;
+using FlavorfulStory.TimeManagement;
 using UnityEngine;
 using DateTime = FlavorfulStory.TimeManagement.DateTime;
 
@@ -52,9 +53,12 @@ namespace FlavorfulStory.AI.InteractableNpc
         /// <summary> Инициализация объекта. </summary>
         public override void Initialize()
         {
+            base.Initialize();
+            InitializeStates();
+
             _scheduleHandler.OnSchedulePointChanged += OnSchedulePointChanged;
             OnCurrentScheduleParamsChanged += _scheduleHandler.SetCurrentScheduleParams;
-            base.Initialize();
+            OnReset(WorldTime.CurrentGameTime);
         }
 
         /// <summary> Освобождает ресурсы при уничтожении объекта. </summary>
@@ -67,7 +71,7 @@ namespace FlavorfulStory.AI.InteractableNpc
 
         /// <summary> Инициализирует все состояния для интерактивного NPC. </summary>
         /// <remarks> Создает состояния взаимодействия, движения, рутины и ожидания, настраивает связи между ними. </remarks>
-        protected override void InitializeStates()
+        private void InitializeStates()
         {
             _nameToCharacterStates.Add(NpcStateName.Movement, new MovementState(_npcMovementController, true));
             _nameToCharacterStates.Add(NpcStateName.Routine, new RoutineState(_animationController));
@@ -87,14 +91,27 @@ namespace FlavorfulStory.AI.InteractableNpc
         protected override void OnReset(DateTime currentTime)
         {
             PrioritizeSchedule(currentTime);
-            base.OnReset(currentTime);
+            ResetStates();
         }
 
         /// <summary> Сбрасывает все состояния и устанавливает состояние рутины. </summary>
-        protected override void ResetStates()
+        private void ResetStates()
         {
             foreach (var state in _nameToCharacterStates.Values) state.Reset();
             SetState(NpcStateName.Routine);
+        }
+
+        /// <summary> Определяет приоритетное расписание на основе текущих условий игры. </summary>
+        /// <param name="currentTime"> Текущее игровое время. </param>
+        private void PrioritizeSchedule(DateTime currentTime)
+        {
+            bool isRaining = false; // TODO
+            int hearts = 0; // TODO
+
+            var suitable = _sortedScheduleParams.FirstOrDefault(param =>
+                param.AreConditionsSuitable(currentTime, hearts, isRaining));
+
+            OnCurrentScheduleParamsChanged?.Invoke(suitable);
         }
 
         /// <summary> Обрабатывает изменение точки расписания и переключает состояние на движение если необходимо. </summary>
@@ -114,19 +131,6 @@ namespace FlavorfulStory.AI.InteractableNpc
             }
 
             _animationController.TriggerAnimation(AnimationType.Locomotion);
-        }
-
-        /// <summary> Определяет приоритетное расписание на основе текущих условий игры. </summary>
-        /// <param name="currentTime"> Текущее игровое время. </param>
-        private void PrioritizeSchedule(DateTime currentTime)
-        {
-            bool isRaining = false; // TODO
-            int hearts = 0; // TODO
-
-            var suitable = _sortedScheduleParams.FirstOrDefault(param =>
-                param.AreConditionsSuitable(currentTime, hearts, isRaining));
-
-            OnCurrentScheduleParamsChanged?.Invoke(suitable);
         }
 
         #region ICharacterCollisionHandler

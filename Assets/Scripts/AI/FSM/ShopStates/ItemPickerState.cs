@@ -1,7 +1,5 @@
-using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using FlavorfulStory.AI.NonInteractableNpc;
-using FlavorfulStory.InventorySystem;
 using FlavorfulStory.Shop;
 using UnityEngine;
 
@@ -37,7 +35,7 @@ namespace FlavorfulStory.AI.FSM.ShopStates
             if (Context != null && Context.TryGet<ShopObject>(FsmContextType.SelectedObject, out var showcase))
             {
                 var showcaseInventory = ((Showcase)showcase).Inventory;
-                var itemStack = GetRandomStackFromInventory(showcaseInventory);
+                var itemStack = showcaseInventory.GetRandomStack();
                 Context?.Set(FsmContextType.PurchaseItem, itemStack);
                 _purchaseIndicator.ShowModel().Forget();
             }
@@ -63,24 +61,5 @@ namespace FlavorfulStory.AI.FSM.ShopStates
         /// <summary> Возвращает статус завершения состояния. </summary>
         /// <returns> Всегда возвращает true, так как состояние завершается сразу после входа. </returns>
         public override bool IsComplete() => true;
-
-        /// <summary> Полуичть рандомный стак из инвенторя. </summary>
-        /// <param name="inventory"> Инвентарь. </param>
-        /// <returns> Стак предметов. </returns>
-        private static ItemStack GetRandomStackFromInventory(Inventory inventory)
-        {
-            var nonEmptySlots = new List<int>();
-
-            for (int i = 0; i < inventory.InventorySize; i++)
-            {
-                var stackSlot = inventory.GetItemStackInSlot(i);
-                if (stackSlot.Item && stackSlot.Number > 0) nonEmptySlots.Add(i);
-            }
-
-            int randomIndex = Random.Range(0, nonEmptySlots.Count);
-            var stack = inventory.GetItemStackInSlot(nonEmptySlots[randomIndex]);
-            inventory.RemoveFromSlot(randomIndex);
-            return stack;
-        }
     }
 }

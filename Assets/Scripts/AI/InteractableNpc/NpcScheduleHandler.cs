@@ -19,9 +19,6 @@ namespace FlavorfulStory.AI.InteractableNpc
         /// <summary> Событие, вызываемое при изменении точки расписания. </summary>
         public event Action<NpcSchedulePoint> OnSchedulePointChanged;
 
-        /// <summary> Инициализирует новый экземпляр обработчика расписания и подписывается на события времени. </summary>
-        public NpcScheduleHandler() { }
-
         public void Initialize()
         {
             WorldTime.OnTimeTick += UpdateSchedulePoint;

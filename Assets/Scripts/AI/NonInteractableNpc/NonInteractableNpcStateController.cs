@@ -6,6 +6,7 @@ using FlavorfulStory.AI.FSM.ShopStates;
 using FlavorfulStory.Economy;
 using FlavorfulStory.SceneManagement;
 using FlavorfulStory.Shop;
+using FlavorfulStory.TimeManagement;
 using UnityEngine;
 using AnimationState = FlavorfulStory.AI.FSM.ShopStates.AnimationState;
 
@@ -42,8 +43,7 @@ namespace FlavorfulStory.AI.NonInteractableNpc
         /// <param name="npcPurchaseIndicator">  </param>
         public NonInteractableNpcStateController(NonInteractableNpcMovementController npcMovementController,
             LocationManager locationManager, NpcAnimationController npcAnimationController,
-            TransactionService transactionService, Transform npcTransform,
-            NpcPurchaseIndicator npcPurchaseIndicator)
+            TransactionService transactionService, Transform npcTransform, NpcPurchaseIndicator npcPurchaseIndicator)
             : base(npcAnimationController, npcTransform)
         {
             _npcMovementController = npcMovementController;
@@ -55,8 +55,15 @@ namespace FlavorfulStory.AI.NonInteractableNpc
             _despawnPoint = new NpcDestinationPoint();
         }
 
+        public override void Initialize()
+        {
+            base.Initialize();
+
+            InitializeStates();
+        }
+
         /// <summary> Инициализирует все состояния и последовательности NPC. </summary>
-        protected override void InitializeStates()
+        private void InitializeStates()
         {
             CreateStates();
             CreateSequences();
@@ -135,8 +142,12 @@ namespace FlavorfulStory.AI.NonInteractableNpc
                 StartRandomSequence;
         }
 
+        /// <summary> Действия при сбросе контроллера. </summary>
+        /// <param name="currentTime"> Текущее время. </param>
+        protected override void OnReset(DateTime currentTime) => ResetStates();
+
         /// <summary> Сбрасывает все состояния в исходное состояние. </summary>
-        protected override void ResetStates()
+        private void ResetStates()
         {
             foreach (var state in _nameToCharacterStates.Values) state.Reset();
             SetState(NpcStateName.Idle);

@@ -30,8 +30,5 @@ namespace FlavorfulStory.AI.FSM
             value = default;
             return false;
         }
-
-        /// <summary> Очищает весь контекст, удаляя все сохранённые данные. </summary>
-        public void Clear() => _data.Clear(); // TODO: НИГДЕ НЕ ИСПОЛЬЗУЕТСЯ
     }
 }

@@ -49,9 +49,6 @@ namespace FlavorfulStory.AI
         /// <summary> Счетчик тиков. </summary>
         private int _tickCounter;
 
-        /// <summary> Флаг паузы времени. </summary>
-        private bool _isTimePaused;
-
         /// <summary> Менеджер локаций. </summary>
         private LocationManager _locationManager;
 
@@ -81,8 +78,6 @@ namespace FlavorfulStory.AI
             );
 
             WorldTime.OnDayEnded += HandleDayEnded;
-            WorldTime.OnTimePaused += HandlePause;
-            WorldTime.OnTimeUnpaused += HandleUnpause;
             WorldTime.OnTimeTick += OnTimeTickHandler;
         }
 
@@ -90,8 +85,6 @@ namespace FlavorfulStory.AI
         private void OnDestroy()
         {
             WorldTime.OnDayEnded -= HandleDayEnded;
-            WorldTime.OnTimePaused -= HandlePause;
-            WorldTime.OnTimeUnpaused -= HandleUnpause;
             WorldTime.OnTimeTick -= OnTimeTickHandler;
         }
 
@@ -99,17 +92,11 @@ namespace FlavorfulStory.AI
         /// <param name="_"> Игнорируемый параметр даты. </param>
         private void HandleDayEnded(DateTime _) => DespawnAllNpcCoroutine().Forget();
 
-        /// <summary> Обрабатывает паузу времени. </summary>
-        private void HandlePause() => _isTimePaused = true;
-
-        /// <summary> Обрабатывает снятие паузы времени. </summary>
-        private void HandleUnpause() => _isTimePaused = false;
-
         /// <summary> Обрабатывает тик времени. </summary>
         /// <param name="_"> Игнорируемый параметр даты. </param>
         private void OnTimeTickHandler(DateTime _)
         {
-            if (_isTimePaused) return;
+            if (WorldTime.IsPaused) return;
 
             _tickCounter++;
             _spawnIntervalInTicks = SpawnIntervalInMinutes / (int)WorldTime.TimeScale;

@@ -24,7 +24,11 @@ namespace FlavorfulStory.AI.FSM.InteractableStates
         public override void Enter() => PlayAnimation();
 
         /// <summary> Сбрасывает состояние рутины к начальному состоянию. </summary>
-        public override void Reset() => _animationController.Reset();
+        public override void Reset()
+        {
+            _currentPoint = null;
+            _animationController.Reset();
+        }
 
         /// <summary> Воспроизводит анимацию текущей точки расписания, если она задана. </summary>
         private void PlayAnimation()

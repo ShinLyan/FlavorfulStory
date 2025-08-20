@@ -3,7 +3,6 @@ using FlavorfulStory.AI.BaseNpc;
 using FlavorfulStory.AI.FSM;
 using FlavorfulStory.Economy;
 using FlavorfulStory.SceneManagement;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.AI;
 using Zenject;
@@ -74,19 +73,5 @@ namespace FlavorfulStory.AI.NonInteractableNpc
             _stateController.SetDespawnPoint(npcDestination);
             OnReachedDespawnPoint += () => _stateController.ForceSetState(NpcStateName.Idle);
         }
-
-#if UNITY_EDITOR
-
-        private void OnDrawGizmosSelected()
-        {
-            if (StateController == null) return;
-
-            Gizmos.color = Color.yellow;
-            var labelPosition = transform.position + Vector3.up * 2.5f;
-
-            Handles.Label(labelPosition, StateController.CurrentNpcStateName.ToString());
-        }
-
-#endif
     }
 }

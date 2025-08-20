@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using UnityEditor;
+using UnityEngine;
 using UnityEngine.AI;
 
 namespace FlavorfulStory.AI.BaseNpc
@@ -41,5 +42,19 @@ namespace FlavorfulStory.AI.BaseNpc
             MovementController.Update();
             StateController.Update();
         }
+
+#if UNITY_EDITOR
+
+        private void OnDrawGizmosSelected()
+        {
+            if (StateController == null) return;
+
+            Gizmos.color = Color.yellow;
+            var labelPosition = transform.position + Vector3.up * 2.5f;
+
+            Handles.Label(labelPosition, StateController.CurrentNpcStateName.ToString());
+        }
+
+#endif
     }
 }

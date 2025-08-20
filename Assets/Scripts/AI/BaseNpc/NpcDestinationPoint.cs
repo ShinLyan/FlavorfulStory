@@ -1,10 +1,8 @@
-using System;
 using UnityEngine;
 
 namespace FlavorfulStory.AI.BaseNpc
 {
     /// <summary> Точка назначения для перемещения NPC. </summary>
-    [Serializable]
     public readonly struct NpcDestinationPoint
     {
         /// <summary> Позиция точки назначения. </summary>

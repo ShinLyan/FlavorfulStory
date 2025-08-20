@@ -40,30 +40,17 @@ namespace FlavorfulStory.AI.BaseNpc
 
         /// <summary> Выполняет полную инициализацию контроллера состояний. </summary>
         /// <remarks> Инициализирует состояния, подписывается на события и сбрасывает систему к начальному состоянию. </remarks>
-        public virtual void Initialize()
-        {
-            InitializeStates();
-            WorldTime.OnDayEnded += OnReset;
-            OnReset(WorldTime.CurrentGameTime);
-        }
+        public virtual void Initialize() => WorldTime.OnDayEnded += OnReset;
 
         /// <summary> Освобождает ресурсы при уничтожении объекта. </summary>
         public virtual void Dispose() => WorldTime.OnDayEnded -= OnReset;
 
-        /// <summary> Инициализирует все доступные состояния персонажа и настраивает связи между ними. </summary>
-        /// <remarks> Должен быть реализован в наследниках. </remarks>
-        protected abstract void InitializeStates();
-
         /// <summary> Сбрасывает систему состояний при смене дня или инициализации. </summary>
         /// <param name="currentTime"> Текущее игровое время. </param>
-        protected virtual void OnReset(DateTime currentTime) => ResetStates();
+        protected abstract void OnReset(DateTime currentTime);
 
         /// <summary> Обновляет текущее состояние персонажа каждый кадр. </summary>
         public void Update() => CurrentState?.Update();
-
-        /// <summary> Сбрасывает все состояния к начальному и устанавливает состояние рутины. </summary>
-        /// <remarks> Может быть переопределен в наследниках для специфической логики сброса. </remarks>
-        protected abstract void ResetStates();
 
         /// <summary> Устанавливает новое состояние персонажа по типу. </summary>
         /// <param name="npcStateName"> Тип состояния для установки. </param>
