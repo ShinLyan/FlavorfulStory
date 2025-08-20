@@ -48,7 +48,7 @@ namespace FlavorfulStory.AI.FiniteStateMachine
 
             OnCurrentScheduleParamsChanged += npcMovementController.SetCurrentScheduleParams;
             WorldTime.OnDayEnded += OnReset;
-            OnReset(WorldTime.CurrentGameTime);
+            OnReset(WorldTime.CurrentDateTime);
         }
 
         /// <summary> Инициализирует все доступные состояния персонажа и настраивает связи между ними. </summary>

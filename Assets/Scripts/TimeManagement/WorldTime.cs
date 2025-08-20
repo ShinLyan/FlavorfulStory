@@ -21,7 +21,7 @@ namespace FlavorfulStory.TimeManagement
         private SignalBus _signalBus;
 
         /// <summary> Текущее игровое время. </summary>
-        public static DateTime CurrentGameTime { get; private set; }
+        public static DateTime CurrentDateTime { get; private set; }
 
         /// <summary> Игра на паузе? </summary>
         private static bool _isPaused;
@@ -61,19 +61,19 @@ namespace FlavorfulStory.TimeManagement
         private void Construct(SignalBus signalBus) => _signalBus = signalBus;
 
         /// <summary> Инициализировать начальное игровое время и подписаться на события. </summary>
-        private void Awake() => CurrentGameTime = new DateTime(1, Season.Spring, 1, DayStartHour, 0);
+        private void Awake() => CurrentDateTime = new DateTime(1, Season.Spring, 1, DayStartHour, 0);
 
         /// <summary> Вызвать начальное обновление интерфейса. </summary>
         private void Start()
         {
-            OnTimeUpdated?.Invoke(CurrentGameTime);
-            OnTimeTick?.Invoke(CurrentGameTime);
+            OnTimeUpdated?.Invoke(CurrentDateTime);
+            OnTimeTick?.Invoke(CurrentDateTime);
         }
 
         /// <summary> Очистить состояние и события при уничтожении объекта. </summary>
         private void OnDestroy()
         {
-            CurrentGameTime = default;
+            CurrentDateTime = default;
             _isPaused = false;
 
             OnTimeUpdated = null;
@@ -88,28 +88,28 @@ namespace FlavorfulStory.TimeManagement
         {
             if (_isPaused) return;
 
-            var previousTime = CurrentGameTime;
-            CurrentGameTime = CurrentGameTime.AddMinutes(Time.deltaTime * _timeScale);
+            var previousTime = CurrentDateTime;
+            CurrentDateTime = CurrentDateTime.AddMinutes(Time.deltaTime * _timeScale);
 
-            if (previousTime.Hour < NightStartHour && CurrentGameTime.Hour >= NightStartHour)
-                _signalBus.Fire(new NightStartedSignal(CurrentGameTime));
+            if (previousTime.Hour < NightStartHour && CurrentDateTime.Hour >= NightStartHour)
+                _signalBus.Fire(new NightStartedSignal(CurrentDateTime));
 
-            if ((int)CurrentGameTime.Minute % TimeBetweenTicks == 0) OnTimeTick?.Invoke(CurrentGameTime);
+            if ((int)CurrentDateTime.Minute % TimeBetweenTicks == 0) OnTimeTick?.Invoke(CurrentDateTime);
 
-            OnTimeUpdated?.Invoke(CurrentGameTime);
+            OnTimeUpdated?.Invoke(CurrentDateTime);
 
-            if (previousTime.Hour < DayEndHour && CurrentGameTime.Hour >= DayEndHour) BeginNewDay();
+            if (previousTime.Hour < DayEndHour && CurrentDateTime.Hour >= DayEndHour) BeginNewDay();
         }
 
         /// <summary> Обновить игровое время до начала следующего дня. </summary>
         public static void BeginNewDay(int dayStartHour = 10)
         {
-            bool isSameDay = CurrentGameTime.Hour is >= 0f and < DayStartHour;
+            bool isSameDay = CurrentDateTime.Hour is >= 0f and < DayStartHour;
             int dayAdjustment = isSameDay ? 0 : 1;
-            CurrentGameTime = new DateTime(CurrentGameTime.Year, CurrentGameTime.Season,
-                CurrentGameTime.SeasonDay + dayAdjustment, dayStartHour, 0);
+            CurrentDateTime = new DateTime(CurrentDateTime.Year, CurrentDateTime.Season,
+                CurrentDateTime.SeasonDay + dayAdjustment, dayStartHour, 0);
 
-            OnDayEnded?.Invoke(CurrentGameTime);
+            OnDayEnded?.Invoke(CurrentDateTime);
             SavingWrapper.Save();
         }
 
@@ -130,11 +130,11 @@ namespace FlavorfulStory.TimeManagement
         #region Saving
 
         /// <summary> Сохраняет текущее игровое время. </summary>
-        public object CaptureState() => CurrentGameTime;
+        public object CaptureState() => CurrentDateTime;
 
         /// <summary> Восстанавливает игровое время из сохранённого состояния. </summary>
         /// <param name="state"> Сохранённое значение игрового времени. </param>
-        public void RestoreState(object state) => CurrentGameTime = (DateTime)state;
+        public void RestoreState(object state) => CurrentDateTime = (DateTime)state;
 
         #endregion
     }

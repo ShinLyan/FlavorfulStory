@@ -11,7 +11,10 @@ namespace FlavorfulStory.DialogueSystem.Editor
     [CustomEditor(typeof(Dialogue))]
     public class DialogueInspectorEditor : UnityEditor.Editor
     {
+        /// <summary> Сериализованное представление списка условий диалога. </summary>
         private SerializedProperty _conditionsProp;
+
+        /// <summary> Словарь всех доступных типов условий диалога, отображаемых в меню добавления. </summary>
         private Dictionary<string, Type> _conditionTypes;
 
         /// <summary> Инициализация при включении редактора. </summary>
@@ -22,13 +25,11 @@ namespace FlavorfulStory.DialogueSystem.Editor
         }
 
         /// <summary> Получает все типы условий диалога. </summary>
-        private Dictionary<string, Type> GetConditionTypes()
-        {
-            return AppDomain.CurrentDomain.GetAssemblies()
-                .SelectMany(a => a.GetTypes())
-                .Where(t => typeof(DialogueCondition).IsAssignableFrom(t) && !t.IsAbstract && t.IsClass)
-                .ToDictionary(t => t.Name, t => t);
-        }
+        /// <returns> Все типы условий диалога. </returns>
+        private static Dictionary<string, Type> GetConditionTypes() => AppDomain.CurrentDomain.GetAssemblies()
+            .SelectMany(assembly => assembly.GetTypes())
+            .Where(type => typeof(DialogueCondition).IsAssignableFrom(type) && !type.IsAbstract && type.IsClass)
+            .ToDictionary(type => type.Name, type => type);
 
         /// <summary> Отрисовка GUI инспектора. </summary>
         public override void OnInspectorGUI()
@@ -64,8 +65,8 @@ namespace FlavorfulStory.DialogueSystem.Editor
         private void ShowConditionMenu()
         {
             var menu = new GenericMenu();
-            foreach (var kv in _conditionTypes.OrderBy(k => k.Key))
-                menu.AddItem(new GUIContent(kv.Key), false, () => AddCondition(kv.Value));
+            foreach (var pair in _conditionTypes.OrderBy(pair => pair.Key))
+                menu.AddItem(new GUIContent(pair.Key), false, () => AddCondition(pair.Value));
             menu.ShowAsContext();
         }
 
@@ -86,8 +87,8 @@ namespace FlavorfulStory.DialogueSystem.Editor
         /// <param name="index"> Индекс. </param>
         private void DrawCondition(int index)
         {
-            var el = _conditionsProp.GetArrayElementAtIndex(index);
-            EditorGUILayout.PropertyField(el, new GUIContent($"Condition {index}"), true);
+            var property = _conditionsProp.GetArrayElementAtIndex(index);
+            EditorGUILayout.PropertyField(property, new GUIContent($"Condition {index}"), true);
             DrawRemoveButton(index);
         }
 
@@ -107,8 +108,8 @@ namespace FlavorfulStory.DialogueSystem.Editor
             if (_conditionsProp == null) return;
 
             _conditionsProp.arraySize++;
-            var element = _conditionsProp.GetArrayElementAtIndex(_conditionsProp.arraySize - 1);
-            element.managedReferenceValue = Activator.CreateInstance(type);
+            var property = _conditionsProp.GetArrayElementAtIndex(_conditionsProp.arraySize - 1);
+            property.managedReferenceValue = Activator.CreateInstance(type);
             serializedObject.ApplyModifiedProperties();
         }
 
@@ -116,8 +117,8 @@ namespace FlavorfulStory.DialogueSystem.Editor
         /// <param name="index"> Индекс условия. </param>
         private void RemoveCondition(int index)
         {
-            var el = _conditionsProp.GetArrayElementAtIndex(index);
-            el.managedReferenceValue = null;
+            var property = _conditionsProp.GetArrayElementAtIndex(index);
+            property.managedReferenceValue = null;
             _conditionsProp.DeleteArrayElementAtIndex(index);
             serializedObject.ApplyModifiedProperties();
         }

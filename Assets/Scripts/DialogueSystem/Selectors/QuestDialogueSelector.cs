@@ -22,15 +22,12 @@ namespace FlavorfulStory.DialogueSystem.Selectors
         public Dialogue SelectDialogue(NpcName npcName)
         {
             foreach (var questStatus in _questExecutionContext.QuestList.QuestStatuses)
+            foreach (var objective in questStatus.CurrentObjectives)
             {
-                int index = questStatus.CurrentStageIndex;
-                if (index >= questStatus.Stages.Count) continue;
+                if (questStatus.IsObjectiveComplete(objective)) continue;
 
-                var stage = questStatus.Stages[index];
-                foreach (var objective in stage.Objectives)
-                    if (!questStatus.IsObjectiveComplete(objective) &&
-                        objective.Type == ObjectiveType.Talk)
-                        return ((TalkObjectiveParams)objective.Params).Dialogue;
+                if (objective is { Type: ObjectiveType.Talk, Params: TalkObjectiveParams talkParams })
+                    return talkParams.Dialogue;
             }
 
             return null;

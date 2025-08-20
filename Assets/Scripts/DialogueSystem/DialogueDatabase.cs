@@ -34,12 +34,9 @@ namespace FlavorfulStory.DialogueSystem
         /// <param name="npcName"> Имя NPC для поиска диалогов. </param>
         /// <param name="dialogueType"> Тип диалогов. </param>
         /// <returns> Список диалогов или пустой список, если диалогов не найдено. </returns>
-        public static List<Dialogue> GetDialoguesFromNameAndType(NpcName npcName, DialogueType dialogueType)
-        {
-            if (_dialoguesByNpc.TryGetValue(npcName, out var dialogues))
-                return dialogues.Where(d => d.DialogueType == dialogueType).ToList();
-
-            return new List<Dialogue>();
-        }
+        public static List<Dialogue> GetDialoguesFromNameAndType(NpcName npcName, DialogueType dialogueType) =>
+            _dialoguesByNpc.TryGetValue(npcName, out var dialogues)
+                ? dialogues.Where(dialogue => dialogue.DialogueType == dialogueType).ToList()
+                : new List<Dialogue>();
     }
 }

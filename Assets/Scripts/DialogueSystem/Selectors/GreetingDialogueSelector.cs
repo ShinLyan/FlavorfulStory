@@ -21,7 +21,7 @@ namespace FlavorfulStory.DialogueSystem.Selectors
 
             if (dialogues.Count == 0)
             {
-                Debug.LogError($"Для NPC {npcName} не существует приветственного диалога!!!");
+                Debug.LogError($"Для NPC {npcName} не существует приветственного диалога!");
                 return null;
             }
 

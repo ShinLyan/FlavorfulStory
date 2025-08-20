@@ -12,15 +12,14 @@ namespace FlavorfulStory.DialogueSystem
         private readonly IDialogueSelector[] _selectors;
 
         /// <summary> Инициализирует сервис с необходимыми зависимостями. </summary>
-        /// <param name="weightsConfig"> Конфигурация весов для контекстных диалогов. </param>
         /// <param name="questContext"> Контекст выполнения квестов. </param>
-        public DialogueService(DialogueWeightsConfig weightsConfig, QuestExecutionContext questContext)
+        public DialogueService(QuestExecutionContext questContext)
         {
             _selectors = new IDialogueSelector[]
             {
                 new QuestDialogueSelector(questContext),
                 new GreetingDialogueSelector(),
-                new ContextDialogueSelector(weightsConfig)
+                new ContextDialogueSelector()
             };
         }
 
@@ -28,6 +27,6 @@ namespace FlavorfulStory.DialogueSystem
         /// <param name="npcName"> Имя NPC. </param>
         /// <returns> Найденный диалог или null. </returns>
         public Dialogue GetDialogue(NpcName npcName) =>
-            _selectors.Select(selector => selector.SelectDialogue(npcName)).FirstOrDefault(dialog => dialog);
+            _selectors.Select(selector => selector.SelectDialogue(npcName)).FirstOrDefault(dialogue => dialogue);
     }
 }

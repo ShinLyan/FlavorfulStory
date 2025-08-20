@@ -11,8 +11,7 @@ namespace FlavorfulStory.DialogueSystem.Conditions
         public abstract bool MatchesCurrentState();
 
         /// <summary> Получает вес условия из конфига. </summary>
-        /// <param name="config"> Конфигурация весов. </param>
         /// <returns> Числовой вес условия.. </returns>
-        public abstract int GetWeight(DialogueWeightsConfig config);
+        public abstract int GetWeight();
     }
 }

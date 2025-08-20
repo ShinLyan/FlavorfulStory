@@ -9,13 +9,6 @@ namespace FlavorfulStory.DialogueSystem.Selectors
     /// <summary> Селектор диалогов, учитывающий контекстные условия. </summary>
     public class ContextDialogueSelector : IDialogueSelector
     {
-        /// <summary> Конфигурация весов для условий диалогов. </summary>
-        private readonly DialogueWeightsConfig _weightsConfig;
-
-        /// <summary> Инициализирует селектор с конфигурацией весов. </summary>
-        /// <param name="weightsConfig"> Конфигурация весов условий. </param>
-        public ContextDialogueSelector(DialogueWeightsConfig weightsConfig) => _weightsConfig = weightsConfig;
-
         /// <summary> Выбирает подходящий диалог для NPC. </summary>
         /// <param name="npcName"> Имя NPC. </param>
         /// <returns> Выбранный диалог или null. </returns>
@@ -34,7 +27,7 @@ namespace FlavorfulStory.DialogueSystem.Selectors
         /// <summary> Группирует диалоги по уникальным комбинациям условий. </summary>
         /// <param name="dialogues"> Список диалогов. </param>
         /// <returns> Словарь сгруппированных диалогов. </returns>
-        private Dictionary<string, List<Dialogue>> GroupDialoguesByCategory(IEnumerable<Dialogue> dialogues)
+        private static Dictionary<string, List<Dialogue>> GroupDialoguesByCategory(IEnumerable<Dialogue> dialogues)
         {
             var categoryMap = new Dictionary<string, List<Dialogue>>();
 
@@ -64,25 +57,20 @@ namespace FlavorfulStory.DialogueSystem.Selectors
         /// <summary> Вычисляет веса для категорий диалогов. </summary>
         /// <param name="categoryMap"> Сгруппированные диалоги. </param>
         /// <returns> Список категорий с весами. </returns>
-        private List<(string category, int weight)> CalculateCategoryWeights(
-            Dictionary<string, List<Dialogue>> categoryMap)
+        private static List<(string category, int weight)> CalculateCategoryWeights(
+            Dictionary<string, List<Dialogue>> categoryMap) => categoryMap.Select(pair =>
         {
-            return categoryMap
-                .Select(kvp =>
-                {
-                    int categoryWeight = kvp.Value
-                        .Sum(d => d.Conditions.Sum(c => c.GetWeight(_weightsConfig)));
-                    return (category: kvp.Key, weight: categoryWeight);
-                })
-                .ToList();
-        }
+            int categoryWeight =
+                pair.Value.Sum(dialogue => dialogue.Conditions.Sum(condition => condition.GetWeight()));
+            return (category: pair.Key, weight: categoryWeight);
+        }).ToList();
 
         /// <summary> Выбирает категорию с учетом весов. </summary>
         /// <param name="pool"> Категории с весами. </param>
         /// <returns> Ключ выбранной категории. </returns>
         private static string GetRandomCategoryByWeight(List<(string category, int weight)> pool)
         {
-            int totalWeight = pool.Sum(p => p.weight);
+            int totalWeight = pool.Sum(valueTuple => valueTuple.weight);
             int randomValue = Random.Range(0, totalWeight);
             int cumulative = 0;
 
@@ -104,9 +92,7 @@ namespace FlavorfulStory.DialogueSystem.Selectors
         /// <summary> Генерирует ключ для набора условий. </summary>
         /// <param name="conditions"> Список условий. </param>
         /// <returns> Уникальный строковый ключ. </returns>
-        private static string GetConditionsKey(List<DialogueCondition> conditions) =>
-            string.Join("|", conditions
-                .OrderBy(c => c.ToString())
-                .Select(c => c.ToString()));
+        private static string GetConditionsKey(List<DialogueCondition> conditions) => string.Join("|",
+            conditions.OrderBy(condition => condition.ToString()).Select(condition => condition.ToString()));
     }
 }

@@ -6,7 +6,7 @@ namespace FlavorfulStory.DialogueSystem
 {
     /// <summary> Данные для отображения диалога. </summary>
     [Serializable]
-    public struct DialogueData
+    public readonly struct DialogueData
     {
         /// <summary> Текст текущей реплики. </summary>
         public string Text { get; }

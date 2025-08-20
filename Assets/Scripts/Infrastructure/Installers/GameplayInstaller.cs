@@ -55,9 +55,6 @@ namespace FlavorfulStory.Infrastructure.Installers
         /// <summary> Префаб всплывающей подсказки для предмета. </summary>
         [SerializeField] private ItemTooltipView _itemTooltipPrefab;
 
-        /// <summary> Веса для условий диалога. </summary>
-        [SerializeField] private DialogueWeightsConfig _dialogueWeightsConfig;
-
         /// <summary> Выполняет установку всех зависимостей, необходимых для сцены. </summary>
         public override void InstallBindings()
         {
@@ -103,7 +100,7 @@ namespace FlavorfulStory.Infrastructure.Installers
             Container.Bind<PlayerSpeaker>().FromComponentInHierarchy().AsSingle();
             Container.Bind<DialogueModelPresenter>().FromComponentInHierarchy().AsSingle();
             Container.Bind<DialogueView>().FromComponentInHierarchy().AsSingle();
-            Container.Bind<DialogueService>().AsSingle().WithArguments(_dialogueWeightsConfig);
+            Container.Bind<DialogueService>().AsSingle();
         }
 
         /// <summary> Установить зависимости, связанные с системой квестов. </summary>

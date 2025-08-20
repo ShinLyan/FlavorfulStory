@@ -1,5 +1,6 @@
 namespace FlavorfulStory.DialogueSystem
 {
+    /// <summary> Тип диалога. </summary>
     public enum DialogueType
     {
         /// <summary> Квестовый диалог. </summary>

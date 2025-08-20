@@ -10,26 +10,25 @@ namespace FlavorfulStory.QuestSystem
     public class QuestStatus
     {
         /// <summary> Квест, к которому относится этот статус. </summary>
-        [field: SerializeField]
-        public Quest Quest { get; private set; }
+        [field: SerializeField] public Quest Quest { get; private set; }
 
         /// <summary> Список выполненных целей квеста. </summary>
         [SerializeField] private List<QuestObjective> _completedObjectives;
 
         /// <summary> Список всех этапов квеста. </summary>
-        public List<QuestStage> Stages { get; private set; }
+        private List<QuestStage> _stages;
 
         /// <summary> Индекс текущего этапа квеста. </summary>
         public int CurrentStageIndex { get; private set; }
 
         /// <summary> Текущие цели из активного этапа квеста. </summary>
         public IEnumerable<QuestObjective> CurrentObjectives =>
-            CurrentStageIndex >= 0 && CurrentStageIndex < Stages.Count
-                ? Stages[CurrentStageIndex].Objectives
+            CurrentStageIndex >= 0 && CurrentStageIndex < _stages.Count
+                ? _stages[CurrentStageIndex].Objectives
                 : Enumerable.Empty<QuestObjective>();
 
         /// <summary> Квест завершен? </summary>
-        public bool IsComplete => CurrentStageIndex >= Stages.Count;
+        public bool IsComplete => CurrentStageIndex >= _stages.Count;
 
         /// <summary> Награды были получены? </summary>
         public bool IsRewardGiven { get; private set; }
@@ -57,7 +56,7 @@ namespace FlavorfulStory.QuestSystem
         public void Initialize()
         {
             _completedObjectives ??= new List<QuestObjective>();
-            Stages ??= Quest.Stages.ToList();
+            _stages ??= Quest.Stages.ToList();
         }
 
         /// <summary> Пометить, что награды получены. </summary>
@@ -93,15 +92,15 @@ namespace FlavorfulStory.QuestSystem
         /// <param name="context"> Контекст выполнения квеста. </param>
         private void ExecuteStageActions(int stageIndex, QuestExecutionContext context)
         {
-            if (stageIndex < 0 || stageIndex >= Stages.Count) return;
+            if (stageIndex < 0 || stageIndex >= _stages.Count) return;
 
-            foreach (var action in Stages[stageIndex].OnStageCompleteActions) action.Execute(context);
+            foreach (var action in _stages[stageIndex].OnStageCompleteActions) action.Execute(context);
         }
 
         /// <summary> Этап квеста по индексу пройден? </summary>
         /// <param name="stageIndex"> Индекс этапа квеста. </param>
         /// <returns> <c>true</c> - этап квеста пройден, <c>false</c> - в противном случае. </returns>
-        public bool IsStageComplete(int stageIndex) => Stages[stageIndex].IsComplete(_completedObjectives);
+        public bool IsStageComplete(int stageIndex) => _stages[stageIndex].IsComplete(_completedObjectives);
 
         #region Saving
 

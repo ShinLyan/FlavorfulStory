@@ -47,7 +47,7 @@ namespace FlavorfulStory.Visuals.Weather
         }
 
         /// <summary> Применяет погоду сразу после старта сцены. </summary>
-        private void Start() => ApplyWeatherForDay(WorldTime.CurrentGameTime);
+        private void Start() => ApplyWeatherForDay(WorldTime.CurrentDateTime);
 
         /// <summary> Отписывается от событий при уничтожении компонента. </summary>
         private void OnDestroy()

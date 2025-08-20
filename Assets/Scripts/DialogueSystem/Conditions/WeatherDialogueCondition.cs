@@ -9,8 +9,7 @@ namespace FlavorfulStory.DialogueSystem.Conditions
     public class WeatherDialogueCondition : DialogueCondition
     {
         /// <summary> Требуемый тип погоды для выполнения условия. </summary>
-        [field: SerializeField]
-        public WeatherType Weather { get; private set; } = WeatherType.Any;
+        [field: SerializeField] public WeatherType Weather { get; private set; }
 
         /// <summary> Проверяет соответствие текущей погоды условию. </summary>
         /// <returns> True, если текущая погода соответствует условию или выбрано "Любая". </returns>
@@ -20,10 +19,8 @@ namespace FlavorfulStory.DialogueSystem.Conditions
             return Weather == WeatherType.Any || Weather == currentWeather;
         }
 
-        /// <summary> Получает вес условия из конфигурации. </summary>
-        /// <param name="config"> Конфигурация весов диалогов. </param>
+        /// <summary> Получает вес условия. </summary>
         /// <returns> Вес условия. </returns>
-        public override int GetWeight(DialogueWeightsConfig config) =>
-            Weather != WeatherType.Any ? config.WeatherWeight : 0;
+        public override int GetWeight() => Weather != WeatherType.Any ? DialogueWeightsConfig.WeatherWeight : 0;
     }
 }
