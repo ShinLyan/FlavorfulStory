@@ -30,9 +30,6 @@ namespace FlavorfulStory.AI.WarpGraphSystem
         [Tooltip("Цвет соединений между разными локациями"), SerializeField]
         private Color _remoteConnectionColor = Color.green;
 
-        /// <summary> Имя локации, к которой принадлежит данный портал. </summary>
-        public LocationName ParentLocationName { get; private set; }
-
         /// <summary> Компонент затемнения экрана при переходах между сценами. </summary>
         private CanvasGroupFader _canvasGroupFader;
 
@@ -54,9 +51,6 @@ namespace FlavorfulStory.AI.WarpGraphSystem
             _locationManager = locationManager;
             _virtualCamera = virtualCamera;
         }
-
-        /// <summary> Определение локации портала при инициализации. </summary>
-        private void Awake() => ParentLocationName = GetComponentInParent<Location>().LocationName;
 
         /// <summary> Обработка входа игрока в триггер телепортации. </summary>
         /// <param name="other"> Коллайдер объекта, вошедшего в триггер. </param>
@@ -88,6 +82,7 @@ namespace FlavorfulStory.AI.WarpGraphSystem
         }
 
 #if UNITY_EDITOR
+        
         /// <summary> Визуализация соединений между порталами в редакторе. </summary>
         private void OnDrawGizmosSelected()
         {
@@ -103,12 +98,17 @@ namespace FlavorfulStory.AI.WarpGraphSystem
 
             // Соединения внутри локации
             foreach (var portal in FindObjectsByType<Portal>(FindObjectsSortMode.None))
-                if (portal != this && portal.ParentLocationName == ParentLocationName)
-                {
-                    Gizmos.color = _localConnectionColor;
-                    Gizmos.DrawLine(transform.position, portal.transform.position);
-                }
+            {
+                var myLocation = GetComponentInParent<Location>();
+                var otherLocation = portal.GetComponentInParent<Location>();
+
+                if (portal == this || myLocation != otherLocation) continue;
+
+                Gizmos.color = _localConnectionColor;
+                Gizmos.DrawLine(transform.position, portal.transform.position);
+            }
         }
+        
 #endif
     }
 }
