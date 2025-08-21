@@ -9,28 +9,35 @@ namespace FlavorfulStory.AI.FSM
         /// <summary> Контроллер движения NPC для управления навигацией. </summary>
         private readonly NpcMovementController _movementController;
 
-        /// <summary>
-        /// 
-        /// </summary>
-        private readonly bool _isInteractableNpc;
-
         /// <summary> Флаг завершения состояния движения. Устанавливается в true при достижении цели. </summary>
         private bool _isComplete;
 
+        private NpcDestinationPoint _destinationPoint;
+
+        private readonly NpcAnimationController _animationController;
+
         /// <summary> Инициализирует новое состояние движения с заданным контроллером движения. </summary>
         /// <param name="movementController"> Контроллер движения для управления перемещением NPC. </param>
-        /// <param name="isInteractableNpc"> NPC интерактивный? </param>
-        public MovementState(NpcMovementController movementController, bool isInteractableNpc)
+        /// <param name="animationController"> Контроллер анимаций NPC. </param>
+        public MovementState(NpcMovementController movementController, NpcAnimationController animationController)
         {
             _movementController = movementController;
-            _isInteractableNpc = isInteractableNpc;
+            _animationController = animationController;
             _isComplete = false;
         }
 
         /// <summary> Входит в состояние движения и начинает перемещение к текущей точке расписания. </summary>
         public override void Enter()
         {
-            _movementController.MoveToPoint();
+            base.Enter();
+
+            if (Context.TryGet(FsmContextType.DestinationPoint, out NpcDestinationPoint destinationPoint))
+            {
+                _destinationPoint = destinationPoint;
+                _movementController.MoveToPoint(destinationPoint);
+                _animationController.TriggerAnimation(AnimationType.Locomotion);
+            }
+
             _movementController.OnDestinationReached += OnCompleteMovement;
 
             WorldTime.OnTimePaused += StopMovementOnPause;
@@ -40,6 +47,8 @@ namespace FlavorfulStory.AI.FSM
         /// <summary> Выходит из состояния движения и останавливает NPC. </summary>
         public override void Exit()
         {
+            base.Exit();
+
             _isComplete = false;
 
             _movementController.Stop();
@@ -50,21 +59,22 @@ namespace FlavorfulStory.AI.FSM
         }
 
         /// <summary> Сбрасывает состояние движения, мгновенно останавливая NPC. </summary>
-        public override void Reset() => _movementController.Stop(true);
+        public override void Reset()
+        {
+            base.Reset();
+
+            _movementController.Stop(true);
+        }
 
         /// <summary> Обрабатывает завершение движения к точке назначения. </summary>
         /// <remarks> Устанавливает флаг завершения и инициирует переход к состоянию рутины. </remarks>
-        private void OnCompleteMovement()
-        {
-            _isComplete = true;
-            if (_isInteractableNpc) RequestStateChange(NpcStateName.Routine);
-        }
+        private void OnCompleteMovement() => _isComplete = true;
 
         /// <summary> Останавливает движение NPC при паузе игрового времени, если персонаж находится в состоянии движения. </summary>
         private void StopMovementOnPause() => _movementController.Stop();
 
         /// <summary> Возобновляет движение NPC при снятии паузы игрового времени, если персонаж находится в состоянии движения. </summary>
-        private void ContinueMovementOnUnpause() => _movementController.MoveToPoint();
+        private void ContinueMovementOnUnpause() => _movementController.MoveToPoint(_destinationPoint);
 
         /// <summary> Проверяет, завершено ли выполнение состояния движения. </summary>
         /// <returns> true, если персонаж достиг точки назначения; иначе false. </returns>

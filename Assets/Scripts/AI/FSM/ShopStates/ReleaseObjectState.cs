@@ -8,8 +8,6 @@ namespace FlavorfulStory.AI.FSM.ShopStates
         /// <summary> Выполняется при входе в состояние. </summary>
         public override void Enter()
         {
-            if (Context == null) return;
-
             if (Context.TryGet<ShopObject>(FsmContextType.SelectedObject, out var shopObject))
                 shopObject.IsOccupied = false;
         }

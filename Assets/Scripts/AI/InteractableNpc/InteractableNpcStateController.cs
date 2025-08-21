@@ -4,11 +4,11 @@ using System.Linq;
 using FlavorfulStory.AI.BaseNpc;
 using FlavorfulStory.AI.FiniteStateMachine;
 using FlavorfulStory.AI.FSM;
-using FlavorfulStory.AI.FSM.InteractableStates;
 using FlavorfulStory.AI.Scheduling;
 using FlavorfulStory.Player;
 using FlavorfulStory.TimeManagement;
 using UnityEngine;
+using AnimationState = FlavorfulStory.AI.FSM.AnimationState;
 using DateTime = FlavorfulStory.TimeManagement.DateTime;
 
 namespace FlavorfulStory.AI.InteractableNpc
@@ -18,7 +18,7 @@ namespace FlavorfulStory.AI.InteractableNpc
     public sealed class InteractableNpcStateController : NpcStateController, ICharacterCollisionHandler
     {
         /// <summary> Отсортированные параметры расписания для быстрого поиска подходящего. </summary>
-        private readonly IEnumerable<NpcScheduleParams> _sortedScheduleParams;
+        private IEnumerable<NpcScheduleParams> _sortedScheduleParams;
 
         /// <summary> Обработчик расписания NPC </summary>
         private readonly NpcScheduleHandler _scheduleHandler;
@@ -32,6 +32,8 @@ namespace FlavorfulStory.AI.InteractableNpc
         /// <summary> Событие, вызываемое при изменении текущих параметров расписания. </summary>
         private event Action<NpcScheduleParams> OnCurrentScheduleParamsChanged;
 
+        private readonly NpcSchedule _npcSchedule;
+
         /// <summary> Инициализирует новый экземпляр контроллера состояний. </summary>
         /// <param name="npcSchedule"> Расписание NPC. </param>
         /// <param name="npcMovementController"> Контроллер движения NPC. </param>
@@ -44,7 +46,7 @@ namespace FlavorfulStory.AI.InteractableNpc
             NpcScheduleHandler scheduleHandler, Transform npcTransform, IPlayerPositionProvider playerPositionProvider)
             : base(npcAnimationController, npcTransform)
         {
-            _sortedScheduleParams = npcSchedule.GetSortedScheduleParams();
+            _npcSchedule = npcSchedule;
             _scheduleHandler = scheduleHandler;
             _npcMovementController = npcMovementController;
             _playerPositionProvider = playerPositionProvider;
@@ -54,6 +56,8 @@ namespace FlavorfulStory.AI.InteractableNpc
         public override void Initialize()
         {
             base.Initialize();
+
+            _sortedScheduleParams = _npcSchedule.GetSortedScheduleParams();
             InitializeStates();
 
             _scheduleHandler.OnSchedulePointChanged += OnSchedulePointChanged;
@@ -73,17 +77,16 @@ namespace FlavorfulStory.AI.InteractableNpc
         /// <remarks> Создает состояния взаимодействия, движения, рутины и ожидания, настраивает связи между ними. </remarks>
         private void InitializeStates()
         {
-            _nameToCharacterStates.Add(NpcStateName.Movement, new MovementState(_npcMovementController, true));
-            _nameToCharacterStates.Add(NpcStateName.Routine, new RoutineState(_animationController));
+            _nameToCharacterStates.Add(NpcStateName.Movement,
+                new MovementState(_npcMovementController, _animationController));
             _nameToCharacterStates.Add(NpcStateName.Waiting, new WaitingState(_playerPositionProvider, _npcTransform));
+            _nameToCharacterStates.Add(NpcStateName.Animation, new AnimationState(_animationController));
 
-            foreach (var state in _nameToCharacterStates.Values)
+            _nameToCharacterStates.Add(NpcStateName.ComeAndAnimateSequence, new SequenceState(new[]
             {
-                state.OnStateChangeRequested += SetState;
-
-                if (state is ICurrentSchedulePointDependable dependable)
-                    _scheduleHandler.OnSchedulePointChanged += dependable.SetNewCurrentPoint;
-            }
+                _nameToCharacterStates[NpcStateName.Movement],
+                _nameToCharacterStates[NpcStateName.Animation]
+            }));
         }
 
         /// <summary> Действия при сбросе контроллера. </summary>
@@ -98,7 +101,7 @@ namespace FlavorfulStory.AI.InteractableNpc
         private void ResetStates()
         {
             foreach (var state in _nameToCharacterStates.Values) state.Reset();
-            SetState(NpcStateName.Routine);
+            SetState(NpcStateName.Animation);
         }
 
         /// <summary> Определяет приоритетное расписание на основе текущих условий игры. </summary>
@@ -122,11 +125,14 @@ namespace FlavorfulStory.AI.InteractableNpc
             {
                 case WaitingState:
                     return;
-                case MovementState:
-                    CurrentState.Enter();
-                    break;
                 default:
-                    SetState(NpcStateName.Movement);
+                    var context = new StateContext();
+
+                    context.Set(FsmContextType.AnimationType, newPoint.NpcAnimation);
+                    context.Set(FsmContextType.DestinationPoint, newPoint.NpcDestinationPoint);
+
+                    _nameToCharacterStates[NpcStateName.ComeAndAnimateSequence].SetContext(context);
+                    SetState(NpcStateName.ComeAndAnimateSequence);
                     break;
             }
 
@@ -145,11 +151,7 @@ namespace FlavorfulStory.AI.InteractableNpc
 
         /// <summary> Вызывается при выходе игрока из триггера NPC. Переводит NPC в состояние движения. </summary>
         /// <param name="other"> Коллайдер, вышедший из триггера. </param>
-        public void OnTriggerExited(Collider other)
-        {
-            SetState(NpcStateName.Movement);
-            _animationController.TriggerAnimation(AnimationType.Locomotion);
-        }
+        public void OnTriggerExited(Collider other) => SetState(NpcStateName.ComeAndAnimateSequence);
 
         #endregion
     }

@@ -30,8 +30,8 @@ namespace FlavorfulStory.Shop
         /// <summary> Отрисовывает гизмо объекта при выборе в редакторе. </summary>
         protected virtual void OnDrawGizmosSelected()
         {
-            Color occupiedColor = new(1f, 0.3f, 0.3f, 1f); // Красный с прозрачностью
-            Color freeColor = new(0.3f, 1f, 0.3f, 1f); // Зелёный с прозрачностью
+            Color occupiedColor = new(1f, 0.3f, 0.3f, 1f);
+            Color freeColor = new(0.3f, 1f, 0.3f, 1f);
             Color accessPointColor = new(0.3f, 0.3f, 1f, 1f);
             const float MainGizmoSize = 3f;
 

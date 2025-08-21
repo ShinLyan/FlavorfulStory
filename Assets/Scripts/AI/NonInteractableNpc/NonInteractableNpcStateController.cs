@@ -8,7 +8,8 @@ using FlavorfulStory.SceneManagement;
 using FlavorfulStory.Shop;
 using FlavorfulStory.TimeManagement;
 using UnityEngine;
-using AnimationState = FlavorfulStory.AI.FSM.ShopStates.AnimationState;
+using AnimationState = FlavorfulStory.AI.FSM.AnimationState;
+using Showcase = FlavorfulStory.Shop.Showcase;
 
 namespace FlavorfulStory.AI.NonInteractableNpc
 {
@@ -67,8 +68,6 @@ namespace FlavorfulStory.AI.NonInteractableNpc
         {
             CreateStates();
             CreateSequences();
-
-            foreach (var state in _nameToCharacterStates.Values) state.OnStateChangeRequested += SetState;
         }
 
         /// <summary> Создает все базовые состояния NPC. </summary>
@@ -76,19 +75,19 @@ namespace FlavorfulStory.AI.NonInteractableNpc
         {
             var shopLocation = (ShopLocation)_locationManager.GetLocationByName(LocationName.NewShop);
 
-            _nameToCharacterStates.Add(NpcStateName.Idle, new IdleState());
-            _nameToCharacterStates.Add(NpcStateName.Movement, new MovementState(_npcMovementController, false));
+            _nameToCharacterStates.Add(NpcStateName.Movement,
+                new MovementState(_npcMovementController, _animationController));
             _nameToCharacterStates.Add(NpcStateName.Animation, new AnimationState(_animationController));
             _nameToCharacterStates.Add(NpcStateName.FurniturePicker,
-                new FurniturePickerState(_npcMovementController, shopLocation));
+                new ShopObjectPickerState<Furniture>(() => shopLocation.GetAvailableFurniture()));
             _nameToCharacterStates.Add(NpcStateName.ItemPicker,
                 new ItemPickerState(_npcMovementController, shopLocation, _purchaseIndicator));
             _nameToCharacterStates.Add(NpcStateName.Payment,
                 new PaymentState(_locationManager, _transactionService, _purchaseIndicator));
             _nameToCharacterStates.Add(NpcStateName.RandomPointPicker,
-                new RandomPointPickerState(_npcMovementController, shopLocation));
+                new RandomPointPickerState(shopLocation));
             _nameToCharacterStates.Add(NpcStateName.ShowcasePicker,
-                new ShowcasePickerState(_npcMovementController, shopLocation));
+                new ShopObjectPickerState<Showcase>(() => shopLocation.GetRandomAvailableShowcaseWithItems()));
             _nameToCharacterStates.Add(NpcStateName.ReleaseObject, new ReleaseObjectState());
         }
 
@@ -150,7 +149,7 @@ namespace FlavorfulStory.AI.NonInteractableNpc
         private void ResetStates()
         {
             foreach (var state in _nameToCharacterStates.Values) state.Reset();
-            SetState(NpcStateName.Idle);
+            SetState(NpcStateName.Animation);
         }
 
         /// <summary> Запускает случайную последовательность действий NPC. </summary>
@@ -203,7 +202,9 @@ namespace FlavorfulStory.AI.NonInteractableNpc
             }
             else
             {
-                _npcMovementController.SetPoint(_despawnPoint);
+                var context = new StateContext();
+                context.Set(FsmContextType.DestinationPoint, _despawnPoint);
+                _nameToCharacterStates[NpcStateName.Movement].SetContext(context);
                 SetState(NpcStateName.Movement);
             }
         }
@@ -223,7 +224,12 @@ namespace FlavorfulStory.AI.NonInteractableNpc
 
         /// <summary> Принудительно устанавливает состояние NPC по строковому типу. </summary>
         /// <param name="npcStateName"> Строковое представление типа состояния для установки. </param>
+        /// <param name="context"> Контекст для состояния. </param>
         /// <remarks> Обёртка над методом SetState для принудительного изменения состояния. </remarks>
-        public void ForceSetState(NpcStateName npcStateName) => SetState(npcStateName);
+        public void ForceSetState(NpcStateName npcStateName, StateContext context = null)
+        {
+            _nameToCharacterStates[npcStateName].SetContext(context);
+            SetState(npcStateName);
+        }
     }
 }

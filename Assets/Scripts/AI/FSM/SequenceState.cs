@@ -25,7 +25,8 @@ namespace FlavorfulStory.AI.FSM
         /// <summary> Выполняет вход в состояние и запускает первое состояние последовательности. </summary>
         public override void Enter()
         {
-            SetContext(new StateContext());
+            base.Enter();
+            if (Context == null) Context = new StateContext();
 
             _currentStateIndex = 0;
             _currentState = _states[_currentStateIndex];
@@ -56,6 +57,27 @@ namespace FlavorfulStory.AI.FSM
             _currentState = _states[_currentStateIndex];
             _currentState.SetContext(Context);
             _currentState.Enter();
+        }
+
+        /// <summary> Выполняет завершающие действия при выходе из текущего состояния. </summary>
+        public override void Exit()
+        {
+            base.Exit();
+
+            if (_currentState != null)
+            {
+                _currentState.Exit();
+                _currentState = null;
+            }
+        }
+
+        /// <summary> Сбрасывает состояние. </summary>
+        public override void Reset()
+        {
+            base.Reset();
+
+            SetContext(null);
+            Exit();
         }
 
         /// <summary> Возвращает индекс к началу последовательности и вызывает событие завершения. </summary>

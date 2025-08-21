@@ -3,12 +3,6 @@ namespace FlavorfulStory.AI.FSM
     /// <summary> Перечисление возможных состояний конечного автомата NPC. </summary>
     public enum NpcStateName
     {
-        /// <summary> Состояние бездействия. </summary>
-        Idle,
-
-        /// <summary> Состояние выполнения рутинных действий. </summary>
-        Routine,
-
         /// <summary> Состояние ожидания. </summary>
         Waiting,
 
@@ -46,6 +40,9 @@ namespace FlavorfulStory.AI.FSM
         BuyItemSequence,
 
         /// <summary> Последовательность действий отказа от предмета. </summary>
-        RefuseItemSequence
+        RefuseItemSequence,
+
+        /// <summary> Последовательности, в котором NPC сначала подходит к цели, а затем выполняет анимацию. </summary>
+        ComeAndAnimateSequence
     }
 }

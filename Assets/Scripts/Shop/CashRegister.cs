@@ -197,7 +197,7 @@ namespace FlavorfulStory.Shop
                 Gizmos.color = isOccupied ? occupiedPointColor : freePointColor;
                 Gizmos.DrawLine(transform.position, point.position);
 
-                string statusText = isOccupied ? "<color=#ff3333>Occupied</color>" : "<color=#33ff33>Free</color>";
+                string statusText = isOccupied ? "Occupied" : "Free";
                 var labelPosition = point.position + Vector3.up * PointLabelHeight;
 
                 Handles.Label(labelPosition, statusText, labelStyle);

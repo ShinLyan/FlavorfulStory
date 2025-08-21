@@ -54,6 +54,6 @@ namespace FlavorfulStory.AI.BaseNpc
 
         /// <summary> Перемещает NPC к указанной точке. </summary>
         /// <remarks> Должен быть реализован в наследниках. </remarks>
-        public abstract void MoveToPoint();
+        public abstract void MoveToPoint(NpcDestinationPoint destinationPoint);
     }
 }

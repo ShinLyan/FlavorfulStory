@@ -1,5 +1,4 @@
 ﻿using FlavorfulStory.AI.BaseNpc;
-using FlavorfulStory.AI.Scheduling;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -21,36 +20,16 @@ namespace FlavorfulStory.AI.InteractableNpc
             : base(navMeshAgent, transform, animationController) => _scheduleHandler = scheduleHandler;
 
         /// <summary> Инициализация объекта. </summary>
-        public override void Initialize()
-        {
-            _scheduleHandler.OnSchedulePointChanged += OnSchedulePointChanged;
-            _navigator.OnDestinationReached += HandleDestinationReached;
-        }
+        public override void Initialize() => _navigator.OnDestinationReached += HandleDestinationReached;
 
         /// <summary> Освобождает ресурсы при уничтожении объекта. </summary>
-        public override void Dispose()
-        {
-            _scheduleHandler.OnSchedulePointChanged -= OnSchedulePointChanged;
-            _navigator.OnDestinationReached -= HandleDestinationReached;
-        }
+        public override void Dispose() => _navigator.OnDestinationReached -= HandleDestinationReached;
 
         /// <summary> Обработка события, вызываемое при достижении пункта назначения. </summary>
         private void HandleDestinationReached() => OnDestinationReached?.Invoke();
 
         /// <summary> Перемещает NPC к текущей точке расписания. </summary>
         /// <remarks> Если текущая точка расписания существует, инициирует движение к ней. </remarks>
-        public override void MoveToPoint() => _navigator.MoveTo(_scheduleHandler.CurrentPoint.NpcDestinationPoint);
-
-        /// <summary> Обрабатывает изменение точки расписания. </summary>
-        /// <param name="point"> Новая точка расписания. </param>
-        /// <remarks> Если NPC не находится в состоянии покоя, останавливает текущее движение
-        /// и начинает движение к новой точке. </remarks>
-        private void OnSchedulePointChanged(NpcSchedulePoint point)
-        {
-            if (!_navigator.IsMoving) return;
-
-            Stop();
-            _navigator.MoveTo(point.NpcDestinationPoint);
-        }
+        public override void MoveToPoint(NpcDestinationPoint destinationPoint) => _navigator.MoveTo(destinationPoint);
     }
 }

@@ -4,19 +4,19 @@ using FlavorfulStory.AI.BaseNpc;
 using FlavorfulStory.TimeManagement;
 using UnityEngine;
 
-namespace FlavorfulStory.AI.FSM.ShopStates
+namespace FlavorfulStory.AI.FSM
 {
-    /// <summary> Состояние анимации персонажа с таймером для управления завершением. </summary>
+    /// <summary> Универсальное состояние анимации NPC с поддержкой таймера. </summary>
     public class AnimationState : CharacterState
     {
-        /// <summary> Флаг завершения анимации. </summary>
-        private bool _isAnimationComplete;
-
         /// <summary> Контроллер анимаций NPC. </summary>
         private readonly NpcAnimationController _npcAnimationController;
 
-        /// <summary> Токен отмены для асинхронного таймера. </summary>
+        /// <summary> Источник токена отмены. </summary>
         private CancellationTokenSource _cts;
+
+        /// <summary> Флаг завершения анимации. </summary>
+        private bool _isAnimationComplete;
 
         /// <summary> Инициализирует состояние анимации. </summary>
         /// <param name="npcAnimationController"> Контроллер анимаций NPC. </param>
@@ -26,6 +26,7 @@ namespace FlavorfulStory.AI.FSM.ShopStates
         /// <summary> Выполняется при входе в состояние. </summary>
         public override void Enter()
         {
+            base.Enter();
             _isAnimationComplete = false;
             _cts = new CancellationTokenSource();
 
@@ -38,7 +39,9 @@ namespace FlavorfulStory.AI.FSM.ShopStates
                 RunAnimationTimerAsync(animationTime, _cts.Token).Forget();
         }
 
-        /// <summary> Асинхронный таймер для завершения анимации. </summary>
+        /// <summary> Запускает таймер анимации. </summary>
+        /// <param name="animationTime"> Время анимации </param>
+        /// <param name="token"> Токен отмены. </param>
         private async UniTaskVoid RunAnimationTimerAsync(float animationTime, CancellationToken token)
         {
             float timeLeft = animationTime;
@@ -60,15 +63,21 @@ namespace FlavorfulStory.AI.FSM.ShopStates
         /// <summary> Выполняется при выходе из состояния. </summary>
         public override void Exit()
         {
+            base.Exit();
             _cts?.Cancel();
             _cts?.Dispose();
             _cts = null;
-
-            _npcAnimationController.TriggerAnimation(AnimationType.Locomotion);
         }
 
-        /// <summary> Проверяет завершение состояния. </summary>
-        /// <returns> True если анимация завершена. </returns>
+        /// <summary> Сбрасывает состояние. </summary>
+        public override void Reset()
+        {
+            base.Reset();
+            _npcAnimationController.Reset();
+        }
+
+        /// <summary> Проверяет завершение анимации. </summary>
+        /// <returns> True если анимация завершена </returns>
         public override bool IsComplete() => _isAnimationComplete;
     }
 }

@@ -61,8 +61,10 @@ namespace FlavorfulStory.AI.NonInteractableNpc
         /// <param name="npcDestination"> Целевая позиция для перемещения. </param>
         public void SetDestination(NpcDestinationPoint npcDestination)
         {
-            _movementController.SetPoint(npcDestination);
-            _stateController.ForceSetState(NpcStateName.Movement);
+            var context = new StateContext();
+            context.Set(FsmContextType.DestinationPoint, npcDestination);
+
+            _stateController.ForceSetState(NpcStateName.Movement, context);
             _movementController.OnDestinationReached += () => _stateController.StartRandomSequence();
         }
 
@@ -71,7 +73,7 @@ namespace FlavorfulStory.AI.NonInteractableNpc
         public void SetDespawnPoint(NpcDestinationPoint npcDestination)
         {
             _stateController.SetDespawnPoint(npcDestination);
-            OnReachedDespawnPoint += () => _stateController.ForceSetState(NpcStateName.Idle);
+            OnReachedDespawnPoint += () => _stateController.ForceSetState(NpcStateName.Animation);
         }
     }
 }

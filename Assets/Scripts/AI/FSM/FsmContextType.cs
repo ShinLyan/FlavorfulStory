@@ -13,6 +13,9 @@ namespace FlavorfulStory.AI.FSM
         AnimationTime,
 
         /// <summary> Выбранный объект для взаимодействия. </summary>
-        SelectedObject
+        SelectedObject,
+
+        /// <summary> Точка назначения, к которой должен направляться персонаж. </summary>
+        DestinationPoint
     }
 }

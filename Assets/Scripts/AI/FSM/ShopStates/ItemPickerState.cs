@@ -46,9 +46,9 @@ namespace FlavorfulStory.AI.FSM.ShopStates
             {
                 Context?.Set(FsmContextType.AnimationType, _shopLocation.CashRegister.InteractableObjectAnimation);
                 Context?.Set(FsmContextType.AnimationTime, 3f);
+                Context?.Set(FsmContextType.DestinationPoint, accessiblePoint.Value);
 
                 _shopLocation.CashRegister.SetPointOccupancy(accessiblePoint.Value.Position, true);
-                _movementController.SetPoint(accessiblePoint.Value);
                 _movementController.OnDestinationReached +=
                     () => _shopLocation.CashRegister.SetPointOccupancy(accessiblePoint.Value.Position, false);
             }
