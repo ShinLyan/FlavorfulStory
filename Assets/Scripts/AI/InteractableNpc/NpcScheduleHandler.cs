@@ -14,11 +14,12 @@ namespace FlavorfulStory.AI.InteractableNpc
         private Stack<NpcSchedulePoint> _currentPath;
 
         /// <summary> Текущая активная точка расписания NPC. </summary>
-        public NpcSchedulePoint CurrentPoint { get; private set; }
+        private NpcSchedulePoint _currentPoint;
 
         /// <summary> Событие, вызываемое при изменении точки расписания. </summary>
         public event Action<NpcSchedulePoint> OnSchedulePointChanged;
 
+        /// <summary> Инициализация компонента. </summary>
         public void Initialize()
         {
             WorldTime.OnTimeTick += UpdateSchedulePoint;
@@ -56,13 +57,13 @@ namespace FlavorfulStory.AI.InteractableNpc
 
             if ((int)currentTime.Hour == nextSchedulePoint.Hour && (int)currentTime.Minute == nextSchedulePoint.Minutes)
             {
-                CurrentPoint = PopNextSchedulePoint();
-                OnSchedulePointChanged?.Invoke(CurrentPoint);
+                _currentPoint = PopNextSchedulePoint();
+                OnSchedulePointChanged?.Invoke(_currentPoint);
             }
         }
 
         /// <summary> Сбросить состояние. </summary>
         /// <param name="time"> Текущее время. </param>
-        private void Reset(DateTime time) => CurrentPoint = null;
+        private void Reset(DateTime time) => _currentPoint = null;
     }
 }

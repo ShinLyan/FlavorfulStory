@@ -12,14 +12,14 @@ namespace FlavorfulStory.AI.NonInteractableNpc
     [RequireComponent(typeof(NpcPurchaseIndicator))]
     public sealed class NonInteractableNpc : Npc
     {
-        /// <summary> Стейт-контроллер для неинтерктивного НПС. </summary>
-        private NonInteractableNpcStateController _stateController;
-
         /// <summary> Менеджер локаций для управления переходами между локациями. </summary>
         private LocationManager _locationManager;
 
         /// <summary> Сервис для транзакций. </summary>
         private TransactionService _transactionService;
+
+        /// <summary> Стейт-контроллер для неинтерктивного НПС. </summary>
+        private NonInteractableNpcStateController _stateController;
 
         /// <summary> Возвращает контроллер состояний NPC. </summary>
         protected override NpcStateController StateController => _stateController;

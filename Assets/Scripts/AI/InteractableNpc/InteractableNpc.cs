@@ -8,7 +8,6 @@ using Zenject;
 namespace FlavorfulStory.AI.InteractableNpc
 {
     /// <summary> NPC с возможностью взаимодействия с игроком. </summary>
-    /// <remarks> Требует наличия компонента NpcCollisionHandler для обработки столкновений. </remarks>
     [RequireComponent(typeof(CapsuleCollider), typeof(NpcSpeaker))]
     public sealed class InteractableNpc : Npc
     {
@@ -47,10 +46,8 @@ namespace FlavorfulStory.AI.InteractableNpc
             base.Awake();
 
             _npcScheduleHandler = new NpcScheduleHandler();
-
             _stateController = new InteractableNpcStateController(_npcSchedule, MovementController,
                 AnimationController, _npcScheduleHandler, transform, _playerPositionProvider);
-
             _collisionHandler = new NpcCollisionHandler(_stateController);
         }
 

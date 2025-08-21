@@ -11,18 +11,18 @@ namespace FlavorfulStory.AI.BaseNpc
         /// <summary> Контроллер анимации NPC для воспроизведения состояний анимации. </summary>
         protected NpcAnimationController AnimationController { get; private set; }
 
-        /// <summary> Контроллер состояний, управляющий переключением между состояниями NPC. </summary>
-        protected abstract NpcStateController StateController { get; }
-
         /// <summary> Контроллер движения NPC для управления навигацией и перемещением. </summary>
         protected NpcMovementController MovementController { get; private set; }
+
+        /// <summary> Контроллер состояний, управляющий переключением между состояниями NPC. </summary>
+        protected abstract NpcStateController StateController { get; }
 
         /// <summary> Вызывается при создании объекта, может быть переопределен в наследниках </summary>
         protected virtual void Awake()
         {
             AnimationController = new NpcAnimationController(GetComponent<Animator>());
-            MovementController =
-                new NpcMovementController(GetComponent<NavMeshAgent>(), transform, AnimationController);
+            MovementController = new NpcMovementController(GetComponent<NavMeshAgent>(),
+                transform, AnimationController);
         }
 
         /// <summary> Инициализация объектов. </summary>
@@ -50,6 +50,7 @@ namespace FlavorfulStory.AI.BaseNpc
 
 #if UNITY_EDITOR
 
+        /// <summary> Отображает текущее состояние NPC в виде подписи над ним при выделении в редакторе. </summary>
         private void OnDrawGizmosSelected()
         {
             if (StateController == null) return;

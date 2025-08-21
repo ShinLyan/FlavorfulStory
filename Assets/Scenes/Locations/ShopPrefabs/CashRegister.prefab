@@ -189,7 +189,6 @@ GameObject:
   m_Component:
   - component: {fileID: 621464303452856891}
   - component: {fileID: 955130521777824042}
-  - component: {fileID: 2533428686932231189}
   - component: {fileID: 6276666782773818123}
   - component: {fileID: 4489152861738310057}
   m_Layer: 0
@@ -242,27 +241,6 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1.9947917, y: 1, z: 0.809119}
   m_Center: {x: -0.02080214, y: 0, z: -0.2313019}
---- !u!65 &2533428686932231189
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5458627584190748074}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 2.08, y: 1, z: 0.89}
-  m_Center: {x: -0.02080214, y: 0, z: -0.2313019}
 --- !u!114 &6276666782773818123
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -307,7 +285,7 @@ GameObject:
   - component: {fileID: 4431874254866082364}
   - component: {fileID: 5894555698208673072}
   m_Layer: 0
-  m_Name: Text (TMP)
+  m_Name: MoneyAmountText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -329,8 +307,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 1.72}
-  m_SizeDelta: {x: 5, y: 5}
+  m_AnchoredPosition: {x: 0, y: 1.9}
+  m_SizeDelta: {x: 2, y: 2}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!23 &428358606823726326
 MeshRenderer:
@@ -425,8 +403,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 6
-  m_fontSizeBase: 6
+  m_fontSize: 5
+  m_fontSizeBase: 5
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -546,6 +524,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: GoldCoin
+      objectReference: {fileID: 0}
+    - target: {fileID: 4138106284808927097, guid: 9a53aee3e325a43349d9de9d08a3bc9e,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

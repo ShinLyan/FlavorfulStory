@@ -13,8 +13,7 @@ namespace FlavorfulStory.TimeManagement
         #region Fields
 
         /// <summary> Сколько игровых минут проходит за реальную секунду. </summary>
-        [Header("Time Scale")]
-        [Tooltip("Сколько игровых минут проходит за реальную секунду."), SerializeField, SteppedRange(-100f, 1000f, 5f)]
+        [Tooltip("Сколько игровых минут проходит за реальную секунду."), SerializeField, SteppedRange(-50f, 100f, 5f)]
         private float _timeScale = 5f;
 
         /// <summary> Шаг времени. </summary>
@@ -95,8 +94,8 @@ namespace FlavorfulStory.TimeManagement
         {
             if (IsPaused) return;
 
-            MovementSpeedMultiplier = CalculateMultiplayer();
             TimeScale = _timeScale;
+            MovementSpeedMultiplier = CalculateMovementSpeedMultiplier();
 
             var previousTime = CurrentGameTime;
             CurrentGameTime = CurrentGameTime.AddMinutes(Time.deltaTime * _timeScale);
@@ -114,7 +113,9 @@ namespace FlavorfulStory.TimeManagement
             if (previousTime.Hour < DayEndHour && CurrentGameTime.Hour >= DayEndHour) BeginNewDay();
         }
 
-        private float CalculateMultiplayer()
+        /// <summary> Расчёт множителя скорости. </summary>
+        /// <returns> Вычисленное значение множителя скорости. </returns>
+        private float CalculateMovementSpeedMultiplier()
         {
             const float BaseScale = 5f;
             const float MaxScale = 1000f;

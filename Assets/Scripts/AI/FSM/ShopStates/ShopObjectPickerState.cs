@@ -20,7 +20,6 @@ namespace FlavorfulStory.AI.FSM.ShopStates
             base.Enter();
 
             var shopObject = _objectSelector();
-
             if (!shopObject)
             {
                 Debug.LogWarning($"No available {typeof(T)} found!");
@@ -28,12 +27,12 @@ namespace FlavorfulStory.AI.FSM.ShopStates
             }
 
             shopObject.IsOccupied = true;
+
             Context?.Set(FsmContextType.SelectedObject, shopObject);
             Context?.Set(FsmContextType.AnimationType, shopObject.InteractableObjectAnimation);
             Context?.Set(FsmContextType.AnimationTime, 3f);
 
             var point = shopObject.GetAccessiblePoint();
-
             if (point.HasValue)
                 Context?.Set(FsmContextType.DestinationPoint, point.Value);
             else

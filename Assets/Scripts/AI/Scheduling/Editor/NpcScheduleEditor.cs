@@ -291,17 +291,13 @@ namespace FlavorfulStory.AI.Scheduling.Editor
 
         /// <summary> Отображает редактор для выбора сезонов. </summary>
         /// <param name="param"> Параметр расписания, в который записываются выбранные значения. </param>
-        private static void ShowSeasonsEdit(NpcScheduleParams param)
-        {
+        private static void ShowSeasonsEdit(NpcScheduleParams param) =>
             param.Seasons = (Season)EditorGUILayout.EnumFlagsField("Seasons", param.Seasons);
-        }
 
         /// <summary> Отображает редактор для выбора дней недели. </summary>
         /// <param name="param"> Параметр расписания, в который записываются выбранные значения. </param>
-        private static void ShowDayOfWeekEdit(NpcScheduleParams param)
-        {
-            param.DayOfWeek = (DayOfWeek)EditorGUILayout.EnumFlagsField("Day of Week", param.DayOfWeek);
-        }
+        private static void ShowDayOfWeekEdit(NpcScheduleParams param) => param.DayOfWeek =
+            (DayOfWeek)EditorGUILayout.EnumFlagsField("Day of Week", param.DayOfWeek);
 
         /// <summary> Управляет редактированием дат для параметра расписания. </summary>
         /// <param name="demonstrator"> Демонстратор расписания. </param>
@@ -349,17 +345,13 @@ namespace FlavorfulStory.AI.Scheduling.Editor
 
         /// <summary> Отображает слайдер для настройки уровня отношений (Hearts). </summary>
         /// <param name="param"> Параметр расписания, в который записываются выбранные значения. </param>
-        private static void ShowHeartsEdit(NpcScheduleParams param)
-        {
+        private static void ShowHeartsEdit(NpcScheduleParams param) =>
             param.Hearts = EditorGUILayout.IntSlider("Hearts", param.Hearts, 0, 12);
-        }
 
         /// <summary> Отображает переключатель для условия дождя. </summary>
         /// <param name="param"> Параметр расписания, в который записываются выбранные значения. </param>
-        private static void ShowIsRainingEdit(NpcScheduleParams param)
-        {
+        private static void ShowIsRainingEdit(NpcScheduleParams param) =>
             param.IsRaining = EditorGUILayout.Toggle("Raining", param.IsRaining);
-        }
 
         /// <summary> Управляет отображением и взаимодействием с точками маршрута. </summary>
         /// <param name="demonstrator"> Демонстратор расписания. </param>
@@ -370,10 +362,7 @@ namespace FlavorfulStory.AI.Scheduling.Editor
             EditorGUILayout.LabelField($"Path Points: {currentParam.Path.Length}", EditorStyles.boldLabel);
 
             EditorGUI.BeginChangeCheck();
-            int newPointIndex = EditorGUILayout.IntSlider(
-                "Path Point",
-                demonstrator.SelectedPointIndex,
-                0,
+            int newPointIndex = EditorGUILayout.IntSlider("Path Point", demonstrator.SelectedPointIndex, 0,
                 Mathf.Max(0, currentParam.Path.Length - 1)
             );
             if (EditorGUI.EndChangeCheck()) demonstrator.SetNewValForPointIndex(newPointIndex);

@@ -1,4 +1,3 @@
-using Cysharp.Threading.Tasks;
 using FlavorfulStory.AI.BaseNpc;
 using FlavorfulStory.Shop;
 using UnityEngine;
@@ -20,7 +19,7 @@ namespace FlavorfulStory.AI.FSM.ShopStates
         /// <summary> Инициализирует новый экземпляр состояния выбора предмета. </summary>
         /// <param name="npcMovementController"> Контроллер движения для управления перемещением NPC. </param>
         /// <param name="shopLocation"> Локация магазина для получения информации о кассе. </param>
-        /// <param name="purchaseIndicator"></param>
+        /// <param name="purchaseIndicator"> Индикатор покупки NPC. </param>
         public ItemPickerState(NpcMovementController npcMovementController, ShopLocation shopLocation,
             NpcPurchaseIndicator purchaseIndicator)
         {
@@ -32,34 +31,48 @@ namespace FlavorfulStory.AI.FSM.ShopStates
         /// <summary> Выполняет вход в состояние, освобождает полку и устанавливает цель движения к кассе. </summary>
         public override void Enter()
         {
-            if (Context != null && Context.TryGet<ShopObject>(FsmContextType.SelectedObject, out var showcase))
-            {
-                var showcaseInventory = ((Showcase)showcase).Inventory;
-                var itemStack = showcaseInventory.GetRandomStack();
-                Context?.Set(FsmContextType.PurchaseItem, itemStack);
-                _purchaseIndicator.ShowModel().Forget();
-            }
+            SelectItem();
+            ResolveCashRegisterDestination();
+        }
 
-            var accessiblePoint = _shopLocation.CashRegister.GetAccessiblePoint();
+        /// <summary> Выбирает случайный предмет из витрины и сохраняет его в контексте. </summary>
+        private void SelectItem()
+        {
+            if (Context == null || !Context.TryGet<ShopObject>(FsmContextType.SelectedObject, out var shopObject) ||
+                shopObject is not Showcase showcase)
+                return;
 
-            if (accessiblePoint.HasValue)
-            {
-                Context?.Set(FsmContextType.AnimationType, _shopLocation.CashRegister.InteractableObjectAnimation);
-                Context?.Set(FsmContextType.AnimationTime, 3f);
-                Context?.Set(FsmContextType.DestinationPoint, accessiblePoint.Value);
+            int slotIndex = showcase.Inventory.GetRandomNonEmptySlotIndex();
+            if (slotIndex == -1) return;
 
-                _shopLocation.CashRegister.SetPointOccupancy(accessiblePoint.Value.Position, true);
-                _movementController.OnDestinationReached +=
-                    () => _shopLocation.CashRegister.SetPointOccupancy(accessiblePoint.Value.Position, false);
-            }
-            else
+            var itemStack = showcase.Inventory.ExtractStackFromSlot(slotIndex);
+            Context.Set(FsmContextType.PurchaseItem, itemStack);
+            _purchaseIndicator.ShowModel();
+        }
+
+        /// <summary> Определяет доступную точку у кассы и сохраняет её в контексте. </summary>
+        private void ResolveCashRegisterDestination()
+        {
+            var destination = _shopLocation.CashRegister.GetAccessiblePoint();
+            if (!destination.HasValue)
             {
                 Debug.LogWarning("No accessible point found for the ShowCase!");
+                return;
             }
+
+            var point = destination.Value;
+
+            Context?.Set(FsmContextType.AnimationType, _shopLocation.CashRegister.InteractableObjectAnimation);
+            Context?.Set(FsmContextType.AnimationTime, 3f);
+            Context?.Set(FsmContextType.DestinationPoint, point);
+
+            _shopLocation.CashRegister.SetPointOccupancy(point.Position, true);
+            _movementController.OnDestinationReached +=
+                () => _shopLocation.CashRegister.SetPointOccupancy(point.Position, false);
         }
 
         /// <summary> Возвращает статус завершения состояния. </summary>
-        /// <returns> Всегда возвращает true, так как состояние завершается сразу после входа. </returns>
+        /// <returns> Всегда <c>true</c>, так как состояние завершается сразу после входа. </returns>
         public override bool IsComplete() => true;
     }
 }

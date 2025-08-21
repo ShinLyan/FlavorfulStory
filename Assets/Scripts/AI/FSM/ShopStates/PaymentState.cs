@@ -1,4 +1,3 @@
-using Cysharp.Threading.Tasks;
 using FlavorfulStory.Audio;
 using FlavorfulStory.Economy;
 using FlavorfulStory.InventorySystem;
@@ -36,12 +35,13 @@ namespace FlavorfulStory.AI.FSM.ShopStates
             if (Context == null || !Context.TryGet<ItemStack>(FsmContextType.PurchaseItem, out var itemStack)) return;
 
             if (_locationManager.IsPlayerInLocation(LocationName.NewShop)) SfxPlayer.Play(SfxType.Buy);
+
             _transactionService.ProcessNpcPurchase(itemStack);
-            _purchaseIndicator.HideModel().Forget();
+            _purchaseIndicator.HideModel();
         }
 
         /// <summary> Возвращает статус завершения состояния. </summary>
-        /// <returns> Всегда возвращает true, так как состояние завершается сразу после входа. </returns>
+        /// <returns> Всегда <c>true</c>, так как состояние завершается сразу после входа. </returns>
         public override bool IsComplete() => true;
     }
 }

@@ -20,16 +20,17 @@ namespace FlavorfulStory.AI.BaseNpc
         /// <summary> Текущая целевая точка расписания. </summary>
         private NpcDestinationPoint _currentTargetPoint;
 
+        /// <summary> NPC двигается? </summary>
+        private bool _isMoving;
+
         /// <summary> Дистанция, на которой считается что цель достигнута. </summary>
         private const float ArrivalDistance = 0.1f;
 
-        /// <summary> NPC двигается? </summary>
-        public bool IsMoving { get; private set; }
+        /// <summary> Скорость по умолчанию. </summary>
+        private const float DefaultSpeed = 2.3f;
 
         /// <summary> Событие, вызываемое при достижении пункта назначения. </summary>
         public Action OnDestinationReached;
-
-        private const float _defaultSpeed = 2.3f;
 
         /// <summary> Инициализирует компонент навигации для NPC. </summary>
         /// <param name="agent"> NavMeshAgent, управляющий движением. </param>
@@ -37,10 +38,9 @@ namespace FlavorfulStory.AI.BaseNpc
         public NpcNavigator(NavMeshAgent agent, Transform transform)
         {
             _agent = agent;
+            _agent.autoTraverseOffMeshLink = false;
             _npcTransform = transform;
             _spawnPosition = transform.position;
-
-            _agent.autoTraverseOffMeshLink = false;
         }
 
         /// <summary> Обновляет состояние навигации каждый кадр. </summary>
@@ -48,8 +48,10 @@ namespace FlavorfulStory.AI.BaseNpc
         public void Update()
         {
             HandleOffMeshLink();
-            if (!IsMoving) return;
-            _agent.speed = _defaultSpeed * WorldTime.MovementSpeedMultiplier;
+
+            if (!_isMoving) return;
+
+            _agent.speed = DefaultSpeed * WorldTime.MovementSpeedMultiplier;
             HandleArrival();
         }
 
@@ -68,9 +70,10 @@ namespace FlavorfulStory.AI.BaseNpc
         /// <param name="point"> Целевая точка назначения. </param>
         public void MoveTo(NpcDestinationPoint point)
         {
-            _currentTargetPoint = point;
-            IsMoving = true;
+            _isMoving = true;
             SetAgentStopped(false);
+
+            _currentTargetPoint = point;
             _agent.SetDestination(point.Position);
         }
 
@@ -90,7 +93,7 @@ namespace FlavorfulStory.AI.BaseNpc
         /// <param name="warpToSpawn"> Если true, телепортирует NPC на точку спавна. </param>
         public void Stop(bool warpToSpawn = false)
         {
-            IsMoving = false;
+            _isMoving = false;
             SetAgentStopped(true);
 
             if (!warpToSpawn) return;

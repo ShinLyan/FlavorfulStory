@@ -4,11 +4,11 @@ using UnityEngine;
 
 namespace FlavorfulStory.AI
 {
-    /// <summary> Управляет 3D-индикатором покупки над NPC. </summary>
+    /// <summary> Индикатор покупки NPC. </summary>
     public class NpcPurchaseIndicator : MonoBehaviour
     {
         /// <summary> 3D-модель индикатора. </summary>
-        [Tooltip("3D-модель индикатора, которую нужно анимировать."), SerializeField]
+        [Tooltip("3D-модель индикатора."), SerializeField]
         private GameObject _model;
 
         /// <summary> Длительность анимации. </summary>
@@ -45,16 +45,21 @@ namespace FlavorfulStory.AI
         private void OnDestroy() => KillAnimations();
 
         /// <summary> Показывает индикатор с анимацией. </summary>
+        public void ShowModel() => ShowModelAsync().Forget();
+
+        /// <summary> Скрывает индикатор с анимацией. </summary>
+        public void HideModel() => HideModelAsync().Forget();
+
+        /// <summary> Показывает индикатор с анимацией. </summary>
         /// <returns> Задача анимации. </returns>
-        public async UniTask ShowModel()
+        private async UniTaskVoid ShowModelAsync()
         {
             KillAnimations();
+
             _model.SetActive(true);
             _model.transform.localScale = _defaultScale * _startScale;
 
-            _currentTween = _model.transform
-                .DOScale(_defaultScale, _fadeDuration)
-                .SetEase(Ease.OutBack);
+            _currentTween = _model.transform.DOScale(_defaultScale, _fadeDuration).SetEase(Ease.OutBack);
 
             float rotationDuration = 360f / _rotationSpeed;
             _rotationTween = _model.transform
@@ -68,11 +73,11 @@ namespace FlavorfulStory.AI
 
         /// <summary> Скрывает индикатор с анимацией. </summary>
         /// <returns> Задача анимации. </returns>
-        public async UniTask HideModel()
+        private async UniTask HideModelAsync()
         {
             KillAnimations();
-            _currentTween = _model.transform
-                .DOScale(_defaultScale * _startScale, _fadeDuration);
+
+            _currentTween = _model.transform.DOScale(_defaultScale * _startScale, _fadeDuration);
 
             await _currentTween.AsyncWaitForCompletion();
             _model.SetActive(false);

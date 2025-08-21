@@ -9,12 +9,14 @@ namespace FlavorfulStory.AI.FSM
         /// <summary> Контроллер движения NPC для управления навигацией. </summary>
         private readonly NpcMovementController _movementController;
 
+        /// <summary> Контроллер анимаций NPC. </summary>
+        private readonly NpcAnimationController _animationController;
+
         /// <summary> Флаг завершения состояния движения. Устанавливается в true при достижении цели. </summary>
         private bool _isComplete;
 
+        /// <summary> Текущая целевая точка назначения для движения. </summary>
         private NpcDestinationPoint _destinationPoint;
-
-        private readonly NpcAnimationController _animationController;
 
         /// <summary> Инициализирует новое состояние движения с заданным контроллером движения. </summary>
         /// <param name="movementController"> Контроллер движения для управления перемещением NPC. </param>

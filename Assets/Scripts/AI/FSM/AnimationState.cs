@@ -10,7 +10,7 @@ namespace FlavorfulStory.AI.FSM
     public class AnimationState : CharacterState
     {
         /// <summary> Контроллер анимаций NPC. </summary>
-        private readonly NpcAnimationController _npcAnimationController;
+        private readonly NpcAnimationController _animationController;
 
         /// <summary> Источник токена отмены. </summary>
         private CancellationTokenSource _cts;
@@ -19,21 +19,21 @@ namespace FlavorfulStory.AI.FSM
         private bool _isAnimationComplete;
 
         /// <summary> Инициализирует состояние анимации. </summary>
-        /// <param name="npcAnimationController"> Контроллер анимаций NPC. </param>
-        public AnimationState(NpcAnimationController npcAnimationController) =>
-            _npcAnimationController = npcAnimationController;
+        /// <param name="animationController"> Контроллер анимаций NPC. </param>
+        public AnimationState(NpcAnimationController animationController) => _animationController = animationController;
 
         /// <summary> Выполняется при входе в состояние. </summary>
         public override void Enter()
         {
             base.Enter();
+
             _isAnimationComplete = false;
             _cts = new CancellationTokenSource();
 
             if (Context == null) return;
 
             if (Context.TryGet<AnimationType>(FsmContextType.AnimationType, out var animationType))
-                _npcAnimationController.TriggerAnimation(animationType);
+                _animationController.TriggerAnimation(animationType);
 
             if (Context.TryGet(FsmContextType.AnimationTime, out float animationTime))
                 RunAnimationTimerAsync(animationTime, _cts.Token).Forget();
@@ -64,6 +64,7 @@ namespace FlavorfulStory.AI.FSM
         public override void Exit()
         {
             base.Exit();
+
             _cts?.Cancel();
             _cts?.Dispose();
             _cts = null;
@@ -73,11 +74,12 @@ namespace FlavorfulStory.AI.FSM
         public override void Reset()
         {
             base.Reset();
-            _npcAnimationController.Reset();
+
+            _animationController.Reset();
         }
 
         /// <summary> Проверяет завершение анимации. </summary>
-        /// <returns> True если анимация завершена </returns>
+        /// <returns> <c>true</c> - если анимация завершена. </returns>
         public override bool IsComplete() => _isAnimationComplete;
     }
 }

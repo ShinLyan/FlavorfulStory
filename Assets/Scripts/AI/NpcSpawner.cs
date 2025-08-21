@@ -16,8 +16,6 @@ namespace FlavorfulStory.AI
     /// <summary> Управляет спавном и деспавном NPC в игре. </summary>
     public class NpcSpawner : MonoBehaviour
     {
-        #region Fields
-
         /// <summary> Данные точек спавна NPC. </summary>
         [Header("Spawner Settings")] [SerializeField]
         private NpcSpawnData[] _spawnData;
@@ -28,14 +26,11 @@ namespace FlavorfulStory.AI
         /// <summary> Родительский объект для NPC. </summary>
         [SerializeField] private Transform _parentTransform;
 
-        /// <summary> Максимальное количество NPC. </summary>
-        private const int MaxNpcCount = 10;
-
-        /// <summary> Интервал спавна в минутах. </summary>
-        private const int SpawnIntervalInMinutes = 30;
-
         /// <summary> Фабрика для создания NPC. </summary>
         private IPrefabFactory<NonInteractableNpc.NonInteractableNpc> _npcFactory;
+
+        /// <summary> Менеджер локаций. </summary>
+        private LocationManager _locationManager;
 
         /// <summary> Пул объектов NPC. </summary>
         private ObjectPool<NonInteractableNpc.NonInteractableNpc> _npcPool;
@@ -43,16 +38,18 @@ namespace FlavorfulStory.AI
         /// <summary> Список активных NPC. </summary>
         private readonly List<NonInteractableNpc.NonInteractableNpc> _activeCharacters = new();
 
-        /// <summary> Интервал спавна в тиках. </summary>
-        private int _spawnIntervalInTicks;
-
         /// <summary> Счетчик тиков. </summary>
         private int _tickCounter;
 
-        /// <summary> Менеджер локаций. </summary>
-        private LocationManager _locationManager;
+        /// <summary> Максимальное количество NPC. </summary>
+        private const int MaxNpcCount = 10;
 
-        #endregion
+        /// <summary> Интервал спавна в минутах. </summary>
+        private const int SpawnIntervalInMinutes = 30;
+
+        /// <summary> Проверяет возможность спавна нового NPC. </summary>
+        /// <returns> True если можно спавнить, иначе False. </returns>
+        private bool CanSpawn => _activeCharacters.Count < MaxNpcCount;
 
         /// <summary> Инициализирует зависимости. </summary>
         /// <param name="npcFactory"> Фабрика NPC. </param>
@@ -90,7 +87,7 @@ namespace FlavorfulStory.AI
 
         /// <summary> Обрабатывает окончание дня. </summary>
         /// <param name="_"> Игнорируемый параметр даты. </param>
-        private void HandleDayEnded(DateTime _) => DespawnAllNpcCoroutine().Forget();
+        private void HandleDayEnded(DateTime _) => DespawnAllNpc().Forget();
 
         /// <summary> Обрабатывает тик времени. </summary>
         /// <param name="_"> Игнорируемый параметр даты. </param>
@@ -99,18 +96,13 @@ namespace FlavorfulStory.AI
             if (WorldTime.IsPaused) return;
 
             _tickCounter++;
-            _spawnIntervalInTicks = SpawnIntervalInMinutes / (int)WorldTime.TimeScale;
+            int spawnIntervalInTicks = SpawnIntervalInMinutes / (int)WorldTime.TimeScale;
 
-            if (_tickCounter >= _spawnIntervalInTicks && CanSpawn())
-            {
-                SpawnNpcFromPool();
-                _tickCounter = 0;
-            }
+            if (_tickCounter < spawnIntervalInTicks || !CanSpawn) return;
+
+            SpawnNpcFromPool();
+            _tickCounter = 0;
         }
-
-        /// <summary> Проверяет возможность спавна нового NPC. </summary>
-        /// <returns> True если можно спавнить, иначе False. </returns>
-        private bool CanSpawn() => _activeCharacters.Count < MaxNpcCount;
 
         /// <summary> Создает NPC для пула. </summary>
         /// <returns> Созданный NPC. </returns>
@@ -198,12 +190,12 @@ namespace FlavorfulStory.AI
 
             if (!npc || !npc.gameObject.activeInHierarchy) return;
 
-            var loc = _locationManager.GetLocationByName(LocationName.NewShop);
-            npc.SetDestination(new NpcDestinationPoint(loc.transform.position, Quaternion.identity));
+            var location = _locationManager.GetLocationByName(LocationName.NewShop);
+            npc.SetDestination(new NpcDestinationPoint(location.transform.position, Quaternion.identity));
         }
 
         /// <summary> Деспавнит всех активных NPC. </summary>
-        private async UniTask DespawnAllNpcCoroutine()
+        private async UniTask DespawnAllNpc()
         {
             for (int i = _activeCharacters.Count - 1; i >= 0; i--)
             {

@@ -6,21 +6,20 @@ namespace FlavorfulStory.AI
     [CreateAssetMenu(menuName = "FlavorfulStory/NPC/Info")]
     public class NpcInfo : ScriptableObject
     {
-        /// <summary> Имя NPC (используется в игровых системах и интерфейсе). </summary>
+        /// <summary> Имя NPC. </summary>
         [field: Tooltip("Имя NPC."), SerializeField]
         public NpcName NpcName { get; private set; }
 
-        /// <summary> Доступен ли NPC для романтических отношений. </summary>
-        [field: Tooltip("Доступен ли NPC для романтических отношений."), SerializeField]
+        /// <summary> Доступен ли NPC для романтических отношений? </summary>
+        [field: Tooltip("Доступен ли NPC для романтических отношений?"), SerializeField]
         public bool IsRomanceable { get; private set; }
 
-        /// <summary> Префаб персонажа в диалоге (например, иконка или 3d модель). </summary>
+        /// <summary> Префаб персонажа в диалоге. </summary>
         [field: Tooltip("Префаб персонажа в диалоге."), SerializeField]
         public GameObject DialogueModelPrefab { get; private set; }
 
         /// <summary> Иконка NPC для отображения в UI. </summary>
-        [field: Tooltip("Иконка NPC для отображения в пользовательском интерфейсе (например, на мини-карте)."),
-                SerializeField]
+        [field: Tooltip("Иконка NPC для отображения в UI."), SerializeField]
         public Sprite Icon { get; private set; }
     }
 }

@@ -19,18 +19,16 @@ namespace FlavorfulStory.AI.FSM.ShopStates
             base.Enter();
 
             var point = _shopLocation.GetRandomPointOnNavMesh();
-
-            if (point.HasValue)
-            {
-                //TODO: добавить анимацию обдумывания
-                Context?.Set(FsmContextType.AnimationType, AnimationType.Special1);
-                Context?.Set(FsmContextType.AnimationTime, 3f);
-                Context?.Set(FsmContextType.DestinationPoint, point.Value);
-            }
-            else
+            if (!point.HasValue)
             {
                 Debug.LogWarning("Didn't find any point for shop location");
+                return;
             }
+
+            //TODO: добавить анимацию обдумывания
+            Context?.Set(FsmContextType.AnimationType, AnimationType.Special1);
+            Context?.Set(FsmContextType.AnimationTime, 3f);
+            Context?.Set(FsmContextType.DestinationPoint, point.Value);
         }
 
         /// <summary> Возвращает статус завершения состояния. </summary>

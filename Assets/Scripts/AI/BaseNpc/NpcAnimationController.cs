@@ -6,7 +6,7 @@ using Zenject;
 namespace FlavorfulStory.AI.BaseNpc
 {
     /// <summary> Контроллер анимации NPC, управляющий всеми анимационными состояниями персонажа. </summary>
-    public class NpcAnimationController : IInitializable, IDisposable
+    public sealed class NpcAnimationController : IInitializable, IDisposable
     {
         /// <summary> Компонент Animator для управления анимациями. </summary>
         private readonly Animator _animator;

@@ -2,8 +2,8 @@
 
 namespace FlavorfulStory.AI
 {
-    /// <summary> Обработчик коллизий NPC, вызывающий соответствующие методы при входе и выходе игрока из триггера. </summary>
-    public class NpcCollisionHandler
+    /// <summary> Обработчик коллизий NPC. </summary>
+    public sealed class NpcCollisionHandler
     {
         /// <summary> Интерфейс обработчика коллизий персонажа, реализующий логику взаимодействия. </summary>
         private readonly ICharacterCollisionHandler _handler;
