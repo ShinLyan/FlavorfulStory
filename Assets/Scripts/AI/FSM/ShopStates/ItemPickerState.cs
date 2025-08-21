@@ -1,5 +1,5 @@
 using Cysharp.Threading.Tasks;
-using FlavorfulStory.AI.NonInteractableNpc;
+using FlavorfulStory.AI.BaseNpc;
 using FlavorfulStory.Shop;
 using UnityEngine;
 
@@ -12,7 +12,7 @@ namespace FlavorfulStory.AI.FSM.ShopStates
         private readonly ShopLocation _shopLocation;
 
         /// <summary> Контроллер движения неинтерактивного NPC. </summary>
-        private readonly NonInteractableNpcMovementController _movementController;
+        private readonly NpcMovementController _movementController;
 
         /// <summary> Индикатор купленного товара у НПС. </summary>
         private readonly NpcPurchaseIndicator _purchaseIndicator;
@@ -21,7 +21,7 @@ namespace FlavorfulStory.AI.FSM.ShopStates
         /// <param name="npcMovementController"> Контроллер движения для управления перемещением NPC. </param>
         /// <param name="shopLocation"> Локация магазина для получения информации о кассе. </param>
         /// <param name="purchaseIndicator"></param>
-        public ItemPickerState(NonInteractableNpcMovementController npcMovementController, ShopLocation shopLocation,
+        public ItemPickerState(NpcMovementController npcMovementController, ShopLocation shopLocation,
             NpcPurchaseIndicator purchaseIndicator)
         {
             _shopLocation = shopLocation;

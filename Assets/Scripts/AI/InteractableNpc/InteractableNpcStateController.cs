@@ -24,7 +24,7 @@ namespace FlavorfulStory.AI.InteractableNpc
         private readonly NpcScheduleHandler _scheduleHandler;
 
         /// <summary> Контроллер движения для интерактивного NPC. </summary>
-        private readonly InteractableNpcMovementController _npcMovementController;
+        private readonly NpcMovementController _npcMovementController;
 
         /// <summary> Контроллер игрока для взаимодействия. </summary>
         private readonly IPlayerPositionProvider _playerPositionProvider;
@@ -42,7 +42,7 @@ namespace FlavorfulStory.AI.InteractableNpc
         /// <param name="npcTransform"> Transform NPC для определения позиции. </param>
         /// <param name="playerPositionProvider"> Контроллер игрока. </param>
         public InteractableNpcStateController(NpcSchedule npcSchedule,
-            InteractableNpcMovementController npcMovementController, NpcAnimationController npcAnimationController,
+            NpcMovementController npcMovementController, NpcAnimationController npcAnimationController,
             NpcScheduleHandler scheduleHandler, Transform npcTransform, IPlayerPositionProvider playerPositionProvider)
             : base(npcAnimationController, npcTransform)
         {

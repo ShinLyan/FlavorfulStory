@@ -3,7 +3,6 @@ using FlavorfulStory.AI.Scheduling;
 using FlavorfulStory.DialogueSystem;
 using FlavorfulStory.Player;
 using UnityEngine;
-using UnityEngine.AI;
 using Zenject;
 
 namespace FlavorfulStory.AI.InteractableNpc
@@ -30,14 +29,8 @@ namespace FlavorfulStory.AI.InteractableNpc
         /// <summary> Провайдер позиции игрока. </summary>
         private IPlayerPositionProvider _playerPositionProvider;
 
-        /// <summary> Контроллер движения персонажа. </summary>
-        private InteractableNpcMovementController _movementController;
-
         /// <summary> Контроллер состояний персонажа. </summary>
         private InteractableNpcStateController _stateController;
-
-        /// <summary> Возвращает контроллер движения для базового NPC. </summary>
-        protected override NpcMovementController MovementController => _movementController;
 
         /// <summary> Возвращает контроллер состояний для базового NPC. </summary>
         protected override NpcStateController StateController => _stateController;
@@ -55,10 +48,7 @@ namespace FlavorfulStory.AI.InteractableNpc
 
             _npcScheduleHandler = new NpcScheduleHandler();
 
-            _movementController = new InteractableNpcMovementController(GetComponent<NavMeshAgent>(), transform,
-                AnimationController, _npcScheduleHandler);
-
-            _stateController = new InteractableNpcStateController(_npcSchedule, _movementController,
+            _stateController = new InteractableNpcStateController(_npcSchedule, MovementController,
                 AnimationController, _npcScheduleHandler, transform, _playerPositionProvider);
 
             _collisionHandler = new NpcCollisionHandler(_stateController);

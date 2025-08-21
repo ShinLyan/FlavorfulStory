@@ -4,7 +4,6 @@ using FlavorfulStory.AI.FSM;
 using FlavorfulStory.Economy;
 using FlavorfulStory.SceneManagement;
 using UnityEngine;
-using UnityEngine.AI;
 using Zenject;
 
 namespace FlavorfulStory.AI.NonInteractableNpc
@@ -13,9 +12,6 @@ namespace FlavorfulStory.AI.NonInteractableNpc
     [RequireComponent(typeof(NpcPurchaseIndicator))]
     public sealed class NonInteractableNpc : Npc
     {
-        /// <summary> Контроллер передвижений для неинтерактивного НПС. </summary>
-        private NonInteractableNpcMovementController _movementController;
-
         /// <summary> Стейт-контроллер для неинтерктивного НПС. </summary>
         private NonInteractableNpcStateController _stateController;
 
@@ -24,9 +20,6 @@ namespace FlavorfulStory.AI.NonInteractableNpc
 
         /// <summary> Сервис для транзакций. </summary>
         private TransactionService _transactionService;
-
-        /// <summary> Возвращает контроллер движения NPC. </summary>
-        protected override NpcMovementController MovementController => _movementController;
 
         /// <summary> Возвращает контроллер состояний NPC. </summary>
         protected override NpcStateController StateController => _stateController;
@@ -49,10 +42,7 @@ namespace FlavorfulStory.AI.NonInteractableNpc
         {
             base.Awake();
 
-            _movementController = new NonInteractableNpcMovementController(GetComponent<NavMeshAgent>(),
-                transform, AnimationController);
-
-            _stateController = new NonInteractableNpcStateController(_movementController, _locationManager,
+            _stateController = new NonInteractableNpcStateController(MovementController, _locationManager,
                 AnimationController, _transactionService, transform, GetComponent<NpcPurchaseIndicator>());
         }
 
@@ -65,7 +55,7 @@ namespace FlavorfulStory.AI.NonInteractableNpc
             context.Set(FsmContextType.DestinationPoint, npcDestination);
 
             _stateController.ForceSetState(NpcStateName.Movement, context);
-            _movementController.OnDestinationReached += () => _stateController.StartRandomSequence();
+            MovementController.OnDestinationReached += () => _stateController.StartRandomSequence();
         }
 
         /// <summary> Устанавливает точку исчезновения для неинтерактивного NPC. </summary>

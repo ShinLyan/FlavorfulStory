@@ -18,7 +18,7 @@ namespace FlavorfulStory.AI.NonInteractableNpc
     public sealed class NonInteractableNpcStateController : NpcStateController
     {
         /// <summary> Контроллер движения неинтерактивного NPC. </summary>
-        private readonly NonInteractableNpcMovementController _npcMovementController;
+        private readonly NpcMovementController _npcMovementController;
 
         /// <summary> Менеджер локаций для получения информации о местоположениях. </summary>
         private readonly LocationManager _locationManager;
@@ -42,7 +42,7 @@ namespace FlavorfulStory.AI.NonInteractableNpc
         /// <param name="transactionService"> Сервис для транзакций. </param>
         /// <param name="npcTransform"> Transform NPC для определения позиции. </param>
         /// <param name="npcPurchaseIndicator">  </param>
-        public NonInteractableNpcStateController(NonInteractableNpcMovementController npcMovementController,
+        public NonInteractableNpcStateController(NpcMovementController npcMovementController,
             LocationManager locationManager, NpcAnimationController npcAnimationController,
             TransactionService transactionService, Transform npcTransform, NpcPurchaseIndicator npcPurchaseIndicator)
             : base(npcAnimationController, npcTransform)

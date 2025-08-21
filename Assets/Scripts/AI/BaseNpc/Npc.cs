@@ -15,10 +15,15 @@ namespace FlavorfulStory.AI.BaseNpc
         protected abstract NpcStateController StateController { get; }
 
         /// <summary> Контроллер движения NPC для управления навигацией и перемещением. </summary>
-        protected abstract NpcMovementController MovementController { get; }
+        protected NpcMovementController MovementController { get; private set; }
 
         /// <summary> Вызывается при создании объекта, может быть переопределен в наследниках </summary>
-        protected virtual void Awake() => AnimationController = new NpcAnimationController(GetComponent<Animator>());
+        protected virtual void Awake()
+        {
+            AnimationController = new NpcAnimationController(GetComponent<Animator>());
+            MovementController =
+                new NpcMovementController(GetComponent<NavMeshAgent>(), transform, AnimationController);
+        }
 
         /// <summary> Инициализация объектов. </summary>
         protected virtual void Start()
