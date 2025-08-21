@@ -24,13 +24,11 @@ using FlavorfulStory.SceneManagement;
 using FlavorfulStory.Shop;
 using FlavorfulStory.Stats;
 using FlavorfulStory.TimeManagement;
-using FlavorfulStory.TimeManagement.UI;
 using FlavorfulStory.Toolbar;
 using FlavorfulStory.Toolbar.UI;
 using FlavorfulStory.Tools;
 using FlavorfulStory.TooltipSystem;
 using FlavorfulStory.TooltipSystem.ActionTooltips;
-using FlavorfulStory.UI.Animation;
 using FlavorfulStory.Visuals.Lightning;
 using Unity.Cinemachine;
 using UnityEngine;
@@ -56,11 +54,8 @@ namespace FlavorfulStory.Infrastructure.Installers
         /// <summary> Префаб всплывающей подсказки для предмета. </summary>
         [SerializeField] private ItemTooltipView _itemTooltipPrefab;
 
-        /// <summary> Инвентарь игрока. </summary>
-        [Header("Inventory")]
-        [SerializeField] private Inventory _playerInventory;
-
         /// <summary> Префаб отображения ячейки инвентаря. </summary>
+        [Header("Inventory")]
         [SerializeField] private InventorySlotView _inventorySlotViewPrefab;
 
         /// <summary> Индикатор клетки на гриде. </summary>
@@ -150,7 +145,6 @@ namespace FlavorfulStory.Infrastructure.Installers
         /// <summary> Установить зависимости, связанные с системой инвентаря. </summary>
         private void BindInventorySystem()
         {
-            Container.Bind<Inventory>().FromInstance(_playerInventory).AsSingle();
             Container.Bind<Equipment>().FromComponentInHierarchy().AsSingle();
 
             Container.Bind<IPrefabFactory<Pickup>>().To<Factories.PrefabFactory<Pickup>>().AsSingle();

@@ -16,13 +16,7 @@ namespace FlavorfulStory.Actions.Interactables
         [Tooltip("Собираемые предметы."), SerializeField]
         private List<ItemStack> _harvestItems;
 
-        /// <summary> Инвентарь игрока. </summary>
-        private Inventory _playerInventory;
-
-        /// <summary> Внедрение зависимости — инвентарь игрока. </summary>
-        /// <param name="inventory"> Инвентарь игрока. </param>
-        [Inject]
-        private void Construct(Inventory inventory) => _playerInventory = inventory;
+        [Inject] private readonly IInventoryProvider _inventoryProvider;
 
         #region IInteractable
 
@@ -49,7 +43,7 @@ namespace FlavorfulStory.Actions.Interactables
             IsInteractionAllowed = false;
 
             foreach (var itemStack in _harvestItems)
-                _playerInventory.TryAddToFirstAvailableSlot(itemStack.Item, itemStack.Number);
+                _inventoryProvider.GetPlayerInventory().TryAddToFirstAvailableSlot(itemStack.Item, itemStack.Number);
         }
 
         /// <summary> Завершает взаимодействие с объектом. </summary>

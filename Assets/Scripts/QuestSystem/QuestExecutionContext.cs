@@ -21,14 +21,17 @@ namespace FlavorfulStory.QuestSystem
 
         /// <summary> Создаёт контекст выполнения цели. </summary>
         /// <param name="questList"> Список квестов. </param>
-        /// <param name="inventory"> Инвентарь игрока. </param>
+        /// <param name="inventoryProvider"> Провайдер инвентарей. </param>
         /// <param name="playerSpeaker"> Компонент диалогов игрока. </param>
         /// <param name="itemDropService"> Сервис, отвечающий за выброс предметов из инвентаря в игровом мире. </param>
-        public QuestExecutionContext(QuestList questList, Inventory inventory, PlayerSpeaker playerSpeaker,
+        public QuestExecutionContext(
+            QuestList questList,
+            IInventoryProvider inventoryProvider,
+            PlayerSpeaker playerSpeaker,
             IItemDropService itemDropService)
         {
             QuestList = questList;
-            Inventory = inventory;
+            Inventory = inventoryProvider.GetPlayerInventory();
             PlayerSpeaker = playerSpeaker;
             ItemDropService = itemDropService;
         }

@@ -310,8 +310,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa51b8f74113497c95b211d61474902e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _otherInventoryView: {fileID: 3853285056171103408}
-  _playerInventoryView: {fileID: 6908656748951128802}
+  _secondInventoryView: {fileID: 3853285056171103408}
+  _firstInventoryView: {fileID: 6908656748951128802}
   _addToExistingButton: {fileID: 6658114838741374000}
   _closeButton: {fileID: 281731267007382176}
 --- !u!1 &6205734266519834335
@@ -785,7 +785,7 @@ PrefabInstance:
     - target: {fileID: 3064444610343552802, guid: 980949da22af4714c9771887b04b1aa4,
         type: 3}
       propertyPath: m_Name
-      value: OtherInventory
+      value: TopInventory
       objectReference: {fileID: 0}
     - target: {fileID: 3660643870602903913, guid: 980949da22af4714c9771887b04b1aa4,
         type: 3}
@@ -1236,7 +1236,7 @@ PrefabInstance:
     - target: {fileID: 3064444610343552802, guid: 980949da22af4714c9771887b04b1aa4,
         type: 3}
       propertyPath: m_Name
-      value: PlayerInventory
+      value: BottomInventory
       objectReference: {fileID: 0}
     - target: {fileID: 3660643870602903913, guid: 980949da22af4714c9771887b04b1aa4,
         type: 3}

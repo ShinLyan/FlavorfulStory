@@ -40,12 +40,7 @@ namespace FlavorfulStory.BuildingRepair.UI
         public event Action<InventoryItem> OnReturnClicked;
 
         /// <summary> Инвентарь игрока. </summary>
-        private Inventory _playerInventory;
-
-        /// <summary> Внедрение зависимости — инвентарь игрока. </summary>
-        /// <param name="inventory"> Инвентарь игрока. </param>
-        [Inject]
-        private void Construct(Inventory inventory) => _playerInventory = inventory;
+        [Inject] private readonly IInventoryProvider _inventoryProvider;
 
         /// <summary> Подписаться на события при активации объекта. </summary>
         private void OnEnable()
@@ -99,9 +94,10 @@ namespace FlavorfulStory.BuildingRepair.UI
         /// <summary> Обновить состояние кнопок добавления и возврата ресурса. </summary>
         private void UpdateButtonsStates()
         {
-            _addResourceButton.interactable =
-                _investedQuantity < _requiredQuantity && _playerInventory.GetItemNumber(_resource) > 0;
-            _returnResourceButton.interactable = _investedQuantity > 0 && _playerInventory.HasSpaceFor(_resource);
+            _addResourceButton.interactable = _investedQuantity < _requiredQuantity &&
+                                              _inventoryProvider.GetPlayerInventory().GetItemNumber(_resource) > 0;
+            _returnResourceButton.interactable = _investedQuantity > 0 && 
+                                                 _inventoryProvider.GetPlayerInventory().HasSpaceFor(_resource);
         }
     }
 }

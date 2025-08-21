@@ -7,11 +7,11 @@ namespace FlavorfulStory.InventorySystem.UI
     /// <summary> Окно обмена между двумя инвентарями (игрок и хранилище). </summary>
     public class InventoryExchangeWindow : BaseWindow
     {
-        /// <summary> View для отображения второго инвентаря (например, сундука). </summary>
-        [SerializeField] private InventoryView _otherInventoryView;
+        /// <summary> View для отображения второго инвентаря. </summary>
+        [SerializeField] private InventoryView _secondInventoryView;
 
-        /// <summary> View для отображения инвентаря игрока. </summary>
-        [SerializeField] private InventoryView _playerInventoryView;
+        /// <summary> View для отображения первого инвентаря. </summary>
+        [SerializeField] private InventoryView _firstInventoryView;
 
         /// <summary> Кнопка "Add to Existing" — переносит стакающиеся предметы. </summary>
         [SerializeField] private Button _addToExistingButton;
@@ -19,11 +19,11 @@ namespace FlavorfulStory.InventorySystem.UI
         /// <summary> Кнопка "Add to Existing" — переносит стакающиеся предметы. </summary>
         [SerializeField] private Button _closeButton;
         
-        /// <summary> Второй инвентарь (например, сундук). </summary>
-        private Inventory _otherInventory;
+        /// <summary> Второй инвентарь . </summary>
+        private Inventory _secondInventory;
 
-        /// <summary> Инвентарь игрока. </summary>
-        private Inventory _playerInventory;
+        /// <summary> Первый инвентарь. </summary>
+        private Inventory _firstInventory;
 
         /// <summary> Сервис для передачи предметов между инвентарями. </summary>
         private InventoryTransferService _transferService;
@@ -47,33 +47,33 @@ namespace FlavorfulStory.InventorySystem.UI
             _closeButton.onClick.RemoveListener(Close);
         }
 
-        public void Setup(Inventory otherInventory, Inventory playerInventory)
+        public void Setup(Inventory secondInventory, Inventory firstInventory)
         {
-            _otherInventory = otherInventory;
-            _playerInventory = playerInventory;
+            _secondInventory = secondInventory;
+            _firstInventory = firstInventory;
 
-            _otherInventoryView.Initialize(otherInventory);
-            _playerInventoryView.Initialize(playerInventory);
+            _secondInventoryView.Initialize(secondInventory);
+            _firstInventoryView.Initialize(firstInventory);
         }
 
         protected override void OnClosed()
         {
             base.OnClosed();
 
-            _otherInventory = null;
-            _playerInventory = null;
+            _secondInventory = null;
+            _firstInventory = null;
         }
 
         /// <summary> Обрабатывает нажатие на кнопку "Add to Existing". </summary>
         /// <remarks> Переносит стакающиеся предметы из инвентаря игрока во второй инвентарь. </remarks>
         private void OnAddToExistingClicked()
         {
-            var stackables = _transferService.GetStackablesToTransfer(_playerInventory, _otherInventory);
+            var stackables = _transferService.GetStackablesToTransfer(_firstInventory, _secondInventory);
             foreach ((int slotIndex, var stack) in stackables)
             {
-                _playerInventoryView.AnimateRemoveAt(slotIndex,
-                    () => { _playerInventory.RemoveFromSlot(slotIndex, stack.Number); });
-                _otherInventoryView.AnimateAdd(stack.Item);
+                _firstInventoryView.AnimateRemoveAt(slotIndex,
+                    () => { _firstInventory.RemoveFromSlot(slotIndex, stack.Number); });
+                _secondInventoryView.AnimateAdd(stack.Item);
             }
         }
     }

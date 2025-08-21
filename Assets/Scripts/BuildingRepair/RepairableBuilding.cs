@@ -36,9 +36,9 @@ namespace FlavorfulStory.BuildingRepair
 
         /// <summary> Завершен ли ремонт здания? </summary>
         private bool _isRepairCompleted;
-
-        /// <summary> Инвентарь игрока. </summary>
-        private Inventory _playerInventory;
+        
+        /// <summary> Провайдер окон. </summary>
+        [Inject] private readonly IInventoryProvider _inventoryProvider;
 
         /// <summary> Текущая стадия ремонта. </summary>
         private RepairStage CurrentStage => _buildingData.Stages[_repairStageIndex];
@@ -54,14 +54,9 @@ namespace FlavorfulStory.BuildingRepair
         private IWindowService _windowService;
         
         /// <summary> Внедрение зависимостей Zenject. </summary>
-        /// <param name="inventory"> Инвентарь игрока. </param>
         /// <param name="windowService"> Сервис окон. </param>
         [Inject]
-        private void Construct(Inventory inventory, IWindowService windowService)
-        {
-            _playerInventory = inventory;
-            _windowService = windowService;
-        }
+        private void Construct(IWindowService windowService) => _windowService = windowService;
 
         /// <summary> Инициализация компонента. </summary>
         private void Awake() => _objectSwitcher = GetComponent<ObjectSwitcher>();
@@ -142,13 +137,13 @@ namespace FlavorfulStory.BuildingRepair
             if (index == -1) return;
 
             var requirement = CurrentStage.Requirements[index];
-            int available = _playerInventory.GetItemNumber(resource);
+            int available = _inventoryProvider.GetPlayerInventory().GetItemNumber(resource);
             int needed = requirement.Number - _investedResources[index];
             int toInvest = Mathf.Min(available, needed);
             if (toInvest <= 0) return;
 
             _investedResources[index] += toInvest;
-            _playerInventory.RemoveItem(resource, toInvest);
+            _inventoryProvider.GetPlayerInventory().RemoveItem(resource, toInvest);
 
             _onStageUpdated?.Invoke(CurrentStage, _investedResources);
         }
@@ -161,9 +156,9 @@ namespace FlavorfulStory.BuildingRepair
             if (index < 0) return;
 
             int invested = _investedResources[index];
-            if (invested <= 0 || !_playerInventory.HasSpaceFor(resource)) return;
+            if (invested <= 0 || !_inventoryProvider.GetPlayerInventory().HasSpaceFor(resource)) return;
 
-            _playerInventory.TryAddToFirstAvailableSlot(resource, invested);
+            _inventoryProvider.GetPlayerInventory().TryAddToFirstAvailableSlot(resource, invested);
             _investedResources[index] = 0;
 
             _onStageUpdated?.Invoke(CurrentStage, _investedResources);

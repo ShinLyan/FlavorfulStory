@@ -47,6 +47,7 @@ namespace FlavorfulStory.InventorySystem.UI
             }
         }
 
+        //TODO: Вызвать в GameMenu или ещё где-то, чтобы InventoryView игрока не съебался
         /// <summary> Переинициализирует отображение для указанного инвентаря. </summary>
         public void Initialize(Inventory inventory)
         {
@@ -61,7 +62,7 @@ namespace FlavorfulStory.InventorySystem.UI
         /// <summary> Отписаться от событий и очистить отображения при уничтожении объекта. </summary>
         private void OnDestroy()
         {
-            _inventory.InventoryUpdated -= UpdateView;
+            if (_inventory != null) _inventory.InventoryUpdated -= UpdateView;
             ClearView();
         }
 

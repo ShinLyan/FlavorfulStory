@@ -23,19 +23,14 @@ namespace FlavorfulStory.PickupSystem
         /// <summary> Количество предметов, доступных для подбора. </summary>
         public int Number => _itemStack.Number;
 
-        /// <summary> Ссылка на инвентарь игрока. </summary>
-        private Inventory _inventory;
+        /// <summary> Провайдер инвентарей. </summary>
+        [Inject] private readonly IInventoryProvider _inventoryProvider;
 
         /// <summary> Флаг, указывающий, можно ли подбирать предмет. </summary>
         private bool _canBePickedUp;
 
         /// <summary> Возвращает true, если предмет можно подобрать и в инвентаре есть место. </summary>
-        private bool CanBePickedUp => _canBePickedUp && _inventory.HasSpaceFor(Item);
-
-        /// <summary> Внедрение зависимостей. </summary>
-        /// <param name="inventory"> Инвентарь игрока. </param>
-        [Inject]
-        private void Construct(Inventory inventory) => _inventory = inventory;
+        private bool CanBePickedUp => _canBePickedUp && _inventoryProvider.GetPlayerInventory().HasSpaceFor(Item);
 
         /// <summary> Устанавливает предмет, количество и задержку перед возможностью подбора. </summary>
         /// <param name="itemStack"> Предмет и его количество, которые можно подобрать. </param>
@@ -52,7 +47,7 @@ namespace FlavorfulStory.PickupSystem
         {
             if (!CanBePickedUp) return;
 
-            if (_inventory.TryAddToFirstAvailableSlot(Item, Number)) Destroy(gameObject);
+            if (_inventoryProvider.GetPlayerInventory().TryAddToFirstAvailableSlot(Item, Number)) Destroy(gameObject);
         }
 
         /// <summary> Делает предмет доступным для подбора. </summary>
