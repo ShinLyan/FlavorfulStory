@@ -58,11 +58,8 @@ namespace FlavorfulStory.GridSystem
         /// <summary> Получить центр ячейки по её координатам. </summary>
         /// <param name="gridPosition"> Позиция в гриде. </param>
         /// <returns> Центр ячейки по её координатам. </returns>
-        public Vector3 GetCellCenterWorld(Vector3Int gridPosition)
-        {
-            var worldOrigin = _grid.CellToWorld(gridPosition);
-            return worldOrigin + new Vector3(CellSize, 0f, CellSize) * 0.5f;
-        }
+        public Vector3 GetCellCenterWorld(Vector3Int gridPosition) =>
+            GridToWorld(gridPosition) + new Vector3(CellSize, 0f, CellSize) * 0.5f;
 
         /// <summary> Переводит количество клеток в мировое расстояние. </summary>
         /// <param name="cellsCount"> Количество клеток. </param>
