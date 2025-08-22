@@ -16,7 +16,7 @@ namespace FlavorfulStory.Notifications.UI
         {
             if (data is not NightStartedSignal notificationData) return;
 
-            _messageText.text = $"Night had fallen. It's already {notificationData.Time.Hour} o'clock";
+            _messageText.text = $"Night had fallen. It's already {(int)notificationData.Time.Hour} o'clock";
         }
     }
 }

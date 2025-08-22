@@ -84,7 +84,6 @@ namespace FlavorfulStory.Infrastructure.Installers
         /// <summary> Выполнить установку всех зависимостей, необходимых для сцены. </summary>
         public override void InstallBindings()
         {
-            SignalBusInstaller.Install(Container);
             DeclareSignals();
 
             BindBuildingRepair();
@@ -111,6 +110,7 @@ namespace FlavorfulStory.Infrastructure.Installers
             Container.DeclareSignal<ItemCollectedSignal>();
             Container.DeclareSignal<QuestAddedSignal>();
             Container.DeclareSignal<DismantleDeniedSignal>();
+            Container.DeclareSignal<ExhaustedSleepSignal>();
 
             Container.DeclareSignal<ToolbarSlotSelectedSignal>();
             Container.DeclareSignal<ToolbarHotkeyPressedSignal>();
@@ -186,6 +186,8 @@ namespace FlavorfulStory.Infrastructure.Installers
             Container.BindInterfacesTo<SignalNotifier<ItemCollectedSignal>>().AsSingle();
             Container.BindInterfacesTo<SignalNotifier<QuestAddedSignal>>().AsSingle();
             Container.BindInterfacesTo<SignalNotifier<DismantleDeniedSignal>>().AsSingle();
+            Container.BindInterfacesTo<SignalNotifier<SaveCompletedSignal>>().AsSingle();
+            Container.BindInterfacesTo<SignalNotifier<ExhaustedSleepSignal>>().AsSingle();
 
             Container.Bind<NotificationAnchorLocator>().FromComponentInHierarchy().AsSingle();
             Container.BindInterfacesAndSelfTo<NotificationService>().AsSingle();
@@ -239,7 +241,7 @@ namespace FlavorfulStory.Infrastructure.Installers
         {
             Container.Bind<SummaryView>().FromComponentInHierarchy().AsSingle();
             Container.BindInterfacesAndSelfTo<DayEndManager>().AsSingle();
-            Container.Bind<SleepTrigger>().FromComponentInHierarchy().AsSingle();
+            Container.Bind<PlayerSpawnService>().AsSingle();
         }
 
         /// <summary> Установить зависимости, связанные с системой тултипов. </summary>

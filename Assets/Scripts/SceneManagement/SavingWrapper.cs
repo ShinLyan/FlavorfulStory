@@ -31,14 +31,20 @@ namespace FlavorfulStory.SceneManagement
         /// <summary> Название текущего сохранения. </summary>
         private static string CurrentSaveFileName => PlayerPrefs.GetString(CurrentSaveKey);
 
+        /// <summary> Сигнальная шина. </summary>
+        private SignalBus _signalBus;
+
         /// <summary> Внедрение зависимостей Zenject. </summary>
         /// <param name="canvasGroupFader"> Компонент затемнения экрана при переходах между сценами. </param>
         /// <param name="locationManager"> Менеджер локаций. </param>
+        /// <param name="signalBus"> Сигнальная шина. </param>
         [Inject]
-        private void Construct(CanvasGroupFader canvasGroupFader, [InjectOptional] LocationManager locationManager)
+        private void Construct(CanvasGroupFader canvasGroupFader, [InjectOptional] LocationManager locationManager,
+            SignalBus signalBus)
         {
             _canvasGroupFader = canvasGroupFader;
             _locationManager = locationManager;
+            _signalBus = signalBus;
         }
 
         /// <summary> Асинхронно начинает новую игру. </summary>
@@ -85,13 +91,17 @@ namespace FlavorfulStory.SceneManagement
         }
 
         /// <summary> Загружает данные игры из текущего сохранения. </summary>
-        public static void Load() => SavingSystem.Load(CurrentSaveFileName);
+        public void Load() => SavingSystem.Load(CurrentSaveFileName);
 
         /// <summary> Сохраняет данные игры в текущий файл сохранения. </summary>
-        public static void Save() => SavingSystem.Save(CurrentSaveFileName);
+        public void Save()
+        {
+            _signalBus.Fire(new SaveCompletedSignal());
+            SavingSystem.Save(CurrentSaveFileName);
+        }
 
         /// <summary> Удаляет текущее сохранение. </summary>
-        public static void Delete() => SavingSystem.Delete(CurrentSaveFileName);
+        public void Delete() => SavingSystem.Delete(CurrentSaveFileName);
 
         #region Debug
 

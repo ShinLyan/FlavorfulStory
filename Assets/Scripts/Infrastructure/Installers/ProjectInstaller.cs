@@ -1,4 +1,5 @@
 ﻿using FlavorfulStory.Audio;
+using FlavorfulStory.Saving;
 using FlavorfulStory.SceneManagement;
 using FlavorfulStory.TooltipSystem;
 using FlavorfulStory.UI.Animation;
@@ -40,6 +41,10 @@ namespace FlavorfulStory.Infrastructure.Installers
             }).AsSingle().NonLazy();
 
             Container.Bind<ButtonTooltipView>().FromInstance(_buttonTooltipPrefab).AsSingle();
+
+
+            SignalBusInstaller.Install(Container);
+            Container.DeclareSignal<SaveCompletedSignal>();
         }
     }
 }

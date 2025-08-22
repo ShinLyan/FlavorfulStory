@@ -18,6 +18,10 @@ namespace FlavorfulStory.SceneManagement
         [field: Tooltip("Является ли локация помещением?"), SerializeField]
         public bool IsRoom { get; private set; }
 
+        /// TODO: ВЫНЕСТИ В ShopLocation после мерджа с NPC
+        [field: SerializeField] public Transform EntryPoint { get; private set; }
+
+
         /// <summary> Устанавливает активное состояние всех объектов из списка. </summary>
         /// <param name="isActive"> <c>true</c> — включить объекты; <c>false</c> — отключить. </param>
         public void SetActive(bool isActive)

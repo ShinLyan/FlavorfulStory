@@ -17,11 +17,14 @@ namespace FlavorfulStory.TimeManagement
         [Tooltip("Сколько игровых минут проходит за реальную секунду."), SerializeField, SteppedRange(-100f, 1000f, 5f)]
         private float _timeScale = 1f;
 
+        /// <summary> Текущее игровое время. </summary>
+        public static DateTime CurrentGameTime { get; private set; }
+
         /// <summary> Сигнальная шина Zenject для отправки и получения событий. </summary>
         private SignalBus _signalBus;
 
-        /// <summary> Текущее игровое время. </summary>
-        public static DateTime CurrentGameTime { get; private set; }
+        /// <summary> Обертка системы сохранений. </summary>
+        private static SavingWrapper _savingWrapper;
 
         /// <summary> Игра на паузе? </summary>
         public static bool IsPaused { get; private set; }
@@ -57,8 +60,13 @@ namespace FlavorfulStory.TimeManagement
 
         /// <summary> Внедрение зависимостей Zenject. </summary>
         /// <param name="signalBus"> Сигнальная шина Zenject для отправки и получения событий. </param>
+        /// <param name="savingWrapper"> Сигнальная шина. </param>
         [Inject]
-        private void Construct(SignalBus signalBus) => _signalBus = signalBus;
+        private void Construct(SignalBus signalBus, SavingWrapper savingWrapper)
+        {
+            _signalBus = signalBus;
+            _savingWrapper = savingWrapper;
+        }
 
         /// <summary> Инициализировать начальное игровое время и подписаться на события. </summary>
         private void Awake() => CurrentGameTime = new DateTime(1, Season.Spring, 1, DayStartHour, 0);
@@ -110,7 +118,7 @@ namespace FlavorfulStory.TimeManagement
                 CurrentGameTime.SeasonDay + dayAdjustment, dayStartHour, 0);
 
             OnDayEnded?.Invoke(CurrentGameTime);
-            SavingWrapper.Save();
+            _savingWrapper.Save();
         }
 
         /// <summary> Поставить игровое время на паузу. </summary>
