@@ -38,25 +38,25 @@ namespace FlavorfulStory.AI.InteractableNpc
         /// <param name="npcSchedule"> Расписание NPC. </param>
         /// <param name="npcMovementController"> Контроллер движения NPC. </param>
         /// <param name="npcAnimationController"> Контроллер анимации NPC. </param>
-        /// <param name="scheduleHandler"> Обработчик расписания NPC. </param>
         /// <param name="npcTransform"> Transform NPC для определения позиции. </param>
         /// <param name="playerPositionProvider"> Контроллер игрока. </param>
         public InteractableNpcStateController(NpcSchedule npcSchedule,
             NpcMovementController npcMovementController, NpcAnimationController npcAnimationController,
-            NpcScheduleHandler scheduleHandler, Transform npcTransform, IPlayerPositionProvider playerPositionProvider)
+            Transform npcTransform, IPlayerPositionProvider playerPositionProvider)
             : base(npcAnimationController, npcTransform)
         {
             _npcSchedule = npcSchedule;
-            _scheduleHandler = scheduleHandler;
             _npcMovementController = npcMovementController;
             _playerPositionProvider = playerPositionProvider;
+
+            _scheduleHandler = new NpcScheduleHandler();
         }
 
         /// <summary> Инициализация объекта. </summary>
         public override void Initialize()
         {
             base.Initialize();
-
+            _scheduleHandler.Initialize();
             _sortedScheduleParams = _npcSchedule.GetSortedScheduleParams();
             InitializeStates();
 
@@ -69,6 +69,8 @@ namespace FlavorfulStory.AI.InteractableNpc
         public override void Dispose()
         {
             base.Dispose();
+            _scheduleHandler.Dispose();
+
             _scheduleHandler.OnSchedulePointChanged -= OnSchedulePointChanged;
             OnCurrentScheduleParamsChanged -= _scheduleHandler.SetCurrentScheduleParams;
         }

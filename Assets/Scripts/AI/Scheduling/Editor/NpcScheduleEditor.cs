@@ -42,13 +42,10 @@ namespace FlavorfulStory.AI.Scheduling.Editor
             for (int i = 0; i < param.Path.Length; i++)
             {
                 var pathPoint = param.Path[i];
-                // var newPosition = GetSurfaceAdjustedPosition(pathPoint.NpcDestinationPoint.Position, viewer);
-                //
-                // if (pathPoint.NpcDestinationPoint.Position != newPosition)
-                // {
-                //     pathPoint.SetTransform(newPosition, pathPoint.NpcDestinationPoint.Rotation);
-                //     EditorUtility.SetDirty(schedule);
-                // }
+                var newPosition = GetSurfaceAdjustedPosition(pathPoint.NpcDestinationPoint.Position, viewer);
+
+                pathPoint.SetTransform(newPosition, pathPoint.NpcDestinationPoint.Rotation);
+                EditorUtility.SetDirty(schedule);
 
                 if (i < param.Path.Length - 1)
                 {
@@ -105,18 +102,10 @@ namespace FlavorfulStory.AI.Scheduling.Editor
 
             EditorGUI.BeginChangeCheck();
             var newPos = Handles.PositionHandle(pos, rot);
-            if (EditorGUI.EndChangeCheck())
-            {
-                Undo.RecordObject(schedule, "Move Schedule Point");
-                point.SetTransform(newPos, rot);
-                EditorUtility.SetDirty(schedule);
-            }
-
-            EditorGUI.BeginChangeCheck();
             var newRot = Handles.RotationHandle(rot, newPos);
             if (EditorGUI.EndChangeCheck())
             {
-                Undo.RecordObject(schedule, "Rotate Schedule Point");
+                Undo.RecordObject(schedule, "Move/Rotate Schedule Point");
                 point.SetTransform(newPos, newRot);
                 EditorUtility.SetDirty(schedule);
             }

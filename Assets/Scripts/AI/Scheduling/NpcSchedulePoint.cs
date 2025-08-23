@@ -36,12 +36,11 @@ namespace FlavorfulStory.AI.Scheduling
         {
             get
             {
-                if (_cachedPoint == null)
-                {
-                    var rot = Quaternion.Euler(_rotationEuler);
-                    if (rot == default) rot = Quaternion.identity;
-                    _cachedPoint = new NpcDestinationPoint(_position, rot);
-                }
+                if (_cachedPoint != null) return _cachedPoint.Value;
+                
+                var rot = Quaternion.Euler(_rotationEuler);
+                if (rot == default) rot = Quaternion.identity;
+                _cachedPoint = new NpcDestinationPoint(_position, rot);
 
                 return _cachedPoint.Value;
             }
@@ -56,8 +55,5 @@ namespace FlavorfulStory.AI.Scheduling
             _rotationEuler = rot.eulerAngles;
             _cachedPoint = new NpcDestinationPoint(_position, rot == default ? Quaternion.identity : rot);
         }
-
-        /// <summary> Сбрасывает кэш при изменении в инспекторе. </summary>
-        private void OnValidate() => _cachedPoint = null;
     }
 }

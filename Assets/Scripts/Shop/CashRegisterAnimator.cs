@@ -12,7 +12,7 @@ namespace FlavorfulStory.Shop
         [SerializeField] private TMP_Text _moneyAmountText;
 
         /// <summary> Объект монетки. </summary>
-        [SerializeField] public GameObject _coin;
+        [SerializeField] public CoinAnimator _coinAnimator;
 
         /// <summary> Ссылка на кассу. </summary>
         private CashRegister _cashRegister;
@@ -30,10 +30,16 @@ namespace FlavorfulStory.Shop
         private void Awake()
         {
             _cashRegister = GetComponent<CashRegister>();
+            InitializeTextTransparency(0f);
+            
             _cashRegister.OnAmountChanged += UpdateAmountText;
             _cashRegister.OnAmountChanged += UpdateCoinState;
+        }
 
-            InitializeTextTransparency(0f);
+        private void OnDestroy()
+        {
+            _cashRegister.OnAmountChanged -= UpdateAmountText;
+            _cashRegister.OnAmountChanged -= UpdateCoinState;
         }
 
         /// <summary> Обновляет текст с количеством денег. </summary>
@@ -42,7 +48,7 @@ namespace FlavorfulStory.Shop
 
         /// <summary> Обновляет состояние монетки. </summary>
         /// <param name="amount"> Текущее количество денег. </param>
-        private void UpdateCoinState(int amount) => _coin.SetActive(amount > 0 && !_playerInTrigger);
+        private void UpdateCoinState(int amount) => _coinAnimator.ToggleCoin(amount > 0 && !_playerInTrigger);
 
         /// <summary> Обрабатывает вход в триггер. </summary>
         /// <param name="other"> Коллайдер вошедшего объекта. </param>
@@ -51,7 +57,7 @@ namespace FlavorfulStory.Shop
             if (!other.CompareTag("Player")) return;
 
             _playerInTrigger = true;
-            _coin.SetActive(false);
+            _coinAnimator.ToggleCoin(false);
             ShowText(true);
         }
 
@@ -107,6 +113,6 @@ namespace FlavorfulStory.Shop
 
         /// <summary> Переключает видимость монетки. </summary>
         /// <param name="show"> Показать монетку. </param>
-        public void ToggleCoin(bool show) => _coin.SetActive(show);
+        public void ToggleCoin(bool show) => _coinAnimator.ToggleCoin(show);
     }
 }

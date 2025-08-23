@@ -19,9 +19,6 @@ namespace FlavorfulStory.AI.InteractableNpc
         [Tooltip("Расписание NPC, определяющее его поведение и маршруты."), SerializeField]
         private NpcSchedule _npcSchedule;
 
-        /// <summary> Обработчик расписания NPC </summary>
-        private NpcScheduleHandler _npcScheduleHandler;
-
         /// <summary> Обработчик столкновений для взаимодействия с игроком. </summary>
         private NpcCollisionHandler _collisionHandler;
 
@@ -45,25 +42,11 @@ namespace FlavorfulStory.AI.InteractableNpc
         {
             base.Awake();
 
-            _npcScheduleHandler = new NpcScheduleHandler();
             _stateController = new InteractableNpcStateController(_npcSchedule, MovementController,
-                AnimationController, _npcScheduleHandler, transform, _playerPositionProvider);
+                AnimationController, transform, _playerPositionProvider);
             _collisionHandler = new NpcCollisionHandler(_stateController);
         }
 
-        /// <summary> Инициализация объекта. </summary>
-        protected override void Start()
-        {
-            _npcScheduleHandler.Initialize();
-            base.Start();
-        }
-
-        /// <summary> Отписка от событий при уничтожении. </summary>
-        protected override void OnDestroy()
-        {
-            base.OnDestroy();
-            _npcScheduleHandler.Dispose();
-        }
 
         /// <summary> Обрабатывает вход другого объекта в триггер коллизии NPC. </summary>
         /// <param name="other"> Коллайдер, вошедший в триггер. </param>
