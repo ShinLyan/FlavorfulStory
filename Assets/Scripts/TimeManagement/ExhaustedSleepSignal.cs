@@ -3,9 +3,10 @@ using FlavorfulStory.Notifications;
 namespace FlavorfulStory.TimeManagement
 {
     /// <summary> Сигнал, отправляемый при наступлении ночи. </summary>
-    public struct ExhaustedSleepSignal : INotificationData
+    public readonly struct ExhaustedSleepSignal : INotificationData
     {
-        /// <summary> Тип уведомления. </summary>
+        /// <summary> Получает тип уведомления. </summary>
+        /// <returns> Тип уведомления о сне от истощения. </returns>
         public NotificationType Type => NotificationType.ExhaustedSleep;
     }
 }

@@ -5,7 +5,7 @@ using UnityEngine;
 namespace FlavorfulStory.Notifications.UI
 {
     /// <summary> Отображение уведомления о наступлении ночи. </summary>
-    public class NightStartedNotificationView : BaseNotificationView
+    public class MidnightStartedNotificationView : BaseNotificationView
     {
         /// <summary> Текстовое поле с сообщением. </summary>
         [SerializeField] private TMP_Text _messageText;
@@ -14,9 +14,9 @@ namespace FlavorfulStory.Notifications.UI
         /// <param name="data"> Данные уведомления. </param>
         public override void Initialize(INotificationData data)
         {
-            if (data is not NightStartedSignal notificationData) return;
+            if (data is not MidnightStartedSignal) return;
 
-            _messageText.text = $"Night had fallen. It's already {(int)notificationData.Time.Hour} o'clock";
+            _messageText.text = "It’s getting pretty late. Time for bed"; //TODO: localize
         }
     }
 }

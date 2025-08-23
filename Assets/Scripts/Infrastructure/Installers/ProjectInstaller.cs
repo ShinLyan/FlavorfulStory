@@ -42,7 +42,6 @@ namespace FlavorfulStory.Infrastructure.Installers
 
             Container.Bind<ButtonTooltipView>().FromInstance(_buttonTooltipPrefab).AsSingle();
 
-
             SignalBusInstaller.Install(Container);
             Container.DeclareSignal<SaveCompletedSignal>();
         }

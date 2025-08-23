@@ -27,6 +27,7 @@ namespace FlavorfulStory.PlacementSystem
         /// <summary> Буфер коллайдеров для поиска объектов, которые можно ударить. </summary>
         private readonly Collider[] _hitsBuffer = new Collider[10];
 
+        /// <summary> Провайдер размещаемых объектов. </summary>
         private readonly PlaceableObjectProvider _placeableObjectProvider;
 
         /// <summary> Объект, который будет размещен. </summary>

@@ -27,12 +27,14 @@ namespace FlavorfulStory.PlacementSystem
             PlacementLayer.Floor
         };
 
+        /// <summary> Провайдер размещаемых объектов. </summary>
         private readonly PlaceableObjectProvider _placeableObjectProvider;
 
         /// <summary> Конструктор режима удаления. </summary>
         /// <param name="positionProvider"> Провайдер позиционирования на гриде. </param>
         /// <param name="placementPreview"> Компонент предпросмотра. </param>
         /// <param name="gridLayers"> Карта слоёв размещения с их данными. </param>
+        /// <param name="placeableObjectProvider"> Провайдер размещаемых объектов. </param>
         public RemovingMode(GridPositionProvider positionProvider, PlacementPreview placementPreview,
             Dictionary<PlacementLayer, PlacementGridData> gridLayers, PlaceableObjectProvider placeableObjectProvider)
         {

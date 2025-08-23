@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Linq;
 using FlavorfulStory.PlacementSystem;
 using FlavorfulStory.SceneManagement;
@@ -29,22 +28,17 @@ namespace FlavorfulStory.TimeManagement
 
         /// <summary> Регистрирует последнюю использованную кровать. </summary>
         /// <param name="sleepTrigger"> Триггер сна. </param>
-        public void RegisterSleepTrigger(SleepTrigger sleepTrigger) => _lastUsedBed = sleepTrigger;
+        public void RegisterLastUsedBed(SleepTrigger sleepTrigger) => _lastUsedBed = sleepTrigger;
 
         /// <summary> Получает позицию для спавна игрока. </summary>
         /// <returns> Позиция спавна. </returns>
         public Vector3 GetSpawnPosition()
         {
-            var allBeds = GetAllBeds().ToHashSet();
+            var allBeds = _placeableObjectProvider.GetObjectsOfType<SleepTrigger>();
 
             if (_lastUsedBed && allBeds.Contains(_lastUsedBed)) return _lastUsedBed.transform.position;
 
             return _locationManager.GetLocationByName(LocationName.RockyIsland).EntryPoint.position;
         }
-
-        /// <summary> Получает все кровати в игре. </summary>
-        /// <returns> Перечисление кроватей. </returns>
-        private IEnumerable<SleepTrigger> GetAllBeds() =>
-            _placeableObjectProvider.GetObjectsOfType<SleepTrigger>();
     }
 }

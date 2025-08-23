@@ -15,24 +15,24 @@ namespace FlavorfulStory.PlacementSystem
         {
             var existingObjects =
                 Object.FindObjectsByType<PlaceableObject>(FindObjectsInactive.Include, FindObjectsSortMode.None);
-            foreach (var obj in existingObjects) Register(obj);
+            foreach (var placeableObject in existingObjects) Register(placeableObject);
         }
 
         /// <summary> Регистрирует новый предмет в реестре. </summary>
-        /// <param name="obj"> Объект для регистрации </param>
-        public void Register(PlaceableObject obj)
+        /// <param name="placeableObject"> Объект для регистрации. </param>
+        public void Register(PlaceableObject placeableObject)
         {
-            if (obj && !_objects.Contains(obj)) _objects.Add(obj);
+            if (placeableObject && !_objects.Contains(placeableObject)) _objects.Add(placeableObject);
         }
 
         /// <summary> Удаляет предмет из реестра. </summary>
-        /// <param name="obj"> Объект для удаления </param>
-        public void Unregister(PlaceableObject obj) => _objects.Remove(obj);
+        /// <param name="placeableObject"> Объект для удаления. </param>
+        public void Unregister(PlaceableObject placeableObject) => _objects.Remove(placeableObject);
 
         /// <summary> Возвращает все объекты указанного типа. </summary>
-        /// <typeparam name="T"> Тип компонента для поиска </typeparam>
-        /// <returns> Перечисление найденных объектов </returns>
+        /// <typeparam name="T"> Тип компонента для поиска. </typeparam>
+        /// <returns> Перечисление найденных объектов. </returns>
         public IEnumerable<T> GetObjectsOfType<T>() where T : Component =>
-            _objects.Select(o => o.GetComponent<T>()).Where(c => c);
+            _objects.Select(placeableObject => placeableObject.GetComponent<T>()).Where(component => component);
     }
 }

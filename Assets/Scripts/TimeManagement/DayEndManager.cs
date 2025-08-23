@@ -67,11 +67,7 @@ namespace FlavorfulStory.TimeManagement
             ProcessSleepAsync(onCompleteCallback, false).Forget();
 
         /// <summary> Обрабатывает принудительный сон при истощении. </summary>
-        private void ExhaustedSleep()
-        {
-            _signalBus.Fire(new ExhaustedSleepSignal());
-            ProcessSleepAsync(null, true).Forget();
-        }
+        private void ExhaustedSleep() => ProcessSleepAsync(null, true).Forget();
 
         /// <summary> Выполняет процесс сна. </summary>
         /// <param name="onComplete"> Коллбэк завершения. </param>
@@ -81,7 +77,10 @@ namespace FlavorfulStory.TimeManagement
             if (_isProcessingSleep) return;
             _isProcessingSleep = true;
 
-            if (!isExhausted) WorldTime.BeginNewDay(6);
+            if (!isExhausted)
+                WorldTime.BeginNewDay(6);
+            else
+                _signalBus.Fire(new ExhaustedSleepSignal());
 
             await EndDayRoutine();
             _summaryView.HideWithAnimation().Forget();

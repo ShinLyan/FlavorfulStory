@@ -106,7 +106,7 @@ namespace FlavorfulStory.Infrastructure.Installers
         /// <summary> Объявить сигналы, используемые в сцене. </summary>
         private void DeclareSignals()
         {
-            Container.DeclareSignal<NightStartedSignal>();
+            Container.DeclareSignal<MidnightStartedSignal>();
             Container.DeclareSignal<ItemCollectedSignal>();
             Container.DeclareSignal<QuestAddedSignal>();
             Container.DeclareSignal<DismantleDeniedSignal>();
@@ -182,7 +182,7 @@ namespace FlavorfulStory.Infrastructure.Installers
         /// <summary> Установить зависимости, связанные с системой уведомлений. </summary>
         private void BindNotifications()
         {
-            Container.BindInterfacesTo<SignalNotifier<NightStartedSignal>>().AsSingle();
+            Container.BindInterfacesTo<SignalNotifier<MidnightStartedSignal>>().AsSingle();
             Container.BindInterfacesTo<SignalNotifier<ItemCollectedSignal>>().AsSingle();
             Container.BindInterfacesTo<SignalNotifier<QuestAddedSignal>>().AsSingle();
             Container.BindInterfacesTo<SignalNotifier<DismantleDeniedSignal>>().AsSingle();

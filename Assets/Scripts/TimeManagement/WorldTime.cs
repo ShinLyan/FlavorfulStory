@@ -20,6 +20,9 @@ namespace FlavorfulStory.TimeManagement
         /// <summary> Текущее игровое время. </summary>
         public static DateTime CurrentGameTime { get; private set; }
 
+        /// <summary> Предыдущее время. </summary>
+        private DateTime _previousTime;
+
         /// <summary> Сигнальная шина Zenject для отправки и получения событий. </summary>
         private SignalBus _signalBus;
 
@@ -34,12 +37,6 @@ namespace FlavorfulStory.TimeManagement
 
         /// <summary> Час начала нового дня. </summary>
         private const int DayStartHour = 6;
-
-        /// <summary> Час окончания дня. </summary>
-        private const int DayEndHour = 2;
-
-        /// <summary> Час начала ночи. </summary>
-        private const int NightStartHour = 18;
 
         /// <summary> Вызывается при изменении игрового времени. </summary>
         public static Action<DateTime> OnTimeUpdated;
@@ -76,6 +73,8 @@ namespace FlavorfulStory.TimeManagement
         {
             OnTimeUpdated?.Invoke(CurrentGameTime);
             OnTimeTick?.Invoke(CurrentGameTime);
+
+            OnTimeTick += HandleTimeTick;
         }
 
         /// <summary> Очистить состояние и события при уничтожении объекта. </summary>
@@ -89,6 +88,8 @@ namespace FlavorfulStory.TimeManagement
             OnTimeTick = null;
             OnTimePaused = null;
             OnTimeUnpaused = null;
+
+            OnTimeTick -= HandleTimeTick;
         }
 
         /// <summary> Обновить игровое время при отсутствии паузы. </summary>
@@ -96,17 +97,30 @@ namespace FlavorfulStory.TimeManagement
         {
             if (IsPaused) return;
 
-            var previousTime = CurrentGameTime;
+            _previousTime = CurrentGameTime;
             CurrentGameTime = CurrentGameTime.AddMinutes(Time.deltaTime * _timeScale);
 
-            if (previousTime.Hour < NightStartHour && CurrentGameTime.Hour >= NightStartHour)
-                _signalBus.Fire(new NightStartedSignal(CurrentGameTime));
+            int previousTick = (int)(_previousTime.Minute / TimeBetweenTicks);
+            int currentTick = (int)(CurrentGameTime.Minute / TimeBetweenTicks);
 
-            if ((int)CurrentGameTime.Minute % TimeBetweenTicks == 0) OnTimeTick?.Invoke(CurrentGameTime);
+            if (currentTick != previousTick) OnTimeTick?.Invoke(CurrentGameTime);
 
             OnTimeUpdated?.Invoke(CurrentGameTime);
+        }
 
-            if (previousTime.Hour < DayEndHour && CurrentGameTime.Hour >= DayEndHour) BeginNewDay();
+        /// <summary> Обработчик, вызываемый на каждый тик времени. </summary>
+        private void HandleTimeTick(DateTime time)
+        {
+            const int DayEndHour = 2;
+            const int MidnightHour = 0;
+
+            int previousHour = (int)_previousTime.Hour;
+            int currentHour = (int)time.Hour;
+
+            if (previousHour != DayEndHour && currentHour == DayEndHour) BeginNewDay();
+
+            if (previousHour != MidnightHour && currentHour == MidnightHour)
+                _signalBus.Fire(new MidnightStartedSignal());
         }
 
         /// <summary> Обновить игровое время до начала следующего дня. </summary>
@@ -134,6 +148,7 @@ namespace FlavorfulStory.TimeManagement
             IsPaused = false;
             OnTimeUnpaused?.Invoke();
         }
+
 
         #region Saving
 

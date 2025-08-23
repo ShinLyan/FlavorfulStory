@@ -7,7 +7,7 @@
         ItemCollected,
 
         /// <summary> Уведомление о наступлении ночи. </summary>
-        NightStarted,
+        MidnightStarted,
 
         /// <summary> Уведомление о добавлении нового квеста. </summary>
         QuestAdded,

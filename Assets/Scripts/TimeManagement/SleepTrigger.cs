@@ -65,20 +65,20 @@ namespace FlavorfulStory.TimeManagement
         public void BeginInteraction(PlayerController player)
         {
             _confirmationWindowView.Setup(SleepConfirmationTitle, SleepConfirmationDescription,
-                OnSleepConfirmed, OnSleepRejected);
-            _hudFader.Hide().OnComplete(() =>
-            {
-                _confirmationWindowView.Show();
-                EndInteraction(player);
-            });
+                () => OnSleepConfirmed(player), OnSleepRejected);
+            _hudFader.Hide().OnComplete(() => { _confirmationWindowView.Show(); });
         }
 
         /// <summary> Обрабатывает подтверждение сна. </summary>
-        private void OnSleepConfirmed()
+        private void OnSleepConfirmed(PlayerController player)
         {
-            _playerSpawnService.RegisterSleepTrigger(this);
+            _playerSpawnService.RegisterLastUsedBed(this);
             _confirmationWindowView.Hide();
-            _dayEndManager.RequestEndDay(() => { _hudFader.Show(); });
+            _dayEndManager.RequestEndDay(() =>
+            {
+                _hudFader.Show();
+                EndInteraction(player);
+            });
         }
 
         /// <summary> Обрабатывает отклонение сна. </summary>

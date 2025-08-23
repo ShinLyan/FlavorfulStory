@@ -30,13 +30,14 @@ namespace FlavorfulStory.PlacementSystem
         /// <summary> Доступные режимы размещения/удаления, сопоставленные с их типами. </summary>
         private readonly Dictionary<PlacementModeType, IPlacementMode> _modes = new();
 
+        /// <summary> Провайдер размещаемых объектов. </summary>
+        private readonly PlaceableObjectProvider _placeableObjectProvider;
+
         /// <summary> Текущий активный режим размещения или удаления. </summary>
         private IPlacementMode _currentMode;
 
         /// <summary> Последняя позиция курсора на гриде, для оптимизации обновления предпросмотра. </summary>
         private Vector3Int _lastGridPosition;
-
-        private readonly PlaceableObjectProvider _placeableObjectProvider;
 
         /// <summary> Действие, вызываемое при успешном применении действия (размещение или удаление). </summary>
         private Action _onApplySuccess;
@@ -46,7 +47,7 @@ namespace FlavorfulStory.PlacementSystem
         /// <param name="placementPreview"> Сервис предпросмотра размещения. </param>
         /// <param name="placeableContainer"> Родительский контейнер для размещаемых объектов. </param>
         /// <param name="placeableFactory"> Фабрика для создания объектов размещения. </param>
-        /// <param name="placeableObjectProvider">  </param>
+        /// <param name="placeableObjectProvider"> Провайдер размещаемых объектов. </param>
         public PlacementController(GridPositionProvider gridPositionProvider, PlacementPreview placementPreview,
             Transform placeableContainer, IPrefabFactory<PlaceableObject> placeableFactory,
             PlaceableObjectProvider placeableObjectProvider)
