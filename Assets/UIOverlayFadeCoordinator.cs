@@ -4,6 +4,7 @@ using DG.Tweening;
 using Zenject;
 using FlavorfulStory.InputSystem;
 using FlavorfulStory.UI.Animation;
+using UnityEngine;
 
 namespace FlavorfulStory
 {

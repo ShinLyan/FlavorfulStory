@@ -40,6 +40,8 @@ namespace FlavorfulStory.UI
             input = input.Trim();
 
             // Условия проверки и соответствующие ошибки
+            // TODO: нет смысла в Func<bool>. +
+            // Сделать как-то универсально, чтобы можно было 100500 условий создавать в каком-то одном валидаторе и включать/выключать их
             var checks = new (Func<bool> Condition, string ErrorMessage)[]
             {
                 (() => string.IsNullOrEmpty(input), EmptyInputError),

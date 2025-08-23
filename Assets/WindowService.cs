@@ -95,6 +95,7 @@ namespace FlavorfulStory
                 {
                     WorldTime.Pause();
                     InputWrapper.BlockAllInput();
+                    InputWrapper.UnblockInput(InputButton.SwitchGameMenu);
                 }
                 _openedWindows.Remove(window);
                 _openedWindows.Add(window);
