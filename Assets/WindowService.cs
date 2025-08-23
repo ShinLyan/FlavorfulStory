@@ -13,6 +13,8 @@ namespace FlavorfulStory
         private readonly Dictionary<Type, BaseWindow> _windows = new();
         private readonly List<BaseWindow> _openedWindows = new();
 
+        public bool HasOpenWindows => _openedWindows.Count > 0;
+        
         public WindowService(IWindowFactory windowFactory) => _windowFactory = windowFactory;
 
         public event Action<BaseWindow> OnWindowOpened;
@@ -89,7 +91,7 @@ namespace FlavorfulStory
 
             window.Opened += () =>
             {
-                if (_openedWindows.Count == 0) //TODO: Переделать(вынести в IInputProvider(для UI)). Выглядить как наррушение SRP
+                if (_openedWindows.Count == 0) //TODO: Переделать(вынести в IInputProvider(для UI)). Выглядит как наррушение SRP
                 {
                     WorldTime.Pause();
                     InputWrapper.BlockAllInput();
@@ -102,7 +104,7 @@ namespace FlavorfulStory
             window.Closed += () =>
             {
                 _openedWindows.Remove(window);
-                if (_openedWindows.Count == 0) //TODO: Переделать(вынести в IInputProvider(для UI)). Выглядить как наррушение SRP
+                if (_openedWindows.Count == 0) //TODO: Переделать(вынести в IInputProvider(для UI)). Выглядит как наррушение SRP
                 {
                     WorldTime.Unpause();
                     InputWrapper.UnblockAllInput();

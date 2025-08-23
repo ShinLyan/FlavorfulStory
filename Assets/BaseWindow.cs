@@ -1,6 +1,4 @@
 ﻿using System;
-using FlavorfulStory.InputSystem;
-using FlavorfulStory.TimeManagement;
 using UnityEngine;
 using Zenject;
 
@@ -39,8 +37,8 @@ namespace FlavorfulStory
 
             gameObject.SetActive(false);
             IsOpened = false;
-            OnClosed();
             Closed?.Invoke();
+            OnClosed();
             
         }
 
@@ -49,8 +47,8 @@ namespace FlavorfulStory
             transform.SetAsLastSibling();
             gameObject.SetActive(true);
             IsOpened = true;
-            OnOpened();
             Opened?.Invoke();
+            OnOpened();
         }
         
         protected virtual void OnOpened() { }

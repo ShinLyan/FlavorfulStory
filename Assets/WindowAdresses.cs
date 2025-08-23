@@ -10,5 +10,6 @@ namespace FlavorfulStory
         [field: SerializeField] public GameObject SummaryWindow { get; private set; }
         [field: SerializeField] public GameObject RepairableBuildingWindow { get; private set; }
         [field: SerializeField] public GameObject InventoryExchangeWindow { get; private set; }
+        [field: SerializeField] public GameObject GameMenu { get; private set; }
     }
 }

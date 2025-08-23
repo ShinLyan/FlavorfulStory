@@ -1,15 +1,17 @@
 using Cysharp.Threading.Tasks;
 using FlavorfulStory.InputSystem;
+using FlavorfulStory.InventorySystem;
+using FlavorfulStory.InventorySystem.UI;
 using FlavorfulStory.SceneManagement;
-using FlavorfulStory.TimeManagement;
 using UnityEngine;
 using UnityEngine.UI;
+using Zenject;
 
 namespace FlavorfulStory.UI
 {
     /// <summary> Меню игры, управляющее вкладками, их выбором и скрытием контента.
     /// Обрабатывает ввод для переключения вкладок и скрытия/показа меню. </summary>
-    public class GameMenu : MonoBehaviour
+    public class GameMenuWindow : BaseWindow
     {
         /// <summary> Контейнер с контентом меню. </summary>
         [SerializeField] private GameObject _content;
@@ -19,7 +21,11 @@ namespace FlavorfulStory.UI
 
         /// <summary> Кнопка выхода в главное меню. </summary>
         [SerializeField] private Button _exitButton;
-
+        
+        [SerializeField] private InventoryView _playerInventoryView;
+        
+        [Inject] private readonly IInventoryProvider _inventoryProvider;
+        
         /// <summary> Массив вкладок в меню. </summary>
         private Tab[] _tabs;
 
@@ -33,15 +39,35 @@ namespace FlavorfulStory.UI
             _tabs = GetComponentsInChildren<Tab>(true);
             for (int i = 0; i < _tabs.Length; i++) _tabs[i].Initialize(i, OnTabSelected);
 
-            _continueButton.onClick.AddListener(OnClickContinue);
+            _continueButton.onClick.AddListener(Close);
             _exitButton.onClick.AddListener(OnClickReturnToMainMenu);
         }
 
+        /// <summary> Устанавливает начальную вкладку - MainTab. </summary>
+        private void Start()
+        {
+            _currentTabIndex = 0;
+            SelectTab(_currentTabIndex);
+            _playerInventoryView.Initialize(_inventoryProvider.GetPlayerInventory());
+        }
+        
         /// <summary> Отписывается от событий при уничтожении компонента. </summary>
         private void OnDestroy()
         {
-            _continueButton.onClick.RemoveListener(OnClickContinue);
+            _continueButton.onClick.RemoveListener(Close);
             _exitButton.onClick.RemoveListener(OnClickReturnToMainMenu);
+        }
+
+        /// <summary> Обрабатывает ввод пользователя для переключения состояния меню,
+        /// смены вкладки и нажатия на кнопки вкладок. </summary>
+        private void Update() => HandleTabInput();
+
+        protected override void OnOpened()
+        {
+            base.OnOpened();
+            InputWrapper.UnblockInput(InputButton.SwitchToPreviousTab);
+            InputWrapper.UnblockInput(InputButton.SwitchToNextTab);
+            foreach (var tab in _tabs) InputWrapper.UnblockInput(tab.InputButton);
         }
 
         /// <summary> Обрабатывает выбор вкладки по её индексу. 
@@ -53,57 +79,20 @@ namespace FlavorfulStory.UI
             SelectTab(index);
         }
 
-        /// <summary> Устанавливает начальную вкладку - MainTab. </summary>
-        private void Start()
-        {
-            _currentTabIndex = 0;
-            SelectTab(_currentTabIndex);
-        }
-
-        /// <summary> Обрабатывает ввод пользователя для переключения состояния меню,
-        /// смены вкладки и нажатия на кнопки вкладок. </summary>
-        private void Update()
-        {
-            // TODO: Расскоментить + сделать адекватно
-            //HandleInputToSwitchMenu();
-            HandleTabInput();
-        }
-
-        /// <summary> Обрабатывает ввод для переключения состояния меню. </summary>
-        private void HandleInputToSwitchMenu()
-        {
-            if (InputWrapper.GetButtonDown(InputButton.SwitchGameMenu)) SwitchMenu(!_content.activeSelf);
-        }
-
         /// <summary> Переключает состояние видимости меню. </summary>
         /// <param name="isEnabled"> Новое состояние видимости меню. </param>
-        public void SwitchMenu(bool isEnabled)
-        {
-            if (isEnabled)
-            {
-                InputWrapper.BlockPlayerInput();
-                WorldTime.Pause();
-            }
-            else
-            {
-                InputWrapper.UnblockPlayerInput();
-                WorldTime.Unpause();
-            }
-
-            _content.SetActive(isEnabled);
-        }
+        public void SwitchMenu(bool isEnabled) => _content.SetActive(isEnabled);
 
         /// <summary> Обрабатывает ввод для переключения между соседними вкладками. </summary>
         private void HandleTabInput()
         {
-            if (!_content.activeSelf) return;
-
             if (InputWrapper.GetButtonDown(InputButton.SwitchToPreviousTab) ||
                 InputWrapper.GetButtonDown(InputButton.SwitchToNextTab))
             {
                 int direction = InputWrapper.GetButtonDown(InputButton.SwitchToPreviousTab) ? -1 : 1;
                 int newIndex = (_currentTabIndex + _tabs.Length + direction) % _tabs.Length;
                 SelectTab(newIndex);
+                return;
             }
 
             for (int i = 0; i < _tabs.Length; i++)
@@ -125,11 +114,8 @@ namespace FlavorfulStory.UI
             _tabs[_currentTabIndex].Activate();
         }
 
-        /// <summary> Обрабатывает нажатие кнопки "Продолжить", скрывая игровое меню. </summary>
-        private void OnClickContinue() => SwitchMenu(false);
-
         /// <summary> Обрабатывает нажатие кнопки "Вернуться в главное меню". Загружает сцену главного меню. </summary>
         private void OnClickReturnToMainMenu() =>
-            SavingWrapper.LoadSceneAsyncByName(SceneName.MainMenu.ToString()).Forget();
+            SavingWrapper.LoadSceneAsyncByName(nameof(SceneName.MainMenu)).Forget();
     }
 }

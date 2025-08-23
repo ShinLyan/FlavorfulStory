@@ -16,5 +16,6 @@ namespace FlavorfulStory
         event Action<BaseWindow> OnWindowClosed;
 
         bool IsOpened<TWindow>() where TWindow : BaseWindow;
+        bool HasOpenWindows { get; }
     }
 }

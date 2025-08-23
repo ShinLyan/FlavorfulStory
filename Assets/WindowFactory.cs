@@ -88,6 +88,7 @@ namespace FlavorfulStory
             if (_windows.SummaryWindow) yield return _windows.SummaryWindow;
             if (_windows.RepairableBuildingWindow) yield return _windows.RepairableBuildingWindow;
             if (_windows.InventoryExchangeWindow) yield return _windows.InventoryExchangeWindow;
+            if (_windows.GameMenu) yield return _windows.GameMenu;
         }
 
         private void EnsureWarmup()
