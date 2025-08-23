@@ -1,3 +1,4 @@
+using FlavorfulStory.InputSystem;
 using FlavorfulStory.UI;
 using UnityEngine;
 using Zenject;
@@ -13,7 +14,7 @@ namespace FlavorfulStory
 
         private void Update()
         {
-            if (Input.GetKeyDown(KeyCode.Escape))
+            if (InputWrapper.GetButtonDown(InputButton.SwitchGameMenu))
             {
                 if (!_windowService.HasOpenWindows)
                     _windowService.OpenWindow<GameMenuWindow>();

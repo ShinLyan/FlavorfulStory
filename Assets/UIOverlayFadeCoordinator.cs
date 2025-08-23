@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using DG.Tweening;
-using FlavorfulStory.UI.Animation;
 using Zenject;
+using FlavorfulStory.InputSystem;
+using FlavorfulStory.UI.Animation;
 
 namespace FlavorfulStory
 {
@@ -78,10 +79,25 @@ namespace FlavorfulStory
                 _preparedForFirstOpen = false;
                 _queuedOpens.Clear();
 
-                _backgroundFader.FadeTo(
-                    0f, false, false, 
-                    _settings.BackgroundFadeOutDuration, _settings.BackgroundEase);
-                _hudFader.Show(_settings.HudFadeInDuration, _settings.HudMaxAlpha, _settings.HudEase);
+                InputWrapper.BlockInput(InputButton.SwitchGameMenu);
+                
+                var sequence = DOTween.Sequence();
+                sequence.Join(_backgroundFader.FadeTo(
+                    0f, false, false,
+                    _settings.BackgroundFadeOutDuration, _settings.BackgroundEase
+                ));
+                sequence.Join(_hudFader.Show(
+                    _settings.HudFadeInDuration, _settings.HudMaxAlpha, _settings.HudEase
+                ));
+                sequence.OnComplete(() =>
+                {
+                    InputWrapper.UnblockInput(InputButton.SwitchGameMenu);
+                });
+                sequence.OnKill(() =>
+                {
+                    if (sequence.active) return;
+                    InputWrapper.UnblockInput(InputButton.SwitchGameMenu);
+                });
             }
         }
 
@@ -102,6 +118,8 @@ namespace FlavorfulStory
             _preparedForFirstOpen = true;
             _queuedOpens.Add(openAction);
 
+            InputWrapper.BlockInput(InputButton.SwitchGameMenu);
+            
             var sequence = DOTween.Sequence();
             sequence.Join(_hudFader.Hide(_settings.HudFadeOutDuration, _settings.HudEase));
             sequence.Join(_backgroundFader.FadeTo(
@@ -114,6 +132,14 @@ namespace FlavorfulStory
                 _queuedOpens.Clear();
 
                 foreach (var action in actions) action?.Invoke();
+                
+                InputWrapper.UnblockInput(InputButton.SwitchGameMenu);
+            });
+            
+            sequence.OnKill(() =>
+            {
+                if (sequence.active) return;
+                InputWrapper.UnblockInput(InputButton.SwitchGameMenu);
             });
         }
     }
