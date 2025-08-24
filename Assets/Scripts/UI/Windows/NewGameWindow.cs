@@ -51,7 +51,7 @@ namespace FlavorfulStory
             _errorMessage.gameObject.SetActive(false);
             ClearInputFields();
             
-            _nameValidator = new InputFieldValidatorBuilder()
+            _nameValidator = new StringValidatorBuilder()
                 .NotEmpty()
                 .MinLength(3)
                 .MaxLength(20)
