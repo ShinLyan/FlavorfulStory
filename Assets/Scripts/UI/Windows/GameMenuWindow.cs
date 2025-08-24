@@ -1,13 +1,13 @@
+using UnityEngine;
+using UnityEngine.UI;
+using Zenject;
 using Cysharp.Threading.Tasks;
 using FlavorfulStory.InputSystem;
 using FlavorfulStory.InventorySystem;
 using FlavorfulStory.InventorySystem.UI;
 using FlavorfulStory.SceneManagement;
-using UnityEngine;
-using UnityEngine.UI;
-using Zenject;
 
-namespace FlavorfulStory.UI
+namespace FlavorfulStory.UI.Windows
 {
     /// <summary> Меню игры, управляющее вкладками, их выбором и скрытием контента.
     /// Обрабатывает ввод для переключения вкладок и скрытия/показа меню. </summary>
@@ -22,8 +22,10 @@ namespace FlavorfulStory.UI
         /// <summary> Кнопка выхода в главное меню. </summary>
         [SerializeField] private Button _exitButton;
         
+        /// <summary> View инвентаря игрока во вкладке. </summary>
         [SerializeField] private InventoryView _playerInventoryView;
         
+        /// <summary> Провайдер инвентарей. </summary>
         [Inject] private readonly IInventoryProvider _inventoryProvider;
         
         /// <summary> Массив вкладок в меню. </summary>

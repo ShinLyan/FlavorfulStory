@@ -1,48 +1,56 @@
 using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
+using Zenject;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using FlavorfulStory.SceneManagement;
-using TMPro;
-using UnityEngine;
-using UnityEngine.UI;
-using Zenject;
+using FlavorfulStory.Utils.StringValidator;
 
-namespace FlavorfulStory
+namespace FlavorfulStory.UI.Windows
 {
+    /// <summary> Окно создания новой игры: ввод имени игрока, названия магазина и валидация. </summary>
     public class NewGameWindow : BaseWindow
     {
         /// <summary> Поля ввода, которые игрок заполняет при запуске новой игры. </summary>
         [SerializeField] private TMP_InputField _playerName;
-        
         /// <summary> Поля ввода, которые игрок заполняет при запуске новой игры. </summary>
         [SerializeField] private TMP_InputField _shopName;
         
+        /// <summary> Кнопка начала новой игры. </summary>
         [SerializeField] private Button _newGameButton;
-        
+        /// <summary> Кнопка закрытия окна. </summary>
         [SerializeField] private Button _closeButton;
 
         /// <summary> Объект для отображения сообщения об ошибке. </summary>
         [SerializeField] private GameObject _errorMessage;
-        
         /// <summary> Поле текста для вывода сообщений об ошибках. </summary>
         [SerializeField] private TMP_Text _errorText;
         
-        private SavingWrapper _savingWrapper;
-        
-        private Tween _errorFadeTween;
-        
+        /// <summary> CanvasGroup, управляющий прозрачностью плашки ошибки. </summary>
         [SerializeField] private CanvasGroup _canvasGroup;
         
+        /// <summary> Ссылка на систему сохранений. </summary>
+        private SavingWrapper _savingWrapper;
+        
+        /// <summary> Активный tween ошибки. </summary>
+        private Tween _errorFadeTween;
+        
+        /// <summary> Валидатор строк (имя игрока и магазина). </summary>
+        private IStringValidator _nameValidator;
+        
+        /// <summary> Символы, запрещённые во вводе. </summary>
         private static readonly char[] ForbiddenCharacters = {
             '"', '\'', '@', '#', '$', '%', '^', '&', '*', '(', ')', '=', '+',
             '[', ']', '{', '}', '\\', '|', '/', '<', '>', '?', '`', '~'
         };
         
-        private IStringValidator _nameValidator;
-        
+        /// <summary> Внедрение зависимостей Zenject. </summary>
         [Inject]
         public void Construct(SavingWrapper savingWrapper) => _savingWrapper = savingWrapper;
         
+        /// <summary> Обработчик открытия окна: очистка, подписки, валидация. </summary>
         protected override void OnOpened()
         {
             base.OnOpened();
@@ -59,6 +67,7 @@ namespace FlavorfulStory
                 .Build();
         }
 
+        /// <summary> Обработчик закрытия окна: очистка tween и скрытие ошибки. </summary>
         protected override void OnClosed()
         {
             base.OnClosed();
@@ -85,24 +94,24 @@ namespace FlavorfulStory
             return true;
         }
 
+        /// <summary> Обработчик нажатия кнопки "Start New Game". </summary>
         private void StartNewGame()
         {
             if (!AreInputFieldsValid()) return;
-
-            //Нарушение SRP.
-            //TODO:: не должен NewGameWindow решать че-то для системы сохранения.
-            // да и вообще системе сохранения нужно сделать тотальную перестройку:
-            // нахер статику, перевсти на сервис, сделать более вразумительную поддержку рантайм сохранялок
+            
+            //TODO: Нарушение SRP. Нужно вынести в отдельный сервис / use case.
             string newGameSaveFileName = string.Concat(_playerName.text, _shopName.text);
             _savingWrapper.StartNewGameAsync(newGameSaveFileName).Forget();
         }
         
+        /// <summary> Очищает поля ввода. </summary>
         private void ClearInputFields()
         {
             _playerName.text = string.Empty;
             _shopName.text = string.Empty;
         }
         
+        /// <summary> Показывает сообщение об ошибке с fade-эффектом. </summary>
         private void ShowError(string message)
         {
             _errorFadeTween?.Kill();

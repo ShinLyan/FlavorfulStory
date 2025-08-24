@@ -1,15 +1,19 @@
-using FlavorfulStory.InputSystem;
-using FlavorfulStory.UI;
 using UnityEngine;
 using Zenject;
+using FlavorfulStory.Infrastructure.Services.WindowService;
+using FlavorfulStory.InputSystem;
 
-namespace FlavorfulStory
+namespace FlavorfulStory.UI.Windows
 {
+    /// <summary> Обработчик нажатия ESC / кнопки меню. Открывает или закрывает окна. </summary>
     public class EscapeWindowCloser : MonoBehaviour
     {
+        /// <summary> Сервис управления UI-окнами. </summary>
         private IWindowService _windowService;
+        /// <summary> Координатор fade-интерфейса, нужен только в геймплейной сцене. </summary>
         private UIOverlayFadeCoordinator _fadeCoordinator;
 
+        /// <summary> Внедрение зависимостей. Координатор — опционально. </summary>
         [Inject]
         private void Construct(IWindowService windowService,[InjectOptional] UIOverlayFadeCoordinator fadeCoordinator)
         {
@@ -17,6 +21,7 @@ namespace FlavorfulStory
             _fadeCoordinator = fadeCoordinator;
         } 
 
+        /// <summary> Проверяет ввод и открывает/закрывает окна при нажатии кнопки меню. </summary>
         private void Update()
         {
             if (InputWrapper.GetButtonDown(InputButton.SwitchGameMenu))

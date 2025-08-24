@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using FlavorfulStory.UI.Windows;
+using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
@@ -24,12 +25,14 @@ namespace FlavorfulStory.TimeManagement.UI
         /// <param name="text"> Текст для отображения. </param>
         public void SetSummary(string text) => _summaryText.text = text;
 
+        /// <summary> Активирует камеру при открытии окна. </summary>
         protected override void OnOpened()
         {
             base.OnOpened();
             _camera.SetActive(true);
         }
         
+        /// <summary> Отключает камеру при закрытии окна. </summary>
         protected override void OnClosed()
         {
             base.OnClosed();

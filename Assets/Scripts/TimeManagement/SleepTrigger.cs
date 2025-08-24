@@ -1,12 +1,11 @@
 using UnityEngine;
 using Zenject;
-using DG.Tweening;
 using FlavorfulStory.Actions;
+using FlavorfulStory.Infrastructure.Services.WindowService;
 using FlavorfulStory.InteractionSystem;
 using FlavorfulStory.Player;
 using FlavorfulStory.TooltipSystem.ActionTooltips;
-using FlavorfulStory.UI;
-using FlavorfulStory.UI.Animation;
+using FlavorfulStory.UI.Windows;
 
 namespace FlavorfulStory.TimeManagement
 {
@@ -18,6 +17,7 @@ namespace FlavorfulStory.TimeManagement
         /// <summary> Оконный сервис. </summary>
         private IWindowService _windowService;
         
+        /// <summary> Координатор оверлея. </summary>
         private UIOverlayFadeCoordinator _overlayCoordinator;
 
         /// <summary> Заголовок окна подтверждения сна. </summary>

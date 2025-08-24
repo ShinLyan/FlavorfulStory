@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using FlavorfulStory.UI.Windows;
+using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
 
@@ -47,6 +48,7 @@ namespace FlavorfulStory.InventorySystem.UI
             _closeButton.onClick.RemoveListener(Close);
         }
 
+        /// <summary> Инициализирует окно двумя инвентарями и обновляет UI. </summary>
         public void Setup(Inventory secondInventory, Inventory firstInventory)
         {
             _secondInventory = secondInventory;
@@ -61,12 +63,13 @@ namespace FlavorfulStory.InventorySystem.UI
             _addToExistingButton.interactable = CheckForDuplicates();
         }
 
+        /// <summary> Обработка закрытия окна. Очищает ссылки и снимает подписки. </summary>
         protected override void OnClosed()
         {
             base.OnClosed();
 
-            _secondInventory.InventoryUpdated += UpdateAddToExistingButton;
-            _firstInventory.InventoryUpdated += UpdateAddToExistingButton;
+            _secondInventory.InventoryUpdated -= UpdateAddToExistingButton;
+            _firstInventory.InventoryUpdated -= UpdateAddToExistingButton;
             
             _secondInventory = null;
             _firstInventory = null;
@@ -85,8 +88,10 @@ namespace FlavorfulStory.InventorySystem.UI
             }
         }
 
+        /// <summary> Обновляет активность кнопки "Add to Existing". </summary>
         private void UpdateAddToExistingButton() => _addToExistingButton.interactable = CheckForDuplicates();
 
+        /// <summary> Проверяет наличие стакающихся предметов, которые можно перенести. </summary>
         private bool CheckForDuplicates()
         {
             if (_firstInventory == null || _secondInventory == null) 

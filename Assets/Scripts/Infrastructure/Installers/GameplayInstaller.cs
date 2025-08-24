@@ -1,4 +1,7 @@
 ﻿using System.Collections.Generic;
+using Unity.Cinemachine;
+using UnityEngine;
+using Zenject;
 using FlavorfulStory.BuildingRepair.UI;
 using FlavorfulStory.DialogueSystem;
 using FlavorfulStory.DialogueSystem.UI;
@@ -30,9 +33,6 @@ using FlavorfulStory.Tools;
 using FlavorfulStory.TooltipSystem;
 using FlavorfulStory.TooltipSystem.ActionTooltips;
 using FlavorfulStory.Visuals.Lightning;
-using Unity.Cinemachine;
-using UnityEngine;
-using Zenject;
 
 namespace FlavorfulStory.Infrastructure.Installers
 {

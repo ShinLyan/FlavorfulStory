@@ -1,30 +1,40 @@
-﻿using UnityEngine;
-using Cysharp.Threading.Tasks;
+﻿using Cysharp.Threading.Tasks;
+using UnityEngine;
 using DG.Tweening;
 
-namespace FlavorfulStory
+namespace FlavorfulStory.UI.Windows
 {
+    /// <summary> Направление анимации появления окна. </summary>
     public enum PanelAnimationDirection { Top, Bottom, Left, Right, Center }
 
+    /// <summary> Окно с анимацией появления и исчезновения (скрытие за экран / масштаб / fade). </summary>
     public class AnimatedWindow : BaseWindow
     {
+        /// <summary> Контейнер UI-элемента, который будет анимироваться. </summary>
         [Header("Animation Settings")]
         [SerializeField] private RectTransform _container;
+        /// <summary> CanvasGroup для управления прозрачностью и блокировкой ввода. </summary>
         [SerializeField] private CanvasGroup _canvasGroup;
+        /// <summary> Длительность анимации появления/исчезновения. </summary>
         [SerializeField] private float _animationDuration;
+        /// <summary> Кривая анимации (easing). </summary>
         [SerializeField] private Ease _animationEase;
-        [SerializeField] private PanelAnimationDirection _direction = PanelAnimationDirection.Center;
+        /// <summary> Направление появления окна. </summary>
+        [SerializeField] private PanelAnimationDirection _direction;
 
+        /// <summary> Расчитанная позиция за экраном, откуда появляется окно. </summary>
         private Vector2 _offscreenPosition;
+        /// <summary> Исходная позиция контейнера в пространстве родителя. </summary>
         private Vector2 _initialAnchoredPos;
+        /// <summary> Флаг, предотвращающий повторные анимации. </summary>
         private bool _isAnimating;
+        /// <summary> Открывается ли окно впервые. </summary>
         private bool _isFirstOpen = true;
         
-        protected override void OnOpened()
-        {
-            AnimateOpenAsync().Forget();
-        }
+        /// <summary> Обработчик события открытия — запускает анимацию появления. </summary>
+        protected override void OnOpened() => AnimateOpenAsync().Forget();
 
+        /// <summary> Асинхронная анимация появления окна. </summary>
         private async UniTaskVoid AnimateOpenAsync()
         {
             if (_container == null || _canvasGroup == null)
@@ -57,12 +67,14 @@ namespace FlavorfulStory
             BlockRaycasts(false);
         }
         
+        /// <summary> Переопределение закрытия — запускает анимацию закрытия. </summary>
         public override void Close()
         {
             if (!IsOpened || _isAnimating) return;
             CloseAsync().Forget();
         }
 
+        /// <summary> Асинхронная анимация скрытия и закрытие окна. </summary>
         private async UniTaskVoid CloseAsync()
         {
             _isAnimating = true;
@@ -79,11 +91,10 @@ namespace FlavorfulStory
             _isAnimating = false;
         }
         
-        protected override void OnClosed()
-        {
-            AnimateCloseOnClosedAsync().Forget();
-        }
+        /// <summary> Вызывается при закрытии окна через базовый метод. </summary>
+        protected override void OnClosed() => AnimateCloseOnClosedAsync().Forget();
 
+        /// <summary> Анимация закрытия, если окно закрыто через WindowService. </summary>
         private async UniTaskVoid AnimateCloseOnClosedAsync()
         {
             if (_isAnimating || _container == null || _canvasGroup == null) return;
@@ -102,6 +113,7 @@ namespace FlavorfulStory
             BlockRaycasts(false);
         }
         
+        /// <summary> Рассчитывает позицию окна за экраном в зависимости от направления. </summary>
         private void SetOffscreenPosition()
         {
             var rect = _container.rect;
@@ -124,6 +136,7 @@ namespace FlavorfulStory
             }
         }
 
+        /// <summary> Включает/выключает блокировку ввода и интерактивность. </summary>
         private void BlockRaycasts(bool block)
         {
             _canvasGroup.blocksRaycasts = !block;

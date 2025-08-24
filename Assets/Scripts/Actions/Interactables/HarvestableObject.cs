@@ -1,10 +1,10 @@
 using System.Collections.Generic;
+using UnityEngine;
+using Zenject;
 using FlavorfulStory.InteractionSystem;
 using FlavorfulStory.InventorySystem;
 using FlavorfulStory.Player;
 using FlavorfulStory.TooltipSystem.ActionTooltips;
-using UnityEngine;
-using Zenject;
 
 namespace FlavorfulStory.Actions.Interactables
 {
@@ -16,6 +16,7 @@ namespace FlavorfulStory.Actions.Interactables
         [Tooltip("Собираемые предметы."), SerializeField]
         private List<ItemStack> _harvestItems;
 
+        /// <summary> Провайдер инвентарей. </summary>
         [Inject] private readonly IInventoryProvider _inventoryProvider;
 
         #region IInteractable

@@ -4,6 +4,7 @@ using System.Linq;
 using FlavorfulStory.Actions;
 using FlavorfulStory.Audio;
 using FlavorfulStory.BuildingRepair.UI;
+using FlavorfulStory.Infrastructure.Services.WindowService;
 using FlavorfulStory.InteractionSystem;
 using FlavorfulStory.InventorySystem;
 using FlavorfulStory.ObjectManagement;
@@ -38,8 +39,11 @@ namespace FlavorfulStory.BuildingRepair
         private bool _isRepairCompleted;
         
         /// <summary> Провайдер окон. </summary>
-        [Inject] private readonly IInventoryProvider _inventoryProvider;
+        private IInventoryProvider _inventoryProvider;
 
+        /// <summary> Сервис окон. </summary>
+        private IWindowService _windowService;
+        
         /// <summary> Текущая стадия ремонта. </summary>
         private RepairStage CurrentStage => _buildingData.Stages[_repairStageIndex];
 
@@ -51,12 +55,15 @@ namespace FlavorfulStory.BuildingRepair
 
         #endregion
 
-        private IWindowService _windowService;
-        
         /// <summary> Внедрение зависимостей Zenject. </summary>
         /// <param name="windowService"> Сервис окон. </param>
+        /// <param name="inventoryProvider"> Провайдер инвентарей. </param>
         [Inject]
-        private void Construct(IWindowService windowService) => _windowService = windowService;
+        private void Construct(IWindowService windowService, IInventoryProvider inventoryProvider)
+        {
+            _windowService = windowService;
+            _inventoryProvider = inventoryProvider;
+        } 
 
         /// <summary> Инициализация компонента. </summary>
         private void Awake() => _objectSwitcher = GetComponent<ObjectSwitcher>();

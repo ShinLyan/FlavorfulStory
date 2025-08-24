@@ -1,7 +1,7 @@
-using FlavorfulStory.InventorySystem;
-using FlavorfulStory.Saving;
 using UnityEngine;
 using Zenject;
+using FlavorfulStory.InventorySystem;
+using FlavorfulStory.Saving;
 using InputWrapper = FlavorfulStory.InputSystem.InputWrapper;
 
 namespace FlavorfulStory.Toolbar.UI

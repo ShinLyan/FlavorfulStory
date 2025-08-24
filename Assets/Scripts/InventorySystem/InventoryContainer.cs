@@ -1,12 +1,12 @@
-﻿using System;
+﻿using UnityEngine;
+using Zenject;
 using FlavorfulStory.Actions;
+using FlavorfulStory.Infrastructure.Services.WindowService;
 using FlavorfulStory.InteractionSystem;
 using FlavorfulStory.InventorySystem.UI;
 using FlavorfulStory.PlacementSystem;
 using FlavorfulStory.Player;
 using FlavorfulStory.TooltipSystem.ActionTooltips;
-using UnityEngine;
-using Zenject;
 
 namespace FlavorfulStory.InventorySystem
 {
@@ -34,8 +34,7 @@ namespace FlavorfulStory.InventorySystem
         private void Construct(
             IInventoryProvider inventoryProvider,
             PlayerController playerController,
-            IWindowService windowService
-            )
+            IWindowService windowService)
         {
             _inventoryProvider = inventoryProvider;
             _playerController = playerController;
@@ -44,15 +43,10 @@ namespace FlavorfulStory.InventorySystem
 
         /// <summary> Инициализация сундука. </summary>
         /// <remarks> Получение ссылки на инвентарь сундука. </remarks>
-        private void Awake()
-        {
-            _inventory = GetComponent<Inventory>();
-        }
+        private void Awake() => _inventory = GetComponent<Inventory>();
 
-        private void Start()
-        {
+        private void Start() =>
             _windowService.GetWindow<InventoryExchangeWindow>().Closed += () => _playerController.SetBusyState(false);
-        }
 
         #region IInteractable
 

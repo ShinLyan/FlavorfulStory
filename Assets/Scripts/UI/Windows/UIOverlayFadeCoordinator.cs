@@ -1,23 +1,34 @@
 ﻿using System;
 using System.Collections.Generic;
-using DG.Tweening;
 using Zenject;
+using DG.Tweening;
+using FlavorfulStory.Infrastructure.Services.WindowService;
 using FlavorfulStory.InputSystem;
 using FlavorfulStory.UI.Animation;
 
-namespace FlavorfulStory
+namespace FlavorfulStory.UI.Windows
 {
+    /// <summary> Координатор фейдов HUD и фонового затемнения при открытии и закрытии UI-окон. </summary>
+    /// <remarks> Управляет порядком открытия окон через <see cref="IWindowOpenGate"/>. </remarks>
     public sealed class UIOverlayFadeCoordinator : IInitializable, IDisposable, IWindowOpenGate
     {
+        /// <summary> Сервис окон. </summary>
         private readonly IWindowService _windowService;
+        /// <summary> Аниматор HUD-панели. </summary>
         private readonly CanvasGroupFader _hudFader;
+        /// <summary> Аниматор затемняющего фона. </summary>
         private readonly CanvasGroupFader _backgroundFader;
+        /// <summary> Настройки анимаций. </summary>
         private readonly OverlayFadeSettings _settings;
 
-        private int _openWindows;
+        /// <summary> Кол-во открытых окон. </summary>
+        private int _openedWindows;
+        /// <summary> Флаг, указывающий, что уже запущена подготовка к первому открытию. </summary>
         private bool _preparedForFirstOpen;
+        /// <summary> Очередь отложенных open-запросов. </summary>
         private readonly List<Action> _queuedOpens = new();
 
+        /// <summary> Конструктор с внедрением зависимостей. </summary>
         [Inject]
         public UIOverlayFadeCoordinator(
             IWindowService windowService,
@@ -31,6 +42,7 @@ namespace FlavorfulStory
             _settings        = settings;
         }
 
+        /// <summary> Инициализация координатора: сбрасывает состояния и подписывается на события. </summary>
         public void Initialize()
         {
             _hudFader.SetState(_settings.HudMaxAlpha, true, true);
@@ -40,16 +52,18 @@ namespace FlavorfulStory
             _windowService.OnWindowClosed += HandleWindowClosed;
         }
 
+        /// <summary> Очистка подписок. </summary>
         public void Dispose()
         {
             _windowService.OnWindowOpened -= HandleWindowOpened;
             _windowService.OnWindowClosed -= HandleWindowClosed;
         }
         
+        /// <summary> Обработка события открытия окна. </summary>
         private void HandleWindowOpened(BaseWindow _)
         {
-            var wasZero = _openWindows == 0;
-            _openWindows++;
+            var wasZero = _openedWindows == 0;
+            _openedWindows++;
 
             if (wasZero)
             {
@@ -66,12 +80,13 @@ namespace FlavorfulStory
             }
         }
 
+        /// <summary> Обработка события закрытия окна. </summary>
         private void HandleWindowClosed(BaseWindow _)
         {
-            if (_openWindows == 0) return;
-            _openWindows--;
+            if (_openedWindows == 0) return;
+            _openedWindows--;
 
-            if (_openWindows == 0)
+            if (_openedWindows == 0)
             {
                 _preparedForFirstOpen = false;
                 _queuedOpens.Clear();
@@ -98,9 +113,11 @@ namespace FlavorfulStory
             }
         }
 
+        /// <summary> Перехватывает открытие первого окна. </summary>
+        /// <remarks> Сначала проигрывает анимацию, затем вызывает openAction. </remarks>
         public void RequestOpen(BaseWindow window, Action openAction)
         {
-            if (_openWindows > 0)
+            if (_openedWindows > 0)
             {
                 openAction?.Invoke();
                 return;

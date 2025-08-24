@@ -1,9 +1,9 @@
 ﻿using System;
-using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
-namespace FlavorfulStory.UI
+namespace FlavorfulStory.UI.Windows
 {
     /// <summary> Представляет UI-компонент для отображения окна подтверждения с кнопками "Да" и "Нет". </summary>
     public class ConfirmationWindow : BaseWindow

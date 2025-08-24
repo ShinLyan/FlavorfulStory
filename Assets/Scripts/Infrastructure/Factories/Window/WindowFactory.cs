@@ -1,21 +1,36 @@
 ﻿using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
+using FlavorfulStory.Infrastructure.Adresses;
+using FlavorfulStory.UI.Windows;
 using UnityEngine;
 using Zenject;
 
-namespace FlavorfulStory
+namespace FlavorfulStory.Infrastructure.Factories.Window
 {
+    /// <summary> Фабрика для создания UI-окон с DI и прогревом. </summary>
     public class WindowFactory : IWindowFactory
     {
+        /// <summary> Канвас, в котором будут появляться окна. </summary>
         private readonly Canvas _canvas;
+        /// <summary> ScriptableObject с адресами всех окон. </summary>
         private readonly WindowAdresses _windows;
+        /// <summary> DI-контейнер Zenject для внедрения зависимостей. </summary>
         private readonly DiContainer _container;
 
+        /// <summary> Словарь соответствий: тип окна → его префаб. </summary>
         private readonly Dictionary<Type, BaseWindow> _prefabByType = new();
+        
+        /// <summary> Родитель для всех окон. </summary>
         private Transform _spawnRoot;
+        
+        /// <summary> Флаг, указывающий, что фабрика уже была прогрета. </summary>
         private bool _isWarmedUp;
 
+        /// <summary> Конструктор фабрики. </summary>
+        /// <param name="canvas"> Канвас, куда будут спавниться окна. </param>
+        /// <param name="windows"> Адреса префабов окон. </param>
+        /// <param name="container"> Контейнер Zenject для внедрения зависимостей. </param>
         public WindowFactory(Canvas canvas, WindowAdresses windows, DiContainer container)
         {
             _canvas = canvas;
@@ -23,11 +38,10 @@ namespace FlavorfulStory
             _container = container;
         }
 
-        public void Initialize()
-        {
-            _spawnRoot = _canvas.transform;
-        }
+        /// <summary> Устанавливает корень для будущих окон (обычно Canvas). </summary>
+        public void Initialize() => _spawnRoot = _canvas.transform;
 
+        /// <summary> Прогревает фабрику, подготавливая словарь типов. </summary>
         public async UniTask WarmUpAsync()
         {
             if (_isWarmedUp) return;
@@ -48,6 +62,7 @@ namespace FlavorfulStory
             await UniTask.Yield();
         }
 
+        /// <summary> Создает окно по типу, внедряет зависимости, вызывает Initialize() и активирует. </summary>
         public T CreateWindow<T>() where T : BaseWindow
         {
             EnsureWarmup();
@@ -71,10 +86,9 @@ namespace FlavorfulStory
             return instance.GetComponent<T>();
         }
         
+        /// <summary> Возвращает все окна из ScriptableObject с адресами. </summary>
         private IEnumerable<BaseWindow> EnumerateAllPrefabs()
         {
-            // Используем текущую структуру WindowAddresses с явными полями (минимальные изменения)
-            // Тут должны быть все окна
             if (_windows.ConfirmationWindow) yield return _windows.ConfirmationWindow;
             if (_windows.SummaryWindow) yield return _windows.SummaryWindow;
             if (_windows.RepairableBuildingWindow) yield return _windows.RepairableBuildingWindow;
@@ -85,6 +99,7 @@ namespace FlavorfulStory
             if (_windows.ExitConfirmationWindow) yield return _windows.ExitConfirmationWindow;
         }
 
+        /// <summary> Защита от преждевременного вызова CreateWindow. </summary>
         private void EnsureWarmup()
         {
             if (_isWarmedUp) return;

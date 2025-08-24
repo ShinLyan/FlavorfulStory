@@ -1,12 +1,12 @@
 using System;
+using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
+using Zenject;
 using DG.Tweening;
 using FlavorfulStory.InventorySystem;
 using FlavorfulStory.InventorySystem.UI;
 using FlavorfulStory.UI;
-using TMPro;
-using UnityEngine;
-using UnityEngine.UI;
-using Zenject;
 
 namespace FlavorfulStory.Toolbar.UI
 {

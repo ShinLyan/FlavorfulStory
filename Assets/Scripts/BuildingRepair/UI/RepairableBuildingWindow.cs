@@ -4,6 +4,7 @@ using System.Linq;
 using FlavorfulStory.Infrastructure;
 using FlavorfulStory.Infrastructure.Factories;
 using FlavorfulStory.InventorySystem;
+using FlavorfulStory.UI.Windows;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -91,8 +92,8 @@ namespace FlavorfulStory.BuildingRepair.UI
         /// <param name="onAdd"> Обработчик добавления ресурсов. </param>
         /// <param name="onReturn"> Обработчик забирания ресурсов. </param>
         /// <param name="onBuild"> Обработчик подтверждения ремонта. </param>
-        public void Setup(RepairStage stage, List<int> investedResources,
-            Action<InventoryItem> onAdd, Action<InventoryItem> onReturn, Action onBuild)
+        public void Setup(RepairStage stage, List<int> investedResources, Action<InventoryItem> onAdd,
+                          Action<InventoryItem> onReturn, Action onBuild)
         {
             _onAdd = onAdd;
             _onReturn = onReturn;
@@ -103,6 +104,26 @@ namespace FlavorfulStory.BuildingRepair.UI
             UpdateView(stage, investedResources);
         }
 
+        /// <summary> Открытие окна. </summary>
+        protected override void OnOpened()
+        {
+            base.OnOpened();
+            _requirementViewsContainer.gameObject.SetActive(true);
+        }
+
+        /// <summary> Закрытие окна. </summary>
+        protected override void OnClosed()
+        {
+            base.OnClosed();
+            ClearView();
+
+            _buildButton.onClick.RemoveListener(_onBuild.Invoke);
+            
+            _onAdd = null;
+            _onReturn = null;
+            _onBuild = null;
+        }
+        
         /// <summary> Обновить отображение требований и состояния ремонта. </summary>
         /// <param name="stage"> Текущая стадия ремонта. </param>
         /// <param name="investedResources"> Список вложенных ресурсов. </param>
@@ -147,24 +168,6 @@ namespace FlavorfulStory.BuildingRepair.UI
         /// <returns> <c>true</c>, если все ресурсы вложены; иначе <c>false</c>. </returns>
         private static bool IsRepairPossible(RepairStage stage, List<int> investedResources) 
             => stage.Requirements.Select((itemStack, i) => investedResources[i] >= itemStack.Number).All(x => x);
-
-        protected override void OnOpened()
-        {
-            base.OnOpened();
-            _requirementViewsContainer.gameObject.SetActive(true);
-        }
-
-        protected override void OnClosed()
-        {
-            base.OnClosed();
-            ClearView();
-
-            _buildButton.onClick.RemoveListener(_onBuild.Invoke);
-            
-            _onAdd = null;
-            _onReturn = null;
-            _onBuild = null;
-        }
 
         /// <summary> Отобразить сообщение об окончании ремонта. </summary>
         /// <param name="repairableBuildingName"> Название ремонтируемого здания. </param>

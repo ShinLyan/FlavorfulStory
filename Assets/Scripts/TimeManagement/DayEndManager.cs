@@ -1,10 +1,11 @@
 ﻿using System;
+using UnityEngine;
+using Zenject;
 using Cysharp.Threading.Tasks;
+using FlavorfulStory.Infrastructure.Services.WindowService;
 using FlavorfulStory.Player;
 using FlavorfulStory.SceneManagement;
 using FlavorfulStory.TimeManagement.UI;
-using UnityEngine;
-using Zenject;
 
 namespace FlavorfulStory.TimeManagement
 {
@@ -19,12 +20,17 @@ namespace FlavorfulStory.TimeManagement
 
         /// <summary> Менеджер локаций. </summary>
         private readonly LocationManager _locationManager;
+        
+        /// <summary> Сервис окон. </summary>
         private readonly IWindowService _windowService;
         
+        /// <summary> Спит ли игрок? </summary>
         private bool _isSleeping;
 
+        /// <summary> Начало дня (в часах). </summary>
         private const int DefaultDayStartHour = 6;
         
+        /// <summary> Конструктор с внедрением зависимостей. </summary>
         public DayEndManager(
             PlayerController playerController,
             SleepTrigger sleepTrigger,
@@ -37,16 +43,23 @@ namespace FlavorfulStory.TimeManagement
             _windowService = windowService;
         }
 
+        /// <summary> Подписка на завершение дня. </summary>
         public void Initialize() => WorldTime.OnDayEnded += OnDayEnded;
+        
+        /// <summary> Отписка от событий. </summary>
         public void Dispose() => WorldTime.OnDayEnded -= OnDayEnded;
 
+        /// <summary> Вручную запрашивает завершение дня (через взаимодействие). </summary>
+        /// <param name="onComplete"> Колбэк после завершения последовательности сна. </param>
         public void RequestEndDay(Action onComplete)
         {
             ProcessSleepAsync(false).ContinueWith(() => onComplete?.Invoke()).Forget();
         }
 
+        /// <summary> Обработка завершения дня по таймеру. </summary>
         private void OnDayEnded(DateTime _) => ProcessSleepAsync(true).Forget();
 
+        /// <summary> Основной процесс сна (и восстановления), не даёт запустить второй раз. </summary>
         private async UniTask ProcessSleepAsync(bool isExhausted)
         {
             if (_isSleeping) return;
@@ -59,6 +72,7 @@ namespace FlavorfulStory.TimeManagement
             _isSleeping = false;
         }
 
+        /// <summary> Последовательность сна: активация локации, показ окна сводки, восстановление игрока. </summary>
         private async UniTask ExecuteSleepSequence(bool isExhausted)
         {
             _locationManager.EnableLocation(LocationName.RockyIsland);
@@ -69,6 +83,7 @@ namespace FlavorfulStory.TimeManagement
             RestorePlayer(isExhausted);
         }
 
+        /// <summary> Открывает окно сводки и ждёт его закрытия. </summary>
         private async UniTask ShowSummaryWindowAsync()
         {
             var window = _windowService.GetWindow<SummaryWindow>();
@@ -80,6 +95,7 @@ namespace FlavorfulStory.TimeManagement
             await WaitForWindowCloseAsync(window);
         }
 
+        /// <summary> Восстанавливает игрока после сна. </summary>
         private void RestorePlayer(bool isExhausted)
         {
             _playerController.RestoreStatsAfterSleep(isExhausted);
@@ -87,6 +103,7 @@ namespace FlavorfulStory.TimeManagement
             _locationManager.UpdateActiveLocation();
         }
 
+        /// <summary> Асинхронно ожидает закрытия окна сводки. </summary>
         private static UniTask WaitForWindowCloseAsync(SummaryWindow window)
         {
             var tcs = new UniTaskCompletionSource();

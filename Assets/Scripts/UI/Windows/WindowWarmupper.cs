@@ -1,14 +1,19 @@
 ﻿using Cysharp.Threading.Tasks;
 using Zenject;
+using FlavorfulStory.Infrastructure.Factories.Window;
 
-namespace FlavorfulStory
+namespace FlavorfulStory.UI.Windows
 {
+    /// <summary> Инициализатор фабрики окон: задаёт корень и запускает прогрев префабов. </summary>
     public class WindowWarmupper : IInitializable
     {
+        /// <summary> Фабрика UI-окон. </summary>
         private readonly IWindowFactory _windowFactory;
 
+        /// <summary> Внедрение зависимости фабрики. </summary>
         public WindowWarmupper(IWindowFactory windowFactory) => _windowFactory = windowFactory;
 
+        /// <summary> Инициализация и прогрев фабрики. </summary>
         public void Initialize()
         {
             _windowFactory.Initialize();

@@ -22,6 +22,7 @@ namespace FlavorfulStory.InventorySystem.UI
         /// <summary> Контейнер для размещения отображений ячеек. </summary>
         private Transform _slotsContainer;
         
+        /// <summary> Флаг инициализации вьюхи. </summary>
         private bool _initialized;
         
         /// <summary> Внедрить зависимости: инвентарь и фабрику отображений ячеек. </summary>
