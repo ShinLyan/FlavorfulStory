@@ -32,6 +32,9 @@ namespace FlavorfulStory.PickupSystem
         /// <summary> Возвращает true, если предмет можно подобрать и в инвентаре есть место. </summary>
         private bool CanBePickedUp => _canBePickedUp && _inventory.HasSpaceFor(Item);
 
+        /// <summary> Доступ к инвентарю для внешних клиентов (например, PickupMagnet). </summary>
+        public Inventory Inventory => _inventory;
+        
         /// <summary> Внедрение зависимостей. </summary>
         /// <param name="inventory"> Инвентарь игрока. </param>
         [Inject]
@@ -51,8 +54,8 @@ namespace FlavorfulStory.PickupSystem
         public void TryPickup()
         {
             if (!CanBePickedUp) return;
-
-            if (_inventory.TryAddToFirstAvailableSlot(Item, Number)) Destroy(gameObject);
+            if (_inventory.TryAddToFirstAvailableSlot(Item, Number)) 
+                Destroy(gameObject);
         }
 
         /// <summary> Делает предмет доступным для подбора. </summary>
