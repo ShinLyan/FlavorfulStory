@@ -27,6 +27,9 @@ namespace FlavorfulStory.PlacementSystem
         /// <summary> Буфер коллайдеров для поиска объектов, которые можно ударить. </summary>
         private readonly Collider[] _hitsBuffer = new Collider[10];
 
+        /// <summary> Провайдер размещаемых объектов. </summary>
+        private readonly IPlaceableObjectProvider _placeableObjectProvider;
+
         /// <summary> Объект, который будет размещен. </summary>
         public PlaceableObject PlaceableObject { get; set; }
 
@@ -36,15 +39,17 @@ namespace FlavorfulStory.PlacementSystem
         /// <param name="gridLayers"> Словарь данных по слоям размещения. </param>
         /// <param name="container"> Родитель для создаваемых объектов. </param>
         /// <param name="placeableFactory"> Фабрика размещаемых объектов. </param>
+        /// <param name="placeableObjectProvider"> Провайдер размещаемых объектов. </param>
         public PlacementMode(GridPositionProvider positionProvider, PlacementPreview placementPreview,
             Dictionary<PlacementLayer, PlacementGridData> gridLayers, Transform container,
-            IPrefabFactory<PlaceableObject> placeableFactory)
+            IPrefabFactory<PlaceableObject> placeableFactory, IPlaceableObjectProvider placeableObjectProvider)
         {
             _positionProvider = positionProvider;
             _placementPreview = placementPreview;
             _gridLayers = gridLayers;
             _container = container;
             _placeableFactory = placeableFactory;
+            _placeableObjectProvider = placeableObjectProvider;
         }
 
         /// <summary> Вход в режим — начать показ превью размещения. </summary>
@@ -68,6 +73,7 @@ namespace FlavorfulStory.PlacementSystem
 
             var instance = _placeableFactory.Create(PlaceableObject, parentTransform: _container);
             instance.transform.position = _positionProvider.GridToWorld(gridPosition);
+            _placeableObjectProvider.Register(instance);
 
             _gridLayers[PlaceableObject.Layer].AddObjectAt(gridPosition, instance);
             _placementPreview.UpdatePosition(_positionProvider.GridToWorld(gridPosition), false);

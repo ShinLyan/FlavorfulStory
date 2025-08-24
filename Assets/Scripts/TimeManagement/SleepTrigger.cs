@@ -28,17 +28,22 @@ namespace FlavorfulStory.TimeManagement
         /// <summary> Компонент затемнения HUD интерфейса во время взаимодействия с кроватью. </summary>
         private CanvasGroupFader _hudFader;
 
+        /// <summary> Сервис для управления точками возрождения игрока и регистрации триггеров сна. </summary>
+        private PlayerSpawnService _playerSpawnService;
+
         /// <summary> Внедряет зависимости через Zenject. </summary>
         /// <param name="confirmationWindowView"> Окно подтверждения. </param>
         /// <param name="dayEndManager"> Менеджер завершения дня. </param>
         /// <param name="hudFader"> Компонент затемнения HUD интерфейса. </param>
+        /// <param name="playerSpawnService"> Сервис спавна игрока. </param>
         [Inject]
         private void Construct(ConfirmationWindowView confirmationWindowView, DayEndManager dayEndManager,
-            [Inject(Id = "HUD")] CanvasGroupFader hudFader)
+            [Inject(Id = "HUD")] CanvasGroupFader hudFader, PlayerSpawnService playerSpawnService)
         {
             _confirmationWindowView = confirmationWindowView;
             _dayEndManager = dayEndManager;
             _hudFader = hudFader;
+            _playerSpawnService = playerSpawnService;
         }
 
         #region IInteractable
@@ -60,15 +65,20 @@ namespace FlavorfulStory.TimeManagement
         public void BeginInteraction(PlayerController player)
         {
             _confirmationWindowView.Setup(SleepConfirmationTitle, SleepConfirmationDescription,
-                OnSleepConfirmed, OnSleepRejected);
+                () => OnSleepConfirmed(player), OnSleepRejected);
             _hudFader.Hide().OnComplete(() => { _confirmationWindowView.Show(); });
         }
 
         /// <summary> Обрабатывает подтверждение сна. </summary>
-        private void OnSleepConfirmed()
+        private void OnSleepConfirmed(PlayerController player)
         {
+            _playerSpawnService.RegisterLastUsedBed(this);
             _confirmationWindowView.Hide();
-            _dayEndManager.RequestEndDay(() => { _hudFader.Show(); });
+            _dayEndManager.RequestEndDay(() =>
+            {
+                _hudFader.Show();
+                EndInteraction(player);
+            });
         }
 
         /// <summary> Обрабатывает отклонение сна. </summary>
@@ -80,7 +90,7 @@ namespace FlavorfulStory.TimeManagement
 
         /// <summary> Завершает взаимодействие с кроватью. </summary>
         /// <param name="player"> Контроллер игрока. </param>
-        public void EndInteraction(PlayerController player) { }
+        public void EndInteraction(PlayerController player) => player.SetBusyState(false);
 
         #endregion
     }
