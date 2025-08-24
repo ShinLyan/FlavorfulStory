@@ -6,7 +6,7 @@
         /// <summary> Уведомление о подобранном предмете. </summary>
         ItemCollected,
 
-        /// <summary> Уведомление о наступлении ночи. </summary>
+        /// <summary> Уведомление о наступлении полуночи. </summary>
         MidnightStarted,
 
         /// <summary> Уведомление о добавлении нового квеста. </summary>

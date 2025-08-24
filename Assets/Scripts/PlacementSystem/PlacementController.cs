@@ -31,7 +31,7 @@ namespace FlavorfulStory.PlacementSystem
         private readonly Dictionary<PlacementModeType, IPlacementMode> _modes = new();
 
         /// <summary> Провайдер размещаемых объектов. </summary>
-        private readonly PlaceableObjectProvider _placeableObjectProvider;
+        private readonly IPlaceableObjectProvider _placeableObjectProvider;
 
         /// <summary> Текущий активный режим размещения или удаления. </summary>
         private IPlacementMode _currentMode;
@@ -50,7 +50,7 @@ namespace FlavorfulStory.PlacementSystem
         /// <param name="placeableObjectProvider"> Провайдер размещаемых объектов. </param>
         public PlacementController(GridPositionProvider gridPositionProvider, PlacementPreview placementPreview,
             Transform placeableContainer, IPrefabFactory<PlaceableObject> placeableFactory,
-            PlaceableObjectProvider placeableObjectProvider)
+            IPlaceableObjectProvider placeableObjectProvider)
         {
             _gridPositionProvider = gridPositionProvider;
             _placementPreview = placementPreview;

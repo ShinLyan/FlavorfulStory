@@ -149,7 +149,6 @@ namespace FlavorfulStory.TimeManagement
             OnTimeUnpaused?.Invoke();
         }
 
-
         #region Saving
 
         /// <summary> Сохраняет текущее игровое время. </summary>

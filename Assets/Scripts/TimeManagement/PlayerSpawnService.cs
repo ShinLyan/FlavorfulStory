@@ -9,7 +9,7 @@ namespace FlavorfulStory.TimeManagement
     public class PlayerSpawnService
     {
         /// <summary> Провайдер размещаемых объектов. </summary>
-        private readonly PlaceableObjectProvider _placeableObjectProvider;
+        private readonly IPlaceableObjectProvider _placeableObjectProvider;
 
         /// <summary> Менеджер локаций. </summary>
         private readonly LocationManager _locationManager;
@@ -20,7 +20,7 @@ namespace FlavorfulStory.TimeManagement
         /// <summary> Инициализирует сервис спавна игрока. </summary>
         /// <param name="placeableObjectProvider"> Провайдер объектов. </param>
         /// <param name="locationManager"> Менеджер локаций. </param>
-        public PlayerSpawnService(PlaceableObjectProvider placeableObjectProvider, LocationManager locationManager)
+        public PlayerSpawnService(IPlaceableObjectProvider placeableObjectProvider, LocationManager locationManager)
         {
             _placeableObjectProvider = placeableObjectProvider;
             _locationManager = locationManager;

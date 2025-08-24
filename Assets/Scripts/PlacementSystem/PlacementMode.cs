@@ -28,7 +28,7 @@ namespace FlavorfulStory.PlacementSystem
         private readonly Collider[] _hitsBuffer = new Collider[10];
 
         /// <summary> Провайдер размещаемых объектов. </summary>
-        private readonly PlaceableObjectProvider _placeableObjectProvider;
+        private readonly IPlaceableObjectProvider _placeableObjectProvider;
 
         /// <summary> Объект, который будет размещен. </summary>
         public PlaceableObject PlaceableObject { get; set; }
@@ -39,9 +39,10 @@ namespace FlavorfulStory.PlacementSystem
         /// <param name="gridLayers"> Словарь данных по слоям размещения. </param>
         /// <param name="container"> Родитель для создаваемых объектов. </param>
         /// <param name="placeableFactory"> Фабрика размещаемых объектов. </param>
+        /// <param name="placeableObjectProvider"> Провайдер размещаемых объектов. </param>
         public PlacementMode(GridPositionProvider positionProvider, PlacementPreview placementPreview,
             Dictionary<PlacementLayer, PlacementGridData> gridLayers, Transform container,
-            IPrefabFactory<PlaceableObject> placeableFactory, PlaceableObjectProvider placeableObjectProvider)
+            IPrefabFactory<PlaceableObject> placeableFactory, IPlaceableObjectProvider placeableObjectProvider)
         {
             _positionProvider = positionProvider;
             _placementPreview = placementPreview;

@@ -1,38 +1,41 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using Zenject;
 
 namespace FlavorfulStory.PlacementSystem
 {
     /// <summary> Провайдер для управления размещаемыми объектами. </summary>
-    public class PlaceableObjectProvider
+    public class PlaceableObjectProvider : IPlaceableObjectProvider, IInitializable
     {
-        /// <summary> Список всех размещаемых объектов. </summary>
-        private readonly List<PlaceableObject> _objects = new();
+        /// <summary> Список всех размещённых объектов. </summary>
+        private readonly List<PlaceableObject> _placeables;
 
-        /// <summary> Инициализирует провайдер и находит все существующие объекты. </summary>
-        public PlaceableObjectProvider()
+        /// <summary> Инициализировать провайдер. </summary>
+        /// <param name="placeables"> Список всех размещённых объектов на сцене. </param>
+        public PlaceableObjectProvider(List<PlaceableObject> placeables) => _placeables = placeables;
+
+        /// <summary> Инициализировать провайдер. </summary>
+        public void Initialize()
         {
-            var existingObjects =
-                Object.FindObjectsByType<PlaceableObject>(FindObjectsInactive.Include, FindObjectsSortMode.None);
-            foreach (var placeableObject in existingObjects) Register(placeableObject);
+            foreach (var placeableObject in _placeables) Register(placeableObject);
         }
 
-        /// <summary> Регистрирует новый предмет в реестре. </summary>
+        /// <summary> Зарегистрировать объект. </summary>
         /// <param name="placeableObject"> Объект для регистрации. </param>
         public void Register(PlaceableObject placeableObject)
         {
-            if (placeableObject && !_objects.Contains(placeableObject)) _objects.Add(placeableObject);
+            if (placeableObject && !_placeables.Contains(placeableObject)) _placeables.Add(placeableObject);
         }
 
-        /// <summary> Удаляет предмет из реестра. </summary>
-        /// <param name="placeableObject"> Объект для удаления. </param>
-        public void Unregister(PlaceableObject placeableObject) => _objects.Remove(placeableObject);
+        /// <summary> Отменить регистрацию объекта. </summary>
+        /// <param name="placeableObject"> Объект для отмены регистрации. </param>
+        public void Unregister(PlaceableObject placeableObject) => _placeables.Remove(placeableObject);
 
-        /// <summary> Возвращает все объекты указанного типа. </summary>
+        /// <summary> Получить все объекты заданного типа компонента. </summary>
         /// <typeparam name="T"> Тип компонента для поиска. </typeparam>
         /// <returns> Перечисление найденных объектов. </returns>
         public IEnumerable<T> GetObjectsOfType<T>() where T : Component =>
-            _objects.Select(placeableObject => placeableObject.GetComponent<T>()).Where(component => component);
+            _placeables.Select(placeableObject => placeableObject.GetComponent<T>()).Where(component => component);
     }
 }

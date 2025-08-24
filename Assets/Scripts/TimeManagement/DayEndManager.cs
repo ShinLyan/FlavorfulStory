@@ -85,9 +85,7 @@ namespace FlavorfulStory.TimeManagement
             await EndDayRoutine();
             _summaryView.HideWithAnimation().Forget();
 
-            var position = _playerSpawnService.GetSpawnPosition();
-
-            await RestorePlayerState(position, isExhausted);
+            await RestorePlayerState(_playerSpawnService.GetSpawnPosition(), isExhausted);
 
             onComplete?.Invoke();
             _isProcessingSleep = false;
