@@ -4,13 +4,9 @@ using DG.Tweening;
 using Zenject;
 using FlavorfulStory.InputSystem;
 using FlavorfulStory.UI.Animation;
-using UnityEngine;
 
 namespace FlavorfulStory
 {
-    // TODO: После того как доделаю все окна - WarpPortal, DialogueView, SavingWrapper, SleepTrigger, SummaryWindow.
-    // Если где-то используется где-то кроме окон(в сейве точно) - тогда перепривязать клиентов на пользование UiOverlayFadeCoordinator
-    // ну и очевидно зарефатокрить данный класс.
     public sealed class UIOverlayFadeCoordinator : IInitializable, IDisposable, IWindowOpenGate
     {
         private readonly IWindowService _windowService;

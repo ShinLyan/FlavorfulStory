@@ -82,8 +82,6 @@ namespace FlavorfulStory
         {
             // Используем текущую структуру WindowAddresses с явными полями (минимальные изменения)
             // Тут должны быть все окна
-            
-            // TODO: Актуализировать. Сначала проверка, затем yield return
             if (_windows.ConfirmationWindow) yield return _windows.ConfirmationWindow;
             if (_windows.SummaryWindow) yield return _windows.SummaryWindow;
             if (_windows.RepairableBuildingWindow) yield return _windows.RepairableBuildingWindow;

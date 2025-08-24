@@ -54,12 +54,20 @@ namespace FlavorfulStory.InventorySystem.UI
 
             _secondInventoryView.Initialize(secondInventory);
             _firstInventoryView.Initialize(firstInventory);
+
+            _secondInventory.InventoryUpdated += UpdateAddToExistingButton;
+            _firstInventory.InventoryUpdated += UpdateAddToExistingButton;
+
+            _addToExistingButton.interactable = CheckForDuplicates();
         }
 
         protected override void OnClosed()
         {
             base.OnClosed();
 
+            _secondInventory.InventoryUpdated += UpdateAddToExistingButton;
+            _firstInventory.InventoryUpdated += UpdateAddToExistingButton;
+            
             _secondInventory = null;
             _firstInventory = null;
         }
@@ -75,6 +83,28 @@ namespace FlavorfulStory.InventorySystem.UI
                     () => { _firstInventory.RemoveFromSlot(slotIndex, stack.Number); });
                 _secondInventoryView.AnimateAdd(stack.Item);
             }
+        }
+
+        private void UpdateAddToExistingButton() => _addToExistingButton.interactable = CheckForDuplicates();
+
+        private bool CheckForDuplicates()
+        {
+            if (_firstInventory == null || _secondInventory == null) 
+                return false;
+
+            for (int i = 0; i < _firstInventory.InventorySize; i++)
+            {
+                var stack = _firstInventory.GetItemStackInSlot(i);
+                var item = stack.Item;
+                
+                if (!item || !item.IsStackable || stack.Number <= 0)
+                    continue;
+                
+                if (_secondInventory.HasItem(item) && _secondInventory.HasSpaceFor(item))
+                    return true;
+            }
+            
+            return false;
         }
     }
 }

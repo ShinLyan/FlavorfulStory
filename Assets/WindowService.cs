@@ -91,7 +91,7 @@ namespace FlavorfulStory
 
             window.Opened += () =>
             {
-                if (_openedWindows.Count == 0) //TODO: Переделать(вынести в IInputProvider(для UI)). Выглядит как наррушение SRP
+                if (_openedWindows.Count == 0)
                 {
                     WorldTime.Pause();
                     InputWrapper.BlockAllInput();
@@ -105,7 +105,7 @@ namespace FlavorfulStory
             window.Closed += () =>
             {
                 _openedWindows.Remove(window);
-                if (_openedWindows.Count == 0) //TODO: Переделать(вынести в IInputProvider(для UI)). Выглядит как наррушение SRP
+                if (_openedWindows.Count == 0)
                 {
                     WorldTime.Unpause();
                     InputWrapper.UnblockAllInput();

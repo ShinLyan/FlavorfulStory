@@ -19,9 +19,13 @@ namespace FlavorfulStory
         private Vector2 _initialAnchoredPos;
         private bool _isAnimating;
         private bool _isFirstOpen = true;
+        
+        protected override void OnOpened()
+        {
+            AnimateOpenAsync().Forget();
+        }
 
-        // TODO: Перевести на UniTaskVoid?
-        protected override async void OnOpened()
+        private async UniTaskVoid AnimateOpenAsync()
         {
             if (_container == null || _canvasGroup == null)
             {
@@ -52,7 +56,7 @@ namespace FlavorfulStory
             _isAnimating = false;
             BlockRaycasts(false);
         }
-
+        
         public override void Close()
         {
             if (!IsOpened || _isAnimating) return;
@@ -74,9 +78,13 @@ namespace FlavorfulStory
             base.Close();
             _isAnimating = false;
         }
+        
+        protected override void OnClosed()
+        {
+            AnimateCloseOnClosedAsync().Forget();
+        }
 
-        // TODO: Перевести на UniTaskVoid?
-        protected override async void OnClosed()
+        private async UniTaskVoid AnimateCloseOnClosedAsync()
         {
             if (_isAnimating || _container == null || _canvasGroup == null) return;
 
@@ -93,7 +101,7 @@ namespace FlavorfulStory
             _isAnimating = false;
             BlockRaycasts(false);
         }
-
+        
         private void SetOffscreenPosition()
         {
             var rect = _container.rect;

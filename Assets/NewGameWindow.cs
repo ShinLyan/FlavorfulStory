@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using FlavorfulStory.SceneManagement;
-using FlavorfulStory.UI;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -19,6 +18,7 @@ namespace FlavorfulStory
         [SerializeField] private TMP_InputField _shopName;
         
         [SerializeField] private Button _newGameButton;
+        
         [SerializeField] private Button _closeButton;
 
         /// <summary> Объект для отображения сообщения об ошибке. </summary>
@@ -30,7 +30,15 @@ namespace FlavorfulStory
         private SavingWrapper _savingWrapper;
         
         private Tween _errorFadeTween;
+        
         [SerializeField] private CanvasGroup _canvasGroup;
+        
+        private static readonly char[] ForbiddenCharacters = {
+            '"', '\'', '@', '#', '$', '%', '^', '&', '*', '(', ')', '=', '+',
+            '[', ']', '{', '}', '\\', '|', '/', '<', '>', '?', '`', '~'
+        };
+        
+        private IStringValidator _nameValidator;
         
         [Inject]
         public void Construct(SavingWrapper savingWrapper) => _savingWrapper = savingWrapper;
@@ -42,6 +50,13 @@ namespace FlavorfulStory
             _newGameButton.onClick.AddListener(StartNewGame);
             _errorMessage.gameObject.SetActive(false);
             ClearInputFields();
+            
+            _nameValidator = new InputFieldValidatorBuilder()
+                .NotEmpty()
+                .MinLength(3)
+                .MaxLength(20)
+                .NoForbiddenCharacters(ForbiddenCharacters)
+                .Build();
         }
 
         protected override void OnClosed()
@@ -56,14 +71,15 @@ namespace FlavorfulStory
         /// <returns> Возвращает True, если все поля ввода заполнены корректно, иначе False. </returns>
         private bool AreInputFieldsValid()
         {
-            var inputFields = new List<TMP_InputField> { _playerName, _shopName };
-            foreach (var inputField in inputFields)
+            var inputFields = new List<TMP_InputField> { _playerName, _shopName};
+
+            foreach (var input in inputFields)
             {
-                //TODO: не нравится. Сделать как-то более универсально, чтоб можно было добавлять и убиратьь проверки к строке.
-                // билдер?
-                if (InputFieldValidator.IsValid(inputField.text, out string warningMessage)) continue;
-                ShowError(warningMessage);
-                return false;
+                if (!_nameValidator.IsValid(input.text, out string warningMessage))
+                {
+                    ShowError(warningMessage);
+                    return false;
+                }
             }
 
             _errorMessage.SetActive(false);

@@ -65,11 +65,7 @@ namespace FlavorfulStory.TimeManagement
         }
 
         /// <summary> Обрабатывает подтверждение сна. </summary>
-        private void OnSleepConfirmed()
-        {
-            // TODO: сходить в _dayEndManager и переписать RequestEndDay
-            _dayEndManager.RequestEndDay(null);
-        }
+        private void OnSleepConfirmed() => _dayEndManager.RequestEndDay(null);
 
         /// <summary> Обрабатывает отклонение сна. </summary>
         private void OnSleepRejected() { }
