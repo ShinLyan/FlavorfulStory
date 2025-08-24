@@ -4,7 +4,6 @@ using TMPro;
 
 namespace FlavorfulStory.TimeManagement.UI
 {
-    //TODO: Довестьи до ума - не проебаться
     /// <summary> Отображение сводки дня с анимациями. </summary>
     public class SummaryWindow : BaseWindow
     {

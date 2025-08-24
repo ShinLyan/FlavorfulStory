@@ -65,8 +65,7 @@ namespace FlavorfulStory
             _errorMessage.SetActive(false);
             _errorFadeTween?.Kill();
         }
-
-        //TODO: внутри пахнет говной
+        
         /// <summary> Проверяет поля ввода на корректность. </summary>
         /// <returns> Возвращает True, если все поля ввода заполнены корректно, иначе False. </returns>
         private bool AreInputFieldsValid()

@@ -8,11 +8,14 @@ namespace FlavorfulStory
     public class EscapeWindowCloser : MonoBehaviour
     {
         private IWindowService _windowService;
+        private UIOverlayFadeCoordinator _fadeCoordinator;
 
-        [InjectOptional] private UIOverlayFadeCoordinator _fadeCoordinator;
-        
         [Inject]
-        private void Construct(IWindowService windowService) => _windowService = windowService;
+        private void Construct(IWindowService windowService,[InjectOptional] UIOverlayFadeCoordinator fadeCoordinator)
+        {
+            _windowService = windowService;
+            _fadeCoordinator = fadeCoordinator;
+        } 
 
         private void Update()
         {

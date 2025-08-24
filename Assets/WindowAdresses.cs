@@ -6,13 +6,13 @@ namespace FlavorfulStory
     public class WindowAdresses: ScriptableObject
     {
         //Все окна добавляются сюда
-        [field: SerializeField] public GameObject ConfirmationWindow { get; private set; }
-        [field: SerializeField] public GameObject SummaryWindow { get; private set; }
-        [field: SerializeField] public GameObject RepairableBuildingWindow { get; private set; }
-        [field: SerializeField] public GameObject InventoryExchangeWindow { get; private set; }
-        [field: SerializeField] public GameObject GameMenu { get; private set; }
-        [field: SerializeField] public GameObject SettingsWindow { get; private set; }
-        [field: SerializeField] public GameObject NewGameWindow { get; private set; }
-        [field: SerializeField] public GameObject ExitConfirmationWindow { get; private set; }
+        [field: SerializeField] public BaseWindow ConfirmationWindow { get; private set; }
+        [field: SerializeField] public BaseWindow SummaryWindow { get; private set; }
+        [field: SerializeField] public BaseWindow RepairableBuildingWindow { get; private set; }
+        [field: SerializeField] public BaseWindow InventoryExchangeWindow { get; private set; }
+        [field: SerializeField] public BaseWindow GameMenu { get; private set; }
+        [field: SerializeField] public BaseWindow SettingsWindow { get; private set; }
+        [field: SerializeField] public BaseWindow NewGameWindow { get; private set; }
+        [field: SerializeField] public BaseWindow ExitConfirmationWindow { get; private set; }
     }
 }

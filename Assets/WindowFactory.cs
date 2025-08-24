@@ -32,18 +32,11 @@ namespace FlavorfulStory
         {
             if (_isWarmedUp) return;
 
-            foreach (var go in EnumerateAllPrefabs())
+            foreach (var window in EnumerateAllPrefabs())
             {
-                if (!go)
-                {
-                    Debug.LogError($"[{nameof(WindowFactory)}] Null prefab in WindowAdresses.");
-                    continue;
-                }
-
-                var window = go.GetComponent<BaseWindow>();
                 if (!window)
                 {
-                    Debug.LogError($"[{nameof(WindowFactory)}] Prefab {go.name} has no BaseWindow component.");
+                    Debug.LogError($"[{nameof(WindowFactory)}] Prefab[{window}] has not been assigned.");
                     continue;
                 }
 
@@ -78,7 +71,7 @@ namespace FlavorfulStory
             return instance.GetComponent<T>();
         }
         
-        private IEnumerable<GameObject> EnumerateAllPrefabs()
+        private IEnumerable<BaseWindow> EnumerateAllPrefabs()
         {
             // Используем текущую структуру WindowAddresses с явными полями (минимальные изменения)
             // Тут должны быть все окна
