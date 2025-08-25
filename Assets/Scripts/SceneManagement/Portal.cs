@@ -82,33 +82,20 @@ namespace FlavorfulStory.AI.WarpGraphSystem
         }
 
 #if UNITY_EDITOR
-        
+
         /// <summary> Визуализация соединений между порталами в редакторе. </summary>
         private void OnDrawGizmosSelected()
         {
             Gizmos.color = Color.red;
             Gizmos.DrawSphere(transform.position, 0.3f);
 
-            // Соединение с парным порталом
             if (Connected)
             {
                 Gizmos.color = _remoteConnectionColor;
                 Gizmos.DrawLine(transform.position, Connected.transform.position);
             }
-
-            // Соединения внутри локации
-            foreach (var portal in FindObjectsByType<Portal>(FindObjectsSortMode.None))
-            {
-                var myLocation = GetComponentInParent<Location>();
-                var otherLocation = portal.GetComponentInParent<Location>();
-
-                if (portal == this || myLocation != otherLocation) continue;
-
-                Gizmos.color = _localConnectionColor;
-                Gizmos.DrawLine(transform.position, portal.transform.position);
-            }
         }
-        
+
 #endif
     }
 }

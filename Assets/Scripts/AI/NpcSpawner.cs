@@ -4,6 +4,7 @@ using FlavorfulStory.AI.BaseNpc;
 using FlavorfulStory.Infrastructure;
 using FlavorfulStory.Infrastructure.Factories;
 using FlavorfulStory.SceneManagement;
+using FlavorfulStory.Shop;
 using FlavorfulStory.TimeManagement;
 using UnityEngine;
 using UnityEngine.AI;
@@ -190,8 +191,10 @@ namespace FlavorfulStory.AI
 
             if (!npc || !npc.gameObject.activeInHierarchy) return;
 
-            var location = _locationManager.GetLocationByName(LocationName.NewShop);
-            npc.SetDestination(new NpcDestinationPoint(location.transform.position, Quaternion.identity));
+            var shopEntryPointPosition = ((ShopLocation)_locationManager.GetLocationByName(LocationName.NewShop))
+                .EntryPoint
+                .position;
+            npc.SetDestination(new NpcDestinationPoint(shopEntryPointPosition, Quaternion.identity));
         }
 
         /// <summary> Деспавнит всех активных NPC. </summary>

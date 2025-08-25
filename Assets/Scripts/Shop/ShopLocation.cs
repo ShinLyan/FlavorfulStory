@@ -1,10 +1,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using FlavorfulStory.AI.BaseNpc;
+using FlavorfulStory.PlacementSystem;
 using FlavorfulStory.SceneManagement;
 using Unity.AI.Navigation;
 using UnityEngine;
 using UnityEngine.AI;
+using Zenject;
 using Random = UnityEngine.Random;
 
 namespace FlavorfulStory.Shop
@@ -12,46 +14,57 @@ namespace FlavorfulStory.Shop
     /// <summary> Локация магазина с функциональностью управления полками, мебелью и кассой. </summary>
     public class ShopLocation : Location
     {
+        [field: SerializeField] public Transform EntryPoint { get; private set; }
+
         /// <summary> Касса магазина для обслуживания покупателей. </summary>
-        [field: SerializeField] public CashRegister CashRegister { get; private set; }
+        [field: SerializeField]
+        public CashRegister CashRegister { get; private set; }
 
         /// <summary> Массив полок в магазине. </summary>
-        [SerializeField] private Showcase[] _showcases;
+        private List<Showcase> Showcases => _placeableObjectProvider.GetObjectsOfType<Showcase>().ToList();
 
         /// <summary> Массив мебели в магазине. </summary>
-        [SerializeField] private Furniture[] _furnitures;
+        private List<Furniture> Furnitures => _placeableObjectProvider.GetObjectsOfType<Furniture>().ToList();
 
         /// <summary> Поверхность NavMesh для данной локации. </summary> 
         [SerializeField] private NavMeshSurface _navMeshSurface;
 
+        /// <summary> Провайдер для получения размещаемых объектов в локации магазина. </summary>
+        private IPlaceableObjectProvider _placeableObjectProvider;
+
         /// <summary> Минимальное расстояние от объектов магазина при генерации случайных точек. </summary>
         private const float MinDistance = 3f;
 
+        [Inject]
+        private void Construct(IPlaceableObjectProvider placeableObjectProvider) =>
+            _placeableObjectProvider = placeableObjectProvider;
+
+
         /// <summary> Возвращает случайную доступную мебель. </summary>
         /// <returns> Доступная мебель или null, если все мебель занята. </returns>
-        public Furniture GetAvailableFurniture() => GetRandomAvailableObject(_furnitures);
+        public Furniture GetAvailableFurniture() => GetRandomAvailableObjectOfType<Furniture>();
 
         /// <summary> Получает массив доступных (незанятых) объектов из переданного массива. </summary>
         /// <typeparam name="T"> Тип объекта, производный от ShopObject. </typeparam>
         /// <param name="objects"> Массив объектов магазина для фильтрации. </param>
         /// <returns> Массив доступных объектов. </returns>
-        private static List<T> GetAvailableObjects<T>(T[] objects) where T : ShopObject
+        private static List<T> GetAvailableObjects<T>(List<T> objects) where T : ShopObject
         {
             var availableObjects = new List<T>();
             foreach (var obj in objects)
                 if (!obj.IsOccupied)
                     availableObjects.Add(obj);
-
+            
             return availableObjects;
         }
 
         /// <summary> Получает случайный свободный объект из массива объектов магазина. </summary>
         /// <typeparam name="T"> Тип объекта, наследующийся от ShopObject. </typeparam>
-        /// <param name="objects"> Массив объектов для выбора. </param>
         /// <returns> Случайный свободный объект типа T, или null, если все объекты заняты. </returns>
-        private static T GetRandomAvailableObject<T>(T[] objects) where T : ShopObject
+        private T GetRandomAvailableObjectOfType<T>() where T : ShopObject
         {
-            var availableObjects = GetAvailableObjects(objects);
+            var placedObjects = _placeableObjectProvider.GetObjectsOfType<T>().ToList();
+            var availableObjects = GetAvailableObjects(placedObjects);
             return availableObjects.Count == 0 ? null : availableObjects[Random.Range(0, availableObjects.Count)];
         }
 
@@ -59,7 +72,7 @@ namespace FlavorfulStory.Shop
         /// <returns> True, если есть прилавки с товарами, иначе False. </returns>
         public bool HasAvailableShowcaseWithItems()
         {
-            var availableShowcases = GetAvailableObjects(_showcases);
+            var availableShowcases = GetAvailableObjects(Showcases);
 
             foreach (var showcase in availableShowcases)
                 for (int i = 0; i < showcase.Inventory.InventorySize; i++)
@@ -73,7 +86,7 @@ namespace FlavorfulStory.Shop
         /// <returns> Случайный прилавок с товарами или null, если таких нет. </returns>
         public Showcase GetRandomAvailableShowcaseWithItems()
         {
-            var availableShowcases = GetAvailableObjects(_showcases).Where(showcase =>
+            var availableShowcases = GetAvailableObjects(Showcases).Where(showcase =>
             {
                 if (!showcase.Inventory) return false;
 
@@ -90,12 +103,12 @@ namespace FlavorfulStory.Shop
 
         /// <summary> Проверяет, занята ли вся мебель в магазине. </summary>
         /// <returns> True, если вся мебель занята, иначе false. </returns>
-        public bool HasAvailableFurniture() => GetAvailableObjects(_furnitures).Count > 0;
+        public bool HasAvailableFurniture() => GetAvailableObjects(Furnitures).Count > 0;
 
         /// <summary> Проверяет, находится ли позиция на допустимом расстоянии от мебели и витрин. </summary>
         private bool IsValidPosition(Vector3 position) =>
-            _showcases.All(showcase => Vector3.Distance(position, showcase.transform.position) >= MinDistance) &&
-            _furnitures.All(furniture => Vector3.Distance(position, furniture.transform.position) >= MinDistance) &&
+            Showcases.All(showcase => Vector3.Distance(position, showcase.transform.position) >= MinDistance) &&
+            Furnitures.All(furniture => Vector3.Distance(position, furniture.transform.position) >= MinDistance) &&
             Vector3.Distance(position, CashRegister.transform.position) >= MinDistance;
 
         /// <summary> Пытается найти случайную точку на NavMesh в пределах указанного числа попыток. </summary>
