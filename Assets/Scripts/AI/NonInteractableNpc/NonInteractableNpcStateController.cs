@@ -196,9 +196,7 @@ namespace FlavorfulStory.AI.NonInteractableNpc
         private void HandleAfterPurchaseTransition()
         {
             var shopLocation = (ShopLocation)_locationManager.GetLocationByName(LocationName.NewShop);
-            bool isFurnitureAvailable = !shopLocation.HasAvailableFurniture();
-
-            if (isFurnitureAvailable && Random.Range(0, 2) == 0 && !_hadVisitedFurnitureAfterPurchase)
+            if (shopLocation.HasAvailableFurniture() && Random.Range(0, 2) == 0 && !_hadVisitedFurnitureAfterPurchase)
             {
                 _hadVisitedFurnitureAfterPurchase = true;
                 SetState(NpcStateName.FurnitureSequence);
