@@ -4,6 +4,7 @@ namespace FlavorfulStory.SceneManagement
 {
     /// <summary> Игровая локация, которая может быть активирована/деактивирована 
     /// и проверяет, находится ли точка внутри её границ. </summary>
+    [RequireComponent(typeof(BoxCollider))]
     public class Location : MonoBehaviour
     {
         /// <summary> Название игровой локации. </summary>
@@ -18,9 +19,12 @@ namespace FlavorfulStory.SceneManagement
         [field: Tooltip("Является ли локация помещением?"), SerializeField]
         public bool IsRoom { get; private set; }
 
-        /// TODO: ВЫНЕСТИ В ShopLocation после мерджа с NPC
-        [field: SerializeField] public Transform EntryPoint { get; private set; }
-        
+        /// <summary> Коллайдер, определяющий границы локации. </summary>
+        private BoxCollider _collider;
+
+        /// <summary> Выполняет инициализацию компонентов. </summary>
+        private void Awake() => _collider = GetComponent<BoxCollider>();
+
         /// <summary> Устанавливает активное состояние всех объектов из списка. </summary>
         /// <param name="isActive"> <c>true</c> — включить объекты; <c>false</c> — отключить. </param>
         public void SetActive(bool isActive)
@@ -33,7 +37,6 @@ namespace FlavorfulStory.SceneManagement
         /// <summary> Находится ли заданная позиция внутри границ локации? </summary>
         /// <param name="position"> Позиция в мировом пространстве. </param>
         /// <returns> <c>true</c>, если позиция внутри локации; иначе — <c>false</c>. </returns>
-        public bool IsPositionInLocation(Vector3 position) =>
-            TryGetComponent(out Collider component) && component.bounds.Contains(position);
+        public bool IsPositionInLocation(Vector3 position) => _collider.bounds.Contains(position);
     }
 }

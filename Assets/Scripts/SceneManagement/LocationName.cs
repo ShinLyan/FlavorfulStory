@@ -11,6 +11,9 @@ namespace FlavorfulStory.SceneManagement
         Restaurant,
 
         /// <summary> Магазин. </summary>
-        Shop
+        Shop,
+
+        /// <summary> Новый магазин. </summary> TODO: Оставить только один Shop, удалить позже
+        NewShop
     }
 }

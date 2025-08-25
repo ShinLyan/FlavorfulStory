@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using FlavorfulStory.Core;
 using FlavorfulStory.Saving;
 using UnityEngine;
 using Zenject;
+using Random = UnityEngine.Random;
 
 namespace FlavorfulStory.InventorySystem
 {
@@ -218,6 +220,32 @@ namespace FlavorfulStory.InventorySystem
         {
             _inventorySlots[slotIndex].Item = null;
             _inventorySlots[slotIndex].Number = 0;
+        }
+
+        /// <summary> Получить случайный непустой индекс слота. </summary>
+        /// <returns> Индекс слота или -1, если инвентарь пуст. </returns>
+        public int GetRandomNonEmptySlotIndex()
+        {
+            var nonEmptyIndices = new List<int>();
+            for (int i = 0; i < InventorySize; i++)
+            {
+                var stack = GetItemStackInSlot(i);
+                if (stack.Item && stack.Number > 0) nonEmptyIndices.Add(i);
+            }
+
+            if (nonEmptyIndices.Count == 0) return -1;
+
+            return nonEmptyIndices[Random.Range(0, nonEmptyIndices.Count)];
+        }
+
+        /// <summary> Получить и удалить стак из указанного слота. </summary>
+        /// <param name="slotIndex"> Индекс слота. </param>
+        /// <returns> Копия стека до удаления. </returns>
+        public ItemStack ExtractStackFromSlot(int slotIndex)
+        {
+            var stack = _inventorySlots[slotIndex];
+            RemoveFromSlot(slotIndex);
+            return stack;
         }
 
         #region Saving

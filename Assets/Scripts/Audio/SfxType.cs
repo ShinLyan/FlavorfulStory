@@ -27,6 +27,12 @@
         /// <summary> Звук строительства. </summary>
         Build,
 
+        /// <summary> Звук кассы. </summary>
+        CashRegister,
+
+        /// <summary> Звук покупки. </summary>
+        Buy,
+
         #region PlacementSystem
 
         /// <summary> Звук при корректном размещении объекта. </summary>

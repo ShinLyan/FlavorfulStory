@@ -106,5 +106,14 @@ namespace FlavorfulStory.SceneManagement
             Debug.LogError($"Локация с именем {name} не найдена!");
             return null;
         }
+
+        /// <summary> Проверяет, находится ли игрок в указанной локации. </summary>
+        /// <param name="locationName"> Имя локации для проверки. </param>
+        /// <returns> Возвращает <c>true</c>, если игрок находится в локации, иначе <c>false</c>. </returns>
+        public bool IsPlayerInLocation(LocationName locationName)
+        {
+            var location = GetLocationByName(locationName);
+            return location.IsPositionInLocation(_playerPositionProvider.GetPlayerPosition());
+        }
     }
 }

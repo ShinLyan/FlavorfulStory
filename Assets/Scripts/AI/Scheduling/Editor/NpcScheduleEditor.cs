@@ -1,16 +1,11 @@
+#if UNITY_EDITOR
+
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using FlavorfulStory.SceneManagement;
 using FlavorfulStory.TimeManagement;
 using UnityEditor;
-using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.AI;
-using UnityEngine.SceneManagement;
 using DayOfWeek = FlavorfulStory.TimeManagement.DayOfWeek;
-
-#if UNITY_EDITOR
 
 namespace FlavorfulStory.AI.Scheduling.Editor
 {
@@ -19,45 +14,11 @@ namespace FlavorfulStory.AI.Scheduling.Editor
     [CustomEditor(typeof(NpcScheduleDemonstrator))]
     public class NpcScheduleEditor : UnityEditor.Editor
     {
-        /// <summary> Кэшированный список всех локаций в сцене. </summary>
-        private static readonly List<Location> _locations = new();
-
         /// <summary> Кэшированные данные триангуляции NavMesh. </summary>
         private NavMeshTriangulation _cachedNavMeshTriangulation;
 
         /// <summary> Флаг, указывающий, что NavMesh был закэширован. </summary>
         private bool _isNavMeshCached;
-
-        /// <summary> Инициализация при загрузке редактора. Подписывается на события изменения
-        /// режима PlayMode и открытия сцены. </summary>
-        [InitializeOnLoadMethod]
-        private static void InitializeOnLoad()
-        {
-            EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
-            EditorSceneManager.sceneOpened += (_, _) => RefreshLocations();
-        }
-
-        /// <summary> Обновить список локаций при изменении режима PlayMode. </summary>
-        /// <param name="state"> Текущее состояние PlayMode. </param>
-        private static void OnPlayModeStateChanged(PlayModeStateChange state)
-        {
-            if (state is PlayModeStateChange.EnteredEditMode or PlayModeStateChange.EnteredPlayMode) RefreshLocations();
-        }
-
-        /// <summary> Обновляет список локаций при активации редактора. </summary>
-        private void OnEnable() => RefreshLocations();
-
-        /// <summary> Обновляет список всех локаций в активной сцене. </summary>
-        private static void RefreshLocations()
-        {
-            _locations.Clear();
-
-            if (Application.isPlaying && !SceneManager.GetActiveScene().isLoaded) return;
-
-            // TODO: ZENJECT
-            var locs = FindObjectsByType<Location>(FindObjectsInactive.Include, FindObjectsSortMode.None);
-            _locations.AddRange(locs);
-        }
 
         /// <summary> Отрисовывает элементы в сцене: точки маршрута, линии между ними, метки с информацией, 
         /// инструменты для перемещения и вращения выбранной точки. </summary>
@@ -81,30 +42,23 @@ namespace FlavorfulStory.AI.Scheduling.Editor
             for (int i = 0; i < param.Path.Length; i++)
             {
                 var pathPoint = param.Path[i];
-                var newPosition = GetSurfaceAdjustedPosition(pathPoint.Position, viewer);
+                var newPosition = GetSurfaceAdjustedPosition(pathPoint.NpcDestinationPoint.Position, viewer);
 
-                if (pathPoint.Position != newPosition)
-                {
-                    pathPoint.Position = newPosition;
-                    EditorUtility.SetDirty(schedule);
-                }
+                pathPoint.SetTransform(newPosition, pathPoint.NpcDestinationPoint.Rotation);
+                EditorUtility.SetDirty(schedule);
 
                 if (i < param.Path.Length - 1)
                 {
                     var next = param.Path[i + 1];
                     Handles.color = viewer.LineColor;
-                    Handles.DrawLine(pathPoint.Position, next.Position, viewer.LineThickness);
+                    Handles.DrawLine(pathPoint.NpcDestinationPoint.Position, next.NpcDestinationPoint.Position,
+                        viewer.LineThickness);
                 }
 
                 // Рисуем метку с фоном
-                var labelPosition = pathPoint.Position + Vector3.forward * viewer.SphereSize;
+                var labelPosition = pathPoint.NpcDestinationPoint.Position + Vector3.forward * viewer.SphereSize;
                 string labelContent =
-                    $"{pathPoint.Hour:00}:{pathPoint.Minutes:00}\n{pathPoint.NpcAnimation}\n{pathPoint.LocationName}";
-
-                var realLocationName =
-                    (from location in _locations
-                        where location.IsPositionInLocation(pathPoint.Position)
-                        select location.LocationName).FirstOrDefault();
+                    $"{pathPoint.Hour:00}:{pathPoint.Minutes:00}\n{pathPoint.NpcAnimation}";
 
                 var labelStyle = new GUIStyle(GUI.skin.label)
                 {
@@ -113,9 +67,7 @@ namespace FlavorfulStory.AI.Scheduling.Editor
                     normal = new GUIStyleState
                     {
                         textColor = Color.black,
-                        background = realLocationName == pathPoint.LocationName
-                            ? Texture2D.whiteTexture
-                            : Texture2D.grayTexture
+                        background = Texture2D.whiteTexture
                     },
                     padding = new RectOffset(6, 6, 4, 4),
                     alignment = TextAnchor.MiddleCenter
@@ -134,7 +86,8 @@ namespace FlavorfulStory.AI.Scheduling.Editor
                 }
 
                 Handles.color = i == viewer.SelectedPointIndex ? Color.green : Color.red;
-                Handles.SphereHandleCap(0, pathPoint.Position, Quaternion.identity, viewer.SphereSize,
+                Handles.SphereHandleCap(0, pathPoint.NpcDestinationPoint.Position, Quaternion.identity,
+                    viewer.SphereSize,
                     EventType.Repaint);
             }
 
@@ -142,24 +95,18 @@ namespace FlavorfulStory.AI.Scheduling.Editor
             if (viewer.SelectedPointIndex < 0 || viewer.SelectedPointIndex >= param.Path.Length) return;
 
             var point = param.Path[viewer.SelectedPointIndex];
-            var pos = point.Position;
-            var rot = Quaternion.Euler(point.Rotation);
+            var pos = point.NpcDestinationPoint.Position;
+            var rot = point.NpcDestinationPoint.Rotation;
+
+            if (rot == default || rot.Equals(new Quaternion(0, 0, 0, 0))) rot = Quaternion.identity;
 
             EditorGUI.BeginChangeCheck();
             var newPos = Handles.PositionHandle(pos, rot);
-            if (EditorGUI.EndChangeCheck())
-            {
-                Undo.RecordObject(schedule, "Move Schedule Point");
-                point.Position = newPos;
-                EditorUtility.SetDirty(schedule);
-            }
-
-            EditorGUI.BeginChangeCheck();
             var newRot = Handles.RotationHandle(rot, newPos);
             if (EditorGUI.EndChangeCheck())
             {
-                Undo.RecordObject(schedule, "Rotate Schedule Point");
-                point.Rotation = newRot.eulerAngles;
+                Undo.RecordObject(schedule, "Move/Rotate Schedule Point");
+                point.SetTransform(newPos, newRot);
                 EditorUtility.SetDirty(schedule);
             }
         }
@@ -269,13 +216,13 @@ namespace FlavorfulStory.AI.Scheduling.Editor
                     Undo.RecordObject(demonstrator.Schedule, "Add Parameter");
 
                     var newParams = demonstrator.Schedule.Params != null
-                        ? new ScheduleParams[demonstrator.Schedule.Params.Length + 1]
-                        : new ScheduleParams[1];
+                        ? new NpcScheduleParams[demonstrator.Schedule.Params.Length + 1]
+                        : new NpcScheduleParams[1];
 
                     if (demonstrator.Schedule.Params != null)
                         Array.Copy(demonstrator.Schedule.Params, newParams, demonstrator.Schedule.Params.Length);
 
-                    newParams[^1] = new ScheduleParams();
+                    newParams[^1] = new NpcScheduleParams();
                     demonstrator.Schedule.Params = newParams;
                     demonstrator.SetNewValForParamIndex(newParams.Length - 1);
 
@@ -292,7 +239,7 @@ namespace FlavorfulStory.AI.Scheduling.Editor
 
                         if (demonstrator.Schedule.Params is { Length: > 0 })
                         {
-                            var newParams = new ScheduleParams[demonstrator.Schedule.Params.Length - 1];
+                            var newParams = new NpcScheduleParams[demonstrator.Schedule.Params.Length - 1];
                             Array.Copy(demonstrator.Schedule.Params, newParams, newParams.Length);
                             demonstrator.Schedule.Params = newParams;
                             demonstrator.SetNewValForParamIndex(
@@ -300,7 +247,7 @@ namespace FlavorfulStory.AI.Scheduling.Editor
                         }
                         else
                         {
-                            demonstrator.Schedule.Params = Array.Empty<ScheduleParams>();
+                            demonstrator.Schedule.Params = Array.Empty<NpcScheduleParams>();
                         }
 
                         EditorUtility.SetDirty(demonstrator.Schedule);
@@ -333,17 +280,13 @@ namespace FlavorfulStory.AI.Scheduling.Editor
 
         /// <summary> Отображает редактор для выбора сезонов. </summary>
         /// <param name="param"> Параметр расписания, в который записываются выбранные значения. </param>
-        private static void ShowSeasonsEdit(ScheduleParams param)
-        {
+        private static void ShowSeasonsEdit(NpcScheduleParams param) =>
             param.Seasons = (Season)EditorGUILayout.EnumFlagsField("Seasons", param.Seasons);
-        }
 
         /// <summary> Отображает редактор для выбора дней недели. </summary>
         /// <param name="param"> Параметр расписания, в который записываются выбранные значения. </param>
-        private static void ShowDayOfWeekEdit(ScheduleParams param)
-        {
-            param.DayOfWeek = (DayOfWeek)EditorGUILayout.EnumFlagsField("Day of Week", param.DayOfWeek);
-        }
+        private static void ShowDayOfWeekEdit(NpcScheduleParams param) => param.DayOfWeek =
+            (DayOfWeek)EditorGUILayout.EnumFlagsField("Day of Week", param.DayOfWeek);
 
         /// <summary> Управляет редактированием дат для параметра расписания. </summary>
         /// <param name="demonstrator"> Демонстратор расписания. </param>
@@ -391,17 +334,13 @@ namespace FlavorfulStory.AI.Scheduling.Editor
 
         /// <summary> Отображает слайдер для настройки уровня отношений (Hearts). </summary>
         /// <param name="param"> Параметр расписания, в который записываются выбранные значения. </param>
-        private static void ShowHeartsEdit(ScheduleParams param)
-        {
+        private static void ShowHeartsEdit(NpcScheduleParams param) =>
             param.Hearts = EditorGUILayout.IntSlider("Hearts", param.Hearts, 0, 12);
-        }
 
         /// <summary> Отображает переключатель для условия дождя. </summary>
         /// <param name="param"> Параметр расписания, в который записываются выбранные значения. </param>
-        private static void ShowIsRainingEdit(ScheduleParams param)
-        {
+        private static void ShowIsRainingEdit(NpcScheduleParams param) =>
             param.IsRaining = EditorGUILayout.Toggle("Raining", param.IsRaining);
-        }
 
         /// <summary> Управляет отображением и взаимодействием с точками маршрута. </summary>
         /// <param name="demonstrator"> Демонстратор расписания. </param>
@@ -412,10 +351,7 @@ namespace FlavorfulStory.AI.Scheduling.Editor
             EditorGUILayout.LabelField($"Path Points: {currentParam.Path.Length}", EditorStyles.boldLabel);
 
             EditorGUI.BeginChangeCheck();
-            int newPointIndex = EditorGUILayout.IntSlider(
-                "Path Point",
-                demonstrator.SelectedPointIndex,
-                0,
+            int newPointIndex = EditorGUILayout.IntSlider("Path Point", demonstrator.SelectedPointIndex, 0,
                 Mathf.Max(0, currentParam.Path.Length - 1)
             );
             if (EditorGUI.EndChangeCheck()) demonstrator.SetNewValForPointIndex(newPointIndex);
@@ -450,19 +386,19 @@ namespace FlavorfulStory.AI.Scheduling.Editor
         private static void AddSchedulePoint(NpcScheduleDemonstrator demonstrator)
         {
             var currentParam = demonstrator.Schedule.Params[demonstrator.SelectedParamIndex];
-            var newPath = new SchedulePoint[currentParam.Path.Length + 1];
+            var newPath = new NpcSchedulePoint[currentParam.Path.Length + 1];
             currentParam.Path.CopyTo(newPath, 0);
 
-            newPath[^1] = new SchedulePoint
+            newPath[^1] = new NpcSchedulePoint
             {
                 Hour = 12,
                 Minutes = 0,
-                LocationName = LocationName.RockyIsland,
-                NpcAnimation = AnimationType.Idle,
-                Position = currentParam.Path.Length > 0
-                    ? currentParam.Path[^1].Position + Vector3.forward
-                    : Vector3.zero
+                NpcAnimation = AnimationType.Idle
             };
+            var pos = currentParam.Path.Length > 0
+                ? currentParam.Path[^1].NpcDestinationPoint.Position + Vector3.forward
+                : Vector3.zero;
+            newPath[^1].SetTransform(pos, Quaternion.identity);
 
             Undo.RecordObject(demonstrator.Schedule, "Add Schedule Point");
             currentParam.Path = newPath;
@@ -475,7 +411,7 @@ namespace FlavorfulStory.AI.Scheduling.Editor
         private static void DeleteLastSchedulePoint(NpcScheduleDemonstrator demonstrator)
         {
             var currentParam = demonstrator.Schedule.Params[demonstrator.SelectedParamIndex];
-            var newPath = new SchedulePoint[currentParam.Path.Length - 1];
+            var newPath = new NpcSchedulePoint[currentParam.Path.Length - 1];
 
             Array.Copy(currentParam.Path, newPath, currentParam.Path.Length - 1);
 
@@ -500,7 +436,6 @@ namespace FlavorfulStory.AI.Scheduling.Editor
             {
                 point.Hour = EditorGUILayout.IntSlider("Hour", point.Hour, 0, 23);
                 point.Minutes = EditorGUILayout.IntSlider("Minutes", point.Minutes, 0, 59);
-                point.LocationName = (LocationName)EditorGUILayout.EnumPopup("Location", point.LocationName);
                 point.NpcAnimation = (AnimationType)EditorGUILayout.EnumPopup("Animation", point.NpcAnimation);
             }
 

@@ -1,6 +1,7 @@
 using System.Linq;
 using FlavorfulStory.PlacementSystem;
 using FlavorfulStory.SceneManagement;
+using FlavorfulStory.Shop;
 using UnityEngine;
 
 namespace FlavorfulStory.TimeManagement
@@ -38,7 +39,7 @@ namespace FlavorfulStory.TimeManagement
 
             if (_lastUsedBed && allBeds.Contains(_lastUsedBed)) return _lastUsedBed.transform.position;
 
-            return _locationManager.GetLocationByName(LocationName.RockyIsland).EntryPoint.position;
+            return ((ShopLocation)_locationManager.GetLocationByName(LocationName.NewShop)).EntryPoint.position;
         }
     }
 }

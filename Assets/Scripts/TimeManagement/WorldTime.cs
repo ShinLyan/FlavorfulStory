@@ -13,18 +13,23 @@ namespace FlavorfulStory.TimeManagement
         #region Fields
 
         /// <summary> Сколько игровых минут проходит за реальную секунду. </summary>
-        [Header("Time Scale")]
-        [Tooltip("Сколько игровых минут проходит за реальную секунду."), SerializeField, SteppedRange(-100f, 1000f, 5f)]
-        private float _timeScale = 1f;
+        [Tooltip("Сколько игровых минут проходит за реальную секунду."), SerializeField, SteppedRange(-50f, 100f, 5f)]
+        private float _timeScale = 5f;
+
+        /// <summary> Шаг времени. </summary>
+        public static float TimeScale { get; private set; }
+
+        /// <summary> Множитель скорости. </summary>
+        public static float MovementSpeedMultiplier { get; private set; } = 1f;
+
+        /// <summary> Сигнальная шина Zenject для отправки и получения событий. </summary>
+        private SignalBus _signalBus;
 
         /// <summary> Текущее игровое время. </summary>
         public static DateTime CurrentGameTime { get; private set; }
 
         /// <summary> Предыдущее время. </summary>
         private DateTime _previousTime;
-
-        /// <summary> Сигнальная шина Zenject для отправки и получения событий. </summary>
-        private SignalBus _signalBus;
 
         /// <summary> Обертка системы сохранений. </summary>
         private static SavingWrapper _savingWrapper;
@@ -71,6 +76,7 @@ namespace FlavorfulStory.TimeManagement
         /// <summary> Вызвать начальное обновление интерфейса. </summary>
         private void Start()
         {
+            TimeScale = _timeScale;
             OnTimeUpdated?.Invoke(CurrentGameTime);
             OnTimeTick?.Invoke(CurrentGameTime);
 
@@ -97,6 +103,9 @@ namespace FlavorfulStory.TimeManagement
         {
             if (IsPaused) return;
 
+            TimeScale = _timeScale;
+            MovementSpeedMultiplier = CalculateMovementSpeedMultiplier();
+
             _previousTime = CurrentGameTime;
             CurrentGameTime = CurrentGameTime.AddMinutes(Time.deltaTime * _timeScale);
 
@@ -121,6 +130,18 @@ namespace FlavorfulStory.TimeManagement
 
             if (previousHour != MidnightHour && currentHour == MidnightHour)
                 _signalBus.Fire(new MidnightStartedSignal());
+        }
+
+        /// <summary> Расчёт множителя скорости. </summary>
+        /// <returns> Вычисленное значение множителя скорости. </returns>
+        private float CalculateMovementSpeedMultiplier()
+        {
+            const float BaseScale = 5f;
+            const float MaxScale = 1000f;
+            const float MaxMultiplier = 10f;
+
+            float t = Mathf.InverseLerp(BaseScale, MaxScale, Mathf.Max(BaseScale, _timeScale));
+            return Mathf.Lerp(1f, MaxMultiplier, Mathf.Pow(t, 0.01f));
         }
 
         /// <summary> Обновить игровое время до начала следующего дня. </summary>
