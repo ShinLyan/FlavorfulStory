@@ -56,6 +56,7 @@ namespace FlavorfulStory.AI.NonInteractableNpc
             _despawnPoint = new NpcDestinationPoint();
         }
 
+        /// <summary> Выполняет полную инициализацию контроллера состояний. </summary>
         public override void Initialize()
         {
             base.Initialize();

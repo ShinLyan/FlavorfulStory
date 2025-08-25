@@ -1,6 +1,7 @@
 namespace FlavorfulStory.Shop
 {
-    public class Furniture : ShopObject //TODO: заглушка 
+    /// <summary> Мебель в магазине. </summary>
+    public class Furniture : ShopObject
     {
     }
 }

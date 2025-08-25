@@ -5,14 +5,13 @@ using UnityEngine;
 namespace FlavorfulStory.Shop
 {
     /// <summary> Базовый класс для объектов магазина с функциональностью занятости и доступными позициями. </summary>
-    public class ShopObject : MonoBehaviour
+    public abstract class ShopObject : MonoBehaviour
     {
         /// <summary> Массив доступных позиций для взаимодействия с объектом. </summary>
         [SerializeField] protected Transform[] _accessiblePositions;
 
         /// <summary> Анимация, которая будет включаться у объекта для НПС. </summary>
-        [field: SerializeField]
-        public AnimationType InteractableObjectAnimation { get; private set; }
+        [field: SerializeField] public AnimationType InteractableObjectAnimation { get; private set; }
 
         /// <summary> Указывает, занят ли объект в данный момент. </summary>
         public bool IsOccupied { get; set; }
@@ -46,11 +45,8 @@ namespace FlavorfulStory.Shop
                         Gizmos.DrawLine(transform.position, point.position);
             }
 
-            var style = new GUIStyle();
-            style.normal.textColor = IsOccupied ? occupiedColor : freeColor;
-            Handles.Label(transform.position + Vector3.up,
-                IsOccupied ? "Occupied" : "Free",
-                style);
+            var style = new GUIStyle { normal = { textColor = IsOccupied ? occupiedColor : freeColor } };
+            Handles.Label(transform.position + Vector3.up, IsOccupied ? "Occupied" : "Free", style);
         }
 
 #endif

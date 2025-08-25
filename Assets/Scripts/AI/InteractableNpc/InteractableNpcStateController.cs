@@ -17,8 +17,8 @@ namespace FlavorfulStory.AI.InteractableNpc
     /// управляющий переходами между различными состояниями персонажа. </summary>
     public sealed class InteractableNpcStateController : NpcStateController, ICharacterCollisionHandler
     {
-        /// <summary> Отсортированные параметры расписания для быстрого поиска подходящего. </summary>
-        private IEnumerable<NpcScheduleParams> _sortedScheduleParams;
+        /// <summary> Расписание NPC. </summary>
+        private readonly NpcSchedule _npcSchedule;
 
         /// <summary> Обработчик расписания NPC </summary>
         private readonly NpcScheduleHandler _scheduleHandler;
@@ -29,10 +29,11 @@ namespace FlavorfulStory.AI.InteractableNpc
         /// <summary> Контроллер игрока для взаимодействия. </summary>
         private readonly IPlayerPositionProvider _playerPositionProvider;
 
+        /// <summary> Отсортированные параметры расписания для быстрого поиска подходящего. </summary>
+        private IEnumerable<NpcScheduleParams> _sortedScheduleParams;
+
         /// <summary> Событие, вызываемое при изменении текущих параметров расписания. </summary>
         private event Action<NpcScheduleParams> OnCurrentScheduleParamsChanged;
-
-        private readonly NpcSchedule _npcSchedule;
 
         /// <summary> Инициализирует новый экземпляр контроллера состояний. </summary>
         /// <param name="npcSchedule"> Расписание NPC. </param>

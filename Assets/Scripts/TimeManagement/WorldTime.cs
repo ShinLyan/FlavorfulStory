@@ -42,7 +42,7 @@ namespace FlavorfulStory.TimeManagement
 
         /// <summary> Час начала нового дня. </summary>
         private const int DayStartHour = 6;
-        
+
         /// <summary> Вызывается при изменении игрового времени. </summary>
         public static Action<DateTime> OnTimeUpdated;
 

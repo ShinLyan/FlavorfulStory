@@ -37,7 +37,7 @@ namespace FlavorfulStory.AI
         private ObjectPool<NonInteractableNpc.NonInteractableNpc> _npcPool;
 
         /// <summary> Список активных NPC. </summary>
-        private readonly List<NonInteractableNpc.NonInteractableNpc> _activeCharacters = new();
+        private List<NonInteractableNpc.NonInteractableNpc> _activeCharacters;
 
         /// <summary> Счетчик тиков. </summary>
         private int _tickCounter;
@@ -74,6 +74,8 @@ namespace FlavorfulStory.AI
                 npc => npc.gameObject.SetActive(true),
                 npc => npc.gameObject.SetActive(false)
             );
+
+            _activeCharacters = new List<NonInteractableNpc.NonInteractableNpc>();
 
             WorldTime.OnDayEnded += HandleDayEnded;
             WorldTime.OnTimeTick += OnTimeTickHandler;
@@ -192,8 +194,7 @@ namespace FlavorfulStory.AI
             if (!npc || !npc.gameObject.activeInHierarchy) return;
 
             var shopEntryPointPosition = ((ShopLocation)_locationManager.GetLocationByName(LocationName.NewShop))
-                .EntryPoint
-                .position;
+                .EntryPoint.position;
             npc.SetDestination(new NpcDestinationPoint(shopEntryPointPosition, Quaternion.identity));
         }
 

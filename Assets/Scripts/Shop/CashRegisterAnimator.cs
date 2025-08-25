@@ -31,7 +31,7 @@ namespace FlavorfulStory.Shop
         {
             _cashRegister = GetComponent<CashRegister>();
             InitializeTextTransparency(0f);
-            
+
             _cashRegister.OnAmountChanged += UpdateAmountText;
             _cashRegister.OnAmountChanged += UpdateCoinState;
         }
@@ -97,16 +97,12 @@ namespace FlavorfulStory.Shop
                 _moneyAmountText.transform.localScale = Vector3.one * MinScaleValue;
 
                 _textFadeTween = _moneyAmountText.DOFade(1f, duration).SetEase(Ease.OutSine);
-                _textScaleTween = _moneyAmountText.transform
-                    .DOScale(1f, duration)
-                    .SetEase(Ease.OutBack);
+                _textScaleTween = _moneyAmountText.transform.DOScale(1f, duration).SetEase(Ease.OutBack);
             }
             else
             {
                 _textFadeTween = _moneyAmountText.DOFade(0f, duration).SetEase(Ease.InSine);
-                _textScaleTween = _moneyAmountText.transform
-                    .DOScale(MinScaleValue, duration)
-                    .SetEase(Ease.InBack)
+                _textScaleTween = _moneyAmountText.transform.DOScale(MinScaleValue, duration).SetEase(Ease.InBack)
                     .OnComplete(() => { _moneyAmountText.gameObject.SetActive(false); });
             }
         }

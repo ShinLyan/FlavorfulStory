@@ -14,31 +14,32 @@ namespace FlavorfulStory.Shop
     /// <summary> Локация магазина с функциональностью управления полками, мебелью и кассой. </summary>
     public class ShopLocation : Location
     {
+        /// <summary> Точка спавна Игрока после сна. </summary>
         [field: SerializeField] public Transform EntryPoint { get; private set; }
 
         /// <summary> Касса магазина для обслуживания покупателей. </summary>
-        [field: SerializeField]
-        public CashRegister CashRegister { get; private set; }
-
-        /// <summary> Массив полок в магазине. </summary>
-        private List<Showcase> Showcases => _placeableObjectProvider.GetObjectsOfType<Showcase>().ToList();
-
-        /// <summary> Массив мебели в магазине. </summary>
-        private List<Furniture> Furnitures => _placeableObjectProvider.GetObjectsOfType<Furniture>().ToList();
+        [field: SerializeField] public CashRegister CashRegister { get; private set; }
 
         /// <summary> Поверхность NavMesh для данной локации. </summary> 
         [SerializeField] private NavMeshSurface _navMeshSurface;
 
-        /// <summary> Провайдер для получения размещаемых объектов в локации магазина. </summary>
+        /// <summary> Провайдер размещенных объектов. </summary>
         private IPlaceableObjectProvider _placeableObjectProvider;
 
         /// <summary> Минимальное расстояние от объектов магазина при генерации случайных точек. </summary>
         private const float MinDistance = 3f;
 
+        /// <summary> Список полок в магазине. </summary>
+        private IEnumerable<Showcase> Showcases => _placeableObjectProvider.GetObjectsOfType<Showcase>();
+
+        /// <summary> Список мебели в магазине. </summary>
+        private IEnumerable<Furniture> Furnitures => _placeableObjectProvider.GetObjectsOfType<Furniture>();
+
+        /// <summary> Внедрение зависимостей Zenject. </summary>
+        /// <param name="placeableObjectProvider"> Провайдер размещенных объектов. </param>
         [Inject]
         private void Construct(IPlaceableObjectProvider placeableObjectProvider) =>
             _placeableObjectProvider = placeableObjectProvider;
-
 
         /// <summary> Возвращает случайную доступную мебель. </summary>
         /// <returns> Доступная мебель или null, если все мебель занята. </returns>
@@ -48,13 +49,13 @@ namespace FlavorfulStory.Shop
         /// <typeparam name="T"> Тип объекта, производный от ShopObject. </typeparam>
         /// <param name="objects"> Массив объектов магазина для фильтрации. </param>
         /// <returns> Массив доступных объектов. </returns>
-        private static List<T> GetAvailableObjects<T>(List<T> objects) where T : ShopObject
+        private static List<T> GetAvailableObjects<T>(IEnumerable<T> objects) where T : ShopObject
         {
             var availableObjects = new List<T>();
             foreach (var obj in objects)
                 if (!obj.IsOccupied)
                     availableObjects.Add(obj);
-            
+
             return availableObjects;
         }
 
@@ -105,12 +106,6 @@ namespace FlavorfulStory.Shop
         /// <returns> True, если вся мебель занята, иначе false. </returns>
         public bool HasAvailableFurniture() => GetAvailableObjects(Furnitures).Count > 0;
 
-        /// <summary> Проверяет, находится ли позиция на допустимом расстоянии от мебели и витрин. </summary>
-        private bool IsValidPosition(Vector3 position) =>
-            Showcases.All(showcase => Vector3.Distance(position, showcase.transform.position) >= MinDistance) &&
-            Furnitures.All(furniture => Vector3.Distance(position, furniture.transform.position) >= MinDistance) &&
-            Vector3.Distance(position, CashRegister.transform.position) >= MinDistance;
-
         /// <summary> Пытается найти случайную точку на NavMesh в пределах указанного числа попыток. </summary>
         private static bool TryGetRandomPoint(Bounds bounds, out Vector3 result, int maxAttempts = 20)
         {
@@ -152,5 +147,11 @@ namespace FlavorfulStory.Shop
 
             return null;
         }
+
+        /// <summary> Проверяет, находится ли позиция на допустимом расстоянии от мебели и витрин. </summary>
+        private bool IsValidPosition(Vector3 position) =>
+            Showcases.All(showcase => Vector3.Distance(position, showcase.transform.position) >= MinDistance) &&
+            Furnitures.All(furniture => Vector3.Distance(position, furniture.transform.position) >= MinDistance) &&
+            Vector3.Distance(position, CashRegister.transform.position) >= MinDistance;
     }
 }

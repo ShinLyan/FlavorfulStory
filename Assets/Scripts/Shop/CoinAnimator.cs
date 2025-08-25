@@ -8,11 +8,13 @@ namespace FlavorfulStory.Shop
     public class CoinAnimator : MonoBehaviour
     {
         /// <summary> Модель монетки. </summary>
-        [Header("Coin model")] [Tooltip("Coin model."), SerializeField]
+        [Header("Coin model")]
+        [Tooltip("Coin model."), SerializeField]
         private GameObject _coinModel;
 
         /// <summary> Амплитуда подпрыгивания. </summary>
-        [Header("Bounce settings")] [Tooltip("Амплитуда подпрыгивания монетки."), SerializeField]
+        [Header("Bounce settings")]
+        [Tooltip("Амплитуда подпрыгивания монетки."), SerializeField]
         private float _bounceAmplitude = 0.1f;
 
         /// <summary> Длительность прыжка. </summary>
@@ -60,27 +62,20 @@ namespace FlavorfulStory.Shop
             {
                 _coinModel.SetActive(true);
                 _coinModel.transform.localPosition = _defaultPosition;
-                
+
                 float rotationDuration = 360f / _rotationSpeed;
                 _rotationTween = _coinModel.transform
                     .DOLocalRotate(new Vector3(0f, 360f, 0f), rotationDuration, RotateMode.FastBeyond360)
-                    .SetEase(Ease.Linear)
-                    .SetLoops(-1, LoopType.Restart)
-                    .SetRelative();
-                
-                _bounceTween = _coinModel.transform
-                    .DOLocalMoveY(_defaultPosition.y + _bounceAmplitude, _bounceDuration)
-                    .SetEase(Ease.InOutSine)
-                    .SetLoops(-1, LoopType.Yoyo);
+                    .SetEase(Ease.Linear).SetLoops(-1, LoopType.Restart).SetRelative();
+
+                _bounceTween = _coinModel.transform.DOLocalMoveY(_defaultPosition.y + _bounceAmplitude, _bounceDuration)
+                    .SetEase(Ease.InOutSine).SetLoops(-1, LoopType.Yoyo);
 
                 await UniTask.Yield();
             }
             else
             {
-                _currentTween = _coinModel.transform
-                    .DOLocalMoveY(_defaultPosition.y, 0.2f)
-                    .SetEase(Ease.InOutSine);
-
+                _currentTween = _coinModel.transform.DOLocalMoveY(_defaultPosition.y, 0.2f).SetEase(Ease.InOutSine);
                 _coinModel.SetActive(false);
             }
         }

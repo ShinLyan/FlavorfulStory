@@ -47,7 +47,6 @@ namespace FlavorfulStory.AI.InteractableNpc
             _collisionHandler = new NpcCollisionHandler(_stateController);
         }
 
-
         /// <summary> Обрабатывает вход другого объекта в триггер коллизии NPC. </summary>
         /// <param name="other"> Коллайдер, вошедший в триггер. </param>
         private void OnTriggerEnter(Collider other) => _collisionHandler?.HandleTriggerEnter(other);
