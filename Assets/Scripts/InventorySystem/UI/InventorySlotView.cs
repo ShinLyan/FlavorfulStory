@@ -29,7 +29,7 @@ namespace FlavorfulStory.InventorySystem.UI
         /// <remarks> Если ограничения нет, то должно быть возвращено значение Int.MaxValue. </remarks>
         /// <param name="item"> Тип элемента, который потенциально может быть добавлен. </param>
         /// <returns> Возвращает максимально допустимое количество элементов. </returns>
-        public int GetMaxAcceptableItemsNumber(InventoryItem item) => _inventory.HasSpaceFor(item) ? int.MaxValue : 0;
+        public int GetMaxAcceptableItemsNumber(InventoryItem item) => _inventory.HasSpaceFor(item) ? item.StackSize : 0;
 
         /// <summary> Обновить UI и все данные для отображения добавления элемента в это место назначения. </summary>
         /// <param name="item">Тип элемента. </param>
