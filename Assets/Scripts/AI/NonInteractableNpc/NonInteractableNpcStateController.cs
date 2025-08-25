@@ -168,8 +168,10 @@ namespace FlavorfulStory.AI.NonInteractableNpc
 
             if (areShowcasesAvailable)
             {
-                availableOptions.Add((NpcStateName.BuyItemSequence, (float)(50 * 0.67)));
                 availableOptions.Add((NpcStateName.RefuseItemSequence, (float)(50 * 0.33)));
+
+                if (shopLocation.CashRegister.HasFreeAccessPoint())
+                    availableOptions.Add((NpcStateName.BuyItemSequence, (float)(50 * 0.67)));
             }
 
             if (areFurnitureAvailable) availableOptions.Add((NpcStateName.FurnitureSequence, 25f));

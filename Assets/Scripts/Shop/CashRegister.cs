@@ -73,6 +73,15 @@ namespace FlavorfulStory.Shop
             foreach (var key in keysToUpdate) _accessPointsAvailability[key] = isOccupied;
         }
 
+        /// <summary> Проверяет, есть ли хотя бы одна свободная точка доступа. </summary>
+        /// <returns> <c>true</c>, если есть хотя бы одна свободная точка, иначе <c>false</c>. </returns>
+        public bool HasFreeAccessPoint()
+        {
+            if (_accessPointsAvailability == null || _accessPointsAvailability.Count == 0) return false;
+
+            return _accessPointsAvailability.Any(pair => !pair.Value);
+        }
+
         #region ICurrencyStorage
 
         /// <summary> Текущее количество золота. </summary>
