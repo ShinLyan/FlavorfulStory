@@ -18,7 +18,7 @@ namespace FlavorfulStory.TimeManagement
         private readonly PlayerController _playerController;
 
         /// <summary> Позиция точки сна. </summary>
-        private readonly Vector3 _sleepTriggerPosition;
+        private readonly SleepTrigger _sleepTrigger;
 
         /// <summary> Менеджер локаций. </summary>
         private readonly LocationManager _locationManager;
@@ -29,18 +29,26 @@ namespace FlavorfulStory.TimeManagement
         /// <summary> Коллбэк завершения. </summary>
         private Action _onCompleteCallback;
 
+        /// <summary> Сервис, отвечающий за управление точками появления игрока. </summary>
+        private readonly PlayerSpawnService _playerSpawnService;
+
+        /// <summary> Сигнальная шина. </summary>
+        private readonly SignalBus _signalBus;
+
         /// <summary> Инициализирует менеджер окончания дня. </summary>
         /// <param name="summaryView"> Вью для отображения итогов дня. </param>
         /// <param name="playerController"> Контроллер игрока. </param>
-        /// <param name="sleepTrigger"> Триггер сна для определения позиции. </param>
         /// <param name="locationManager"> Менеджер управления локациями. </param>
-        public DayEndManager(SummaryView summaryView, PlayerController playerController, SleepTrigger sleepTrigger,
-            LocationManager locationManager)
+        /// <param name="playerSpawnService"> Сервис для спавна игрока. </param>
+        /// <param name="signalBus"> Сигнальная шина. </param>
+        public DayEndManager(SummaryView summaryView, PlayerController playerController,
+            LocationManager locationManager, PlayerSpawnService playerSpawnService, SignalBus signalBus)
         {
             _summaryView = summaryView;
             _playerController = playerController;
-            _sleepTriggerPosition = sleepTrigger.transform.position;
             _locationManager = locationManager;
+            _playerSpawnService = playerSpawnService;
+            _signalBus = signalBus;
         }
 
         /// <summary> Подписывается на события. </summary>
@@ -59,8 +67,7 @@ namespace FlavorfulStory.TimeManagement
             ProcessSleepAsync(onCompleteCallback, false).Forget();
 
         /// <summary> Обрабатывает принудительный сон при истощении. </summary>
-        private void ExhaustedSleep() =>
-            ProcessSleepAsync(null, true).Forget();
+        private void ExhaustedSleep() => ProcessSleepAsync(null, true).Forget();
 
         /// <summary> Выполняет процесс сна. </summary>
         /// <param name="onComplete"> Коллбэк завершения. </param>
@@ -70,11 +77,15 @@ namespace FlavorfulStory.TimeManagement
             if (_isProcessingSleep) return;
             _isProcessingSleep = true;
 
-            if (!isExhausted) WorldTime.BeginNewDay(6);
+            if (!isExhausted)
+                WorldTime.BeginNewDay(6);
+            else
+                _signalBus.Fire(new ExhaustedSleepSignal());
 
             await EndDayRoutine();
             _summaryView.HideWithAnimation().Forget();
-            await RestorePlayerState(_sleepTriggerPosition, isExhausted);
+
+            await RestorePlayerState(_playerSpawnService.GetSpawnPosition(), isExhausted);
 
             onComplete?.Invoke();
             _isProcessingSleep = false;

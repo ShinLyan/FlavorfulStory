@@ -85,7 +85,6 @@ namespace FlavorfulStory.Infrastructure.Installers
         /// <summary> Выполнить установку всех зависимостей, необходимых для сцены. </summary>
         public override void InstallBindings()
         {
-            SignalBusInstaller.Install(Container);
             DeclareSignals();
 
             BindBuildingRepair();
@@ -108,10 +107,11 @@ namespace FlavorfulStory.Infrastructure.Installers
         /// <summary> Объявить сигналы, используемые в сцене. </summary>
         private void DeclareSignals()
         {
-            Container.DeclareSignal<NightStartedSignal>();
+            Container.DeclareSignal<MidnightStartedSignal>();
             Container.DeclareSignal<ItemCollectedSignal>();
             Container.DeclareSignal<QuestAddedSignal>();
             Container.DeclareSignal<DismantleDeniedSignal>();
+            Container.DeclareSignal<ExhaustedSleepSignal>();
 
             Container.DeclareSignal<ToolbarSlotSelectedSignal>();
             Container.DeclareSignal<ToolbarHotkeyPressedSignal>();
@@ -186,10 +186,12 @@ namespace FlavorfulStory.Infrastructure.Installers
         /// <summary> Установить зависимости, связанные с системой уведомлений. </summary>
         private void BindNotifications()
         {
-            Container.BindInterfacesTo<SignalNotifier<NightStartedSignal>>().AsSingle();
+            Container.BindInterfacesTo<SignalNotifier<MidnightStartedSignal>>().AsSingle();
             Container.BindInterfacesTo<SignalNotifier<ItemCollectedSignal>>().AsSingle();
             Container.BindInterfacesTo<SignalNotifier<QuestAddedSignal>>().AsSingle();
             Container.BindInterfacesTo<SignalNotifier<DismantleDeniedSignal>>().AsSingle();
+            Container.BindInterfacesTo<SignalNotifier<SaveCompletedSignal>>().AsSingle();
+            Container.BindInterfacesTo<SignalNotifier<ExhaustedSleepSignal>>().AsSingle();
 
             Container.Bind<NotificationAnchorLocator>().FromComponentInHierarchy().AsSingle();
             Container.BindInterfacesAndSelfTo<NotificationService>().AsSingle();
@@ -201,6 +203,10 @@ namespace FlavorfulStory.Infrastructure.Installers
             Container.Bind<PlacementPreview>().FromComponentInHierarchy().AsSingle();
             Container.Bind<IPrefabFactory<PlaceableObject>>().To<Factories.PrefabFactory<PlaceableObject>>().AsSingle();
             Container.BindInterfacesAndSelfTo<PlacementController>().AsSingle().WithArguments(_placeableContainer);
+
+            var placeables = FindObjectsByType<PlaceableObject>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+            Container.Bind<IPlaceableObjectProvider>().To<PlaceableObjectProvider>().AsSingle()
+                .WithArguments(new List<PlaceableObject>(placeables));
         }
 
         /// <summary> Установить зависимости, связанные с игроком. </summary>
@@ -241,7 +247,7 @@ namespace FlavorfulStory.Infrastructure.Installers
         {
             Container.Bind<SummaryView>().FromComponentInHierarchy().AsSingle();
             Container.BindInterfacesAndSelfTo<DayEndManager>().AsSingle();
-            Container.Bind<SleepTrigger>().FromComponentInHierarchy().AsSingle();
+            Container.Bind<PlayerSpawnService>().AsSingle();
         }
 
         /// <summary> Установить зависимости, связанные с системой тултипов. </summary>
