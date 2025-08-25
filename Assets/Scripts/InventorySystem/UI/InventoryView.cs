@@ -22,6 +22,9 @@ namespace FlavorfulStory.InventorySystem.UI
         /// <summary> Контейнер для размещения отображений ячеек. </summary>
         private Transform _slotsContainer;
 
+        //TODO: Потому что нельзя биндить инвентарь игрока на всее инъекции инвентаря!!
+        [SerializeField] private bool _autoInitialize = true;
+        
         /// <summary> Внедрить зависимости: инвентарь и фабрику отображений ячеек. </summary>
         /// <param name="inventory"> Инвентарь игрока. </param>
         /// <param name="slotFactory"> Фабрика отображений ячеек. </param>
@@ -37,7 +40,10 @@ namespace FlavorfulStory.InventorySystem.UI
         {
             _slotsContainer = transform;
             CacheInitialSlots();
-            Initialize(_inventory);
+            
+            //TODO: Потому что нельзя биндить инвентарь игрока на всее инъекции инвентаря!!
+            if (_autoInitialize && _inventory != null)
+                Initialize(_inventory);
         }
 
         /// <summary> Сохранить существующие отображения ячеек, если они уже присутствуют в иерархии. </summary>
@@ -59,8 +65,13 @@ namespace FlavorfulStory.InventorySystem.UI
             if (_inventory) _inventory.InventoryUpdated -= UpdateView;
 
             _inventory = inventory;
-
             _inventory.InventoryUpdated += UpdateView;
+
+            //TODO: Удалить когда будет принят фикс из WindowsRework ветки
+            var trashSlot = GetComponentInChildren<TrashSlotView>();
+            if (trashSlot != null) trashSlot.Initialize(_inventory);
+            //
+            
             UpdateView();
         }
 

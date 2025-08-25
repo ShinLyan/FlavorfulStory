@@ -29,7 +29,7 @@ namespace FlavorfulStory.InventorySystem.DropSystem
         /// <param name="item"> Тип элемента, который потенциально может быть добавлен. </param>
         /// <returns> Максимально допустимое количество элементов. </returns>
         /// <remarks> Если ограничений нет, метод должен возвращать значение <c>Int.MaxValue</c>. </remarks>
-        public int GetMaxAcceptableItemsNumber(InventoryItem item) => int.MaxValue;
+        public int GetMaxAcceptableItemsNumber(InventoryItem item) => item.StackSize;
 
         /// <summary> Добавить элементы в это место назначения с обновлением UI и данных. </summary>
         /// <param name="item"> Тип добавляемого элемента. </param>

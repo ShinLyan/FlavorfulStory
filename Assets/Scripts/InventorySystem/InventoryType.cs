@@ -10,6 +10,9 @@
         Chest,
 
         /// <summary> Прилавок магазина. </summary>
-        Showcase
+        Showcase,
+        
+        /// <summary> Мусорная корзиина. </summary>
+        Trashbin,
     }
 }
