@@ -1,12 +1,12 @@
-﻿using UnityEngine;
-using Zenject;
-using FlavorfulStory.Actions;
+﻿using FlavorfulStory.Actions;
 using FlavorfulStory.Infrastructure.Services.WindowService;
 using FlavorfulStory.InteractionSystem;
 using FlavorfulStory.InventorySystem.UI;
 using FlavorfulStory.PlacementSystem;
 using FlavorfulStory.Player;
 using FlavorfulStory.TooltipSystem.ActionTooltips;
+using UnityEngine;
+using Zenject;
 
 namespace FlavorfulStory.InventorySystem
 {
@@ -15,14 +15,14 @@ namespace FlavorfulStory.InventorySystem
     public class InventoryContainer : MonoBehaviour, IInteractable, ICanBeDismantled
     {
         /// <summary> Провайдер инвентарей. </summary>
-        private PlayerController _playerController;
-        
-        /// <summary> Провайдер инвентарей. </summary>
         private IInventoryProvider _inventoryProvider;
+
+        /// <summary> Провайдер инвентарей. </summary>
+        private PlayerController _playerController;
 
         /// <summary> Сервис окон. </summary>
         private IWindowService _windowService;
-        
+
         /// <summary> Инвентарь сундука. </summary>
         private Inventory _inventory;
 
@@ -31,9 +31,7 @@ namespace FlavorfulStory.InventorySystem
         /// <param name="playerController"> Контроллер игрока. </param>
         /// <param name="windowService"> Сервис окон. </param>
         [Inject]
-        private void Construct(
-            IInventoryProvider inventoryProvider,
-            PlayerController playerController,
+        private void Construct(IInventoryProvider inventoryProvider, PlayerController playerController,
             IWindowService windowService)
         {
             _inventoryProvider = inventoryProvider;
@@ -45,8 +43,12 @@ namespace FlavorfulStory.InventorySystem
         /// <remarks> Получение ссылки на инвентарь сундука. </remarks>
         private void Awake() => _inventory = GetComponent<Inventory>();
 
+        /// <summary>
+        /// 
+        /// </summary>
         private void Start() =>
             _windowService.GetWindow<InventoryExchangeWindow>().Closed += () => _playerController.SetBusyState(false);
+        // TODO: Вынести в `InventoryExchangeWindow`
 
         #region IInteractable
 
@@ -64,11 +66,13 @@ namespace FlavorfulStory.InventorySystem
         public void BeginInteraction(PlayerController player)
         {
             player.SetBusyState(true);
-            _windowService.GetWindow<InventoryExchangeWindow>().Setup(_inventory, _inventoryProvider.GetPlayerInventory());
+            _windowService.GetWindow<InventoryExchangeWindow>()
+                .Setup(_inventory, _inventoryProvider.GetPlayerInventory());
             _windowService.OpenWindow<InventoryExchangeWindow>();
         }
 
         /// <summary> Завершить взаимодействие. </summary>
+        /// <param name="player"> Контроллер игрока. </param>
         public void EndInteraction(PlayerController player) { }
 
         #endregion

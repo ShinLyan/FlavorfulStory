@@ -9,15 +9,20 @@ namespace FlavorfulStory.UI.Windows
     {
         /// <summary> Открыто ли окно в данный момент. </summary>
         public bool IsOpened { get; private set; }
-        
+
         /// <summary> Событие: окно было открыто. </summary>
         public event Action Opened;
+
         /// <summary> Событие: окно было закрыто. </summary>
         public event Action Closed;
 
         /// <summary> Опциональный гейт, управляющий порядком открытия окон. </summary>
-        [InjectOptional] private IWindowOpenGate _openGate;
-        
+        private IWindowOpenGate _windowOpenGate;
+
+        /// <summary> Внедрение зависимостей Zenject. </summary>
+        /// <param name="windowOpenGate"> Опциональный гейт, управляющий порядком открытия окон. </param>
+        private void Construct([InjectOptional] IWindowOpenGate windowOpenGate) => _windowOpenGate = windowOpenGate;
+
         /// <summary> Открывает окно. Учитывает гейт открытия, если установлен. </summary>
         public void Open()
         {
@@ -27,9 +32,9 @@ namespace FlavorfulStory.UI.Windows
                 return;
             }
 
-            if (_openGate != null)
+            if (_windowOpenGate != null)
             {
-                _openGate.RequestOpen(this, DoOpenImmediate);
+                _windowOpenGate.RequestOpen(this, DoOpenImmediate);
                 return;
             }
 
@@ -45,7 +50,6 @@ namespace FlavorfulStory.UI.Windows
             IsOpened = false;
             Closed?.Invoke();
             OnClosed();
-            
         }
 
         /// <summary> Мгновенное открытие окна (в обход гейта). </summary>
@@ -57,10 +61,11 @@ namespace FlavorfulStory.UI.Windows
             Opened?.Invoke();
             OnOpened();
         }
-        
-        /// <summary> Вызывается при открытии окна. Переопределяется в потомках. </summary>
+
+        /// <summary> Вызывается при открытии окна. </summary>
         protected virtual void OnOpened() { }
-        /// <summary> Вызывается при закрытии окна. Переопределяется в потомках. </summary>
+
+        /// <summary> Вызывается при закрытии окна. </summary>
         protected virtual void OnClosed() { }
 
         /// <summary> Включает или выключает GameObject окна. Не влияет на IsOpened. </summary>

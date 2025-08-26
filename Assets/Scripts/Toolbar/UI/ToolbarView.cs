@@ -1,7 +1,7 @@
-using UnityEngine;
-using Zenject;
 using FlavorfulStory.InventorySystem;
 using FlavorfulStory.Saving;
+using UnityEngine;
+using Zenject;
 using InputWrapper = FlavorfulStory.InputSystem.InputWrapper;
 
 namespace FlavorfulStory.Toolbar.UI
@@ -14,8 +14,8 @@ namespace FlavorfulStory.Toolbar.UI
         /// <summary> Шина сигналов для оповещения других компонентов. </summary>
         private SignalBus _signalBus;
 
-        /// <summary> Провайдер окон. </summary>
-        [Inject] private readonly IInventoryProvider _inventoryProvider;
+        /// <summary> Провайдер инвентарей. </summary>
+        private IInventoryProvider _inventoryProvider;
 
         /// <summary> Массив слотов панели инструментов. </summary>
         private ToolbarSlotView[] _slots;
@@ -25,15 +25,20 @@ namespace FlavorfulStory.Toolbar.UI
 
         /// <summary> Можно ли взаимодействовать? </summary>
         public bool IsInteractable { get; set; }
-        
+
         /// <summary> Выбранный предмет. </summary>
         public InventoryItem SelectedItem => _slots[SelectedItemIndex].GetItem();
 
         /// <summary> Внедрение зависимостей Zenject. </summary>
         /// <param name="signalBus"> Сигнальная шина Zenject. </param>
+        /// <param name="inventoryProvider"> Провайдер инвентарей. </param>
         [Inject]
-        private void Construct(SignalBus signalBus) => _signalBus = signalBus;
-        
+        private void Construct(SignalBus signalBus, IInventoryProvider inventoryProvider)
+        {
+            _signalBus = signalBus;
+            _inventoryProvider = inventoryProvider;
+        }
+
         /// <summary> Подписка на события слотов панели. </summary>
         private void Awake()
         {
@@ -42,6 +47,7 @@ namespace FlavorfulStory.Toolbar.UI
 
             _slots = GetComponentsInChildren<ToolbarSlotView>();
         }
+
         /// <summary> Обрабатывает сигнал нажатия горячей клавиши тулбара. </summary>
         /// <param name="signal"> Сигнал с индексом выбранного слота. </param>
         private void OnHotkeyPressed(ToolbarHotkeyPressedSignal signal) => SelectItem(signal.SlotIndex);
@@ -61,9 +67,9 @@ namespace FlavorfulStory.Toolbar.UI
         {
             foreach (var slot in _slots) slot.OnSlotClicked += SelectItem;
             _inventoryProvider.GetPlayerInventory().InventoryUpdated += RedrawToolbar;
-            
+
             IsInteractable = true;
-            
+
             ResetToolbar();
             RedrawToolbar();
             _slots[SelectedItemIndex].Select();

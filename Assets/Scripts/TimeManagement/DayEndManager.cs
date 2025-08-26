@@ -4,7 +4,6 @@ using FlavorfulStory.Infrastructure.Services.WindowService;
 using FlavorfulStory.Player;
 using FlavorfulStory.SceneManagement;
 using FlavorfulStory.TimeManagement.UI;
-using UnityEngine;
 using Zenject;
 
 namespace FlavorfulStory.TimeManagement
@@ -71,7 +70,7 @@ namespace FlavorfulStory.TimeManagement
 
         private void RestorePlayer(bool isExhausted)
         {
-            Vector3 spawnPosition = _playerSpawnService.GetSpawnPosition();
+            var spawnPosition = _playerSpawnService.GetSpawnPosition();
 
             _playerController.RestoreStatsAfterSleep(isExhausted);
             _playerController.SetPosition(spawnPosition);
@@ -81,8 +80,6 @@ namespace FlavorfulStory.TimeManagement
         private async UniTask ShowSummaryWindowAsync()
         {
             var window = _windowService.GetWindow<SummaryWindow>();
-            if (window == null) return;
-
             window.SetSummary(SummaryWindow.DefaultSummaryText);
             _windowService.OpenWindow<SummaryWindow>();
 

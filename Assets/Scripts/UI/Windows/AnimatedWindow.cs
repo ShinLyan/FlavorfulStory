@@ -1,11 +1,27 @@
 ﻿using Cysharp.Threading.Tasks;
-using UnityEngine;
 using DG.Tweening;
+using UnityEngine;
 
 namespace FlavorfulStory.UI.Windows
 {
     /// <summary> Направление анимации появления окна. </summary>
-    public enum PanelAnimationDirection { Top, Bottom, Left, Right, Center }
+    public enum PanelAnimationDirection
+    {
+        /// <summary> Направление появления окна сверху. </summary>
+        Top,
+
+        /// <summary> Направление появления окна снизу. </summary>
+        Bottom,
+
+        /// <summary> Направление появления окна слева. </summary>
+        Left,
+
+        /// <summary> Направление появления окна справа. </summary>
+        Right,
+
+        /// <summary> Появление окна из центра с масштабированием. </summary>
+        Center
+    }
 
     /// <summary> Окно с анимацией появления и исчезновения (скрытие за экран / масштаб / fade). </summary>
     public class AnimatedWindow : BaseWindow
@@ -13,31 +29,38 @@ namespace FlavorfulStory.UI.Windows
         /// <summary> Контейнер UI-элемента, который будет анимироваться. </summary>
         [Header("Animation Settings")]
         [SerializeField] private RectTransform _container;
+
         /// <summary> CanvasGroup для управления прозрачностью и блокировкой ввода. </summary>
         [SerializeField] private CanvasGroup _canvasGroup;
+
         /// <summary> Длительность анимации появления/исчезновения. </summary>
         [SerializeField] private float _animationDuration;
+
         /// <summary> Кривая анимации (easing). </summary>
         [SerializeField] private Ease _animationEase;
+
         /// <summary> Направление появления окна. </summary>
         [SerializeField] private PanelAnimationDirection _direction;
 
         /// <summary> Расчитанная позиция за экраном, откуда появляется окно. </summary>
         private Vector2 _offscreenPosition;
+
         /// <summary> Исходная позиция контейнера в пространстве родителя. </summary>
         private Vector2 _initialAnchoredPos;
+
         /// <summary> Флаг, предотвращающий повторные анимации. </summary>
         private bool _isAnimating;
+
         /// <summary> Открывается ли окно впервые. </summary>
         private bool _isFirstOpen = true;
-        
+
         /// <summary> Обработчик события открытия — запускает анимацию появления. </summary>
         protected override void OnOpened() => AnimateOpenAsync().Forget();
 
         /// <summary> Асинхронная анимация появления окна. </summary>
         private async UniTaskVoid AnimateOpenAsync()
         {
-            if (_container == null || _canvasGroup == null)
+            if (!_container || !_canvasGroup)
             {
                 Debug.LogError($"[AnimatedWindow] Missing _container or _canvasGroup on {gameObject.name}");
                 return;
@@ -66,7 +89,7 @@ namespace FlavorfulStory.UI.Windows
             _isAnimating = false;
             BlockRaycasts(false);
         }
-        
+
         /// <summary> Переопределение закрытия — запускает анимацию закрытия. </summary>
         public override void Close()
         {
@@ -90,14 +113,14 @@ namespace FlavorfulStory.UI.Windows
             base.Close();
             _isAnimating = false;
         }
-        
+
         /// <summary> Вызывается при закрытии окна через базовый метод. </summary>
         protected override void OnClosed() => AnimateCloseOnClosedAsync().Forget();
 
         /// <summary> Анимация закрытия, если окно закрыто через WindowService. </summary>
         private async UniTaskVoid AnimateCloseOnClosedAsync()
         {
-            if (_isAnimating || _container == null || _canvasGroup == null) return;
+            if (_isAnimating || !_container || !_canvasGroup) return;
 
             _isAnimating = true;
             BlockRaycasts(true);
@@ -112,25 +135,29 @@ namespace FlavorfulStory.UI.Windows
             _isAnimating = false;
             BlockRaycasts(false);
         }
-        
+
         /// <summary> Рассчитывает позицию окна за экраном в зависимости от направления. </summary>
         private void SetOffscreenPosition()
         {
             var rect = _container.rect;
-            var screenSize = ((RectTransform) _container.parent).rect.size;
+            var screenSize = ((RectTransform)_container.parent).rect.size;
 
             _offscreenPosition = _initialAnchoredPos;
 
             switch (_direction)
             {
                 case PanelAnimationDirection.Top:
-                    _offscreenPosition.y = screenSize.y + rect.height; break;
+                    _offscreenPosition.y = screenSize.y + rect.height;
+                    break;
                 case PanelAnimationDirection.Bottom:
-                    _offscreenPosition.y = -screenSize.y - rect.height; break;
+                    _offscreenPosition.y = -screenSize.y - rect.height;
+                    break;
                 case PanelAnimationDirection.Left:
-                    _offscreenPosition.x = -screenSize.x - rect.width; break;
+                    _offscreenPosition.x = -screenSize.x - rect.width;
+                    break;
                 case PanelAnimationDirection.Right:
-                    _offscreenPosition.x = screenSize.x + rect.width; break;
+                    _offscreenPosition.x = screenSize.x + rect.width;
+                    break;
                 case PanelAnimationDirection.Center:
                     break;
             }

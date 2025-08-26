@@ -1,38 +1,30 @@
-﻿using FlavorfulStory.UI.Windows;
+﻿using System.Collections.Generic;
+using FlavorfulStory.UI.Windows;
 using UnityEngine;
 using UnityEngine.UI;
-using Zenject;
 
 namespace FlavorfulStory.InventorySystem.UI
 {
     /// <summary> Окно обмена между двумя инвентарями (игрок и хранилище). </summary>
     public class InventoryExchangeWindow : BaseWindow
     {
-        /// <summary> View для отображения второго инвентаря. </summary>
-        [SerializeField] private InventoryView _secondInventoryView;
+        /// <summary> Отображение инвентаря сундука. </summary>
+        [SerializeField] private InventoryView _chestInventoryView;
 
-        /// <summary> View для отображения первого инвентаря. </summary>
-        [SerializeField] private InventoryView _firstInventoryView;
+        /// <summary> Отображение инвентаря игрока. </summary>
+        [SerializeField] private InventoryView _playerInventoryView;
 
         /// <summary> Кнопка "Add to Existing" — переносит стакающиеся предметы. </summary>
         [SerializeField] private Button _addToExistingButton;
 
         /// <summary> Кнопка "Add to Existing" — переносит стакающиеся предметы. </summary>
         [SerializeField] private Button _closeButton;
-        
-        /// <summary> Второй инвентарь . </summary>
-        private Inventory _secondInventory;
 
         /// <summary> Первый инвентарь. </summary>
-        private Inventory _firstInventory;
+        private Inventory _chestInventory;
 
-        /// <summary> Сервис для передачи предметов между инвентарями. </summary>
-        private InventoryTransferService _transferService;
-
-        /// <summary> Внедрение зависимостей Zenject. </summary>
-        /// <param name="transferService"> Сервис передачи предметов между инвентарями. </param>
-        [Inject]
-        private void Construct(InventoryTransferService transferService) => _transferService = transferService;
+        /// <summary> Второй инвентарь. </summary>
+        private Inventory _playerInventory;
 
         /// <summary> Подписывает обработчик на кнопку переноса предметов. </summary>
         private void Awake()
@@ -49,67 +41,55 @@ namespace FlavorfulStory.InventorySystem.UI
         }
 
         /// <summary> Инициализирует окно двумя инвентарями и обновляет UI. </summary>
-        public void Setup(Inventory secondInventory, Inventory firstInventory)
+        public void Setup(Inventory chestInventory, Inventory playerInventory)
         {
-            _secondInventory = secondInventory;
-            _firstInventory = firstInventory;
+            _chestInventory = chestInventory;
+            _playerInventory = playerInventory;
 
-            _secondInventoryView.Initialize(secondInventory);
-            _firstInventoryView.Initialize(firstInventory);
-
-            _secondInventory.InventoryUpdated += UpdateAddToExistingButton;
-            _firstInventory.InventoryUpdated += UpdateAddToExistingButton;
-
-            _addToExistingButton.interactable = CheckForDuplicates();
+            _chestInventoryView.Initialize(_chestInventory);
+            _playerInventoryView.Initialize(_playerInventory);
         }
 
         /// <summary> Обработка закрытия окна. Очищает ссылки и снимает подписки. </summary>
         protected override void OnClosed()
         {
-            base.OnClosed();
-
-            _secondInventory.InventoryUpdated -= UpdateAddToExistingButton;
-            _firstInventory.InventoryUpdated -= UpdateAddToExistingButton;
-            
-            _secondInventory = null;
-            _firstInventory = null;
+            _playerInventory = null;
+            _chestInventory = null;
         }
 
         /// <summary> Обрабатывает нажатие на кнопку "Add to Existing". </summary>
         /// <remarks> Переносит стакающиеся предметы из инвентаря игрока во второй инвентарь. </remarks>
-        private void OnAddToExistingClicked()
+        private void OnAddToExistingClicked() // TODO: ТУТ БАГА С АНИМКОЙ И ЕЩЕ ЧЕМ-то
         {
-            var stackables = _transferService.GetStackablesToTransfer(_firstInventory, _secondInventory);
+            var stackables = GetStackablesToTransfer();
             foreach ((int slotIndex, var stack) in stackables)
             {
-                _firstInventoryView.AnimateRemoveAt(slotIndex,
-                    () => { _firstInventory.RemoveFromSlot(slotIndex, stack.Number); });
-                _secondInventoryView.AnimateAdd(stack.Item);
+                _playerInventoryView.AnimateRemoveAt(slotIndex,
+                    () => _playerInventory.RemoveFromSlot(slotIndex, stack.Number));
+                _chestInventoryView.AnimateAdd(stack.Item);
             }
         }
 
-        /// <summary> Обновляет активность кнопки "Add to Existing". </summary>
-        private void UpdateAddToExistingButton() => _addToExistingButton.interactable = CheckForDuplicates();
-
-        /// <summary> Проверяет наличие стакающихся предметов, которые можно перенести. </summary>
-        private bool CheckForDuplicates()
+        /// <summary> Получить список предметов, которые можно перенести из инвентаря игрока в сундук. </summary>
+        /// <returns> Список пар (индекс слота, предмет), которые были успешно добавлены. </returns>
+        private List<(int SlotIndex, ItemStack Stack)> GetStackablesToTransfer()
         {
-            if (_firstInventory == null || _secondInventory == null) 
-                return false;
-
-            for (int i = 0; i < _firstInventory.InventorySize; i++)
+            var result = new List<(int, ItemStack)>();
+            for (int i = 0; i < _playerInventory.InventorySize; i++)
             {
-                var stack = _firstInventory.GetItemStackInSlot(i);
-                var item = stack.Item;
-                
-                if (!item || !item.IsStackable || stack.Number <= 0)
+                var itemStack = _playerInventory.GetItemStackInSlot(i);
+                var item = itemStack.Item;
+                int number = itemStack.Number;
+
+                if (!item || !item.IsStackable || itemStack.Number <= 0 || !_chestInventory.HasItem(item) ||
+                    !_chestInventory.HasSpaceFor(item))
                     continue;
-                
-                if (_secondInventory.HasItem(item) && _secondInventory.HasSpaceFor(item))
-                    return true;
+
+                if (_chestInventory.TryAddToFirstAvailableSlot(item, number)) result.Add((i, itemStack));
+                // TODO: У тебя метод называется Get - а ты еще тут добавляешь в слоты. Вытаскивай отсюда
             }
-            
-            return false;
+
+            return result;
         }
     }
 }

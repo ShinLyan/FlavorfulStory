@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 using FlavorfulStory.Infrastructure.Factories.Window;
 using FlavorfulStory.InputSystem;
 using FlavorfulStory.TimeManagement;
 using FlavorfulStory.UI.Windows;
+using UnityEngine;
 
 namespace FlavorfulStory.Infrastructure.Services.WindowService
 {
@@ -14,8 +14,10 @@ namespace FlavorfulStory.Infrastructure.Services.WindowService
     {
         /// <summary> Фабрика UI-окон. </summary>
         private readonly IWindowFactory _windowFactory;
+
         /// <summary> Зарегистрированные окна (по типу). </summary>
         private readonly Dictionary<Type, BaseWindow> _windows = new();
+
         /// <summary> Список открытых окон в порядке их открытия. </summary>
         private readonly List<BaseWindow> _openedWindows = new();
 
@@ -24,13 +26,14 @@ namespace FlavorfulStory.Infrastructure.Services.WindowService
 
         /// <summary> Событие: окно открылось. </summary>
         public event Action<BaseWindow> OnWindowOpened;
+
         /// <summary> Событие: окно закрылось. </summary>
         public event Action<BaseWindow> OnWindowClosed;
 
         /// <summary> Инъекция зависимостей. </summary>
         /// <param name="windowFactory"> Фабрика окон. </param>
         public WindowService(IWindowFactory windowFactory) => _windowFactory = windowFactory;
-        
+
         /// <summary> Проверяет, открыто ли окно указанного типа. </summary>
         public bool IsOpened<TWindow>() where TWindow : BaseWindow
         {
@@ -43,7 +46,7 @@ namespace FlavorfulStory.Infrastructure.Services.WindowService
         {
             var window = GetWindow<TWindow>();
             if (!window) return null;
-            
+
             if (window.IsOpened)
             {
                 _openedWindows.Remove(window);
@@ -63,7 +66,7 @@ namespace FlavorfulStory.Infrastructure.Services.WindowService
         {
             var window = GetWindow<TWindow>();
             if (!window) return;
-            
+
             window.Close();
         }
 
@@ -71,23 +74,22 @@ namespace FlavorfulStory.Infrastructure.Services.WindowService
         public void CloseTopWindow()
         {
             if (_openedWindows.Count == 0) return;
-    
+
             var top = _openedWindows.Last();
             top.Close();
         }
-        
+
         /// <summary> Закрывает все открытые окна. </summary>
         public void CloseAllWindows()
         {
             var snapshot = _openedWindows.ToArray();
             foreach (var window in snapshot) window.Close();
         }
-        
+
         /// <summary> Возвращает окно по типу. Создает, если ещё не зарегистрировано. </summary>
         public TWindow GetWindow<TWindow>() where TWindow : BaseWindow
         {
-            if (_windows.TryGetValue(typeof(TWindow), out var baseWindow))
-                return baseWindow as TWindow;
+            if (_windows.TryGetValue(typeof(TWindow), out var baseWindow)) return baseWindow as TWindow;
 
             var window = _windowFactory.CreateWindow<TWindow>();
             if (!window) return null;
@@ -115,6 +117,7 @@ namespace FlavorfulStory.Infrastructure.Services.WindowService
                     InputWrapper.BlockAllInput();
                     InputWrapper.UnblockInput(InputButton.SwitchGameMenu);
                 }
+
                 _openedWindows.Remove(window);
                 _openedWindows.Add(window);
                 OnWindowOpened?.Invoke(window);
@@ -128,6 +131,7 @@ namespace FlavorfulStory.Infrastructure.Services.WindowService
                     WorldTime.Unpause();
                     InputWrapper.UnblockAllInput();
                 }
+
                 OnWindowClosed?.Invoke(window);
             };
         }

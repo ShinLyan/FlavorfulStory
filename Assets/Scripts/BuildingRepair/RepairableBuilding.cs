@@ -37,13 +37,13 @@ namespace FlavorfulStory.BuildingRepair
 
         /// <summary> Завершен ли ремонт здания? </summary>
         private bool _isRepairCompleted;
-        
-        /// <summary> Провайдер окон. </summary>
-        private IInventoryProvider _inventoryProvider;
 
         /// <summary> Сервис окон. </summary>
         private IWindowService _windowService;
-        
+
+        /// <summary> Провайдер окон. </summary>
+        private IInventoryProvider _inventoryProvider;
+
         /// <summary> Текущая стадия ремонта. </summary>
         private RepairStage CurrentStage => _buildingData.Stages[_repairStageIndex];
 
@@ -63,7 +63,7 @@ namespace FlavorfulStory.BuildingRepair
         {
             _windowService = windowService;
             _inventoryProvider = inventoryProvider;
-        } 
+        }
 
         /// <summary> Инициализация компонента. </summary>
         private void Awake() => _objectSwitcher = GetComponent<ObjectSwitcher>();
@@ -72,9 +72,10 @@ namespace FlavorfulStory.BuildingRepair
         private void Start()
         {
             _investedResources = CurrentStage.Requirements.Select(_ => 0).ToList();
-            
+
             _objectSwitcher.Initialize();
-            _objectSwitcher.SwitchTo(GetVisualStageIndex());
+            _objectSwitcher.SwitchTo(_isRepairCompleted ? _repairStageIndex + 1 : _repairStageIndex);
+            // TODO: FIX SAVING
         }
 
         #region IInteractable
@@ -171,35 +172,43 @@ namespace FlavorfulStory.BuildingRepair
             _onStageUpdated?.Invoke(CurrentStage, _investedResources);
         }
 
-        private int FindRequirementIndex(InventoryItem item) => 
+        /// <summary> Найти индекс ресурса. </summary>
+        /// <param name="item"> Ресурс для поиска. </param>
+        /// <returns> Индекс ресурса. </returns>
+        private int FindRequirementIndex(InventoryItem item) =>
             CurrentStage.Requirements.FindIndex(itemStack => itemStack.Item.ItemID == item.ItemID);
-        
-        private int GetVisualStageIndex() => _isRepairCompleted ? _repairStageIndex + 1 : _repairStageIndex;
-        
+
         #region Saving
 
         /// <summary> Структура для сохранения состояния объекта ремонта. </summary>
         [Serializable]
-        private struct RepairableBuildingRecord
+        private readonly struct RepairableBuildingRecord
         {
             /// <summary> Индекс текущей стадии ремонта. </summary>
-            public int StageIndex;
+            public int StageIndex { get; }
 
             /// <summary> Завершён ли ремонт? </summary>
-            public bool IsRepairCompleted;
+            public bool IsRepairCompleted { get; }
 
             /// <summary> Количество вложенных ресурсов для текущей стадии ремонта. </summary>
-            public List<int> InvestedResources;
+            public List<int> InvestedResources { get; }
+
+            /// <summary> Конструктор с параметрами. </summary>
+            /// <param name="stageIndex"> Индекс текущей стадии ремонта. </param>
+            /// <param name="isRepairCompleted"> Завершён ли ремонт? </param>
+            /// <param name="investedResources"> Количество вложенных ресурсов для текущей стадии ремонта. </param>
+            public RepairableBuildingRecord(int stageIndex, bool isRepairCompleted, List<int> investedResources)
+            {
+                StageIndex = stageIndex;
+                IsRepairCompleted = isRepairCompleted;
+                InvestedResources = investedResources;
+            }
         }
 
         /// <summary> Сохранить состояние объекта для дальнейшего восстановления. </summary>
         /// <returns> Объект состояния для последующего восстановления. </returns>
-        public object CaptureState() => new RepairableBuildingRecord
-        {
-            StageIndex = _repairStageIndex,
-            IsRepairCompleted = _isRepairCompleted,
-            InvestedResources = _investedResources
-        };
+        public object CaptureState() => new RepairableBuildingRecord(_repairStageIndex,
+            _isRepairCompleted, _investedResources);
 
         /// <summary> Восстановить состояние объекта из сохранённого состояния. </summary>
         /// <param name="state"> Сохраненное состояние для восстановления. </param>

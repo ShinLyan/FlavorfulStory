@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
-using FlavorfulStory.Infrastructure.Adresses;
+using FlavorfulStory.Infrastructure.Addresses;
 using FlavorfulStory.UI.Windows;
 using UnityEngine;
 using Zenject;
+using Object = UnityEngine.Object;
 
 namespace FlavorfulStory.Infrastructure.Factories.Window
 {
@@ -13,17 +14,19 @@ namespace FlavorfulStory.Infrastructure.Factories.Window
     {
         /// <summary> Канвас, в котором будут появляться окна. </summary>
         private readonly Canvas _canvas;
+
         /// <summary> ScriptableObject с адресами всех окон. </summary>
-        private readonly WindowAdresses _windows;
+        private readonly WindowAddresses _windows;
+
         /// <summary> DI-контейнер Zenject для внедрения зависимостей. </summary>
         private readonly DiContainer _container;
 
         /// <summary> Словарь соответствий: тип окна → его префаб. </summary>
         private readonly Dictionary<Type, BaseWindow> _prefabByType = new();
-        
+
         /// <summary> Родитель для всех окон. </summary>
         private Transform _spawnRoot;
-        
+
         /// <summary> Флаг, указывающий, что фабрика уже была прогрета. </summary>
         private bool _isWarmedUp;
 
@@ -31,7 +34,7 @@ namespace FlavorfulStory.Infrastructure.Factories.Window
         /// <param name="canvas"> Канвас, куда будут спавниться окна. </param>
         /// <param name="windows"> Адреса префабов окон. </param>
         /// <param name="container"> Контейнер Zenject для внедрения зависимостей. </param>
-        public WindowFactory(Canvas canvas, WindowAdresses windows, DiContainer container)
+        public WindowFactory(Canvas canvas, WindowAddresses windows, DiContainer container)
         {
             _canvas = canvas;
             _windows = windows;
@@ -74,18 +77,17 @@ namespace FlavorfulStory.Infrastructure.Factories.Window
                 return null;
             }
 
-            var instance = UnityEngine.Object.Instantiate(prefab.gameObject, _spawnRoot);
+            var instance = Object.Instantiate(prefab.gameObject, _spawnRoot);
             instance.SetActive(false);
 
             _container.InjectGameObject(instance);
 
-            foreach (var init in instance.GetComponentsInChildren<IInitializable>(true))
-                init.Initialize();
+            foreach (var init in instance.GetComponentsInChildren<IInitializable>(true)) init.Initialize();
 
             instance.SetActive(true);
             return instance.GetComponent<T>();
         }
-        
+
         /// <summary> Возвращает все окна из ScriptableObject с адресами. </summary>
         private IEnumerable<BaseWindow> EnumerateAllPrefabs()
         {
@@ -93,7 +95,7 @@ namespace FlavorfulStory.Infrastructure.Factories.Window
             if (_windows.SummaryWindow) yield return _windows.SummaryWindow;
             if (_windows.RepairableBuildingWindow) yield return _windows.RepairableBuildingWindow;
             if (_windows.InventoryExchangeWindow) yield return _windows.InventoryExchangeWindow;
-            if (_windows.GameMenu) yield return _windows.GameMenu;
+            if (_windows.GameMenuWindow) yield return _windows.GameMenuWindow;
             if (_windows.SettingsWindow) yield return _windows.SettingsWindow;
             if (_windows.NewGameWindow) yield return _windows.NewGameWindow;
             if (_windows.ExitConfirmationWindow) yield return _windows.ExitConfirmationWindow;

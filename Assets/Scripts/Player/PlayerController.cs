@@ -24,17 +24,20 @@ namespace FlavorfulStory.Player
         /// <remarks> Прокидывается в <see cref="IItemDropService"/>. </remarks>
         [SerializeField] private Transform _dropPoint;
 
-        /// <summary> Провайдер инвентарей. </summary>
-        [Inject] private readonly IInventoryProvider _inventoryProvider;
+        /// <summary> Сигнальная шина Zenject. </summary>
+        private SignalBus _signalBus;
 
-        /// <summary> Панель быстрого доступа. </summary>
-        private ToolbarView _toolbarView;
+        /// <summary> Статы игрока. </summary>
+        private PlayerStats _playerStats;
 
         /// <summary> Сервис выброса предметов. </summary>
         private IItemDropService _itemDropService;
 
-        /// <summary> Статы игрока. </summary>
-        private PlayerStats _playerStats;
+        /// <summary> Панель быстрого доступа. </summary>
+        private ToolbarView _toolbarView;
+
+        /// <summary> Провайдер инвентарей. </summary>
+        private IInventoryProvider _inventoryProvider;
 
         /// <summary> Передвижение игрока. </summary>
         private PlayerMover _playerMover;
@@ -48,9 +51,6 @@ namespace FlavorfulStory.Player
         /// <summary> Аниматор игрока. </summary>
         private Animator _animator; // TODO: DELETE
 
-        /// <summary> Сигнальная шина Zenject. </summary>
-        private SignalBus _signalBus;
-
         #endregion
 
         /// <summary> Внедрение зависимостей Zenject. </summary>
@@ -59,20 +59,16 @@ namespace FlavorfulStory.Player
         /// <param name="toolbarView"> Панель быстрого доступа игрока. </param>
         /// <param name="itemDropService"> Сервис выброса предметов из инвентаря. </param>
         /// <param name="toolUsageService"> Сервис использования инструментов. </param>
+        /// <param name="inventoryProvider"> Провайдер инвентарей. </param>
         [Inject]
-        private void Construct(
-            SignalBus signalBus,
-            PlayerStats playerStats,
-            ToolbarView toolbarView,
-            IItemDropService itemDropService,
-            ToolUsageService toolUsageService)
+        private void Construct(SignalBus signalBus, PlayerStats playerStats, ToolbarView toolbarView,
+            IItemDropService itemDropService, ToolUsageService toolUsageService, IInventoryProvider inventoryProvider)
         {
             _signalBus = signalBus;
-            
             _playerStats = playerStats;
-
             _toolbarView = toolbarView;
             _itemDropService = itemDropService;
+            _inventoryProvider = inventoryProvider;
         }
 
         /// <summary> Инициализация компонентов. </summary>

@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using Zenject;
 using DG.Tweening;
 using FlavorfulStory.Infrastructure.Services.WindowService;
 using FlavorfulStory.InputSystem;
 using FlavorfulStory.UI.Animation;
+using Zenject;
 
 namespace FlavorfulStory.UI.Windows
 {
@@ -14,32 +14,34 @@ namespace FlavorfulStory.UI.Windows
     {
         /// <summary> Сервис окон. </summary>
         private readonly IWindowService _windowService;
+
         /// <summary> Аниматор HUD-панели. </summary>
         private readonly CanvasGroupFader _hudFader;
+
         /// <summary> Аниматор затемняющего фона. </summary>
         private readonly CanvasGroupFader _backgroundFader;
+
         /// <summary> Настройки анимаций. </summary>
         private readonly OverlayFadeSettings _settings;
 
         /// <summary> Кол-во открытых окон. </summary>
         private int _openedWindows;
+
         /// <summary> Флаг, указывающий, что уже запущена подготовка к первому открытию. </summary>
         private bool _preparedForFirstOpen;
+
         /// <summary> Очередь отложенных open-запросов. </summary>
         private readonly List<Action> _queuedOpens = new();
 
         /// <summary> Конструктор с внедрением зависимостей. </summary>
         [Inject]
-        public UIOverlayFadeCoordinator(
-            IWindowService windowService,
-            [Inject(Id = "HUD")] CanvasGroupFader hudFader,
-            [Inject(Id = "UIBackground")] CanvasGroupFader backgroundFader,
-            OverlayFadeSettings settings)
+        public UIOverlayFadeCoordinator(IWindowService windowService, [Inject(Id = "HUD")] CanvasGroupFader hudFader,
+            [Inject(Id = "UIBackground")] CanvasGroupFader backgroundFader, OverlayFadeSettings settings)
         {
-            _windowService   = windowService;
-            _hudFader        = hudFader;
+            _windowService = windowService;
+            _hudFader = hudFader;
             _backgroundFader = backgroundFader;
-            _settings        = settings;
+            _settings = settings;
         }
 
         /// <summary> Инициализация координатора: сбрасывает состояния и подписывается на события. </summary>
@@ -58,11 +60,11 @@ namespace FlavorfulStory.UI.Windows
             _windowService.OnWindowOpened -= HandleWindowOpened;
             _windowService.OnWindowClosed -= HandleWindowClosed;
         }
-        
+
         /// <summary> Обработка события открытия окна. </summary>
         private void HandleWindowOpened(BaseWindow _)
         {
-            var wasZero = _openedWindows == 0;
+            bool wasZero = _openedWindows == 0;
             _openedWindows++;
 
             if (wasZero)
@@ -72,10 +74,10 @@ namespace FlavorfulStory.UI.Windows
                     _preparedForFirstOpen = false;
                     return;
                 }
-                
+
                 _hudFader.Hide(_settings.HudFadeOutDuration, _settings.HudEase);
                 _backgroundFader.FadeTo(
-                    _settings.BackgroundMaxAlpha, false, _settings.BackgroundBlocksRaycasts, 
+                    _settings.BackgroundMaxAlpha, false, _settings.BackgroundBlocksRaycasts,
                     _settings.BackgroundFadeInDuration, _settings.BackgroundEase);
             }
         }
@@ -83,7 +85,7 @@ namespace FlavorfulStory.UI.Windows
         /// <summary> Обработка события закрытия окна. </summary>
         private void HandleWindowClosed(BaseWindow _)
         {
-            if (_openedWindows == 0) return;
+            if (_openedWindows == 0) return; // TODO: ШО ЗА НАХ ТУТ ПРОИСХОДИТ
             _openedWindows--;
 
             if (_openedWindows == 0)
@@ -92,7 +94,7 @@ namespace FlavorfulStory.UI.Windows
                 _queuedOpens.Clear();
 
                 InputWrapper.BlockInput(InputButton.SwitchGameMenu);
-                
+
                 var sequence = DOTween.Sequence();
                 sequence.Join(_backgroundFader.FadeTo(
                     0f, false, false,
@@ -101,10 +103,7 @@ namespace FlavorfulStory.UI.Windows
                 sequence.Join(_hudFader.Show(
                     _settings.HudFadeInDuration, _settings.HudMaxAlpha, _settings.HudEase
                 ));
-                sequence.OnComplete(() =>
-                {
-                    InputWrapper.UnblockInput(InputButton.SwitchGameMenu);
-                });
+                sequence.OnComplete(() => { InputWrapper.UnblockInput(InputButton.SwitchGameMenu); });
                 sequence.OnKill(() =>
                 {
                     if (sequence.active) return;
@@ -122,34 +121,34 @@ namespace FlavorfulStory.UI.Windows
                 openAction?.Invoke();
                 return;
             }
-            
+
             if (_preparedForFirstOpen)
             {
                 _queuedOpens.Add(openAction);
                 return;
             }
-            
+
             _preparedForFirstOpen = true;
             _queuedOpens.Add(openAction);
 
             InputWrapper.BlockInput(InputButton.SwitchGameMenu);
-            
+
             var sequence = DOTween.Sequence();
             sequence.Join(_hudFader.Hide(_settings.HudFadeOutDuration, _settings.HudEase));
             sequence.Join(_backgroundFader.FadeTo(
-                _settings.BackgroundMaxAlpha, false, _settings.BackgroundBlocksRaycasts, 
+                _settings.BackgroundMaxAlpha, false, _settings.BackgroundBlocksRaycasts,
                 _settings.BackgroundFadeInDuration, _settings.BackgroundEase));
-            
+
             sequence.OnComplete(() =>
             {
                 var actions = _queuedOpens.ToArray();
                 _queuedOpens.Clear();
 
                 foreach (var action in actions) action?.Invoke();
-                
+
                 InputWrapper.UnblockInput(InputButton.SwitchGameMenu);
             });
-            
+
             sequence.OnKill(() =>
             {
                 if (sequence.active) return;

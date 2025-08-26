@@ -1,7 +1,7 @@
-using UnityEngine;
-using Zenject;
 using FlavorfulStory.Infrastructure.Services.WindowService;
 using FlavorfulStory.InputSystem;
+using UnityEngine;
+using Zenject;
 
 namespace FlavorfulStory.UI.Windows
 {
@@ -10,27 +10,29 @@ namespace FlavorfulStory.UI.Windows
     {
         /// <summary> Сервис управления UI-окнами. </summary>
         private IWindowService _windowService;
+
         /// <summary> Координатор fade-интерфейса, нужен только в геймплейной сцене. </summary>
         private UIOverlayFadeCoordinator _fadeCoordinator;
 
-        /// <summary> Внедрение зависимостей. Координатор — опционально. </summary>
+        /// <summary> Внедрение зависимостей. </summary>
+        /// <param name="windowService"> Сервис управления UI-окнами. </param>
+        /// <param name="fadeCoordinator"> Координатор fade-интерфейса, нужен только в геймплейной сцене. </param>
         [Inject]
-        private void Construct(IWindowService windowService,[InjectOptional] UIOverlayFadeCoordinator fadeCoordinator)
+        private void Construct(IWindowService windowService, [InjectOptional] UIOverlayFadeCoordinator fadeCoordinator)
         {
             _windowService = windowService;
             _fadeCoordinator = fadeCoordinator;
-        } 
+        }
 
         /// <summary> Проверяет ввод и открывает/закрывает окна при нажатии кнопки меню. </summary>
         private void Update()
         {
-            if (InputWrapper.GetButtonDown(InputButton.SwitchGameMenu))
-            {
-                if (!_windowService.HasOpenWindows && _fadeCoordinator != null)
-                    _windowService.OpenWindow<GameMenuWindow>();
-                else
-                    _windowService.CloseTopWindow();
-            }
+            if (!InputWrapper.GetButtonDown(InputButton.SwitchGameMenu)) return;
+
+            if (!_windowService.HasOpenWindows && _fadeCoordinator != null)
+                _windowService.OpenWindow<GameMenuWindow>();
+            else
+                _windowService.CloseTopWindow();
         }
     }
 }

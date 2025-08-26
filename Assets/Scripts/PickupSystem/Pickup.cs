@@ -24,13 +24,18 @@ namespace FlavorfulStory.PickupSystem
         public int Number => _itemStack.Number;
 
         /// <summary> Провайдер инвентарей. </summary>
-        [Inject] private readonly IInventoryProvider _inventoryProvider;
+        private IInventoryProvider _inventoryProvider;
 
         /// <summary> Флаг, указывающий, можно ли подбирать предмет. </summary>
         private bool _canBePickedUp;
 
         /// <summary> Возвращает true, если предмет можно подобрать и в инвентаре есть место. </summary>
         private bool CanBePickedUp => _canBePickedUp && _inventoryProvider.GetPlayerInventory().HasSpaceFor(Item);
+
+        /// <summary> Внедрение зависимостей Zenject. </summary>
+        /// <param name="inventoryProvider"> Провайдер инвентарей. </param>
+        [Inject]
+        private void Construct(IInventoryProvider inventoryProvider) => _inventoryProvider = inventoryProvider;
 
         /// <summary> Устанавливает предмет, количество и задержку перед возможностью подбора. </summary>
         /// <param name="itemStack"> Предмет и его количество, которые можно подобрать. </param>

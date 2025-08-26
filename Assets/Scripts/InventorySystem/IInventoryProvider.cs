@@ -16,7 +16,7 @@ namespace FlavorfulStory.InventorySystem
         /// <summary> Получить все инвентари указанного типа. </summary>
         /// <param name="type"> Тип инвентаря (например, игрок, прилавок, сундук). </param>
         /// <returns> Коллекция инвентарей указанного типа. </returns>
-        IEnumerable<Inventory> GetAll(InventoryType type);
+        IEnumerable<Inventory> GetAllOfType(InventoryType type);
 
         /// <summary> Получить инвентарь игрока. </summary>
         /// <returns> Инвентарь, принадлежащий игроку. </returns>

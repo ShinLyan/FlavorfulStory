@@ -1,11 +1,11 @@
-using UnityEngine;
-using UnityEngine.UI;
-using Zenject;
 using Cysharp.Threading.Tasks;
 using FlavorfulStory.InputSystem;
 using FlavorfulStory.InventorySystem;
 using FlavorfulStory.InventorySystem.UI;
 using FlavorfulStory.SceneManagement;
+using UnityEngine;
+using UnityEngine.UI;
+using Zenject;
 
 namespace FlavorfulStory.UI.Windows
 {
@@ -21,13 +21,13 @@ namespace FlavorfulStory.UI.Windows
 
         /// <summary> Кнопка выхода в главное меню. </summary>
         [SerializeField] private Button _exitButton;
-        
+
         /// <summary> View инвентаря игрока во вкладке. </summary>
         [SerializeField] private InventoryView _playerInventoryView;
-        
+
         /// <summary> Провайдер инвентарей. </summary>
         [Inject] private readonly IInventoryProvider _inventoryProvider;
-        
+
         /// <summary> Массив вкладок в меню. </summary>
         private Tab[] _tabs;
 
@@ -52,7 +52,7 @@ namespace FlavorfulStory.UI.Windows
             SelectTab(_currentTabIndex);
             _playerInventoryView.Initialize(_inventoryProvider.GetPlayerInventory());
         }
-        
+
         /// <summary> Отписывается от событий при уничтожении компонента. </summary>
         private void OnDestroy()
         {
@@ -64,9 +64,9 @@ namespace FlavorfulStory.UI.Windows
         /// смены вкладки и нажатия на кнопки вкладок. </summary>
         private void Update() => HandleTabInput();
 
+        /// <summary> Вызывается при открытии окна. </summary>
         protected override void OnOpened()
         {
-            base.OnOpened();
             InputWrapper.UnblockInput(InputButton.SwitchToPreviousTab);
             InputWrapper.UnblockInput(InputButton.SwitchToNextTab);
             foreach (var tab in _tabs) InputWrapper.UnblockInput(tab.InputButton);

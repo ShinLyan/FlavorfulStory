@@ -12,10 +12,9 @@ namespace FlavorfulStory.BuildingRepair.UI
     public class ResourceRequirementView : MonoBehaviour
     {
         /// <summary> Иконка ресурса, отображаемая на панели. </summary>
-        [SerializeField] private RepairResourceSlotView _resourceSlotView;
+        [SerializeField] private ResourceSlotView _resourceSlotView;
 
-        /// <summary> Текстовое поле, отображающее количество текущего ресурса
-        /// и необходимое для завершения стадии. </summary>
+        /// <summary> Текстовое поле, отображающее текущее количество ресурса и необходимое для завершения. </summary>
         [SerializeField] private TMP_Text _quantityText;
 
         /// <summary> Кнопка добавления ресурса в процесс ремонта. </summary>
@@ -28,10 +27,10 @@ namespace FlavorfulStory.BuildingRepair.UI
         private InventoryItem _resource;
 
         /// <summary> Требуемое количество ресурса. </summary>
-        private int _requiredQuantity;
+        private int _requiredAmount;
 
         /// <summary> Вложенное количество ресурса. </summary>
-        private int _investedQuantity;
+        private int _investedAmount;
 
         /// <summary> Событие, вызываемое при нажатии кнопки добавления ресурса. </summary>
         public event Action<InventoryItem> OnAddClicked;
@@ -39,8 +38,13 @@ namespace FlavorfulStory.BuildingRepair.UI
         /// <summary> Событие, вызываемое при нажатии кнопки возврата ресурса. </summary>
         public event Action<InventoryItem> OnReturnClicked;
 
-        /// <summary> Инвентарь игрока. </summary>
-        [Inject] private readonly IInventoryProvider _inventoryProvider;
+        /// <summary> Провайдер инвентарей. </summary>
+        private IInventoryProvider _inventoryProvider;
+
+        /// <summary> Внедрение зависимостей Zenject. </summary>
+        /// <param name="inventoryProvider"> Провайдер инвентарей. </param>
+        [Inject]
+        private void Construct(IInventoryProvider inventoryProvider) => _inventoryProvider = inventoryProvider;
 
         /// <summary> Подписаться на события при активации объекта. </summary>
         private void OnEnable()
@@ -58,46 +62,40 @@ namespace FlavorfulStory.BuildingRepair.UI
 
         /// <summary> Установить ресурс для текущего элемента. </summary>
         /// <param name="requirement"> Ресурсное требование. </param>
-        /// <param name="investedNumber"> Количество вложенного ресурса в процесс ремонта. </param>
-        public void Setup(ItemStack requirement, int investedNumber)
+        /// <param name="investedAmount"> Количество вложенного ресурса в процесс ремонта. </param>
+        public void Setup(ItemStack requirement, int investedAmount)
         {
-            InitializeResourceData(requirement.Item, requirement.Number, investedNumber);
-            UpdateView();
-            UpdateButtonsStates();
-        }
+            _resource = requirement.Item;
+            _requiredAmount = requirement.Number;
+            _investedAmount = investedAmount;
 
-        /// <summary> Инициализировать данные о ресурсе. </summary>
-        /// <param name="resource"> Ресурс. </param>
-        /// <param name="requiredNumber"> Требуемое количество ресурса. </param>
-        /// <param name="investedNumber"> Вложенное количество ресурса. </param>
-        private void InitializeResourceData(InventoryItem resource, int requiredNumber, int investedNumber)
-        {
-            _resource = resource;
-            _requiredQuantity = requiredNumber;
-            _investedQuantity = investedNumber;
-        }
-
-        public void Refresh(int investedQuantity)
-        {
-            _investedQuantity = investedQuantity;
-            UpdateView();
-            UpdateButtonsStates();
-        }
-        
-        /// <summary> Обновить визуальное отображение информации о ресурсе. </summary>
-        private void UpdateView()
-        {
             _resourceSlotView.Setup(_resource);
-            _quantityText.text = $"{_investedQuantity}/{_requiredQuantity}";
+
+            Redraw();
         }
-        
+
+        /// <summary> Обновляет количество вложенного ресурса. </summary>
+        /// <param name="newAmount"> Количество вложенного ресурса в процесс ремонта. </param>
+        public void UpdateInvestedAmount(int newAmount)
+        {
+            _investedAmount = newAmount;
+            Redraw();
+        }
+
+        /// <summary> Обновить визуальное отображение информации о ресурсе. </summary>
+        private void Redraw()
+        {
+            _quantityText.text = $"{_investedAmount}/{_requiredAmount}";
+            UpdateButtonsStates();
+        }
+
         /// <summary> Обновить состояние кнопок добавления и возврата ресурса. </summary>
         private void UpdateButtonsStates()
         {
-            _addResourceButton.interactable = _investedQuantity < _requiredQuantity &&
-                                              _inventoryProvider.GetPlayerInventory().GetItemNumber(_resource) > 0;
-            _returnResourceButton.interactable = _investedQuantity > 0 && 
-                                                 _inventoryProvider.GetPlayerInventory().HasSpaceFor(_resource);
+            var playerInventory = _inventoryProvider.GetPlayerInventory();
+            _addResourceButton.interactable = _investedAmount < _requiredAmount &&
+                                              playerInventory.GetItemNumber(_resource) > 0;
+            _returnResourceButton.interactable = _investedAmount > 0 && playerInventory.HasSpaceFor(_resource);
         }
     }
 }

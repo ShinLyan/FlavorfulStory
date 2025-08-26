@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 using TMPro;
+using UnityEngine;
 
 namespace FlavorfulStory.UI.Settings
 {
@@ -17,7 +17,7 @@ namespace FlavorfulStory.UI.Settings
 
         /// <summary> Список доступных разрешений экрана. </summary>
         private readonly List<Resolution> _resolutions = new();
-        
+
         /// <summary> Список доступных режимов окна. </summary>
         private readonly List<string> _screenModeOptions = new()
         {
@@ -32,21 +32,21 @@ namespace FlavorfulStory.UI.Settings
             InitializeScreenModes();
             UpdateDropdownValues();
         }
-        
-        /// <summary> Подписывается на события изменения настроек экрана при активации объекта. </summary>
+
+        /// <summary> Подписывается на события при активации объекта. </summary>
         private void OnEnable()
         {
             _resolutionDropdown.onValueChanged.AddListener(ResolutionOptionChanged);
             _screenModeDropdown.onValueChanged.AddListener(ScreenModeChanged);
         }
-        
+
         /// <summary> Отписывается от событий при отключении объекта. </summary>
         private void OnDisable()
         {
-            _resolutionDropdown.onValueChanged.RemoveAllListeners();
-            _screenModeDropdown.onValueChanged.RemoveAllListeners();
+            _resolutionDropdown.onValueChanged.RemoveListener(ResolutionOptionChanged);
+            _screenModeDropdown.onValueChanged.RemoveListener(ScreenModeChanged);
         }
-        
+
         /// <summary> Устанавливает выбранное пользователем разрешение экрана. </summary>
         private void ResolutionOptionChanged(int index)
         {
@@ -55,15 +55,12 @@ namespace FlavorfulStory.UI.Settings
         }
 
         /// <summary> Устанавливает выбранный пользователем режим окна. </summary>
-        private static void ScreenModeChanged(int index)
+        private static void ScreenModeChanged(int index) => Screen.fullScreenMode = index switch
         {
-            Screen.fullScreenMode = index switch
-            {
-                0 => FullScreenMode.Windowed,
-                1 => FullScreenMode.FullScreenWindow,
-                _ => Screen.fullScreenMode
-            };
-        }
+            0 => FullScreenMode.Windowed,
+            1 => FullScreenMode.FullScreenWindow,
+            _ => Screen.fullScreenMode
+        };
 
         /// <summary> Получает все доступные разрешения экрана и заполняет выпадающий список. </summary>
         private void InitializeResolutions()

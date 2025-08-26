@@ -1,10 +1,10 @@
 using System.Collections.Generic;
-using UnityEngine;
-using Zenject;
 using FlavorfulStory.InteractionSystem;
 using FlavorfulStory.InventorySystem;
 using FlavorfulStory.Player;
 using FlavorfulStory.TooltipSystem.ActionTooltips;
+using UnityEngine;
+using Zenject;
 
 namespace FlavorfulStory.Actions.Interactables
 {
@@ -17,7 +17,12 @@ namespace FlavorfulStory.Actions.Interactables
         private List<ItemStack> _harvestItems;
 
         /// <summary> Провайдер инвентарей. </summary>
-        [Inject] private readonly IInventoryProvider _inventoryProvider;
+        private IInventoryProvider _inventoryProvider;
+
+        /// <summary> Внедрение зависимостей Zenject. </summary>
+        /// <param name="inventoryProvider"> Провайдер инвентарей. </param>
+        [Inject]
+        private void Construct(IInventoryProvider inventoryProvider) => _inventoryProvider = inventoryProvider;
 
         #region IInteractable
 

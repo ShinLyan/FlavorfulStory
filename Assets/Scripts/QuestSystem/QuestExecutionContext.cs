@@ -11,7 +11,7 @@ namespace FlavorfulStory.QuestSystem
         public QuestList QuestList { get; }
 
         /// <summary> Инвентарь игрока. </summary>
-        public Inventory Inventory { get; }
+        public Inventory PlayerInventory { get; }
 
         /// <summary> Компонент диалогов игрока. </summary>
         public PlayerSpeaker PlayerSpeaker { get; }
@@ -24,14 +24,11 @@ namespace FlavorfulStory.QuestSystem
         /// <param name="inventoryProvider"> Провайдер инвентарей. </param>
         /// <param name="playerSpeaker"> Компонент диалогов игрока. </param>
         /// <param name="itemDropService"> Сервис, отвечающий за выброс предметов из инвентаря в игровом мире. </param>
-        public QuestExecutionContext(
-            QuestList questList,
-            IInventoryProvider inventoryProvider,
-            PlayerSpeaker playerSpeaker,
-            IItemDropService itemDropService)
+        public QuestExecutionContext(QuestList questList, IInventoryProvider inventoryProvider,
+            PlayerSpeaker playerSpeaker, IItemDropService itemDropService)
         {
             QuestList = questList;
-            Inventory = inventoryProvider.GetPlayerInventory();
+            PlayerInventory = inventoryProvider.GetPlayerInventory();
             PlayerSpeaker = playerSpeaker;
             ItemDropService = itemDropService;
         }

@@ -103,7 +103,7 @@ namespace FlavorfulStory.QuestSystem
         {
             foreach (var reward in rewards)
             {
-                bool isSuccess = _context.Inventory.TryAddToFirstAvailableSlot(reward.Item, reward.Number);
+                bool isSuccess = _context.PlayerInventory.TryAddToFirstAvailableSlot(reward.Item, reward.Number);
                 if (!isSuccess) _itemDropService.Drop(reward, transform.position);
             }
         }

@@ -1,8 +1,5 @@
 ﻿using System.Collections.Generic;
 using FlavorfulStory.AI.NonInteractableNpc;
-using Unity.Cinemachine;
-using UnityEngine;
-using Zenject;
 using FlavorfulStory.BuildingRepair.UI;
 using FlavorfulStory.DialogueSystem;
 using FlavorfulStory.DialogueSystem.UI;
@@ -34,6 +31,9 @@ using FlavorfulStory.Tools;
 using FlavorfulStory.TooltipSystem;
 using FlavorfulStory.TooltipSystem.ActionTooltips;
 using FlavorfulStory.Visuals.Lightning;
+using Unity.Cinemachine;
+using UnityEngine;
+using Zenject;
 
 namespace FlavorfulStory.Infrastructure.Installers
 {
@@ -156,11 +156,9 @@ namespace FlavorfulStory.Infrastructure.Installers
             Container.Bind<IItemDropService>().To<ItemDropService>().AsSingle();
             Container.Bind<ISaveable>().To<ItemDropService>().FromResolve();
             Container.Bind<IInventoryProvider>().To<InventoryProvider>().AsSingle().NonLazy();
-            Container.Bind<InventoryTransferService>().AsSingle();
 
             Container.Bind<IPrefabFactory<InventorySlotView>>().To<Factories.PrefabFactory<InventorySlotView>>()
-                .AsSingle()
-                .WithArguments(_inventorySlotViewPrefab);
+                .AsSingle().WithArguments(_inventorySlotViewPrefab);
 
             Container.BindInterfacesTo<ToolUseController>().AsSingle();
             Container.BindInterfacesTo<EdibleUseController>().AsSingle();
@@ -228,8 +226,7 @@ namespace FlavorfulStory.Infrastructure.Installers
         }
 
         /// <summary> Установить зависимости, связанные со статами игрока. </summary>
-        private void BindStats() =>
-            Container.Bind<PlayerStats>().FromComponentInHierarchy().AsSingle();
+        private void BindStats() => Container.Bind<PlayerStats>().FromComponentInHierarchy().AsSingle();
 
         /// <summary> Установить зависимости, связанные с системой времени. </summary>
         private void BindTimeManagement()

@@ -8,7 +8,7 @@ namespace FlavorfulStory.BuildingRepair.UI
     /// <summary> Визуальное отображение одного ресурса, использованного при ремонте. </summary>
     /// <remarks> Показывает иконку ресурса и позволяет отобразить его тултип. </remarks>
     [RequireComponent(typeof(ItemTooltipSpawner))]
-    public class RepairResourceSlotView : MonoBehaviour, IItemHolder
+    public class ResourceSlotView : MonoBehaviour, IItemHolder
     {
         /// <summary> UI-иконка ресурса, отображаемая в этом слоте. </summary>
         [SerializeField] private Image _resourceIcon;

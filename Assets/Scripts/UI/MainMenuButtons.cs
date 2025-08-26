@@ -1,10 +1,10 @@
-using UnityEngine;
-using UnityEngine.UI;
-using Zenject;
 using Cysharp.Threading.Tasks;
 using FlavorfulStory.Infrastructure.Services.WindowService;
 using FlavorfulStory.SceneManagement;
 using FlavorfulStory.UI.Windows;
+using UnityEngine;
+using UnityEngine.UI;
+using Zenject;
 
 namespace FlavorfulStory.UI
 {
@@ -13,27 +13,36 @@ namespace FlavorfulStory.UI
     {
         /// <summary> Кнопка начала новой игры. </summary>
         [SerializeField] private Button _newGameButton;
+
         /// <summary> Кнопка продолжения игры. </summary>
         /// <remarks> Отображается при условии существующего файла сохранения. </remarks>
         [SerializeField] private Button _continueGameButton;
+
         /// <summary> Кнопка загрузки игры. </summary>
         /// <remarks> Отображается при условии существующего файла сохранения. </remarks>
         [SerializeField] private Button _loadGameButton;
+
         /// <summary> Кнопка открытия окна настроек. </summary>
         [SerializeField] private Button _settingsButton;
+
         /// <summary> Кнопка выхода из игры. </summary>
         [SerializeField] private Button _exitGameButton;
-        
+
         /// <summary> Сервис управления окнами. </summary>
-        [Inject] private readonly IWindowService _windowService;
-        
+        private IWindowService _windowService;
+
         /// <summary> Ссылка на компонент, управляющий системой сохранений. </summary>
         private SavingWrapper _savingWrapper;
-        
+
         /// <summary> Внедрение зависимости компонента сохранений. </summary>
         /// <param name="savingWrapper"> Экземпляр SavingWrapper. </param>
+        /// <param name="windowService"> Сервис управления окнами. </param>
         [Inject]
-        public void Construct(SavingWrapper savingWrapper) => _savingWrapper = savingWrapper;
+        public void Construct(SavingWrapper savingWrapper, IWindowService windowService)
+        {
+            _savingWrapper = savingWrapper;
+            _windowService = windowService;
+        }
 
         /// <summary> Настраивает кнопки и скрывает ненужные при отсутствии сохранений. </summary>
         private void Start()
@@ -41,7 +50,7 @@ namespace FlavorfulStory.UI
             bool saveExists = SavingWrapper.SaveFileExists;
             _continueGameButton.gameObject.SetActive(saveExists);
             _loadGameButton.gameObject.SetActive(saveExists);
-            
+
             _newGameButton.onClick.AddListener(OpenNewGameWindow);
             _continueGameButton.onClick.AddListener(ContinueGame);
             _settingsButton.onClick.AddListener(OpenSettingsWindow);
@@ -55,11 +64,11 @@ namespace FlavorfulStory.UI
             _continueGameButton.onClick.RemoveListener(ContinueGame);
             _settingsButton.onClick.RemoveListener(OpenSettingsWindow);
             _exitGameButton.onClick.RemoveListener(ShowExitConfirmationWindow);
-        } 
-        
+        }
+
         /// <summary> Открывает окно создания новой игры. </summary>
         private void OpenNewGameWindow() => _windowService.OpenWindow<NewGameWindow>();
-        
+
         /// <summary> Продолжить ранее сохраненную игру. </summary>
         public void ContinueGame() => _savingWrapper.ContinueGameAsync().Forget();
 
