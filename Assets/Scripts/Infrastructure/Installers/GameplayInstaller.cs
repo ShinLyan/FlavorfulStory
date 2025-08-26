@@ -78,7 +78,6 @@ namespace FlavorfulStory.Infrastructure.Installers
         /// <summary> Выполнить установку всех зависимостей, необходимых для сцены. </summary>
         public override void InstallBindings()
         {
-            SignalBusInstaller.Install(Container);
             DeclareSignals();
 
             BindBuildingRepair();
@@ -100,7 +99,7 @@ namespace FlavorfulStory.Infrastructure.Installers
         /// <summary> Объявить сигналы, используемые в сцене. </summary>
         private void DeclareSignals()
         {
-            Container.DeclareSignal<NightStartedSignal>();
+            Container.DeclareSignal<MidnightStartedSignal>();
             Container.DeclareSignal<ItemCollectedSignal>();
             Container.DeclareSignal<QuestAddedSignal>();
             Container.DeclareSignal<DismantleDeniedSignal>();
