@@ -30,6 +30,9 @@ namespace FlavorfulStory.PlacementSystem
         /// <summary> Доступные режимы размещения/удаления, сопоставленные с их типами. </summary>
         private readonly Dictionary<PlacementModeType, IPlacementMode> _modes = new();
 
+        /// <summary> Провайдер размещаемых объектов. </summary>
+        private readonly IPlaceableObjectProvider _placeableObjectProvider;
+
         /// <summary> Текущий активный режим размещения или удаления. </summary>
         private IPlacementMode _currentMode;
 
@@ -44,13 +47,16 @@ namespace FlavorfulStory.PlacementSystem
         /// <param name="placementPreview"> Сервис предпросмотра размещения. </param>
         /// <param name="placeableContainer"> Родительский контейнер для размещаемых объектов. </param>
         /// <param name="placeableFactory"> Фабрика для создания объектов размещения. </param>
+        /// <param name="placeableObjectProvider"> Провайдер размещаемых объектов. </param>
         public PlacementController(GridPositionProvider gridPositionProvider, PlacementPreview placementPreview,
-            Transform placeableContainer, IPrefabFactory<PlaceableObject> placeableFactory)
+            Transform placeableContainer, IPrefabFactory<PlaceableObject> placeableFactory,
+            IPlaceableObjectProvider placeableObjectProvider)
         {
             _gridPositionProvider = gridPositionProvider;
             _placementPreview = placementPreview;
             _placeableContainer = placeableContainer;
             _placeableFactory = placeableFactory;
+            _placeableObjectProvider = placeableObjectProvider;
 
             InitializeGridLayers();
             InitializeModes();
@@ -67,8 +73,9 @@ namespace FlavorfulStory.PlacementSystem
         private void InitializeModes()
         {
             _modes[PlacementModeType.Place] = new PlacementMode(_gridPositionProvider, _placementPreview, _gridLayers,
-                _placeableContainer, _placeableFactory);
-            _modes[PlacementModeType.Remove] = new RemovingMode(_gridPositionProvider, _placementPreview, _gridLayers);
+                _placeableContainer, _placeableFactory, _placeableObjectProvider);
+            _modes[PlacementModeType.Remove] = new RemovingMode(_gridPositionProvider, _placementPreview, _gridLayers,
+                _placeableObjectProvider);
         }
 
         /// <summary> Включает указанный режим работы системы размещения объектов. </summary>

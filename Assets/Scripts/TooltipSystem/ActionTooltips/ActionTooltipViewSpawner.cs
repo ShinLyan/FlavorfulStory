@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using FlavorfulStory.Infrastructure;
+using FlavorfulStory.Utils;
 using UnityEngine;
 
 namespace FlavorfulStory.TooltipSystem.ActionTooltips
@@ -89,6 +90,6 @@ namespace FlavorfulStory.TooltipSystem.ActionTooltips
         /// <param name="actionTooltipData"> Данные действия. </param>
         /// <returns> Строка описания. </returns>
         private static string GetActionTooltipDescription(ActionTooltipData actionTooltipData) =>
-            $"{actionTooltipData.Action} {actionTooltipData.Target}";
+            $"{actionTooltipData.Action.ToDisplayName()} {actionTooltipData.Target}";
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using FlavorfulStory.AI.NonInteractableNpc;
 using Unity.Cinemachine;
 using UnityEngine;
 using Zenject;
@@ -103,6 +104,7 @@ namespace FlavorfulStory.Infrastructure.Installers
             Container.DeclareSignal<ItemCollectedSignal>();
             Container.DeclareSignal<QuestAddedSignal>();
             Container.DeclareSignal<DismantleDeniedSignal>();
+            Container.DeclareSignal<ExhaustedSleepSignal>();
 
             Container.DeclareSignal<ToolbarSlotSelectedSignal>();
             Container.DeclareSignal<ToolbarHotkeyPressedSignal>();
@@ -130,8 +132,11 @@ namespace FlavorfulStory.Infrastructure.Installers
         private void BindEconomy()
         {
             Container.Bind<PlayerWalletView>().FromComponentInHierarchy().AsSingle();
-            Container.Bind<ICurrencyStorage>().WithId("Player").To<PlayerWallet>().AsSingle();
-            Container.Bind<ICurrencyStorage>().WithId("Register").To<CashRegister>().AsSingle();
+            Container.Bind<ICurrencyStorage>().WithId("Player").To<PlayerWallet>().FromComponentsInHierarchy()
+                .AsSingle();
+            Container.Bind<ICurrencyStorage>().WithId("Register").To<CashRegister>().FromComponentsInHierarchy()
+                .AsSingle();
+            Container.Bind<TransactionService>().AsSingle();
         }
 
         /// <summary> Установить зависимости, связанные с системой грида. </summary>
@@ -171,10 +176,12 @@ namespace FlavorfulStory.Infrastructure.Installers
         /// <summary> Установить зависимости, связанные с системой уведомлений. </summary>
         private void BindNotifications()
         {
-            Container.BindInterfacesTo<SignalNotifier<NightStartedSignal>>().AsSingle();
+            Container.BindInterfacesTo<SignalNotifier<MidnightStartedSignal>>().AsSingle();
             Container.BindInterfacesTo<SignalNotifier<ItemCollectedSignal>>().AsSingle();
             Container.BindInterfacesTo<SignalNotifier<QuestAddedSignal>>().AsSingle();
             Container.BindInterfacesTo<SignalNotifier<DismantleDeniedSignal>>().AsSingle();
+            Container.BindInterfacesTo<SignalNotifier<SaveCompletedSignal>>().AsSingle();
+            Container.BindInterfacesTo<SignalNotifier<ExhaustedSleepSignal>>().AsSingle();
 
             Container.Bind<NotificationAnchorLocator>().FromComponentInHierarchy().AsSingle();
             Container.BindInterfacesAndSelfTo<NotificationService>().AsSingle();
@@ -186,6 +193,10 @@ namespace FlavorfulStory.Infrastructure.Installers
             Container.Bind<PlacementPreview>().FromComponentInHierarchy().AsSingle();
             Container.Bind<IPrefabFactory<PlaceableObject>>().To<Factories.PrefabFactory<PlaceableObject>>().AsSingle();
             Container.BindInterfacesAndSelfTo<PlacementController>().AsSingle().WithArguments(_placeableContainer);
+
+            var placeables = FindObjectsByType<PlaceableObject>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+            Container.Bind<IPlaceableObjectProvider>().To<PlaceableObjectProvider>().AsSingle()
+                .WithArguments(new List<PlaceableObject>(placeables));
         }
 
         /// <summary> Установить зависимости, связанные с игроком. </summary>
@@ -225,7 +236,7 @@ namespace FlavorfulStory.Infrastructure.Installers
         private void BindTimeManagement()
         {
             Container.BindInterfacesAndSelfTo<DayEndManager>().AsSingle();
-            Container.Bind<SleepTrigger>().FromComponentInHierarchy().AsSingle();
+            Container.Bind<PlayerSpawnService>().AsSingle();
         }
 
         /// <summary> Установить зависимости, связанные с системой тултипов. </summary>
@@ -242,6 +253,9 @@ namespace FlavorfulStory.Infrastructure.Installers
         {
             Container.Bind<GlobalLightSystem>().FromComponentInHierarchy().AsSingle();
             Container.Bind<CinemachineCamera>().FromInstance(_teleportVirtualCamera).AsSingle();
+
+            Container.Bind<IPrefabFactory<NonInteractableNpc>>().To<Factories.PrefabFactory<NonInteractableNpc>>()
+                .AsSingle();
         }
     }
 }

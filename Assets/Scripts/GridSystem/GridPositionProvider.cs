@@ -1,4 +1,5 @@
 using FlavorfulStory.InputSystem;
+using FlavorfulStory.Utils;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -7,9 +8,6 @@ namespace FlavorfulStory.GridSystem
     /// <summary> Провайдер позиции на гриде. </summary>
     public class GridPositionProvider
     {
-        /// <summary> Камера, используемая для преобразования координат мыши в мир. </summary>
-        private Camera _mainCamera;
-
         /// <summary> Грид. </summary>
         private readonly Grid _grid;
 
@@ -21,16 +19,6 @@ namespace FlavorfulStory.GridSystem
 
         /// <summary> Половина размера клетки. </summary>
         public static readonly Vector3 CellHalfExtents = new(0.5f, 0.5f, 0.5f);
-
-        /// <summary> Камера, используемая для преобразования координат мыши в мир. </summary>
-        private Camera MainCamera
-        {
-            get
-            {
-                if (!_mainCamera) _mainCamera = Camera.main;
-                return _mainCamera;
-            }
-        }
 
         /// <summary> Конструктор, принимающий ссылку на компонент Grid. </summary>
         /// <param name="grid"> Сетка, в которой происходит размещение объектов. </param>
@@ -47,9 +35,9 @@ namespace FlavorfulStory.GridSystem
             if (EventSystem.current.IsPointerOverGameObject()) return false;
 
             var mousePosition = InputWrapper.GetMousePosition();
-            mousePosition.z = MainCamera.nearClipPlane;
+            mousePosition.z = CameraUtils.MainCamera.nearClipPlane;
 
-            var ray = MainCamera.ScreenPointToRay(mousePosition);
+            var ray = CameraUtils.MainCamera.ScreenPointToRay(mousePosition);
 
             if (!Physics.Raycast(ray, out var hit, 100f, PlacementLayerMask)) return false;
 
@@ -70,11 +58,8 @@ namespace FlavorfulStory.GridSystem
         /// <summary> Получить центр ячейки по её координатам. </summary>
         /// <param name="gridPosition"> Позиция в гриде. </param>
         /// <returns> Центр ячейки по её координатам. </returns>
-        public Vector3 GetCellCenterWorld(Vector3Int gridPosition)
-        {
-            var worldOrigin = _grid.CellToWorld(gridPosition);
-            return worldOrigin + new Vector3(CellSize, 0f, CellSize) * 0.5f;
-        }
+        public Vector3 GetCellCenterWorld(Vector3Int gridPosition) =>
+            GridToWorld(gridPosition) + new Vector3(CellSize, 0f, CellSize) * 0.5f;
 
         /// <summary> Переводит количество клеток в мировое расстояние. </summary>
         /// <param name="cellsCount"> Количество клеток. </param>

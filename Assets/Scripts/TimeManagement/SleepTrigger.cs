@@ -1,79 +1,58 @@
-using UnityEngine;
-using Zenject;
 using FlavorfulStory.Actions;
 using FlavorfulStory.Infrastructure.Services.WindowService;
 using FlavorfulStory.InteractionSystem;
 using FlavorfulStory.Player;
+using FlavorfulStory.TimeManagement.UI;
 using FlavorfulStory.TooltipSystem.ActionTooltips;
 using FlavorfulStory.UI.Windows;
+using UnityEngine;
+using Zenject;
 
 namespace FlavorfulStory.TimeManagement
 {
-    /// <summary> Триггер сна - кровать, с которой игрок может взаимодействовать для завершения дня. </summary>
+    /// <summary> Триггер сна — позволяет игроку завершить день через взаимодействие. </summary>
     public class SleepTrigger : MonoBehaviour, IInteractable
     {
-        /// <summary> Менеджер завершения дня, управляющий процессом сна и переходом между днями. </summary>
         private DayEndManager _dayEndManager;
-        /// <summary> Оконный сервис. </summary>
         private IWindowService _windowService;
-        
-        /// <summary> Координатор оверлея. </summary>
-        private UIOverlayFadeCoordinator _overlayCoordinator;
+        private PlayerSpawnService _playerSpawnService;
 
-        /// <summary> Заголовок окна подтверждения сна. </summary>
-        private const string SleepConfirmationTitle = "Bed"; // TODO: заменить на генератор/локализацию
+        private const string SleepConfirmationTitle = "Bed"; // TODO: локализация
+        private const string SleepConfirmationDescription = "Go to sleep?";
 
-        /// <summary> Заголовок окна подтверждения сна. </summary>
-        private const string SleepConfirmationDescription = "Go to sleep?"; // TODO: заменить на генератор/локализацию
-        
-        /// <summary> Внедряет зависимости через Zenject. </summary>
-        /// <param name="dayEndManager"> Менеджер завершения дня. </param>
-        /// <param name="windowService"> Сервис окон. </param>
-        /// <param name="overlayCoordinator"> Координатор оверлея. </param>
         [Inject]
         private void Construct(
             DayEndManager dayEndManager,
             IWindowService windowService,
-            UIOverlayFadeCoordinator overlayCoordinator)
+            PlayerSpawnService playerSpawnService)
         {
             _dayEndManager = dayEndManager;
             _windowService = windowService;
-            _overlayCoordinator = overlayCoordinator;
+            _playerSpawnService = playerSpawnService;
         }
 
-        #region IInteractable
-
-        /// <summary> Описание действия с объектом. </summary>
         public ActionTooltipData ActionTooltip => new("E", ActionType.Sleep, "to Bed");
-
-        /// <summary> Возвращает возможность взаимодействия с объектом. </summary>
         public bool IsInteractionAllowed => true;
 
-        /// <summary> Вычисляет расстояние до указанного трансформа. </summary>
-        /// <param name="otherTransform"> Трансформ, до которого вычисляется расстояние. </param>
-        /// <returns> Расстояние до объекта. </returns>
         public float GetDistanceTo(Transform otherTransform) =>
             Vector3.Distance(transform.position, otherTransform.position);
 
-        /// <summary> Начинает взаимодействие с кроватью. </summary>
-        /// <param name="player"> Контроллер игрока. </param>
         public void BeginInteraction(PlayerController player)
         {
             var window = _windowService.GetWindow<ConfirmationWindow>();
-            window.Setup(SleepConfirmationTitle, SleepConfirmationDescription, OnSleepConfirmed, OnSleepRejected);
+            window.Setup(SleepConfirmationTitle, SleepConfirmationDescription,
+                () => OnSleepConfirmed(player), OnSleepRejected);
             window.Open();
         }
 
-        /// <summary> Обрабатывает подтверждение сна. </summary>
-        private void OnSleepConfirmed() => _dayEndManager.RequestEndDay(null);
+        private void OnSleepConfirmed(PlayerController player)
+        {
+            _playerSpawnService.RegisterLastUsedBed(this);
+            _dayEndManager.RequestEndDay(() => EndInteraction(player));
+        }
 
-        /// <summary> Обрабатывает отклонение сна. </summary>
         private void OnSleepRejected() { }
 
-        /// <summary> Завершает взаимодействие с кроватью. </summary>
-        /// <param name="player"> Контроллер игрока. </param>
-        public void EndInteraction(PlayerController player) { }
-
-        #endregion
+        public void EndInteraction(PlayerController player) => player.SetBusyState(false);
     }
 }

@@ -11,7 +11,7 @@ namespace FlavorfulStory.Utils
         private static Camera _mainCamera;
 
         /// <summary> Ссылка на основную камеру. </summary>
-        private static Camera MainCamera
+        public static Camera MainCamera
         {
             get
             {

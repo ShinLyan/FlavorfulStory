@@ -27,16 +27,21 @@ namespace FlavorfulStory.PlacementSystem
             PlacementLayer.Floor
         };
 
+        /// <summary> Провайдер размещаемых объектов. </summary>
+        private readonly IPlaceableObjectProvider _placeableObjectProvider;
+
         /// <summary> Конструктор режима удаления. </summary>
         /// <param name="positionProvider"> Провайдер позиционирования на гриде. </param>
         /// <param name="placementPreview"> Компонент предпросмотра. </param>
         /// <param name="gridLayers"> Карта слоёв размещения с их данными. </param>
+        /// <param name="placeableObjectProvider"> Провайдер размещаемых объектов. </param>
         public RemovingMode(GridPositionProvider positionProvider, PlacementPreview placementPreview,
-            Dictionary<PlacementLayer, PlacementGridData> gridLayers)
+            Dictionary<PlacementLayer, PlacementGridData> gridLayers, IPlaceableObjectProvider placeableObjectProvider)
         {
             _positionProvider = positionProvider;
             _placementPreview = placementPreview;
             _gridLayers = gridLayers;
+            _placeableObjectProvider = placeableObjectProvider;
         }
 
         /// <summary> Вход в режим — показать превью удаления. </summary>
@@ -52,6 +57,7 @@ namespace FlavorfulStory.PlacementSystem
         {
             if (TryRemoveAtSilent(gridPosition, out var removed))
             {
+                _placeableObjectProvider.Unregister(removed);
                 Object.Destroy(removed);
                 SfxPlayer.Play(SfxType.RemoveObject);
 
@@ -83,6 +89,7 @@ namespace FlavorfulStory.PlacementSystem
 
                 gridData.RemoveObjectAt(gridPosition);
                 removedPlaceable = target;
+                _placeableObjectProvider.Unregister(removedPlaceable);
                 return true;
             }
 
@@ -91,9 +98,8 @@ namespace FlavorfulStory.PlacementSystem
 
         /// <summary> Обновляет превью для текущей ячейки. </summary>
         /// <param name="gridPosition"> Позиция ячейки в координатах грида. </param>
-        public void Refresh(Vector3Int gridPosition) =>
-            _placementPreview.UpdatePosition(_positionProvider.GridToWorld(gridPosition),
-                IsSelectionValid(gridPosition));
+        public void Refresh(Vector3Int gridPosition) => _placementPreview.UpdatePosition(
+            _positionProvider.GridToWorld(gridPosition), IsSelectionValid(gridPosition));
 
         /// <summary> Проверяет, есть ли что удалять в указанной ячейке хотя бы в одном слое по приоритету. </summary>
         /// <param name="gridPosition"> Позиция ячейки в координатах грида. </param>

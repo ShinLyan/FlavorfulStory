@@ -1,0 +1,66 @@
+﻿using UnityEditor;
+using UnityEngine;
+using UnityEngine.AI;
+
+namespace FlavorfulStory.AI.BaseNpc
+{
+    /// <summary> Базовый класс для всех NPC. </summary>
+    [RequireComponent(typeof(CapsuleCollider), typeof(NavMeshAgent), typeof(Animator))]
+    public abstract class Npc : MonoBehaviour
+    {
+        /// <summary> Контроллер анимации NPC для воспроизведения состояний анимации. </summary>
+        protected NpcAnimationController AnimationController { get; private set; }
+
+        /// <summary> Контроллер движения NPC для управления навигацией и перемещением. </summary>
+        protected NpcMovementController MovementController { get; private set; }
+
+        /// <summary> Контроллер состояний, управляющий переключением между состояниями NPC. </summary>
+        protected abstract NpcStateController StateController { get; }
+
+        /// <summary> Вызывается при создании объекта, может быть переопределен в наследниках </summary>
+        protected virtual void Awake()
+        {
+            AnimationController = new NpcAnimationController(GetComponent<Animator>());
+            MovementController = new NpcMovementController(GetComponent<NavMeshAgent>(),
+                transform, AnimationController);
+        }
+
+        /// <summary> Инициализация объектов. </summary>
+        protected virtual void Start()
+        {
+            AnimationController.Initialize();
+            MovementController.Initialize();
+            StateController.Initialize();
+        }
+
+        /// <summary> Освобождает ресурсы при уничтожении объекта. </summary>
+        protected virtual void OnDestroy()
+        {
+            AnimationController.Dispose();
+            MovementController.Dispose();
+            StateController.Dispose();
+        }
+
+        /// <summary> Обновляет логику состояний и движения NPC каждый кадр. </summary>
+        protected virtual void Update()
+        {
+            MovementController.Update();
+            StateController.Update();
+        }
+
+#if UNITY_EDITOR
+
+        /// <summary> Отображает текущее состояние NPC в виде подписи над ним при выделении в редакторе. </summary>
+        private void OnDrawGizmosSelected()
+        {
+            if (StateController == null) return;
+
+            Gizmos.color = Color.yellow;
+            var labelPosition = transform.position + Vector3.up * 2.5f;
+
+            Handles.Label(labelPosition, StateController.CurrentNpcStateName.ToString());
+        }
+
+#endif
+    }
+}

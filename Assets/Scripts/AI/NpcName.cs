@@ -13,6 +13,9 @@ namespace FlavorfulStory.AI
         Luxor,
 
         /// <summary> Фелиана. </summary>
-        Feliana
+        Feliana,
+
+        /// <summary> Бэт. </summary>
+        Bet
     }
 }
