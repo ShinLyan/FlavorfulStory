@@ -1,5 +1,8 @@
 ﻿using System.Collections.Generic;
 using FlavorfulStory.AI.NonInteractableNpc;
+using Unity.Cinemachine;
+using UnityEngine;
+using Zenject;
 using FlavorfulStory.BuildingRepair.UI;
 using FlavorfulStory.DialogueSystem;
 using FlavorfulStory.DialogueSystem.UI;
@@ -25,18 +28,12 @@ using FlavorfulStory.SceneManagement;
 using FlavorfulStory.Shop;
 using FlavorfulStory.Stats;
 using FlavorfulStory.TimeManagement;
-using FlavorfulStory.TimeManagement.UI;
 using FlavorfulStory.Toolbar;
 using FlavorfulStory.Toolbar.UI;
 using FlavorfulStory.Tools;
 using FlavorfulStory.TooltipSystem;
 using FlavorfulStory.TooltipSystem.ActionTooltips;
-using FlavorfulStory.UI;
-using FlavorfulStory.UI.Animation;
 using FlavorfulStory.Visuals.Lightning;
-using Unity.Cinemachine;
-using UnityEngine;
-using Zenject;
 
 namespace FlavorfulStory.Infrastructure.Installers
 {
@@ -55,27 +52,23 @@ namespace FlavorfulStory.Infrastructure.Installers
         /// <remarks> Используется для WarpPortal при смене локаций. </remarks>
         [SerializeField] private CinemachineCamera _teleportVirtualCamera;
 
-        /// <summary> Затемнитель интерфейса HUD. </summary>
-        [SerializeField] private CanvasGroupFader _hudFader;
-
         /// <summary> Префаб всплывающей подсказки для предмета. </summary>
         [SerializeField] private ItemTooltipView _itemTooltipPrefab;
 
-        /// <summary> Инвентарь игрока. </summary>
-        [Header("Inventory")] [SerializeField] private Inventory _playerInventory;
-
         /// <summary> Префаб отображения ячейки инвентаря. </summary>
+        [Header("Inventory")]
         [SerializeField] private InventorySlotView _inventorySlotViewPrefab;
 
         /// <summary> Индикатор клетки на гриде. </summary>
-        [Header("Placement System")] [SerializeField]
-        private GameObject _gridIndicator;
+        [Header("Placement System")]
+        [SerializeField] private GameObject _gridIndicator;
 
         /// <summary> Родительский контейнер для размещаемых объектов. </summary>
         [SerializeField] private Transform _placeableContainer;
 
         /// <summary> Сопоставления типов инструментов с их префабами для визуализации в руке игрока. </summary>
-        [Header("Tools")] [SerializeField] private ToolPrefabMapping[] _toolMappings;
+        [Header("Tools")]
+        [SerializeField] private ToolPrefabMapping[] _toolMappings;
 
         /// <summary> Слои, по которым производится удар с помощью инструмента. </summary>
         [SerializeField] private LayerMask _hitableLayers;
@@ -100,7 +93,6 @@ namespace FlavorfulStory.Infrastructure.Installers
             BindStats();
             BindTimeManagement();
             BindTooltipSystem();
-            BindUI();
             BindOther();
         }
 
@@ -122,7 +114,6 @@ namespace FlavorfulStory.Infrastructure.Installers
         /// <summary> Установить зависимости, связанные с ремонтом построек. </summary>
         private void BindBuildingRepair()
         {
-            Container.Bind<RepairableBuildingView>().FromComponentInHierarchy().AsSingle();
             Container.Bind<IPrefabFactory<ResourceRequirementView>>()
                 .To<Factories.PrefabFactory<ResourceRequirementView>>().AsSingle()
                 .WithArguments(_requirementViewPrefab);
@@ -158,7 +149,6 @@ namespace FlavorfulStory.Infrastructure.Installers
         /// <summary> Установить зависимости, связанные с системой инвентаря. </summary>
         private void BindInventorySystem()
         {
-            Container.Bind<Inventory>().FromInstance(_playerInventory).AsSingle();
             Container.Bind<Equipment>().FromComponentInHierarchy().AsSingle();
 
             Container.Bind<IPrefabFactory<Pickup>>().To<Factories.PrefabFactory<Pickup>>().AsSingle();
@@ -171,7 +161,6 @@ namespace FlavorfulStory.Infrastructure.Installers
             Container.Bind<IPrefabFactory<InventorySlotView>>().To<Factories.PrefabFactory<InventorySlotView>>()
                 .AsSingle()
                 .WithArguments(_inventorySlotViewPrefab);
-            Container.Bind<InventoryExchangeWindow>().FromComponentInHierarchy().AsSingle();
 
             Container.BindInterfacesTo<ToolUseController>().AsSingle();
             Container.BindInterfacesTo<EdibleUseController>().AsSingle();
@@ -245,7 +234,6 @@ namespace FlavorfulStory.Infrastructure.Installers
         /// <summary> Установить зависимости, связанные с системой времени. </summary>
         private void BindTimeManagement()
         {
-            Container.Bind<SummaryView>().FromComponentInHierarchy().AsSingle();
             Container.BindInterfacesAndSelfTo<DayEndManager>().AsSingle();
             Container.Bind<PlayerSpawnService>().AsSingle();
         }
@@ -257,13 +245,6 @@ namespace FlavorfulStory.Infrastructure.Installers
             Container.Bind<IActionTooltipViewSpawner>().To<ActionTooltipViewSpawner>().FromComponentInHierarchy()
                 .AsSingle();
             Container.Bind<ItemTooltipView>().FromInstance(_itemTooltipPrefab).AsSingle();
-        }
-
-        /// <summary> Установить зависимости, связанные с пользовательским интерфейсом. </summary>
-        private void BindUI()
-        {
-            Container.Bind<CanvasGroupFader>().WithId("HUD").FromInstance(_hudFader).AsSingle();
-            Container.Bind<ConfirmationWindowView>().FromComponentInHierarchy().AsSingle();
         }
 
         /// <summary> Установить общие или прочие зависимости. </summary>

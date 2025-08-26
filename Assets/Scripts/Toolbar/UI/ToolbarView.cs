@@ -1,8 +1,8 @@
-using FlavorfulStory.InputSystem;
-using FlavorfulStory.InventorySystem;
-using FlavorfulStory.Saving;
 using UnityEngine;
 using Zenject;
+using FlavorfulStory.InventorySystem;
+using FlavorfulStory.Saving;
+using InputWrapper = FlavorfulStory.InputSystem.InputWrapper;
 
 namespace FlavorfulStory.Toolbar.UI
 {
@@ -14,8 +14,8 @@ namespace FlavorfulStory.Toolbar.UI
         /// <summary> Шина сигналов для оповещения других компонентов. </summary>
         private SignalBus _signalBus;
 
-        /// <summary> Инвентарь игрока. </summary>
-        private Inventory _playerInventory;
+        /// <summary> Провайдер окон. </summary>
+        [Inject] private readonly IInventoryProvider _inventoryProvider;
 
         /// <summary> Массив слотов панели инструментов. </summary>
         private ToolbarSlotView[] _slots;
@@ -25,33 +25,23 @@ namespace FlavorfulStory.Toolbar.UI
 
         /// <summary> Можно ли взаимодействовать? </summary>
         public bool IsInteractable { get; set; }
-
+        
         /// <summary> Выбранный предмет. </summary>
         public InventoryItem SelectedItem => _slots[SelectedItemIndex].GetItem();
 
         /// <summary> Внедрение зависимостей Zenject. </summary>
         /// <param name="signalBus"> Сигнальная шина Zenject. </param>
-        /// <param name="inventory"> Инвентарь игрока. </param>
         [Inject]
-        private void Construct(SignalBus signalBus, Inventory inventory)
-        {
-            _signalBus = signalBus;
-            _playerInventory = inventory;
-        }
-
-        /// <summary> Инициализация полей и подписка на события слотов панели. </summary>
+        private void Construct(SignalBus signalBus) => _signalBus = signalBus;
+        
+        /// <summary> Подписка на события слотов панели. </summary>
         private void Awake()
         {
             _signalBus.Subscribe<ToolbarHotkeyPressedSignal>(OnHotkeyPressed);
             _signalBus.Subscribe<ConsumeSelectedItemSignal>(OnConsumeSelected);
 
-            _playerInventory.InventoryUpdated += RedrawToolbar;
-
             _slots = GetComponentsInChildren<ToolbarSlotView>();
-            IsInteractable = true;
-            foreach (var slot in _slots) slot.OnSlotClicked += SelectItem;
         }
-
         /// <summary> Обрабатывает сигнал нажатия горячей клавиши тулбара. </summary>
         /// <param name="signal"> Сигнал с индексом выбранного слота. </param>
         private void OnHotkeyPressed(ToolbarHotkeyPressedSignal signal) => SelectItem(signal.SlotIndex);
@@ -62,13 +52,18 @@ namespace FlavorfulStory.Toolbar.UI
         {
             if (!IsInteractable) return;
 
-            _playerInventory.RemoveFromSlot(SelectedItemIndex, signal.Amount);
+            _inventoryProvider.GetPlayerInventory().RemoveFromSlot(SelectedItemIndex, signal.Amount);
             RedrawToolbar();
         }
 
         /// <summary> Первоначальная настройка панели инструментов. </summary>
         private void Start()
         {
+            foreach (var slot in _slots) slot.OnSlotClicked += SelectItem;
+            _inventoryProvider.GetPlayerInventory().InventoryUpdated += RedrawToolbar;
+            
+            IsInteractable = true;
+            
             ResetToolbar();
             RedrawToolbar();
             _slots[SelectedItemIndex].Select();

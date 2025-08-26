@@ -4,6 +4,7 @@ using System.Linq;
 using FlavorfulStory.Actions;
 using FlavorfulStory.Audio;
 using FlavorfulStory.BuildingRepair.UI;
+using FlavorfulStory.Infrastructure.Services.WindowService;
 using FlavorfulStory.InteractionSystem;
 using FlavorfulStory.InventorySystem;
 using FlavorfulStory.ObjectManagement;
@@ -34,15 +35,15 @@ namespace FlavorfulStory.BuildingRepair
         /// <summary> Количество вложенных ресурсов для текущей стадии ремонта. </summary>
         private List<int> _investedResources;
 
-        /// <summary> Представление интерфейса ремонта здания. </summary>
-        private RepairableBuildingView _view;
-
         /// <summary> Завершен ли ремонт здания? </summary>
         private bool _isRepairCompleted;
+        
+        /// <summary> Провайдер окон. </summary>
+        private IInventoryProvider _inventoryProvider;
 
-        /// <summary> Инвентарь игрока. </summary>
-        private Inventory _playerInventory;
-
+        /// <summary> Сервис окон. </summary>
+        private IWindowService _windowService;
+        
         /// <summary> Текущая стадия ремонта. </summary>
         private RepairStage CurrentStage => _buildingData.Stages[_repairStageIndex];
 
@@ -55,14 +56,14 @@ namespace FlavorfulStory.BuildingRepair
         #endregion
 
         /// <summary> Внедрение зависимостей Zenject. </summary>
-        /// <param name="inventory"> Инвентарь игрока. </param>
-        /// <param name="view"> Визуальное представление ремонта зданий. </param>
+        /// <param name="windowService"> Сервис окон. </param>
+        /// <param name="inventoryProvider"> Провайдер инвентарей. </param>
         [Inject]
-        private void Construct(Inventory inventory, RepairableBuildingView view)
+        private void Construct(IWindowService windowService, IInventoryProvider inventoryProvider)
         {
-            _playerInventory = inventory;
-            _view = view;
-        }
+            _windowService = windowService;
+            _inventoryProvider = inventoryProvider;
+        } 
 
         /// <summary> Инициализация компонента. </summary>
         private void Awake() => _objectSwitcher = GetComponent<ObjectSwitcher>();
@@ -71,11 +72,9 @@ namespace FlavorfulStory.BuildingRepair
         private void Start()
         {
             _investedResources = CurrentStage.Requirements.Select(_ => 0).ToList();
+            
             _objectSwitcher.Initialize();
-
-            // На случай системы сохранения
-            int index = _isRepairCompleted ? _repairStageIndex + 1 : _repairStageIndex;
-            _objectSwitcher.SwitchTo(index);
+            _objectSwitcher.SwitchTo(GetVisualStageIndex());
         }
 
         #region IInteractable
@@ -96,17 +95,18 @@ namespace FlavorfulStory.BuildingRepair
         /// <param name="player"> Игрок, который начал взаимодействие. </param>
         public void BeginInteraction(PlayerController player)
         {
-            _onStageUpdated += _view.UpdateView;
-            OnRepairCompleted += _view.DisplayCompletionMessage;
+            var window = _windowService.GetWindow<RepairableBuildingWindow>();
+            _onStageUpdated += window.UpdateView;
+            OnRepairCompleted += window.DisplayCompletionMessage;
 
-            _view.Show(CurrentStage, _investedResources, AddResource, ReturnResource, Build,
-                () =>
-                {
-                    _onStageUpdated -= _view.UpdateView;
-                    OnRepairCompleted -= _view.DisplayCompletionMessage;
-                    EndInteraction(player);
-                }
-            );
+            window.Closed += () =>
+            {
+                _onStageUpdated -= window.UpdateView;
+                OnRepairCompleted -= window.DisplayCompletionMessage;
+                EndInteraction(player);
+            };
+            window.Setup(CurrentStage, _investedResources, AddResource, ReturnResource, Build);
+            window.Open();
         }
 
         /// <summary> Завершает взаимодействие. </summary>
@@ -140,17 +140,17 @@ namespace FlavorfulStory.BuildingRepair
         /// <param name="resource"> Ресурс, который будет добавлен в ремонт. </param>
         private void AddResource(InventoryItem resource)
         {
-            int index = CurrentStage.Requirements.FindIndex(requirement => requirement.Item.ItemID == resource.ItemID);
+            int index = FindRequirementIndex(resource);
             if (index == -1) return;
 
             var requirement = CurrentStage.Requirements[index];
-            int available = _playerInventory.GetItemNumber(resource);
+            int available = _inventoryProvider.GetPlayerInventory().GetItemNumber(resource);
             int needed = requirement.Number - _investedResources[index];
             int toInvest = Mathf.Min(available, needed);
             if (toInvest <= 0) return;
 
             _investedResources[index] += toInvest;
-            _playerInventory.RemoveItem(resource, toInvest);
+            _inventoryProvider.GetPlayerInventory().RemoveItem(resource, toInvest);
 
             _onStageUpdated?.Invoke(CurrentStage, _investedResources);
         }
@@ -159,18 +159,23 @@ namespace FlavorfulStory.BuildingRepair
         /// <param name="resource"> Ресурс, который возвращается в инвентарь. </param>
         private void ReturnResource(InventoryItem resource)
         {
-            int index = CurrentStage.Requirements.FindIndex(requirement => requirement.Item.ItemID == resource.ItemID);
-            if (index == -1) return;
+            int index = FindRequirementIndex(resource);
+            if (index < 0) return;
 
             int invested = _investedResources[index];
-            if (invested <= 0 || !_playerInventory.HasSpaceFor(resource)) return;
+            if (invested <= 0 || !_inventoryProvider.GetPlayerInventory().HasSpaceFor(resource)) return;
 
-            _playerInventory.TryAddToFirstAvailableSlot(resource, invested);
+            _inventoryProvider.GetPlayerInventory().TryAddToFirstAvailableSlot(resource, invested);
             _investedResources[index] = 0;
 
             _onStageUpdated?.Invoke(CurrentStage, _investedResources);
         }
 
+        private int FindRequirementIndex(InventoryItem item) => 
+            CurrentStage.Requirements.FindIndex(itemStack => itemStack.Item.ItemID == item.ItemID);
+        
+        private int GetVisualStageIndex() => _isRepairCompleted ? _repairStageIndex + 1 : _repairStageIndex;
+        
         #region Saving
 
         /// <summary> Структура для сохранения состояния объекта ремонта. </summary>

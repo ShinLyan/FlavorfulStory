@@ -1,5 +1,6 @@
 ﻿using System;
 using Cysharp.Threading.Tasks;
+using FlavorfulStory.Infrastructure.Services.WindowService;
 using FlavorfulStory.Player;
 using FlavorfulStory.SceneManagement;
 using FlavorfulStory.TimeManagement.UI;
@@ -8,115 +9,98 @@ using Zenject;
 
 namespace FlavorfulStory.TimeManagement
 {
-    /// <summary> Управляет процессом завершения игрового дня.. </summary>
+    /// <summary> Управляет процессом завершения игрового дня. </summary>
     public class DayEndManager : IInitializable, IDisposable
     {
-        /// <summary> Отображение сводки дня. </summary>
-        private readonly SummaryView _summaryView;
-
-        /// <summary> Контроллер игрока. </summary>
         private readonly PlayerController _playerController;
-
-        /// <summary> Позиция точки сна. </summary>
-        private readonly SleepTrigger _sleepTrigger;
-
-        /// <summary> Менеджер локаций. </summary>
         private readonly LocationManager _locationManager;
-
-        /// <summary> Флаг выполнения процесса сна. </summary>
-        private bool _isProcessingSleep;
-
-        /// <summary> Коллбэк завершения. </summary>
-        private Action _onCompleteCallback;
-
-        /// <summary> Сервис, отвечающий за управление точками появления игрока. </summary>
+        private readonly IWindowService _windowService;
         private readonly PlayerSpawnService _playerSpawnService;
-
-        /// <summary> Сигнальная шина. </summary>
         private readonly SignalBus _signalBus;
 
-        /// <summary> Инициализирует менеджер окончания дня. </summary>
-        /// <param name="summaryView"> Вью для отображения итогов дня. </param>
-        /// <param name="playerController"> Контроллер игрока. </param>
-        /// <param name="locationManager"> Менеджер управления локациями. </param>
-        /// <param name="playerSpawnService"> Сервис для спавна игрока. </param>
-        /// <param name="signalBus"> Сигнальная шина. </param>
-        public DayEndManager(SummaryView summaryView, PlayerController playerController,
-            LocationManager locationManager, PlayerSpawnService playerSpawnService, SignalBus signalBus)
+        private bool _isProcessingSleep;
+
+        private const int DefaultDayStartHour = 6;
+
+        public DayEndManager(
+            PlayerController playerController,
+            LocationManager locationManager,
+            IWindowService windowService,
+            PlayerSpawnService playerSpawnService,
+            SignalBus signalBus)
         {
-            _summaryView = summaryView;
             _playerController = playerController;
             _locationManager = locationManager;
+            _windowService = windowService;
             _playerSpawnService = playerSpawnService;
             _signalBus = signalBus;
         }
 
-        /// <summary> Подписывается на события. </summary>
         public void Initialize() => WorldTime.OnDayEnded += OnDayEnded;
-
-        /// <summary> Отписывается от событий. </summary>
         public void Dispose() => WorldTime.OnDayEnded -= OnDayEnded;
 
-        /// <summary> Обрабатывает принудительное завершение дня. </summary>
-        /// <param name="date"> Текущая дата игрового времени. </param>
-        private void OnDayEnded(DateTime date) => ExhaustedSleep();
+        private void OnDayEnded(DateTime _) => ProcessSleepAsync(true).Forget();
 
-        /// <summary> Запрашивает завершение дня. </summary>
-        /// <param name="onCompleteCallback"> Коллбэк, вызываемый по завершении процесса. </param>
-        public void RequestEndDay(Action onCompleteCallback) =>
-            ProcessSleepAsync(onCompleteCallback, false).Forget();
+        public void RequestEndDay(Action onComplete) =>
+            ProcessSleepAsync(false).ContinueWith(() => onComplete?.Invoke()).Forget();
 
-        /// <summary> Обрабатывает принудительный сон при истощении. </summary>
-        private void ExhaustedSleep() => ProcessSleepAsync(null, true).Forget();
-
-        /// <summary> Выполняет процесс сна. </summary>
-        /// <param name="onComplete"> Коллбэк завершения. </param>
-        /// <param name="isExhausted"> Флаг принудительного сна. </param>
-        private async UniTaskVoid ProcessSleepAsync(Action onComplete, bool isExhausted)
+        private async UniTask ProcessSleepAsync(bool isExhausted)
         {
             if (_isProcessingSleep) return;
             _isProcessingSleep = true;
 
             if (!isExhausted)
-                WorldTime.BeginNewDay(6);
+                WorldTime.BeginNewDay(DefaultDayStartHour);
             else
                 _signalBus.Fire(new ExhaustedSleepSignal());
 
-            await EndDayRoutine();
-            _summaryView.HideWithAnimation().Forget();
-
-            await RestorePlayerState(_playerSpawnService.GetSpawnPosition(), isExhausted);
-
-            onComplete?.Invoke();
+            await ExecuteSleepSequence(isExhausted);
             _isProcessingSleep = false;
         }
 
-        /// <summary> Выполняет рутину завершения дня. </summary>
-        private async UniTask EndDayRoutine()
+        private async UniTask ExecuteSleepSequence(bool isExhausted)
         {
-            WorldTime.Pause();
             _locationManager.EnableLocation(LocationName.RockyIsland);
-            await ShowSummaryAndWaitForContinue();
-            WorldTime.Unpause();
+
+            await ShowSummaryWindowAsync();
+
+            _windowService.CloseWindow<SummaryWindow>();
+
+            RestorePlayer(isExhausted);
         }
 
-        /// <summary> Восстанавливает состояние игрока после сна. </summary>
-        /// <param name="targetPosition"> Целевая позиция для перемещения игрока. </param>
-        /// <param name="isExhausted"> Флаг состояния истощения. </param>
-        private async UniTask RestorePlayerState(Vector3 targetPosition, bool isExhausted)
+        private void RestorePlayer(bool isExhausted)
         {
+            Vector3 spawnPosition = _playerSpawnService.GetSpawnPosition();
+
             _playerController.RestoreStatsAfterSleep(isExhausted);
-            _playerController.SetPosition(targetPosition);
-            await UniTask.Yield();
+            _playerController.SetPosition(spawnPosition);
             _locationManager.UpdateActiveLocation();
         }
 
-        /// <summary> Показывает сводку и ожидает продолжения. </summary>
-        private async UniTask ShowSummaryAndWaitForContinue()
+        private async UniTask ShowSummaryWindowAsync()
         {
-            _summaryView.SetSummary(SummaryView.DefaultSummaryText);
-            await _summaryView.ShowWithAnimation();
-            await _summaryView.WaitForContinue();
+            var window = _windowService.GetWindow<SummaryWindow>();
+            if (window == null) return;
+
+            window.SetSummary(SummaryWindow.DefaultSummaryText);
+            _windowService.OpenWindow<SummaryWindow>();
+
+            await WaitForWindowCloseAsync(window);
+        }
+
+        private static UniTask WaitForWindowCloseAsync(SummaryWindow window)
+        {
+            var tcs = new UniTaskCompletionSource();
+
+            void OnClosed()
+            {
+                window.Closed -= OnClosed;
+                tcs.TrySetResult();
+            }
+
+            window.Closed += OnClosed;
+            return tcs.Task;
         }
     }
 }

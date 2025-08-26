@@ -11,7 +11,7 @@ namespace FlavorfulStory.Audio
         [SerializeField] private AudioMixer _audioMixer;
 
         /// <summary> Устанавливает значения громкости при запуске. </summary>
-        private void Start() => SetDefaultValues();
+        private void Awake() => SetDefaultValues();
 
         /// <summary> Устанавливает значения громкости из сохранённых настроек. </summary>
         private void SetDefaultValues()

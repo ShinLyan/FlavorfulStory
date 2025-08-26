@@ -24,8 +24,8 @@ namespace FlavorfulStory.Player
         /// <remarks> Прокидывается в <see cref="IItemDropService"/>. </remarks>
         [SerializeField] private Transform _dropPoint;
 
-        /// <summary> Инвентарь игрока. </summary>
-        private Inventory _playerInventory;
+        /// <summary> Провайдер инвентарей. </summary>
+        [Inject] private readonly IInventoryProvider _inventoryProvider;
 
         /// <summary> Панель быстрого доступа. </summary>
         private ToolbarView _toolbarView;
@@ -55,18 +55,20 @@ namespace FlavorfulStory.Player
 
         /// <summary> Внедрение зависимостей Zenject. </summary>
         /// <param name="signalBus"> Шина сигналов Zenject для отправки событий. </param>
-        /// <param name="inventory"> Инвентарь игрока. </param>
         /// <param name="playerStats"> Статы игрока. </param>
         /// <param name="toolbarView"> Панель быстрого доступа игрока. </param>
         /// <param name="itemDropService"> Сервис выброса предметов из инвентаря. </param>
         /// <param name="toolUsageService"> Сервис использования инструментов. </param>
         [Inject]
-        private void Construct(SignalBus signalBus, Inventory inventory, PlayerStats playerStats,
-            ToolbarView toolbarView, IItemDropService itemDropService, ToolUsageService toolUsageService)
+        private void Construct(
+            SignalBus signalBus,
+            PlayerStats playerStats,
+            ToolbarView toolbarView,
+            IItemDropService itemDropService,
+            ToolUsageService toolUsageService)
         {
             _signalBus = signalBus;
-
-            _playerInventory = inventory;
+            
             _playerStats = playerStats;
 
             _toolbarView = toolbarView;
@@ -147,7 +149,7 @@ namespace FlavorfulStory.Player
                 return;
 
             const float DropItemForce = 2.5f;
-            _itemDropService.DropFromInventory(_playerInventory, _toolbarView.SelectedItemIndex,
+            _itemDropService.DropFromInventory(_inventoryProvider.GetPlayerInventory(), _toolbarView.SelectedItemIndex,
                 _dropPoint.transform.position, _dropPoint.forward * DropItemForce);
         }
 

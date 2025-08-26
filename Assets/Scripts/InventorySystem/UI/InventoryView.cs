@@ -21,25 +21,35 @@ namespace FlavorfulStory.InventorySystem.UI
 
         /// <summary> Контейнер для размещения отображений ячеек. </summary>
         private Transform _slotsContainer;
-
+        
+        /// <summary> Флаг инициализации вьюхи. </summary>
+        private bool _initialized;
+        
         /// <summary> Внедрить зависимости: инвентарь и фабрику отображений ячеек. </summary>
-        /// <param name="inventory"> Инвентарь игрока. </param>
         /// <param name="slotFactory"> Фабрика отображений ячеек. </param>
         [Inject]
-        private void Construct(Inventory inventory, IPrefabFactory<InventorySlotView> slotFactory)
+        private void Construct(IPrefabFactory<InventorySlotView> slotFactory) => _slotFactory = slotFactory;
+        
+        /// <summary> Переинициализирует отображение для указанного инвентаря. </summary>
+        public void Initialize(Inventory inventory)
         {
+            if (_inventory == inventory && _initialized)
+                return; 
+            
+            if (_inventory) _inventory.InventoryUpdated -= UpdateView;
             _inventory = inventory;
-            _slotFactory = slotFactory;
-        }
+            
+            if (!_initialized)
+            {
+                _initialized = true;
+                _slotsContainer = transform;
+                CacheInitialSlots();
+            }
 
-        /// <summary> Инициализировать отображения и подписаться на обновление инвентаря. </summary>
-        private void Awake()
-        {
-            _slotsContainer = transform;
-            CacheInitialSlots();
-            Initialize(_inventory);
+            _inventory.InventoryUpdated += UpdateView;
+            UpdateView();
         }
-
+        
         /// <summary> Сохранить существующие отображения ячеек, если они уже присутствуют в иерархии. </summary>
         private void CacheInitialSlots()
         {
@@ -53,27 +63,17 @@ namespace FlavorfulStory.InventorySystem.UI
             }
         }
 
-        /// <summary> Переинициализирует отображение для указанного инвентаря. </summary>
-        public void Initialize(Inventory inventory)
-        {
-            if (_inventory) _inventory.InventoryUpdated -= UpdateView;
-
-            _inventory = inventory;
-
-            _inventory.InventoryUpdated += UpdateView;
-            UpdateView();
-        }
-
         /// <summary> Отписаться от событий и очистить отображения при уничтожении объекта. </summary>
         private void OnDestroy()
         {
-            _inventory.InventoryUpdated -= UpdateView;
+            if (_inventory != null) _inventory.InventoryUpdated -= UpdateView;
             ClearView();
         }
 
         /// <summary> Обновить отображения ячеек в соответствии с данными инвентаря. </summary>
         private void UpdateView()
         {
+            
             for (int i = 0; i < _inventory.InventorySize; i++)
             {
                 var slot = EnsureSlot(i);
