@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 using FlavorfulStory.Infrastructure.Factories;
 using FlavorfulStory.PickupSystem;
 using FlavorfulStory.Saving;
-using UnityEngine;
 
 namespace FlavorfulStory.InventorySystem.DropSystem
 {
@@ -63,7 +63,7 @@ namespace FlavorfulStory.InventorySystem.DropSystem
         /// <param name="position"> Позиция появления. </param>
         /// <param name="pickupDelay"> Задержка перед возможностью поднятия. </param>
         /// <returns> Ссылка на созданный Pickup. </returns>
-        private Pickup Spawn(ItemStack itemStack, Vector3 position, float pickupDelay = 1f)
+        private Pickup Spawn(ItemStack itemStack, Vector3 position, float pickupDelay)
         {
             var pickup = _pickupFactory.Create(itemStack.Item.PickupPrefab, position, parentTransform: _container);
             pickup.Setup(itemStack, pickupDelay);
@@ -138,7 +138,7 @@ namespace FlavorfulStory.InventorySystem.DropSystem
             {
                 var item = ItemDatabase.GetItemFromID(record.ItemID);
                 var itemStack = new ItemStack(item, record.Quantity);
-                if (item) Spawn(itemStack, record.Position.ToVector());
+                if (item) Spawn(itemStack, record.Position.ToVector(), PickupDelay);
             }
         }
 

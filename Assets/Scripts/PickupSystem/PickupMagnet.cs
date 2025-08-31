@@ -1,42 +1,36 @@
-using FlavorfulStory.InventorySystem;
-using FlavorfulStory.TimeManagement;
 using UnityEngine;
 using Zenject;
+using FlavorfulStory.GridSystem;
+using FlavorfulStory.InventorySystem;
+using FlavorfulStory.Player;
+using FlavorfulStory.TimeManagement;
 
 namespace FlavorfulStory.PickupSystem
 {
     [RequireComponent(typeof(Pickup))]
     public class PickupMagnet : MonoBehaviour
     {
-        [SerializeField, Tooltip("Пауза перед началом примагничивания (сек).")]
-        private float _magnetDelay = 0.0f;
-
         [SerializeField, Tooltip("Максимальная дистанция для примагничивания (в тайлах).")]
-        private float _magnetRangeTiles = 3f;
+        private float _magnetRangeTiles;
 
         [SerializeField, Tooltip("Скорость движения к игроку (в тайлах/сек).")]
-        private float _magnetSpeedTiles = 0.9f;
+        private float _magnetSpeedTiles;
 
-        [Header("Tuning")]
-        [SerializeField, Tooltip("Считать достигнутым игрока при этой дистанции (мировые ед.).")]
-        private float _reachDistance = 0.01f;
-
-        private const float TileSize = 1f;
-
-        private Pickup _pickup;
         private Transform _playerTransform;
         private Inventory _playerInventory;
 
+        private Pickup _pickup;
+        private Rigidbody _rigidbody;
+        private Collider[] _allColliders;
+        private SphereCollider _pickupTrigger;
+        
         private bool _magnetScheduled;
         private bool _isFlying;
         private float _delayTimer;
-
-        private Rigidbody _rb;
-        private Collider[] _allColliders;
-        private SphereCollider _pickupTrigger;
-
+        
+        //TODO: Обновить playerInventory на IInventoryProvider
         [Inject]
-        private void Construct(Player.PlayerController playerController, Inventory playerInventory)
+        private void Construct(PlayerController playerController, Inventory playerInventory)
         {
             _playerTransform = playerController.transform;
             _playerInventory = playerInventory;
@@ -45,21 +39,20 @@ namespace FlavorfulStory.PickupSystem
         private void Awake()
         {
             _pickup = GetComponent<Pickup>();
+            _rigidbody = GetComponent<Rigidbody>();
             _allColliders = GetComponentsInChildren<Collider>(true);
-            TryGetComponent(out _rb);
             
             foreach (var col in _allColliders)
-                if (col is SphereCollider sc && sc.isTrigger) { _pickupTrigger = sc; break; }
+                if (col is SphereCollider { isTrigger: true } sphereCollider)
+                {
+                    _pickupTrigger = sphereCollider; 
+                    break;
+                }
 
-            if (_playerInventory != null)
-                _playerInventory.InventoryUpdated += OnInventoryUpdated;
+            _playerInventory.InventoryUpdated += OnInventoryUpdated;
         }
 
-        private void OnDestroy()
-        {
-            if (_playerInventory != null)
-                _playerInventory.InventoryUpdated -= OnInventoryUpdated;
-        }
+        private void OnDestroy() => _playerInventory.InventoryUpdated -= OnInventoryUpdated;
 
         private void Start() => TryScheduleMagnet();
 
@@ -76,12 +69,12 @@ namespace FlavorfulStory.PickupSystem
             if (_isFlying)
             {
                 var target = _playerTransform.position;
-                float speedWorld = _magnetSpeedTiles * TileSize;
+                float speedWorld = _magnetSpeedTiles * GridPositionProvider.CellSize;
                 transform.position = Vector3.MoveTowards(transform.position, target, speedWorld * Time.deltaTime);
-                
-                if ((transform.position - target).sqrMagnitude <= _reachDistance * _reachDistance)
+                float magnetRangeWorld = _magnetRangeTiles * GridPositionProvider.CellSize;
+                if (Vector3.Distance(transform.position, _playerTransform.position) > magnetRangeWorld)
                 {
-                    //TODO: Тянуть к центру по Y игрока?
+                    CancelFlying();
                 }
             }
             else
@@ -96,36 +89,52 @@ namespace FlavorfulStory.PickupSystem
         {
             if (_isFlying || _magnetScheduled) return;
             
-            if (!_pickup.IsReadyForPickup) return;
+            if (!_pickup.CanBePickedUp) return;
             
-            if (!_playerInventory.HasSpaceFor(_pickup.Item)) return;
-            
-            float maxDistWorld = _magnetRangeTiles * TileSize;
-            if ((transform.position - _playerTransform.position).sqrMagnitude > maxDistWorld * maxDistWorld) return;
+            float magnetRangeWorld = _magnetRangeTiles * GridPositionProvider.CellSize;
+            if (Vector3.Distance(transform.position, _playerTransform.position) > magnetRangeWorld) return;
 
             _magnetScheduled = true;
-            _delayTimer = _magnetDelay;
+            _delayTimer = 0f;
         }
 
         private void BeginFlying()
         {
             _isFlying = true;
 
-            if (_rb)
+            if (_rigidbody)
             {
-                if (!_rb.isKinematic)
+                if (!_rigidbody.isKinematic)
                 {
-                    _rb.linearVelocity = Vector3.zero;
-                    _rb.angularVelocity = Vector3.zero;
+                    _rigidbody.linearVelocity = Vector3.zero;
+                    _rigidbody.angularVelocity = Vector3.zero;
                 }
-                
-                _rb.isKinematic = true;
+                _rigidbody.isKinematic = true;
             }
 
             foreach (var c in _allColliders)
             {
-                if (c == _pickupTrigger) { c.enabled = true; continue; }
-                if (!c.isTrigger) c.enabled = false;
+                if (c == _pickupTrigger)
+                {
+                    c.enabled = true;
+                    continue;
+                }
+                
+                if (!c.isTrigger)
+                    c.enabled = false;
+            }
+        }
+        
+        private void CancelFlying()
+        {
+            _isFlying = false;
+            _magnetScheduled = false;
+            
+            _rigidbody.detectCollisions = true;
+
+            foreach (var c in _allColliders)
+            {
+                if (!c.isTrigger) c.enabled = true;
             }
         }
     }

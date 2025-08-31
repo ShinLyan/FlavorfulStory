@@ -1,8 +1,8 @@
-﻿using FlavorfulStory.Infrastructure.Factories;
+﻿using UnityEngine;
+using Zenject;
+using FlavorfulStory.Infrastructure.Factories;
 using FlavorfulStory.InventorySystem;
 using FlavorfulStory.Saving;
-using UnityEngine;
-using Zenject;
 
 namespace FlavorfulStory.PickupSystem
 {

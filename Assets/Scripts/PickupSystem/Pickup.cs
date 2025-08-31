@@ -1,17 +1,17 @@
-﻿using FlavorfulStory.InventorySystem;
-using UnityEngine;
+﻿using UnityEngine;
 using Zenject;
+using FlavorfulStory.InventorySystem;
 
 namespace FlavorfulStory.PickupSystem
 {
     /// <summary> Отвечает за механику подбора предметов игроком. </summary>
     /// <remarks> Скрипт должен быть размещен на специальном префабе, содержащем данные о предмете. </remarks>
-    [RequireComponent(typeof(SphereCollider))]
+    [RequireComponent(typeof(SphereCollider), typeof(Rigidbody))]
     public class Pickup : MonoBehaviour
     {
         /// <summary> Радиус подбора предмета. </summary>
         [Tooltip("Радиус подбора предмета."), SerializeField, Range(0f, 5f)]
-        private float _pickupRadius = 0.1f;
+        private float _pickupRadius;
 
         /// <summary> Стак предметов для подбора. </summary>
         [Tooltip("Стак предметов для подбора."), SerializeField]
@@ -22,8 +22,6 @@ namespace FlavorfulStory.PickupSystem
 
         /// <summary> Количество предметов, доступных для подбора. </summary>
         public int Number => _itemStack.Number;
-
-        public bool IsReadyForPickup => _canBePickedUp;
         
         /// <summary> Ссылка на инвентарь игрока. </summary>
         private Inventory _inventory;
@@ -32,7 +30,7 @@ namespace FlavorfulStory.PickupSystem
         private bool _canBePickedUp;
 
         /// <summary> Возвращает true, если предмет можно подобрать и в инвентаре есть место. </summary>
-        private bool CanBePickedUp => _canBePickedUp && _inventory.HasSpaceFor(Item);
+        public bool CanBePickedUp => _canBePickedUp && _inventory.HasSpaceFor(Item);
         
         /// <summary> Внедрение зависимостей. </summary>
         /// <param name="inventory"> Инвентарь игрока. </param>
@@ -42,7 +40,7 @@ namespace FlavorfulStory.PickupSystem
         /// <summary> Устанавливает предмет, количество и задержку перед возможностью подбора. </summary>
         /// <param name="itemStack"> Предмет и его количество, которые можно подобрать. </param>
         /// <param name="pickupDelay"> Задержка в секундах до возможности подбора. </param>
-        public void Setup(ItemStack itemStack, float pickupDelay = 1f)
+        public void Setup(ItemStack itemStack, float pickupDelay)
         {
             _itemStack = itemStack;
             _canBePickedUp = false;
