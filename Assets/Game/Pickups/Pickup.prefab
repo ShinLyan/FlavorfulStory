@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 3674612255559614732}
   - component: {fileID: 8999188196258589257}
   - component: {fileID: 8472433202357826936}
+  - component: {fileID: 524922925795594575}
   m_Layer: 0
   m_Name: Pickup
   m_TagString: Untagged
@@ -96,7 +97,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _pickupRadius: 1
-  <Item>k__BackingField: {fileID: 0}
+  _itemStack:
+    <Item>k__BackingField: {fileID: 0}
+    <Number>k__BackingField: 0
 --- !u!114 &8472433202357826936
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -109,3 +112,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4021fc4d9f8b9d64dbf1d88dc273920a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &524922925795594575
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3052585347083124877}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 081bbc2833cc7fa4d9764189e07aff92, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _magnetDelay: 0.5
+  _magnetRangeTiles: 3
+  _magnetSpeedTiles: 9
+  _reachDistance: 0.05
