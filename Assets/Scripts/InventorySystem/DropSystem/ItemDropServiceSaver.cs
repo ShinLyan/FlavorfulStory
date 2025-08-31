@@ -1,7 +1,7 @@
-﻿using FlavorfulStory.Saving;
-using FlavorfulStory.TimeManagement;
-using UnityEngine;
+﻿using UnityEngine;
 using Zenject;
+using FlavorfulStory.Saving;
+using FlavorfulStory.TimeManagement;
 
 namespace FlavorfulStory.InventorySystem.DropSystem
 {
@@ -21,26 +21,17 @@ namespace FlavorfulStory.InventorySystem.DropSystem
             dropService.SetDroppedItemsContainer(transform);
         }
 
-        private void OnEnable()
-        {
-            WorldTime.OnDayEnded += HandleDayEnded;
-        }
+        /// <summary> Подписывается на обновление инвентаря игрока при активации объекта. </summary>
+        private void OnEnable() => WorldTime.OnDayEnded += HandleDayEnded;
 
-        private void OnDisable()
-        {
-            WorldTime.OnDayEnded -= HandleDayEnded;
-        }
-        
+        /// <summary> Отписывается от обновлений инвентаря при деактивации объекта. </summary>
+        private void OnDisable() => WorldTime.OnDayEnded -= HandleDayEnded;
+
         /// <summary> Удаляет все выброшенные предметы в контейнере по окончанию дня. </summary>
         private void HandleDayEnded(DateTime _)
         {
-            // C конца, чтобы безопасно изменить иерархию
-            //TODO: Проверить!
-            for (int i = transform.childCount - 1; i >= 0; i--)
-            {
-                var child = transform.GetChild(i);
-                if (child) Destroy(child.gameObject);
-            }
+            foreach (Transform child in transform) 
+                Destroy(child.gameObject);
         }
         
         /// <summary> Сохраняет состояние выброшенных предметов. </summary>
