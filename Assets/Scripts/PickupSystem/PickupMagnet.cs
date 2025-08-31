@@ -11,28 +11,30 @@ namespace FlavorfulStory.PickupSystem
     public class PickupMagnet : MonoBehaviour
     {
         [SerializeField, Tooltip("Максимальная дистанция для примагничивания (в тайлах).")]
-        private float _magnetRangeTiles;
+        private float _magnetRangeTiles = 3f;
 
         [SerializeField, Tooltip("Скорость движения к игроку (в тайлах/сек).")]
-        private float _magnetSpeedTiles;
+        private float _magnetSpeedTiles = 9f;
+
+        private const float TileSize = GridPositionProvider.CellSize;
+        private readonly Vector3 _playerPositionOffset = new(0f, 0.5f, 0f);
 
         private Transform _playerTransform;
         private Inventory _playerInventory;
 
         private Pickup _pickup;
         private Rigidbody _rigidbody;
-        private Collider[] _allColliders;
         private SphereCollider _pickupTrigger;
-        
-        private bool _magnetScheduled;
+        private Collider[] _colliders;
+
+        private bool _isScheduled;
         private bool _isFlying;
         private float _delayTimer;
-        
-        //TODO: Обновить playerInventory на IInventoryProvider
+
         [Inject]
-        private void Construct(PlayerController playerController, Inventory playerInventory)
+        private void Construct(PlayerController player, Inventory playerInventory)
         {
-            _playerTransform = playerController.transform;
+            _playerTransform = player.transform;
             _playerInventory = playerInventory;
         }
 
@@ -40,39 +42,32 @@ namespace FlavorfulStory.PickupSystem
         {
             _pickup = GetComponent<Pickup>();
             _rigidbody = GetComponent<Rigidbody>();
-            _allColliders = GetComponentsInChildren<Collider>(true);
-            
-            foreach (var col in _allColliders)
-                if (col is SphereCollider { isTrigger: true } sphereCollider)
-                {
-                    _pickupTrigger = sphereCollider; 
-                    break;
-                }
+            _colliders = GetComponentsInChildren<Collider>(includeInactive: true);
 
-            _playerInventory.InventoryUpdated += OnInventoryUpdated;
+            _pickupTrigger = FindTriggerCollider(_colliders);
+            _playerInventory.InventoryUpdated += OnInventoryChanged;
         }
 
-        private void OnDestroy() => _playerInventory.InventoryUpdated -= OnInventoryUpdated;
+        private void OnDestroy() => _playerInventory.InventoryUpdated -= OnInventoryChanged;
 
-        private void Start() => TryScheduleMagnet();
+        private void Start()
+        {
+            TryScheduleMagnet();
+        }
 
         private void Update()
         {
             if (WorldTime.IsPaused) return;
 
-            if (_magnetScheduled && !_isFlying)
+            if (_isScheduled && !_isFlying)
             {
-                _delayTimer -= Time.deltaTime;
-                if (_delayTimer <= 0f) BeginFlying();
+                UpdateDelayTimer();
             }
 
             if (_isFlying)
             {
-                var target = _playerTransform.position;
-                float speedWorld = _magnetSpeedTiles * GridPositionProvider.CellSize;
-                transform.position = Vector3.MoveTowards(transform.position, target, speedWorld * Time.deltaTime);
-                float magnetRangeWorld = _magnetRangeTiles * GridPositionProvider.CellSize;
-                if (Vector3.Distance(transform.position, _playerTransform.position) > magnetRangeWorld)
+                FlyTowardsPlayer();
+                if (ShouldCancelFlying())
                 {
                     CancelFlying();
                 }
@@ -83,59 +78,94 @@ namespace FlavorfulStory.PickupSystem
             }
         }
 
-        private void OnInventoryUpdated() => TryScheduleMagnet();
+        private void OnInventoryChanged() => TryScheduleMagnet();
 
         private void TryScheduleMagnet()
         {
-            if (_isFlying || _magnetScheduled) return;
-            
-            if (!_pickup.CanBePickedUp) return;
-            
-            float magnetRangeWorld = _magnetRangeTiles * GridPositionProvider.CellSize;
-            if (Vector3.Distance(transform.position, _playerTransform.position) > magnetRangeWorld) return;
+            if (_isScheduled || _isFlying || !CanStartMagnet()) return;
 
-            _magnetScheduled = true;
+            _isScheduled = true;
             _delayTimer = 0f;
+        }
+
+        private bool CanStartMagnet()
+        {
+            if (!_pickup.CanBePickedUp) return false;
+
+            return DistanceToPlayer() <= MaxRangeWorld();
+        }
+
+        private float DistanceToPlayer() => Vector3.Distance(transform.position, _playerTransform.position);
+        private float MaxRangeWorld() => _magnetRangeTiles * TileSize;
+
+        private void UpdateDelayTimer()
+        {
+            _delayTimer -= Time.deltaTime;
+            if (_delayTimer <= 0f)
+                BeginFlying();
         }
 
         private void BeginFlying()
         {
             _isFlying = true;
+            _isScheduled = false;
 
-            if (_rigidbody)
+            if (!_rigidbody.isKinematic)
             {
-                if (!_rigidbody.isKinematic)
-                {
-                    _rigidbody.linearVelocity = Vector3.zero;
-                    _rigidbody.angularVelocity = Vector3.zero;
-                }
+                _rigidbody.linearVelocity = Vector3.zero;
+                _rigidbody.angularVelocity = Vector3.zero;
                 _rigidbody.isKinematic = true;
             }
 
-            foreach (var c in _allColliders)
-            {
-                if (c == _pickupTrigger)
-                {
-                    c.enabled = true;
-                    continue;
-                }
-                
-                if (!c.isTrigger)
-                    c.enabled = false;
-            }
+            EnableOnlyTriggerCollider();
         }
-        
+
+        private void FlyTowardsPlayer()
+        {
+            var speed = _magnetSpeedTiles * TileSize;
+            var target = _playerTransform.position + _playerPositionOffset;
+            transform.position = Vector3.MoveTowards(transform.position, target, speed * Time.deltaTime);
+        }
+
+        private bool ShouldCancelFlying() => DistanceToPlayer() > MaxRangeWorld();
+
         private void CancelFlying()
         {
             _isFlying = false;
-            _magnetScheduled = false;
+            _isScheduled = false;
             
             _rigidbody.detectCollisions = true;
+            _rigidbody.useGravity = false;
 
-            foreach (var c in _allColliders)
+            EnableAllColliders();
+        }
+
+        private void EnableOnlyTriggerCollider()
+        {
+            foreach (var col in _colliders)
             {
-                if (!c.isTrigger) c.enabled = true;
+                col.enabled = (col == _pickupTrigger) || col.isTrigger;
             }
+        }
+
+        private void EnableAllColliders()
+        {
+            foreach (var col in _colliders)
+            {
+                if (!col.isTrigger)
+                    col.enabled = true;
+            }
+        }
+
+        private SphereCollider FindTriggerCollider(Collider[] colliders)
+        {
+            foreach (var col in colliders)
+            {
+                if (col is SphereCollider { isTrigger: true } trigger) return trigger;
+            }
+
+            Debug.LogWarning("[PickupMagnet] No trigger SphereCollider found.");
+            return null;
         }
     }
 }
