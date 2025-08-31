@@ -11,7 +11,7 @@ namespace FlavorfulStory.PickupSystem
     {
         /// <summary> Радиус подбора предмета. </summary>
         [Tooltip("Радиус подбора предмета."), SerializeField, Range(0f, 5f)]
-        private float _pickupRadius = 0.5f;
+        private float _pickupRadius = 0.1f;
 
         /// <summary> Стак предметов для подбора. </summary>
         [Tooltip("Стак предметов для подбора."), SerializeField]

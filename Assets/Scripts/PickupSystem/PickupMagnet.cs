@@ -15,11 +15,11 @@ namespace FlavorfulStory.PickupSystem
         private float _magnetRangeTiles = 3f;
 
         [SerializeField, Tooltip("Скорость движения к игроку (в тайлах/сек).")]
-        private float _magnetSpeedTiles = 9f;
+        private float _magnetSpeedTiles = 0.9f;
 
         [Header("Tuning")]
         [SerializeField, Tooltip("Считать достигнутым игрока при этой дистанции (мировые ед.).")]
-        private float _reachDistance = 0.1f;
+        private float _reachDistance = 0.01f;
 
         private const float TileSize = 1f;
 
