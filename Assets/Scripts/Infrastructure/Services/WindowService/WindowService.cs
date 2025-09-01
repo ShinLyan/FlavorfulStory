@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 using FlavorfulStory.Infrastructure.Factories.Window;
 using FlavorfulStory.InputSystem;
 using FlavorfulStory.TimeManagement;
 using FlavorfulStory.UI.Windows;
-using UnityEngine;
 
 namespace FlavorfulStory.Infrastructure.Services.WindowService
 {
@@ -34,31 +34,16 @@ namespace FlavorfulStory.Infrastructure.Services.WindowService
         /// <param name="windowFactory"> Фабрика окон. </param>
         public WindowService(IWindowFactory windowFactory) => _windowFactory = windowFactory;
 
-        /// <summary> Проверяет, открыто ли окно указанного типа. </summary>
-        public bool IsOpened<TWindow>() where TWindow : BaseWindow
-        {
-            var window = GetWindow<TWindow>();
-            return window && window.IsOpened;
-        }
-
         /// <summary> Открывает окно. Если уже открыто — переносит наверх. </summary>
-        public TWindow OpenWindow<TWindow>() where TWindow : BaseWindow
+        public void OpenWindow<TWindow>() where TWindow : BaseWindow
         {
             var window = GetWindow<TWindow>();
-            if (!window) return null;
+            if (!window) Debug.LogError("Window not found: " + typeof(TWindow).Name);
 
             if (window.IsOpened)
-            {
-                _openedWindows.Remove(window);
-                _openedWindows.Add(window);
-                window.transform.SetAsLastSibling();
-            }
+                BringWindowToFront(window);
             else
-            {
                 window.Open();
-            }
-
-            return window;
         }
 
         /// <summary> Закрывает указанное окно. </summary>
@@ -77,13 +62,6 @@ namespace FlavorfulStory.Infrastructure.Services.WindowService
 
             var top = _openedWindows.Last();
             top.Close();
-        }
-
-        /// <summary> Закрывает все открытые окна. </summary>
-        public void CloseAllWindows()
-        {
-            var snapshot = _openedWindows.ToArray();
-            foreach (var window in snapshot) window.Close();
         }
 
         /// <summary> Возвращает окно по типу. Создает, если ещё не зарегистрировано. </summary>
@@ -141,6 +119,15 @@ namespace FlavorfulStory.Infrastructure.Services.WindowService
         {
             OnWindowOpened = null;
             OnWindowClosed = null;
+        }
+        
+        /// <summary> Поднять окно на верх стека. </summary>
+        /// <param name="window"> Окно, которое нужно поднять. </param>
+        private void BringWindowToFront(BaseWindow window)
+        {
+            _openedWindows.Remove(window);
+            _openedWindows.Add(window);
+            window.transform.SetAsLastSibling();
         }
     }
 }
