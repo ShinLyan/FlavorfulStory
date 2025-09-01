@@ -1,6 +1,6 @@
-﻿using UnityEngine;
+﻿using FlavorfulStory.InventorySystem;
+using UnityEngine;
 using Zenject;
-using FlavorfulStory.InventorySystem;
 
 namespace FlavorfulStory.PickupSystem
 {
@@ -10,7 +10,7 @@ namespace FlavorfulStory.PickupSystem
     public class Pickup : MonoBehaviour
     {
         /// <summary> Радиус подбора предмета. </summary>
-        [Tooltip("Радиус подбора предмета."), SerializeField, Range(0f, 5f)]
+        [Tooltip("Радиус подбора предмета."), SerializeField, Range(1f, 5f)]
         private float _pickupRadius;
 
         /// <summary> Стак предметов для подбора. </summary>
@@ -22,7 +22,7 @@ namespace FlavorfulStory.PickupSystem
 
         /// <summary> Количество предметов, доступных для подбора. </summary>
         public int Number => _itemStack.Number;
-        
+
         /// <summary> Ссылка на инвентарь игрока. </summary>
         private Inventory _inventory;
 
@@ -31,7 +31,7 @@ namespace FlavorfulStory.PickupSystem
 
         /// <summary> Возвращает true, если предмет можно подобрать и в инвентаре есть место. </summary>
         public bool CanBePickedUp => _canBePickedUp && _inventory.HasSpaceFor(Item);
-        
+
         /// <summary> Внедрение зависимостей. </summary>
         /// <param name="inventory"> Инвентарь игрока. </param>
         [Inject]
