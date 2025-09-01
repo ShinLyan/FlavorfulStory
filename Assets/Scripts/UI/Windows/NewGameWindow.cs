@@ -59,6 +59,7 @@ namespace FlavorfulStory.UI.Windows
         {
             _closeButton.onClick.AddListener(Close);
             _newGameButton.onClick.AddListener(StartNewGame);
+            _newGameButton.onClick.AddListener(Close);
             _errorMessage.gameObject.SetActive(false);
             ClearInputFields();
 
@@ -69,6 +70,8 @@ namespace FlavorfulStory.UI.Windows
         /// <summary> Обработчик закрытия окна: очистка tween и скрытие ошибки. </summary>
         protected override void OnClosed()
         {
+            _closeButton.onClick.RemoveListener(Close);
+            _newGameButton.onClick.RemoveListener(Close);
             _errorMessage.SetActive(false);
             _errorFadeTween?.Kill();
         }
