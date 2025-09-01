@@ -16,12 +16,6 @@ namespace FlavorfulStory.Infrastructure.Installers
         [Header("UI Root")]
         [SerializeField] private Canvas _canvas;
 
-        /// <summary> EventSystem для обработки ввода. </summary>
-        [SerializeField] private EventSystem _eventSystem;
-
-        /// <summary> Raycaster для UI-интеракций. </summary>
-        [SerializeField] private GraphicRaycaster _raycaster;
-
         /// <summary> Затемнение HUD'а (опционально). </summary>
         [Header("Optional Fade")]
         [SerializeField] private CanvasGroupFader _hudFader;
@@ -37,8 +31,6 @@ namespace FlavorfulStory.Infrastructure.Installers
             Container.BindInterfacesTo<WindowWarmupper>().AsSingle();
 
             Container.Bind<Canvas>().FromInstance(_canvas).AsSingle();
-            Container.Bind<EventSystem>().FromInstance(_eventSystem).AsSingle();
-            Container.Bind<GraphicRaycaster>().FromInstance(_raycaster).AsSingle();
 
             if (_hudFader) Container.Bind<CanvasGroupFader>().WithId("HUD").FromInstance(_hudFader).AsCached();
             if (_backgroundFader)
