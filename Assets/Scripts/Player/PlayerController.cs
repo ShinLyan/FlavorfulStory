@@ -1,3 +1,5 @@
+using UnityEngine;
+using Zenject;
 using FlavorfulStory.CursorSystem;
 using FlavorfulStory.InputSystem;
 using FlavorfulStory.InteractionSystem;
@@ -9,8 +11,6 @@ using FlavorfulStory.Toolbar;
 using FlavorfulStory.Toolbar.UI;
 using FlavorfulStory.Tools;
 using FlavorfulStory.Utils;
-using UnityEngine;
-using Zenject;
 
 namespace FlavorfulStory.Player
 {

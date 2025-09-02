@@ -1,7 +1,10 @@
 ﻿using System.Collections.Generic;
+using FlavorfulStory.Player;
 using FlavorfulStory.UI.Windows;
 using UnityEngine;
+using UnityEngine.PlayerLoop;
 using UnityEngine.UI;
+using Zenject;
 
 namespace FlavorfulStory.InventorySystem.UI
 {
@@ -20,12 +23,15 @@ namespace FlavorfulStory.InventorySystem.UI
         /// <summary> Кнопка "Add to Existing" — переносит стакающиеся предметы. </summary>
         [SerializeField] private Button _closeButton;
 
+        /// <summary> Контроллер игрока. </summary>
+        [Inject] private readonly PlayerController _playerController;
+        
         /// <summary> Первый инвентарь. </summary>
         private Inventory _chestInventory;
 
         /// <summary> Второй инвентарь. </summary>
         private Inventory _playerInventory;
-
+        
         /// <summary> Подписывает обработчик на кнопку переноса предметов. </summary>
         private void Awake()
         {
@@ -50,11 +56,14 @@ namespace FlavorfulStory.InventorySystem.UI
             _playerInventoryView.Initialize(_playerInventory);
         }
 
-        /// <summary> Обработка закрытия окна. Очищает ссылки и снимает подписки. </summary>
+        /// <summary> Обработка закрытия окна. </summary>
+        /// <remarks> Очищает ссылки и снимает подписки. "Освобождает" игрока. </remarks>
         protected override void OnClosed()
         {
             _playerInventory = null;
             _chestInventory = null;
+
+            _playerController.SetBusyState(false);
         }
 
         /// <summary> Обрабатывает нажатие на кнопку "Add to Existing". </summary>

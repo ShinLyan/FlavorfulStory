@@ -22,9 +22,6 @@ namespace FlavorfulStory.InventorySystem.UI
         /// <summary> Контейнер для размещения отображений ячеек. </summary>
         private Transform _slotsContainer;
 
-        /// <summary> Флаг инициализации вьюхи. </summary>
-        private bool _initialized;
-
         /// <summary> Внедрить зависимости Zenject. </summary>
         /// <param name="slotFactory"> Фабрика отображений слотов. </param>
         [Inject]
@@ -34,17 +31,13 @@ namespace FlavorfulStory.InventorySystem.UI
         /// <param name="inventory"> Инвентарь. </param>
         public void Initialize(Inventory inventory)
         {
-            if (_inventory == inventory && _initialized) return;
+            if (_inventory == inventory) return;
 
             if (_inventory) _inventory.InventoryUpdated -= UpdateView;
             _inventory = inventory;
-
-            if (!_initialized)
-            {
-                _initialized = true;
-                _slotsContainer = transform;
-                CacheInitialSlots();
-            }
+            
+            _slotsContainer = transform;
+            CacheInitialSlots();
 
             _inventory.InventoryUpdated += UpdateView;
             UpdateView();
