@@ -1,16 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using DG.Tweening;
-using FlavorfulStory.Infrastructure.Services.WindowService;
 using FlavorfulStory.InputSystem;
 using FlavorfulStory.UI.Animation;
+using FlavorfulStory.Windows.UI;
 using Zenject;
 
-namespace FlavorfulStory.UI.Windows
+namespace FlavorfulStory.Windows
 {
     /// <summary> Координатор фейдов HUD и фонового затемнения при открытии и закрытии UI-окон. </summary>
     /// <remarks> Управляет порядком открытия окон через <see cref="IWindowOpenGate"/>. </remarks>
-    public sealed class UIOverlayFadeCoordinator : IInitializable, IDisposable, IWindowOpenGate
+    public class UIOverlayFadeCoordinator : IInitializable, IDisposable, IWindowOpenGate
     {
         /// <summary> Сервис окон. </summary>
         private readonly IWindowService _windowService;
@@ -50,15 +50,15 @@ namespace FlavorfulStory.UI.Windows
             _hudFader.SetState(_settings.HudMaxAlpha, true, true);
             _backgroundFader.SetState(0f, false, false);
 
-            _windowService.OnWindowOpened += HandleWindowOpened;
-            _windowService.OnWindowClosed += HandleWindowClosed;
+            _windowService.WindowOpened += HandleWindowOpened;
+            _windowService.WindowClosed += HandleWindowClosed;
         }
 
         /// <summary> Очистка подписок. </summary>
         public void Dispose()
         {
-            _windowService.OnWindowOpened -= HandleWindowOpened;
-            _windowService.OnWindowClosed -= HandleWindowClosed;
+            _windowService.WindowOpened -= HandleWindowOpened;
+            _windowService.WindowClosed -= HandleWindowClosed;
         }
 
         /// <summary> Обработка события открытия окна. </summary>

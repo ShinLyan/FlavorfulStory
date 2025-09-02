@@ -1,4 +1,4 @@
-﻿using FlavorfulStory.UI.Windows;
+﻿using FlavorfulStory.Windows.UI;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;

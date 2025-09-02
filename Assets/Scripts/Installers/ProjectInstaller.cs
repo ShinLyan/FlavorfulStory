@@ -6,7 +6,7 @@ using FlavorfulStory.UI.Animation;
 using UnityEngine;
 using Zenject;
 
-namespace FlavorfulStory.Infrastructure.Installers
+namespace FlavorfulStory.Installers
 {
     /// <summary> Устанавливает зависимости, необходимые на уровне проекта. </summary>
     public class ProjectInstaller : MonoInstaller

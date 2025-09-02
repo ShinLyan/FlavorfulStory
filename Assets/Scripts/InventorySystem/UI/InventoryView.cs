@@ -35,7 +35,7 @@ namespace FlavorfulStory.InventorySystem.UI
 
             if (_inventory) _inventory.InventoryUpdated -= UpdateView;
             _inventory = inventory;
-            
+
             _slotsContainer = transform;
             CacheInitialSlots();
 

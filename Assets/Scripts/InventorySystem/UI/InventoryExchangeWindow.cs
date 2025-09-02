@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
 using FlavorfulStory.Player;
-using FlavorfulStory.UI.Windows;
+using FlavorfulStory.Windows.UI;
 using UnityEngine;
-using UnityEngine.PlayerLoop;
 using UnityEngine.UI;
 using Zenject;
 
@@ -24,14 +23,19 @@ namespace FlavorfulStory.InventorySystem.UI
         [SerializeField] private Button _closeButton;
 
         /// <summary> Контроллер игрока. </summary>
-        [Inject] private readonly PlayerController _playerController;
-        
+        private PlayerController _playerController;
+
         /// <summary> Первый инвентарь. </summary>
         private Inventory _chestInventory;
 
         /// <summary> Второй инвентарь. </summary>
         private Inventory _playerInventory;
-        
+
+        /// <summary> Внедрение зависимостей Zenject. </summary>
+        /// <param name="playerController"> Контроллер игрока. </param>
+        [Inject]
+        private void Construct(PlayerController playerController) => _playerController = playerController;
+
         /// <summary> Подписывает обработчик на кнопку переноса предметов. </summary>
         private void Awake()
         {

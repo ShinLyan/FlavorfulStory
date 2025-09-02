@@ -4,7 +4,7 @@ using System.Linq;
 using FlavorfulStory.Infrastructure;
 using FlavorfulStory.Infrastructure.Factories;
 using FlavorfulStory.InventorySystem;
-using FlavorfulStory.UI.Windows;
+using FlavorfulStory.Windows.UI;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;

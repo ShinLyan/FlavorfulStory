@@ -8,7 +8,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
 
-namespace FlavorfulStory.UI.Windows
+namespace FlavorfulStory.Windows.UI
 {
     /// <summary> Окно создания новой игры: ввод имени игрока, названия магазина и валидация. </summary>
     public class NewGameWindow : BaseWindow

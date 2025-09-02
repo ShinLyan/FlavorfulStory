@@ -2,7 +2,7 @@ using FlavorfulStory.UI.Settings;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace FlavorfulStory.UI.Windows
+namespace FlavorfulStory.Windows.UI
 {
     /// <summary> Окно настроек с кнопкой закрытия. </summary>
     [RequireComponent(typeof(ScreenSettings))]

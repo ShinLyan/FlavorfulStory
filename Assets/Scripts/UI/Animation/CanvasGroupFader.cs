@@ -1,5 +1,5 @@
-using UnityEngine;
 using DG.Tweening;
+using UnityEngine;
 
 namespace FlavorfulStory.UI.Animation
 {

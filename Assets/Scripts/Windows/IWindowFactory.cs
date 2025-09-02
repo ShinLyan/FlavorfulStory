@@ -1,7 +1,7 @@
 ﻿using Cysharp.Threading.Tasks;
-using FlavorfulStory.UI.Windows;
+using FlavorfulStory.Windows.UI;
 
-namespace FlavorfulStory.Infrastructure.Factories.Window
+namespace FlavorfulStory.Windows
 {
     /// <summary> Фабрика окон: инициализация, прогрев, создание окон по типу. </summary>
     public interface IWindowFactory

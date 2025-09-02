@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace FlavorfulStory.UI.Windows
+namespace FlavorfulStory.Windows.UI
 {
     /// <summary> Окно подтверждения выхода из игры. </summary>
     public class ExitConfirmationWindow : BaseWindow

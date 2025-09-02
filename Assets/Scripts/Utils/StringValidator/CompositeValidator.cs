@@ -21,10 +21,8 @@ namespace FlavorfulStory.Utils.StringValidator
         public bool IsValid(string input, out string error)
         {
             foreach (var validator in _validators)
-            {
                 if (!validator.IsValid(input, out error))
                     return false;
-            }
 
             error = string.Empty;
             return true;

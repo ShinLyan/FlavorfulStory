@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
-using FlavorfulStory.Infrastructure.Addresses;
-using FlavorfulStory.UI.Windows;
+using FlavorfulStory.Windows.UI;
 using UnityEngine;
 using Zenject;
 using Object = UnityEngine.Object;
 
-namespace FlavorfulStory.Infrastructure.Factories.Window
+namespace FlavorfulStory.Windows
 {
     /// <summary> Фабрика для создания UI-окон с DI и прогревом. </summary>
     public class WindowFactory : IWindowFactory

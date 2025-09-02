@@ -1,11 +1,20 @@
 using System;
-using FlavorfulStory.UI.Windows;
+using FlavorfulStory.Windows.UI;
 
-namespace FlavorfulStory.Infrastructure.Services.WindowService
+namespace FlavorfulStory.Windows
 {
     /// <summary> Сервис управления UI-окнами: открытие, закрытие, события, пауза и ввод. </summary>
     public interface IWindowService
     {
+        /// <summary> Есть ли открытые окна. </summary>
+        bool HasOpenWindows { get; }
+
+        /// <summary> Событие: окно было открыто. </summary>
+        event Action<BaseWindow> WindowOpened;
+
+        /// <summary> Событие: окно было закрыто. </summary>
+        event Action<BaseWindow> WindowClosed;
+
         /// <summary> Возвращает экземпляр окна по типу. Создает при первом вызове. </summary>
         TWindow GetWindow<TWindow>() where TWindow : BaseWindow;
 
@@ -17,14 +26,5 @@ namespace FlavorfulStory.Infrastructure.Services.WindowService
 
         /// <summary> Закрывает самое верхнее (последнее) окно. </summary>
         void CloseTopWindow();
-
-        /// <summary> Событие: окно было открыто. </summary>
-        event Action<BaseWindow> OnWindowOpened;
-
-        /// <summary> Событие: окно было закрыто. </summary>
-        event Action<BaseWindow> OnWindowClosed;
-
-        /// <summary> Есть ли открытые окна. </summary>
-        bool HasOpenWindows { get; }
     }
 }

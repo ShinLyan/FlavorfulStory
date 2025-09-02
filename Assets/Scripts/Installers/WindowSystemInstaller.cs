@@ -1,13 +1,9 @@
-using FlavorfulStory.Infrastructure.Factories.Window;
-using FlavorfulStory.Infrastructure.Services.WindowService;
 using FlavorfulStory.UI.Animation;
-using FlavorfulStory.UI.Windows;
+using FlavorfulStory.Windows;
 using UnityEngine;
-using UnityEngine.EventSystems;
-using UnityEngine.UI;
 using Zenject;
 
-namespace FlavorfulStory.Infrastructure.Installers
+namespace FlavorfulStory.Installers
 {
     /// <summary> Инсталлер для систем UI-окон, включая фабрику, сервис и опциональные анимации. </summary>
     public class WindowSystemInstaller : MonoInstaller
@@ -26,7 +22,7 @@ namespace FlavorfulStory.Infrastructure.Installers
         /// <summary> Привязывает сервис окон, фабрику и все зависимости UI-системы. </summary>
         public override void InstallBindings()
         {
-            Container.Bind<IWindowService>().To<WindowService>().AsSingle();
+            Container.BindInterfacesTo<WindowService>().AsSingle();
             Container.Bind<IWindowFactory>().To<WindowFactory>().AsSingle();
             Container.BindInterfacesTo<WindowWarmupper>().AsSingle();
 

@@ -1,9 +1,9 @@
 ﻿using System;
 using Cysharp.Threading.Tasks;
-using FlavorfulStory.Infrastructure.Services.WindowService;
 using FlavorfulStory.Player;
 using FlavorfulStory.SceneManagement;
 using FlavorfulStory.TimeManagement.UI;
+using FlavorfulStory.Windows;
 using Zenject;
 
 namespace FlavorfulStory.TimeManagement

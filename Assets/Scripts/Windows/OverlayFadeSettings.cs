@@ -1,7 +1,7 @@
 ﻿using DG.Tweening;
 using UnityEngine;
 
-namespace FlavorfulStory.UI.Windows
+namespace FlavorfulStory.Windows
 {
     /// <summary> Настройки фейдов HUD и фонового затемнения. </summary>
     [CreateAssetMenu(menuName = "FlavorfulStory/StaticData/UI/OverlayFadeSettings")]

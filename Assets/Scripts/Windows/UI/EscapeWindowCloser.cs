@@ -1,9 +1,8 @@
-using FlavorfulStory.Infrastructure.Services.WindowService;
 using FlavorfulStory.InputSystem;
 using UnityEngine;
 using Zenject;
 
-namespace FlavorfulStory.UI.Windows
+namespace FlavorfulStory.Windows.UI
 {
     /// <summary> Обработчик нажатия ESC / кнопки меню. Открывает или закрывает окна. </summary>
     public class EscapeWindowCloser : MonoBehaviour

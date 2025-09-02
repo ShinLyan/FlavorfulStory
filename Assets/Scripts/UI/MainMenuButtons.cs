@@ -1,7 +1,7 @@
 using Cysharp.Threading.Tasks;
-using FlavorfulStory.Infrastructure.Services.WindowService;
 using FlavorfulStory.SceneManagement;
-using FlavorfulStory.UI.Windows;
+using FlavorfulStory.Windows;
+using FlavorfulStory.Windows.UI;
 using UnityEngine;
 using UnityEngine.UI;
 using Zenject;

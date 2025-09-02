@@ -1,7 +1,7 @@
-﻿using FlavorfulStory.UI.Windows;
+﻿using FlavorfulStory.Windows.UI;
 using UnityEngine;
 
-namespace FlavorfulStory.Infrastructure.Addresses
+namespace FlavorfulStory.Windows
 {
     /// <summary> Адреса префабов окон, используемых в игре. </summary>
     [CreateAssetMenu(menuName = "FlavorfulStory/StaticData/WindowAddresses")]

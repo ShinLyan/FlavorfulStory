@@ -2,7 +2,7 @@
 using UnityEngine;
 using Zenject;
 
-namespace FlavorfulStory.UI.Windows
+namespace FlavorfulStory.Windows.UI
 {
     /// <summary> Базовый класс для всех UI-окон. Управляет открытием, закрытием и событиями. </summary>
     public abstract class BaseWindow : MonoBehaviour

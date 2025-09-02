@@ -3,11 +3,12 @@ using FlavorfulStory.InputSystem;
 using FlavorfulStory.InventorySystem;
 using FlavorfulStory.InventorySystem.UI;
 using FlavorfulStory.SceneManagement;
+using FlavorfulStory.UI;
 using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
 
-namespace FlavorfulStory.UI.Windows
+namespace FlavorfulStory.Windows.UI
 {
     /// <summary> Меню игры, управляющее вкладками, их выбором и скрытием контента.
     /// Обрабатывает ввод для переключения вкладок и скрытия/показа меню. </summary>

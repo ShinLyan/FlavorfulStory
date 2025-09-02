@@ -35,7 +35,7 @@ using Unity.Cinemachine;
 using UnityEngine;
 using Zenject;
 
-namespace FlavorfulStory.Infrastructure.Installers
+namespace FlavorfulStory.Installers
 {
     /// <summary> Установщик зависимостей, необходимых для игрового процесса. </summary>
     public class GameplayInstaller : MonoInstaller
@@ -115,7 +115,7 @@ namespace FlavorfulStory.Infrastructure.Installers
         private void BindBuildingRepair()
         {
             Container.Bind<IPrefabFactory<ResourceRequirementView>>()
-                .To<Factories.PrefabFactory<ResourceRequirementView>>().AsSingle()
+                .To<Infrastructure.Factories.PrefabFactory<ResourceRequirementView>>().AsSingle()
                 .WithArguments(_requirementViewPrefab);
         }
 
@@ -151,14 +151,15 @@ namespace FlavorfulStory.Infrastructure.Installers
         {
             Container.Bind<Equipment>().FromComponentInHierarchy().AsSingle();
 
-            Container.Bind<IPrefabFactory<Pickup>>().To<Factories.PrefabFactory<Pickup>>().AsSingle();
+            Container.Bind<IPrefabFactory<Pickup>>().To<Infrastructure.Factories.PrefabFactory<Pickup>>().AsSingle();
 
             Container.Bind<IItemDropService>().To<ItemDropService>().AsSingle();
             Container.Bind<ISaveable>().To<ItemDropService>().FromResolve();
             Container.Bind<IInventoryProvider>().To<InventoryProvider>().AsSingle().NonLazy();
 
-            Container.Bind<IPrefabFactory<InventorySlotView>>().To<Factories.PrefabFactory<InventorySlotView>>()
-                .AsSingle().WithArguments(_inventorySlotViewPrefab);
+            Container.Bind<IPrefabFactory<InventorySlotView>>()
+                .To<Infrastructure.Factories.PrefabFactory<InventorySlotView>>().AsSingle()
+                .WithArguments(_inventorySlotViewPrefab);
 
             Container.BindInterfacesTo<ToolUseController>().AsSingle();
             Container.BindInterfacesTo<EdibleUseController>().AsSingle();
@@ -188,7 +189,8 @@ namespace FlavorfulStory.Infrastructure.Installers
         private void BindPlacementSystem()
         {
             Container.Bind<PlacementPreview>().FromComponentInHierarchy().AsSingle();
-            Container.Bind<IPrefabFactory<PlaceableObject>>().To<Factories.PrefabFactory<PlaceableObject>>().AsSingle();
+            Container.Bind<IPrefabFactory<PlaceableObject>>()
+                .To<Infrastructure.Factories.PrefabFactory<PlaceableObject>>().AsSingle();
             Container.BindInterfacesAndSelfTo<PlacementController>().AsSingle().WithArguments(_placeableContainer);
 
             var placeables = FindObjectsByType<PlaceableObject>(FindObjectsInactive.Include, FindObjectsSortMode.None);
@@ -208,7 +210,8 @@ namespace FlavorfulStory.Infrastructure.Installers
         {
             Container.Bind<QuestList>().FromComponentInHierarchy().AsSingle();
             Container.Bind<IQuestList>().To<QuestList>().FromResolve();
-            Container.Bind<IPrefabFactory<QuestListButton>>().To<Factories.PrefabFactory<QuestListButton>>().AsSingle()
+            Container.Bind<IPrefabFactory<QuestListButton>>()
+                .To<Infrastructure.Factories.PrefabFactory<QuestListButton>>().AsSingle()
                 .WithArguments(_questListButtonPrefab);
             Container.Bind<QuestDescriptionView>().FromComponentInHierarchy().AsSingle();
 
@@ -250,8 +253,8 @@ namespace FlavorfulStory.Infrastructure.Installers
             Container.Bind<GlobalLightSystem>().FromComponentInHierarchy().AsSingle();
             Container.Bind<CinemachineCamera>().FromInstance(_teleportVirtualCamera).AsSingle();
 
-            Container.Bind<IPrefabFactory<NonInteractableNpc>>().To<Factories.PrefabFactory<NonInteractableNpc>>()
-                .AsSingle();
+            Container.Bind<IPrefabFactory<NonInteractableNpc>>()
+                .To<Infrastructure.Factories.PrefabFactory<NonInteractableNpc>>().AsSingle();
         }
     }
 }

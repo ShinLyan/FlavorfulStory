@@ -1,10 +1,9 @@
 using FlavorfulStory.Actions;
-using FlavorfulStory.Infrastructure.Services.WindowService;
 using FlavorfulStory.InteractionSystem;
 using FlavorfulStory.Player;
-using FlavorfulStory.TimeManagement.UI;
 using FlavorfulStory.TooltipSystem.ActionTooltips;
-using FlavorfulStory.UI.Windows;
+using FlavorfulStory.Windows;
+using FlavorfulStory.Windows.UI;
 using UnityEngine;
 using Zenject;
 

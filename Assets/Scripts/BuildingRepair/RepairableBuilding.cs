@@ -4,13 +4,13 @@ using System.Linq;
 using FlavorfulStory.Actions;
 using FlavorfulStory.Audio;
 using FlavorfulStory.BuildingRepair.UI;
-using FlavorfulStory.Infrastructure.Services.WindowService;
 using FlavorfulStory.InteractionSystem;
 using FlavorfulStory.InventorySystem;
 using FlavorfulStory.ObjectManagement;
 using FlavorfulStory.Player;
 using FlavorfulStory.Saving;
 using FlavorfulStory.TooltipSystem.ActionTooltips;
+using FlavorfulStory.Windows;
 using UnityEngine;
 using Zenject;
 

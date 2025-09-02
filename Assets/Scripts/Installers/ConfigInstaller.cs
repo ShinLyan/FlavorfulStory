@@ -1,13 +1,12 @@
-using FlavorfulStory.Infrastructure.Addresses;
 using FlavorfulStory.Notifications.Configs;
-using FlavorfulStory.UI.Windows;
+using FlavorfulStory.Windows;
 using UnityEngine;
 using Zenject;
 
-namespace FlavorfulStory.Infrastructure.Installers
+namespace FlavorfulStory.Installers
 {
     /// <summary> Инсталлер для биндинга ScriptableObject-конфигов. </summary>
-    [CreateAssetMenu(fileName = "ConfigInstaller", menuName = "Installers/ConfigInstaller")]
+    [CreateAssetMenu(fileName = "ConfigInstaller", menuName = "FlavorfulStory/Installers/ConfigInstaller")]
     public class ConfigInstaller : ScriptableObjectInstaller<ConfigInstaller>
     {
         /// <summary> Адреса всех UI-окон (префабы). </summary>

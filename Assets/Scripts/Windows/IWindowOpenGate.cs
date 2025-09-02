@@ -1,7 +1,7 @@
 ﻿using System;
-using FlavorfulStory.UI.Windows;
+using FlavorfulStory.Windows.UI;
 
-namespace FlavorfulStory
+namespace FlavorfulStory.Windows
 {
     /// <summary> Гейт, который гарантирует фейды перед открытием первого окна. </summary>
     public interface IWindowOpenGate
