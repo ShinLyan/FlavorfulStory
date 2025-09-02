@@ -1,5 +1,4 @@
 ﻿using System;
-using FlavorfulStory.Windows.UI;
 
 namespace FlavorfulStory.Windows
 {
@@ -7,6 +6,7 @@ namespace FlavorfulStory.Windows
     public interface IWindowOpenGate
     {
         /// <summary> Запросить открытие окна: либо сразу, либо после фейдов (если это первое окно). </summary>
-        void RequestOpen(BaseWindow window, Action openAction);
+        /// <param name="openAction"> Действие при открытии. </param>
+        void RequestOpen(Action openAction);
     }
 }

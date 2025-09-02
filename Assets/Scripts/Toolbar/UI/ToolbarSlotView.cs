@@ -1,12 +1,12 @@
 using System;
-using UnityEngine;
-using UnityEngine.UI;
-using TMPro;
-using Zenject;
 using DG.Tweening;
 using FlavorfulStory.InventorySystem;
 using FlavorfulStory.InventorySystem.UI;
 using FlavorfulStory.UI;
+using TMPro;
+using UnityEngine;
+using UnityEngine.UI;
+using Zenject;
 
 namespace FlavorfulStory.Toolbar.UI
 {
@@ -39,13 +39,18 @@ namespace FlavorfulStory.Toolbar.UI
         public event Action<int> OnSlotClicked;
 
         /// <summary> Провайдер инвентарей. </summary>
-        [Inject] private readonly IInventoryProvider _inventoryProvider;
+        private IInventoryProvider _inventoryProvider;
 
         /// <summary> Анимация затухания подсветки при наведении курсора. </summary>
         private Tween _hoverTween;
 
         /// <summary> Анимация изменения цвета слота при выборе или сбросе. </summary>
         private Tween _colorTween;
+
+        /// <summary> Внедрение зависимостей Zenject. </summary>
+        /// <param name="inventoryProvider"> Провайдер инвентарей. </param>
+        [Inject]
+        private void Construct(IInventoryProvider inventoryProvider) => _inventoryProvider = inventoryProvider;
 
         /// <summary> Освобождает ресурсы и завершает активные анимации при уничтожении объекта. </summary>
         private void OnDestroy()
@@ -102,7 +107,7 @@ namespace FlavorfulStory.Toolbar.UI
         }
 
         /// <summary> Обновляет отображение предмета в слоте. </summary>
-        public void Redraw() => 
+        public void Redraw() =>
             _itemStackView.UpdateView(_inventoryProvider.GetPlayerInventory().GetItemStackInSlot(_index));
 
         /// <summary> Получает предмет, находящийся в данном слоте. </summary>

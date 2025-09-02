@@ -9,11 +9,11 @@ namespace FlavorfulStory.Windows
         /// <summary> Есть ли открытые окна. </summary>
         bool HasOpenWindows { get; }
 
-        /// <summary> Событие: окно было открыто. </summary>
-        event Action<BaseWindow> WindowOpened;
+        /// <summary> Событие открытия окна. </summary>
+        event Action WindowOpened;
 
-        /// <summary> Событие: окно было закрыто. </summary>
-        event Action<BaseWindow> WindowClosed;
+        /// <summary> Событие закрытия окна. </summary>
+        event Action WindowClosed;
 
         /// <summary> Возвращает экземпляр окна по типу. Создает при первом вызове. </summary>
         TWindow GetWindow<TWindow>() where TWindow : BaseWindow;

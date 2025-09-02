@@ -23,8 +23,7 @@ namespace FlavorfulStory.Installers
         public override void InstallBindings()
         {
             Container.BindInterfacesTo<WindowService>().AsSingle();
-            Container.Bind<IWindowFactory>().To<WindowFactory>().AsSingle();
-            Container.BindInterfacesTo<WindowWarmupper>().AsSingle();
+            Container.BindInterfacesTo<WindowFactory>().AsSingle();
 
             Container.Bind<Canvas>().FromInstance(_canvas).AsSingle();
 

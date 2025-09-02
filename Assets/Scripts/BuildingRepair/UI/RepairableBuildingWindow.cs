@@ -100,13 +100,15 @@ namespace FlavorfulStory.BuildingRepair.UI
             _onReturn = onReturn;
             _onBuild = onBuild;
 
-            _buildButton.onClick.AddListener(_onBuild.Invoke);
-
             UpdateView(stage, investedResources);
         }
 
         /// <summary> Открытие окна. </summary>
-        protected override void OnOpened() => _requirementViewsContainer.gameObject.SetActive(true);
+        protected override void OnOpened()
+        {
+            _buildButton.onClick.AddListener(_onBuild.Invoke);
+            _requirementViewsContainer.gameObject.SetActive(true);
+        }
 
         /// <summary> Закрытие окна. </summary>
         protected override void OnClosed()

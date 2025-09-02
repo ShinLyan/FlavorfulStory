@@ -17,9 +17,6 @@ namespace FlavorfulStory.InventorySystem
         /// <summary> Провайдер инвентарей. </summary>
         private IInventoryProvider _inventoryProvider;
 
-        /// <summary> Провайдер инвентарей. </summary>
-        private PlayerController _playerController;
-
         /// <summary> Сервис окон. </summary>
         private IWindowService _windowService;
 
@@ -28,27 +25,17 @@ namespace FlavorfulStory.InventorySystem
 
         /// <summary> Внедрение зависимостей Zenject. </summary>
         /// <param name="inventoryProvider"> Провайдер для получения других инвентарей (например, игрока). </param>
-        /// <param name="playerController"> Контроллер игрока. </param>
         /// <param name="windowService"> Сервис окон. </param>
         [Inject]
-        private void Construct(IInventoryProvider inventoryProvider, PlayerController playerController,
-            IWindowService windowService)
+        private void Construct(IInventoryProvider inventoryProvider, IWindowService windowService)
         {
             _inventoryProvider = inventoryProvider;
-            _playerController = playerController;
             _windowService = windowService;
         }
 
         /// <summary> Инициализация сундука. </summary>
         /// <remarks> Получение ссылки на инвентарь сундука. </remarks>
         private void Awake() => _inventory = GetComponent<Inventory>();
-
-        /// <summary>
-        /// 
-        /// </summary>
-        private void Start() =>
-            _windowService.GetWindow<InventoryExchangeWindow>().Closed += () => _playerController.SetBusyState(false);
-        // TODO: Вынести в `InventoryExchangeWindow`
 
         #region IInteractable
 

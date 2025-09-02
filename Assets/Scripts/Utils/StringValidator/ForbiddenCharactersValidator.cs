@@ -6,16 +6,19 @@ namespace FlavorfulStory.Utils.StringValidator
     public class ForbiddenCharactersValidator : IStringValidator
     {
         /// <summary> Массив запрещённых символов. </summary>
-        private readonly char[] _forbidden;
+        private static readonly char[] ForbiddenCharacters =
+        {
+            '"', '\'', '@', '#', '$', '%', '^', '&', '*', '(', ')', '=', '+',
+            '[', ']', '{', '}', '\\', '|', '/', '<', '>', '?', '`', '~'
+        };
 
-        /// <summary> Конструктор. </summary>
-        /// <param name="forbidden"> Запрещённые символы. </param>
-        public ForbiddenCharactersValidator(char[] forbidden) => _forbidden = forbidden;
-
-        /// <inheritdoc />
+        /// <summary> Проверяет строку на корректность. </summary>
+        /// <param name="input"> Входная строка. </param>
+        /// <param name="error"> Сообщение об ошибке (если есть). </param>
+        /// <returns> True — строка валидна, False — ошибка. </returns>
         public bool IsValid(string input, out string error)
         {
-            if (input.Any(c => _forbidden.Contains(c)))
+            if (input.Any(c => ForbiddenCharacters.Contains(c)))
             {
                 error = "The text contains forbidden characters!";
                 return false;

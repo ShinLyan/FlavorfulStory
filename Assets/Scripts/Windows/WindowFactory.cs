@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Cysharp.Threading.Tasks;
 using FlavorfulStory.Windows.UI;
 using UnityEngine;
 using Zenject;
@@ -9,10 +8,10 @@ using Object = UnityEngine.Object;
 namespace FlavorfulStory.Windows
 {
     /// <summary> Фабрика для создания UI-окон с DI и прогревом. </summary>
-    public class WindowFactory : IWindowFactory
+    public class WindowFactory : IInitializable, IWindowFactory
     {
-        /// <summary> Канвас, в котором будут появляться окна. </summary>
-        private readonly Canvas _canvas;
+        /// <summary> Родитель для всех окон. </summary>
+        private readonly Transform _spawnRoot;
 
         /// <summary> ScriptableObject с адресами всех окон. </summary>
         private readonly WindowAddresses _windows;
@@ -23,32 +22,21 @@ namespace FlavorfulStory.Windows
         /// <summary> Словарь соответствий: тип окна → его префаб. </summary>
         private readonly Dictionary<Type, BaseWindow> _prefabByType = new();
 
-        /// <summary> Родитель для всех окон. </summary>
-        private Transform _spawnRoot;
-
-        /// <summary> Флаг, указывающий, что фабрика уже была прогрета. </summary>
-        private bool _isWarmedUp;
-
         /// <summary> Конструктор фабрики. </summary>
         /// <param name="canvas"> Канвас, куда будут спавниться окна. </param>
         /// <param name="windows"> Адреса префабов окон. </param>
         /// <param name="container"> Контейнер Zenject для внедрения зависимостей. </param>
         public WindowFactory(Canvas canvas, WindowAddresses windows, DiContainer container)
         {
-            _canvas = canvas;
+            _spawnRoot = canvas.transform;
             _windows = windows;
             _container = container;
         }
 
-        /// <summary> Устанавливает корень для будущих окон (обычно Canvas). </summary>
-        public void Initialize() => _spawnRoot = _canvas.transform;
-
-        /// <summary> Прогревает фабрику, подготавливая словарь типов. </summary>
-        public async UniTask WarmUpAsync()
+        /// <summary> Инициализирует фабрику: устанавливает родитель и кэширует все доступные префабы окон. </summary>
+        public void Initialize()
         {
-            if (_isWarmedUp) return;
-
-            foreach (var window in EnumerateAllPrefabs())
+            foreach (var window in _windows.AllWindows())
             {
                 if (!window)
                 {
@@ -56,19 +44,15 @@ namespace FlavorfulStory.Windows
                     continue;
                 }
 
-                var type = window.GetType();
-                _prefabByType.TryAdd(type, window);
+                _prefabByType.TryAdd(window.GetType(), window);
             }
-
-            _isWarmedUp = true;
-            await UniTask.Yield();
         }
 
         /// <summary> Создает окно по типу, внедряет зависимости, вызывает Initialize() и активирует. </summary>
+        /// <typeparam name="T"> Тип окна, унаследованный от <see cref="BaseWindow"/>. </typeparam>
+        /// <returns> Экземпляр созданного окна, либо null, если префаб не найден. </returns>
         public T CreateWindow<T>() where T : BaseWindow
         {
-            EnsureWarmup();
-
             var type = typeof(T);
             if (!_prefabByType.TryGetValue(type, out var prefab))
             {
@@ -81,31 +65,11 @@ namespace FlavorfulStory.Windows
 
             _container.InjectGameObject(instance);
 
-            foreach (var init in instance.GetComponentsInChildren<IInitializable>(true)) init.Initialize();
+            foreach (var initializable in instance.GetComponentsInChildren<IInitializable>(true))
+                initializable.Initialize();
 
             instance.SetActive(true);
             return instance.GetComponent<T>();
-        }
-
-        /// <summary> Возвращает все окна из ScriptableObject с адресами. </summary>
-        private IEnumerable<BaseWindow> EnumerateAllPrefabs()
-        {
-            if (_windows.ConfirmationWindow) yield return _windows.ConfirmationWindow;
-            if (_windows.SummaryWindow) yield return _windows.SummaryWindow;
-            if (_windows.RepairableBuildingWindow) yield return _windows.RepairableBuildingWindow;
-            if (_windows.InventoryExchangeWindow) yield return _windows.InventoryExchangeWindow;
-            if (_windows.GameMenuWindow) yield return _windows.GameMenuWindow;
-            if (_windows.SettingsWindow) yield return _windows.SettingsWindow;
-            if (_windows.NewGameWindow) yield return _windows.NewGameWindow;
-            if (_windows.ExitConfirmationWindow) yield return _windows.ExitConfirmationWindow;
-        }
-
-        /// <summary> Защита от преждевременного вызова CreateWindow. </summary>
-        private void EnsureWarmup()
-        {
-            if (_isWarmedUp) return;
-            Debug.LogError($"[{nameof(WindowFactory)}] Used before WarmUpAsync(). Warming up on the fly.");
-            WarmUpAsync().Forget();
         }
     }
 }

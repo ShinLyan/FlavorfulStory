@@ -12,9 +12,9 @@ namespace FlavorfulStory.Windows.UI
         [SerializeField] private Button _closeButton;
 
         /// <summary> Подписка на кнопку при открытии окна. </summary>
-        private void OnEnable() => _closeButton.onClick.AddListener(Close);
+        protected override void OnOpened() => _closeButton.onClick.AddListener(Close);
 
         /// <summary> Отписка от кнопки при закрытии окна. </summary>
-        private void OnDisable() => _closeButton.onClick.RemoveListener(Close);
+        protected override void OnClosed() => _closeButton.onClick.RemoveListener(Close);
     }
 }

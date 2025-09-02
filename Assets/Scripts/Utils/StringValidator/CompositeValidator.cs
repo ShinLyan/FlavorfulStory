@@ -11,13 +11,12 @@ namespace FlavorfulStory.Utils.StringValidator
         /// <summary> Добавляет новый валидатор в цепочку. </summary>
         /// <param name="validator"> Валидатор для добавления. </param>
         /// <returns> Текущий композитный валидатор (для чейнинга). </returns>
-        public CompositeValidator Add(IStringValidator validator)
-        {
-            _validators.Add(validator);
-            return this;
-        }
+        public void Add(IStringValidator validator) => _validators.Add(validator);
 
-        /// <inheritdoc />
+        /// <summary> Проверяет строку на корректность. </summary>
+        /// <param name="input"> Входная строка. </param>
+        /// <param name="error"> Сообщение об ошибке (если есть). </param>
+        /// <returns> True — строка валидна, False — ошибка. </returns>
         public bool IsValid(string input, out string error)
         {
             foreach (var validator in _validators)

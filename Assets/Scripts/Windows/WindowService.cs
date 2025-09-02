@@ -23,11 +23,11 @@ namespace FlavorfulStory.Windows
         /// <summary> Есть ли хотя бы одно открытое окно. </summary>
         public bool HasOpenWindows => _openedWindows.Count > 0;
 
-        /// <summary> Событие: окно открылось. </summary>
-        public event Action<BaseWindow> WindowOpened;
+        /// <summary> Событие открытия окна. </summary>
+        public event Action WindowOpened;
 
-        /// <summary> Событие: окно закрылось. </summary>
-        public event Action<BaseWindow> WindowClosed;
+        /// <summary> Событие закрытия окна. </summary>
+        public event Action WindowClosed;
 
         /// <summary> Внедрение зависимостей Zenject. </summary>
         /// <param name="windowFactory"> Фабрика окон. </param>
@@ -41,7 +41,6 @@ namespace FlavorfulStory.Windows
             var window = _windowFactory.CreateWindow<TWindow>();
             if (!window) return null;
 
-            window.SetActive(false);
             TryAddWindow(window);
             return window;
         }
@@ -67,7 +66,8 @@ namespace FlavorfulStory.Windows
 
                 _openedWindows.Remove(window);
                 _openedWindows.Add(window);
-                WindowOpened?.Invoke(window);
+
+                WindowOpened?.Invoke();
             };
 
             window.Closed += () =>
@@ -79,7 +79,7 @@ namespace FlavorfulStory.Windows
                     InputWrapper.UnblockAllInput();
                 }
 
-                WindowClosed?.Invoke(window);
+                WindowClosed?.Invoke();
             };
         }
 

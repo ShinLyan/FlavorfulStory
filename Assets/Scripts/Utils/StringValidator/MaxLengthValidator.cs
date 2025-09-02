@@ -10,7 +10,10 @@
         /// <param name="max"> Максимальная длина строки. </param>
         public MaxLengthValidator(int max) => _max = max;
 
-        /// <inheritdoc />
+        /// <summary> Проверяет строку на корректность. </summary>
+        /// <param name="input"> Входная строка. </param>
+        /// <param name="error"> Сообщение об ошибке (если есть). </param>
+        /// <returns> True — строка валидна, False — ошибка. </returns>
         public bool IsValid(string input, out string error)
         {
             if (input.Length > _max)

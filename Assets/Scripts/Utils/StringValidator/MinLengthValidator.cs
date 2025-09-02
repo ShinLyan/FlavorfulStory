@@ -10,7 +10,10 @@
         /// <param name="min"> Минимальная длина строки. </param>
         public MinLengthValidator(int min) => _min = min;
 
-        /// <inheritdoc />
+        /// <summary> Проверяет строку на корректность. </summary>
+        /// <param name="input"> Входная строка. </param>
+        /// <param name="error"> Сообщение об ошибке (если есть). </param>
+        /// <returns> True — строка валидна, False — ошибка. </returns>
         public bool IsValid(string input, out string error)
         {
             if (input.Length < _min)

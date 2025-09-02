@@ -1,4 +1,5 @@
-﻿using FlavorfulStory.Windows.UI;
+﻿using System.Collections.Generic;
+using FlavorfulStory.Windows.UI;
 using UnityEngine;
 
 namespace FlavorfulStory.Windows
@@ -8,27 +9,41 @@ namespace FlavorfulStory.Windows
     public class WindowAddresses : ScriptableObject
     {
         /// <summary> Окно подтверждения действия. </summary>
-        [field: SerializeField] public BaseWindow ConfirmationWindow { get; private set; }
+        [SerializeField] private BaseWindow _confirmationWindow;
 
         /// <summary> Окно итога (например, сна или события). </summary>
-        [field: SerializeField] public BaseWindow SummaryWindow { get; private set; }
+        [SerializeField] private BaseWindow _summaryWindow;
 
         /// <summary> Окно ремонта здания. </summary>
-        [field: SerializeField] public BaseWindow RepairableBuildingWindow { get; private set; }
+        [SerializeField] private BaseWindow _repairableBuildingWindow;
 
         /// <summary> Окно обмена предметами между инвентарями. </summary>
-        [field: SerializeField] public BaseWindow InventoryExchangeWindow { get; private set; }
+        [SerializeField] private BaseWindow _inventoryExchangeWindow;
 
         /// <summary> Главное меню во время игры. </summary>
-        [field: SerializeField] public BaseWindow GameMenuWindow { get; private set; }
+        [SerializeField] private BaseWindow _gameMenuWindow;
 
         /// <summary> Окно настроек игры. </summary>
-        [field: SerializeField] public BaseWindow SettingsWindow { get; private set; }
+        [SerializeField] private BaseWindow _settingsWindow;
 
         /// <summary> Окно создания новой игры. </summary>
-        [field: SerializeField] public BaseWindow NewGameWindow { get; private set; }
+        [SerializeField] private BaseWindow _newGameWindow;
 
         /// <summary> Окно подтверждения выхода в меню. </summary>
-        [field: SerializeField] public BaseWindow ExitConfirmationWindow { get; private set; }
+        [SerializeField] private BaseWindow _exitConfirmationWindow;
+
+        /// <summary> Возвращает все окна с адресами. </summary>
+        /// <returns> Все окна с адресами. </returns>
+        public IEnumerable<BaseWindow> AllWindows()
+        {
+            yield return _confirmationWindow;
+            yield return _summaryWindow;
+            yield return _repairableBuildingWindow;
+            yield return _inventoryExchangeWindow;
+            yield return _gameMenuWindow;
+            yield return _settingsWindow;
+            yield return _newGameWindow;
+            yield return _exitConfirmationWindow;
+        }
     }
 }

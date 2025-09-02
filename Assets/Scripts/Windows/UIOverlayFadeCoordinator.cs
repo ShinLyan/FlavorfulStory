@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using DG.Tweening;
 using FlavorfulStory.InputSystem;
 using FlavorfulStory.UI.Animation;
-using FlavorfulStory.Windows.UI;
 using Zenject;
 
 namespace FlavorfulStory.Windows
@@ -47,8 +46,8 @@ namespace FlavorfulStory.Windows
         /// <summary> Инициализация координатора: сбрасывает состояния и подписывается на события. </summary>
         public void Initialize()
         {
-            _hudFader.SetState(_settings.HudMaxAlpha, true, true);
-            _backgroundFader.SetState(0f, false, false);
+            _hudFader.SetState(_settings.HudMaxAlpha, true);
+            _backgroundFader.SetState(0f, false);
 
             _windowService.WindowOpened += HandleWindowOpened;
             _windowService.WindowClosed += HandleWindowClosed;
@@ -62,59 +61,58 @@ namespace FlavorfulStory.Windows
         }
 
         /// <summary> Обработка события открытия окна. </summary>
-        private void HandleWindowOpened(BaseWindow _)
+        private void HandleWindowOpened()
         {
             bool wasZero = _openedWindows == 0;
             _openedWindows++;
 
-            if (wasZero)
-            {
-                if (_preparedForFirstOpen)
-                {
-                    _preparedForFirstOpen = false;
-                    return;
-                }
+            if (!wasZero) return;
 
-                _hudFader.Hide(_settings.HudFadeOutDuration, _settings.HudEase);
-                _backgroundFader.FadeTo(
-                    _settings.BackgroundMaxAlpha, false, _settings.BackgroundBlocksRaycasts,
-                    _settings.BackgroundFadeInDuration, _settings.BackgroundEase);
+            if (_preparedForFirstOpen)
+            {
+                _preparedForFirstOpen = false;
+                return;
             }
+
+            _hudFader.Hide(_settings.HudFadeOutDuration, _settings.HudEase);
+            _backgroundFader.FadeTo(
+                _settings.BackgroundMaxAlpha, false, _settings.BackgroundBlocksRaycasts,
+                _settings.BackgroundFadeInDuration, _settings.BackgroundEase);
         }
 
         /// <summary> Обработка события закрытия окна. </summary>
-        private void HandleWindowClosed(BaseWindow _)
+        private void HandleWindowClosed()
         {
-            if (_openedWindows == 0) return; // TODO: ШО ЗА НАХ ТУТ ПРОИСХОДИТ
+            if (_openedWindows == 0) return;
+
             _openedWindows--;
 
-            if (_openedWindows == 0)
+            if (_openedWindows != 0) return;
+
+            _preparedForFirstOpen = false;
+            _queuedOpens.Clear();
+
+            InputWrapper.BlockInput(InputButton.SwitchGameMenu);
+
+            var sequence = DOTween.Sequence();
+            sequence.Join(_backgroundFader.FadeTo(
+                0f, false, false,
+                _settings.BackgroundFadeOutDuration, _settings.BackgroundEase
+            ));
+            sequence.Join(_hudFader.Show(
+                _settings.HudFadeInDuration, _settings.HudMaxAlpha, _settings.HudEase
+            ));
+            sequence.OnComplete(() => { InputWrapper.UnblockInput(InputButton.SwitchGameMenu); });
+            sequence.OnKill(() =>
             {
-                _preparedForFirstOpen = false;
-                _queuedOpens.Clear();
-
-                InputWrapper.BlockInput(InputButton.SwitchGameMenu);
-
-                var sequence = DOTween.Sequence();
-                sequence.Join(_backgroundFader.FadeTo(
-                    0f, false, false,
-                    _settings.BackgroundFadeOutDuration, _settings.BackgroundEase
-                ));
-                sequence.Join(_hudFader.Show(
-                    _settings.HudFadeInDuration, _settings.HudMaxAlpha, _settings.HudEase
-                ));
-                sequence.OnComplete(() => { InputWrapper.UnblockInput(InputButton.SwitchGameMenu); });
-                sequence.OnKill(() =>
-                {
-                    if (sequence.active) return;
-                    InputWrapper.UnblockInput(InputButton.SwitchGameMenu);
-                });
-            }
+                if (sequence.active) return;
+                InputWrapper.UnblockInput(InputButton.SwitchGameMenu);
+            });
         }
 
-        /// <summary> Перехватывает открытие первого окна. </summary>
-        /// <remarks> Сначала проигрывает анимацию, затем вызывает openAction. </remarks>
-        public void RequestOpen(BaseWindow window, Action openAction)
+        /// <summary> Запросить открытие окна: либо сразу, либо после фейдов (если это первое окно). </summary>
+        /// <param name="openAction"> Действие при открытии. </param>
+        public void RequestOpen(Action openAction)
         {
             if (_openedWindows > 0)
             {

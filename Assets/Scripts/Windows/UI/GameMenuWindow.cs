@@ -27,13 +27,18 @@ namespace FlavorfulStory.Windows.UI
         [SerializeField] private InventoryView _playerInventoryView;
 
         /// <summary> Провайдер инвентарей. </summary>
-        [Inject] private readonly IInventoryProvider _inventoryProvider;
+        private IInventoryProvider _inventoryProvider;
 
         /// <summary> Массив вкладок в меню. </summary>
         private Tab[] _tabs;
 
         /// <summary> Индекс текущей активной вкладки. </summary>
         private int _currentTabIndex;
+
+        /// <summary> Внедрение зависимостей Zenject. </summary>
+        /// <param name="inventoryProvider"> Провайдер инвентарей. </param>
+        [Inject]
+        private void Construct(IInventoryProvider inventoryProvider) => _inventoryProvider = inventoryProvider;
 
         /// <summary> Инициализация компонента.
         /// Находит все вкладки и назначает обработчики для их выбора. </summary>
@@ -65,27 +70,6 @@ namespace FlavorfulStory.Windows.UI
         /// смены вкладки и нажатия на кнопки вкладок. </summary>
         private void Update() => HandleTabInput();
 
-        /// <summary> Вызывается при открытии окна. </summary>
-        protected override void OnOpened()
-        {
-            InputWrapper.UnblockInput(InputButton.SwitchToPreviousTab);
-            InputWrapper.UnblockInput(InputButton.SwitchToNextTab);
-            foreach (var tab in _tabs) InputWrapper.UnblockInput(tab.InputButton);
-        }
-
-        /// <summary> Обрабатывает выбор вкладки по её индексу. 
-        /// Активирует меню (если скрыто) и отображает выбранную вкладку. </summary>
-        /// <param name="index"> Индекс выбранной вкладки. </param>
-        private void OnTabSelected(int index)
-        {
-            SwitchMenu(true);
-            SelectTab(index);
-        }
-
-        /// <summary> Переключает состояние видимости меню. </summary>
-        /// <param name="isEnabled"> Новое состояние видимости меню. </param>
-        public void SwitchMenu(bool isEnabled) => _content.SetActive(isEnabled);
-
         /// <summary> Обрабатывает ввод для переключения между соседними вкладками. </summary>
         private void HandleTabInput()
         {
@@ -108,6 +92,28 @@ namespace FlavorfulStory.Windows.UI
             }
         }
 
+        /// <summary> Вызывается при открытии окна. </summary>
+        protected override void OnOpened()
+        {
+            InputWrapper.UnblockInput(InputButton.SwitchToPreviousTab);
+            InputWrapper.UnblockInput(InputButton.SwitchToNextTab);
+
+            foreach (var tab in _tabs) InputWrapper.UnblockInput(tab.InputButton);
+        }
+
+        /// <summary> Обрабатывает выбор вкладки по её индексу. 
+        /// Активирует меню (если скрыто) и отображает выбранную вкладку. </summary>
+        /// <param name="index"> Индекс выбранной вкладки. </param>
+        private void OnTabSelected(int index)
+        {
+            SwitchMenu(true);
+            SelectTab(index);
+        }
+
+        /// <summary> Переключает состояние видимости меню. </summary>
+        /// <param name="isEnabled"> Новое состояние видимости меню. </param>
+        public void SwitchMenu(bool isEnabled) => _content.SetActive(isEnabled);
+
         /// <summary> Выбирает вкладку и скрывает текущую. </summary>
         /// <param name="index"> Индекс вкладки для выбора. </param>
         private void SelectTab(int index)
@@ -117,7 +123,7 @@ namespace FlavorfulStory.Windows.UI
             _tabs[_currentTabIndex].Activate();
         }
 
-        /// <summary> Обрабатывает нажатие кнопки "Вернуться в главное меню". Загружает сцену главного меню. </summary>
+        /// <summary> Обрабатывает нажатие кнопки "Вернуться в главное меню". </summary>
         private void OnClickReturnToMainMenu() =>
             SavingWrapper.LoadSceneAsyncByName(nameof(SceneName.MainMenu)).Forget();
     }

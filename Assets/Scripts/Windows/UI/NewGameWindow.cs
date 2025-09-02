@@ -43,16 +43,13 @@ namespace FlavorfulStory.Windows.UI
         /// <summary> Валидатор строк (имя игрока и магазина). </summary>
         private IStringValidator _nameValidator;
 
-        /// <summary> Символы, запрещённые во вводе. </summary>
-        private static readonly char[] ForbiddenCharacters =
-        {
-            '"', '\'', '@', '#', '$', '%', '^', '&', '*', '(', ')', '=', '+',
-            '[', ']', '{', '}', '\\', '|', '/', '<', '>', '?', '`', '~'
-        };
-
         /// <summary> Внедрение зависимостей Zenject. </summary>
         [Inject]
         public void Construct(SavingWrapper savingWrapper) => _savingWrapper = savingWrapper;
+
+        /// <summary> Инициализация компонента. </summary>
+        private void Awake() => _nameValidator = new StringValidatorBuilder().NotEmpty().MinLength(3).MaxLength(20)
+            .NoForbiddenCharacters().Build();
 
         /// <summary> Обработчик открытия окна: очистка, подписки, валидация. </summary>
         protected override void OnOpened()
@@ -62,9 +59,13 @@ namespace FlavorfulStory.Windows.UI
             _newGameButton.onClick.AddListener(Close);
             _errorMessage.gameObject.SetActive(false);
             ClearInputFields();
+        }
 
-            _nameValidator = new StringValidatorBuilder().NotEmpty().MinLength(3).MaxLength(20)
-                .NoForbiddenCharacters(ForbiddenCharacters).Build();
+        /// <summary> Очищает поля ввода. </summary>
+        private void ClearInputFields()
+        {
+            _playerName.text = string.Empty;
+            _shopName.text = string.Empty;
         }
 
         /// <summary> Обработчик закрытия окна: очистка tween и скрытие ошибки. </summary>
@@ -74,6 +75,16 @@ namespace FlavorfulStory.Windows.UI
             _newGameButton.onClick.RemoveListener(Close);
             _errorMessage.SetActive(false);
             _errorFadeTween?.Kill();
+        }
+
+        /// <summary> Обработчик нажатия кнопки "Start New Game". </summary>
+        private void StartNewGame()
+        {
+            if (!AreInputFieldsValid()) return;
+
+            // TODO: Нарушение SRP. Нужно вынести в отдельный сервис / use case.
+            string newGameSaveFileName = string.Concat(_playerName.text, _shopName.text);
+            _savingWrapper.StartNewGameAsync(newGameSaveFileName).Forget();
         }
 
         /// <summary> Проверяет поля ввода на корректность. </summary>
@@ -91,23 +102,6 @@ namespace FlavorfulStory.Windows.UI
 
             _errorMessage.SetActive(false);
             return true;
-        }
-
-        /// <summary> Обработчик нажатия кнопки "Start New Game". </summary>
-        private void StartNewGame()
-        {
-            if (!AreInputFieldsValid()) return;
-
-            // TODO: Нарушение SRP. Нужно вынести в отдельный сервис / use case.
-            string newGameSaveFileName = string.Concat(_playerName.text, _shopName.text);
-            _savingWrapper.StartNewGameAsync(newGameSaveFileName).Forget();
-        }
-
-        /// <summary> Очищает поля ввода. </summary>
-        private void ClearInputFields()
-        {
-            _playerName.text = string.Empty;
-            _shopName.text = string.Empty;
         }
 
         /// <summary> Показывает сообщение об ошибке с fade-эффектом. </summary>

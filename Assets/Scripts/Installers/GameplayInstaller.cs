@@ -155,7 +155,7 @@ namespace FlavorfulStory.Installers
 
             Container.Bind<IItemDropService>().To<ItemDropService>().AsSingle();
             Container.Bind<ISaveable>().To<ItemDropService>().FromResolve();
-            Container.Bind<IInventoryProvider>().To<InventoryProvider>().AsSingle().NonLazy();
+            Container.BindInterfacesTo<InventoryProvider>().AsSingle().NonLazy();
 
             Container.Bind<IPrefabFactory<InventorySlotView>>()
                 .To<Infrastructure.Factories.PrefabFactory<InventorySlotView>>().AsSingle()
@@ -202,7 +202,7 @@ namespace FlavorfulStory.Installers
         private void BindPlayer()
         {
             Container.Bind<PlayerController>().FromComponentInHierarchy().AsSingle();
-            Container.Bind<IPlayerPositionProvider>().To<PlayerPositionProvider>().AsSingle();
+            Container.BindInterfacesTo<PlayerPositionProvider>().AsSingle();
         }
 
         /// <summary> Установить зависимости, связанные с системой квестов. </summary>

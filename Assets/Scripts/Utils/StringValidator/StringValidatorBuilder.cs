@@ -33,11 +33,10 @@
         }
 
         /// <summary> Добавляет проверку на отсутствие запрещённых символов. </summary>
-        /// <param name="forbiddenCharacters"> Массив запрещённых символов. </param>
         /// <returns> Текущий билдер для чейнинга. </returns>
-        public StringValidatorBuilder NoForbiddenCharacters(char[] forbiddenCharacters)
+        public StringValidatorBuilder NoForbiddenCharacters()
         {
-            _composite.Add(new ForbiddenCharactersValidator(forbiddenCharacters));
+            _composite.Add(new ForbiddenCharactersValidator());
             return this;
         }
 

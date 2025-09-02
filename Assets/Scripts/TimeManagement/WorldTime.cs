@@ -42,7 +42,7 @@ namespace FlavorfulStory.TimeManagement
         private const float TimeBetweenTicks = 5f;
 
         /// <summary> Час начала нового дня. </summary>
-        private const int DayStartHour = 6;
+        private const int DefaultDayStartHour = 6;
 
         /// <summary> Вызывается при изменении игрового времени. </summary>
         public static Action<DateTime> OnTimeUpdated;
@@ -72,7 +72,7 @@ namespace FlavorfulStory.TimeManagement
         }
 
         /// <summary> Инициализировать начальное игровое время и подписаться на события. </summary>
-        private void Awake() => CurrentGameTime = new DateTime(1, Season.Spring, 1, DayStartHour, 0);
+        private void Awake() => CurrentGameTime = new DateTime(1, Season.Spring, 1, DefaultDayStartHour, 0);
 
         /// <summary> Вызвать начальное обновление интерфейса. </summary>
         private void Start()
@@ -127,7 +127,7 @@ namespace FlavorfulStory.TimeManagement
             int previousHour = (int)_previousTime.Hour;
             int currentHour = (int)time.Hour;
 
-            if (previousHour != DayEndHour && currentHour == DayEndHour) BeginNewDay();
+            if (previousHour != DayEndHour && currentHour == DayEndHour) BeginNewDay(10);
 
             if (previousHour != MidnightHour && currentHour == MidnightHour)
                 _signalBus.Fire(new MidnightStartedSignal());
@@ -146,9 +146,9 @@ namespace FlavorfulStory.TimeManagement
         }
 
         /// <summary> Обновить игровое время до начала следующего дня. </summary>
-        public static void BeginNewDay(int dayStartHour = 10)
+        public static void BeginNewDay(int dayStartHour = DefaultDayStartHour)
         {
-            bool isSameDay = CurrentGameTime.Hour is >= 0f and < DayStartHour;
+            bool isSameDay = CurrentGameTime.Hour is >= 0f and < DefaultDayStartHour;
             int dayAdjustment = isSameDay ? 0 : 1;
             CurrentGameTime = new DateTime(CurrentGameTime.Year, CurrentGameTime.Season,
                 CurrentGameTime.SeasonDay + dayAdjustment, dayStartHour, 0);

@@ -13,14 +13,14 @@ namespace FlavorfulStory.Windows.UI
         [SerializeField] private Button _noButton;
 
         /// <summary> Подписывает кнопки при открытии окна. </summary>
-        private void OnEnable()
+        protected override void OnOpened()
         {
             _yesButton.onClick.AddListener(ExitGame);
             _noButton.onClick.AddListener(Close);
         }
 
         /// <summary> Удаляет подписки при закрытии окна. </summary>
-        private void OnDisable()
+        protected override void OnClosed()
         {
             _yesButton.onClick.RemoveListener(ExitGame);
             _noButton.onClick.RemoveListener(Close);

@@ -53,25 +53,24 @@ namespace FlavorfulStory.UI.Animation
             _canvasGroup.interactable = false;
             _canvasGroup.blocksRaycasts = false;
 
-            _fadeTween = _canvasGroup
-                .DOFade(Mathf.Clamp01(targetAlpha), duration)
-                .SetEase(ease)
-                .OnComplete(() =>
-                {
-                    _canvasGroup.interactable = interactable;
-                    _canvasGroup.blocksRaycasts = blocksRaycasts;
-                });
+            _fadeTween = _canvasGroup.DOFade(Mathf.Clamp01(targetAlpha), duration).SetEase(ease).OnComplete(() =>
+            {
+                _canvasGroup.interactable = interactable;
+                _canvasGroup.blocksRaycasts = blocksRaycasts;
+            });
 
             return _fadeTween;
         }
 
         /// <summary> Мгновенно применяет альфу и интерактивность без анимации. </summary>
-        public void SetState(float alpha, bool interactable, bool blocksRaycasts)
+        /// <param name="alpha"> Значение прозрачности. </param>
+        /// <param name="interactable"> Должен ли элемент быть интерактивным. </param>
+        public void SetState(float alpha, bool interactable)
         {
             _fadeTween?.Kill();
             _canvasGroup.alpha = Mathf.Clamp01(alpha);
             _canvasGroup.interactable = interactable;
-            _canvasGroup.blocksRaycasts = blocksRaycasts;
+            _canvasGroup.blocksRaycasts = interactable;
         }
     }
 }

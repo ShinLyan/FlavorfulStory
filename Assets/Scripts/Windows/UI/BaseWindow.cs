@@ -7,6 +7,9 @@ namespace FlavorfulStory.Windows.UI
     /// <summary> Базовый класс для всех UI-окон. Управляет открытием, закрытием и событиями. </summary>
     public abstract class BaseWindow : MonoBehaviour
     {
+        /// <summary> Опциональный гейт, управляющий порядком открытия окон. </summary>
+        private IWindowOpenGate _windowOpenGate;
+
         /// <summary> Открыто ли окно в данный момент. </summary>
         public bool IsOpened { get; private set; }
 
@@ -15,9 +18,6 @@ namespace FlavorfulStory.Windows.UI
 
         /// <summary> Событие: окно было закрыто. </summary>
         public event Action Closed;
-
-        /// <summary> Опциональный гейт, управляющий порядком открытия окон. </summary>
-        private IWindowOpenGate _windowOpenGate;
 
         /// <summary> Внедрение зависимостей Zenject. </summary>
         /// <param name="windowOpenGate"> Опциональный гейт, управляющий порядком открытия окон. </param>
@@ -34,7 +34,7 @@ namespace FlavorfulStory.Windows.UI
 
             if (_windowOpenGate != null)
             {
-                _windowOpenGate.RequestOpen(this, DoOpenImmediate);
+                _windowOpenGate.RequestOpen(DoOpenImmediate);
                 return;
             }
 
@@ -67,8 +67,5 @@ namespace FlavorfulStory.Windows.UI
 
         /// <summary> Вызывается при закрытии окна. </summary>
         protected virtual void OnClosed() { }
-
-        /// <summary> Включает или выключает GameObject окна. Не влияет на IsOpened. </summary>
-        public void SetActive(bool value) => gameObject.SetActive(value);
     }
 }

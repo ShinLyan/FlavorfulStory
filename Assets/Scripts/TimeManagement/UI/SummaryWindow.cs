@@ -20,20 +20,22 @@ namespace FlavorfulStory.TimeManagement.UI
         /// <summary> Текст сводки по умолчанию. </summary>
         public const string DefaultSummaryText = "BEST SUMMARY EVER";
 
-        /// <summary> При включении объекта подписываемся на события. </summary>
-        private void OnEnable() => _nextDayButton.onClick.AddListener(Close);
-
-        /// <summary> При выключении объекта отписываемся от событий. </summary>
-        private void OnDisable() => _nextDayButton.onClick.RemoveListener(Close);
-
-        /// <summary> Устанавливает текст сводки. </summary>
+        /// <summary> Устанавливает окно сводки дня. </summary>
         /// <param name="text"> Текст для отображения. </param>
-        public void SetSummary(string text) => _summaryText.text = text;
+        public void Setup(string text) => _summaryText.text = text;
 
         /// <summary> Активирует камеру при открытии окна. </summary>
-        protected override void OnOpened() => _camera.SetActive(true);
+        protected override void OnOpened()
+        {
+            _nextDayButton.onClick.AddListener(Close);
+            _camera.SetActive(true);
+        }
 
         /// <summary> Отключает камеру при закрытии окна. </summary>
-        protected override void OnClosed() => _camera.SetActive(false);
+        protected override void OnClosed()
+        {
+            _nextDayButton.onClick.RemoveListener(Close);
+            _camera.SetActive(false);
+        }
     }
 }
