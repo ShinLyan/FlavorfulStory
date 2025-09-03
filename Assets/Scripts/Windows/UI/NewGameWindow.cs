@@ -56,7 +56,6 @@ namespace FlavorfulStory.Windows.UI
         {
             _closeButton.onClick.AddListener(Close);
             _newGameButton.onClick.AddListener(StartNewGame);
-            // _newGameButton.onClick.AddListener(Close);
             _errorMessage.gameObject.SetActive(false);
             ClearInputFields();
         }
@@ -85,6 +84,8 @@ namespace FlavorfulStory.Windows.UI
             // TODO: Нарушение SRP. Нужно вынести в отдельный сервис / use case.
             string newGameSaveFileName = string.Concat(_playerName.text, _shopName.text);
             _savingWrapper.StartNewGameAsync(newGameSaveFileName).Forget();
+            
+            Close();
         }
 
         /// <summary> Проверяет поля ввода на корректность. </summary>
