@@ -32,7 +32,7 @@ namespace FlavorfulStory.Windows.UI
         [SerializeField] private TMP_Text _errorText;
 
         /// <summary> CanvasGroup, управляющий прозрачностью плашки ошибки. </summary>
-        [SerializeField] private CanvasGroup _canvasGroup;
+        [SerializeField] private CanvasGroup _errorCanvasGroup;
 
         /// <summary> Ссылка на систему сохранений. </summary>
         private SavingWrapper _savingWrapper;
@@ -56,7 +56,7 @@ namespace FlavorfulStory.Windows.UI
         {
             _closeButton.onClick.AddListener(Close);
             _newGameButton.onClick.AddListener(StartNewGame);
-            _newGameButton.onClick.AddListener(Close);
+            // _newGameButton.onClick.AddListener(Close);
             _errorMessage.gameObject.SetActive(false);
             ClearInputFields();
         }
@@ -111,9 +111,9 @@ namespace FlavorfulStory.Windows.UI
 
             _errorText.text = message;
             _errorMessage.SetActive(true);
-            _canvasGroup.alpha = 1f;
+            _errorCanvasGroup.alpha = 1f;
 
-            _errorFadeTween = _canvasGroup.DOFade(0f, 2.5f).SetEase(Ease.InOutSine)
+            _errorFadeTween = _errorCanvasGroup.DOFade(0f, 2.5f).SetEase(Ease.InOutSine)
                 .OnComplete(() => _errorMessage.SetActive(false));
         }
     }
