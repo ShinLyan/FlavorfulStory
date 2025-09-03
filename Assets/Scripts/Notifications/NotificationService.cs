@@ -15,7 +15,7 @@ namespace FlavorfulStory.Notifications
     public class NotificationService : IInitializable, IDisposable, INotificationService
     {
         /// <summary> Глобальные настройки системы уведомлений. </summary>
-        private readonly NotificationSystemSettings _settings;
+        private readonly NotificationsSettings _settings;
 
         /// <summary> Компонент, содержащий якоря для разных зон экрана. </summary>
         private readonly NotificationAnchorLocator _locator;
@@ -32,7 +32,7 @@ namespace FlavorfulStory.Notifications
         /// <summary> Конструктор сервиса уведомлений. </summary>
         /// <param name="settings"> Глобальные настройки отображения. </param>
         /// <param name="locator"> Компонент с привязками к позициям на экране. </param>
-        public NotificationService(NotificationSystemSettings settings, NotificationAnchorLocator locator)
+        public NotificationService(NotificationsSettings settings, NotificationAnchorLocator locator)
         {
             _settings = settings;
             _locator = locator;

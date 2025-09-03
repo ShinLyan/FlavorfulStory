@@ -1,112 +1,96 @@
-﻿using System;
-using Cysharp.Threading.Tasks;
-using FlavorfulStory.InputSystem;
-using FlavorfulStory.TimeManagement;
+﻿using System.Collections.Generic;
+using FlavorfulStory.Windows.UI;
 using UnityEngine;
 using UnityEngine.UI;
-using Zenject;
 
 namespace FlavorfulStory.InventorySystem.UI
 {
     /// <summary> Окно обмена между двумя инвентарями (игрок и хранилище). </summary>
-    public class InventoryExchangeWindow : MonoBehaviour
+    public class InventoryExchangeWindow : BaseWindow
     {
-        /// <summary> View для отображения второго инвентаря (например, сундука). </summary>
-        [SerializeField] private InventoryView _otherInventoryView;
+        /// <summary> Отображение инвентаря сундука. </summary>
+        [SerializeField] private InventoryView _chestInventoryView;
 
-        /// <summary> View для отображения инвентаря игрока. </summary>
+        /// <summary> Отображение инвентаря игрока. </summary>
         [SerializeField] private InventoryView _playerInventoryView;
 
         /// <summary> Кнопка "Add to Existing" — переносит стакающиеся предметы. </summary>
         [SerializeField] private Button _addToExistingButton;
 
-        /// <summary> Второй инвентарь (например, сундук). </summary>
-        private Inventory _otherInventory;
+        /// <summary> Кнопка закрытия окна. </summary>
+        [SerializeField] private Button _closeButton;
 
-        /// <summary> Инвентарь игрока. </summary>
+        /// <summary> Первый инвентарь. </summary>
+        private Inventory _chestInventory;
+
+        /// <summary> Второй инвентарь. </summary>
         private Inventory _playerInventory;
 
-        /// <summary> Колбэк, вызываемый при закрытии окна. </summary>
-        private Action _onClose;
-
-        /// <summary> Сервис для передачи предметов между инвентарями. </summary>
-        private InventoryTransferService _transferService;
-
-        /// <summary> Внедрение зависимостей Zenject. </summary>
-        /// <param name="transferService"> Сервис передачи предметов между инвентарями. </param>
-        [Inject]
-        private void Construct(InventoryTransferService transferService) => _transferService = transferService;
-
         /// <summary> Подписывает обработчик на кнопку переноса предметов. </summary>
-        private void Awake() => _addToExistingButton.onClick.AddListener(OnAddToExistingClicked);
+        private void Awake()
+        {
+            _addToExistingButton.onClick.AddListener(OnAddToExistingClicked);
+            _closeButton.onClick.AddListener(Close);
+        }
 
         /// <summary> Удаляет все подписки при уничтожении объекта. </summary>
-        private void OnDestroy() => _addToExistingButton.onClick.RemoveAllListeners();
-
-        /// <summary> Закрывает окно по нажатию кнопки выхода из меню (например, Escape). </summary>
-        private void Update()
+        private void OnDestroy()
         {
-            if (!InputWrapper.GetButtonDown(InputButton.SwitchGameMenu)) return;
-
-            Hide();
-            BlockGameMenuForOneFrame().Forget();
+            _addToExistingButton.onClick.RemoveListener(OnAddToExistingClicked);
+            _closeButton.onClick.RemoveListener(Close);
         }
 
-        /// <summary> Открыть окно обмена между двумя инвентарями. </summary>
-        /// <param name="playerInventory"> Инвентарь игрока. </param>
-        /// <param name="otherInventory"> Инвентарь объекта (сундук и тд.). </param>
-        /// <param name="onClose"> Колбэк, вызываемый при закрытии окна. </param>
-        public void Show(Inventory playerInventory, Inventory otherInventory, Action onClose)
+        /// <summary> Инициализирует окно двумя инвентарями и обновляет UI. </summary>
+        public void Setup(Inventory chestInventory, Inventory playerInventory)
         {
-            gameObject.SetActive(true);
-
-            _otherInventory = otherInventory;
+            _chestInventory = chestInventory;
             _playerInventory = playerInventory;
 
-            _otherInventoryView.Initialize(otherInventory);
-            _playerInventoryView.Initialize(playerInventory);
-
-            _onClose = onClose;
-
-            WorldTime.Pause();
-            InputWrapper.BlockAllInput();
-            InputWrapper.UnblockInput(InputButton.SwitchGameMenu);
+            _chestInventoryView.Initialize(_chestInventory);
+            _playerInventoryView.Initialize(_playerInventory);
         }
 
-        /// <summary> Закрыть окно и вернуть управление игроку. </summary>
-        public void Hide()
+        /// <summary> Обработка закрытия окна. </summary>
+        /// <remarks> Очищает ссылки и снимает подписки. "Освобождает" игрока. </remarks>
+        protected override void OnClosed()
         {
-            gameObject.SetActive(false);
-
-            _otherInventory = null;
             _playerInventory = null;
-
-            _onClose?.Invoke();
-            _onClose = null;
-
-            WorldTime.Unpause();
-            InputWrapper.UnblockAllInput();
+            _chestInventory = null;
         }
 
         /// <summary> Обрабатывает нажатие на кнопку "Add to Existing". </summary>
         /// <remarks> Переносит стакающиеся предметы из инвентаря игрока во второй инвентарь. </remarks>
-        private void OnAddToExistingClicked()
+        private void OnAddToExistingClicked() // TODO: ТУТ БАГА С АНИМКОЙ И ЕЩЕ ЧЕМ-то
         {
-            var stackables = _transferService.GetStackablesToTransfer(_playerInventory, _otherInventory);
+            var stackables = GetStackablesToTransfer();
             foreach ((int slotIndex, var stack) in stackables)
             {
                 _playerInventoryView.AnimateRemoveAt(slotIndex,
-                    () => { _playerInventory.RemoveFromSlot(slotIndex, stack.Number); });
-                _otherInventoryView.AnimateAdd(stack.Item);
+                    () => _playerInventory.RemoveFromSlot(slotIndex, stack.Number));
+                _chestInventoryView.AnimateAdd(stack.Item);
             }
         }
 
-        /// <summary> Блокирует кнопку выхода из окна на один кадр (предотвращает повторное закрытие). </summary>
-        private static async UniTaskVoid BlockGameMenuForOneFrame()
+        /// <summary> Получить список предметов, которые можно перенести из инвентаря игрока в сундук. </summary>
+        /// <returns> Список пар (индекс слота, предмет), которые были успешно добавлены. </returns>
+        private List<(int SlotIndex, ItemStack Stack)> GetStackablesToTransfer()
         {
-            InputWrapper.BlockInput(InputButton.SwitchGameMenu);
-            await UniTask.Yield();
-            InputWrapper.UnblockAllInput();
+            var result = new List<(int, ItemStack)>();
+            for (int i = 0; i < _playerInventory.InventorySize; i++)
+            {
+                var itemStack = _playerInventory.GetItemStackInSlot(i);
+                var item = itemStack.Item;
+                int number = itemStack.Number;
+
+                if (!item || !item.IsStackable || itemStack.Number <= 0 || !_chestInventory.HasItem(item) ||
+                    !_chestInventory.HasSpaceFor(item))
+                    continue;
+
+                if (_chestInventory.TryAddToFirstAvailableSlot(item, number)) result.Add((i, itemStack));
+                // TODO: У тебя метод называется Get - а ты еще тут добавляешь в слоты. Вытаскивай отсюда
+            }
+
+            return result;
         }
     }
 }

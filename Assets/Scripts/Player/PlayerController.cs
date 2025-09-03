@@ -24,17 +24,20 @@ namespace FlavorfulStory.Player
         /// <remarks> Прокидывается в <see cref="IItemDropService"/>. </remarks>
         [SerializeField] private Transform _dropPoint;
 
-        /// <summary> Инвентарь игрока. </summary>
-        private Inventory _playerInventory;
+        /// <summary> Сигнальная шина Zenject. </summary>
+        private SignalBus _signalBus;
 
-        /// <summary> Панель быстрого доступа. </summary>
-        private ToolbarView _toolbarView;
+        /// <summary> Статы игрока. </summary>
+        private PlayerStats _playerStats;
 
         /// <summary> Сервис выброса предметов. </summary>
         private IItemDropService _itemDropService;
 
-        /// <summary> Статы игрока. </summary>
-        private PlayerStats _playerStats;
+        /// <summary> Панель быстрого доступа. </summary>
+        private ToolbarView _toolbarView;
+
+        /// <summary> Провайдер инвентарей. </summary>
+        private IInventoryProvider _inventoryProvider;
 
         /// <summary> Передвижение игрока. </summary>
         private PlayerMover _playerMover;
@@ -48,29 +51,24 @@ namespace FlavorfulStory.Player
         /// <summary> Аниматор игрока. </summary>
         private Animator _animator; // TODO: DELETE
 
-        /// <summary> Сигнальная шина Zenject. </summary>
-        private SignalBus _signalBus;
-
         #endregion
 
         /// <summary> Внедрение зависимостей Zenject. </summary>
         /// <param name="signalBus"> Шина сигналов Zenject для отправки событий. </param>
-        /// <param name="inventory"> Инвентарь игрока. </param>
         /// <param name="playerStats"> Статы игрока. </param>
         /// <param name="toolbarView"> Панель быстрого доступа игрока. </param>
         /// <param name="itemDropService"> Сервис выброса предметов из инвентаря. </param>
         /// <param name="toolUsageService"> Сервис использования инструментов. </param>
+        /// <param name="inventoryProvider"> Провайдер инвентарей. </param>
         [Inject]
-        private void Construct(SignalBus signalBus, Inventory inventory, PlayerStats playerStats,
-            ToolbarView toolbarView, IItemDropService itemDropService, ToolUsageService toolUsageService)
+        private void Construct(SignalBus signalBus, PlayerStats playerStats, ToolbarView toolbarView,
+            IItemDropService itemDropService, ToolUsageService toolUsageService, IInventoryProvider inventoryProvider)
         {
             _signalBus = signalBus;
-
-            _playerInventory = inventory;
             _playerStats = playerStats;
-
             _toolbarView = toolbarView;
             _itemDropService = itemDropService;
+            _inventoryProvider = inventoryProvider;
         }
 
         /// <summary> Инициализация компонентов. </summary>
@@ -147,7 +145,7 @@ namespace FlavorfulStory.Player
                 return;
 
             const float DropItemForce = 2.5f;
-            _itemDropService.DropFromInventory(_playerInventory, _toolbarView.SelectedItemIndex,
+            _itemDropService.DropFromInventory(_inventoryProvider.GetPlayerInventory(), _toolbarView.SelectedItemIndex,
                 _dropPoint.transform.position, _dropPoint.forward * DropItemForce);
         }
 

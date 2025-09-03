@@ -49,7 +49,7 @@ namespace FlavorfulStory.InventorySystem
         private void Awake()
         {
             _inventorySlots = new ItemStack[InventorySize];
-            _inventoryProvider?.Register(this);
+            _inventoryProvider.Register(this);
         }
 
         /// <summary> При старте вызываем событие обновление инвентаря. </summary>
@@ -59,7 +59,7 @@ namespace FlavorfulStory.InventorySystem
         /// <summary> При уничтожении объекта отвязать инвентарь. </summary>
         private void OnDestroy()
         {
-            _inventoryProvider?.Unregister(this);
+            _inventoryProvider.Unregister(this);
             InventoryUpdated = null;
         }
 
