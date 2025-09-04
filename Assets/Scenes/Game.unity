@@ -386,6 +386,91 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 629537258}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &658675987
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 1407106709}
+    m_Modifications:
+    - target: {fileID: 5265830868985977914, guid: c1803dcf5c30534479730acb28fae765,
+        type: 3}
+      propertyPath: _dialogue
+      value: 
+      objectReference: {fileID: 11400000, guid: 9e5424065cee3bd4893b828eeb63d49c,
+        type: 2}
+    - target: {fileID: 5687291827491204600, guid: c1803dcf5c30534479730acb28fae765,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -35.42
+      objectReference: {fileID: 0}
+    - target: {fileID: 5687291827491204600, guid: c1803dcf5c30534479730acb28fae765,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.00091552734
+      objectReference: {fileID: 0}
+    - target: {fileID: 5687291827491204600, guid: c1803dcf5c30534479730acb28fae765,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -8.31
+      objectReference: {fileID: 0}
+    - target: {fileID: 5687291827491204600, guid: c1803dcf5c30534479730acb28fae765,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5687291827491204600, guid: c1803dcf5c30534479730acb28fae765,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5687291827491204600, guid: c1803dcf5c30534479730acb28fae765,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5687291827491204600, guid: c1803dcf5c30534479730acb28fae765,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5687291827491204600, guid: c1803dcf5c30534479730acb28fae765,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5687291827491204600, guid: c1803dcf5c30534479730acb28fae765,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5687291827491204600, guid: c1803dcf5c30534479730acb28fae765,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7368387351728123332, guid: c1803dcf5c30534479730acb28fae765,
+        type: 3}
+      propertyPath: m_Name
+      value: Dirk
+      objectReference: {fileID: 0}
+    - target: {fileID: 8621200245204727901, guid: c1803dcf5c30534479730acb28fae765,
+        type: 3}
+      propertyPath: _uniqueIdentifier
+      value: 06cd1646-3a67-40ed-a4f5-2b6087f955bd
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: c1803dcf5c30534479730acb28fae765, type: 3}
+--- !u!4 &658675988 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 5687291827491204600, guid: c1803dcf5c30534479730acb28fae765,
+    type: 3}
+  m_PrefabInstance: {fileID: 658675987}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &700257463
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1227,7 +1312,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 45ae2c32555046ed9b00dd5da81d15e6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <Schedule>k__BackingField: {fileID: 11400000, guid: 4d6245afe77778b4798be89b04f75ca0,
+  <Schedule>k__BackingField: {fileID: 11400000, guid: 4516d24dfbf0902489cc91833ed01ecb,
     type: 2}
   <LineThickness>k__BackingField: 3.57
   <LineColor>k__BackingField: {r: 0.94275093, g: 1, b: 0, a: 1}
@@ -1510,6 +1595,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 987976717}
+  - {fileID: 658675988}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1514013231
