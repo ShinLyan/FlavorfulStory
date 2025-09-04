@@ -14,6 +14,9 @@ namespace FlavorfulStory.Saving
     {
         #region Public Methods
 
+        /// <summary> Расширение файлов сохранений. </summary>
+        public const string SaveFileExtension = ".sav";
+
         /// <summary> Событие, вызываемое после завершения загрузки сцены. </summary>
         public static event Action OnLoadCompleted;
 
@@ -59,7 +62,7 @@ namespace FlavorfulStory.Saving
         /// <param name="saveFile"> Название файла сохранения. </param>
         /// <returns> Возвращает путь до сохраненного файла. </returns>
         public static string GetPathFromSaveFile(string saveFile) =>
-            Path.Combine(Application.persistentDataPath, saveFile + ".sav");
+            Path.Combine(Application.persistentDataPath, saveFile + SaveFileExtension);
 
         /// <summary> Существует ли сохраненный файл?</summary>
         /// <param name="saveFile"> Название файла сохранения. </param>
