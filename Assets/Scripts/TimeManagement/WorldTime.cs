@@ -170,7 +170,7 @@ namespace FlavorfulStory.TimeManagement
             OnTimeUnpaused?.Invoke();
         }
 
-        #region Saving
+        #region ISaveable
 
         /// <summary> Сохраняет текущее игровое время. </summary>
         public object CaptureState() => CurrentGameTime;

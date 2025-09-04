@@ -123,7 +123,7 @@ namespace FlavorfulStory.Toolbar.UI
             _signalBus.Fire(new ToolbarSlotSelectedSignal(SelectedItem));
         }
 
-        #region Saving
+        #region ISaveable
 
         /// <summary> Сохраняет текущее состояние выбранного индекса. </summary>
         /// <returns> Индекс текущего выбранного предмета. </returns>

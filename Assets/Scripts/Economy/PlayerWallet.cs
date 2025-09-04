@@ -52,26 +52,13 @@ namespace FlavorfulStory.Economy
 
         #region ISaveable
 
-        /// <summary> Структура данных для сериализации состояния кошелька. </summary>
-        [Serializable]
-        private struct WalletData
-        {
-            /// <summary> Количество золота. </summary>
-            public int Gold;
-        }
-
         /// <summary> Сохраняет текущее состояние кошелька. </summary>
         /// <returns> Сериализуемое состояние. </returns>
-        public object CaptureState() => new WalletData { Gold = Amount };
+        public object CaptureState() => Amount;
 
         /// <summary> Восстанавливает состояние кошелька из сериализованных данных. </summary>
         /// <param name="state"> Объект состояния, содержащий количество золота. </param>
-        public void RestoreState(object state)
-        {
-            if (state is not WalletData data) return;
-
-            Amount = data.Gold;
-        }
+        public void RestoreState(object state) => Amount = (int)state;
 
         #endregion
     }

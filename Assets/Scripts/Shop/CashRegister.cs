@@ -18,7 +18,7 @@ namespace FlavorfulStory.Shop
 {
     /// <summary> Касса магазина — хранит валюту, точки доступа, умеет взаимодействовать и сохраняться. </summary>
     [RequireComponent(typeof(CashRegisterAnimator))]
-    public class CashRegister : ShopObject, ICurrencyStorage, ISaveable, IInteractable
+    public class CashRegister : ShopObject, ICurrencyStorage, IInteractable, ISaveable
     {
         /// <summary> Словарь доступности точек доступа к кассе. </summary>
         private Dictionary<Transform, bool> _accessPointsAvailability;
@@ -146,30 +146,13 @@ namespace FlavorfulStory.Shop
 
         #region ISaveable
 
-        /// <summary> Структура, представляющая сериализуемое состояние кассы. </summary>
-        [Serializable]
-        private readonly struct CashRegisterData
-        {
-            /// <summary> Количество золота. </summary>
-            public int Gold { get; }
-
-            /// <summary> Конструктор с параметрами. </summary>
-            /// <param name="gold"> Количество золота. </param>
-            public CashRegisterData(int gold) => Gold = gold;
-        }
-
         /// <summary> Сохраняет текущее состояние кассы. </summary>
         /// <returns> Объект состояния для сериализации. </returns>
-        public object CaptureState() => new CashRegisterData(Amount);
+        public object CaptureState() => Amount;
 
         /// <summary> Восстанавливает состояние кассы из сериализованных данных. </summary>
         /// <param name="state"> Объект состояния, полученный при сохранении. </param>
-        public void RestoreState(object state)
-        {
-            if (state is not CashRegisterData data) return;
-
-            Amount = data.Gold;
-        }
+        public void RestoreState(object state) => Amount = (int)state;
 
         #endregion
 

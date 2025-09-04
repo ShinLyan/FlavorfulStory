@@ -99,20 +99,31 @@ namespace FlavorfulStory.InventorySystem.DropSystem
             return true;
         }
 
-        #region Saving
+        #region ISaveable
 
         /// <summary> Структура для сериализации информации о выброшенных предметах. </summary>
         [Serializable]
-        private struct DropSaveData
+        private readonly struct DropRecord
         {
             /// <summary> ID предмета, который был выброшен. </summary>
-            public string ItemID;
+            public string ItemId { get; }
 
             /// <summary> Позиция, в которой находился выброшенный предмет. </summary>
-            public SerializableVector3 Position;
+            public SerializableVector3 Position { get; }
 
             /// <summary> Количество выброшенных предметов. </summary>
-            public int Quantity;
+            public int Quantity { get; }
+
+            /// <summary> Конструктор с параметрами. </summary>
+            /// <param name="itemId"> ID предмета, который был выброшен. </param>
+            /// <param name="position"> Позиция, в которой находился выброшенный предмет. </param>
+            /// <param name="quantity"> Количество выброшенных предметов. </param>
+            public DropRecord(string itemId, SerializableVector3 position, int quantity)
+            {
+                ItemId = itemId;
+                Position = position;
+                Quantity = quantity;
+            }
         }
 
         /// <summary> Сохраняет текущее состояние выброшенных предметов. </summary>
@@ -120,26 +131,19 @@ namespace FlavorfulStory.InventorySystem.DropSystem
         public object CaptureState()
         {
             _spawnedPickups.RemoveAll(pickup => !pickup);
-            return _spawnedPickups.Select(pickup => new DropSaveData
-            {
-                ItemID = pickup.Item.ItemID,
-                Position = new SerializableVector3(pickup.transform.position),
-                Quantity = pickup.Number
-            }).ToList();
+            return _spawnedPickups.Select(pickup => new DropRecord(pickup.Item.ItemID,
+                new SerializableVector3(pickup.transform.position), pickup.Number)).ToList();
         }
 
         /// <summary> Восстанавливает выброшенные предметы из сохраненного состояния. </summary>
         /// <param name="state"> Сохраненные данные. </param>
         public void RestoreState(object state)
         {
-            if (state is not List<DropSaveData> records) return;
+            if (state is not List<DropRecord> records) return;
 
             foreach (var record in records)
-            {
-                var item = ItemDatabase.GetItemFromID(record.ItemID);
-                var itemStack = new ItemStack(item, record.Quantity);
-                if (item) Spawn(itemStack, record.Position.ToVector());
-            }
+                Spawn(new ItemStack(ItemDatabase.GetItemFromID(record.ItemId), record.Quantity),
+                    record.Position.ToVector());
         }
 
         #endregion

@@ -10,10 +10,13 @@ namespace FlavorfulStory.InventorySystem.EquipmentSystem
     public class Equipment : MonoBehaviour, ISaveable
     {
         /// <summary> Текущее состояние экипировки, связанное со слотами. </summary>
-        private Dictionary<EquipmentType, EquipableItem> _equippedItems = new();
+        private Dictionary<EquipmentType, EquipableItem> _equippedItems;
 
         /// <summary> Событие, вызываемое при изменении состояния экипировки. </summary>
         public event Action EquipmentUpdated;
+
+        /// <summary> Инициализация компонента. </summary>
+        private void Awake() => _equippedItems = new Dictionary<EquipmentType, EquipableItem>();
 
         /// <summary> Получить предмет из указанного слота экипировки. </summary>
         /// <param name="equipLocation"> Слот экипировки. </param>
@@ -42,26 +45,25 @@ namespace FlavorfulStory.InventorySystem.EquipmentSystem
         /// <returns> Перечисление слотов с экипированными предметами. </returns>
         public IEnumerable<EquipmentType> GetEquippedItems() => _equippedItems.Keys;
 
-        #region Saving
+        #region ISaveable
 
         /// <summary> Сохранить текущее состояние экипировки. </summary>
         /// <returns> Сериализованные данные об экипировке. </returns>
         public object CaptureState()
         {
-            var equippedItemsForSerialization = new Dictionary<EquipmentType, string>();
-            foreach (var pair in _equippedItems) equippedItemsForSerialization[pair.Key] = pair.Value.ItemID;
+            var records = new Dictionary<EquipmentType, string>();
+            foreach (var pair in _equippedItems) records[pair.Key] = pair.Value.ItemID;
 
-            return equippedItemsForSerialization;
+            return records;
         }
 
         /// <summary> Восстановить состояние экипировки из сохраненных данных. </summary>
         /// <param name="state"> Сохраненные данные экипировки. </param>
         public void RestoreState(object state)
         {
-            _equippedItems = new Dictionary<EquipmentType, EquipableItem>();
+            if (state is not Dictionary<EquipmentType, string> records) return;
 
-            var equippedItemsForSerialization = state as Dictionary<EquipmentType, string>;
-            foreach (var pair in equippedItemsForSerialization)
+            foreach (var pair in records)
             {
                 var item = ItemDatabase.GetItemFromID(pair.Value) as EquipableItem;
                 if (item) _equippedItems[pair.Key] = item;

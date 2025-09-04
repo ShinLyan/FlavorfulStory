@@ -35,9 +35,6 @@ namespace FlavorfulStory.BuildingRepair
         /// <summary> Количество вложенных ресурсов для текущей стадии ремонта. </summary>
         private List<int> _investedResources;
 
-        /// <summary> Завершен ли ремонт здания? </summary>
-        private bool _isRepairCompleted;
-
         /// <summary> Сервис окон. </summary>
         private IWindowService _windowService;
 
@@ -46,6 +43,9 @@ namespace FlavorfulStory.BuildingRepair
 
         /// <summary> Текущая стадия ремонта. </summary>
         private RepairStage CurrentStage => _buildingData.Stages[_repairStageIndex];
+
+        /// <summary> Завершен ли ремонт здания? </summary>
+        private bool IsRepairCompleted => _repairStageIndex >= _buildingData.Stages.Count;
 
         /// <summary> Событие при обновлении стадии ремонта. </summary>
         private event Action<RepairStage, List<int>> _onStageUpdated;
@@ -71,12 +71,13 @@ namespace FlavorfulStory.BuildingRepair
         /// <summary> Запуск инициализации после загрузки сцены. </summary>
         private void Start()
         {
-            _investedResources = CurrentStage.Requirements.Select(_ => 0).ToList();
-
+            if (_investedResources == null) InitializeInvestments();
             _objectSwitcher.Initialize();
-            _objectSwitcher.SwitchTo(_isRepairCompleted ? _repairStageIndex + 1 : _repairStageIndex);
-            // TODO: FIX SAVING
+            _objectSwitcher.SwitchTo(_repairStageIndex);
         }
+
+        /// <summary> Инициализация вложений. </summary>
+        private void InitializeInvestments() => _investedResources = CurrentStage.Requirements.Select(_ => 0).ToList();
 
         #region IInteractable
 
@@ -84,7 +85,7 @@ namespace FlavorfulStory.BuildingRepair
         public ActionTooltipData ActionTooltip => new("E", ActionType.Build, CurrentStage.BuildingName);
 
         /// <summary> Доступно ли взаимодействие с объектом в текущий момент? </summary>
-        public bool IsInteractionAllowed => !_isRepairCompleted;
+        public bool IsInteractionAllowed => !IsRepairCompleted;
 
         /// <summary> Получить расстояние до указанного объекта. </summary>
         /// <param name="otherTransform"> Трансформ объекта, до которого нужно получить расстояние. </param>
@@ -120,21 +121,20 @@ namespace FlavorfulStory.BuildingRepair
         /// <remarks> Переходит к следующей стадии ремонта, если все ресурсы добавлены. </remarks>
         private void Build()
         {
-            if (_isRepairCompleted) return;
-
-            if (_repairStageIndex + 1 >= _buildingData.Stages.Count)
-            {
-                _isRepairCompleted = true;
-                _objectSwitcher.SwitchTo(_repairStageIndex + 1);
-                OnRepairCompleted?.Invoke(_buildingData.Name);
-                return;
-            }
+            if (IsRepairCompleted) return;
 
             _repairStageIndex++;
             _objectSwitcher.SwitchTo(_repairStageIndex);
             SfxPlayer.Play(SfxType.Build);
-
-            _onStageUpdated?.Invoke(CurrentStage, _investedResources);
+            if (IsRepairCompleted)
+            {
+                OnRepairCompleted?.Invoke(_buildingData.Name);
+            }
+            else
+            {
+                InitializeInvestments();
+                _onStageUpdated?.Invoke(CurrentStage, _investedResources);
+            }
         }
 
         /// <summary> Добавить ресурс в процесс ремонта. </summary>
@@ -178,7 +178,7 @@ namespace FlavorfulStory.BuildingRepair
         private int FindRequirementIndex(InventoryItem item) =>
             CurrentStage.Requirements.FindIndex(itemStack => itemStack.Item.ItemID == item.ItemID);
 
-        #region Saving
+        #region ISaveable
 
         /// <summary> Структура для сохранения состояния объекта ремонта. </summary>
         [Serializable]
@@ -187,38 +187,31 @@ namespace FlavorfulStory.BuildingRepair
             /// <summary> Индекс текущей стадии ремонта. </summary>
             public int StageIndex { get; }
 
-            /// <summary> Завершён ли ремонт? </summary>
-            public bool IsRepairCompleted { get; }
-
             /// <summary> Количество вложенных ресурсов для текущей стадии ремонта. </summary>
             public List<int> InvestedResources { get; }
 
             /// <summary> Конструктор с параметрами. </summary>
             /// <param name="stageIndex"> Индекс текущей стадии ремонта. </param>
-            /// <param name="isRepairCompleted"> Завершён ли ремонт? </param>
             /// <param name="investedResources"> Количество вложенных ресурсов для текущей стадии ремонта. </param>
-            public RepairableBuildingRecord(int stageIndex, bool isRepairCompleted, List<int> investedResources)
+            public RepairableBuildingRecord(int stageIndex, List<int> investedResources)
             {
                 StageIndex = stageIndex;
-                IsRepairCompleted = isRepairCompleted;
                 InvestedResources = investedResources;
             }
         }
 
         /// <summary> Сохранить состояние объекта для дальнейшего восстановления. </summary>
         /// <returns> Объект состояния для последующего восстановления. </returns>
-        public object CaptureState() => new RepairableBuildingRecord(_repairStageIndex,
-            _isRepairCompleted, _investedResources);
+        public object CaptureState() => new RepairableBuildingRecord(_repairStageIndex, _investedResources);
 
         /// <summary> Восстановить состояние объекта из сохранённого состояния. </summary>
         /// <param name="state"> Сохраненное состояние для восстановления. </param>
         public void RestoreState(object state)
         {
-            if (state is not RepairableBuildingRecord data) return;
+            if (state is not RepairableBuildingRecord record) return;
 
-            _repairStageIndex = data.StageIndex;
-            _isRepairCompleted = data.IsRepairCompleted;
-            _investedResources = data.InvestedResources;
+            _repairStageIndex = record.StageIndex;
+            _investedResources = record.InvestedResources;
         }
 
         #endregion

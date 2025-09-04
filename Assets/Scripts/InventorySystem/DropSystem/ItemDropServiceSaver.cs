@@ -20,12 +20,16 @@ namespace FlavorfulStory.InventorySystem.DropSystem
             dropService.SetDroppedItemsContainer(transform);
         }
 
+        #region ISaveable
+
         /// <summary> Сохраняет состояние выброшенных предметов. </summary>
         /// <returns> Сериализованное состояние выброшенных предметов. </returns>
-        public object CaptureState() => _dropService?.CaptureState();
+        public object CaptureState() => _dropService.CaptureState();
 
         /// <summary> Восстанавливает состояние выброшенных предметов из сериализованных данных. </summary>
         /// <param name="state"> Сохранённое состояние выброшенных предметов. </param>
-        public void RestoreState(object state) => _dropService?.RestoreState(state);
+        public void RestoreState(object state) => _dropService.RestoreState(state);
+
+        #endregion
     }
 }
