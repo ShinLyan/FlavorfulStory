@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Object = UnityEngine.Object;
@@ -17,18 +17,22 @@ namespace FlavorfulStory.Saving
         /// <summary> Событие, вызываемое после завершения загрузки сцены. </summary>
         public static event Action OnLoadCompleted;
 
-        /// <summary> Загрузка последней сцены. </summary>
+        /// <summary> Асинхронная загрузка последней сцены. </summary>
         /// <param name="saveFile"> Название файла с сохранением. </param>
-        /// <returns> Корутина, которая запускает асинхронную подгрузку сцены. </returns>
-        public static IEnumerator LoadLastScene(string saveFile)
+        public static async UniTask LoadLastSceneAsync(string saveFile)
         {
             var state = LoadFile(saveFile);
-            if (state == null) yield break;
+            if (state == null)
+            {
+                Debug.LogError("No save file loaded");
+                return;
+            }
 
             int buildIndex = SceneManager.GetActiveScene().buildIndex;
             if (state.TryGetValue("lastSceneBuildIndex", out object value)) buildIndex = (int)value;
 
-            yield return SceneManager.LoadSceneAsync(buildIndex);
+            await SceneManager.LoadSceneAsync(buildIndex);
+
             RestoreState(state);
         }
 
@@ -100,8 +104,8 @@ namespace FlavorfulStory.Saving
         /// <param name="state"> Словарь, содержащий состояния всех объектов, которые необходимо зафиксировать. </param>
         private static void CaptureState(Dictionary<string, object> state)
         {
-            foreach (var saveable in
-                     Object.FindObjectsByType<SaveableEntity>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+            foreach (var saveable in Object.FindObjectsByType<SaveableEntity>(
+                         FindObjectsInactive.Include, FindObjectsSortMode.None))
                 state[saveable.UniqueIdentifier] = saveable.CaptureState();
 
             state["lastSceneBuildIndex"] = SceneManager.GetActiveScene().buildIndex;
@@ -113,8 +117,8 @@ namespace FlavorfulStory.Saving
         {
             if (state == null) return;
 
-            foreach (var saveable in
-                     Object.FindObjectsByType<SaveableEntity>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+            foreach (var saveable in Object.FindObjectsByType<SaveableEntity>
+                         (FindObjectsInactive.Include, FindObjectsSortMode.None))
             {
                 string id = saveable.UniqueIdentifier;
                 if (state.TryGetValue(id, out object value)) saveable.RestoreState(value);

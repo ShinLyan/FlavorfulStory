@@ -65,14 +65,15 @@ namespace FlavorfulStory.SceneManagement
             InputWrapper.UnblockAllInput();
         }
 
-        /// <summary> Асинхронно продолжает игру из последнего сохранения. </summary>
-        public async UniTask ContinueGameAsync()
-        {
-            if (!SaveFileExists) return;
+        /// <summary> Продолжить игру. </summary>
+        public void ContinueGame() => ContinueGameAsync().Forget();
 
+        /// <summary> Асинхронно продолжает игру из последнего сохранения. </summary>
+        private async UniTask ContinueGameAsync()
+        {
             await _canvasGroupFader.Show().AsyncWaitForCompletion();
 
-            await SavingSystem.LoadLastScene(CurrentSaveFileName);
+            await SavingSystem.LoadLastSceneAsync(CurrentSaveFileName);
 
             _canvasGroupFader.Hide();
             _locationManager?.UpdateActiveLocation();
