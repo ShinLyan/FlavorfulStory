@@ -99,16 +99,20 @@ namespace FlavorfulStory.Installers
         /// <summary> Объявить сигналы, используемые в сцене. </summary>
         private void DeclareSignals()
         {
+            SignalBusInstaller.Install(Container);
+
             Container.DeclareSignal<MidnightStartedSignal>();
             Container.DeclareSignal<ItemCollectedSignal>();
             Container.DeclareSignal<QuestAddedSignal>();
             Container.DeclareSignal<DismantleDeniedSignal>();
-            Container.DeclareSignal<ExhaustedSleepSignal>();
 
             Container.DeclareSignal<ToolbarSlotSelectedSignal>();
             Container.DeclareSignal<ToolbarHotkeyPressedSignal>();
             Container.DeclareSignal<ConsumeSelectedItemSignal>();
             Container.DeclareSignal<ClosestInteractableChangedSignal>();
+
+            Container.DeclareSignal<SaveCompletedSignal>();
+            Container.DeclareSignal<ExhaustedSleepSignal>();
         }
 
         /// <summary> Установить зависимости, связанные с ремонтом построек. </summary>

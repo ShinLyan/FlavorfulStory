@@ -59,6 +59,8 @@ namespace FlavorfulStory.TimeManagement
         /// <summary> Вызывается при снятии паузы времени. </summary>
         public static Action OnTimeUnpaused;
 
+        public static WorldTime Instance { get; private set; } // TODO: ВРЕМЕННЫЙ КОСТЫЛЬ
+
         #endregion
 
         /// <summary> Внедрение зависимостей Zenject. </summary>
@@ -72,7 +74,11 @@ namespace FlavorfulStory.TimeManagement
         }
 
         /// <summary> Инициализировать начальное игровое время и подписаться на события. </summary>
-        private void Awake() => CurrentGameTime = new DateTime(1, Season.Spring, 1, DefaultDayStartHour, 0);
+        private void Awake()
+        {
+            CurrentGameTime = new DateTime(1, Season.Spring, 1, DefaultDayStartHour, 0);
+            Instance = this;
+        }
 
         /// <summary> Вызвать начальное обновление интерфейса. </summary>
         private void Start()
@@ -146,7 +152,7 @@ namespace FlavorfulStory.TimeManagement
         }
 
         /// <summary> Обновить игровое время до начала следующего дня. </summary>
-        public static void BeginNewDay(int dayStartHour = DefaultDayStartHour)
+        public void BeginNewDay(int dayStartHour = DefaultDayStartHour)
         {
             bool isSameDay = CurrentGameTime.Hour is >= 0f and < DefaultDayStartHour;
             int dayAdjustment = isSameDay ? 0 : 1;
@@ -155,6 +161,7 @@ namespace FlavorfulStory.TimeManagement
 
             OnDayEnded?.Invoke(CurrentGameTime);
             _savingWrapper.Save();
+            _signalBus.Fire(new SaveCompletedSignal());
         }
 
         /// <summary> Поставить игровое время на паузу. </summary>

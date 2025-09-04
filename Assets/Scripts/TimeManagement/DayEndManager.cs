@@ -70,7 +70,7 @@ namespace FlavorfulStory.TimeManagement
             _isProcessingSleep = true;
 
             if (!isExhausted)
-                WorldTime.BeginNewDay();
+                WorldTime.Instance.BeginNewDay();
             else
                 _signalBus.Fire(new ExhaustedSleepSignal());
 
