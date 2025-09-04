@@ -31,9 +31,6 @@ namespace FlavorfulStory.TimeManagement
         /// <summary> Предыдущее время. </summary>
         private DateTime _previousTime;
 
-        /// <summary> Обертка системы сохранений. </summary>
-        private static SavingWrapper _savingWrapper;
-
         /// <summary> Игра на паузе? </summary>
         public static bool IsPaused { get; private set; }
 
@@ -65,13 +62,8 @@ namespace FlavorfulStory.TimeManagement
 
         /// <summary> Внедрение зависимостей Zenject. </summary>
         /// <param name="signalBus"> Сигнальная шина Zenject для отправки и получения событий. </param>
-        /// <param name="savingWrapper"> Сигнальная шина. </param>
         [Inject]
-        private void Construct(SignalBus signalBus, SavingWrapper savingWrapper)
-        {
-            _signalBus = signalBus;
-            _savingWrapper = savingWrapper;
-        }
+        private void Construct(SignalBus signalBus) => _signalBus = signalBus;
 
         /// <summary> Инициализировать начальное игровое время и подписаться на события. </summary>
         private void Awake()
@@ -160,7 +152,7 @@ namespace FlavorfulStory.TimeManagement
                 CurrentGameTime.SeasonDay + dayAdjustment, dayStartHour, 0);
 
             OnDayEnded?.Invoke(CurrentGameTime);
-            _savingWrapper.Save();
+            SavingWrapper.Save();
             _signalBus.Fire(new SaveCompletedSignal());
         }
 

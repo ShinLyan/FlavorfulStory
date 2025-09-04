@@ -40,6 +40,9 @@ namespace FlavorfulStory.SceneManagement
             await _canvasGroupFader.Show().AsyncWaitForCompletion();
 
             await SceneManager.LoadSceneAsync(nameof(SceneName.Game));
+
+            // Ждём один кадр — Unity вызовет Start() всем объектам
+            await UniTask.NextFrame();
             Save();
 
             _canvasGroupFader.Hide();
@@ -70,13 +73,13 @@ namespace FlavorfulStory.SceneManagement
         }
 
         /// <summary> Загружает данные игры из текущего сохранения. </summary>
-        public void Load() => SavingSystem.Load(CurrentSaveFileName);
+        public static void Load() => SavingSystem.Load(CurrentSaveFileName);
 
         /// <summary> Сохраняет данные игры в текущий файл сохранения. </summary>
-        public void Save() => SavingSystem.Save(CurrentSaveFileName);
+        public static void Save() => SavingSystem.Save(CurrentSaveFileName);
 
         /// <summary> Удаляет текущее сохранение. </summary>
-        public void Delete() => SavingSystem.Delete(CurrentSaveFileName);
+        public static void Delete() => SavingSystem.Delete(CurrentSaveFileName);
 
         #region Debug
 
