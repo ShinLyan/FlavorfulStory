@@ -80,28 +80,5 @@ namespace FlavorfulStory.SceneManagement
 
         /// <summary> Удаляет текущее сохранение. </summary>
         public static void Delete() => SavingSystem.Delete(CurrentSaveFileName);
-
-        #region Debug
-
-#if UNITY_EDITOR
-        /// <summary> Клавиша для сохранения в режиме отладки. </summary>
-        private const KeyCode SaveKey = KeyCode.K;
-
-        /// <summary> Клавиша для загрузки в режиме отладки. </summary>
-        private const KeyCode LoadKey = KeyCode.L;
-
-        /// <summary> Клавиша для удаления сохранения в режиме отладки. </summary>
-        private const KeyCode DeleteKey = KeyCode.Delete;
-
-        /// <summary> Обрабатывает ввод для сохранения, загрузки и удаления в режиме отладки. </summary>
-        private void Update()
-        {
-            if (Input.GetKeyDown(SaveKey)) Save();
-            if (Input.GetKeyDown(LoadKey)) Load();
-            if (Input.GetKeyDown(DeleteKey)) Delete();
-        }
-#endif
-
-        #endregion
     }
 }

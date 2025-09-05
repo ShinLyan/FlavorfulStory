@@ -10,17 +10,22 @@ using Object = UnityEngine.Object;
 namespace FlavorfulStory.Saving
 {
     /// <summary> Система сохранений. </summary>
+    /// <remarks> Сохраняет и сценовые <see cref="SaveableEntity"/>,
+    /// и зарегистрированные Zenject-сервисы <see cref="ISaveableService"/>. </remarks>
     public static class SavingSystem
     {
-        #region Public Methods
-
         /// <summary> Расширение файлов сохранений. </summary>
         public const string SaveFileExtension = ".sav";
 
-        /// <summary> Событие, вызываемое после завершения загрузки сцены. </summary>
+        /// <summary> Ключ для сохранения индекса последней сцены. </summary>
+        private const string LastSceneKey = "lastSceneBuildIndex";
+
+        /// <summary> Событие, вызываемое после завершения загрузки сцены и восстановления состояния. </summary>
         public static event Action OnLoadCompleted;
 
-        /// <summary> Асинхронная загрузка последней сцены. </summary>
+        #region Public Methods
+
+        /// <summary> Асинхронная загрузка последней сцены и восстановление состояния. </summary>
         /// <param name="saveFile"> Название файла с сохранением. </param>
         public static async UniTask LoadLastSceneAsync(string saveFile)
         {
@@ -32,42 +37,39 @@ namespace FlavorfulStory.Saving
             }
 
             int buildIndex = SceneManager.GetActiveScene().buildIndex;
-            if (state.TryGetValue("lastSceneBuildIndex", out object value)) buildIndex = (int)value;
+            if (state.TryGetValue(LastSceneKey, out object value)) buildIndex = (int)value;
 
             await SceneManager.LoadSceneAsync(buildIndex);
-
             RestoreState(state);
         }
 
-        /// <summary> Сохранение состояния текущей сцены в заданном файле сохранения. </summary>
+        /// <summary> Сохранение текущего состояния сцены и сервисов в заданном файле сохранения. </summary>
         /// <param name="saveFile"> Название файла, куда необходимо сохранить данные. </param>
         public static void Save(string saveFile)
         {
             var state = LoadFile(saveFile);
-            if (state == null) return;
-
             CaptureState(state);
-            SaveFile(saveFile, state);
+            SaveToFile(saveFile, state);
         }
 
-        /// <summary> Загрузка текущего состояния сцены из заданного файла сохранения. </summary>
+        /// <summary> Загрузка состояния из файла и восстановление объектов. </summary>
         /// <param name="saveFile"> Название файла, откуда необходимо загружать данные. </param>
         public static void Load(string saveFile) => RestoreState(LoadFile(saveFile));
 
         /// <summary> Удаление файла сохранения. </summary>
         /// <param name="saveFile"> Название файла, который необходимо удалить. </param>
-        public static void Delete(string saveFile) => File.Delete(GetPathFromSaveFile(saveFile));
+        public static void Delete(string saveFile) => File.Delete(GetPath(saveFile));
 
         /// <summary> Получение пути до сохраненного файла. </summary>
         /// <param name="saveFile"> Название файла сохранения. </param>
-        /// <returns> Возвращает путь до сохраненного файла. </returns>
-        public static string GetPathFromSaveFile(string saveFile) =>
+        /// <returns> Путь до сохраненного файла. </returns>
+        public static string GetPath(string saveFile) =>
             Path.Combine(Application.persistentDataPath, saveFile + SaveFileExtension);
 
         /// <summary> Существует ли сохраненный файл?</summary>
         /// <param name="saveFile"> Название файла сохранения. </param>
         /// <returns> Возвращает True - если файл сохранения существует, False - в противном случае. </returns>
-        public static bool SaveFileExists(string saveFile) => File.Exists(GetPathFromSaveFile(saveFile));
+        public static bool SaveFileExists(string saveFile) => File.Exists(GetPath(saveFile));
 
         #endregion
 
@@ -78,56 +80,76 @@ namespace FlavorfulStory.Saving
         /// <returns> Возвращает словарь названия и объекта. </returns>
         private static Dictionary<string, object> LoadFile(string saveFile)
         {
-            string path = GetPathFromSaveFile(saveFile);
+            string path = GetPath(saveFile);
             if (!File.Exists(path)) return new Dictionary<string, object>();
 
-            using (var stream = File.Open(path, FileMode.Open))
-            {
-                var formatter = new BinaryFormatter();
-                return formatter.Deserialize(stream) as Dictionary<string, object>;
-            }
+            using var stream = File.Open(path, FileMode.Open);
+            var formatter = new BinaryFormatter();
+            return formatter.Deserialize(stream) as Dictionary<string, object>;
         }
 
         /// <summary> Сохранение данных в файл. </summary>
         /// <param name="saveFile"> Название файла сохранения. </param>
         /// <param name="state"> Состояние, которое необходимо записать в файл. </param>
-        private static void SaveFile(string saveFile, object state)
+        private static void SaveToFile(string saveFile, object state)
         {
-            string path = GetPathFromSaveFile(saveFile);
-            Debug.Log("Saving to " + path);
+            string path = GetPath(saveFile);
+            using var stream = File.Open(path, FileMode.Create);
+            var formatter = new BinaryFormatter();
+            formatter.Serialize(stream, state);
 
-            using (var stream = File.Open(path, FileMode.Create))
-            {
-                var formatter = new BinaryFormatter();
-                formatter.Serialize(stream, state);
-            }
+            Debug.Log($"Saving to {path}");
         }
 
-        /// <summary> Фиксация состояний всех объектов при сохранении. </summary>
-        /// <param name="state"> Словарь, содержащий состояния всех объектов, которые необходимо зафиксировать. </param>
+        /// <summary> Сохранение зарегистрированных объектов сцены и сервисов. </summary>
+        /// <param name="state"> Словарь, содержащий состояния всех объектов, которые необходимо сохранить. </param>
         private static void CaptureState(Dictionary<string, object> state)
         {
-            foreach (var saveable in Object.FindObjectsByType<SaveableEntity>(
-                         FindObjectsInactive.Include, FindObjectsSortMode.None))
-                state[saveable.UniqueIdentifier] = saveable.CaptureState();
+            foreach ((string key, var saveable) in GetAllSaveables()) state[key] = saveable.CaptureState();
 
-            state["lastSceneBuildIndex"] = SceneManager.GetActiveScene().buildIndex;
+            state[LastSceneKey] = SceneManager.GetActiveScene().buildIndex;
         }
 
-        /// <summary> Восстановление состояний всех объектов при загрузке. </summary>
-        /// <param name="state"> Словарь, содержащий состояния всех объектов, которые необходимо загрузить. </param>
+        /// <summary> Возвращает все объекты, поддерживающие сохранение: сценовые и сервисные. </summary>
+        /// <returns> Перечисление пар (ключ, объект ISaveable). </returns>
+        private static IEnumerable<(string Key, ISaveable Saveable)> GetAllSaveables()
+        {
+            foreach (var saveableEntity in Object.FindObjectsByType<SaveableEntity>
+                         (FindObjectsInactive.Include, FindObjectsSortMode.None))
+                yield return (saveableEntity.UniqueIdentifier, saveableEntity);
+
+            foreach (var saveableService in SaveServiceRegistry.All)
+                yield return (saveableService.UniqueIdentifier, saveableService);
+        }
+
+        /// <summary> Восстановление состояний зарегистрированных объектов сцены и сервисов. </summary>
+        /// <param name="state"> Словарь, содержащий состояния объектов, которые необходимо загрузить. </param>
         private static void RestoreState(Dictionary<string, object> state)
         {
-            if (state == null) return;
-
-            foreach (var saveable in Object.FindObjectsByType<SaveableEntity>
-                         (FindObjectsInactive.Include, FindObjectsSortMode.None))
-            {
-                string id = saveable.UniqueIdentifier;
-                if (state.TryGetValue(id, out object value)) saveable.RestoreState(value);
-            }
-
+            RestoreSceneObjects(state);
+            RestoreServiceStatesAsync(state).Forget();
             OnLoadCompleted?.Invoke();
+        }
+
+        /// <summary> Восстанавливает состояния объектов сцены (SaveableEntity). </summary>
+        /// <param name="state"> Словарь, содержащий состояния объектов, которые необходимо загрузить. </param>
+        private static void RestoreSceneObjects(Dictionary<string, object> state)
+        {
+            foreach (var entity in Object.FindObjectsByType<SaveableEntity>(
+                         FindObjectsInactive.Include, FindObjectsSortMode.None))
+                if (state.TryGetValue(entity.UniqueIdentifier, out object value))
+                    entity.RestoreState(value);
+        }
+
+        /// <summary> Восстанавливает состояния зарегистрированных сервисов (ISaveableService). </summary>
+        /// <param name="state"> Словарь, содержащий состояния объектов, которые необходимо загрузить. </param>
+        private static async UniTaskVoid RestoreServiceStatesAsync(Dictionary<string, object> state)
+        {
+            await UniTask.NextFrame();
+
+            foreach (var service in SaveServiceRegistry.All)
+                if (state.TryGetValue(service.UniqueIdentifier, out object value))
+                    service.RestoreState(value);
         }
 
         #endregion
