@@ -17,9 +17,5 @@ namespace FlavorfulStory.InventorySystem.DropSystem
         /// <param name="position"> Позиция появления предмета. </param>
         /// <param name="force"> Применяемая сила (необязательно). </param>
         void DropFromInventory(Inventory inventory, int slotIndex, Vector3 position, Vector3? force = null);
-
-        /// <summary> Устанавливает контейнер, в котором будут размещаться выброшенные предметы. </summary>
-        /// <param name="container"> Объект-контейнер на сцене. </param>
-        void SetDroppedItemsContainer(Transform container);
     }
 }

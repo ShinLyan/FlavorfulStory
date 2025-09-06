@@ -9,7 +9,7 @@ using UnityEngine;
 namespace FlavorfulStory.InventorySystem.DropSystem
 {
     /// <summary> Сервис, отвечающий за выброс предметов из инвентаря в игровом мире. </summary>
-    public class ItemDropService : IItemDropService, ISaveable
+    public class ItemDropService : IItemDropService, ISaveableService
     {
         /// <summary> Задержка перед возможностью подбора предмета. </summary>
         private const float PickupDelay = 1.5f;
@@ -21,7 +21,7 @@ namespace FlavorfulStory.InventorySystem.DropSystem
         public static readonly Vector3 ResourceDropForce = Vector3.up * ResourceDropForceValue;
 
         /// <summary> Контейнер, в котором спавнятся все выброшенные предметы. </summary>
-        private Transform _container;
+        private readonly Transform _container;
 
         /// <summary> Фабрика создания объектов Pickup'ов. </summary>
         private readonly IPrefabFactory<Pickup> _pickupFactory;
@@ -31,7 +31,12 @@ namespace FlavorfulStory.InventorySystem.DropSystem
 
         /// <summary> Конструктор сервиса выброса предметов. </summary>
         /// <param name="pickupFactory"> Фабрика создания Pickup объектов. </param>
-        public ItemDropService(IPrefabFactory<Pickup> pickupFactory) => _pickupFactory = pickupFactory;
+        /// <param name="container"> Контейнер, в котором спавнятся все выброшенные предметы. </param>
+        public ItemDropService(IPrefabFactory<Pickup> pickupFactory, Transform container)
+        {
+            _pickupFactory = pickupFactory;
+            _container = container;
+        }
 
         /// <summary> Выбрасывает предмет в мир в указанной позиции с опциональной силой. </summary>
         /// <param name="itemStack"> Предмет и его количество для выбрасывания. </param>
@@ -53,10 +58,6 @@ namespace FlavorfulStory.InventorySystem.DropSystem
             if (!TryConsumeInventorySlot(inventory, slotIndex, out var itemStack)) return;
             Drop(itemStack, position, force);
         }
-
-        /// <summary> Устанавливает контейнер, в котором будут размещаться выброшенные предметы. </summary>
-        /// <param name="container"> Объект-контейнер на сцене. </param>
-        public void SetDroppedItemsContainer(Transform container) => _container = container;
 
         /// <summary> Спавнит предмет в мире с заданным количеством и задержкой. </summary>
         /// <param name="itemStack"> Предмет для спавна. </param>

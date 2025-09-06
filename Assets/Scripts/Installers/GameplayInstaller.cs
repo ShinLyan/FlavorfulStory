@@ -59,6 +59,9 @@ namespace FlavorfulStory.Installers
         [Header("Inventory")]
         [SerializeField] private InventorySlotView _inventorySlotViewPrefab;
 
+        /// <summary> Родительский контейнер для выбрасываемых предметов. </summary>
+        [SerializeField] private Transform _itemDropContainer;
+
         /// <summary> Индикатор клетки на гриде. </summary>
         [Header("Placement System")]
         [SerializeField] private GameObject _gridIndicator;
@@ -157,8 +160,9 @@ namespace FlavorfulStory.Installers
 
             Container.Bind<IPrefabFactory<Pickup>>().To<Infrastructure.Factories.PrefabFactory<Pickup>>().AsSingle();
 
-            Container.Bind<IItemDropService>().To<ItemDropService>().AsSingle();
-            Container.Bind<ISaveable>().To<ItemDropService>().FromResolve();
+            Container.BindInterfacesAndSelfTo<ItemDropService>().AsSingle().WithArguments(_itemDropContainer);
+            Container.BindInterfacesTo<SaveableServiceBinder<ItemDropService>>().AsSingle();
+
             Container.BindInterfacesTo<InventoryProvider>().AsSingle().NonLazy();
 
             Container.Bind<IPrefabFactory<InventorySlotView>>()
