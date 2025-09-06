@@ -112,8 +112,7 @@ namespace FlavorfulStory.QuestSystem
 
         /// <summary> Сохраняет текущее состояние списка квестов. </summary>
         /// <returns> Сериализованное состояние квестов. </returns>
-        public object CaptureState() =>
-            _questStatuses.Select(questStatus => questStatus.CaptureState()).ToList();
+        public object CaptureState() => _questStatuses.Select(questStatus => questStatus.CaptureState()).ToList();
 
         /// <summary> Восстанавливает список квестов из сохраненного состояния. </summary>
         /// <param name="state"> Сохраненное состояние. </param>

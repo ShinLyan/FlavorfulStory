@@ -2,7 +2,7 @@ using FlavorfulStory.Notifications;
 
 namespace FlavorfulStory.TimeManagement
 {
-    /// <summary> Сигнал, отправляемый при наступлении ночи. </summary>
+    /// <summary> Сигнал, отправляемый когда проигрался принудительный сон. </summary>
     public readonly struct ExhaustedSleepSignal : INotificationData
     {
         /// <summary> Получает тип уведомления. </summary>

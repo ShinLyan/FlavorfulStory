@@ -6,6 +6,9 @@ namespace FlavorfulStory.PlacementSystem
     /// <summary> Интерфейс провайдера размещаемых объектов. </summary>
     public interface IPlaceableObjectProvider
     {
+        /// <summary> Все текущие размещённые объекты. </summary>
+        IReadOnlyCollection<PlaceableObject> All { get; }
+
         /// <summary> Зарегистрировать объект. </summary>
         /// <param name="placeableObject"> Объект для регистрации. </param>
         void Register(PlaceableObject placeableObject);

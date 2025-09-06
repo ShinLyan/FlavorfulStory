@@ -31,9 +31,6 @@ namespace FlavorfulStory.TimeManagement
         /// <summary> Предыдущее время. </summary>
         private DateTime _previousTime;
 
-        /// <summary> Обертка системы сохранений. </summary>
-        private static SavingWrapper _savingWrapper;
-
         /// <summary> Игра на паузе? </summary>
         public static bool IsPaused { get; private set; }
 
@@ -59,20 +56,21 @@ namespace FlavorfulStory.TimeManagement
         /// <summary> Вызывается при снятии паузы времени. </summary>
         public static Action OnTimeUnpaused;
 
+        public static WorldTime Instance { get; private set; } // TODO: ВРЕМЕННЫЙ КОСТЫЛЬ
+
         #endregion
 
         /// <summary> Внедрение зависимостей Zenject. </summary>
         /// <param name="signalBus"> Сигнальная шина Zenject для отправки и получения событий. </param>
-        /// <param name="savingWrapper"> Сигнальная шина. </param>
         [Inject]
-        private void Construct(SignalBus signalBus, SavingWrapper savingWrapper)
-        {
-            _signalBus = signalBus;
-            _savingWrapper = savingWrapper;
-        }
+        private void Construct(SignalBus signalBus) => _signalBus = signalBus;
 
         /// <summary> Инициализировать начальное игровое время и подписаться на события. </summary>
-        private void Awake() => CurrentGameTime = new DateTime(1, Season.Spring, 1, DefaultDayStartHour, 0);
+        private void Awake()
+        {
+            CurrentGameTime = new DateTime(1, Season.Spring, 1, DefaultDayStartHour, 0);
+            Instance = this;
+        }
 
         /// <summary> Вызвать начальное обновление интерфейса. </summary>
         private void Start()
@@ -146,7 +144,7 @@ namespace FlavorfulStory.TimeManagement
         }
 
         /// <summary> Обновить игровое время до начала следующего дня. </summary>
-        public static void BeginNewDay(int dayStartHour = DefaultDayStartHour)
+        public void BeginNewDay(int dayStartHour = DefaultDayStartHour)
         {
             bool isSameDay = CurrentGameTime.Hour is >= 0f and < DefaultDayStartHour;
             int dayAdjustment = isSameDay ? 0 : 1;
@@ -154,7 +152,8 @@ namespace FlavorfulStory.TimeManagement
                 CurrentGameTime.SeasonDay + dayAdjustment, dayStartHour, 0);
 
             OnDayEnded?.Invoke(CurrentGameTime);
-            _savingWrapper.Save();
+            SavingWrapper.Save();
+            _signalBus.Fire(new SaveCompletedSignal());
         }
 
         /// <summary> Поставить игровое время на паузу. </summary>
@@ -171,7 +170,7 @@ namespace FlavorfulStory.TimeManagement
             OnTimeUnpaused?.Invoke();
         }
 
-        #region Saving
+        #region ISaveable
 
         /// <summary> Сохраняет текущее игровое время. </summary>
         public object CaptureState() => CurrentGameTime;

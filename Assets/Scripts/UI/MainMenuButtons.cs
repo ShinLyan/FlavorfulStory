@@ -1,4 +1,3 @@
-using Cysharp.Threading.Tasks;
 using FlavorfulStory.SceneManagement;
 using FlavorfulStory.Windows;
 using FlavorfulStory.Windows.UI;
@@ -70,7 +69,7 @@ namespace FlavorfulStory.UI
         private void OpenNewGameWindow() => _windowService.OpenWindow<NewGameWindow>();
 
         /// <summary> Продолжить ранее сохраненную игру. </summary>
-        public void ContinueGame() => _savingWrapper.ContinueGameAsync().Forget();
+        private void ContinueGame() => _savingWrapper.ContinueGame();
 
         /// <summary> Открывает окно настроек. </summary>
         private void OpenSettingsWindow() => _windowService.OpenWindow<SettingsWindow>();

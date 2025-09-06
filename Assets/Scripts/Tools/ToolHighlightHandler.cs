@@ -8,7 +8,7 @@ using Zenject;
 namespace FlavorfulStory.Tools
 {
     /// <summary> Отвечает за отображение индикатора на клетке грида при выборе инструмента. </summary>
-    public class ToolHighlightHandler : IInitializable, ILateTickable, IDisposable
+    public class ToolHighlightHandler : IInitializable, IDisposable, ILateTickable
     {
         /// <summary> Шина сигналов Zenject, используется для подписки на события. </summary>
         private readonly SignalBus _signalBus;
@@ -62,6 +62,14 @@ namespace FlavorfulStory.Tools
             _signalBus.Subscribe<ToolbarSlotSelectedSignal>(OnToolbarItemChanged);
             _toolUsageService.ToolUseStarted += OnToolUseStarted;
             _toolUsageService.ToolUseFinished += OnToolUseFinished;
+        }
+
+        /// <summary> Освобождает ресурсы. </summary>
+        public void Dispose()
+        {
+            _signalBus.Unsubscribe<ToolbarSlotSelectedSignal>(OnToolbarItemChanged);
+            _toolUsageService.ToolUseStarted -= OnToolUseStarted;
+            _toolUsageService.ToolUseFinished -= OnToolUseFinished;
         }
 
         /// <summary> Обрабатывает смену предмета в тулбаре. </summary>
@@ -153,14 +161,6 @@ namespace FlavorfulStory.Tools
             var origin = new Vector3(centerWorld.x - half.x, 0f, centerWorld.z - half.z);
             _gridSelectionService.ShowGridIndicator(origin, Vector2Int.one, state);
             _ownsIndicator = true;
-        }
-
-        /// <summary> Освобождает ресурсы. </summary>
-        public void Dispose()
-        {
-            _signalBus.Unsubscribe<ToolbarSlotSelectedSignal>(OnToolbarItemChanged);
-            _toolUsageService.ToolUseStarted -= OnToolUseStarted;
-            _toolUsageService.ToolUseFinished -= OnToolUseFinished;
         }
     }
 }

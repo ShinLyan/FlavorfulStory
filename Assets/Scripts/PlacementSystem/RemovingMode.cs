@@ -57,7 +57,6 @@ namespace FlavorfulStory.PlacementSystem
         {
             if (TryRemoveAtSilent(gridPosition, out var removed))
             {
-                _placeableObjectProvider.Unregister(removed);
                 Object.Destroy(removed);
                 SfxPlayer.Play(SfxType.RemoveObject);
 
@@ -87,9 +86,11 @@ namespace FlavorfulStory.PlacementSystem
                 var target = gridData.GetPlacedObject(gridPosition);
                 if (!target) return false;
 
-                gridData.RemoveObjectAt(gridPosition);
                 removedPlaceable = target;
+
+                gridData.RemoveObjectAt(gridPosition);
                 _placeableObjectProvider.Unregister(removedPlaceable);
+
                 return true;
             }
 

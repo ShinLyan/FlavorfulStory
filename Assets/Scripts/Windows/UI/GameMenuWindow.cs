@@ -124,7 +124,10 @@ namespace FlavorfulStory.Windows.UI
         }
 
         /// <summary> Обрабатывает нажатие кнопки "Вернуться в главное меню". </summary>
-        private void OnClickReturnToMainMenu() =>
+        private void OnClickReturnToMainMenu()
+        {
+            Close();
             SavingWrapper.LoadSceneAsyncByName(nameof(SceneName.MainMenu)).Forget();
+        }
     }
 }

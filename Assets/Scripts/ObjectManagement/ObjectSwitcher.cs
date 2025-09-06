@@ -31,8 +31,6 @@ namespace FlavorfulStory.ObjectManagement
         /// Многократный вызов не приведет к ошибке. </remarks>
         public void Initialize()
         {
-            if (_spawnedObjects != null) return;
-
             _spawnedObjects = new List<GameObject>(_objectPrefabs.Length + 1) { transform.GetChild(0).gameObject };
             foreach (var prefab in _objectPrefabs)
             {
