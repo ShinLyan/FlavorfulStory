@@ -32,10 +32,6 @@ namespace FlavorfulStory.Shop
             Color occupiedColor = new(1f, 0.3f, 0.3f, 1f);
             Color freeColor = new(0.3f, 1f, 0.3f, 1f);
             Color accessPointColor = new(0.3f, 0.3f, 1f, 1f);
-            const float MainGizmoSize = 3f;
-
-            Gizmos.color = IsOccupied ? occupiedColor : freeColor;
-            Gizmos.DrawWireSphere(transform.position, MainGizmoSize);
 
             if (_accessiblePositions != null)
             {

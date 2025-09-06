@@ -17,7 +17,7 @@ using Random = UnityEngine.Random;
 namespace FlavorfulStory.Shop
 {
     /// <summary> Касса магазина — хранит валюту, точки доступа, умеет взаимодействовать и сохраняться. </summary>
-    [RequireComponent(typeof(CashRegisterAnimator))]
+    [RequireComponent(typeof(CashRegisterAnimator), typeof(SaveableEntity))]
     public class CashRegister : ShopObject, ICurrencyStorage, IInteractable, ISaveable
     {
         /// <summary> Словарь доступности точек доступа к кассе. </summary>

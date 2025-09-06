@@ -36,6 +36,7 @@ namespace FlavorfulStory.Shop
             _cashRegister.OnAmountChanged += UpdateCoinState;
         }
 
+        /// <summary> При разрушении компонента отписаться от событий. </summary>
         private void OnDestroy()
         {
             _cashRegister.OnAmountChanged -= UpdateAmountText;
