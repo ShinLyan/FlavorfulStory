@@ -52,6 +52,7 @@ namespace FlavorfulStory.DialogueSystem
             WorldTime.OnDayEnded += OnDayEnded;
         }
 
+        /// <summary> Отписка от событий завершения диалога и окончания дня. </summary>
         private void OnDestroy()
         {
             _playerSpeaker.OnDialogueCompleted -= OnDialogueCompleted;
@@ -86,10 +87,10 @@ namespace FlavorfulStory.DialogueSystem
         {
             if (!IsInteractionAllowed) return;
 
-            var dialogue = _dialogueService.GetDialogue(NpcInfo.NpcName);
+            var dialogue = _dialogueService.GetDialogue(NpcInfo);
             _playerSpeaker.StartDialogue(this, dialogue);
 
-            if (dialogue.DialogueType == DialogueType.Context) _timesContextTalked++;
+            // if (dialogue.DialogueType == DialogueType.Context) _timesContextTalked++;
         }
 
         /// <summary> Завершает взаимодействие с NPC. </summary>

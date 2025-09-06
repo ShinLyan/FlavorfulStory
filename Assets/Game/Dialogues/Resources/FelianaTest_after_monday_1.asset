@@ -38,27 +38,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2a68b60154ae481c9936879aa8e46c42, type: 3}
   m_Name: FelianaTest_after_monday_1
   m_EditorClassIdentifier: 
-  <NpcName>k__BackingField: 2
-  <DialogueType>k__BackingField: 2
-  Conditions:
-  - rid: 56856002631041145
-  - rid: 56856002631041157
   _nodes:
   - {fileID: -7223135853868520076}
   - {fileID: 3823964211823037872}
-  references:
-    version: 2
-    RefIds:
-    - rid: 56856002631041145
-      type: {class: TimeOfDayDialogueCondition, ns: FlavorfulStory.DialogueSystem.Conditions,
-        asm: Assembly-CSharp}
-      data:
-        <TimeOfDay>k__BackingField: 1
-    - rid: 56856002631041157
-      type: {class: DayOfWeekDialogueCondition, ns: FlavorfulStory.DialogueSystem.Conditions,
-        asm: Assembly-CSharp}
-      data:
-        <DayOfWeek>k__BackingField: 1
 --- !u!114 &3823964211823037872
 MonoBehaviour:
   m_ObjectHideFlags: 0

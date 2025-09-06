@@ -1,4 +1,5 @@
 using System;
+using UnityEngine;
 
 namespace FlavorfulStory.DialogueSystem.Conditions
 {
@@ -13,5 +14,12 @@ namespace FlavorfulStory.DialogueSystem.Conditions
         /// <summary> Получает вес условия из конфига. </summary>
         /// <returns> Числовой вес условия.. </returns>
         public abstract int GetWeight();
+
+        public virtual DialogueCondition Clone()
+        {
+            // Стандартная реализация через сериализацию JSON
+            string json = JsonUtility.ToJson(this);
+            return JsonUtility.FromJson(json, GetType()) as DialogueCondition;
+        }
     }
 }

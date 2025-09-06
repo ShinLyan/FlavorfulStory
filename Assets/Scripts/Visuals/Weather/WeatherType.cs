@@ -9,14 +9,11 @@ namespace FlavorfulStory.Visuals.Weather
         Clear,
 
         /// <summary> Дождливая погода. </summary>
-        Rainy,
+        Rainy
 
         // Cloudy, // Облачно
         // Stormy, // Гроза
         // Snowy, // Снег
         // Foggy // Туман
-
-        /// <summary> Любая погода (используется когда погода не имеет значения). </summary>
-        Any
     }
 }

@@ -7,9 +7,6 @@ namespace FlavorfulStory.TimeManagement
         Before17,
 
         /// <summary> Временной период после 17:00. </summary>
-        After17,
-
-        /// <summary> Любое время (используется когда время не имеет значения). </summary>
-        Any
+        After17
     }
 }

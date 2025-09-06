@@ -17,16 +17,14 @@ namespace FlavorfulStory.DialogueSystem
         {
             _selectors = new IDialogueSelector[]
             {
-                new QuestDialogueSelector(questContext),
-                new GreetingDialogueSelector(),
+                new QuestDialogueSelector(questContext), new GreetingDialogueSelector(),
                 new ContextDialogueSelector()
             };
         }
 
         /// <summary> Получает наиболее подходящий диалог для NPC. </summary>
-        /// <param name="npcName"> Имя NPC. </param>
         /// <returns> Найденный диалог или null. </returns>
-        public Dialogue GetDialogue(NpcName npcName) =>
-            _selectors.Select(selector => selector.SelectDialogue(npcName)).FirstOrDefault(dialogue => dialogue);
+        public Dialogue GetDialogue(NpcInfo npcInfo) =>
+            _selectors.Select(selector => selector.SelectDialogue(npcInfo)).FirstOrDefault(dialogue => dialogue);
     }
 }

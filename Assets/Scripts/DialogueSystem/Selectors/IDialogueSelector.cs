@@ -6,8 +6,8 @@ namespace FlavorfulStory.DialogueSystem.Selectors
     public interface IDialogueSelector
     {
         /// <summary> Выбирает подходящий диалог для NPC. </summary>
-        /// <param name="npcName"> Имя NPC для выбора диалога. </param>
+        /// <param name="npcInfo"> Информация о NPC. </param>
         /// <returns> Выбранный диалог или null. </returns>
-        Dialogue SelectDialogue(NpcName npcName);
+        Dialogue SelectDialogue(NpcInfo npcInfo);
     }
 }

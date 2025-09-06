@@ -10,63 +10,66 @@ namespace FlavorfulStory.DialogueSystem.Selectors
     public class ContextDialogueSelector : IDialogueSelector
     {
         /// <summary> Выбирает подходящий диалог для NPC. </summary>
-        /// <param name="npcName"> Имя NPC. </param>
         /// <returns> Выбранный диалог или null. </returns>
-        public Dialogue SelectDialogue(NpcName npcName)
+        public Dialogue SelectDialogue(NpcInfo npcInfo)
         {
-            var dialogues = DialogueDatabase.GetDialoguesFromNameAndType(npcName, DialogueType.Context);
+            var dialogues = npcInfo.DialogueConfig.ConditionalDialogues;
             var categoryMap = GroupDialoguesByCategory(dialogues);
-
-            if (categoryMap.Count == 0) return null;
-
             var weightedCategories = CalculateCategoryWeights(categoryMap);
             string chosenCategoryKey = GetRandomCategoryByWeight(weightedCategories);
             return PickRandomDialogueFromCategory(categoryMap[chosenCategoryKey]);
         }
 
-        /// <summary> Группирует диалоги по уникальным комбинациям условий. </summary>
-        /// <param name="dialogues"> Список диалогов. </param>
-        /// <returns> Словарь сгруппированных диалогов. </returns>
-        private static Dictionary<string, List<Dialogue>> GroupDialoguesByCategory(IEnumerable<Dialogue> dialogues)
+        /// <summary> Группирует диалоги по категорям, основанным на уникальных комбинациях условий. </summary>
+        /// <param name="dialogues"> Коллекция условных диалогов для группировки. </param>
+        /// <returns> Словарь, где ключами являются категории, а значениями — списки условных диалогов. </returns>
+        private static Dictionary<string, List<ConditionalDialogue>> GroupDialoguesByCategory(
+            IEnumerable<ConditionalDialogue> dialogues)
         {
-            var categoryMap = new Dictionary<string, List<Dialogue>>();
+            var categoryMap = new Dictionary<string, List<ConditionalDialogue>>();
 
-            foreach (var dialogue in dialogues)
+            foreach (var conditionalDialogue in dialogues)
             {
-                if (!DialogueMatchesCurrentState(dialogue)) continue;
+                bool allMatched = conditionalDialogue.Conditions.All(c => c != null && c.MatchesCurrentState());
+                if (!allMatched) continue;
 
-                string key = GetConditionsKey(dialogue.Conditions);
+                string key = GetConditionsKey(conditionalDialogue.Conditions);
+
                 if (!categoryMap.TryGetValue(key, out var list))
                 {
-                    list = new List<Dialogue>();
+                    list = new List<ConditionalDialogue>();
                     categoryMap[key] = list;
                 }
 
-                list.Add(dialogue);
+                list.Add(conditionalDialogue);
             }
 
             return categoryMap;
         }
 
-        /// <summary> Проверяет соответствие условий диалога текущему состоянию. </summary>
-        /// <param name="dialogue"> Диалог для проверки. </param>
-        /// <returns> Результат проверки. </returns>
-        private static bool DialogueMatchesCurrentState(Dialogue dialogue) =>
-            dialogue.Conditions.All(c => c.MatchesCurrentState());
+        /// <summary> Генерирует ключ для набора условий диалога. </summary>
+        /// <param name="conditions"> Коллекция условий, которые используются для создания ключа. </param>
+        /// <returns> Строковый ключ, представляющий объединённое и отсортированное представление условий. </returns>
+        private static string GetConditionsKey(IEnumerable<DialogueCondition> conditions) =>
+            string.Join("|", conditions
+                .Where(c => c != null)
+                .OrderBy(c => c.ToString())
+                .Select(c => c.ToString()));
 
-        /// <summary> Вычисляет веса для категорий диалогов. </summary>
-        /// <param name="categoryMap"> Сгруппированные диалоги. </param>
-        /// <returns> Список категорий с весами. </returns>
+        /// <summary> Рассчитывает вес для каждой категории диалогов на основе условий. </summary>
+        /// <param name="categoryMap"> Словарь, где ключ — имя категории, а значение — список диалогов этой категории. </param>
+        /// <returns> Список из пар, каждая из которых содержит категорию и её рассчитанный вес. </returns>
         private static List<(string category, int weight)> CalculateCategoryWeights(
-            Dictionary<string, List<Dialogue>> categoryMap) => categoryMap.Select(pair =>
-        {
-            int categoryWeight =
-                pair.Value.Sum(dialogue => dialogue.Conditions.Sum(condition => condition.GetWeight()));
-            return (category: pair.Key, weight: categoryWeight);
-        }).ToList();
+            Dictionary<string, List<ConditionalDialogue>> categoryMap) =>
+            categoryMap.Select(pair =>
+            {
+                int categoryWeight = pair.Value.Sum(conditionalDialogue =>
+                    conditionalDialogue.Conditions.Sum(condition => condition.GetWeight()));
+                return (category: pair.Key, weight: categoryWeight);
+            }).ToList();
 
-        /// <summary> Выбирает категорию с учетом весов. </summary>
-        /// <param name="pool"> Категории с весами. </param>
+        /// <summary> Выбирает случайную категорию с учетом весов. </summary>
+        /// <param name="pool"> Список категорий с весами. </param>
         /// <returns> Ключ выбранной категории. </returns>
         private static string GetRandomCategoryByWeight(List<(string category, int weight)> pool)
         {
@@ -84,15 +87,9 @@ namespace FlavorfulStory.DialogueSystem.Selectors
         }
 
         /// <summary> Выбирает случайный диалог из категории. </summary>
-        /// <param name="dialogues"> Диалоги категории. </param>
-        /// <returns> Случайный диалог. </returns>
-        private static Dialogue PickRandomDialogueFromCategory(List<Dialogue> dialogues) =>
-            dialogues[Random.Range(0, dialogues.Count)];
-
-        /// <summary> Генерирует ключ для набора условий. </summary>
-        /// <param name="conditions"> Список условий. </param>
-        /// <returns> Уникальный строковый ключ. </returns>
-        private static string GetConditionsKey(List<DialogueCondition> conditions) => string.Join("|",
-            conditions.OrderBy(condition => condition.ToString()).Select(condition => condition.ToString()));
+        /// <param name="dialogues"> Список условных диалогов категории. </param>
+        /// <returns> Случайный выбранный диалог. </returns>
+        private static Dialogue PickRandomDialogueFromCategory(List<ConditionalDialogue> dialogues) =>
+            dialogues[Random.Range(0, dialogues.Count)].Dialogue;
     }
 }

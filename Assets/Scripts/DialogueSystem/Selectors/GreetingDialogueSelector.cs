@@ -11,13 +11,13 @@ namespace FlavorfulStory.DialogueSystem.Selectors
         private readonly Dictionary<NpcName, bool> _greetedNpcs = new();
 
         /// <summary> Выбирает приветственный диалог для NPC. </summary>
-        /// <param name="npcName"> Имя NPC. </param>
         /// <returns> Приветственный диалог или null. </returns>
-        public Dialogue SelectDialogue(NpcName npcName)
+        public Dialogue SelectDialogue(NpcInfo npcInfo) //TODO: rework
         {
+            var npcName = npcInfo.NpcName;
             if (_greetedNpcs.TryGetValue(npcName, out bool greeted) && greeted) return null;
 
-            var dialogues = DialogueDatabase.GetDialoguesFromNameAndType(npcName, DialogueType.Greeting);
+            var dialogues = npcInfo.DialogueConfig.GreetingDialogues;
 
             if (dialogues.Count == 0)
             {

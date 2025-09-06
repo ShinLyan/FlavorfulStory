@@ -9,18 +9,19 @@ namespace FlavorfulStory.DialogueSystem.Conditions
     public class WeatherDialogueCondition : DialogueCondition
     {
         /// <summary> Требуемый тип погоды для выполнения условия. </summary>
-        [field: SerializeField] public WeatherType Weather { get; private set; }
+        [field: SerializeField]
+        public WeatherType Weather { get; private set; }
 
         /// <summary> Проверяет соответствие текущей погоды условию. </summary>
         /// <returns> True, если текущая погода соответствует условию или выбрано "Любая". </returns>
         public override bool MatchesCurrentState()
         {
             var currentWeather = WeatherType.Clear; //TODO: Заменить на Zenject Weather сервис
-            return Weather == WeatherType.Any || Weather == currentWeather;
+            return Weather == currentWeather;
         }
 
         /// <summary> Получает вес условия. </summary>
         /// <returns> Вес условия. </returns>
-        public override int GetWeight() => Weather != WeatherType.Any ? DialogueWeightsConfig.WeatherWeight : 0;
+        public override int GetWeight() => DialogueWeightsConfig.WeatherWeight;
     }
 }

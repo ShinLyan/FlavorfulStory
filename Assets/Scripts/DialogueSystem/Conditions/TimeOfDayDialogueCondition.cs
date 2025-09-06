@@ -16,11 +16,11 @@ namespace FlavorfulStory.DialogueSystem.Conditions
         public override bool MatchesCurrentState()
         {
             var currentTime = WorldTime.CurrentDateTime.Hour < 17 ? TimeOfDay.Before17 : TimeOfDay.After17;
-            return TimeOfDay == TimeOfDay.Any || TimeOfDay == currentTime;
+            return TimeOfDay == currentTime;
         }
 
         /// <summary> Получает вес условия. </summary>
         /// <returns> Вес условия. </returns>
-        public override int GetWeight() => TimeOfDay != TimeOfDay.Any ? DialogueWeightsConfig.TimeOfDayWeight : 0;
+        public override int GetWeight() => DialogueWeightsConfig.TimeOfDayWeight;
     }
 }

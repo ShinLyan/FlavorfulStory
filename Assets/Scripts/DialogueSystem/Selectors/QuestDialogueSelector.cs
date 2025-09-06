@@ -16,10 +16,10 @@ namespace FlavorfulStory.DialogueSystem.Selectors
         public QuestDialogueSelector(QuestExecutionContext executionContext) =>
             _questExecutionContext = executionContext;
 
-        /// <summary> Выбирает диалог для NPC, связанный с активными квестами. </summary>
-        /// <param name="npcName"> Имя NPC. </param>
-        /// <returns> Диалог квеста или null. </returns>
-        public Dialogue SelectDialogue(NpcName npcName)
+        /// <summary> Выбирает подходящий диалог для NPC на основании текущих квестовых целей. </summary>
+        /// <param name="npcInfo">Информация о NPC, для которого выбирается диалог.</param>
+        /// <returns>Объект диалога или null, если подходящий диалог не найден.</returns>
+        public Dialogue SelectDialogue(NpcInfo npcInfo)
         {
             foreach (var questStatus in _questExecutionContext.QuestList.QuestStatuses)
             foreach (var objective in questStatus.CurrentObjectives)

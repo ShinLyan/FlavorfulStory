@@ -6,9 +6,6 @@ namespace FlavorfulStory.TimeManagement
     [Serializable, Flags]
     public enum DayOfWeek
     {
-        /// <summary> Любое день недели (используется когда не имеет значения). </summary>
-        Any = 0,
-
         /// <summary> Понедельник. </summary>
         Monday = 1 << 0,
 

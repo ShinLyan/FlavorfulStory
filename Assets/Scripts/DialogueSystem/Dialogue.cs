@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using FlavorfulStory.AI;
-using FlavorfulStory.DialogueSystem.Conditions;
 using UnityEditor;
 using UnityEngine;
 
@@ -12,15 +10,6 @@ namespace FlavorfulStory.DialogueSystem
     [CreateAssetMenu(menuName = "FlavorfulStory/DialogueSystem/Dialogue")]
     public class Dialogue : ScriptableObject, ISerializationCallbackReceiver
     {
-        /// <summary> Имя NPC, к которому относится этот диалог. </summary>
-        [field: SerializeField] public NpcName NpcName { get; private set; }
-
-        /// <summary> Тип диалога. </summary>
-        [field: SerializeField] public DialogueType DialogueType { get; private set; }
-
-        /// <summary> Список условий, которые должны выполняться для доступности диалога. </summary>
-        [SerializeReference] public List<DialogueCondition> Conditions = new();
-
         /// <summary> Узлы диалога. </summary> 
         [SerializeField, HideInInspector] private List<DialogueNode> _nodes = new();
 
