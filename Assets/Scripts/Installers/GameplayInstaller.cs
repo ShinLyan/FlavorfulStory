@@ -199,11 +199,13 @@ namespace FlavorfulStory.Installers
             Container.Bind<PlacementPreview>().FromComponentInHierarchy().AsSingle();
             Container.Bind<IPrefabFactory<PlaceableObject>>()
                 .To<Infrastructure.Factories.PrefabFactory<PlaceableObject>>().AsSingle();
-            Container.BindInterfacesAndSelfTo<PlacementController>().AsSingle().WithArguments(_placeableContainer);
 
-            var placeables = FindObjectsByType<PlaceableObject>(FindObjectsInactive.Include, FindObjectsSortMode.None);
-            Container.Bind<IPlaceableObjectProvider>().To<PlaceableObjectProvider>().AsSingle()
-                .WithArguments(new List<PlaceableObject>(placeables));
+            Container.BindInterfacesAndSelfTo<PlacementController>().AsSingle().WithArguments(_placeableContainer);
+            Container.BindInterfacesTo<PlaceableObjectProvider>().AsSingle().WithArguments(new List<PlaceableObject>
+                (FindObjectsByType<PlaceableObject>(FindObjectsInactive.Include, FindObjectsSortMode.None)));
+
+            Container.BindInterfacesAndSelfTo<PlaceableSaveService>().AsSingle().WithArguments(_placeableContainer);
+            Container.BindInterfacesTo<SaveableServiceBinder<PlaceableSaveService>>().AsSingle();
         }
 
         /// <summary> Установить зависимости, связанные с игроком. </summary>

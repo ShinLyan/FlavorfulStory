@@ -1,25 +1,21 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using Zenject;
 
 namespace FlavorfulStory.PlacementSystem
 {
     /// <summary> Провайдер для управления размещаемыми объектами. </summary>
-    public class PlaceableObjectProvider : IPlaceableObjectProvider, IInitializable
+    public class PlaceableObjectProvider : IPlaceableObjectProvider
     {
         /// <summary> Список всех размещённых объектов. </summary>
         private readonly List<PlaceableObject> _placeables;
 
+        /// <summary> Все текущие размещённые объекты. </summary>
+        public IReadOnlyCollection<PlaceableObject> All => _placeables;
+
         /// <summary> Инициализировать провайдер. </summary>
         /// <param name="placeables"> Список всех размещённых объектов на сцене. </param>
         public PlaceableObjectProvider(List<PlaceableObject> placeables) => _placeables = placeables;
-
-        /// <summary> Инициализировать провайдер. </summary>
-        public void Initialize()
-        {
-            foreach (var placeableObject in _placeables) Register(placeableObject);
-        }
 
         /// <summary> Зарегистрировать объект. </summary>
         /// <param name="placeableObject"> Объект для регистрации. </param>
@@ -30,7 +26,10 @@ namespace FlavorfulStory.PlacementSystem
 
         /// <summary> Отменить регистрацию объекта. </summary>
         /// <param name="placeableObject"> Объект для отмены регистрации. </param>
-        public void Unregister(PlaceableObject placeableObject) => _placeables.Remove(placeableObject);
+        public void Unregister(PlaceableObject placeableObject)
+        {
+            if (_placeables.Contains(placeableObject)) _placeables.Remove(placeableObject);
+        }
 
         /// <summary> Получить все объекты заданного типа компонента. </summary>
         /// <typeparam name="T"> Тип компонента для поиска. </typeparam>
