@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using FlavorfulStory.Economy;
 using FlavorfulStory.Infrastructure;
 using FlavorfulStory.Infrastructure.Factories;
 using FlavorfulStory.InventorySystem;
@@ -26,6 +27,11 @@ namespace FlavorfulStory.BuildingRepair.UI
         /// <summary> Родитель для префабов отображений ресурсных требований. </summary>
         [SerializeField] private Transform _requirementViewsContainer;
 
+        /// <summary> Текст, отображающий стоимость ремонта. </summary>
+        [SerializeField] private TMP_Text _repairCostText;
+
+        [SerializeField] private GameObject _costContainer;
+
         /// <summary> Кнопка подтверждения ремонта. </summary>
         [SerializeField] private Button _buildButton;
 
@@ -34,6 +40,9 @@ namespace FlavorfulStory.BuildingRepair.UI
 
         /// <summary> Список отображений требований ресурсов. </summary>
         private readonly List<ResourceRequirementView> _requirementViews = new();
+
+        /// <summary> Хранилище валюты игрока. </summary>
+        private ICurrencyStorage _playerWallet;
 
         /// <summary> Делегат, вызываемый при добавлении ресурса. </summary>
         private Action<InventoryItem> _onAdd;
@@ -51,8 +60,14 @@ namespace FlavorfulStory.BuildingRepair.UI
 
         /// <summary> Внедрить фабрику создания отображений требований ресурсов. </summary>
         /// <param name="factory"> Фабрика создания отображений требований ресурсов. </param>
+        /// <param name="playerWallet">  </param>
         [Inject]
-        private void Construct(IPrefabFactory<ResourceRequirementView> factory) => _requirementViewFactory = factory;
+        private void Construct(IPrefabFactory<ResourceRequirementView> factory,
+            [Inject(Id = "Player")] ICurrencyStorage playerWallet)
+        {
+            _requirementViewFactory = factory;
+            _playerWallet = playerWallet;
+        }
 
         /// <summary> Инициализация кэша отображений и создание пула объектов. </summary>
         private void Awake()
@@ -149,8 +164,9 @@ namespace FlavorfulStory.BuildingRepair.UI
                 }
             }
 
+            _repairCostText.text = $"{_playerWallet.Amount} / {stage.MoneyCost}";
             _buildingNameText.text = stage.BuildingName;
-            _buildButton.interactable = IsRepairPossible(stage, investedResources);
+            _buildButton.interactable = IsRepairPossible(stage, investedResources, _playerWallet.Amount);
         }
 
         /// <summary> Очистить отображение окна ремонта. </summary>
@@ -163,9 +179,11 @@ namespace FlavorfulStory.BuildingRepair.UI
         /// <summary> Проверить возможность завершения ремонта. </summary>
         /// <param name="stage"> Стадия ремонта. </param>
         /// <param name="investedResources"> Вложенные ресурсы. </param>
+        /// <param name="playerMoney"> Деньги игрока. </param>
         /// <returns> <c>true</c>, если все ресурсы вложены; иначе <c>false</c>. </returns>
-        private static bool IsRepairPossible(RepairStage stage, List<int> investedResources)
-            => stage.Requirements.Select((itemStack, i) => investedResources[i] >= itemStack.Number).All(x => x);
+        private static bool IsRepairPossible(RepairStage stage, List<int> investedResources, int playerMoney)
+            => stage.Requirements.Select((itemStack, i) => investedResources[i] >= itemStack.Number).All(x => x) &&
+               stage.MoneyCost <= playerMoney;
 
         /// <summary> Отобразить сообщение об окончании ремонта. </summary>
         /// <param name="repairableBuildingName"> Название ремонтируемого здания. </param>
@@ -175,6 +193,7 @@ namespace FlavorfulStory.BuildingRepair.UI
             _repairCompletedText.text = $"{repairableBuildingName}'s repair completed";
             _repairCompletedText.gameObject.SetActive(true);
             _buildButton.gameObject.SetActive(false);
+            _costContainer.SetActive(false);
         }
     }
 }
