@@ -30,6 +30,7 @@ namespace FlavorfulStory.BuildingRepair.UI
         /// <summary> Текст, отображающий стоимость ремонта. </summary>
         [SerializeField] private TMP_Text _repairCostText;
 
+        /// <summary> Контейнер для отображения затрат на ремонт. </summary>
         [SerializeField] private GameObject _costContainer;
 
         /// <summary> Кнопка подтверждения ремонта. </summary>
@@ -60,7 +61,7 @@ namespace FlavorfulStory.BuildingRepair.UI
 
         /// <summary> Внедрить фабрику создания отображений требований ресурсов. </summary>
         /// <param name="factory"> Фабрика создания отображений требований ресурсов. </param>
-        /// <param name="playerWallet">  </param>
+        /// <param name="playerWallet"> Хранилище валюты игрока. </param>
         [Inject]
         private void Construct(IPrefabFactory<ResourceRequirementView> factory,
             [Inject(Id = "Player")] ICurrencyStorage playerWallet)
