@@ -30,7 +30,7 @@ namespace FlavorfulStory.PickupSystem
         private bool _canBePickedUp;
 
         /// <summary> Возвращает true, если предмет можно подобрать и в инвентаре есть место. </summary>
-        private bool CanBePickedUp => _canBePickedUp && _inventoryProvider.GetPlayerInventory().HasSpaceFor(Item);
+        public bool CanBePickedUp => _canBePickedUp && _inventoryProvider.GetPlayerInventory().HasSpaceFor(Item);
 
         /// <summary> Внедрение зависимостей Zenject. </summary>
         /// <param name="inventoryProvider"> Провайдер инвентарей. </param>

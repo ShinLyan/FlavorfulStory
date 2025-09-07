@@ -28,7 +28,7 @@ namespace FlavorfulStory.PickupSystem
         /// <summary> Ссылка на инвентарь игрока. </summary>
         private IInventoryProvider _inventoryProvider;
 
-        /// <summary> Компонент Pickup, отвечающий за предмет. </summary>
+        /// <summary> Компонент Pickup, отвечающий за предмет. </summary>   
         private Pickup _pickup;
 
         /// <summary> Rigidbody предмета. </summary>
@@ -156,7 +156,7 @@ namespace FlavorfulStory.PickupSystem
         }
 
         /// <summary> Проверяет, следует ли отменить притягивание (например, если игрок ушёл слишком далеко). </summary>
-        private bool ShouldCancelFlying() => DistanceToPlayer() > MaxRangeWorld();
+        private bool ShouldCancelFlying() => !IsInMagnetRange();
 
         /// <summary> Проверяет, можно ли начать притягивание. </summary>
         /// <returns> <c>True</c>, если условия для начала притягивания соблюдены. </returns>
@@ -164,7 +164,7 @@ namespace FlavorfulStory.PickupSystem
         {
             if (!_pickup.CanBePickedUp) return false;
 
-            return DistanceToPlayer() <= MaxRangeWorld();
+            return IsInMagnetRange();
         }
 
         /// <summary> Возвращает расстояние от предмета до игрока. </summary>
@@ -193,5 +193,7 @@ namespace FlavorfulStory.PickupSystem
                 if (!collider.isTrigger)
                     collider.enabled = true;
         }
+        
+        private bool IsInMagnetRange() => DistanceToPlayer() <= MaxRangeWorld();
     }
 }
