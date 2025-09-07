@@ -23,8 +23,8 @@ namespace FlavorfulStory.AI
         [field: Tooltip("Иконка NPC для отображения в UI."), SerializeField]
         public Sprite Icon { get; private set; }
 
-        /// <summary> Конфигурация диалога, содержащая приветственные и условные диалоги NPC. </summary>
-        [field: SerializeField]
+        /// <summary> Конфиг, содержащий приветственные и контекстные диалоги. </summary>
+        [field: Tooltip("Конфиг, содержащий приветственные и контекстные диалоги."), SerializeField]
         public DialogueConfig DialogueConfig { get; private set; }
     }
 }

@@ -10,8 +10,7 @@ namespace FlavorfulStory.DialogueSystem.Conditions
     public class DayOfWeekDialogueCondition : DialogueCondition
     {
         /// <summary> Требуемый день недели для выполнения условия. </summary>
-        [field: SerializeField]
-        public DayOfWeek DayOfWeek { get; private set; }
+        [field: SerializeField] public DayOfWeek DayOfWeek { get; private set; }
 
         /// <summary> Проверяет, соответствует ли текущий день недели условию. </summary>
         /// <returns> True, если текущий день соответствует условию. </returns>

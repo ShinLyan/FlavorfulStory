@@ -8,9 +8,9 @@ namespace FlavorfulStory.DialogueSystem
     [CreateAssetMenu(menuName = "FlavorfulStory/DialogueSystem/DialogueConfig")]
     public class DialogueConfig : ScriptableObject
     {
-        /// <summary> Список приветственных диалогов. </summary>
-        [field: Tooltip("Приветственный диалог NPC."), SerializeField]
-        public List<Dialogue> GreetingDialogues { get; private set; }
+        /// <summary> Приветственный диалог. </summary>
+        [field: Tooltip("Приветственный диалог."), SerializeField]
+        public Dialogue GreetingDialogue { get; private set; }
 
         /// <summary> Список условных диалогов. </summary>
         [field: Tooltip("Диалоги с условиями."), SerializeField]
