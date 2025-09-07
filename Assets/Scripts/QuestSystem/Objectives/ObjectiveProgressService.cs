@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using FlavorfulStory.AI;
 using FlavorfulStory.BuildingRepair;
 using FlavorfulStory.DialogueSystem;
@@ -6,11 +7,12 @@ using FlavorfulStory.InventorySystem;
 using FlavorfulStory.QuestSystem.Objectives.Params;
 using FlavorfulStory.TimeManagement;
 using Zenject;
+using DateTime = FlavorfulStory.TimeManagement.DateTime;
 
 namespace FlavorfulStory.QuestSystem.Objectives
 {
     /// <summary> Сервис отслеживания и проверки выполнения целей квестов. </summary>
-    public class ObjectiveProgressService : IInitializable
+    public class ObjectiveProgressService : IInitializable, IDisposable
     {
         /// <summary> Контекст, предоставляющий доступ к системам, необходимым для выполнения действий квеста. </summary>
         private readonly QuestExecutionContext _context;
@@ -27,14 +29,18 @@ namespace FlavorfulStory.QuestSystem.Objectives
             _context = questExecutionContext;
         }
 
-        /// <summary> Подписывается на события, влияющие на прогресс целей. </summary>
+        /// <summary> Подписаться на события. </summary>
         public void Initialize()
         {
             _signalBus.Subscribe<ItemCollectedSignal>(OnItemCollected);
+
             _context.PlayerSpeaker.OnDialogueCompleted += OnDialogueCompleted; // TODO: Переписать на SignalBus
             WorldTime.OnDayEnded += OnDayEnded; // TODO: Переписать на SignalBus
             RepairableBuilding.OnRepairCompleted += OnRepairCompleted; // TODO: Переписать на SignalBus
         }
+
+        /// <summary> Отписаться от событий. </summary>
+        public void Dispose() => _signalBus.Unsubscribe<ItemCollectedSignal>(OnItemCollected);
 
         /// <summary> Обработчик события сбора предмета. </summary>
         /// <param name="signal"></param>

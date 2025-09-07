@@ -39,13 +39,20 @@ namespace FlavorfulStory.Toolbar.UI
             _inventoryProvider = inventoryProvider;
         }
 
-        /// <summary> Подписка на события слотов панели. </summary>
+        /// <summary> При инициализации подписаться на события. </summary>
         private void Awake()
         {
             _signalBus.Subscribe<ToolbarHotkeyPressedSignal>(OnHotkeyPressed);
             _signalBus.Subscribe<ConsumeSelectedItemSignal>(OnConsumeSelected);
 
             _slots = GetComponentsInChildren<ToolbarSlotView>();
+        }
+
+        /// <summary> При уничтожении объекта отписаться от событий. </summary>
+        private void OnDestroy()
+        {
+            _signalBus.Unsubscribe<ToolbarHotkeyPressedSignal>(OnHotkeyPressed);
+            _signalBus.Unsubscribe<ConsumeSelectedItemSignal>(OnConsumeSelected);
         }
 
         /// <summary> Обрабатывает сигнал нажатия горячей клавиши тулбара. </summary>
@@ -116,7 +123,7 @@ namespace FlavorfulStory.Toolbar.UI
             _signalBus.Fire(new ToolbarSlotSelectedSignal(SelectedItem));
         }
 
-        #region Saving
+        #region ISaveable
 
         /// <summary> Сохраняет текущее состояние выбранного индекса. </summary>
         /// <returns> Индекс текущего выбранного предмета. </returns>

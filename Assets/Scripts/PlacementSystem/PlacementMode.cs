@@ -71,11 +71,11 @@ namespace FlavorfulStory.PlacementSystem
 
             SfxPlayer.Play(SfxType.PlacementSuccess);
 
-            var instance = _placeableFactory.Create(PlaceableObject, parentTransform: _container);
-            instance.transform.position = _positionProvider.GridToWorld(gridPosition);
-            _placeableObjectProvider.Register(instance);
+            var placeableObject = _placeableFactory.Create(PlaceableObject, parentTransform: _container);
+            placeableObject.transform.position = _positionProvider.GridToWorld(gridPosition);
+            _placeableObjectProvider.Register(placeableObject);
 
-            _gridLayers[PlaceableObject.Layer].AddObjectAt(gridPosition, instance);
+            _gridLayers[PlaceableObject.Layer].AddObjectAt(gridPosition, placeableObject);
             _placementPreview.UpdatePosition(_positionProvider.GridToWorld(gridPosition), false);
 
             return true;

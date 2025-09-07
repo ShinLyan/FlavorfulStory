@@ -7,8 +7,8 @@ using UnityEngine;
 
 namespace GridSystem.Editor
 {
-    /// <summary> Инструменты редактора для выравнивания объектов по глобальной сетке. </summary>
-    public static class GridAlignmentEditor
+    /// <summary> Утилита для выравнивания объектов по глобальной сетке. </summary>
+    public static class GridAlignmentUtility
     {
         /// <summary> Путь в меню для выравнивания всех размещаемых объектов. </summary>
         private const string AlignPlaceablesPath = "FlavorfulStory/Grid/Align all placeables to grid";

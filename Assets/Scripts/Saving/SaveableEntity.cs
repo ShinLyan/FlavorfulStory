@@ -7,7 +7,7 @@ namespace FlavorfulStory.Saving
 {
     /// <summary> Сохраняемый объект. </summary>
     [ExecuteAlways]
-    public class SaveableEntity : MonoBehaviour
+    public class SaveableEntity : MonoBehaviour, ISaveable
     {
         /// <summary> GUID. </summary>
         [SerializeField] private string _uniqueIdentifier;
@@ -21,7 +21,12 @@ namespace FlavorfulStory.Saving
         {
             var state = new Dictionary<string, object>();
             foreach (var saveable in GetComponents<ISaveable>())
+            {
+                if (ReferenceEquals(saveable, this)) continue;
+
                 state[saveable.GetType().ToString()] = saveable.CaptureState();
+            }
+
             return state;
         }
 
@@ -33,6 +38,8 @@ namespace FlavorfulStory.Saving
 
             foreach (var saveable in GetComponents<ISaveable>())
             {
+                if (ReferenceEquals(saveable, this)) continue;
+
                 string typeString = saveable.GetType().ToString();
                 if (stateDict.TryGetValue(typeString, out object value)) saveable.RestoreState(value);
             }
@@ -41,8 +48,9 @@ namespace FlavorfulStory.Saving
         #region Setting GUID
 
 #if UNITY_EDITOR
-        /// <summary> База данных GUID всех сохраняемых объектов на сцене. </summary>
-        private static readonly Dictionary<string, SaveableEntity> _saveableEntityDatabase = new();
+
+        /// <summary> База GUID всех сохраняемых объектов на сцене. </summary>
+        private static readonly Dictionary<string, SaveableEntity> _entityLookup = new();
 
         /// <summary> Является ли объект префабом?</summary>
         /// <remarks> В префабах не должен выставляться GUID. </remarks>
@@ -52,6 +60,7 @@ namespace FlavorfulStory.Saving
         private void Update()
         {
             if (Application.IsPlaying(gameObject) || IsPrefab) return;
+
             SetUniqueIdentifier();
         }
 
@@ -66,7 +75,7 @@ namespace FlavorfulStory.Saving
                 serializedObject.ApplyModifiedProperties();
             }
 
-            _saveableEntityDatabase[property.stringValue] = this;
+            _entityLookup[property.stringValue] = this;
         }
 
         /// <summary> Является ли GUID уникальным? </summary>
@@ -74,18 +83,14 @@ namespace FlavorfulStory.Saving
         /// <returns> Возвращает True - если GUID является уникальным, False - в противном случае. </returns>
         private bool IsUnique(string candidate)
         {
-            if (!_saveableEntityDatabase.ContainsKey(candidate) || _saveableEntityDatabase[candidate] == this)
-                return true;
+            if (!_entityLookup.ContainsKey(candidate) || _entityLookup[candidate] == this) return true;
 
-            if (!_saveableEntityDatabase[candidate]
-                || _saveableEntityDatabase[candidate].UniqueIdentifier != candidate)
-            {
-                _saveableEntityDatabase.Remove(candidate);
-                return true;
-            }
+            if (_entityLookup[candidate] && _entityLookup[candidate].UniqueIdentifier == candidate) return false;
 
-            return false;
+            _entityLookup.Remove(candidate);
+            return true;
         }
+
 #endif
 
         #endregion

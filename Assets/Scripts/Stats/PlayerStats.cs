@@ -73,19 +73,32 @@ namespace FlavorfulStory.Stats
 
         /// <summary> Структура для сериализации значений статов. </summary>
         [Serializable]
-        private struct StatsData
+        private readonly struct StatsRecord
         {
             /// <summary> Текущее значение здоровья. </summary>
-            public float HpCurrentValue;
+            public float HpCurrentValue { get; }
 
             /// <summary> Максимальное значение здоровья. </summary>
-            public float HpMaxValue;
+            public float HpMaxValue { get; }
 
             /// <summary> Текущее значение выносливости. </summary>
-            public float StaminaCurrentValue;
+            public float StaminaCurrentValue { get; }
 
             /// <summary> Максимальное значение выносливости. </summary>
-            public float StaminaMaxValue;
+            public float StaminaMaxValue { get; }
+
+            /// <summary> Конструктор с параметрами. </summary>
+            /// <param name="hpCurrentValue"> Текущее значение здоровья. </param>
+            /// <param name="hpMaxValue"> Максимальное значение здоровья. </param>
+            /// <param name="staminaCurrentValue"> Текущее значение выносливости. </param>
+            /// <param name="staminaMaxValue"> Максимальное значение выносливости. </param>
+            public StatsRecord(float hpCurrentValue, float hpMaxValue, float staminaCurrentValue, float staminaMaxValue)
+            {
+                HpCurrentValue = hpCurrentValue;
+                HpMaxValue = hpMaxValue;
+                StaminaCurrentValue = staminaCurrentValue;
+                StaminaMaxValue = staminaMaxValue;
+            }
         }
 
         /// <summary> Сохранить текущее состояние всех статов. </summary>
@@ -95,25 +108,20 @@ namespace FlavorfulStory.Stats
             var health = GetStat<Health>();
             var stamina = GetStat<Stamina>();
 
-            return new StatsData
-            {
-                HpCurrentValue = health?.CurrentValue ?? 0,
-                HpMaxValue = health?.MaxValue ?? 0,
-                StaminaCurrentValue = stamina?.CurrentValue ?? 0,
-                StaminaMaxValue = stamina?.MaxValue ?? 0
-            };
+            return new StatsRecord(health?.CurrentValue ?? 0, health?.MaxValue ?? 0,
+                stamina?.CurrentValue ?? 0, stamina?.MaxValue ?? 0);
         }
 
         /// <summary> Восстановить состояние всех статов из сохранённого состояния. </summary>
         /// <param name="state"> Сохранённые данные. </param>
         public void RestoreState(object state)
         {
-            if (state is not StatsData data) return;
+            if (state is not StatsRecord record) return;
 
             _stats.Clear();
 
-            Register<Health>(new Health(data.HpCurrentValue, data.HpMaxValue), _healthView);
-            Register<Stamina>(new Stamina(data.StaminaCurrentValue, data.StaminaMaxValue), _staminaView);
+            Register<Health>(new Health(record.HpCurrentValue, record.HpMaxValue), _healthView);
+            Register<Stamina>(new Stamina(record.StaminaCurrentValue, record.StaminaMaxValue), _staminaView);
         }
 
         #endregion

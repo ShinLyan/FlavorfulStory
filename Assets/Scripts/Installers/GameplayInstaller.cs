@@ -59,6 +59,9 @@ namespace FlavorfulStory.Installers
         [Header("Inventory")]
         [SerializeField] private InventorySlotView _inventorySlotViewPrefab;
 
+        /// <summary> Родительский контейнер для выбрасываемых предметов. </summary>
+        [SerializeField] private Transform _itemDropContainer;
+
         /// <summary> Индикатор клетки на гриде. </summary>
         [Header("Placement System")]
         [SerializeField] private GameObject _gridIndicator;
@@ -99,16 +102,20 @@ namespace FlavorfulStory.Installers
         /// <summary> Объявить сигналы, используемые в сцене. </summary>
         private void DeclareSignals()
         {
+            SignalBusInstaller.Install(Container);
+
             Container.DeclareSignal<MidnightStartedSignal>();
             Container.DeclareSignal<ItemCollectedSignal>();
             Container.DeclareSignal<QuestAddedSignal>();
             Container.DeclareSignal<DismantleDeniedSignal>();
-            Container.DeclareSignal<ExhaustedSleepSignal>();
 
             Container.DeclareSignal<ToolbarSlotSelectedSignal>();
             Container.DeclareSignal<ToolbarHotkeyPressedSignal>();
             Container.DeclareSignal<ConsumeSelectedItemSignal>();
             Container.DeclareSignal<ClosestInteractableChangedSignal>();
+
+            Container.DeclareSignal<SaveCompletedSignal>();
+            Container.DeclareSignal<ExhaustedSleepSignal>();
         }
 
         /// <summary> Установить зависимости, связанные с ремонтом построек. </summary>
@@ -153,8 +160,9 @@ namespace FlavorfulStory.Installers
 
             Container.Bind<IPrefabFactory<Pickup>>().To<Infrastructure.Factories.PrefabFactory<Pickup>>().AsSingle();
 
-            Container.Bind<IItemDropService>().To<ItemDropService>().AsSingle();
-            Container.Bind<ISaveable>().To<ItemDropService>().FromResolve();
+            Container.BindInterfacesAndSelfTo<ItemDropService>().AsSingle().WithArguments(_itemDropContainer);
+            Container.BindInterfacesTo<SaveableServiceBinder<ItemDropService>>().AsSingle();
+
             Container.BindInterfacesTo<InventoryProvider>().AsSingle().NonLazy();
 
             Container.Bind<IPrefabFactory<InventorySlotView>>()
@@ -191,11 +199,13 @@ namespace FlavorfulStory.Installers
             Container.Bind<PlacementPreview>().FromComponentInHierarchy().AsSingle();
             Container.Bind<IPrefabFactory<PlaceableObject>>()
                 .To<Infrastructure.Factories.PrefabFactory<PlaceableObject>>().AsSingle();
-            Container.BindInterfacesAndSelfTo<PlacementController>().AsSingle().WithArguments(_placeableContainer);
 
-            var placeables = FindObjectsByType<PlaceableObject>(FindObjectsInactive.Include, FindObjectsSortMode.None);
-            Container.Bind<IPlaceableObjectProvider>().To<PlaceableObjectProvider>().AsSingle()
-                .WithArguments(new List<PlaceableObject>(placeables));
+            Container.BindInterfacesAndSelfTo<PlacementController>().AsSingle().WithArguments(_placeableContainer);
+            Container.BindInterfacesTo<PlaceableObjectProvider>().AsSingle().WithArguments(new List<PlaceableObject>
+                (FindObjectsByType<PlaceableObject>(FindObjectsInactive.Include, FindObjectsSortMode.None)));
+
+            Container.BindInterfacesAndSelfTo<PlaceableSaveService>().AsSingle().WithArguments(_placeableContainer);
+            Container.BindInterfacesTo<SaveableServiceBinder<PlaceableSaveService>>().AsSingle();
         }
 
         /// <summary> Установить зависимости, связанные с игроком. </summary>

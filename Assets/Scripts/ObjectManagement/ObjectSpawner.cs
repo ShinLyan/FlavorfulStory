@@ -81,7 +81,9 @@ namespace FlavorfulStory.ObjectManagement
         /// <summary> Запуск процесса спавна при старте сцены. </summary>
         private void Start()
         {
-            if (_spawnedObjects.Count == 0) SpawnObjects();
+            if (_spawnedObjects.Count != 0) return;
+
+            SpawnObjects();
         }
 
         /// <summary> Спавнит объекты случайным образом в заданной зоне спавна. </summary>
@@ -147,57 +149,48 @@ namespace FlavorfulStory.ObjectManagement
         /// <summary> Проверяет возможность спавна объекта в заданной позиции. </summary>
         /// <param name="position"> Позиция для проверки. </param>
         /// <returns> Возвращает true, если объект может быть заспавнен в данной позиции, иначе false. </returns>
-        private bool CanSpawnAtPosition(Vector3 position) => Physics.OverlapSphere(
-            position, _minSpacing, _obstaclesLayerMask, QueryTriggerInteraction.Collide
-        ).Length == 0;
+        private bool CanSpawnAtPosition(Vector3 position) => Physics.OverlapSphere(position, _minSpacing,
+            _obstaclesLayerMask, QueryTriggerInteraction.Collide).Length == 0;
 
-        #region Saving
+        #region ISaveable
 
         /// <summary> Структура для записи состояния заспавненных объектов. </summary>
         [Serializable]
-        protected struct SpawnedObjectRecord
+        protected readonly struct SpawnedObjectRecord
         {
             /// <summary> Позиция заспавненного объекта. </summary>
-            public SerializableVector3 Position;
+            public SerializableVector3 Position { get; }
 
             /// <summary> Поворот по оси Y. </summary>
-            public float RotationY;
+            public float RotationY { get; }
 
             /// <summary> Размер. </summary>
-            public float Scale;
+            public float Scale { get; }
+
+            /// <summary> Конструктор с параметрами. </summary>
+            /// <param name="position"> Позиция заспавненного объекта. </param>
+            /// <param name="rotationY"> Поворот по оси Y. </param>
+            /// <param name="scale"> Размер. </param>
+            public SpawnedObjectRecord(SerializableVector3 position, float rotationY, float scale)
+            {
+                Position = position;
+                RotationY = rotationY;
+                Scale = scale;
+            }
         }
 
         /// <summary> Фиксация состояния объекта при сохранении. </summary>
         /// <returns> Возвращает объект, в котором фиксируется состояние. </returns>
-        public virtual object CaptureState() => _spawnedObjects.Select(spawnedObject => new SpawnedObjectRecord
-        {
-            Position = new SerializableVector3(spawnedObject.transform.position),
-            RotationY = spawnedObject.transform.eulerAngles.y,
-            Scale = spawnedObject.transform.localScale.x
-        }).ToList();
+        public virtual object CaptureState() => _spawnedObjects.Select(spawnedObject => new SpawnedObjectRecord(
+            new SerializableVector3(spawnedObject.transform.position), spawnedObject.transform.eulerAngles.y,
+            spawnedObject.transform.localScale.x)).ToList();
 
         /// <summary> Восстановление состояния объекта при загрузке. </summary>
         /// <param name="state"> Объект состояния, который необходимо восстановить. </param>
         public virtual void RestoreState(object state)
         {
-            if (_spawnedObjects != null && _spawnedObjects.Count != 0) DestroySpawnedObjects();
+            if (state is not List<SpawnedObjectRecord> records) return;
 
-            var spawnedObjectRecords = state as List<SpawnedObjectRecord>;
-            SpawnFromSave(spawnedObjectRecords);
-        }
-
-        /// <summary> Уничтожить заспавненные объекты. </summary>
-        protected void DestroySpawnedObjects()
-        {
-            foreach (var spawnedObject in _spawnedObjects) Destroy(spawnedObject);
-
-            _spawnedObjects.Clear();
-        }
-
-        /// <summary> Восстанавливает заспавненные объекты из сохраненного состояния. </summary>
-        /// <param name="records"> Список сохраненных объектов. </param>
-        private void SpawnFromSave(List<SpawnedObjectRecord> records)
-        {
             foreach (var record in records)
                 SpawnObject(record.Position.ToVector(), record.RotationY, Vector3.one * record.Scale);
         }
@@ -207,14 +200,14 @@ namespace FlavorfulStory.ObjectManagement
         #region Debug
 
 #if UNITY_EDITOR
+
         /// <summary> Валидация данных. </summary>
         /// <remarks> Коллбэк из UnityAPI. </remarks>
         private void OnValidate()
         {
             if (_spawnObjectPrefab.GetComponent<IHitable>() != null)
-                Debug.LogError(
-                    "В конфиге спавнера не должен находится объект, реализующий интерфейс IHitable. " +
-                    $"Используйте DestroyableContainerSpawner для {name}");
+                Debug.LogError("В конфиге спавнера не должен находится объект, реализующий интерфейс IHitable. " +
+                               $"Используйте DestroyableContainerSpawner для {name}");
         }
 
         /// <summary> Отображает визуализацию зоны спавна в редакторе. </summary>
@@ -223,7 +216,6 @@ namespace FlavorfulStory.ObjectManagement
             var color = new Color(_spawnAreaVisualizationColor.r, _spawnAreaVisualizationColor.g,
                 _spawnAreaVisualizationColor.b, 0.3f);
             Gizmos.color = color;
-
             Gizmos.DrawCube(transform.position, new Vector3(_widthSpawnArea, 0f, _lengthSpawnArea));
         }
 #endif

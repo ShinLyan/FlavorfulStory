@@ -48,8 +48,8 @@ namespace FlavorfulStory.InventorySystem
         /// <summary> Инициализация слотов и ссылки на инвентарь игрока. </summary>
         private void Awake()
         {
+            _inventoryProvider?.Register(this);
             _inventorySlots = new ItemStack[InventorySize];
-            _inventoryProvider.Register(this);
         }
 
         /// <summary> При старте вызываем событие обновление инвентаря. </summary>
@@ -59,7 +59,7 @@ namespace FlavorfulStory.InventorySystem
         /// <summary> При уничтожении объекта отвязать инвентарь. </summary>
         private void OnDestroy()
         {
-            _inventoryProvider.Unregister(this);
+            _inventoryProvider?.Unregister(this);
             InventoryUpdated = null;
         }
 
@@ -248,7 +248,7 @@ namespace FlavorfulStory.InventorySystem
             return stack;
         }
 
-        #region Saving
+        #region ISaveable
 
         /// <summary> Запись о предмете в слоте. </summary>
         [Serializable]
@@ -281,16 +281,13 @@ namespace FlavorfulStory.InventorySystem
         /// <param name="state"> Объект состояния, который необходимо восстановить. </param>
         public void RestoreState(object state)
         {
-            var slotRecords = state as InventorySlotRecord[];
+            if (state is not InventorySlotRecord[] records) return;
+
             for (int i = 0; i < InventorySize; i++)
             {
-                if (slotRecords == null) continue;
-
-                _inventorySlots[i].Item = ItemDatabase.GetItemFromID(slotRecords[i].ItemID);
-                _inventorySlots[i].Number = slotRecords[i].Number;
+                _inventorySlots[i].Item = ItemDatabase.GetItemFromID(records[i].ItemID);
+                _inventorySlots[i].Number = records[i].Number;
             }
-
-            InventoryUpdated?.Invoke(); // TODO: DELETE
         }
 
         #endregion
