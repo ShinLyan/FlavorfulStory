@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using FlavorfulStory.Core;
 using FlavorfulStory.Saving;
 using UnityEngine;
 using Zenject;
+using Random = UnityEngine.Random;
 
 namespace FlavorfulStory.InventorySystem
 {
@@ -27,6 +29,9 @@ namespace FlavorfulStory.InventorySystem
         /// <summary> Сигнальная шина Zenject для отправки и получения событий. </summary>
         private SignalBus _signalBus;
 
+        /// <summary> Инвентарь пуст? </summary>
+        public bool IsEmpty => _inventorySlots.All(itemStack => !itemStack.Item || itemStack.Number <= 0);
+
         /// <summary> Событие, вызываемое при изменении инвентаря (добавление, удаление предметов). </summary>
         public event Action InventoryUpdated;
 
@@ -43,8 +48,8 @@ namespace FlavorfulStory.InventorySystem
         /// <summary> Инициализация слотов и ссылки на инвентарь игрока. </summary>
         private void Awake()
         {
-            _inventorySlots = new ItemStack[InventorySize];
             _inventoryProvider?.Register(this);
+            _inventorySlots = new ItemStack[InventorySize];
         }
 
         /// <summary> При старте вызываем событие обновление инвентаря. </summary>
@@ -52,7 +57,11 @@ namespace FlavorfulStory.InventorySystem
         private void Start() => InventoryUpdated?.Invoke();
 
         /// <summary> При уничтожении объекта отвязать инвентарь. </summary>
-        private void OnDestroy() => _inventoryProvider?.Unregister(this);
+        private void OnDestroy()
+        {
+            _inventoryProvider?.Unregister(this);
+            InventoryUpdated = null;
+        }
 
         /// <summary> Есть ли место для предмета в инвентаре? </summary>
         public bool HasSpaceFor(InventoryItem item) => FindSlot(item) >= 0;
@@ -192,7 +201,7 @@ namespace FlavorfulStory.InventorySystem
                 return;
             }
 
-            var slot = _inventorySlots[slotIndex];
+            ref var slot = ref _inventorySlots[slotIndex];
             if (!slot.Item || slot.Number <= 0)
             {
                 Debug.LogError($"Attempted to remove from empty slot {slotIndex}");
@@ -213,7 +222,33 @@ namespace FlavorfulStory.InventorySystem
             _inventorySlots[slotIndex].Number = 0;
         }
 
-        #region Saving
+        /// <summary> Получить случайный непустой индекс слота. </summary>
+        /// <returns> Индекс слота или -1, если инвентарь пуст. </returns>
+        public int GetRandomNonEmptySlotIndex()
+        {
+            var nonEmptyIndices = new List<int>();
+            for (int i = 0; i < InventorySize; i++)
+            {
+                var stack = GetItemStackInSlot(i);
+                if (stack.Item && stack.Number > 0) nonEmptyIndices.Add(i);
+            }
+
+            if (nonEmptyIndices.Count == 0) return -1;
+
+            return nonEmptyIndices[Random.Range(0, nonEmptyIndices.Count)];
+        }
+
+        /// <summary> Получить и удалить стак из указанного слота. </summary>
+        /// <param name="slotIndex"> Индекс слота. </param>
+        /// <returns> Копия стека до удаления. </returns>
+        public ItemStack ExtractStackFromSlot(int slotIndex)
+        {
+            var stack = _inventorySlots[slotIndex];
+            RemoveFromSlot(slotIndex);
+            return stack;
+        }
+
+        #region ISaveable
 
         /// <summary> Запись о предмете в слоте. </summary>
         [Serializable]
@@ -246,16 +281,13 @@ namespace FlavorfulStory.InventorySystem
         /// <param name="state"> Объект состояния, который необходимо восстановить. </param>
         public void RestoreState(object state)
         {
-            var slotRecords = state as InventorySlotRecord[];
+            if (state is not InventorySlotRecord[] records) return;
+
             for (int i = 0; i < InventorySize; i++)
             {
-                if (slotRecords == null) continue;
-
-                _inventorySlots[i].Item = ItemDatabase.GetItemFromID(slotRecords[i].ItemID);
-                _inventorySlots[i].Number = slotRecords[i].Number;
+                _inventorySlots[i].Item = ItemDatabase.GetItemFromID(records[i].ItemID);
+                _inventorySlots[i].Number = records[i].Number;
             }
-
-            InventoryUpdated?.Invoke(); // TODO: DELETE
         }
 
         #endregion

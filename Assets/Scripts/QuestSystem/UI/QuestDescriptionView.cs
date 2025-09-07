@@ -6,7 +6,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace FlavorfulStory.QuestSystem
+namespace FlavorfulStory.QuestSystem.UI
 {
     /// <summary> Представление описания выбранного квеста в UI. </summary>
     public class QuestDescriptionView : MonoBehaviour

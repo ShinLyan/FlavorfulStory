@@ -14,7 +14,7 @@ namespace FlavorfulStory.InventorySystem.UI
         private Inventory _inventory;
 
         /// <summary> Фабрика для создания отображений ячеек инвентаря. </summary>
-        private IGameFactory<InventorySlotView> _slotFactory;
+        private IPrefabFactory<InventorySlotView> _slotFactory;
 
         /// <summary> Список отображений ячеек инвентаря. </summary>
         private readonly List<InventorySlotView> _slots = new();
@@ -22,22 +22,25 @@ namespace FlavorfulStory.InventorySystem.UI
         /// <summary> Контейнер для размещения отображений ячеек. </summary>
         private Transform _slotsContainer;
 
-        /// <summary> Внедрить зависимости: инвентарь и фабрику отображений ячеек. </summary>
-        /// <param name="inventory"> Инвентарь игрока. </param>
-        /// <param name="slotFactory"> Фабрика отображений ячеек. </param>
+        /// <summary> Внедрить зависимости Zenject. </summary>
+        /// <param name="slotFactory"> Фабрика отображений слотов. </param>
         [Inject]
-        private void Construct(Inventory inventory, IGameFactory<InventorySlotView> slotFactory)
-        {
-            _inventory = inventory;
-            _slotFactory = slotFactory;
-        }
+        private void Construct(IPrefabFactory<InventorySlotView> slotFactory) => _slotFactory = slotFactory;
 
-        /// <summary> Инициализировать отображения и подписаться на обновление инвентаря. </summary>
-        private void Awake()
+        /// <summary> Переинициализирует отображение для указанного инвентаря. </summary>
+        /// <param name="inventory"> Инвентарь. </param>
+        public void Initialize(Inventory inventory)
         {
+            if (_inventory == inventory) return;
+
+            if (_inventory) _inventory.InventoryUpdated -= UpdateView;
+            _inventory = inventory;
+
             _slotsContainer = transform;
             CacheInitialSlots();
-            Initialize(_inventory);
+
+            _inventory.InventoryUpdated += UpdateView;
+            UpdateView();
         }
 
         /// <summary> Сохранить существующие отображения ячеек, если они уже присутствуют в иерархии. </summary>
@@ -53,21 +56,10 @@ namespace FlavorfulStory.InventorySystem.UI
             }
         }
 
-        /// <summary> Переинициализирует отображение для указанного инвентаря. </summary>
-        public void Initialize(Inventory inventory)
-        {
-            if (_inventory) _inventory.InventoryUpdated -= UpdateView;
-
-            _inventory = inventory;
-
-            _inventory.InventoryUpdated += UpdateView;
-            UpdateView();
-        }
-
         /// <summary> Отписаться от событий и очистить отображения при уничтожении объекта. </summary>
         private void OnDestroy()
         {
-            _inventory.InventoryUpdated -= UpdateView;
+            if (_inventory) _inventory.InventoryUpdated -= UpdateView;
             ClearView();
         }
 
@@ -90,7 +82,7 @@ namespace FlavorfulStory.InventorySystem.UI
         {
             if (index < _slots.Count) return _slots[index];
 
-            var slot = _slotFactory.Create(_slotsContainer);
+            var slot = _slotFactory.Create(parentTransform: _slotsContainer);
             _slots.Add(slot);
             return slot;
         }

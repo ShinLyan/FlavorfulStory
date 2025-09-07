@@ -7,64 +7,68 @@ namespace FlavorfulStory.UI.Animation
     [RequireComponent(typeof(CanvasGroup))]
     public class CanvasGroupFader : MonoBehaviour
     {
-        /// <summary> Компонент CanvasGroup для управления прозрачностью и интерактивностью. </summary>
+        /// <summary> Компонент CanvasGroup для управления альфой и взаимодействием. </summary>
         private CanvasGroup _canvasGroup;
 
-        /// <summary> Активная tween-анимация изменения прозрачности. </summary>
+        /// <summary> Активная tween-анимация. </summary>
         private Tween _fadeTween;
 
-        /// <summary> Длительность появления. </summary>
-        private const float FadeInDuration = 0.4f;
+        /// <summary> Длительность анимации показа по умолчанию. </summary>
+        private const float DefaultFadeIn = 0.4f;
 
-        /// <summary> Длительность исчезновения. </summary>
-        private const float FadeOutDuration = 0.2f;
+        /// <summary> Длительность анимации скрытия по умолчанию. </summary>
+        private const float DefaultFadeOut = 0.2f;
 
-        /// <summary> Инициализация компонента. </summary>
+        /// <summary> Easing-кривая по умолчанию. </summary>
+        private const Ease DefaultEase = Ease.InOutSine;
+
+        /// <summary> Кэширует CanvasGroup. </summary>
         private void Awake() => _canvasGroup = GetComponent<CanvasGroup>();
 
-        /// <summary> Плавно показывает элемент. </summary>
-        /// <returns> Tween-анимация, управляющая появлением. </returns>
-        public Tween Show() => FadeTo(1f, true, FadeInDuration);
+        /// <summary> Показывает элемент с настройками по умолчанию. </summary>
+        public Tween Show() => FadeTo(1f, true, true, DefaultFadeIn, DefaultEase);
 
-        /// <summary> Плавно скрывает элемент. </summary>
-        /// <returns> Tween-анимация, управляющая исчезновением. </returns>
-        public Tween Hide() => FadeTo(0f, false, FadeOutDuration);
+        /// <summary> Показывает элемент с кастомной длительностью и альфой. </summary>
+        public Tween Show(float duration, float targetAlpha = 1f, Ease? ease = null)
+            => FadeTo(Mathf.Clamp01(targetAlpha), true, true, duration, ease ?? DefaultEase);
 
-        /// <summary> Мгновенно показывает элемент без анимации. </summary>
-        public void ShowImmediate() => SetAlpha(1f, true);
+        /// <summary> Скрывает элемент с настройками по умолчанию. </summary>
+        public Tween Hide() => FadeTo(0f, false, false, DefaultFadeOut, DefaultEase);
 
-        /// <summary> Мгновенно скрывает элемент без анимации. </summary>
-        public void HideImmediate() => SetAlpha(0f, false);
+        /// <summary> Скрывает элемент с кастомной длительностью. </summary>
+        public Tween Hide(float duration, Ease? ease = null)
+            => FadeTo(0f, false, false, duration, ease ?? DefaultEase);
 
         /// <summary> Выполняет анимацию изменения прозрачности до заданного значения. </summary>
         /// <param name="targetAlpha"> Целевое значение альфа-прозрачности. </param>
         /// <param name="interactable"> Должен ли элемент быть интерактивным после анимации. </param>
+        /// <param name="blocksRaycasts"> Должен ли элемент блокировать лучи после анимации. </param>
         /// <param name="duration"> Продолжительность анимации. </param>
+        /// <param name="ease"> Easing-кривая. </param>
         /// <returns> Tween-анимация изменения прозрачности. </returns>
-        private Tween FadeTo(float targetAlpha, bool interactable, float duration)
+        public Tween FadeTo(float targetAlpha, bool interactable, bool blocksRaycasts, float duration, Ease ease)
         {
             _fadeTween?.Kill();
 
             _canvasGroup.interactable = false;
             _canvasGroup.blocksRaycasts = false;
 
-            const Ease fadeEase = Ease.InOutSine;
-            _fadeTween = _canvasGroup.DOFade(targetAlpha, duration).SetEase(fadeEase).OnComplete(() =>
+            _fadeTween = _canvasGroup.DOFade(Mathf.Clamp01(targetAlpha), duration).SetEase(ease).OnComplete(() =>
             {
                 _canvasGroup.interactable = interactable;
-                _canvasGroup.blocksRaycasts = interactable;
+                _canvasGroup.blocksRaycasts = blocksRaycasts;
             });
 
             return _fadeTween;
         }
 
-        /// <summary> Устанавливает прозрачность и интерактивность элемента без анимации. </summary>
+        /// <summary> Мгновенно применяет альфу и интерактивность без анимации. </summary>
         /// <param name="alpha"> Значение прозрачности. </param>
         /// <param name="interactable"> Должен ли элемент быть интерактивным. </param>
-        private void SetAlpha(float alpha, bool interactable)
+        public void SetState(float alpha, bool interactable)
         {
             _fadeTween?.Kill();
-            _canvasGroup.alpha = alpha;
+            _canvasGroup.alpha = Mathf.Clamp01(alpha);
             _canvasGroup.interactable = interactable;
             _canvasGroup.blocksRaycasts = interactable;
         }

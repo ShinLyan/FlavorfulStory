@@ -15,7 +15,7 @@ namespace FlavorfulStory.DialogueSystem.Conditions
         /// <returns> True, если текущее время соответствует условию. </returns>
         public override bool MatchesCurrentState()
         {
-            var currentTime = WorldTime.CurrentDateTime.Hour < 17 ? TimeOfDay.Before17 : TimeOfDay.After17;
+            var currentTime = WorldTime.CurrentGameTime.Hour < 17 ? TimeOfDay.Before17 : TimeOfDay.After17;
             return TimeOfDay == currentTime;
         }
 

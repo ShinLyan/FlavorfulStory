@@ -1,11 +1,11 @@
 ﻿using System;
-using FlavorfulStory.InventorySystem.PickupSystem;
+using FlavorfulStory.PickupSystem;
 using UnityEngine;
 
 namespace FlavorfulStory.InventorySystem
 {
     // TODO: сделать абстрактным, когда все типы предметов будут реализованы
-    /// <summary> ScriptableObject, представляющий предмет, который может быть помещен в инвентарь. </summary>
+    /// <summary> Предмет, который может быть помещен в инвентарь. </summary>
     [CreateAssetMenu(menuName = "FlavorfulStory/Inventory/Item")]
     public class InventoryItem : ScriptableObject, ISerializationCallbackReceiver
     {
@@ -13,6 +13,7 @@ namespace FlavorfulStory.InventorySystem
 
         /// <summary> Автоматически сгенерированный ID для сохранения/загрузки. </summary>
         /// <remarks> Очистите это поле, если вы хотите создать новое. </remarks>
+        [field: Header("General Properties")]
         [field: Tooltip("Автоматически сгенерированный ID для сохранения/загрузки. " +
                         "Очистите это поле, если вы хотите создать новое."), SerializeField]
         public string ItemID { get; private set; }

@@ -23,7 +23,7 @@ namespace FlavorfulStory.QuestSystem.Objectives.Params
         protected override bool ShouldComplete(QuestExecutionContext context, object eventData)
         {
             if (eventData is InventoryItem item && item != InventoryItem) return false;
-            return context.Inventory.GetItemNumber(InventoryItem) >= RequiredAmount;
+            return context.PlayerInventory.GetItemNumber(InventoryItem) >= RequiredAmount;
         }
     }
 }

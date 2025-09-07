@@ -1,30 +1,42 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using FlavorfulStory.InventorySystem.PickupSystem;
+using FlavorfulStory.Infrastructure.Factories;
+using FlavorfulStory.PickupSystem;
 using FlavorfulStory.Saving;
 using UnityEngine;
 
 namespace FlavorfulStory.InventorySystem.DropSystem
 {
     /// <summary> Сервис, отвечающий за выброс предметов из инвентаря в игровом мире. </summary>
-    public class ItemDropService : IItemDropService, ISaveable
+    public class ItemDropService : IItemDropService, ISaveableService
     {
         /// <summary> Задержка перед возможностью подбора предмета. </summary>
         private const float PickupDelay = 1.5f;
 
+        /// <summary> Сила, с которой выбрасываются ресурсы вверх при спавне. </summary>
+        private const float ResourceDropForceValue = 5f;
+
+        /// <summary> Вектор силы, прикладываемый при выбросе ресурса (по умолчанию — вверх). </summary>
+        public static readonly Vector3 ResourceDropForce = Vector3.up * ResourceDropForceValue;
+
         /// <summary> Контейнер, в котором спавнятся все выброшенные предметы. </summary>
-        private Transform _container;
+        private readonly Transform _container;
 
         /// <summary> Фабрика создания объектов Pickup'ов. </summary>
-        private readonly PickupFactory _pickupFactory;
+        private readonly IPrefabFactory<Pickup> _pickupFactory;
 
         /// <summary> Список заспавненных Pickup для сохранения и очистки. </summary>
         private readonly List<Pickup> _spawnedPickups = new();
 
         /// <summary> Конструктор сервиса выброса предметов. </summary>
         /// <param name="pickupFactory"> Фабрика создания Pickup объектов. </param>
-        public ItemDropService(PickupFactory pickupFactory) => _pickupFactory = pickupFactory;
+        /// <param name="container"> Контейнер, в котором спавнятся все выброшенные предметы. </param>
+        public ItemDropService(IPrefabFactory<Pickup> pickupFactory, Transform container)
+        {
+            _pickupFactory = pickupFactory;
+            _container = container;
+        }
 
         /// <summary> Выбрасывает предмет в мир в указанной позиции с опциональной силой. </summary>
         /// <param name="itemStack"> Предмет и его количество для выбрасывания. </param>
@@ -47,10 +59,6 @@ namespace FlavorfulStory.InventorySystem.DropSystem
             Drop(itemStack, position, force);
         }
 
-        /// <summary> Устанавливает контейнер, в котором будут размещаться выброшенные предметы. </summary>
-        /// <param name="container"> Объект-контейнер на сцене. </param>
-        public void SetDroppedItemsContainer(Transform container) => _container = container;
-
         /// <summary> Спавнит предмет в мире с заданным количеством и задержкой. </summary>
         /// <param name="itemStack"> Предмет для спавна. </param>
         /// <param name="position"> Позиция появления. </param>
@@ -58,10 +66,9 @@ namespace FlavorfulStory.InventorySystem.DropSystem
         /// <returns> Ссылка на созданный Pickup. </returns>
         private Pickup Spawn(ItemStack itemStack, Vector3 position, float pickupDelay = 1f)
         {
-            if (!_container) Debug.LogError($"{nameof(ItemDropService)}.{nameof(Spawn)}: Container is not set)");
-
-            var pickup = _pickupFactory.Create(itemStack, position, pickupDelay, _container);
-            if (pickup) _spawnedPickups.Add(pickup);
+            var pickup = _pickupFactory.Create(itemStack.Item.PickupPrefab, position, parentTransform: _container);
+            pickup.Setup(itemStack, pickupDelay);
+            _spawnedPickups.Add(pickup);
             return pickup;
         }
 
@@ -93,20 +100,31 @@ namespace FlavorfulStory.InventorySystem.DropSystem
             return true;
         }
 
-        #region Saving
+        #region ISaveable
 
         /// <summary> Структура для сериализации информации о выброшенных предметах. </summary>
         [Serializable]
-        private struct DropSaveData
+        private readonly struct DropRecord
         {
             /// <summary> ID предмета, который был выброшен. </summary>
-            public string ItemID;
+            public string ItemId { get; }
 
             /// <summary> Позиция, в которой находился выброшенный предмет. </summary>
-            public SerializableVector3 Position;
+            public SerializableVector3 Position { get; }
 
             /// <summary> Количество выброшенных предметов. </summary>
-            public int Quantity;
+            public int Quantity { get; }
+
+            /// <summary> Конструктор с параметрами. </summary>
+            /// <param name="itemId"> ID предмета, который был выброшен. </param>
+            /// <param name="position"> Позиция, в которой находился выброшенный предмет. </param>
+            /// <param name="quantity"> Количество выброшенных предметов. </param>
+            public DropRecord(string itemId, SerializableVector3 position, int quantity)
+            {
+                ItemId = itemId;
+                Position = position;
+                Quantity = quantity;
+            }
         }
 
         /// <summary> Сохраняет текущее состояние выброшенных предметов. </summary>
@@ -114,26 +132,19 @@ namespace FlavorfulStory.InventorySystem.DropSystem
         public object CaptureState()
         {
             _spawnedPickups.RemoveAll(pickup => !pickup);
-            return _spawnedPickups.Select(p => new DropSaveData
-            {
-                ItemID = p.Item.ItemID,
-                Position = new SerializableVector3(p.transform.position),
-                Quantity = p.Number
-            }).ToList();
+            return _spawnedPickups.Select(pickup => new DropRecord(pickup.Item.ItemID,
+                new SerializableVector3(pickup.transform.position), pickup.Number)).ToList();
         }
 
         /// <summary> Восстанавливает выброшенные предметы из сохраненного состояния. </summary>
         /// <param name="state"> Сохраненные данные. </param>
         public void RestoreState(object state)
         {
-            if (state is not List<DropSaveData> records) return;
+            if (state is not List<DropRecord> records) return;
 
             foreach (var record in records)
-            {
-                var item = ItemDatabase.GetItemFromID(record.ItemID);
-                var itemStack = new ItemStack { Item = item, Number = record.Quantity };
-                if (item) Spawn(itemStack, record.Position.ToVector());
-            }
+                Spawn(new ItemStack(ItemDatabase.GetItemFromID(record.ItemId), record.Quantity),
+                    record.Position.ToVector());
         }
 
         #endregion

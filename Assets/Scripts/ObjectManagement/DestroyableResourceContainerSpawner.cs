@@ -15,7 +15,7 @@ namespace FlavorfulStory.ObjectManagement
         /// <param name="position"> Глобальная позиция в мировых координатах. </param>
         /// <param name="rotationY"> Угол поворота вокруг оси Y. </param>
         /// <param name="scale"> Масштаб. </param>
-        /// <param name="hitsTaken"> Количество нанесенных ударов. </param>
+        /// <param name="data"> Дополнительные данные. </param>
         protected override GameObject SpawnObject(Vector3 position, float rotationY, Vector3 scale, object data = null)
         {
             var obj = base.SpawnObject(position, rotationY, scale);
@@ -26,46 +26,41 @@ namespace FlavorfulStory.ObjectManagement
             return obj;
         }
 
-        #region Saving
+        #region ISaveable
 
         /// <summary> Запись добываемого объекта. </summary>
         [Serializable]
-        private struct SpawnedContainerRecord
+        private readonly struct SpawnedContainerRecord
         {
             /// <summary> Структура для записи состояния заспавненных объектов. </summary>
-            public SpawnedObjectRecord ObjectRecord;
+            public SpawnedObjectRecord ObjectRecord { get; }
 
             /// <summary> Количество полученных ударов. </summary>
-            public int HitsTaken;
+            public int HitsTaken { get; }
+
+            /// <summary> Конструктор с параметрами. </summary>
+            /// <param name="objectRecord"> Структура для записи состояния заспавненных объектов. </param>
+            /// <param name="hitsTaken"> Количество полученных ударов. </param>
+            public SpawnedContainerRecord(SpawnedObjectRecord objectRecord, int hitsTaken)
+            {
+                ObjectRecord = objectRecord;
+                HitsTaken = hitsTaken;
+            }
         }
 
         /// <summary> Фиксация состояния объекта при сохранении. </summary>
         /// <returns> Возвращает объект, в котором фиксируется состояние. </returns>
-        public override object CaptureState() => _spawnedObjects.Select(spawnedObject => new SpawnedContainerRecord
-        {
-            ObjectRecord = new SpawnedObjectRecord
-            {
-                Position = new SerializableVector3(spawnedObject.transform.position),
-                RotationY = spawnedObject.transform.eulerAngles.y,
-                Scale = spawnedObject.transform.localScale.x
-            },
-            HitsTaken = spawnedObject.GetComponent<DestroyableResourceContainer>().HitsTaken
-        }).ToList();
+        public override object CaptureState() => _spawnedObjects.Select(spawnedObject => new SpawnedContainerRecord(
+            new SpawnedObjectRecord(new SerializableVector3(spawnedObject.transform.position),
+                spawnedObject.transform.eulerAngles.y, spawnedObject.transform.localScale.x),
+            spawnedObject.GetComponent<DestroyableResourceContainer>().HitsTaken)).ToList();
 
         /// <summary> Восстановление состояния объекта при загрузке. </summary>
         /// <param name="state"> Объект состояния, который необходимо восстановить. </param>
         public override void RestoreState(object state)
         {
-            if (_spawnedObjects != null && _spawnedObjects.Count != 0) DestroySpawnedObjects();
+            if (state is not List<SpawnedContainerRecord> records) return;
 
-            var spawnedContainerRecords = state as List<SpawnedContainerRecord>;
-            SpawnFromSave(spawnedContainerRecords);
-        }
-
-        /// <summary> Восстанавливает заспавненные объекты из сохраненного состояния. </summary>
-        /// <param name="records"> Заспавненные объекты. </param>
-        private void SpawnFromSave(List<SpawnedContainerRecord> records)
-        {
             foreach (var record in records)
                 SpawnObject(record.ObjectRecord.Position.ToVector(), record.ObjectRecord.RotationY,
                     Vector3.one * record.ObjectRecord.Scale, record.HitsTaken);

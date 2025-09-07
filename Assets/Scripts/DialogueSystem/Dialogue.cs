@@ -11,7 +11,7 @@ namespace FlavorfulStory.DialogueSystem
     public class Dialogue : ScriptableObject, ISerializationCallbackReceiver
     {
         /// <summary> Узлы диалога. </summary> 
-        [SerializeField, HideInInspector] private List<DialogueNode> _nodes = new();
+        [SerializeField] private List<DialogueNode> _nodes = new();
 
         /// <summary> Словарь для поиска узлов по идентификатору. </summary>
         private readonly Dictionary<string, DialogueNode> _nodeLookup = new();

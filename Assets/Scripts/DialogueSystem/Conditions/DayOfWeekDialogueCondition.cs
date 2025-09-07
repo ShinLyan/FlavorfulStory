@@ -15,7 +15,7 @@ namespace FlavorfulStory.DialogueSystem.Conditions
 
         /// <summary> Проверяет, соответствует ли текущий день недели условию. </summary>
         /// <returns> True, если текущий день соответствует условию. </returns>
-        public override bool MatchesCurrentState() => DayOfWeek == WorldTime.CurrentDateTime.DayOfWeek;
+        public override bool MatchesCurrentState() => DayOfWeek == WorldTime.CurrentGameTime.DayOfWeek;
 
         /// <summary> Получает вес условия из конфигурации. </summary>
         /// <returns> Вес условия. </returns>
