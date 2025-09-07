@@ -12,7 +12,7 @@ namespace FlavorfulStory.DialogueSystem.Selectors
 
         /// <summary> Выбирает приветственный диалог для NPC. </summary>
         /// <returns> Приветственный диалог или null. </returns>
-        public Dialogue SelectDialogue(NpcInfo npcInfo) //TODO: rework
+        public Dialogue SelectDialogue(NpcInfo npcInfo)
         {
             var npcName = npcInfo.NpcName;
             if (_greetedNpcs.TryGetValue(npcName, out bool greeted) && greeted) return null;

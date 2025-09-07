@@ -132,7 +132,7 @@ namespace FlavorfulStory.Installers
             Container.Bind<PlayerSpeaker>().FromComponentInHierarchy().AsSingle();
             Container.Bind<DialogueModelPresenter>().FromComponentInHierarchy().AsSingle();
             Container.Bind<DialogueView>().FromComponentInHierarchy().AsSingle();
-            Container.Bind<DialogueService>().AsSingle();
+            Container.BindInterfacesAndSelfTo<DialogueService>().AsSingle();
         }
 
         /// <summary> Установить зависимости, связанные с экономикой. </summary>

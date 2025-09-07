@@ -2,27 +2,48 @@ using System.Collections.Generic;
 using System.Linq;
 using FlavorfulStory.AI;
 using FlavorfulStory.DialogueSystem.Conditions;
+using FlavorfulStory.TimeManagement;
+using DateTime = FlavorfulStory.TimeManagement.DateTime;
 using Random = UnityEngine.Random;
 
 namespace FlavorfulStory.DialogueSystem.Selectors
 {
-    /// <summary> Селектор диалогов, учитывающий контекстные условия. </summary>
-    public class ContextDialogueSelector : IDialogueSelector
+    /// <summary> Селектор диалогов, учитывающий контекстные условия и ограничение разговоров с NPC. </summary>
+    public class ContextDialogueSelector : IDialogueSelector, IInitializableSelector
     {
+        // Храним количество разговоров с каждым NPC за текущий день
+        private readonly Dictionary<NpcName, int> _dailyNpcConversations = new();
+
+        /// <summary> Инициализирует обработчики событий. </summary>
+        public void Initialize() => WorldTime.OnDayEnded += ResetDailyCounters;
+
+        /// <summary> Освобождает ресурсы и отписывается от событий. </summary>
+        public void Dispose() => WorldTime.OnDayEnded -= ResetDailyCounters;
+
+        /// <summary> Сброс счетчиков разговоров в конце дня. </summary>
+        private void ResetDailyCounters(DateTime _) => _dailyNpcConversations.Clear();
+
         /// <summary> Выбирает подходящий диалог для NPC. </summary>
         /// <returns> Выбранный диалог или null. </returns>
         public Dialogue SelectDialogue(NpcInfo npcInfo)
         {
+            if (_dailyNpcConversations.TryGetValue(npcInfo.NpcName, out int count) && count >= 3) return null;
+
             var dialogues = npcInfo.DialogueConfig.ConditionalDialogues;
             var categoryMap = GroupDialoguesByCategory(dialogues);
+
+            if (categoryMap.Count == 0) return null;
+
             var weightedCategories = CalculateCategoryWeights(categoryMap);
             string chosenCategoryKey = GetRandomCategoryByWeight(weightedCategories);
-            return PickRandomDialogueFromCategory(categoryMap[chosenCategoryKey]);
+            var dialogue = PickRandomDialogueFromCategory(categoryMap[chosenCategoryKey]);
+
+            _dailyNpcConversations.TryAdd(npcInfo.NpcName, 0);
+            _dailyNpcConversations[npcInfo.NpcName]++;
+
+            return dialogue;
         }
 
-        /// <summary> Группирует диалоги по категорям, основанным на уникальных комбинациях условий. </summary>
-        /// <param name="dialogues"> Коллекция условных диалогов для группировки. </param>
-        /// <returns> Словарь, где ключами являются категории, а значениями — списки условных диалогов. </returns>
         private static Dictionary<string, List<ConditionalDialogue>> GroupDialoguesByCategory(
             IEnumerable<ConditionalDialogue> dialogues)
         {
@@ -47,18 +68,12 @@ namespace FlavorfulStory.DialogueSystem.Selectors
             return categoryMap;
         }
 
-        /// <summary> Генерирует ключ для набора условий диалога. </summary>
-        /// <param name="conditions"> Коллекция условий, которые используются для создания ключа. </param>
-        /// <returns> Строковый ключ, представляющий объединённое и отсортированное представление условий. </returns>
         private static string GetConditionsKey(IEnumerable<DialogueCondition> conditions) =>
             string.Join("|", conditions
                 .Where(c => c != null)
                 .OrderBy(c => c.ToString())
                 .Select(c => c.ToString()));
 
-        /// <summary> Рассчитывает вес для каждой категории диалогов на основе условий. </summary>
-        /// <param name="categoryMap"> Словарь, где ключ — имя категории, а значение — список диалогов этой категории. </param>
-        /// <returns> Список из пар, каждая из которых содержит категорию и её рассчитанный вес. </returns>
         private static List<(string category, int weight)> CalculateCategoryWeights(
             Dictionary<string, List<ConditionalDialogue>> categoryMap) =>
             categoryMap.Select(pair =>
@@ -68,9 +83,6 @@ namespace FlavorfulStory.DialogueSystem.Selectors
                 return (category: pair.Key, weight: categoryWeight);
             }).ToList();
 
-        /// <summary> Выбирает случайную категорию с учетом весов. </summary>
-        /// <param name="pool"> Список категорий с весами. </param>
-        /// <returns> Ключ выбранной категории. </returns>
         private static string GetRandomCategoryByWeight(List<(string category, int weight)> pool)
         {
             int totalWeight = pool.Sum(valueTuple => valueTuple.weight);
@@ -86,9 +98,6 @@ namespace FlavorfulStory.DialogueSystem.Selectors
             return pool[0].category;
         }
 
-        /// <summary> Выбирает случайный диалог из категории. </summary>
-        /// <param name="dialogues"> Список условных диалогов категории. </param>
-        /// <returns> Случайный выбранный диалог. </returns>
         private static Dialogue PickRandomDialogueFromCategory(List<ConditionalDialogue> dialogues) =>
             dialogues[Random.Range(0, dialogues.Count)].Dialogue;
     }
