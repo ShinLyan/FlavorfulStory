@@ -9,15 +9,14 @@ namespace FlavorfulStory.DialogueSystem.Conditions
     [Serializable]
     public class DayOfWeekDialogueCondition : DialogueCondition
     {
-        /// <summary> Требуемый день недели для выполнения условия. </summary>
-        [field: SerializeField] public DayOfWeek DayOfWeek { get; private set; }
+        /// <summary> День недели, требуемый для выполнения условия. </summary>
+        [field: Tooltip("День недели, требуемый для выполнения условия."), SerializeField]
+        public DayOfWeek DayOfWeek { get; private set; }
 
         /// <summary> Проверяет, соответствует ли текущий день недели условию. </summary>
-        /// <returns> True, если текущий день соответствует условию. </returns>
-        public override bool MatchesCurrentState() => DayOfWeek == WorldTime.CurrentGameTime.DayOfWeek;
+        public override bool IsSatisfied => DayOfWeek == WorldTime.CurrentGameTime.DayOfWeek;
 
-        /// <summary> Получает вес условия из конфигурации. </summary>
-        /// <returns> Вес условия. </returns>
-        public override int GetWeight() => DialogueWeightsConfig.DayOfWeekWeight;
+        /// <summary> Вес условия. </summary>
+        public override int Weight => DialogueWeightsConfig.DayOfWeekWeight;
     }
 }

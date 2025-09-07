@@ -1,334 +1,226 @@
-﻿// Assets/Editor/DialogueConfigEditor.cs
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using System.Runtime.CompilerServices;
 using FlavorfulStory.DialogueSystem.Conditions;
 using UnityEditor;
+using UnityEditorInternal;
 using UnityEngine;
 
 namespace FlavorfulStory.DialogueSystem.Editor
 {
-    /// <summary> Кастомный редактор для конфигурации диалогов. </summary>
+    /// <summary> Кастомный редактор для DialogueConfig, отображает приветственный и условные диалоги. </summary>
     [CustomEditor(typeof(DialogueConfig))]
     public class DialogueConfigEditor : UnityEditor.Editor
     {
-        private SerializedProperty _greetingProp;
-        private SerializedProperty _conditionalProp;
+        /// <summary> Сериализованное свойство для приветственного диалога. </summary>
+        private SerializedProperty _greetingDialogueProperty;
 
-        private static Type[] _conditionTypes;
-        private static string[] _conditionTypeNames;
+        /// <summary> Сериализованное свойство для условных диалогов. </summary>
+        private SerializedProperty _contextDialoguesProperty;
 
-        // UI state:
-        private readonly List<bool> _dialogueFoldouts = new();
-        private readonly List<List<bool>> _conditionFoldouts = new();
-        private readonly List<int> _addConditionSelectedType = new();
+        /// <summary> Список условных диалогов с поддержкой drag-and-drop и сортировки. </summary>
+        private ReorderableList _dialogueList;
 
-        /// <summary> Инициализация редактора. </summary>
+        /// <summary> Словарь списков условий для каждого диалога. </summary>
+        private readonly Dictionary<int, ReorderableList> _conditionLists = new();
+
+        /// <summary> Словарь состояния foldout'ов для каждого диалога. </summary>
+        private readonly Dictionary<int, bool> _dialogueFoldouts = new();
+
+        /// <summary> Список доступных типов условий, найденных в сборках. </summary>
+        private List<Type> _conditionTypes;
+
+        /// <summary> Вызывается при включении инспектора, инициализирует свойства и списки. </summary>
         private void OnEnable()
         {
-            _greetingProp = serializedObject.FindProperty("<GreetingDialogues>k__BackingField");
-            _conditionalProp = serializedObject.FindProperty("<ConditionalDialogues>k__BackingField");
+            _greetingDialogueProperty = serializedObject.FindProperty("<GreetingDialogue>k__BackingField");
+            _contextDialoguesProperty = serializedObject.FindProperty("<ContextDialogues>k__BackingField");
 
-            if (_conditionTypes == null)
+            _conditionTypes = AppDomain.CurrentDomain.GetAssemblies().SelectMany(assembly => assembly.GetTypes())
+                .Where(type => !type.IsAbstract && typeof(DialogueCondition).IsAssignableFrom(type)).ToList();
+
+            _dialogueList = new ReorderableList(serializedObject, _contextDialoguesProperty, true, true, true, true)
             {
-                _conditionTypes = AppDomain.CurrentDomain.GetAssemblies()
-                    .SelectMany(a => a.GetTypes())
-                    .Where(t => typeof(DialogueCondition).IsAssignableFrom(t) && !t.IsAbstract)
-                    .ToArray();
-
-                _conditionTypeNames = _conditionTypes.Select(t => t.Name).ToArray();
-            }
-
-            EnsureUIStateSize();
+                drawHeaderCallback = DrawDialogueListHeader,
+                drawElementCallback = DrawDialogueElement,
+                elementHeightCallback = CalculateDialogueElementHeight,
+                onAddCallback = AddNewDialogueEntry
+            };
         }
 
-        /// <summary> Отрисовка GUI инспектора. </summary>
+        /// <summary> Рисует пользовательский интерфейс инспектора. </summary>
         public override void OnInspectorGUI()
         {
             serializedObject.Update();
-            EnsureNoSharedConditionInstances();
 
-            EditorGUILayout.LabelField("Greeting Dialogues", EditorStyles.boldLabel);
-            EditorGUILayout.PropertyField(_greetingProp, true);
+            EditorGUILayout.PropertyField(_greetingDialogueProperty);
+            EditorGUILayout.Space(10);
+            _dialogueList.DoLayoutList();
 
-            EditorGUILayout.Space();
-            EditorGUILayout.LabelField("Conditional Dialogues", EditorStyles.boldLabel);
-
-            EnsureUIStateSize();
-
-            for (int i = 0; i < _conditionalProp.arraySize; i++) DrawConditionalDialogue(i);
-
-            DrawAddConditionalDialogueButton();
             serializedObject.ApplyModifiedProperties();
         }
 
-        /// <summary> Отрисовывает условный диалог. </summary>
-        /// <param name="index"> Индекс диалога </param>
-        private void DrawConditionalDialogue(int index)
+        /// <summary> Рисует заголовок списка условных диалогов. </summary>
+        /// <param name="rect"> Область для отрисовки. </param>
+        private static void DrawDialogueListHeader(Rect rect) => EditorGUI.LabelField(rect, "Context Dialogues");
+
+        /// <summary> Рисует элемент списка условных диалогов. </summary>
+        /// <param name="rect"> Область для отрисовки. </param>
+        /// <param name="index"> Индекс элемента. </param>
+        /// <param name="isActive"> Активен ли элемент. </param>
+        /// <param name="isFocused"> В фокусе ли элемент. </param>
+        private void DrawDialogueElement(Rect rect, int index, bool isActive, bool isFocused)
         {
-            var dialogueItem = _conditionalProp.GetArrayElementAtIndex(index);
-            var dialogueField = dialogueItem.FindPropertyRelative("Dialogue");
-            var conditionsList = dialogueItem.FindPropertyRelative("Conditions");
+            var dialogueElement = _contextDialoguesProperty.GetArrayElementAtIndex(index);
+            var dialogueField = dialogueElement.FindPropertyRelative("<Dialogue>k__BackingField");
+            var conditionsField = dialogueElement.FindPropertyRelative("<Conditions>k__BackingField");
 
-            _dialogueFoldouts[index] = EditorGUILayout.Foldout(_dialogueFoldouts[index],
-                $"Conditional Dialogue {index} : {(dialogueField.objectReferenceValue ? dialogueField.objectReferenceValue.name : "None")}",
-                true);
+            float y = rect.y;
+            float spacing = EditorGUIUtility.standardVerticalSpacing;
+            float line = EditorGUIUtility.singleLineHeight;
 
-            if (_dialogueFoldouts[index])
+            _dialogueFoldouts.TryAdd(index, true);
+            _dialogueFoldouts[index] = EditorGUI.Foldout(new Rect(rect.x, y, rect.width, line),
+                _dialogueFoldouts[index], $"Context Dialogue {index + 1}", true);
+
+            y += line + spacing;
+            if (!_dialogueFoldouts[index]) return;
+
+            EditorGUI.PropertyField(new Rect(rect.x, y, rect.width, line), dialogueField);
+            y += line + spacing;
+
+            if (!_conditionLists.ContainsKey(index))
+                _conditionLists[index] = CreateConditionsReorderableList(conditionsField);
+
+            _conditionLists[index].DoList(new Rect(rect.x, y, rect.width, _conditionLists[index].GetHeight()));
+        }
+
+        /// <summary> Вычисляет высоту элемента списка диалога. </summary>
+        /// <param name="index"> Индекс элемента. </param>
+        /// <returns> Высота элемента в пикселях. </returns>
+        private float CalculateDialogueElementHeight(int index)
+        {
+            float height = EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
+
+            if (_dialogueFoldouts.TryGetValue(index, out bool expanded) && expanded)
             {
-                EditorGUI.indentLevel++;
-                EditorGUILayout.PropertyField(dialogueField);
-                EditorGUILayout.Space();
-                EditorGUILayout.LabelField("Conditions", EditorStyles.boldLabel);
+                height += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
 
-                EnsureConditionFoldoutsSize(index, conditionsList);
-                DrawConditions(index, conditionsList);
-                DrawAddConditionControls(index, conditionsList);
-
-                EditorGUI.indentLevel--;
+                if (_conditionLists.TryGetValue(index, out var list)) height += list.GetHeight();
             }
 
-            DrawRemoveDialogueButton(index);
-            EditorGUILayout.Space();
+            return height;
         }
 
-        /// <summary> Отрисовывает кнопку добавления диалога. </summary>
-        private void DrawAddConditionalDialogueButton()
+        /// <summary> Добавляет новую запись условного диалога в список. </summary>
+        /// <param name="list"> Список условных диалогов. </param>
+        private void AddNewDialogueEntry(ReorderableList list)
         {
-            if (GUILayout.Button("Add Conditional Dialogue"))
+            _contextDialoguesProperty.arraySize++;
+            var newElement =
+                _contextDialoguesProperty.GetArrayElementAtIndex(_contextDialoguesProperty.arraySize - 1);
+            newElement.FindPropertyRelative("<Dialogue>k__BackingField").objectReferenceValue = null;
+            newElement.FindPropertyRelative("<Conditions>k__BackingField").ClearArray();
+        }
+
+        /// <summary> Создает ReorderableList для отображения условий диалога. </summary>
+        /// <param name="conditionsProperty"> Сериализованное свойство списка условий. </param>
+        /// <returns> Список для редактирования условий. </returns>
+        private ReorderableList CreateConditionsReorderableList(SerializedProperty conditionsProperty) => new(
+            conditionsProperty.serializedObject, conditionsProperty, true, true, true, true)
+        {
+            drawHeaderCallback = rect => EditorGUI.LabelField(rect, "Conditions"),
+
+            drawElementCallback = (rect, index, _, _) =>
             {
-                _conditionalProp.arraySize++;
-                var newDialogueProp = _conditionalProp.GetArrayElementAtIndex(_conditionalProp.arraySize - 1);
-                newDialogueProp.FindPropertyRelative("Dialogue").objectReferenceValue = null;
-                newDialogueProp.FindPropertyRelative("Conditions").ClearArray();
+                var condition = conditionsProperty.GetArrayElementAtIndex(index);
+                DrawConditionFields(rect, condition);
+            },
 
-                serializedObject.ApplyModifiedProperties();
-                _dialogueFoldouts.Add(true);
-                _conditionFoldouts.Add(new List<bool>());
-                _addConditionSelectedType.Add(0);
-            }
-        }
-
-        /// <summary> Обеспечивает корректный размер списков состояний UI. </summary>
-        private void EnsureUIStateSize()
-        {
-            while (_dialogueFoldouts.Count < _conditionalProp.arraySize) _dialogueFoldouts.Add(false);
-            while (_conditionFoldouts.Count < _conditionalProp.arraySize) _conditionFoldouts.Add(new List<bool>());
-            while (_addConditionSelectedType.Count < _conditionalProp.arraySize) _addConditionSelectedType.Add(0);
-        }
-
-        /// <summary> Обеспечивает корректный размер списка условий. </summary>
-        private void EnsureConditionFoldoutsSize(int index, SerializedProperty conditionsList)
-        {
-            while (_conditionFoldouts[index].Count < conditionsList.arraySize) _conditionFoldouts[index].Add(false);
-            while (_addConditionSelectedType.Count < _conditionalProp.arraySize) _addConditionSelectedType.Add(0);
-        }
-
-        /// <summary> Отрисовывает условия диалога. </summary>
-        private void DrawConditions(int index, SerializedProperty conditionsList)
-        {
-            for (int j = 0; j < conditionsList.arraySize; j++) DrawCondition(index, conditionsList, j);
-        }
-
-        /// <summary> Отрисовывает отдельное условие. </summary>
-        private void DrawCondition(int index, SerializedProperty conditionsList, int conditionIndex)
-        {
-            var condProp = conditionsList.GetArrayElementAtIndex(conditionIndex);
-            object condObj = condProp.managedReferenceValue;
-            string condName = condObj != null ? condObj.GetType().Name : "Null";
-
-            EditorGUILayout.BeginVertical(GUI.skin.box);
-            EditorGUILayout.BeginHorizontal();
-
-            _conditionFoldouts[index][conditionIndex] = EditorGUILayout.Foldout(
-                _conditionFoldouts[index][conditionIndex],
-                $"Condition {conditionIndex}: {condName}", true);
-
-            if (GUILayout.Button("Remove", GUILayout.Width(70)))
+            elementHeightCallback = index =>
             {
-                RemoveConditionAt(conditionsList, conditionIndex);
-                _conditionFoldouts[index].RemoveAt(conditionIndex);
-                EditorGUILayout.EndHorizontal();
-                EditorGUILayout.EndVertical();
-                return;
-            }
+                var condition = conditionsProperty.GetArrayElementAtIndex(index);
+                return CalculateConditionHeight(condition);
+            },
 
-            EditorGUILayout.EndHorizontal();
+            onAddDropdownCallback = (_, _) => ShowConditionTypeMenu(conditionsProperty)
+        };
 
-            if (_conditionFoldouts[index][conditionIndex])
-            {
-                EditorGUI.indentLevel++;
-                DrawConditionTypeSelector(condProp, condObj);
-                DrawConditionFields(condProp);
-                EditorGUI.indentLevel--;
-            }
-
-            EditorGUILayout.EndVertical();
-        }
-
-        /// <summary> Отрисовывает селектор типа условия. </summary>
-        private void DrawConditionTypeSelector(SerializedProperty condProp, object condObj)
+        /// <summary> Рисует поля одного условия. </summary>
+        /// <param name="rect"> Область для отрисовки. </param>
+        /// <param name="conditionProperty"> Сериализованное свойство условия. </param>
+        private static void DrawConditionFields(Rect rect, SerializedProperty conditionProperty)
         {
-            int currentIndex = 0;
-            if (condObj != null)
-            {
-                int idx = Array.FindIndex(_conditionTypes, t => t == condObj.GetType());
-                currentIndex = idx >= 0 ? idx : 0;
-            }
+            float y = rect.y;
+            float spacing = EditorGUIUtility.standardVerticalSpacing;
 
-            int newIndex = EditorGUILayout.Popup("Type", currentIndex, _conditionTypeNames);
-            if (newIndex != currentIndex)
+            string typeName = conditionProperty.managedReferenceValue?.GetType().Name ?? "Missing";
+            EditorGUI.LabelField(new Rect(rect.x, y, rect.width, EditorGUIUtility.singleLineHeight), typeName);
+            y += EditorGUIUtility.singleLineHeight + spacing;
+
+            if (conditionProperty.managedReferenceValue == null) return;
+
+            var property = conditionProperty.Copy();
+            var end = property.GetEndProperty();
+            property.NextVisible(true);
+
+            while (!SerializedProperty.EqualContents(property, end))
             {
-                var newInstance = Activator.CreateInstance(_conditionTypes[newIndex]);
-                condProp.managedReferenceValue = newInstance;
-                serializedObject.ApplyModifiedProperties();
+                float height = EditorGUI.GetPropertyHeight(property, true);
+                EditorGUI.PropertyField(new Rect(rect.x, y, rect.width, height), property, true);
+                y += height + spacing;
+                property.NextVisible(false);
             }
         }
 
-        /// <summary> Отрисовывает поля условия. </summary>
-        private void DrawConditionFields(SerializedProperty condProp)
+        /// <summary> Вычисляет высоту одного условия. </summary>
+        /// <param name="conditionProperty"> Сериализованное свойство условия. </param>
+        /// <returns> Высота условия в пикселях. </returns>
+        private static float CalculateConditionHeight(SerializedProperty conditionProperty)
         {
-            if (condProp.managedReferenceValue != null)
+            float height = EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
+
+            if (conditionProperty.managedReferenceValue == null) return height;
+
+            var property = conditionProperty.Copy();
+            var end = property.GetEndProperty();
+            property.NextVisible(true);
+
+            while (!SerializedProperty.EqualContents(property, end))
             {
-                var iter = condProp.Copy();
-                var end = iter.GetEndProperty();
-                bool enter = iter.NextVisible(true);
-
-                while (enter && !SerializedProperty.EqualContents(iter, end))
-                {
-                    EditorGUILayout.PropertyField(iter, true);
-                    enter = iter.NextVisible(false);
-                }
-            }
-        }
-
-        /// <summary> Отрисовывает контролы добавления условия. </summary>
-        private void DrawAddConditionControls(int index, SerializedProperty conditionsList)
-        {
-            EditorGUILayout.BeginHorizontal();
-            _addConditionSelectedType[index] =
-                EditorGUILayout.Popup(_addConditionSelectedType[index], _conditionTypeNames);
-
-            if (GUILayout.Button("Add Condition", GUILayout.Width(120)))
-            {
-                AddNewCondition(conditionsList, _addConditionSelectedType[index]);
-                _conditionFoldouts[index].Add(true);
+                height += EditorGUI.GetPropertyHeight(property, true) + EditorGUIUtility.standardVerticalSpacing;
+                property.NextVisible(false);
             }
 
-            EditorGUILayout.EndHorizontal();
+            return height;
         }
 
-        /// <summary> Отрисовывает кнопку удаления диалога. </summary>
-        private void DrawRemoveDialogueButton(int index)
+        /// <summary> Показывает контекстное меню для выбора типа условия и добавления его в список. </summary>
+        /// <param name="conditionsProperty"> Сериализованное свойство списка условий. </param>
+        private void ShowConditionTypeMenu(SerializedProperty conditionsProperty)
         {
-            if (GUILayout.Button($"Remove Conditional Dialogue {index}"))
+            var existingTypes = new HashSet<Type>();
+            for (int i = 0; i < conditionsProperty.arraySize; i++)
             {
-                _conditionalProp.DeleteArrayElementAtIndex(index);
-                _dialogueFoldouts.RemoveAt(index);
-                _conditionFoldouts.RemoveAt(index);
-                if (_addConditionSelectedType.Count > index) _addConditionSelectedType.RemoveAt(index);
-                serializedObject.ApplyModifiedProperties();
+                object condition = conditionsProperty.GetArrayElementAtIndex(i).managedReferenceValue;
+                if (condition != null) existingTypes.Add(condition.GetType());
             }
-        }
 
-        /// <summary> Добавляет новое условие. </summary>
-        private static void AddNewCondition(SerializedProperty conditionsList, int typeIndex)
-        {
-            if (typeIndex < 0 || typeIndex >= _conditionTypes.Length) typeIndex = 0;
-
-            int insertIndex = conditionsList.arraySize;
-            conditionsList.InsertArrayElementAtIndex(insertIndex);
-            var element = conditionsList.GetArrayElementAtIndex(insertIndex);
-            element.managedReferenceValue = Activator.CreateInstance(_conditionTypes[typeIndex]);
-            conditionsList.serializedObject.ApplyModifiedProperties();
-        }
-
-        /// <summary> Удаляет условие. </summary>
-        private static void RemoveConditionAt(SerializedProperty conditionsList, int index)
-        {
-            if (index < 0 || index >= conditionsList.arraySize) return;
-            conditionsList.DeleteArrayElementAtIndex(index);
-            conditionsList.serializedObject.ApplyModifiedProperties();
-        }
-
-        /// <summary> Проверяет отсутствие shared instances условий. </summary>
-        private void EnsureNoSharedConditionInstances()
-        {
-            var seen = new Dictionary<object, SerializedProperty>(ReferenceEqualityComparer.Instance);
-            bool changed = false;
-
-            for (int i = 0; i < _conditionalProp.arraySize; i++)
-            {
-                var dialogueItem = _conditionalProp.GetArrayElementAtIndex(i);
-                var conditionsList = dialogueItem.FindPropertyRelative("Conditions");
-
-                for (int j = 0; j < conditionsList.arraySize; j++)
-                {
-                    var elem = conditionsList.GetArrayElementAtIndex(j);
-                    var obj = elem.managedReferenceValue;
-                    if (obj == null) continue;
-
-                    if (seen.TryGetValue(obj, out var firstProp))
+            var menu = new GenericMenu();
+            foreach (var type in _conditionTypes)
+                if (existingTypes.Contains(type))
+                    menu.AddDisabledItem(new GUIContent(type.Name));
+                else
+                    menu.AddItem(new GUIContent(type.Name), false, () =>
                     {
-                        var clone = CloneManagedObject(obj);
-                        elem.managedReferenceValue = clone;
-                        changed = true;
-                    }
-                    else
-                    {
-                        seen[obj] = elem;
-                    }
-                }
-            }
+                        object instance = Activator.CreateInstance(type);
+                        conditionsProperty.arraySize++;
+                        var newCondition = conditionsProperty.GetArrayElementAtIndex(conditionsProperty.arraySize - 1);
+                        newCondition.managedReferenceValue = instance;
+                        serializedObject.ApplyModifiedProperties();
+                    });
 
-            if (changed) serializedObject.ApplyModifiedProperties();
-        }
-
-        /// <summary> Клонирует managed объект. </summary>
-        private static object CloneManagedObject(object original)
-        {
-            if (original == null) return null;
-            var type = original.GetType();
-            object clone = null;
-
-            try
-            {
-                clone = Activator.CreateInstance(type);
-                var json = JsonUtility.ToJson(original);
-                JsonUtility.FromJsonOverwrite(json, clone);
-                return clone;
-            }
-            catch
-            {
-                try
-                {
-                    clone = Activator.CreateInstance(type);
-                    var fields = type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-                    foreach (var f in fields)
-                    {
-                        var val = f.GetValue(original);
-                        f.SetValue(clone, val);
-                    }
-
-                    return clone;
-                }
-                catch (Exception ex)
-                {
-                    Debug.LogError($"Failed to clone DialogueCondition of type {type.Name}: {ex}");
-                    return null;
-                }
-            }
-        }
-
-        /// <summary> Сравнитель ссылочной эквивалентности. </summary>
-        private class ReferenceEqualityComparer : IEqualityComparer<object>
-        {
-            public static readonly ReferenceEqualityComparer Instance = new();
-            public new bool Equals(object x, object y) => ReferenceEquals(x, y);
-            public int GetHashCode(object obj) => RuntimeHelpers.GetHashCode(obj);
+            menu.ShowAsContext();
         }
     }
 }

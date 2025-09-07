@@ -5,11 +5,9 @@ using FlavorfulStory.CursorSystem;
 using FlavorfulStory.InputSystem;
 using FlavorfulStory.InteractionSystem;
 using FlavorfulStory.Player;
-using FlavorfulStory.TimeManagement;
 using FlavorfulStory.TooltipSystem.ActionTooltips;
 using UnityEngine;
 using Zenject;
-using DateTime = FlavorfulStory.TimeManagement.DateTime;
 
 namespace FlavorfulStory.DialogueSystem
 {
@@ -28,9 +26,6 @@ namespace FlavorfulStory.DialogueSystem
 
         /// <summary> Сервис диалогов. </summary>
         private DialogueService _dialogueService;
-
-        /// <summary> Количество проигранных контекстных диалогов. </summary>
-        private int _timesContextTalked;
 
         /// <summary> Информация о NPC. </summary>
         public NpcInfo NpcInfo { get; private set; }
@@ -56,18 +51,10 @@ namespace FlavorfulStory.DialogueSystem
             NpcInfo = GetComponent<InteractableNpc>().NpcInfo;
 
             _playerSpeaker.OnDialogueCompleted += OnDialogueCompleted;
-            WorldTime.OnDayEnded += OnDayEnded;
         }
 
         /// <summary> Отписка от событий завершения диалога и окончания дня. </summary>
-        private void OnDestroy()
-        {
-            _playerSpeaker.OnDialogueCompleted -= OnDialogueCompleted;
-            WorldTime.OnDayEnded -= OnDayEnded;
-        }
-
-        /// <summary> Обнуляет счётчик контекстных диалогов при завершении игрового дня. </summary>
-        private void OnDayEnded(DateTime _) => _timesContextTalked = 0;
+        private void OnDestroy() => _playerSpeaker.OnDialogueCompleted -= OnDialogueCompleted;
 
         /// <summary> Обработчик завершения диалога — завершает взаимодействие с NPC. </summary>
         /// <param name="npcName"> Имя NPC. </param>
@@ -80,7 +67,7 @@ namespace FlavorfulStory.DialogueSystem
         public ActionTooltipData ActionTooltip => new("E", ActionType.Talk, $"to {NpcInfo.NpcName}");
 
         /// <summary> Флаг, разрешено ли взаимодействие с NPC. </summary>
-        public bool IsInteractionAllowed => _timesContextTalked < 3 && IsPlayerInRange(transform.position);
+        public bool IsInteractionAllowed => IsPlayerInRange(transform.position);
 
         /// <summary> Вычисляет расстояние до другого трансформа. </summary>
         /// <param name="otherTransform"> Трансформ объекта, до которого вычисляется расстояние. </param>
@@ -95,9 +82,13 @@ namespace FlavorfulStory.DialogueSystem
             if (!IsInteractionAllowed) return;
 
             var dialogue = _dialogueService.GetDialogue(NpcInfo);
-            _playerSpeaker.StartDialogue(this, dialogue);
+            if (!dialogue)
+            {
+                player.SetBusyState(false);
+                return;
+            }
 
-            // if (dialogue.DialogueType == DialogueType.Context) _timesContextTalked++; // TODO: СДЕЛАТЬ
+            _playerSpeaker.StartDialogue(this, dialogue);
         }
 
         /// <summary> Завершает взаимодействие с NPC. </summary>

@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using FlavorfulStory.DialogueSystem.Conditions;
 using UnityEngine;
 
 namespace FlavorfulStory.DialogueSystem
@@ -12,8 +11,8 @@ namespace FlavorfulStory.DialogueSystem
         [field: Tooltip("Приветственный диалог."), SerializeField]
         public Dialogue GreetingDialogue { get; private set; }
 
-        /// <summary> Список условных диалогов. </summary>
-        [field: Tooltip("Диалоги с условиями."), SerializeField]
-        public List<ConditionalDialogue> ConditionalDialogues { get; private set; }
+        /// <summary> Контекстные (повседневные) диалоги. </summary>
+        [field: Tooltip("Контекстные (повседневные) диалоги. "), SerializeField]
+        public List<ContextDialogue> ContextDialogues { get; private set; }
     }
 }

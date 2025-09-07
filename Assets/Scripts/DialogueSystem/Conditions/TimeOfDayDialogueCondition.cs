@@ -8,19 +8,21 @@ namespace FlavorfulStory.DialogueSystem.Conditions
     [Serializable]
     public class TimeOfDayDialogueCondition : DialogueCondition
     {
-        /// <summary> Требуемое время суток для выполнения условия. </summary>
-        [field: SerializeField] public TimeOfDay TimeOfDay { get; private set; }
+        /// <summary> Время суток, требуемое для выполнения условия. </summary>
+        [field: Tooltip("Время суток, требуемое для выполнения условия."), SerializeField]
+        public TimeOfDay TimeOfDay { get; private set; }
 
         /// <summary> Проверяет соответствие текущего времени суток условию. </summary>
-        /// <returns> True, если текущее время соответствует условию. </returns>
-        public override bool MatchesCurrentState()
+        public override bool IsSatisfied
         {
-            var currentTime = WorldTime.CurrentGameTime.Hour < 17 ? TimeOfDay.Before17 : TimeOfDay.After17;
-            return TimeOfDay == currentTime;
+            get
+            {
+                var currentTime = WorldTime.CurrentGameTime.Hour < 17 ? TimeOfDay.Before17 : TimeOfDay.After17;
+                return TimeOfDay == currentTime;
+            }
         }
 
-        /// <summary> Получает вес условия. </summary>
-        /// <returns> Вес условия. </returns>
-        public override int GetWeight() => DialogueWeightsConfig.TimeOfDayWeight;
+        /// <summary> Вес условия. </summary>
+        public override int Weight => DialogueWeightsConfig.TimeOfDayWeight;
     }
 }

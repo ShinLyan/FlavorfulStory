@@ -1,5 +1,4 @@
 using System;
-using UnityEngine;
 
 namespace FlavorfulStory.DialogueSystem.Conditions
 {
@@ -7,19 +6,10 @@ namespace FlavorfulStory.DialogueSystem.Conditions
     [Serializable]
     public abstract class DialogueCondition
     {
-        /// <summary> Проверяет соответствие текущему состоянию. </summary>
-        /// <returns> True, если условие выполнено. </returns>
-        public abstract bool MatchesCurrentState();
+        /// <summary> Возвращает true, если условие выполнено. </summary>
+        public abstract bool IsSatisfied { get; }
 
-        /// <summary> Получает вес условия из конфига. </summary>
-        /// <returns> Числовой вес условия.. </returns>
-        public abstract int GetWeight();
-
-        public virtual DialogueCondition Clone()
-        {
-            // Стандартная реализация через сериализацию JSON
-            string json = JsonUtility.ToJson(this);
-            return JsonUtility.FromJson(json, GetType()) as DialogueCondition;
-        }
+        /// <summary> Вес условия, используется для приоритизации. </summary>
+        public abstract int Weight { get; }
     }
 }
