@@ -41,7 +41,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8190544430970003015}
   m_Layer: 0
-  m_Name: AccessiblePosition (1)
+  m_Name: AccessiblePosition
   m_TagString: Untagged
   m_Icon: {fileID: -5442936267250999957, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
@@ -55,13 +55,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3893254048415873830}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
   m_LocalPosition: {x: 1, y: 0, z: 1.6}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 5638996502175218203}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
 --- !u!1001 &4333303156480932583
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -83,7 +83,7 @@ PrefabInstance:
     - target: {fileID: 5131046964791068863, guid: 7c7f5e0479458b842ad0caa607a4c488,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.5
+      value: 0.6
       objectReference: {fileID: 0}
     - target: {fileID: 5131046964791068863, guid: 7c7f5e0479458b842ad0caa607a4c488,
         type: 3}
@@ -234,7 +234,11 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 2462439481004458844, guid: b38b19d6f04e3ee4584148382da00661,
         type: 3}
       insertIndex: 1
-      addedObject: {fileID: 7156273965101872520}
+      addedObject: {fileID: 1802922340809311081}
+    - targetCorrespondingSourceObject: {fileID: 2462439481004458844, guid: b38b19d6f04e3ee4584148382da00661,
+        type: 3}
+      insertIndex: 2
+      addedObject: {fileID: 8397499845591003761}
     - targetCorrespondingSourceObject: {fileID: 2462439481004458844, guid: b38b19d6f04e3ee4584148382da00661,
         type: 3}
       insertIndex: -1
@@ -247,10 +251,6 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 2869798236510267724}
-    - targetCorrespondingSourceObject: {fileID: 2462439481004458844, guid: b38b19d6f04e3ee4584148382da00661,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 8397499845591003761}
   m_SourcePrefab: {fileID: 100100000, guid: b38b19d6f04e3ee4584148382da00661, type: 3}
 --- !u!1 &2275365521150534118 stripped
 GameObject:
@@ -258,8 +258,8 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 4449538064489013946}
   m_PrefabAsset: {fileID: 0}
---- !u!65 &7156273965101872520
-BoxCollider:
+--- !u!135 &1802922340809311081
+SphereCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -277,8 +277,24 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 2, y: 1, z: 1.5}
+  m_Radius: 1.2
+  m_Center: {x: 1, y: 0.5381336, z: 0.5}
+--- !u!208 &8397499845591003761
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2275365521150534118}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 1, y: 0.5, z: 0.5}
+  m_MoveThreshold: 0.1
+  m_Carve: 1
+  m_CarveOnlyStationary: 1
   m_Center: {x: 1, y: 0.5, z: 0.5}
+  m_TimeToStationary: 0.5
 --- !u!114 &2312620661480623054
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -321,22 +337,6 @@ MonoBehaviour:
   - {fileID: 3175193763898960993}
   - {fileID: 8190544430970003015}
   <InteractableObjectAnimation>k__BackingField: 7
---- !u!208 &8397499845591003761
-NavMeshObstacle:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2275365521150534118}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Shape: 1
-  m_Extents: {x: 1, y: 0.5, z: 0.5}
-  m_MoveThreshold: 0.1
-  m_Carve: 1
-  m_CarveOnlyStationary: 1
-  m_Center: {x: 1, y: 0.5, z: 0.5}
-  m_TimeToStationary: 0.5
 --- !u!4 &5638996502175218203 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8358208370420783265, guid: b38b19d6f04e3ee4584148382da00661,

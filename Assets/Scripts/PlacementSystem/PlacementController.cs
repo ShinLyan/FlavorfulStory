@@ -136,6 +136,7 @@ namespace FlavorfulStory.PlacementSystem
         {
             var gridPosition = _gridPositionProvider.WorldToGrid(worldPosition);
             _gridLayers[placeableObject.Layer].AddObjectAt(gridPosition, placeableObject);
+            _placeableObjectProvider.Register(placeableObject);
         }
 
         /// <summary> Удаляет объект из системы размещения. </summary>
@@ -145,6 +146,7 @@ namespace FlavorfulStory.PlacementSystem
         {
             var gridPosition = _gridPositionProvider.WorldToGrid(worldPosition);
             _gridLayers[placeableObject.Layer].RemoveObjectAt(gridPosition);
+            _placeableObjectProvider.Unregister(placeableObject);
         }
 
         /// <summary> Обрабатывает обновление предпросмотра и клик размещения. </summary>

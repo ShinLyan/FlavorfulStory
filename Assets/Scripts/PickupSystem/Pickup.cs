@@ -6,12 +6,12 @@ namespace FlavorfulStory.PickupSystem
 {
     /// <summary> Отвечает за механику подбора предметов игроком. </summary>
     /// <remarks> Скрипт должен быть размещен на специальном префабе, содержащем данные о предмете. </remarks>
-    [RequireComponent(typeof(SphereCollider), typeof(Rigidbody))]
+    [RequireComponent(typeof(SphereCollider))]
     public class Pickup : MonoBehaviour
     {
         /// <summary> Радиус подбора предмета. </summary>
-        [Tooltip("Радиус подбора предмета."), SerializeField, Range(1f, 5f)]
-        private float _pickupRadius;
+        [Tooltip("Радиус подбора предмета."), SerializeField, Range(0f, 5f)]
+        private float _pickupRadius = 1f;
 
         /// <summary> Стак предметов для подбора. </summary>
         [Tooltip("Стак предметов для подбора."), SerializeField]
@@ -23,24 +23,24 @@ namespace FlavorfulStory.PickupSystem
         /// <summary> Количество предметов, доступных для подбора. </summary>
         public int Number => _itemStack.Number;
 
-        /// <summary> Ссылка на инвентарь игрока. </summary>
-        private Inventory _inventory;
+        /// <summary> Провайдер инвентарей. </summary>
+        private IInventoryProvider _inventoryProvider;
 
         /// <summary> Флаг, указывающий, можно ли подбирать предмет. </summary>
         private bool _canBePickedUp;
 
         /// <summary> Возвращает true, если предмет можно подобрать и в инвентаре есть место. </summary>
-        public bool CanBePickedUp => _canBePickedUp && _inventory.HasSpaceFor(Item);
+        private bool CanBePickedUp => _canBePickedUp && _inventoryProvider.GetPlayerInventory().HasSpaceFor(Item);
 
-        /// <summary> Внедрение зависимостей. </summary>
-        /// <param name="inventory"> Инвентарь игрока. </param>
+        /// <summary> Внедрение зависимостей Zenject. </summary>
+        /// <param name="inventoryProvider"> Провайдер инвентарей. </param>
         [Inject]
-        private void Construct(Inventory inventory) => _inventory = inventory;
+        private void Construct(IInventoryProvider inventoryProvider) => _inventoryProvider = inventoryProvider;
 
         /// <summary> Устанавливает предмет, количество и задержку перед возможностью подбора. </summary>
         /// <param name="itemStack"> Предмет и его количество, которые можно подобрать. </param>
         /// <param name="pickupDelay"> Задержка в секундах до возможности подбора. </param>
-        public void Setup(ItemStack itemStack, float pickupDelay)
+        public void Setup(ItemStack itemStack, float pickupDelay = 1f)
         {
             _itemStack = itemStack;
             _canBePickedUp = false;
@@ -52,7 +52,7 @@ namespace FlavorfulStory.PickupSystem
         {
             if (!CanBePickedUp) return;
 
-            if (_inventory.TryAddToFirstAvailableSlot(Item, Number)) Destroy(gameObject);
+            if (_inventoryProvider.GetPlayerInventory().TryAddToFirstAvailableSlot(Item, Number)) Destroy(gameObject);
         }
 
         /// <summary> Делает предмет доступным для подбора. </summary>

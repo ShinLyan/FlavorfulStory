@@ -38,8 +38,8 @@ namespace FlavorfulStory.Toolbar.UI
         /// <summary> Событие, возникающее при клике на слот. </summary>
         public event Action<int> OnSlotClicked;
 
-        /// <summary> Инвентарь игрока. </summary>
-        private Inventory _playerInventory;
+        /// <summary> Провайдер инвентарей. </summary>
+        private IInventoryProvider _inventoryProvider;
 
         /// <summary> Анимация затухания подсветки при наведении курсора. </summary>
         private Tween _hoverTween;
@@ -47,10 +47,10 @@ namespace FlavorfulStory.Toolbar.UI
         /// <summary> Анимация изменения цвета слота при выборе или сбросе. </summary>
         private Tween _colorTween;
 
-        /// <summary> Внедрение зависимости — инвентарь игрока. </summary>
-        /// <param name="inventory"> Инвентарь игрока. </param>
+        /// <summary> Внедрение зависимостей Zenject. </summary>
+        /// <param name="inventoryProvider"> Провайдер инвентарей. </param>
         [Inject]
-        private void Construct(Inventory inventory) => _playerInventory = inventory;
+        private void Construct(IInventoryProvider inventoryProvider) => _inventoryProvider = inventoryProvider;
 
         /// <summary> Освобождает ресурсы и завершает активные анимации при уничтожении объекта. </summary>
         private void OnDestroy()
@@ -107,10 +107,11 @@ namespace FlavorfulStory.Toolbar.UI
         }
 
         /// <summary> Обновляет отображение предмета в слоте. </summary>
-        public void Redraw() => _itemStackView.UpdateView(_playerInventory.GetItemStackInSlot(_index));
+        public void Redraw() =>
+            _itemStackView.UpdateView(_inventoryProvider.GetPlayerInventory().GetItemStackInSlot(_index));
 
         /// <summary> Получает предмет, находящийся в данном слоте. </summary>
         /// <returns> Предмет инвентаря в текущем слоте. </returns>
-        public InventoryItem GetItem() => _playerInventory.GetItemInSlot(_index);
+        public InventoryItem GetItem() => _inventoryProvider.GetPlayerInventory().GetItemInSlot(_index);
     }
 }

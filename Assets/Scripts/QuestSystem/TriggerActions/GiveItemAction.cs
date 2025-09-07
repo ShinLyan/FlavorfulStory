@@ -15,7 +15,7 @@ namespace FlavorfulStory.QuestSystem.TriggerActions
         /// <param name="context"> Контекст выполнения квеста. </param>
         public override void Execute(QuestExecutionContext context)
         {
-            bool isSuccess = context.Inventory.TryAddToFirstAvailableSlot(_itemToGive.Item, _itemToGive.Number);
+            bool isSuccess = context.PlayerInventory.TryAddToFirstAvailableSlot(_itemToGive.Item, _itemToGive.Number);
             if (!isSuccess) context.ItemDropService.Drop(_itemToGive, context.PlayerSpeaker.transform.position);
         }
     }

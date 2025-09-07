@@ -1,4 +1,5 @@
-﻿using FlavorfulStory.TimeManagement;
+﻿using System;
+using FlavorfulStory.TimeManagement;
 using FlavorfulStory.Toolbar;
 using Zenject;
 
@@ -7,7 +8,7 @@ namespace FlavorfulStory.InventorySystem.ItemUsage
     /// <summary> Базовый обработчик ввода для предметов. </summary>
     /// <remarks> Подписывается на выбор предмета в тулбаре,
     /// хранит активный предмет нужного типа и тикает только когда игра не на паузе. </remarks>
-    public abstract class ItemUseController<TItem> : IInitializable, ITickable
+    public abstract class ItemUseController<TItem> : IInitializable, IDisposable, ITickable
         where TItem : InventoryItem
     {
         /// <summary> Сигнальная шина Zenject. </summary>
@@ -20,12 +21,11 @@ namespace FlavorfulStory.InventorySystem.ItemUsage
         /// <param name="signalBus"> Шина сигналов для подписки и отправки событий. </param>
         protected ItemUseController(SignalBus signalBus) => _signalBus = signalBus;
 
-        /// <summary> Инициализация – подписка на выбор предмета и вызов пользовательской инициализации. </summary>
-        public void Initialize()
-        {
-            _signalBus.Subscribe<ToolbarSlotSelectedSignal>(OnToolbarItemChanged);
-            OnInitialize();
-        }
+        /// <summary> Подписаться на события. </summary>
+        public void Initialize() => _signalBus.Subscribe<ToolbarSlotSelectedSignal>(OnToolbarItemChanged);
+
+        /// <summary> Отписаться от событий. </summary>
+        public void Dispose() => _signalBus.Unsubscribe<ToolbarSlotSelectedSignal>(OnToolbarItemChanged);
 
         /// <summary> Обновляет активный предмет при смене выбранного слота тулбара. </summary>
         /// <param name="signal"> Сигнал о выборе нового предмета. </param>
@@ -43,9 +43,6 @@ namespace FlavorfulStory.InventorySystem.ItemUsage
 
             TickItem(_activeItem);
         }
-
-        /// <summary> Разовая инициализация наследника. </summary>
-        protected virtual void OnInitialize() { }
 
         /// <summary> Реакция на смену выбранного предмета. </summary>
         /// <param name="previous"> Предыдущий выбранный предмет. </param>

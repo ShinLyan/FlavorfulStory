@@ -104,34 +104,41 @@ namespace FlavorfulStory.Player
         /// <param name="position"> Позиция, к которой необходимо перенести игрока. </param>
         public void SetPosition(Vector3 position) => _rigidbody.MovePosition(position);
 
-        #region Saving
+        #region ISaveable
 
         /// <summary> Структура для сохранения позиции и поворота игрока. </summary>
         [Serializable]
-        private struct MoverSaveData
+        private readonly struct MoverRecord
         {
             /// <summary> Позиция игрока. </summary>
-            public SerializableVector3 Position;
+            public SerializableVector3 Position { get; }
 
             /// <summary> Поворот игрока. </summary>
-            public SerializableVector3 Rotation;
+            public SerializableVector3 Rotation { get; }
+
+            /// <summary> Конструктор с параметрами. </summary>
+            /// <param name="position"> Позиция игрока. </param>
+            /// <param name="rotation"> Поворот игрока. </param>
+            public MoverRecord(SerializableVector3 position, SerializableVector3 rotation)
+            {
+                Position = position;
+                Rotation = rotation;
+            }
         }
 
         /// <summary> Сохраняет текущее состояние игрока (позиция и поворот). </summary>
         /// <returns> Объект с данными позиции и поворота. </returns>
-        public object CaptureState() => new MoverSaveData
-        {
-            Position = new SerializableVector3(transform.position),
-            Rotation = new SerializableVector3(transform.eulerAngles)
-        };
+        public object CaptureState() => new MoverRecord(
+            new SerializableVector3(transform.position), new SerializableVector3(transform.eulerAngles));
 
         /// <summary> Восстанавливает состояние игрока из сохранения. </summary>
         /// <param name="state"> Объект сохраненного состояния. </param>
         public void RestoreState(object state)
         {
-            var data = (MoverSaveData)state;
-            transform.position = data.Position.ToVector();
-            transform.eulerAngles = data.Rotation.ToVector();
+            if (state is not MoverRecord record) return;
+
+            transform.position = record.Position.ToVector();
+            transform.eulerAngles = record.Rotation.ToVector();
         }
 
         #endregion

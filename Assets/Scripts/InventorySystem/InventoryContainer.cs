@@ -4,6 +4,7 @@ using FlavorfulStory.InventorySystem.UI;
 using FlavorfulStory.PlacementSystem;
 using FlavorfulStory.Player;
 using FlavorfulStory.TooltipSystem.ActionTooltips;
+using FlavorfulStory.Windows;
 using UnityEngine;
 using Zenject;
 
@@ -13,23 +14,23 @@ namespace FlavorfulStory.InventorySystem
     [RequireComponent(typeof(Inventory), typeof(Collider))]
     public class InventoryContainer : MonoBehaviour, IInteractable, ICanBeDismantled
     {
-        /// <summary> Окно для обмена предметами между инвентарями. </summary>
-        private InventoryExchangeWindow _exchangeWindow;
-
         /// <summary> Провайдер инвентарей. </summary>
         private IInventoryProvider _inventoryProvider;
+
+        /// <summary> Сервис окон. </summary>
+        private IWindowService _windowService;
 
         /// <summary> Инвентарь сундука. </summary>
         private Inventory _inventory;
 
         /// <summary> Внедрение зависимостей Zenject. </summary>
-        /// <param name="exchangeWindow"> Окно обмена инвентарями. </param>
         /// <param name="inventoryProvider"> Провайдер для получения других инвентарей (например, игрока). </param>
+        /// <param name="windowService"> Сервис окон. </param>
         [Inject]
-        private void Construct(InventoryExchangeWindow exchangeWindow, IInventoryProvider inventoryProvider)
+        private void Construct(IInventoryProvider inventoryProvider, IWindowService windowService)
         {
-            _exchangeWindow = exchangeWindow;
             _inventoryProvider = inventoryProvider;
+            _windowService = windowService;
         }
 
         /// <summary> Инициализация сундука. </summary>
@@ -52,10 +53,13 @@ namespace FlavorfulStory.InventorySystem
         public void BeginInteraction(PlayerController player)
         {
             player.SetBusyState(true);
-            _exchangeWindow.Show(_inventoryProvider.GetPlayerInventory(), _inventory, () => player.SetBusyState(false));
+            _windowService.GetWindow<InventoryExchangeWindow>()
+                .Setup(_inventory, _inventoryProvider.GetPlayerInventory());
+            _windowService.OpenWindow<InventoryExchangeWindow>();
         }
 
         /// <summary> Завершить взаимодействие. </summary>
+        /// <param name="player"> Контроллер игрока. </param>
         public void EndInteraction(PlayerController player) { }
 
         #endregion

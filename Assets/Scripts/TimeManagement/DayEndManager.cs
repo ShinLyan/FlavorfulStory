@@ -3,31 +3,22 @@ using Cysharp.Threading.Tasks;
 using FlavorfulStory.Player;
 using FlavorfulStory.SceneManagement;
 using FlavorfulStory.TimeManagement.UI;
-using UnityEngine;
+using FlavorfulStory.Windows;
 using Zenject;
 
 namespace FlavorfulStory.TimeManagement
 {
-    /// <summary> Управляет процессом завершения игрового дня.. </summary>
+    /// <summary> Управляет процессом завершения игрового дня. </summary>
     public class DayEndManager : IInitializable, IDisposable
     {
-        /// <summary> Отображение сводки дня. </summary>
-        private readonly SummaryView _summaryView;
-
         /// <summary> Контроллер игрока. </summary>
         private readonly PlayerController _playerController;
-
-        /// <summary> Позиция точки сна. </summary>
-        private readonly SleepTrigger _sleepTrigger;
 
         /// <summary> Менеджер локаций. </summary>
         private readonly LocationManager _locationManager;
 
-        /// <summary> Флаг выполнения процесса сна. </summary>
-        private bool _isProcessingSleep;
-
-        /// <summary> Коллбэк завершения. </summary>
-        private Action _onCompleteCallback;
+        /// <summary> Сервис окон. </summary>
+        private readonly IWindowService _windowService;
 
         /// <summary> Сервис, отвечающий за управление точками появления игрока. </summary>
         private readonly PlayerSpawnService _playerSpawnService;
@@ -35,18 +26,21 @@ namespace FlavorfulStory.TimeManagement
         /// <summary> Сигнальная шина. </summary>
         private readonly SignalBus _signalBus;
 
+        /// <summary> Флаг выполнения процесса сна. </summary>
+        private bool _isProcessingSleep;
+
         /// <summary> Инициализирует менеджер окончания дня. </summary>
-        /// <param name="summaryView"> Вью для отображения итогов дня. </param>
         /// <param name="playerController"> Контроллер игрока. </param>
         /// <param name="locationManager"> Менеджер управления локациями. </param>
+        /// <param name="windowService"> Сервис окон. </param>
         /// <param name="playerSpawnService"> Сервис для спавна игрока. </param>
         /// <param name="signalBus"> Сигнальная шина. </param>
-        public DayEndManager(SummaryView summaryView, PlayerController playerController,
-            LocationManager locationManager, PlayerSpawnService playerSpawnService, SignalBus signalBus)
+        public DayEndManager(PlayerController playerController, LocationManager locationManager,
+            IWindowService windowService, PlayerSpawnService playerSpawnService, SignalBus signalBus)
         {
-            _summaryView = summaryView;
             _playerController = playerController;
             _locationManager = locationManager;
+            _windowService = windowService;
             _playerSpawnService = playerSpawnService;
             _signalBus = signalBus;
         }
@@ -57,66 +51,83 @@ namespace FlavorfulStory.TimeManagement
         /// <summary> Отписывается от событий. </summary>
         public void Dispose() => WorldTime.OnDayEnded -= OnDayEnded;
 
-        /// <summary> Обрабатывает принудительное завершение дня. </summary>
-        /// <param name="date"> Текущая дата игрового времени. </param>
-        private void OnDayEnded(DateTime date) => ExhaustedSleep();
+        /// <summary> Обрабатывает завершение дня, инициируя процесс сна. </summary>
+        /// <param name="_"> Время окончания дня. </param>
+        private void OnDayEnded(DateTime _) => ProcessSleepAsync(true).Forget();
 
-        /// <summary> Запрашивает завершение дня. </summary>
-        /// <param name="onCompleteCallback"> Коллбэк, вызываемый по завершении процесса. </param>
-        public void RequestEndDay(Action onCompleteCallback) =>
-            ProcessSleepAsync(onCompleteCallback, false).Forget();
+        /// <summary> Запрашивает завершение дня вручную, с последующим колбэком. </summary>
+        /// <param name="onComplete"> Метод, вызываемый после завершения всех процедур сна. </param>
+        public void RequestEndDay(Action onComplete) =>
+            ProcessSleepAsync(false).ContinueWith(() => onComplete?.Invoke()).Forget();
 
-        /// <summary> Обрабатывает принудительный сон при истощении. </summary>
-        private void ExhaustedSleep() => ProcessSleepAsync(null, true).Forget();
-
-        /// <summary> Выполняет процесс сна. </summary>
-        /// <param name="onComplete"> Коллбэк завершения. </param>
-        /// <param name="isExhausted"> Флаг принудительного сна. </param>
-        private async UniTaskVoid ProcessSleepAsync(Action onComplete, bool isExhausted)
+        /// <summary> Выполняет процесс сна: смена дня или сигнал об истощении,
+        /// показ окна, восстановление игрока. </summary>
+        /// <param name="isExhausted"> Является ли сон результатом истощения. </param>
+        private async UniTask ProcessSleepAsync(bool isExhausted)
         {
             if (_isProcessingSleep) return;
+
             _isProcessingSleep = true;
 
             if (!isExhausted)
-                WorldTime.BeginNewDay(6);
+                WorldTime.Instance.BeginNewDay();
             else
                 _signalBus.Fire(new ExhaustedSleepSignal());
 
-            await EndDayRoutine();
-            _summaryView.HideWithAnimation().Forget();
-
-            await RestorePlayerState(_playerSpawnService.GetSpawnPosition(), isExhausted);
-
-            onComplete?.Invoke();
+            await ExecuteSleepSequence(isExhausted);
             _isProcessingSleep = false;
         }
 
-        /// <summary> Выполняет рутину завершения дня. </summary>
-        private async UniTask EndDayRoutine()
+        /// <summary> Выполняет полную последовательность сна: активация локации,
+        /// окно итога, восстановление игрока. </summary>
+        /// <param name="isExhausted"> Истощён ли игрок. </param>
+        private async UniTask ExecuteSleepSequence(bool isExhausted)
         {
-            WorldTime.Pause();
             _locationManager.EnableLocation(LocationName.RockyIsland);
-            await ShowSummaryAndWaitForContinue();
-            WorldTime.Unpause();
+
+            await ShowSummaryWindowAsync();
+
+            _windowService.CloseWindow<SummaryWindow>();
+
+            RestorePlayer(isExhausted);
         }
 
-        /// <summary> Восстанавливает состояние игрока после сна. </summary>
-        /// <param name="targetPosition"> Целевая позиция для перемещения игрока. </param>
-        /// <param name="isExhausted"> Флаг состояния истощения. </param>
-        private async UniTask RestorePlayerState(Vector3 targetPosition, bool isExhausted)
+        /// <summary> Восстанавливает игрока после сна и перемещает его на точку спавна. </summary>
+        /// <param name="isExhausted"> Был ли сон принудительным из-за истощения. </param>
+        private void RestorePlayer(bool isExhausted)
         {
+            var spawnPosition = _playerSpawnService.GetSpawnPosition();
+
             _playerController.RestoreStatsAfterSleep(isExhausted);
-            _playerController.SetPosition(targetPosition);
-            await UniTask.Yield();
+            _playerController.SetPosition(spawnPosition);
             _locationManager.UpdateActiveLocation();
         }
 
-        /// <summary> Показывает сводку и ожидает продолжения. </summary>
-        private async UniTask ShowSummaryAndWaitForContinue()
+        /// <summary> Отображает окно итогов дня и ожидает его закрытия. </summary>
+        private async UniTask ShowSummaryWindowAsync()
         {
-            _summaryView.SetSummary(SummaryView.DefaultSummaryText);
-            await _summaryView.ShowWithAnimation();
-            await _summaryView.WaitForContinue();
+            var window = _windowService.GetWindow<SummaryWindow>();
+            window.Setup(SummaryWindow.DefaultSummaryText);
+            _windowService.OpenWindow<SummaryWindow>();
+
+            await WaitForWindowCloseAsync(window);
+        }
+
+        /// <summary> Ожидает, пока окно SummaryWindow будет закрыто пользователем. </summary>
+        /// <param name="window"> Ссылка на окно итогов дня. </param>
+        /// <returns> Задача, завершающаяся после закрытия окна. </returns>
+        private static UniTask WaitForWindowCloseAsync(SummaryWindow window)
+        {
+            var tcs = new UniTaskCompletionSource();
+
+            window.Closed += OnClosed;
+            return tcs.Task;
+
+            void OnClosed()
+            {
+                window.Closed -= OnClosed;
+                tcs.TrySetResult();
+            }
         }
     }
 }
