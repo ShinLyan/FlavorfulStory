@@ -2,7 +2,6 @@ using System;
 using System.Linq;
 using FlavorfulStory.AI;
 using FlavorfulStory.DialogueSystem.Selectors;
-using FlavorfulStory.QuestSystem;
 using Zenject;
 
 namespace FlavorfulStory.DialogueSystem
@@ -14,10 +13,17 @@ namespace FlavorfulStory.DialogueSystem
         private readonly IDialogueSelector[] _selectors;
 
         /// <summary> Инициализирует сервис с необходимыми зависимостями. </summary>
-        /// <param name="questList"> Список квестов. </param>
-        public DialogueService(QuestList questList) => _selectors = new IDialogueSelector[]
+        /// <param name="selectors"> Селекторы. </param>
+        [Inject]
+        public DialogueService(IDialogueSelector[] selectors) =>
+            _selectors = selectors.OrderBy(SelectorPriority).ToArray();
+
+        private static int SelectorPriority(IDialogueSelector selector) => selector switch
         {
-            new QuestDialogueSelector(questList), new GreetingDialogueSelector(), new ContextDialogueSelector()
+            QuestDialogueSelector => 0,
+            GreetingDialogueSelector => 1,
+            ContextDialogueSelector => 2,
+            _ => 100
         };
 
         /// <summary> Инициализирует все инициализируемые селекторы. </summary>

@@ -14,6 +14,9 @@ namespace FlavorfulStory.DialogueSystem.Selectors
         /// <summary> Храним количество разговоров с каждым NPC за текущий день. </summary>
         private readonly Dictionary<NpcName, int> _dailyNpcConversations = new();
 
+
+        #region IInitializableSelector
+
         /// <summary> Инициализирует обработчики событий. </summary>
         public void Initialize() => WorldTime.OnDayEnded += ResetDailyCounters;
 
@@ -23,6 +26,10 @@ namespace FlavorfulStory.DialogueSystem.Selectors
         /// <summary> Сброс счетчиков разговоров в конце дня. </summary>
         /// <param name="_"> Текущее игровое время (не используется). </param>
         private void ResetDailyCounters(DateTime _) => _dailyNpcConversations.Clear();
+
+        #endregion
+
+        #region IDialogueSelector
 
         /// <summary> Выбирает подходящий диалог для NPC. </summary>
         /// <param name="npcInfo"> Информация об NPC, включая конфигурацию диалогов. </param>
@@ -111,5 +118,7 @@ namespace FlavorfulStory.DialogueSystem.Selectors
         /// <returns> Один из диалогов в категории. </returns>
         private static Dialogue PickRandomDialogueFromCategory(List<ContextDialogue> dialogues) =>
             dialogues[Random.Range(0, dialogues.Count)].Dialogue;
+
+        #endregion
     }
 }

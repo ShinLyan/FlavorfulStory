@@ -25,7 +25,8 @@ namespace FlavorfulStory.DialogueSystem.Selectors
             {
                 if (questStatus.IsObjectiveComplete(objective)) continue;
 
-                if (objective is { Type: ObjectiveType.Talk, Params: TalkObjectiveParams talkParams })
+                if (objective is { Type: ObjectiveType.Talk, Params: TalkObjectiveParams talkParams } &&
+                    talkParams.NpcName == npcInfo.NpcName)
                     return talkParams.Dialogue;
             }
 

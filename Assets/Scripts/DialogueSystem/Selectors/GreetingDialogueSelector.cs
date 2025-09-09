@@ -1,14 +1,16 @@
+using System;
 using System.Collections.Generic;
 using FlavorfulStory.AI;
+using FlavorfulStory.Saving;
 using UnityEngine;
 
 namespace FlavorfulStory.DialogueSystem.Selectors
 {
     /// <summary> Селектор для приветственных диалогов NPC. </summary>
-    public class GreetingDialogueSelector : IDialogueSelector
+    public class GreetingDialogueSelector : IDialogueSelector, ISaveableService
     {
         /// <summary> Словарь для отслеживания приветствованных NPC. </summary>
-        private readonly Dictionary<NpcName, bool> _greetedNpcs = new(); // TODO: Нужно это сохранять
+        private readonly Dictionary<NpcName, bool> _greetedNpcs = new();
 
         /// <summary> Выбирает приветственный диалог для NPC. </summary>
         /// <returns> Приветственный диалог или null. </returns>
@@ -27,5 +29,26 @@ namespace FlavorfulStory.DialogueSystem.Selectors
             _greetedNpcs[npcName] = true;
             return dialogue;
         }
+
+        #region ISaveableService
+
+        [Serializable]
+        private struct State
+        {
+            public List<NpcName> GreetedNpcs;
+        }
+
+        public object CaptureState() => new State { GreetedNpcs = new List<NpcName>(_greetedNpcs.Keys) };
+
+        public void RestoreState(object restoredState)
+        {
+            if (restoredState is State state)
+            {
+                _greetedNpcs.Clear();
+                foreach (var npc in state.GreetedNpcs) _greetedNpcs[npc] = true;
+            }
+        }
+
+        #endregion
     }
 }
