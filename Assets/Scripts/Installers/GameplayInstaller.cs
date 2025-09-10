@@ -57,25 +57,31 @@ namespace FlavorfulStory.Installers
         [SerializeField] private ItemTooltipView _itemTooltipPrefab;
 
         /// <summary> Префаб отображения ячейки инвентаря. </summary>
-        [Header("Inventory")] [SerializeField] private InventorySlotView _inventorySlotViewPrefab;
+        [Header("Inventory")] 
+        [SerializeField] private InventorySlotView _inventorySlotViewPrefab;
 
         /// <summary> Родительский контейнер для выбрасываемых предметов. </summary>
         [SerializeField] private Transform _itemDropContainer;
 
         /// <summary> Индикатор клетки на гриде. </summary>
-        [Header("Placement System")] [SerializeField]
-        private GameObject _gridIndicator;
+        [Header("Placement System")] 
+        [SerializeField] private GameObject _gridIndicator;
 
         /// <summary> Родительский контейнер для размещаемых объектов. </summary>
         [SerializeField] private Transform _placeableContainer;
 
         /// <summary> Сопоставления типов инструментов с их префабами для визуализации в руке игрока. </summary>
-        [Header("Tools")] [SerializeField] private ToolPrefabMapping[] _toolMappings;
+        [Header("Tools")] 
+        [SerializeField] private ToolPrefabMapping[] _toolMappings;
 
         /// <summary> Слои, по которым производится удар с помощью инструмента. </summary>
         [SerializeField] private LayerMask _hitableLayers;
 
-        [Header("Visuals")] [SerializeField] private WeatherConfig _weatherConfig;
+        /// <summary> Конфигурация погодных условий. </summary>
+        [Header("Visuals")]
+        [SerializeField] private WeatherConfig _weatherConfig;
+        
+        /// <summary> Родительский объект для погодных частиц. </summary>
         [SerializeField] private GameObject _particleParent;
 
         #endregion
