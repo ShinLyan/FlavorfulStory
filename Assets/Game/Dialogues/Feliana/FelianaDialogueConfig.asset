@@ -1,0 +1,130 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a36ac90341694f408fe65eb547cf4588, type: 3}
+  m_Name: FelianaDialogueConfig
+  m_EditorClassIdentifier: 
+  <GreetingDialogue>k__BackingField: {fileID: 11400000, guid: 26e6d079e1d8f4b78b9220c638598fad,
+    type: 2}
+  <ContextDialogues>k__BackingField:
+  - <Dialogues>k__BackingField:
+    - {fileID: 11400000, guid: d16dca264cea24ad59d1944f24c5e030, type: 2}
+    - {fileID: 11400000, guid: cc488c1c51b3cce43b62038e15b02b5f, type: 2}
+    <Conditions>k__BackingField:
+    - rid: 5750390003574505553
+  - <Dialogues>k__BackingField:
+    - {fileID: 11400000, guid: 3bf88e5c0d57041158ef27007dd903ac, type: 2}
+    - {fileID: 11400000, guid: 5a21d7b4bf66ea34fa4bd6b76b6341ae, type: 2}
+    <Conditions>k__BackingField:
+    - rid: 5750390003574505555
+  - <Dialogues>k__BackingField:
+    - {fileID: 11400000, guid: aa87a150b3baa49369a0717fa11b9869, type: 2}
+    - {fileID: 11400000, guid: 83c0d2bf8c153944bb8e91ad7e6e1b59, type: 2}
+    <Conditions>k__BackingField:
+    - rid: 1140105819959328868
+  - <Dialogues>k__BackingField:
+    - {fileID: 11400000, guid: cc3ccec9457a94c2bbd978da02ea76d0, type: 2}
+    - {fileID: 11400000, guid: 65a6563feda7ada4e9a29ac2c1f390cf, type: 2}
+    <Conditions>k__BackingField:
+    - rid: 5750390003574505556
+  - <Dialogues>k__BackingField:
+    - {fileID: 11400000, guid: 90f41ef126de07e469e5bcdb320d4220, type: 2}
+    - {fileID: 11400000, guid: 9b817b249e82c974da29b435a7d07fb3, type: 2}
+    <Conditions>k__BackingField:
+    - rid: 5750390003574505557
+  - <Dialogues>k__BackingField:
+    - {fileID: 11400000, guid: c0770668a19835b4db56f59f30e96d18, type: 2}
+    - {fileID: 11400000, guid: 512da1a675dafb94c8cfd3c79e71644f, type: 2}
+    <Conditions>k__BackingField:
+    - rid: 5750390003574505558
+  - <Dialogues>k__BackingField:
+    - {fileID: 11400000, guid: a657a18fdc652f944a199bc31321d252, type: 2}
+    - {fileID: 11400000, guid: 48b54816098961c4fb9d8b60e1b1f75a, type: 2}
+    <Conditions>k__BackingField:
+    - rid: 5750390003574505559
+  - <Dialogues>k__BackingField:
+    - {fileID: 11400000, guid: 9ee642eafdf80f649ae007b39abd013e, type: 2}
+    - {fileID: 11400000, guid: cef20ed4acf27a948936d99607b40b9e, type: 2}
+    <Conditions>k__BackingField:
+    - rid: 5750390003574505560
+  - <Dialogues>k__BackingField:
+    - {fileID: 11400000, guid: f9784e0b90bc1624a8541da632b69f89, type: 2}
+    - {fileID: 11400000, guid: bdb61d3305692344c954d764beb79cfe, type: 2}
+    <Conditions>k__BackingField:
+    - rid: 5750390003574505561
+  - <Dialogues>k__BackingField:
+    - {fileID: 11400000, guid: 35f8130fab104ca4885aa5a45a200aac, type: 2}
+    - {fileID: 11400000, guid: 84448f4bfb73864409b5e6a504a69584, type: 2}
+    <Conditions>k__BackingField:
+    - rid: 5750390003574505562
+  - <Dialogues>k__BackingField:
+    - {fileID: 11400000, guid: dca9d8a72e6459c46a3210d5e3af8536, type: 2}
+    - {fileID: 11400000, guid: 518c02e95bcd23842b08f25016bf3a88, type: 2}
+    <Conditions>k__BackingField:
+    - rid: 5750390003574505563
+  references:
+    version: 2
+    RefIds:
+    - rid: 1140105819959328868
+      type: {class: TimeOfDayDialogueCondition, ns: FlavorfulStory.DialogueSystem.Conditions,
+        asm: Assembly-CSharp}
+      data:
+        <TimeOfDay>k__BackingField: 0
+    - rid: 5750390003574505553
+      type: {class: WeatherDialogueCondition, ns: FlavorfulStory.DialogueSystem.Conditions,
+        asm: Assembly-CSharp}
+      data:
+        <Weather>k__BackingField: 0
+    - rid: 5750390003574505555
+      type: {class: WeatherDialogueCondition, ns: FlavorfulStory.DialogueSystem.Conditions,
+        asm: Assembly-CSharp}
+      data:
+        <Weather>k__BackingField: 1
+    - rid: 5750390003574505556
+      type: {class: TimeOfDayDialogueCondition, ns: FlavorfulStory.DialogueSystem.Conditions,
+        asm: Assembly-CSharp}
+      data:
+        <TimeOfDay>k__BackingField: 1
+    - rid: 5750390003574505557
+      type: {class: DayOfWeekDialogueCondition, ns: FlavorfulStory.DialogueSystem.Conditions,
+        asm: Assembly-CSharp}
+      data:
+        <DayOfWeek>k__BackingField: 1
+    - rid: 5750390003574505558
+      type: {class: DayOfWeekDialogueCondition, ns: FlavorfulStory.DialogueSystem.Conditions,
+        asm: Assembly-CSharp}
+      data:
+        <DayOfWeek>k__BackingField: 2
+    - rid: 5750390003574505559
+      type: {class: DayOfWeekDialogueCondition, ns: FlavorfulStory.DialogueSystem.Conditions,
+        asm: Assembly-CSharp}
+      data:
+        <DayOfWeek>k__BackingField: 4
+    - rid: 5750390003574505560
+      type: {class: DayOfWeekDialogueCondition, ns: FlavorfulStory.DialogueSystem.Conditions,
+        asm: Assembly-CSharp}
+      data:
+        <DayOfWeek>k__BackingField: 8
+    - rid: 5750390003574505561
+      type: {class: DayOfWeekDialogueCondition, ns: FlavorfulStory.DialogueSystem.Conditions,
+        asm: Assembly-CSharp}
+      data:
+        <DayOfWeek>k__BackingField: 16
+    - rid: 5750390003574505562
+      type: {class: DayOfWeekDialogueCondition, ns: FlavorfulStory.DialogueSystem.Conditions,
+        asm: Assembly-CSharp}
+      data:
+        <DayOfWeek>k__BackingField: 32
+    - rid: 5750390003574505563
+      type: {class: DayOfWeekDialogueCondition, ns: FlavorfulStory.DialogueSystem.Conditions,
+        asm: Assembly-CSharp}
+      data:
+        <DayOfWeek>k__BackingField: 64

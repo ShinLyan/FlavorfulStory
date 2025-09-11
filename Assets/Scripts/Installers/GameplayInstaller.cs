@@ -135,9 +135,9 @@ namespace FlavorfulStory.Installers
             Container.Bind<DialogueView>().FromComponentInHierarchy().AsSingle();
 
             Container.BindInterfacesAndSelfTo<QuestDialogueSelector>().AsSingle();
-            Container.BindInterfacesAndSelfTo<GreetingDialogueSelector>().AsSingle();
             Container.BindInterfacesAndSelfTo<ContextDialogueSelector>().AsSingle();
 
+            Container.BindInterfacesAndSelfTo<GreetingDialogueSelector>().AsSingle();
             Container.BindInterfacesTo<SaveableServiceBinder<GreetingDialogueSelector>>().AsSingle();
 
             Container.BindInterfacesAndSelfTo<DialogueService>().AsSingle();

@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using FlavorfulStory.AI;
 using FlavorfulStory.Saving;
@@ -13,7 +12,8 @@ namespace FlavorfulStory.DialogueSystem.Selectors
         private readonly Dictionary<NpcName, bool> _greetedNpcs = new();
 
         /// <summary> Выбирает приветственный диалог для NPC. </summary>
-        /// <returns> Приветственный диалог или null. </returns>
+        /// <param name="npcInfo"> Информация об NPC, для которого выбирается диалог. </param>
+        /// <returns> Приветственный диалог или null, если уже приветствован или не задан. </returns>
         public Dialogue SelectDialogue(NpcInfo npcInfo)
         {
             var npcName = npcInfo.NpcName;
@@ -32,21 +32,19 @@ namespace FlavorfulStory.DialogueSystem.Selectors
 
         #region ISaveableService
 
-        [Serializable]
-        private struct State
-        {
-            public List<NpcName> GreetedNpcs;
-        }
+        /// <summary> Сохраняет состояние — список NPC, которых уже приветствовали. </summary>
+        /// <returns> Объект состояния (список имён NPC). </returns>
+        public object CaptureState() => new List<NpcName>(_greetedNpcs.Keys);
 
-        public object CaptureState() => new State { GreetedNpcs = new List<NpcName>(_greetedNpcs.Keys) };
-
-        public void RestoreState(object restoredState)
+        /// <summary> Восстанавливает состояние после загрузки. </summary>
+        /// <param name="state"> Объект состояния, ранее сохранённый через <see cref="CaptureState"/>. </param>
+        public void RestoreState(object state)
         {
-            if (restoredState is State state)
-            {
-                _greetedNpcs.Clear();
-                foreach (var npc in state.GreetedNpcs) _greetedNpcs[npc] = true;
-            }
+            if (state is not List<NpcName> records) return;
+
+            _greetedNpcs.Clear();
+
+            foreach (var npc in records) _greetedNpcs[npc] = true;
         }
 
         #endregion

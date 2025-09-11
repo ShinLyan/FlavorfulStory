@@ -25,7 +25,7 @@ namespace FlavorfulStory.DialogueSystem
         private IPlayerPositionProvider _playerPositionProvider;
 
         /// <summary> Сервис диалогов. </summary>
-        private DialogueService _dialogueService;
+        private IDialogueService _dialogueService;
 
         /// <summary> Информация о NPC. </summary>
         public NpcInfo NpcInfo { get; private set; }
@@ -37,7 +37,7 @@ namespace FlavorfulStory.DialogueSystem
         /// <param name="dialogueService"> Сервис диалогов. </param>
         [Inject]
         private void Construct(PlayerSpeaker playerSpeaker, PlayerController playerController,
-            IPlayerPositionProvider playerPositionProvider, DialogueService dialogueService)
+            IPlayerPositionProvider playerPositionProvider, IDialogueService dialogueService)
         {
             _playerSpeaker = playerSpeaker;
             _playerController = playerController;

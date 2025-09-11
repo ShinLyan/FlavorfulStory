@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using FlavorfulStory.DialogueSystem.Conditions;
 using UnityEditor;
 using UnityEditorInternal;
@@ -15,10 +16,10 @@ namespace FlavorfulStory.DialogueSystem.Editor
         /// <summary> Сериализованное свойство для приветственного диалога. </summary>
         private SerializedProperty _greetingDialogueProperty;
 
-        /// <summary> Сериализованное свойство для условных диалогов. </summary>
+        /// <summary> Сериализованное свойство для контекстных диалогов. </summary>
         private SerializedProperty _contextDialoguesProperty;
 
-        /// <summary> Список условных диалогов с поддержкой drag-and-drop и сортировки. </summary>
+        /// <summary> Список контекстных диалогов с поддержкой drag-and-drop и сортировки. </summary>
         private ReorderableList _dialogueList;
 
         /// <summary> Словарь списков условий для каждого диалога. </summary>
@@ -29,6 +30,14 @@ namespace FlavorfulStory.DialogueSystem.Editor
 
         /// <summary> Список доступных типов условий, найденных в сборках. </summary>
         private List<Type> _conditionTypes;
+
+        /// <summary> Фиксированный порядок типов условий. </summary>
+        private static readonly List<Type> ConditionTypeOrder = new()
+        {
+            typeof(WeatherDialogueCondition),
+            typeof(DayOfWeekDialogueCondition),
+            typeof(TimeOfDayDialogueCondition)
+        };
 
         /// <summary> Вызывается при включении инспектора, инициализирует свойства и списки. </summary>
         private void OnEnable()
@@ -60,39 +69,100 @@ namespace FlavorfulStory.DialogueSystem.Editor
             serializedObject.ApplyModifiedProperties();
         }
 
-        /// <summary> Рисует заголовок списка условных диалогов. </summary>
+        /// <summary> Рисует заголовок списка контекстных диалогов. </summary>
         /// <param name="rect"> Область для отрисовки. </param>
         private static void DrawDialogueListHeader(Rect rect) => EditorGUI.LabelField(rect, "Context Dialogues");
 
-        /// <summary> Рисует элемент списка условных диалогов. </summary>
+        /// <summary> Рисует элемент списка контекстных диалогов. </summary>
         /// <param name="rect"> Область для отрисовки. </param>
         /// <param name="index"> Индекс элемента. </param>
         /// <param name="isActive"> Активен ли элемент. </param>
         /// <param name="isFocused"> В фокусе ли элемент. </param>
         private void DrawDialogueElement(Rect rect, int index, bool isActive, bool isFocused)
         {
-            var dialogueElement = _contextDialoguesProperty.GetArrayElementAtIndex(index);
-            var dialogueField = dialogueElement.FindPropertyRelative("<Dialogue>k__BackingField");
-            var conditionsField = dialogueElement.FindPropertyRelative("<Conditions>k__BackingField");
+            var element = _contextDialoguesProperty.GetArrayElementAtIndex(index);
+            var dialoguesField = element.FindPropertyRelative("<Dialogues>k__BackingField");
+            var conditionsField = element.FindPropertyRelative("<Conditions>k__BackingField");
 
             float y = rect.y;
             float spacing = EditorGUIUtility.standardVerticalSpacing;
             float line = EditorGUIUtility.singleLineHeight;
 
             _dialogueFoldouts.TryAdd(index, true);
-            _dialogueFoldouts[index] = EditorGUI.Foldout(new Rect(rect.x, y, rect.width, line),
-                _dialogueFoldouts[index], $"Context Dialogue {index + 1}", true);
+
+            EditorGUI.indentLevel++;
+
+            _dialogueFoldouts[index] = EditorGUI.Foldout(
+                new Rect(rect.x, y, rect.width, line),
+                _dialogueFoldouts[index],
+                GetDialogueTitle(conditionsField),
+                true
+            );
 
             y += line + spacing;
-            if (!_dialogueFoldouts[index]) return;
-
-            EditorGUI.PropertyField(new Rect(rect.x, y, rect.width, line), dialogueField);
-            y += line + spacing;
+            if (!_dialogueFoldouts[index])
+            {
+                EditorGUI.indentLevel--;
+                return;
+            }
 
             if (!_conditionLists.ContainsKey(index))
                 _conditionLists[index] = CreateConditionsReorderableList(conditionsField);
 
-            _conditionLists[index].DoList(new Rect(rect.x, y, rect.width, _conditionLists[index].GetHeight()));
+            var conditionList = _conditionLists[index];
+            conditionList.DoList(new Rect(rect.x, y, rect.width, conditionList.GetHeight()));
+            y += conditionList.GetHeight();
+
+            EditorGUI.PropertyField(
+                new Rect(rect.x, y, rect.width, EditorGUI.GetPropertyHeight(dialoguesField, true)),
+                dialoguesField,
+                new GUIContent("Dialogues"),
+                true
+            );
+
+            EditorGUI.indentLevel--;
+        }
+
+        /// <summary> Генерирует заголовок для foldout-а, отображая список сокращённых названий условий. </summary>
+        /// <param name="conditionsProperty"> Список условий. </param>
+        /// <returns> Строка с названиями типов условий. </returns>
+        private static string GetDialogueTitle(SerializedProperty conditionsProperty)
+        {
+            if (conditionsProperty == null || conditionsProperty.arraySize == 0) return "No Conditions";
+
+            var typeNameList = new List<(int order, string displayName)>();
+
+            for (int i = 0; i < conditionsProperty.arraySize; i++)
+            {
+                var prop = conditionsProperty.GetArrayElementAtIndex(i);
+                object value = prop.managedReferenceValue;
+
+                if (value == null)
+                {
+                    typeNameList.Add((int.MaxValue, "Missing"));
+                    continue;
+                }
+
+                var type = value.GetType();
+                int index = ConditionTypeOrder.IndexOf(type);
+                if (index < 0) index = int.MaxValue;
+
+                string readable = GetReadableConditionName(type);
+                typeNameList.Add((index, readable));
+            }
+
+            var sortedNames = typeNameList.OrderBy(x => x.order).Select(x => x.displayName);
+            return string.Join(", ", sortedNames);
+        }
+
+        /// <summary> Преобразует имя типа условия в читаемый вид.</summary>
+        /// <param name="type"> Тип условия. </param>
+        /// <returns> Первая буква — заглавная, остальные — строчные, все слова раздельно. </returns>
+        private static string GetReadableConditionName(Type type)
+        {
+            string name = type.Name.Replace("DialogueCondition", "");
+            string withSpaces = Regex.Replace(name, "([a-z])([A-Z])", "$1 $2");
+            return char.ToUpper(withSpaces[0]) + withSpaces[1..].ToLower();
         }
 
         /// <summary> Вычисляет высоту элемента списка диалога. </summary>
@@ -100,51 +170,91 @@ namespace FlavorfulStory.DialogueSystem.Editor
         /// <returns> Высота элемента в пикселях. </returns>
         private float CalculateDialogueElementHeight(int index)
         {
-            float height = EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
+            float height = 2f;
+            height += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
 
             if (_dialogueFoldouts.TryGetValue(index, out bool expanded) && expanded)
             {
-                height += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
+                var element = _contextDialoguesProperty.GetArrayElementAtIndex(index);
+                var dialoguesField = element.FindPropertyRelative("<Dialogues>k__BackingField");
 
                 if (_conditionLists.TryGetValue(index, out var list)) height += list.GetHeight();
+
+                height += EditorGUI.GetPropertyHeight(dialoguesField, true);
             }
 
+            height += 2f;
             return height;
         }
 
-        /// <summary> Добавляет новую запись условного диалога в список. </summary>
-        /// <param name="list"> Список условных диалогов. </param>
+        /// <summary> Добавляет новую запись контекстного диалога в список. </summary>
+        /// <param name="list"> Список контекстных диалогов. </param>
         private void AddNewDialogueEntry(ReorderableList list)
         {
+            serializedObject.Update();
+
             _contextDialoguesProperty.arraySize++;
-            var newElement =
-                _contextDialoguesProperty.GetArrayElementAtIndex(_contextDialoguesProperty.arraySize - 1);
-            newElement.FindPropertyRelative("<Dialogue>k__BackingField").objectReferenceValue = null;
+            var newElement = _contextDialoguesProperty.GetArrayElementAtIndex(_contextDialoguesProperty.arraySize - 1);
+
+            var dialogues = newElement.FindPropertyRelative("<Dialogues>k__BackingField");
+            dialogues.ClearArray();
+            dialogues.arraySize = 2;
+            dialogues.GetArrayElementAtIndex(0).objectReferenceValue = null;
+            dialogues.GetArrayElementAtIndex(1).objectReferenceValue = null;
+
             newElement.FindPropertyRelative("<Conditions>k__BackingField").ClearArray();
+
+            serializedObject.ApplyModifiedProperties();
         }
 
         /// <summary> Создает ReorderableList для отображения условий диалога. </summary>
         /// <param name="conditionsProperty"> Сериализованное свойство списка условий. </param>
         /// <returns> Список для редактирования условий. </returns>
         private ReorderableList CreateConditionsReorderableList(SerializedProperty conditionsProperty) => new(
-            conditionsProperty.serializedObject, conditionsProperty, true, true, true, true)
+            conditionsProperty.serializedObject, conditionsProperty, false, true, true, true)
         {
             drawHeaderCallback = rect => EditorGUI.LabelField(rect, "Conditions"),
-
             drawElementCallback = (rect, index, _, _) =>
             {
-                var condition = conditionsProperty.GetArrayElementAtIndex(index);
-                DrawConditionFields(rect, condition);
+                var sorted = GetSortedConditions(conditionsProperty);
+                if (index < sorted.Count) DrawConditionFields(rect, sorted[index]);
             },
-
             elementHeightCallback = index =>
             {
-                var condition = conditionsProperty.GetArrayElementAtIndex(index);
-                return CalculateConditionHeight(condition);
+                var sorted = GetSortedConditions(conditionsProperty);
+                return index < sorted.Count
+                    ? CalculateConditionHeight(sorted[index])
+                    : EditorGUIUtility.singleLineHeight;
             },
-
             onAddDropdownCallback = (_, _) => ShowConditionTypeMenu(conditionsProperty)
         };
+
+        /// <summary> Возвращает список условий, отсортированных по фиксированному порядку. </summary>
+        /// <param name="conditionsProperty"> Сериализованное свойство списка условий. </param>
+        /// <returns> Список условий, отсортированных по фиксированному порядку. </returns>
+        private static List<SerializedProperty> GetSortedConditions(SerializedProperty conditionsProperty)
+        {
+            var list = new List<(int order, SerializedProperty prop)>();
+
+            for (int i = 0; i < conditionsProperty.arraySize; i++)
+            {
+                var prop = conditionsProperty.GetArrayElementAtIndex(i);
+                object obj = prop.managedReferenceValue;
+                if (obj == null)
+                {
+                    list.Add((int.MaxValue, prop));
+                    continue;
+                }
+
+                var type = obj.GetType();
+                int index = ConditionTypeOrder.IndexOf(type);
+                if (index < 0) index = int.MaxValue;
+
+                list.Add((index, prop));
+            }
+
+            return list.OrderBy(x => x.order).Select(x => x.prop).ToList();
+        }
 
         /// <summary> Рисует поля одного условия. </summary>
         /// <param name="rect"> Область для отрисовки. </param>
@@ -152,14 +262,6 @@ namespace FlavorfulStory.DialogueSystem.Editor
         private static void DrawConditionFields(Rect rect, SerializedProperty conditionProperty)
         {
             float y = rect.y;
-            float spacing = EditorGUIUtility.standardVerticalSpacing;
-
-            string typeName = conditionProperty.managedReferenceValue?.GetType().Name ?? "Missing";
-            EditorGUI.LabelField(new Rect(rect.x, y, rect.width, EditorGUIUtility.singleLineHeight), typeName);
-            y += EditorGUIUtility.singleLineHeight + spacing;
-
-            if (conditionProperty.managedReferenceValue == null) return;
-
             var property = conditionProperty.Copy();
             var end = property.GetEndProperty();
             property.NextVisible(true);
@@ -168,7 +270,7 @@ namespace FlavorfulStory.DialogueSystem.Editor
             {
                 float height = EditorGUI.GetPropertyHeight(property, true);
                 EditorGUI.PropertyField(new Rect(rect.x, y, rect.width, height), property, true);
-                y += height + spacing;
+                y += height;
                 property.NextVisible(false);
             }
         }
@@ -178,17 +280,16 @@ namespace FlavorfulStory.DialogueSystem.Editor
         /// <returns> Высота условия в пикселях. </returns>
         private static float CalculateConditionHeight(SerializedProperty conditionProperty)
         {
-            float height = EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
+            if (conditionProperty.managedReferenceValue == null) return EditorGUIUtility.singleLineHeight;
 
-            if (conditionProperty.managedReferenceValue == null) return height;
-
+            float height = 0f;
             var property = conditionProperty.Copy();
             var end = property.GetEndProperty();
             property.NextVisible(true);
 
             while (!SerializedProperty.EqualContents(property, end))
             {
-                height += EditorGUI.GetPropertyHeight(property, true) + EditorGUIUtility.standardVerticalSpacing;
+                height += EditorGUI.GetPropertyHeight(property, true);
                 property.NextVisible(false);
             }
 

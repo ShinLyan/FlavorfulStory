@@ -9,9 +9,9 @@ namespace FlavorfulStory.DialogueSystem
     [Serializable]
     public struct ContextDialogue
     {
-        /// <summary> Диалог, который может быть показан при выполнении всех условий. </summary>
-        [field: Tooltip("Диалог, который может быть показан при выполнении всех условий."), SerializeField]
-        public Dialogue Dialogue { get; private set; }
+        /// <summary> Диалоги, которые могут быть показаны при выполнении всех условий. </summary>
+        [field: Tooltip("Диалоги, которые могут быть показаны при выполнении всех условий."), SerializeField]
+        public List<Dialogue> Dialogues { get; private set; }
 
         /// <summary> Условия, при которых диалог становится доступным. </summary>
         [field: Tooltip("Условия, при которых диалог становится доступным."), SerializeReference]
