@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using FlavorfulStory.GridSystem;
-using FlavorfulStory.Infrastructure.Factories;
+using FlavorfulStory.Utils.Factories;
 using FlavorfulStory.InputSystem;
 using FlavorfulStory.TimeManagement;
 using UnityEngine;

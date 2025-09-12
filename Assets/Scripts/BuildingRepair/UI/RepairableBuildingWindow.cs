@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using FlavorfulStory.Economy;
 using FlavorfulStory.Infrastructure;
-using FlavorfulStory.Infrastructure.Factories;
 using FlavorfulStory.InventorySystem;
+using FlavorfulStory.Utils.Factories;
 using FlavorfulStory.Windows.UI;
 using TMPro;
 using UnityEngine;
@@ -27,11 +27,11 @@ namespace FlavorfulStory.BuildingRepair.UI
         /// <summary> Родитель для префабов отображений ресурсных требований. </summary>
         [SerializeField] private Transform _requirementViewsContainer;
 
+        /// <summary> Контейнер для отображения затрат на ремонт. </summary>
+        [SerializeField] private GameObject _repairCostContainer;
+
         /// <summary> Текст, отображающий стоимость ремонта. </summary>
         [SerializeField] private TMP_Text _repairCostText;
-
-        /// <summary> Контейнер для отображения затрат на ремонт. </summary>
-        [SerializeField] private GameObject _costContainer;
 
         /// <summary> Кнопка подтверждения ремонта. </summary>
         [SerializeField] private Button _buildButton;
@@ -165,7 +165,8 @@ namespace FlavorfulStory.BuildingRepair.UI
                 }
             }
 
-            _repairCostText.text = $"{_playerWallet.Amount} / {stage.MoneyCost}";
+            _repairCostContainer.SetActive(stage.RepairCost > 0);
+            _repairCostText.text = $"{_playerWallet.Amount} / {stage.RepairCost}";
             _buildingNameText.text = stage.BuildingName;
             _buildButton.interactable = IsRepairPossible(stage, investedResources, _playerWallet.Amount);
         }
@@ -181,10 +182,17 @@ namespace FlavorfulStory.BuildingRepair.UI
         /// <param name="stage"> Стадия ремонта. </param>
         /// <param name="investedResources"> Вложенные ресурсы. </param>
         /// <param name="playerMoney"> Деньги игрока. </param>
-        /// <returns> <c>true</c>, если все ресурсы вложены; иначе <c>false</c>. </returns>
+        /// <returns> <c>true</c>, если ремонт можно завершить, иначе <c>false</c>. </returns>
         private static bool IsRepairPossible(RepairStage stage, List<int> investedResources, int playerMoney)
-            => stage.Requirements.Select((itemStack, i) => investedResources[i] >= itemStack.Number).All(x => x) &&
-               stage.MoneyCost <= playerMoney;
+        {
+            bool hasEnoughResources = stage.Requirements
+                .Select((requiredStack, index) => investedResources[index] >= requiredStack.Number)
+                .All(hasEnough => hasEnough);
+
+            bool hasEnoughMoney = stage.RepairCost <= playerMoney;
+
+            return hasEnoughResources && hasEnoughMoney;
+        }
 
         /// <summary> Отобразить сообщение об окончании ремонта. </summary>
         /// <param name="repairableBuildingName"> Название ремонтируемого здания. </param>
@@ -194,7 +202,7 @@ namespace FlavorfulStory.BuildingRepair.UI
             _repairCompletedText.text = $"{repairableBuildingName}'s repair completed";
             _repairCompletedText.gameObject.SetActive(true);
             _buildButton.gameObject.SetActive(false);
-            _costContainer.SetActive(false);
+            _repairCostContainer.SetActive(false);
         }
     }
 }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using FlavorfulStory.InventorySystem;
+using FlavorfulStory.Utils.Attributes;
 using UnityEngine;
 
 namespace FlavorfulStory.BuildingRepair
@@ -17,8 +18,8 @@ namespace FlavorfulStory.BuildingRepair
         [field: Tooltip("Ресурсные требования для выполнения стадии ремонта."), SerializeField]
         public List<ItemStack> Requirements { get; private set; }
 
-        /// <summary> Денежные требования для выполнения стадии ремонта. </summary>
-        [field: Tooltip("Денежные требования для выполнения стадии ремонта."), SerializeField]
-        public int MoneyCost { get; private set; }
+        /// <summary> Стоимость стадии ремонта. </summary>
+        [field: Tooltip("Стоимость стадии ремонта."), SerializeField, SteppedRange(0f, 10000f, 50f)]
+        public int RepairCost { get; private set; }
     }
 }

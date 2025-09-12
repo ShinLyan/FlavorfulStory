@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 6493702981426936176}
   - component: {fileID: 6896033617434537092}
   - component: {fileID: 7040995384521798060}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: AddResourceButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -145,7 +145,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8071676836392856746}
   - component: {fileID: 4486669678431649871}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: Buttons
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -212,7 +212,7 @@ GameObject:
   - component: {fileID: 5577401144237942476}
   - component: {fileID: 303901440932444748}
   - component: {fileID: 5425839851834427126}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: ReturnResourceButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -345,7 +345,7 @@ GameObject:
   - component: {fileID: 6969688490521398588}
   - component: {fileID: 3640893724541192771}
   - component: {fileID: 8107993037165025684}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: ResourceRequirementView
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -425,7 +425,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8112623352540325393}
   - component: {fileID: 1456948593377380}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: RequirementInfo
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -490,7 +490,7 @@ GameObject:
   - component: {fileID: 333222456025244883}
   - component: {fileID: 5120910198525705168}
   - component: {fileID: 7451592401237252109}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: QuantityText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -627,7 +627,7 @@ GameObject:
   - component: {fileID: 5313691522556479144}
   - component: {fileID: 7462622122501234952}
   - component: {fileID: 1845815152819239943}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: Icon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -702,7 +702,7 @@ GameObject:
   - component: {fileID: 4587633470400226664}
   - component: {fileID: 4124035803590638252}
   - component: {fileID: 8151732606258618484}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: Icon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -777,8 +777,7 @@ GameObject:
   - component: {fileID: 997024336681842068}
   - component: {fileID: 3591953035103019559}
   - component: {fileID: 2304619182621575953}
-  - component: {fileID: 5937524557467021777}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: QuantityBackground
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -843,50 +842,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &5937524557467021777
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8788943409104362175}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Navigation:
-    m_Mode: 3
-    m_WrapAround: 0
-    m_SelectOnUp: {fileID: 0}
-    m_SelectOnDown: {fileID: 0}
-    m_SelectOnLeft: {fileID: 0}
-    m_SelectOnRight: {fileID: 0}
-  m_Transition: 1
-  m_Colors:
-    m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
-    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
-    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
-    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
-    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
-    m_ColorMultiplier: 1
-    m_FadeDuration: 0.1
-  m_SpriteState:
-    m_HighlightedSprite: {fileID: 0}
-    m_PressedSprite: {fileID: 0}
-    m_SelectedSprite: {fileID: 0}
-    m_DisabledSprite: {fileID: 0}
-  m_AnimationTriggers:
-    m_NormalTrigger: Normal
-    m_HighlightedTrigger: Highlighted
-    m_PressedTrigger: Pressed
-    m_SelectedTrigger: Selected
-    m_DisabledTrigger: Disabled
-  m_Interactable: 1
-  m_TargetGraphic: {fileID: 2304619182621575953}
-  m_OnClick:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!1001 &6713361855781076122
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -895,10 +850,20 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 8112623352540325393}
     m_Modifications:
+    - target: {fileID: 842498044300951495, guid: d9d0a16d0b8a2a6428212d46bdcf229a,
+        type: 3}
+      propertyPath: m_Layer
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2961830607051824118, guid: d9d0a16d0b8a2a6428212d46bdcf229a,
         type: 3}
       propertyPath: m_Name
       value: ResourceSlotView
+      objectReference: {fileID: 0}
+    - target: {fileID: 2961830607051824118, guid: d9d0a16d0b8a2a6428212d46bdcf229a,
+        type: 3}
+      propertyPath: m_Layer
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3396034838130881860, guid: d9d0a16d0b8a2a6428212d46bdcf229a,
         type: 3}

@@ -1,7 +1,7 @@
 using System;
-using FlavorfulStory.EditorTools.Attributes;
 using FlavorfulStory.Saving;
 using FlavorfulStory.SceneManagement;
+using FlavorfulStory.Utils.Attributes;
 using UnityEngine;
 using Zenject;
 

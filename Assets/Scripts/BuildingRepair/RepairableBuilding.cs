@@ -42,6 +42,7 @@ namespace FlavorfulStory.BuildingRepair
         /// <summary> Провайдер окон. </summary>
         private IInventoryProvider _inventoryProvider;
 
+        /// <summary> Хранилище валюты игрока. </summary>
         private ICurrencyStorage _playerWallet;
 
         /// <summary> Текущая стадия ремонта. </summary>
@@ -129,7 +130,8 @@ namespace FlavorfulStory.BuildingRepair
         {
             if (IsRepairCompleted) return;
 
-            _playerWallet.TrySpend(CurrentStage.MoneyCost);
+            if (!_playerWallet.TrySpend(CurrentStage.RepairCost)) return;
+
             _repairStageIndex++;
             _objectSwitcher.SwitchTo(_repairStageIndex);
             SfxPlayer.Play(SfxType.Build);

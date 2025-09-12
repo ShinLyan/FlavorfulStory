@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using FlavorfulStory.Audio;
 using FlavorfulStory.GridSystem;
-using FlavorfulStory.Infrastructure.Factories;
+using FlavorfulStory.Utils.Factories;
 using UnityEngine;
 
 namespace FlavorfulStory.PlacementSystem

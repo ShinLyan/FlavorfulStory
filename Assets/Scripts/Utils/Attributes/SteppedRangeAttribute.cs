@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace FlavorfulStory.EditorTools.Attributes
+namespace FlavorfulStory.Utils.Attributes
 {
     /// <summary> Атрибут для отображения слайдера с шагом в инспекторе. </summary>
     public class SteppedRangeAttribute : PropertyAttribute

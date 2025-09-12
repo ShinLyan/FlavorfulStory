@@ -1,5 +1,5 @@
 ﻿using System;
-using FlavorfulStory.EditorTools.Attributes;
+using FlavorfulStory.Utils.Attributes;
 using UnityEngine;
 
 namespace FlavorfulStory.Visuals.Weather
