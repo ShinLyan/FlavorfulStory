@@ -32,6 +32,7 @@ using FlavorfulStory.Tools;
 using FlavorfulStory.TooltipSystem;
 using FlavorfulStory.TooltipSystem.ActionTooltips;
 using FlavorfulStory.Visuals.Lightning;
+using FlavorfulStory.Visuals.Weather;
 using Unity.Cinemachine;
 using UnityEngine;
 using Zenject;
@@ -77,6 +78,13 @@ namespace FlavorfulStory.Installers
         /// <summary> Слои, по которым производится удар с помощью инструмента. </summary>
         [SerializeField] private LayerMask _hitableLayers;
 
+        /// <summary> Конфигурация погодных условий. </summary>
+        [Header("Visuals")]
+        [SerializeField] private WeatherConfig _weatherConfig;
+
+        /// <summary> Родительский объект для погодных частиц. </summary>
+        [SerializeField] private Transform _particleParent;
+
         #endregion
 
         /// <summary> Выполнить установку всех зависимостей, необходимых для сцены. </summary>
@@ -97,6 +105,7 @@ namespace FlavorfulStory.Installers
             BindStats();
             BindTimeManagement();
             BindTooltipSystem();
+            BindVisuals();
             BindOther();
         }
 
@@ -266,10 +275,19 @@ namespace FlavorfulStory.Installers
             Container.Bind<ItemTooltipView>().FromInstance(_itemTooltipPrefab).AsSingle();
         }
 
+        /// <summary> Установить зависимости, связанные с визуалом. </summary>
+        private void BindVisuals()
+        {
+            Container.BindInterfacesAndSelfTo<WeatherService>().AsSingle()
+                .WithArguments(_weatherConfig, _particleParent);
+            Container.BindInterfacesTo<SaveableServiceBinder<WeatherService>>().AsSingle();
+
+            Container.Bind<GlobalLightSystem>().FromComponentInHierarchy().AsSingle();
+        }
+
         /// <summary> Установить общие или прочие зависимости. </summary>
         private void BindOther()
         {
-            Container.Bind<GlobalLightSystem>().FromComponentInHierarchy().AsSingle();
             Container.Bind<CinemachineCamera>().FromInstance(_teleportVirtualCamera).AsSingle();
 
             Container.Bind<IPrefabFactory<NonInteractableNpc>>()
