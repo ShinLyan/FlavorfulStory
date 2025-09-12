@@ -36,7 +36,10 @@ namespace FlavorfulStory.DialogueSystem.Selectors
         /// <returns> Подходящий диалог или null, если не найден. </returns>
         public Dialogue SelectDialogue(NpcInfo npcInfo)
         {
-            if (_dailyNpcConversations.TryGetValue(npcInfo.NpcName, out int count) && count >= 3) return null;
+            const int DailyConversationsCountLimit = 3;
+            if (_dailyNpcConversations.TryGetValue(npcInfo.NpcName, out int count) &&
+                count >= DailyConversationsCountLimit)
+                return null;
 
             var categoryMap = GroupDialoguesByCategory(npcInfo.DialogueConfig.ContextDialogues);
 

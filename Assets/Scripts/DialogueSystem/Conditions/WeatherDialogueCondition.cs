@@ -13,14 +13,7 @@ namespace FlavorfulStory.DialogueSystem.Conditions
         public WeatherType Weather { get; private set; }
 
         /// <summary> Проверяет соответствие текущей погоды условию. </summary>
-        public override bool IsSatisfied
-        {
-            get
-            {
-                var currentWeather = WeatherType.Clear; //TODO: Заменить на Zenject Weather сервис
-                return Weather == currentWeather;
-            }
-        }
+        public override bool IsSatisfied => Weather == WeatherService.CurrentWeatherType;
 
         /// <summary> Вес условия. </summary>
         public override int Weight => DialogueWeightsConfig.WeatherWeight;
