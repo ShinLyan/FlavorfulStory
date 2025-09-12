@@ -14,6 +14,9 @@ namespace FlavorfulStory.DialogueSystem.Selectors
         /// <summary> Храним количество разговоров с каждым NPC за текущий день. </summary>
         private readonly Dictionary<NpcName, int> _dailyNpcConversations = new();
 
+        /// <summary> Словарь, содержащий информацию о диалогах, воспроизведенных сегодня для каждого NPC. </summary>
+        private readonly Dictionary<NpcName, HashSet<Dialogue>> _playedDialoguesToday = new();
+
         /// <summary> Инициализирует обработчики событий. </summary>
         public void Initialize() => WorldTime.OnDayEnded += ResetDailyCounters;
 
@@ -22,7 +25,11 @@ namespace FlavorfulStory.DialogueSystem.Selectors
 
         /// <summary> Сброс счетчиков разговоров в конце дня. </summary>
         /// <param name="_"> Текущее игровое время (не используется). </param>
-        private void ResetDailyCounters(DateTime _) => _dailyNpcConversations.Clear();
+        private void ResetDailyCounters(DateTime _)
+        {
+            _dailyNpcConversations.Clear();
+            _playedDialoguesToday.Clear();
+        }
 
         /// <summary> Выбирает подходящий диалог для NPC. </summary>
         /// <param name="npcInfo"> Информация об NPC, включая конфигурацию диалогов. </param>
@@ -35,9 +42,13 @@ namespace FlavorfulStory.DialogueSystem.Selectors
 
             if (categoryMap.Count == 0) return null;
 
+            RemovePlayedDialoguesFromCategories(npcInfo.NpcName, categoryMap);
+
+            if (categoryMap.Count == 0) return null;
+
             var weightedCategories = CalculateCategoryWeights(categoryMap);
             string chosenCategoryKey = GetRandomCategoryByWeight(weightedCategories);
-            var dialogue = PickRandomDialogueFromCategory(categoryMap[chosenCategoryKey]);
+            var dialogue = PickRandomDialogueFromCategory(categoryMap[chosenCategoryKey], npcInfo.NpcName);
 
             _dailyNpcConversations.TryAdd(npcInfo.NpcName, 0);
             _dailyNpcConversations[npcInfo.NpcName]++;
@@ -70,6 +81,23 @@ namespace FlavorfulStory.DialogueSystem.Selectors
             return categoryMap;
         }
 
+        /// <summary> Удаляет из категорий диалоги, которые уже были воспроизведены сегодня для указанного NPC </summary>
+        /// <param name="npcName"> Имя NPC, для которого выполняется фильтрация диалогов. </param>
+        /// <param name="categoryMap"> Словарь категорий диалогов. </param>
+        private void RemovePlayedDialoguesFromCategories(NpcName npcName,
+            Dictionary<string, List<ContextDialogue>> categoryMap)
+        {
+            foreach (var key in categoryMap.Keys.ToList())
+            {
+                var played = _playedDialoguesToday.GetValueOrDefault(npcName, new HashSet<Dialogue>());
+
+                categoryMap[key] = categoryMap[key].Where(contextDialogue =>
+                    contextDialogue.Dialogues.Any(dialogue => !played.Contains(dialogue))).ToList();
+
+                if (categoryMap[key].Count == 0) categoryMap.Remove(key);
+            }
+        }
+
         /// <summary> Формирует строковый ключ из условий (по их ToString), сортируя их. </summary>
         /// <param name="conditions"> Коллекция условий. </param>
         /// <returns> Строка, представляющая уникальный ключ набора условий. </returns>
@@ -81,12 +109,13 @@ namespace FlavorfulStory.DialogueSystem.Selectors
         /// <param name="categoryMap"> Словарь категорий и диалогов. </param>
         /// <returns> Список пар: категория и её суммарный вес. </returns>
         private static List<(string category, int weight)> CalculateCategoryWeights(
-            Dictionary<string, List<ContextDialogue>> categoryMap) => categoryMap.Select(pair =>
-        {
-            int categoryWeight = pair.Value.Sum(conditionalDialogue =>
-                conditionalDialogue.Conditions.Sum(condition => condition.Weight));
-            return (category: pair.Key, weight: categoryWeight);
-        }).ToList();
+            Dictionary<string, List<ContextDialogue>> categoryMap) =>
+            categoryMap.Select(pair =>
+            {
+                int categoryWeight = pair.Value.Sum(conditionalDialogue =>
+                    conditionalDialogue.Conditions.Sum(condition => condition.Weight));
+                return (category: pair.Key, weight: categoryWeight);
+            }).ToList();
 
         /// <summary> Выбирает случайную категорию с учетом веса. </summary>
         /// <param name="pool"> Список категорий с весами. </param>
@@ -108,13 +137,24 @@ namespace FlavorfulStory.DialogueSystem.Selectors
 
         /// <summary> Выбирает случайный диалог из категории. </summary>
         /// <param name="dialogues"> Список диалогов внутри категории. </param>
+        /// <param name="npcName"> Имя NPC. </param>
         /// <returns> Один из диалогов в категории. </returns>
-        private static Dialogue PickRandomDialogueFromCategory(List<ContextDialogue> dialogues)
+        private Dialogue PickRandomDialogueFromCategory(List<ContextDialogue> dialogues, NpcName npcName)
         {
-            var dialogueSet = dialogues[Random.Range(0, dialogues.Count)];
-            if (dialogueSet.Dialogues == null || dialogueSet.Dialogues.Count == 0) return null;
+            var playedDialogues = _playedDialoguesToday.GetValueOrDefault(npcName, new HashSet<Dialogue>());
 
-            return dialogueSet.Dialogues[Random.Range(0, dialogueSet.Dialogues.Count)];
+            var nonPlayedDialogues = dialogues.SelectMany(d => d.Dialogues)
+                .Where(dialogue => !playedDialogues.Contains(dialogue)).ToList();
+
+            if (nonPlayedDialogues.Count == 0) return null;
+
+            var chosenDialogue = nonPlayedDialogues[Random.Range(0, nonPlayedDialogues.Count)];
+
+            if (!_playedDialoguesToday.ContainsKey(npcName)) _playedDialoguesToday[npcName] = new HashSet<Dialogue>();
+
+            _playedDialoguesToday[npcName].Add(chosenDialogue);
+
+            return chosenDialogue;
         }
     }
 }
