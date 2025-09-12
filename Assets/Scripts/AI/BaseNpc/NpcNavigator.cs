@@ -71,7 +71,6 @@ namespace FlavorfulStory.AI.BaseNpc
         public void MoveTo(NpcDestinationPoint point)
         {
             _isMoving = true;
-            SetAgentStopped(false);
 
             _currentTargetPoint = point;
             _agent.SetDestination(point.Position);
@@ -94,19 +93,11 @@ namespace FlavorfulStory.AI.BaseNpc
         public void Stop(bool warpToSpawn = false)
         {
             _isMoving = false;
-            SetAgentStopped(true);
 
             if (!warpToSpawn) return;
 
             _agent.Warp(_spawnPosition);
             _currentTargetPoint = new NpcDestinationPoint();
-        }
-
-        /// <summary> Включает или отключает движение агента. </summary>
-        /// <param name="isStopped"> True — остановить агента; False — продолжить движение. </param>
-        private void SetAgentStopped(bool isStopped)
-        {
-            if (_agent.isOnNavMesh) _agent.isStopped = isStopped;
         }
     }
 }

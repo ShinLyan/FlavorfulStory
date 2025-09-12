@@ -35,22 +35,28 @@ namespace FlavorfulStory.AI.NonInteractableNpc
         /// <summary> Точка, в которой NPC должен исчезнуть. </summary>
         private NpcDestinationPoint _despawnPoint;
 
+        /// <summary> Замок магазина. </summary>
+        private readonly ShopLock _shopLock;
+
         /// <summary> Инициализирует новый экземпляр контроллера состояний для неинтерактивного NPC. </summary>
         /// <param name="npcMovementController"> Контроллер движения NPC, отвечающий за перемещение персонажа. </param>
         /// <param name="locationManager"> Менеджер локаций для получения информации о местоположениях. </param>
         /// <param name="npcAnimationController"> Контроллер анимации NPC для управления анимациями персонажа. </param>
         /// <param name="transactionService"> Сервис для транзакций. </param>
         /// <param name="npcTransform"> Transform NPC для определения позиции. </param>
-        /// <param name="npcPurchaseIndicator">  </param>
+        /// <param name="npcPurchaseIndicator"> Индикатаор покупки. </param>
+        /// <param name="shopLock"> Замок магазина. </param>
         public NonInteractableNpcStateController(NpcMovementController npcMovementController,
             LocationManager locationManager, NpcAnimationController npcAnimationController,
-            TransactionService transactionService, Transform npcTransform, NpcPurchaseIndicator npcPurchaseIndicator)
+            TransactionService transactionService, Transform npcTransform, NpcPurchaseIndicator npcPurchaseIndicator,
+            ShopLock shopLock)
             : base(npcAnimationController, npcTransform)
         {
             _npcMovementController = npcMovementController;
             _locationManager = locationManager;
             _transactionService = transactionService;
             _purchaseIndicator = npcPurchaseIndicator;
+            _shopLock = shopLock;
 
             _hadVisitedFurnitureAfterPurchase = false;
             _despawnPoint = new NpcDestinationPoint();
@@ -95,42 +101,40 @@ namespace FlavorfulStory.AI.NonInteractableNpc
         /// <summary> Создает все последовательности состояний для различных сценариев поведения NPC. </summary>
         private void CreateSequences()
         {
-            _nameToCharacterStates.Add(NpcStateName.RandomPointSequence, new SequenceState(new[]
-            {
-                _nameToCharacterStates[NpcStateName.RandomPointPicker],
-                _nameToCharacterStates[NpcStateName.Movement],
-                _nameToCharacterStates[NpcStateName.Animation]
-            }));
+            _nameToCharacterStates.Add(NpcStateName.RandomPointSequence,
+                new SequenceState(new[]
+                {
+                    _nameToCharacterStates[NpcStateName.RandomPointPicker],
+                    _nameToCharacterStates[NpcStateName.Movement], _nameToCharacterStates[NpcStateName.Animation]
+                }));
 
-            _nameToCharacterStates.Add(NpcStateName.FurnitureSequence, new SequenceState(new[]
-            {
-                _nameToCharacterStates[NpcStateName.FurniturePicker],
-                _nameToCharacterStates[NpcStateName.Movement],
-                _nameToCharacterStates[NpcStateName.Animation],
-                _nameToCharacterStates[NpcStateName.ReleaseObject]
-            }));
+            _nameToCharacterStates.Add(NpcStateName.FurnitureSequence,
+                new SequenceState(new[]
+                {
+                    _nameToCharacterStates[NpcStateName.FurniturePicker],
+                    _nameToCharacterStates[NpcStateName.Movement], _nameToCharacterStates[NpcStateName.Animation],
+                    _nameToCharacterStates[NpcStateName.ReleaseObject]
+                }));
 
-            _nameToCharacterStates.Add(NpcStateName.BuyItemSequence, new SequenceState(new[]
+            _nameToCharacterStates.Add(NpcStateName.BuyItemSequence,
+                new SequenceState(new[]
                 {
                     _nameToCharacterStates[NpcStateName.ShowcasePicker],
-                    _nameToCharacterStates[NpcStateName.Movement],
-                    _nameToCharacterStates[NpcStateName.Animation],
+                    _nameToCharacterStates[NpcStateName.Movement], _nameToCharacterStates[NpcStateName.Animation],
                     _nameToCharacterStates[NpcStateName.ReleaseObject],
-                    _nameToCharacterStates[NpcStateName.ItemPicker],
-                    _nameToCharacterStates[NpcStateName.Movement],
-                    _nameToCharacterStates[NpcStateName.Payment],
-                    _nameToCharacterStates[NpcStateName.Animation],
+                    _nameToCharacterStates[NpcStateName.ItemPicker], _nameToCharacterStates[NpcStateName.Movement],
+                    _nameToCharacterStates[NpcStateName.Payment], _nameToCharacterStates[NpcStateName.Animation],
                     _nameToCharacterStates[NpcStateName.ReleaseObject]
                 })
             );
 
-            _nameToCharacterStates.Add(NpcStateName.RefuseItemSequence, new SequenceState(new[]
-            {
-                _nameToCharacterStates[NpcStateName.ShowcasePicker],
-                _nameToCharacterStates[NpcStateName.Movement],
-                _nameToCharacterStates[NpcStateName.Animation],
-                _nameToCharacterStates[NpcStateName.ReleaseObject]
-            }));
+            _nameToCharacterStates.Add(NpcStateName.RefuseItemSequence,
+                new SequenceState(new[]
+                {
+                    _nameToCharacterStates[NpcStateName.ShowcasePicker],
+                    _nameToCharacterStates[NpcStateName.Movement], _nameToCharacterStates[NpcStateName.Animation],
+                    _nameToCharacterStates[NpcStateName.ReleaseObject]
+                }));
 
             ((SequenceState)_nameToCharacterStates[NpcStateName.BuyItemSequence]).OnSequenceEnded +=
                 HandleAfterPurchaseTransition;
@@ -196,18 +200,24 @@ namespace FlavorfulStory.AI.NonInteractableNpc
         private void HandleAfterPurchaseTransition()
         {
             var shopLocation = (ShopLocation)_locationManager.GetLocationByName(LocationName.NewShop);
-            if (shopLocation.HasAvailableFurniture() && Random.Range(0, 2) == 0 && !_hadVisitedFurnitureAfterPurchase)
+            if (_shopLock.IsOpen && shopLocation.HasAvailableFurniture() && Random.Range(0, 2) == 0 &&
+                !_hadVisitedFurnitureAfterPurchase)
             {
                 _hadVisitedFurnitureAfterPurchase = true;
                 SetState(NpcStateName.FurnitureSequence);
             }
             else
             {
-                var context = new StateContext();
-                context.Set(FsmContextType.DestinationPoint, _despawnPoint);
-                _nameToCharacterStates[NpcStateName.Movement].SetContext(context);
-                SetState(NpcStateName.Movement);
+                GoToDespawnPoint();
             }
+        }
+
+        public void GoToDespawnPoint()
+        {
+            var context = new StateContext();
+            context.Set(FsmContextType.DestinationPoint, _despawnPoint);
+            _nameToCharacterStates[NpcStateName.Movement].SetContext(context);
+            SetState(NpcStateName.Movement);
         }
 
         /// <summary> Обрабатывает переход после завершения последовательности с мебелью. </summary>
