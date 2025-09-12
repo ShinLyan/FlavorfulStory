@@ -1,0 +1,36 @@
+using FlavorfulStory.AI;
+using FlavorfulStory.QuestSystem;
+using FlavorfulStory.QuestSystem.Objectives;
+using FlavorfulStory.QuestSystem.Objectives.Params;
+
+namespace FlavorfulStory.DialogueSystem.Selectors
+{
+    /// <summary> Селектор диалогов, связанных с квестами. </summary>
+    public class QuestDialogueSelector : IDialogueSelector
+    {
+        /// <summary> Список квестов. </summary>
+        private readonly QuestList _questList;
+
+        /// <summary> Инициализирует селектор с контекстом квестов. </summary>
+        /// <param name="questList"> Контекст выполнения квестов. </param>
+        public QuestDialogueSelector(QuestList questList) => _questList = questList;
+
+        /// <summary> Выбирает подходящий диалог для NPC на основании текущих квестовых целей. </summary>
+        /// <param name="npcInfo"> Информация о NPC, для которого выбирается диалог. </param>
+        /// <returns> Объект диалога или null, если подходящий диалог не найден. </returns>
+        public Dialogue SelectDialogue(NpcInfo npcInfo)
+        {
+            foreach (var questStatus in _questList.QuestStatuses)
+            foreach (var objective in questStatus.CurrentObjectives)
+            {
+                if (questStatus.IsObjectiveComplete(objective)) continue;
+
+                if (objective is { Type: ObjectiveType.Talk, Params: TalkObjectiveParams talkParams } &&
+                    talkParams.NpcName == npcInfo.NpcName)
+                    return talkParams.Dialogue;
+            }
+
+            return null;
+        }
+    }
+}

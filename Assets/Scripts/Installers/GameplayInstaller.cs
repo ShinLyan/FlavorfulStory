@@ -2,6 +2,7 @@
 using FlavorfulStory.AI.NonInteractableNpc;
 using FlavorfulStory.BuildingRepair.UI;
 using FlavorfulStory.DialogueSystem;
+using FlavorfulStory.DialogueSystem.Selectors;
 using FlavorfulStory.DialogueSystem.UI;
 using FlavorfulStory.Economy;
 using FlavorfulStory.GridSystem;
@@ -141,6 +142,14 @@ namespace FlavorfulStory.Installers
             Container.Bind<PlayerSpeaker>().FromComponentInHierarchy().AsSingle();
             Container.Bind<DialogueModelPresenter>().FromComponentInHierarchy().AsSingle();
             Container.Bind<DialogueView>().FromComponentInHierarchy().AsSingle();
+
+            Container.BindInterfacesAndSelfTo<QuestDialogueSelector>().AsSingle();
+            Container.BindInterfacesAndSelfTo<ContextDialogueSelector>().AsSingle();
+
+            Container.BindInterfacesAndSelfTo<GreetingDialogueSelector>().AsSingle();
+            Container.BindInterfacesTo<SaveableServiceBinder<GreetingDialogueSelector>>().AsSingle();
+
+            Container.BindInterfacesAndSelfTo<DialogueService>().AsSingle();
         }
 
         /// <summary> Установить зависимости, связанные с экономикой. </summary>

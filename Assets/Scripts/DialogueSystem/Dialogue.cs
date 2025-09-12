@@ -7,7 +7,7 @@ using UnityEngine;
 namespace FlavorfulStory.DialogueSystem
 {
     /// <summary> Диалог. </summary>
-    [CreateAssetMenu(menuName = "FlavorfulStory/Dialogue")]
+    [CreateAssetMenu(menuName = "FlavorfulStory/DialogueSystem/Dialogue")]
     public class Dialogue : ScriptableObject, ISerializationCallbackReceiver
     {
         /// <summary> Узлы диалога. </summary> 

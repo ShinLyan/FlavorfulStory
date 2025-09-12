@@ -12,19 +12,20 @@ using Zenject;
 namespace FlavorfulStory.DialogueSystem
 {
     /// <summary> Компонент, позволяющий NPC инициировать диалог при взаимодействии с игроком. </summary>
+    [RequireComponent(typeof(InteractableNpc))]
     public class NpcSpeaker : MonoBehaviour, IInteractable, ICursorInteractable
     {
-        /// <summary> Диалог, который будет запущен при взаимодействии с NPC. </summary>
-        [SerializeField] private Dialogue _dialogue;
-
         /// <summary> Компонент диалогов игрока. </summary>
         private PlayerSpeaker _playerSpeaker;
 
         /// <summary> Контроллер игрока. </summary>
-        private PlayerController _playerController; // TODO: Возможно удалить
+        private PlayerController _playerController; // TODO: Удалить после рефакторинга InteractionSystem
 
         /// <summary> Провайдер позиции игрока. </summary>
         private IPlayerPositionProvider _playerPositionProvider;
+
+        /// <summary> Сервис диалогов. </summary>
+        private IDialogueService _dialogueService;
 
         /// <summary> Информация о NPC. </summary>
         public NpcInfo NpcInfo { get; private set; }
@@ -33,23 +34,27 @@ namespace FlavorfulStory.DialogueSystem
         /// <param name="playerSpeaker"> Компонент диалогов игрока. </param>
         /// <param name="playerController"> Контроллер игрока. </param>
         /// <param name="playerPositionProvider"> Провайдер позиции игрока. </param>
+        /// <param name="dialogueService"> Сервис диалогов. </param>
         [Inject]
         private void Construct(PlayerSpeaker playerSpeaker, PlayerController playerController,
-            IPlayerPositionProvider playerPositionProvider)
+            IPlayerPositionProvider playerPositionProvider, IDialogueService dialogueService)
         {
             _playerSpeaker = playerSpeaker;
             _playerController = playerController;
             _playerPositionProvider = playerPositionProvider;
+            _dialogueService = dialogueService;
         }
 
         /// <summary> Инициализация свойств класса. </summary>
         private void Awake()
         {
-            IsInteractionAllowed = true;
             NpcInfo = GetComponent<InteractableNpc>().NpcInfo;
 
             _playerSpeaker.OnDialogueCompleted += OnDialogueCompleted;
         }
+
+        /// <summary> Отписка от событий завершения диалога и окончания дня. </summary>
+        private void OnDestroy() => _playerSpeaker.OnDialogueCompleted -= OnDialogueCompleted;
 
         /// <summary> Обработчик завершения диалога — завершает взаимодействие с NPC. </summary>
         /// <param name="npcName"> Имя NPC. </param>
@@ -62,7 +67,7 @@ namespace FlavorfulStory.DialogueSystem
         public ActionTooltipData ActionTooltip => new("E", ActionType.Talk, $"to {NpcInfo.NpcName}");
 
         /// <summary> Флаг, разрешено ли взаимодействие с NPC. </summary>
-        public bool IsInteractionAllowed { get; private set; }
+        public bool IsInteractionAllowed => IsPlayerInRange(transform.position);
 
         /// <summary> Вычисляет расстояние до другого трансформа. </summary>
         /// <param name="otherTransform"> Трансформ объекта, до которого вычисляется расстояние. </param>
@@ -76,17 +81,19 @@ namespace FlavorfulStory.DialogueSystem
         {
             if (!IsInteractionAllowed) return;
 
-            IsInteractionAllowed = false;
-            _playerSpeaker.StartDialogue(this, _dialogue);
+            var dialogue = _dialogueService.GetDialogue(NpcInfo);
+            if (!dialogue)
+            {
+                player.SetBusyState(false);
+                return;
+            }
+
+            _playerSpeaker.StartDialogue(this, dialogue);
         }
 
         /// <summary> Завершает взаимодействие с NPC. </summary>
         /// <param name="player"> Контроллер игрока, завершающий взаимодействие. </param>
-        public void EndInteraction(PlayerController player)
-        {
-            player.SetBusyState(false);
-            IsInteractionAllowed = true;
-        }
+        public void EndInteraction(PlayerController player) => player.SetBusyState(false);
 
         #endregion
 
@@ -94,22 +101,18 @@ namespace FlavorfulStory.DialogueSystem
 
         /// <summary> Возвращает тип курсора "Диалог" при наведении на NPC. </summary>
         /// <returns> Тип курсора Dialogue. </returns>
-        public CursorType CursorType => IsPlayerInRange(transform.position)
-            ? CursorType.DialogueAvailable
-            : CursorType.DialogueNotAvailable;
+        public CursorType CursorType =>
+            IsInteractionAllowed ? CursorType.DialogueAvailable : CursorType.DialogueNotAvailable;
 
         /// <summary> Обрабатывает взаимодействие игрока с NPC: запускает диалог по правому клику. </summary>
         /// <param name="controller"> Контроллер игрока, инициирующий взаимодействие. </param>
         /// <returns> <c>true</c>, если взаимодействие обработано. </returns>
         public bool TryInteractWithCursor(PlayerController controller)
         {
-            if (!_dialogue) return false;
-
-            if (!IsPlayerInRange(transform.position) || !InputWrapper.GetRightMouseButtonDown()) return true;
+            if (!IsInteractionAllowed || !InputWrapper.GetRightMouseButtonDown()) return false;
 
             BeginInteraction(controller);
             controller.SetBusyState(true);
-
             return true;
         }
 

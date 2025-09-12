@@ -34,7 +34,6 @@ namespace FlavorfulStory.TimeManagement
         /// <summary> Игра на паузе? </summary>
         public static bool IsPaused { get; private set; }
 
-        //TODO: вот эти поля вынести в конфиг(static_data) и прокидывать через ConfigInstaller. *По аналогии с уведомлениями*
         /// <summary> Раз в сколько игровых минут происходит тик времени. </summary>
         private const float TimeBetweenTicks = 5f;
 

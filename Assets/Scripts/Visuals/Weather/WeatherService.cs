@@ -38,7 +38,7 @@ namespace FlavorfulStory.Visuals.Weather
         private ParticleSystem _activeParticle;
 
         /// <summary> Получает текущий тип погоды. </summary>
-        public WeatherType CurrentWeatherType => _currentWeather.WeatherType;
+        public static WeatherType CurrentWeatherType { get; private set; }
 
         /// <summary> Инициализирует сервис погоды. </summary>
         /// <param name="config"> Конфигурация погоды. </param>
@@ -78,6 +78,7 @@ namespace FlavorfulStory.Visuals.Weather
             if (!_weatherByDay.ContainsKey(day)) _weatherByDay[day] = GenerateRandomWeather();
 
             _currentWeather = _weatherByDay[day];
+            CurrentWeatherType = _currentWeather.WeatherType;
             _lightSystem.SetLightSettings(_currentWeather.WeatherType);
             UpdateWeatherParticles();
         }

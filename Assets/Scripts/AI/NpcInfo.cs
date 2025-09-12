@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using FlavorfulStory.DialogueSystem;
+using UnityEngine;
 
 namespace FlavorfulStory.AI
 {
@@ -21,5 +22,9 @@ namespace FlavorfulStory.AI
         /// <summary> Иконка NPC для отображения в UI. </summary>
         [field: Tooltip("Иконка NPC для отображения в UI."), SerializeField]
         public Sprite Icon { get; private set; }
+
+        /// <summary> Конфиг, содержащий приветственные и контекстные диалоги. </summary>
+        [field: Tooltip("Конфиг, содержащий приветственные и контекстные диалоги."), SerializeField]
+        public DialogueConfig DialogueConfig { get; private set; }
     }
 }

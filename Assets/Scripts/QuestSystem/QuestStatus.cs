@@ -19,7 +19,7 @@ namespace FlavorfulStory.QuestSystem
         private List<QuestStage> _stages;
 
         /// <summary> Индекс текущего этапа квеста. </summary>
-        public int CurrentStageIndex { get; set; }
+        public int CurrentStageIndex { get; private set; }
 
         /// <summary> Текущие цели из активного этапа квеста. </summary>
         public IEnumerable<QuestObjective> CurrentObjectives =>

@@ -9,8 +9,7 @@ namespace FlavorfulStory.DialogueSystem
     public class DialogueTrigger : MonoBehaviour
     {
         /// <summary> Список действий и соответствующих событий. </summary>
-        [field: SerializeField]
-        public List<DialogueEvent> DialogueEvents { get; private set; }
+        [field: SerializeField] public List<DialogueEvent> DialogueEvents { get; private set; }
 
         /// <summary> Выполнить событие, если действие совпадает с одним из зарегистрированных. </summary>
         /// <param name="actionToTrigger"> Имя действия, пришедшее из узла диалога. </param>
@@ -18,8 +17,8 @@ namespace FlavorfulStory.DialogueSystem
         {
             if (string.IsNullOrEmpty(actionToTrigger)) return;
 
-            foreach (var dialogueEvent in DialogueEvents
-                         .Where(dialogueEvent => dialogueEvent.ActionName == actionToTrigger))
+            foreach (var dialogueEvent in DialogueEvents.Where(dialogueEvent =>
+                         dialogueEvent.ActionName == actionToTrigger))
                 dialogueEvent.OnTrigger?.Invoke();
         }
     }
