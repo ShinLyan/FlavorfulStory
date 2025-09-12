@@ -56,28 +56,7 @@ namespace FlavorfulStory.AI.NonInteractableNpc
 
             _stateController = new NonInteractableNpcStateController(MovementController, _locationManager,
                 AnimationController, _transactionService, transform, GetComponent<NpcPurchaseIndicator>(),
-                _shopLock);
-        }
-
-        protected override void Start()
-        {
-            base.Start();
-
-            _signalBus.Subscribe<ShopStateChangedSignal>(OnShopStateChanged);
-        }
-
-        protected override void OnDestroy()
-        {
-            base.OnDestroy();
-
-            _signalBus.Unsubscribe<ShopStateChangedSignal>(OnShopStateChanged);
-        }
-
-        /// <summary> Изменение состояния магазина. </summary>
-        /// <param name="signal"> Сигнал. </param>
-        private void OnShopStateChanged(ShopStateChangedSignal signal)
-        {
-            if (!signal.IsOpen) _stateController.GoToDespawnPoint();
+                _shopLock, _signalBus);
         }
 
         /// <summary> Устанавливает цель для перемещения NPC с автоматическим запуском

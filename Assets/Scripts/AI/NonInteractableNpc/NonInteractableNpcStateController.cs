@@ -8,6 +8,7 @@ using FlavorfulStory.SceneManagement;
 using FlavorfulStory.Shop;
 using FlavorfulStory.TimeManagement;
 using UnityEngine;
+using Zenject;
 using AnimationState = FlavorfulStory.AI.FSM.AnimationState;
 using Showcase = FlavorfulStory.Shop.Showcase;
 
@@ -38,6 +39,9 @@ namespace FlavorfulStory.AI.NonInteractableNpc
         /// <summary> Замок магазина. </summary>
         private readonly ShopLock _shopLock;
 
+        /// <summary> Сигнальная шина. </summary>
+        private readonly SignalBus _signalBus;
+
         /// <summary> Инициализирует новый экземпляр контроллера состояний для неинтерактивного NPC. </summary>
         /// <param name="npcMovementController"> Контроллер движения NPC, отвечающий за перемещение персонажа. </param>
         /// <param name="locationManager"> Менеджер локаций для получения информации о местоположениях. </param>
@@ -46,10 +50,11 @@ namespace FlavorfulStory.AI.NonInteractableNpc
         /// <param name="npcTransform"> Transform NPC для определения позиции. </param>
         /// <param name="npcPurchaseIndicator"> Индикатаор покупки. </param>
         /// <param name="shopLock"> Замок магазина. </param>
+        /// <param name="signalBus"> Сигнальная шина. </param>
         public NonInteractableNpcStateController(NpcMovementController npcMovementController,
             LocationManager locationManager, NpcAnimationController npcAnimationController,
             TransactionService transactionService, Transform npcTransform, NpcPurchaseIndicator npcPurchaseIndicator,
-            ShopLock shopLock)
+            ShopLock shopLock, SignalBus signalBus)
             : base(npcAnimationController, npcTransform)
         {
             _npcMovementController = npcMovementController;
@@ -57,6 +62,7 @@ namespace FlavorfulStory.AI.NonInteractableNpc
             _transactionService = transactionService;
             _purchaseIndicator = npcPurchaseIndicator;
             _shopLock = shopLock;
+            _signalBus = signalBus;
 
             _hadVisitedFurnitureAfterPurchase = false;
             _despawnPoint = new NpcDestinationPoint();
@@ -68,6 +74,14 @@ namespace FlavorfulStory.AI.NonInteractableNpc
             base.Initialize();
 
             InitializeStates();
+            _signalBus.Subscribe<ShopStateChangedSignal>(OnShopStateChanged);
+        }
+
+        public override void Dispose()
+        {
+            base.Dispose();
+
+            _signalBus.Unsubscribe<ShopStateChangedSignal>(OnShopStateChanged);
         }
 
         /// <summary> Инициализирует все состояния и последовательности NPC. </summary>
@@ -75,6 +89,24 @@ namespace FlavorfulStory.AI.NonInteractableNpc
         {
             CreateStates();
             CreateSequences();
+        }
+
+        /// <summary> Изменение состояния магазина. </summary>
+        /// <param name="signal"> Сигнал. </param>
+        private void OnShopStateChanged(ShopStateChangedSignal signal)
+        {
+            if (!signal.IsOpen)
+            {
+                UnsubscribeSequences();
+                ((SequenceState)_nameToCharacterStates[NpcStateName.BuyItemSequence]).OnSequenceEnded +=
+                    GoToDespawnPoint;
+
+                if (CurrentNpcStateName != NpcStateName.BuyItemSequence) GoToDespawnPoint();
+            }
+            else
+            {
+                SubscribeSequences();
+            }
         }
 
         /// <summary> Создает все базовые состояния NPC. </summary>
@@ -135,6 +167,12 @@ namespace FlavorfulStory.AI.NonInteractableNpc
                     _nameToCharacterStates[NpcStateName.Movement], _nameToCharacterStates[NpcStateName.Animation],
                     _nameToCharacterStates[NpcStateName.ReleaseObject]
                 }));
+        }
+
+        /// <summary> Подписать последовательности. </summary>
+        private void SubscribeSequences()
+        {
+            UnsubscribeSequences();
 
             ((SequenceState)_nameToCharacterStates[NpcStateName.BuyItemSequence]).OnSequenceEnded +=
                 HandleAfterPurchaseTransition;
@@ -143,6 +181,19 @@ namespace FlavorfulStory.AI.NonInteractableNpc
             ((SequenceState)_nameToCharacterStates[NpcStateName.RefuseItemSequence]).OnSequenceEnded +=
                 StartRandomSequence;
             ((SequenceState)_nameToCharacterStates[NpcStateName.RandomPointSequence]).OnSequenceEnded +=
+                StartRandomSequence;
+        }
+
+        /// <summary> Отписать последовательности. </summary>
+        private void UnsubscribeSequences()
+        {
+            ((SequenceState)_nameToCharacterStates[NpcStateName.BuyItemSequence]).OnSequenceEnded -=
+                HandleAfterPurchaseTransition;
+            ((SequenceState)_nameToCharacterStates[NpcStateName.FurnitureSequence]).OnSequenceEnded -=
+                HandleAfterFurnitureSequence;
+            ((SequenceState)_nameToCharacterStates[NpcStateName.RefuseItemSequence]).OnSequenceEnded -=
+                StartRandomSequence;
+            ((SequenceState)_nameToCharacterStates[NpcStateName.RandomPointSequence]).OnSequenceEnded -=
                 StartRandomSequence;
         }
 
@@ -200,8 +251,7 @@ namespace FlavorfulStory.AI.NonInteractableNpc
         private void HandleAfterPurchaseTransition()
         {
             var shopLocation = (ShopLocation)_locationManager.GetLocationByName(LocationName.NewShop);
-            if (_shopLock.IsOpen && shopLocation.HasAvailableFurniture() && Random.Range(0, 2) == 0 &&
-                !_hadVisitedFurnitureAfterPurchase)
+            if (shopLocation.HasAvailableFurniture() && Random.Range(0, 2) == 0 && !_hadVisitedFurnitureAfterPurchase)
             {
                 _hadVisitedFurnitureAfterPurchase = true;
                 SetState(NpcStateName.FurnitureSequence);

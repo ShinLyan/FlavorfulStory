@@ -20,9 +20,6 @@ namespace FlavorfulStory.AI.BaseNpc
         /// <summary> Текущая целевая точка расписания. </summary>
         private NpcDestinationPoint _currentTargetPoint;
 
-        /// <summary> NPC двигается? </summary>
-        private bool _isMoving;
-
         /// <summary> Дистанция, на которой считается что цель достигнута. </summary>
         private const float ArrivalDistance = 0.1f;
 
@@ -49,7 +46,7 @@ namespace FlavorfulStory.AI.BaseNpc
         {
             HandleOffMeshLink();
 
-            if (!_isMoving) return;
+            if (_agent.isStopped) return;
 
             _agent.speed = DefaultSpeed * WorldTime.MovementSpeedMultiplier;
             HandleArrival();
@@ -70,7 +67,7 @@ namespace FlavorfulStory.AI.BaseNpc
         /// <param name="point"> Целевая точка назначения. </param>
         public void MoveTo(NpcDestinationPoint point)
         {
-            _isMoving = true;
+            SetAgentStopped(false);
 
             _currentTargetPoint = point;
             _agent.SetDestination(point.Position);
@@ -85,19 +82,25 @@ namespace FlavorfulStory.AI.BaseNpc
 
             _agent.transform.rotation = _currentTargetPoint.Rotation;
             OnDestinationReached?.Invoke();
-            Stop();
         }
 
         /// <summary> Останавливает навигацию NPC. </summary>
         /// <param name="warpToSpawn"> Если true, телепортирует NPC на точку спавна. </param>
         public void Stop(bool warpToSpawn = false)
         {
-            _isMoving = false;
+            SetAgentStopped(true);
 
             if (!warpToSpawn) return;
 
             _agent.Warp(_spawnPosition);
             _currentTargetPoint = new NpcDestinationPoint();
+        }
+
+        /// <summary> Включает или отключает движение агента. </summary>
+        /// <param name="isStopped"> True — остановить агента; False — продолжить движение. </param>
+        private void SetAgentStopped(bool isStopped)
+        {
+            if (_agent.isOnNavMesh) _agent.isStopped = isStopped;
         }
     }
 }
