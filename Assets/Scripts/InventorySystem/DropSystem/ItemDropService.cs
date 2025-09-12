@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using FlavorfulStory.Infrastructure.Factories;
+using FlavorfulStory.Utils.Factories;
 using FlavorfulStory.PickupSystem;
 using FlavorfulStory.Saving;
 using UnityEngine;

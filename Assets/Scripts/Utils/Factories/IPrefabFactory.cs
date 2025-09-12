@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace FlavorfulStory.Infrastructure.Factories
+namespace FlavorfulStory.Utils.Factories
 {
     /// <summary> Интерфейс фабрики для создания и удаления префабов. </summary>
     /// <typeparam name="T"> Тип компонента. </typeparam>

@@ -1,4 +1,4 @@
-﻿using FlavorfulStory.Infrastructure.Factories;
+﻿using FlavorfulStory.Utils.Factories;
 using FlavorfulStory.InventorySystem;
 using FlavorfulStory.Saving;
 using UnityEngine;

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using FlavorfulStory.Infrastructure;
-using FlavorfulStory.Infrastructure.Factories;
+using FlavorfulStory.Utils.Factories;
 using UnityEngine;
 using Zenject;
 

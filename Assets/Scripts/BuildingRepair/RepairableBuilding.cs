@@ -4,6 +4,7 @@ using System.Linq;
 using FlavorfulStory.Actions;
 using FlavorfulStory.Audio;
 using FlavorfulStory.BuildingRepair.UI;
+using FlavorfulStory.Economy;
 using FlavorfulStory.InteractionSystem;
 using FlavorfulStory.InventorySystem;
 using FlavorfulStory.ObjectManagement;
@@ -41,6 +42,9 @@ namespace FlavorfulStory.BuildingRepair
         /// <summary> Провайдер окон. </summary>
         private IInventoryProvider _inventoryProvider;
 
+        /// <summary> Хранилище валюты игрока. </summary>
+        private ICurrencyStorage _playerWallet;
+
         /// <summary> Текущая стадия ремонта. </summary>
         private RepairStage CurrentStage => _buildingData.Stages[_repairStageIndex];
 
@@ -58,11 +62,14 @@ namespace FlavorfulStory.BuildingRepair
         /// <summary> Внедрение зависимостей Zenject. </summary>
         /// <param name="windowService"> Сервис окон. </param>
         /// <param name="inventoryProvider"> Провайдер инвентарей. </param>
+        /// <param name="playerWallet"> Хранилище валюты игрока. </param>
         [Inject]
-        private void Construct(IWindowService windowService, IInventoryProvider inventoryProvider)
+        private void Construct(IWindowService windowService, IInventoryProvider inventoryProvider,
+            [Inject(Id = "Player")] ICurrencyStorage playerWallet)
         {
             _windowService = windowService;
             _inventoryProvider = inventoryProvider;
+            _playerWallet = playerWallet;
         }
 
         /// <summary> Инициализация компонента. </summary>
@@ -122,6 +129,8 @@ namespace FlavorfulStory.BuildingRepair
         private void Build()
         {
             if (IsRepairCompleted) return;
+
+            if (!_playerWallet.TrySpend(CurrentStage.RepairCost)) return;
 
             _repairStageIndex++;
             _objectSwitcher.SwitchTo(_repairStageIndex);

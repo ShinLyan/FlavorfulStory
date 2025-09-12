@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using DG.Tweening;
-using FlavorfulStory.Infrastructure.Factories;
+using FlavorfulStory.Utils.Factories;
 using UnityEngine;
 using Zenject;
 

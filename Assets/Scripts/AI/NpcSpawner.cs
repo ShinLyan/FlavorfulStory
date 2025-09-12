@@ -2,7 +2,7 @@
 using Cysharp.Threading.Tasks;
 using FlavorfulStory.AI.BaseNpc;
 using FlavorfulStory.Infrastructure;
-using FlavorfulStory.Infrastructure.Factories;
+using FlavorfulStory.Utils.Factories;
 using FlavorfulStory.SceneManagement;
 using FlavorfulStory.Shop;
 using FlavorfulStory.TimeManagement;

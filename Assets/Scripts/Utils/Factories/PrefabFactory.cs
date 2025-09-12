@@ -3,7 +3,7 @@ using UnityEngine;
 using Zenject;
 using Object = UnityEngine.Object;
 
-namespace FlavorfulStory.Infrastructure.Factories
+namespace FlavorfulStory.Utils.Factories
 {
     /// <summary> Базовый класс фабрики объектов, поддерживающий создание и уничтожение компонентов. </summary>
     public class PrefabFactory<T> : IPrefabFactory<T> where T : Component

@@ -5,7 +5,7 @@ using FlavorfulStory.DialogueSystem;
 using FlavorfulStory.DialogueSystem.UI;
 using FlavorfulStory.Economy;
 using FlavorfulStory.GridSystem;
-using FlavorfulStory.Infrastructure.Factories;
+using FlavorfulStory.Utils.Factories;
 using FlavorfulStory.InteractionSystem;
 using FlavorfulStory.InventorySystem;
 using FlavorfulStory.InventorySystem.DropSystem;
@@ -131,7 +131,7 @@ namespace FlavorfulStory.Installers
         private void BindBuildingRepair()
         {
             Container.Bind<IPrefabFactory<ResourceRequirementView>>()
-                .To<Infrastructure.Factories.PrefabFactory<ResourceRequirementView>>().AsSingle()
+                .To<Utils.Factories.PrefabFactory<ResourceRequirementView>>().AsSingle()
                 .WithArguments(_requirementViewPrefab);
         }
 
@@ -167,7 +167,7 @@ namespace FlavorfulStory.Installers
         {
             Container.Bind<Equipment>().FromComponentInHierarchy().AsSingle();
 
-            Container.Bind<IPrefabFactory<Pickup>>().To<Infrastructure.Factories.PrefabFactory<Pickup>>().AsSingle();
+            Container.Bind<IPrefabFactory<Pickup>>().To<Utils.Factories.PrefabFactory<Pickup>>().AsSingle();
 
             Container.BindInterfacesAndSelfTo<ItemDropService>().AsSingle().WithArguments(_itemDropContainer);
             Container.BindInterfacesTo<SaveableServiceBinder<ItemDropService>>().AsSingle();
@@ -175,7 +175,7 @@ namespace FlavorfulStory.Installers
             Container.BindInterfacesTo<InventoryProvider>().AsSingle().NonLazy();
 
             Container.Bind<IPrefabFactory<InventorySlotView>>()
-                .To<Infrastructure.Factories.PrefabFactory<InventorySlotView>>().AsSingle()
+                .To<Utils.Factories.PrefabFactory<InventorySlotView>>().AsSingle()
                 .WithArguments(_inventorySlotViewPrefab);
 
             Container.BindInterfacesTo<ToolUseController>().AsSingle();
@@ -207,7 +207,7 @@ namespace FlavorfulStory.Installers
         {
             Container.Bind<PlacementPreview>().FromComponentInHierarchy().AsSingle();
             Container.Bind<IPrefabFactory<PlaceableObject>>()
-                .To<Infrastructure.Factories.PrefabFactory<PlaceableObject>>().AsSingle();
+                .To<Utils.Factories.PrefabFactory<PlaceableObject>>().AsSingle();
 
             Container.BindInterfacesAndSelfTo<PlacementController>().AsSingle().WithArguments(_placeableContainer);
             Container.BindInterfacesTo<PlaceableObjectProvider>().AsSingle().WithArguments(new List<PlaceableObject>
@@ -230,7 +230,7 @@ namespace FlavorfulStory.Installers
             Container.Bind<QuestList>().FromComponentInHierarchy().AsSingle();
             Container.Bind<IQuestList>().To<QuestList>().FromResolve();
             Container.Bind<IPrefabFactory<QuestListButton>>()
-                .To<Infrastructure.Factories.PrefabFactory<QuestListButton>>().AsSingle()
+                .To<Utils.Factories.PrefabFactory<QuestListButton>>().AsSingle()
                 .WithArguments(_questListButtonPrefab);
             Container.Bind<QuestDescriptionView>().FromComponentInHierarchy().AsSingle();
 
@@ -282,7 +282,7 @@ namespace FlavorfulStory.Installers
             Container.Bind<CinemachineCamera>().FromInstance(_teleportVirtualCamera).AsSingle();
 
             Container.Bind<IPrefabFactory<NonInteractableNpc>>()
-                .To<Infrastructure.Factories.PrefabFactory<NonInteractableNpc>>().AsSingle();
+                .To<Utils.Factories.PrefabFactory<NonInteractableNpc>>().AsSingle();
         }
     }
 }
