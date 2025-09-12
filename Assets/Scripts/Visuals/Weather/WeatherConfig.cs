@@ -7,6 +7,6 @@ namespace FlavorfulStory.Visuals.Weather
     public class WeatherConfig : ScriptableObject
     {
         /// <summary> Массив настроек погодных условий. </summary>
-        public WeatherSettings[] WeatherSettings;
+        [field: SerializeField] public WeatherSettings[] WeatherSettings { get; private set; }
     }
 }

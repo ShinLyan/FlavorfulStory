@@ -57,21 +57,21 @@ namespace FlavorfulStory.Installers
         [SerializeField] private ItemTooltipView _itemTooltipPrefab;
 
         /// <summary> Префаб отображения ячейки инвентаря. </summary>
-        [Header("Inventory")] 
+        [Header("Inventory")]
         [SerializeField] private InventorySlotView _inventorySlotViewPrefab;
 
         /// <summary> Родительский контейнер для выбрасываемых предметов. </summary>
         [SerializeField] private Transform _itemDropContainer;
 
         /// <summary> Индикатор клетки на гриде. </summary>
-        [Header("Placement System")] 
+        [Header("Placement System")]
         [SerializeField] private GameObject _gridIndicator;
 
         /// <summary> Родительский контейнер для размещаемых объектов. </summary>
         [SerializeField] private Transform _placeableContainer;
 
         /// <summary> Сопоставления типов инструментов с их префабами для визуализации в руке игрока. </summary>
-        [Header("Tools")] 
+        [Header("Tools")]
         [SerializeField] private ToolPrefabMapping[] _toolMappings;
 
         /// <summary> Слои, по которым производится удар с помощью инструмента. </summary>
@@ -266,11 +266,11 @@ namespace FlavorfulStory.Installers
             Container.Bind<ItemTooltipView>().FromInstance(_itemTooltipPrefab).AsSingle();
         }
 
+        /// <summary> Установить зависимости, связанные с визуалом. </summary>
         private void BindVisuals()
         {
             Container.BindInterfacesAndSelfTo<WeatherService>().AsSingle()
                 .WithArguments(_weatherConfig, _particleParent);
-
             Container.BindInterfacesTo<SaveableServiceBinder<WeatherService>>().AsSingle();
 
             Container.Bind<GlobalLightSystem>().FromComponentInHierarchy().AsSingle();

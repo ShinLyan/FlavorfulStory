@@ -127,16 +127,15 @@ namespace FlavorfulStory.Visuals.Weather
         /// <param name="state"> Сохраненное состояние. </param>
         public void RestoreState(object state)
         {
-            var saved = state as Dictionary<int, WeatherType>;
-            _weatherByDay.Clear();
+            if (state is not Dictionary<int, WeatherType> records) return;
 
-            if (saved != null)
-                foreach (var kvp in saved)
-                {
-                    var setting = _config.WeatherSettings.FirstOrDefault(weatherSettings =>
-                        weatherSettings.WeatherType == kvp.Value);
-                    if (setting != null) _weatherByDay[kvp.Key] = setting;
-                }
+            _weatherByDay.Clear();
+            foreach (var kvp in records)
+            {
+                var setting = _config.WeatherSettings.FirstOrDefault(weatherSettings =>
+                    weatherSettings.WeatherType == kvp.Value);
+                if (setting != null) _weatherByDay[kvp.Key] = setting;
+            }
 
             ApplyWeatherForDay(WorldTime.CurrentGameTime);
         }
