@@ -26,7 +26,7 @@ namespace FlavorfulStory.Visuals.Weather
         private readonly LocationManager _locationManager;
 
         /// <summary> Родительский объект для частиц. </summary>
-        private readonly GameObject _particleParent;
+        private readonly Transform _particleParent;
 
         /// <summary> Словарь погодных условий по дням. </summary>
         private readonly Dictionary<int, WeatherSettings> _weatherByDay = new();
@@ -38,14 +38,14 @@ namespace FlavorfulStory.Visuals.Weather
         private ParticleSystem _activeParticle;
 
         /// <summary> Получает текущий тип погоды. </summary>
-        public WeatherType CurrentWeatherType => _currentWeather?.WeatherType ?? WeatherType.Clear;
+        public WeatherType CurrentWeatherType => _currentWeather.WeatherType;
 
         /// <summary> Инициализирует сервис погоды. </summary>
         /// <param name="config"> Конфигурация погоды. </param>
         /// <param name="particleParent"> Родитель для частиц. </param>
         /// <param name="lightSystem"> Система освещения. </param>
         /// <param name="locationManager"> Менеджер локаций. </param>
-        public WeatherService(WeatherConfig config, GameObject particleParent, GlobalLightSystem lightSystem,
+        public WeatherService(WeatherConfig config, Transform particleParent, GlobalLightSystem lightSystem,
             LocationManager locationManager)
         {
             _config = config;
@@ -88,15 +88,13 @@ namespace FlavorfulStory.Visuals.Weather
             if (_activeParticle) Object.Destroy(_activeParticle.gameObject);
 
             if (_currentWeather.ParticleObject)
-                _activeParticle = Object.Instantiate(_currentWeather.ParticleObject, _particleParent.transform);
+                _activeParticle = Object.Instantiate(_currentWeather.ParticleObject, _particleParent);
         }
 
         /// <summary> Обновляет видимость частиц при смене локации. </summary>
         /// <param name="location"> Новая локация. </param>
-        private void UpdateParticleVisibility(Location location)
-        {
-            if (_particleParent) _particleParent.SetActive(!location.IsRoom);
-        }
+        private void UpdateParticleVisibility(Location location) =>
+            _particleParent.gameObject.SetActive(!location.IsRoom);
 
         /// <summary> Генерирует случайные погодные условия. </summary>
         /// <returns> Настройки погоды. </returns>
@@ -135,7 +133,8 @@ namespace FlavorfulStory.Visuals.Weather
             if (saved != null)
                 foreach (var kvp in saved)
                 {
-                    var setting = _config.WeatherSettings.FirstOrDefault(s => s.WeatherType == kvp.Value);
+                    var setting = _config.WeatherSettings.FirstOrDefault(weatherSettings =>
+                        weatherSettings.WeatherType == kvp.Value);
                     if (setting != null) _weatherByDay[kvp.Key] = setting;
                 }
 

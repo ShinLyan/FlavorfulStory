@@ -80,9 +80,9 @@ namespace FlavorfulStory.Installers
         /// <summary> Конфигурация погодных условий. </summary>
         [Header("Visuals")]
         [SerializeField] private WeatherConfig _weatherConfig;
-        
+
         /// <summary> Родительский объект для погодных частиц. </summary>
-        [SerializeField] private GameObject _particleParent;
+        [SerializeField] private Transform _particleParent;
 
         #endregion
 
@@ -268,8 +268,7 @@ namespace FlavorfulStory.Installers
 
         private void BindVisuals()
         {
-            Container.BindInterfacesAndSelfTo<WeatherService>()
-                .AsSingle()
+            Container.BindInterfacesAndSelfTo<WeatherService>().AsSingle()
                 .WithArguments(_weatherConfig, _particleParent);
 
             Container.BindInterfacesTo<SaveableServiceBinder<WeatherService>>().AsSingle();
