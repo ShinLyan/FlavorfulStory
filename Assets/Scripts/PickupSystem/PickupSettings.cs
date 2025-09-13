@@ -12,7 +12,7 @@ namespace FlavorfulStory.PickupSystem
         public float PickupActivationDelay { get; private set; }
         
         /// <summary> Задержка активации магнетизма предмета. </summary>
-        /// <remarks> В секундах. </remarks>
+        /// <remarks> В секундах. Отсчет начинаетися после окончания задержки подбора. </remarks>
         [field: SerializeField, Tooltip("Задержка активации магнетизма предмета.")]
         public float MagnetActivationDelay { get; private set; }
         
