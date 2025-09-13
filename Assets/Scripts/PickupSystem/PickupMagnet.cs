@@ -1,136 +1,124 @@
+using System;
+using System.Threading;
+using UnityEngine;
+using Cysharp.Threading.Tasks;
 using FlavorfulStory.GridSystem;
 using FlavorfulStory.InventorySystem;
 using FlavorfulStory.Player;
-using FlavorfulStory.TimeManagement;
-using UnityEngine;
-using Zenject;
 
 namespace FlavorfulStory.PickupSystem
 {
-    /// <summary> Отвечает за автоматическое притягивание предмета к игроку. </summary>
-    [RequireComponent(typeof(Pickup))]
-    public class PickupMagnet : MonoBehaviour
+    /// <summary> Обеспечивает автоматическое притягивание предмета к игроку при выполнении условий. </summary>
+    public class PickupMagnet
     {
-        /// <summary> Максимальная дистанция для притягивания (в тайлах). </summary>
-        [SerializeField, Tooltip("Максимальная дистанция для примагничивания (в тайлах).")]
-        private float _magnetRangeTiles = 3f;
+        /// <summary> Смещение позиции игрока вверх, чтобы предмет не въезжал в ноги. </summary>
+        private readonly Vector3 _playerOffset = new(0f, 0.5f, 0f);
 
-        /// <summary> Скорость движения предмета к игроку (в тайлах/секунду). </summary>
-        [SerializeField, Tooltip("Скорость движения к игроку (в тайлах/сек).")]
-        private float _magnetSpeedTiles = 9f;
-
-        /// <summary> Смещение вверх при движении к игроку, чтобы предмет не въезжал в ноги. </summary>
-        private readonly Vector3 _playerPositionOffset = new(0f, 0.5f, 0f);
-
+        /// <summary> Трансформ объекта предмета. </summary>
+        private readonly Transform _transform;
+        /// <summary> Rigidbody предмета, используемый для отключения физики во время притягивания. </summary>
+        private readonly Rigidbody _rigidbody;
+        /// <summary> Все коллайдеры предмета, включая триггер и физические. </summary>
+        private readonly Collider[] _colliders;
+        /// <summary> Компонент Pickup, содержащий данные предмета и флаг CanBePickedUp. </summary>
+        private readonly Pickup _pickup;
         /// <summary> Провайдер позиции игрока. </summary>
-        private IPlayerPositionProvider _playerPositionProvider;
-
-        /// <summary> Ссылка на инвентарь игрока. </summary>
-        private IInventoryProvider _inventoryProvider;
-
-        /// <summary> Компонент Pickup, отвечающий за предмет. </summary>   
-        private Pickup _pickup;
-
-        /// <summary> Rigidbody предмета. </summary>
-        private Rigidbody _rigidbody;
-
-        /// <summary> Коллайдер триггера, используемый для захвата предмета. </summary>
-        private SphereCollider _pickupTrigger;
-
-        /// <summary> Все коллайдеры на предмете (включая вложенные). </summary>
-        private Collider[] _colliders;
-
-        /// <summary> Флаг, указывающий, что запланировано начало притягивания. </summary>
-        private bool _isScheduled;
-
+        private readonly IPlayerPositionProvider _playerPositionProvider;
+        /// <summary> Инвентарь игрока, в который будет добавлен предмет. </summary>
+        private readonly Inventory _playerInventory;
+        
+        /// <summary> Настройки поведения притягивания предметов. </summary>
+        private PickupSettings _pickupSettings;
+        
+        /// <summary> Источник отмены для текущей задачи притягивания. </summary>
+        private CancellationTokenSource _cts;
         /// <summary> Флаг, указывающий, что предмет сейчас летит к игроку. </summary>
         private bool _isFlying;
-
-        /// <summary> Время ожидания до начала притягивания. </summary>
-        private float _delayTimer;
-
-        /// <summary> Внедрение зависимостей Zenject. </summary>
-        /// <param name="playerPositionProvider">  Провайдер позиции игрока. </param>
-        /// <param name="inventoryProvider"> Инвентарь игрока. </param>
-        [Inject]
-        private void Construct(IPlayerPositionProvider playerPositionProvider, IInventoryProvider inventoryProvider)
+        
+        /// <summary> Конструктор притягивателя. </summary>
+        /// <param name="pickup"> Ссылка на компонент Pickup. </param>
+        /// <param name="transform"> Transform объекта предмета. </param>
+        /// <param name="rigidbody"> Rigidbody предмета. </param>
+        /// <param name="colliders"> Массив всех коллайдеров предмета. </param>
+        /// <param name="playerPositionProvider"> Провайдер позиции игрока. </param>
+        /// <param name="inventoryProvider"> Провайдер инвентарей, откуда берётся инвентарь игрока. </param>
+        /// <param name="pickupSettings"> Настройки притягивания предметов. </param>
+        public PickupMagnet(
+            Pickup pickup,
+            Transform transform,
+            Rigidbody rigidbody,
+            Collider[] colliders,
+            IPlayerPositionProvider playerPositionProvider,
+            IInventoryProvider inventoryProvider,
+            PickupSettings pickupSettings)
         {
+            _pickup = pickup;
+            _transform = transform;
+            _rigidbody = rigidbody;
+            _colliders = colliders;
             _playerPositionProvider = playerPositionProvider;
-            _inventoryProvider = inventoryProvider;
+            _playerInventory = inventoryProvider.GetPlayerInventory();
+            _pickupSettings = pickupSettings;
+
+            _playerInventory.InventoryUpdated += OnInventoryChanged;
         }
 
-        /// <summary> Инициализация компонентов при создании объекта. </summary>
-        private void Awake()
+        /// <summary> Планирует запуск притягивания, если предмет может быть притянут. </summary>
+        public void ScheduleMagnet()
         {
-            _pickup = GetComponent<Pickup>();
-            _rigidbody = GetComponent<Rigidbody>();
-            _colliders = GetComponentsInChildren<Collider>(true);
+            if (_isFlying || !_pickup.CanBePickedUp)
+                return;
 
-            _pickupTrigger = FindTriggerCollider(_colliders);
+            _cts?.Cancel();
+            _cts = new CancellationTokenSource();
+
+            CheckNearbyAsync(_cts.Token).Forget();
+        }
+        
+        /// <summary> Вызывается при изменении инвентаря. Повторно запускает магнит, если возможно. </summary
+        private void OnInventoryChanged()
+        {
+            if (!_isFlying && CanStartMagnet()) ScheduleMagnet();
+        }
+        
+        /// <summary> Освобождает ресурсы и отписывается от событий. </summary>
+        public void Dispose()
+        {
+            _playerInventory.InventoryUpdated -= OnInventoryChanged;
+            CancelFlying();
         }
 
-        /// <summary> Ищет и возвращает триггерный <see cref="SphereCollider"/> среди всех коллайдеров объекта. </summary>
-        /// <param name="colliders"> Массив коллайдеров. </param>
-        /// <returns> Триггерный <see cref="SphereCollider"/> или <c>null</c>, если не найден. </returns>
-        private static SphereCollider FindTriggerCollider(Collider[] colliders)
+        /// <summary> Асинхронно проверяет, может ли предмет начать притягиваться, с периодическими интервалами. </summary>
+        /// <param name="token"> Токен отмены для прерывания задачи. </param>
+        private async UniTaskVoid CheckNearbyAsync(CancellationToken token)
         {
-            foreach (var collider in colliders)
-                if (collider is SphereCollider { isTrigger: true } trigger)
-                    return trigger;
-
-            Debug.LogWarning("[PickupMagnet] No trigger SphereCollider found.");
-            return null;
-        }
-
-        /// <summary> Подписка на события при включении объекта. </summary>
-        private void OnEnable() => _inventoryProvider.GetPlayerInventory().InventoryUpdated += OnInventoryChanged;
-
-        /// <summary> Отписка от событий при отключении объекта. </summary>
-        private void OnDisable() => _inventoryProvider.GetPlayerInventory().InventoryUpdated -= OnInventoryChanged;
-
-        /// <summary> Коллбэк при изменении состояния инвентаря игрока. </summary>
-        private void OnInventoryChanged() => TryScheduleMagnet();
-
-        /// <summary> Планирует начало притягивания, если условия соблюдены. </summary>
-        private void TryScheduleMagnet()
-        {
-            if (_isScheduled || _isFlying || !CanStartMagnet()) return;
-
-            _isScheduled = true;
-            _delayTimer = 0f;
-        }
-
-        /// <summary> Обновление состояния объекта каждый кадр. </summary>
-        private void Update()
-        {
-            if (WorldTime.IsPaused) return;
-
-            if (_isScheduled && !_isFlying) UpdateDelayTimer();
-
-            if (_isFlying)
+            try
             {
-                MoveToPlayer();
-                if (ShouldCancelFlying()) CancelFlying();
+                await UniTask.Delay(
+                    TimeSpan.FromSeconds(_pickupSettings.MagnetActivationDelay), cancellationToken: token); 
+
+                while (!token.IsCancellationRequested)
+                {
+                    if (!_isFlying && CanStartMagnet())
+                    {
+                        BeginFlying();
+                        await MoveToPlayerAsync(token);
+                        FinishFlying();
+
+                        break;
+                    }
+
+                    await UniTask.Delay(
+                        TimeSpan.FromSeconds(_pickupSettings.MagnetCheckIntervalSeconds), cancellationToken: token);
+                }
             }
-            else
-            {
-                TryScheduleMagnet();
-            }
+            catch (OperationCanceledException) { }
         }
 
-        /// <summary> Обновляет таймер задержки и начинает полёт при его окончании. </summary>
-        private void UpdateDelayTimer()
-        {
-            _delayTimer -= Time.deltaTime;
-            if (_delayTimer <= 0f) BeginFlying();
-        }
-
-        /// <summary> Активирует режим полёта к игроку. </summary>
+        /// <summary> Инициализирует полёт предмета: отключает физику и коллайдеры. </summary>
         private void BeginFlying()
         {
             _isFlying = true;
-            _isScheduled = false;
-
             if (!_rigidbody.isKinematic)
             {
                 _rigidbody.linearVelocity = Vector3.zero;
@@ -138,62 +126,52 @@ namespace FlavorfulStory.PickupSystem
                 _rigidbody.isKinematic = true;
             }
 
-            EnableOnlyTriggerCollider();
+            foreach (var collider in _colliders) collider.enabled = collider == collider.isTrigger;
         }
 
-        /// <summary> Отключает все коллайдеры, кроме триггера. </summary>
-        private void EnableOnlyTriggerCollider()
+        /// <summary> Перемещает предмет к игроку с заданной скоростью до выхода из радиуса. </summary>
+        /// <param name="token"> Токен отмены для остановки движения. </param>
+        private async UniTask MoveToPlayerAsync(CancellationToken token)
         {
-            foreach (var collider in _colliders) collider.enabled = collider == _pickupTrigger || collider.isTrigger;
+            float speed = _pickupSettings.MagnetSpeedTiles * GridPositionProvider.CellSize;
+
+            while (IsInRange())
+            {
+                Vector3 target = _playerPositionProvider.GetPlayerPosition() + _playerOffset;
+                _transform.position = Vector3.MoveTowards(_transform.position, target, speed * Time.deltaTime);
+
+                await UniTask.Yield(PlayerLoopTiming.Update, token);
+            }
         }
 
-        /// <summary> Двигает предмет к игроку. </summary>
-        private void MoveToPlayer()
-        {
-            float speed = _magnetSpeedTiles * GridPositionProvider.CellSize;
-            var target = _playerPositionProvider.GetPlayerPosition() + _playerPositionOffset;
-            transform.position = Vector3.MoveTowards(transform.position, target, speed * Time.deltaTime);
-        }
-
-        /// <summary> Проверяет, следует ли отменить притягивание (например, если игрок ушёл слишком далеко). </summary>
-        private bool ShouldCancelFlying() => !IsInMagnetRange();
-
-        /// <summary> Проверяет, можно ли начать притягивание. </summary>
-        /// <returns> <c>True</c>, если условия для начала притягивания соблюдены. </returns>
-        private bool CanStartMagnet()
-        {
-            if (!_pickup.CanBePickedUp) return false;
-
-            return IsInMagnetRange();
-        }
-
-        /// <summary> Возвращает расстояние от предмета до игрока. </summary>
-        private float DistanceToPlayer() =>
-            Vector3.Distance(transform.position, _playerPositionProvider.GetPlayerPosition());
-
-        /// <summary> Возвращает максимальную дистанцию притягивания в мировых координатах. </summary>
-        private float MaxRangeWorld() => _magnetRangeTiles * GridPositionProvider.CellSize;
-
-        /// <summary> Останавливает притягивание и возвращает коллайдеры к обычному состоянию. </summary>
-        private void CancelFlying()
+        /// <summary> Завершает притягивание и включает все коллайдеры. </summary>
+        private void FinishFlying()
         {
             _isFlying = false;
-            _isScheduled = false;
-
-            _rigidbody.detectCollisions = true;
-            _rigidbody.useGravity = false;
-
             EnableAllColliders();
         }
 
-        /// <summary> Включает все физические (не-триггерные) коллайдеры. </summary>
+        /// <summary> Отменяет текущую задачу притягивания и сбрасывает флаги. </summary>
+        private void CancelFlying()
+        {
+            _cts?.Cancel();
+            _cts?.Dispose();
+            _cts = null;
+            _isFlying = false;
+        }
+
+        /// <summary> Проверяет, можно ли начать притягивание (по условиям и дистанции). </summary>
+        private bool CanStartMagnet() => _pickup.CanBePickedUp && IsInRange();
+
+        /// <summary> Проверяет, находится ли предмет в радиусе магнитного притягивания. </summary>
+        private bool IsInRange() =>
+            Vector3.Distance(_transform.position, _playerPositionProvider.GetPlayerPosition()) <= 
+                             _pickupSettings.MagnetRangeTiles * GridPositionProvider.CellSize;
+
+        /// <summary> Включает все коллайдеры предмета. </summary>
         private void EnableAllColliders()
         {
-            foreach (var collider in _colliders)
-                if (!collider.isTrigger)
-                    collider.enabled = true;
+            foreach (var collider in _colliders) collider.enabled = true;
         }
-        
-        private bool IsInMagnetRange() => DistanceToPlayer() <= MaxRangeWorld();
     }
 }

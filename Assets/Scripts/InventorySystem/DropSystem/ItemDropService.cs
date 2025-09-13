@@ -11,9 +11,6 @@ namespace FlavorfulStory.InventorySystem.DropSystem
     /// <summary> Сервис, отвечающий за выброс предметов из инвентаря в игровом мире. </summary>
     public class ItemDropService : IItemDropService, ISaveableService
     {
-        /// <summary> Задержка перед возможностью подбора предмета. </summary>
-        private const float PickupDelay = 1.5f;
-
         /// <summary> Сила, с которой выбрасываются ресурсы вверх при спавне. </summary>
         private const float ResourceDropForceValue = 5f;
 
@@ -44,7 +41,7 @@ namespace FlavorfulStory.InventorySystem.DropSystem
         /// <param name="force"> Применяемая сила (например, для отталкивания). </param>
         public void Drop(ItemStack itemStack, Vector3 position, Vector3? force = null)
         {
-            var pickup = Spawn(itemStack, position, PickupDelay);
+            var pickup = Spawn(itemStack, position);
             if (pickup && force.HasValue) ApplyForce(pickup, force.Value);
         }
 
@@ -64,10 +61,10 @@ namespace FlavorfulStory.InventorySystem.DropSystem
         /// <param name="position"> Позиция появления. </param>
         /// <param name="pickupDelay"> Задержка перед возможностью поднятия. </param>
         /// <returns> Ссылка на созданный Pickup. </returns>
-        private Pickup Spawn(ItemStack itemStack, Vector3 position, float pickupDelay = 1f)
+        private Pickup Spawn(ItemStack itemStack, Vector3 position)
         {
             var pickup = _pickupFactory.Create(itemStack.Item.PickupPrefab, position, parentTransform: _container);
-            pickup.Setup(itemStack, pickupDelay);
+            pickup.Setup(itemStack);
             _spawnedPickups.Add(pickup);
             return pickup;
         }

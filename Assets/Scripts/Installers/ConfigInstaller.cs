@@ -1,7 +1,8 @@
-using FlavorfulStory.Notifications.Configs;
-using FlavorfulStory.Windows;
 using UnityEngine;
 using Zenject;
+using FlavorfulStory.Notifications.Configs;
+using FlavorfulStory.PickupSystem;
+using FlavorfulStory.Windows;
 
 namespace FlavorfulStory.Installers
 {
@@ -18,12 +19,16 @@ namespace FlavorfulStory.Installers
         /// <summary> Настройки затемнения фона и HUD при открытии окон. </summary>
         [SerializeField] private OverlayFadeSettings _overlayFadeSettings;
 
+        /// <summary> Настройки затемнения фона и HUD при открытии окон. </summary>
+        [SerializeField] private PickupSettings _pickupSettings;
+        
         /// <summary> Привязывает конфиги в контейнер Zenject как singleton-инстансы. </summary>
         public override void InstallBindings()
         {
             Container.Bind<WindowAddresses>().FromInstance(_windowAddresses).AsSingle();
             Container.Bind<NotificationsSettings>().FromInstance(_notificationSettings).AsSingle();
             Container.Bind<OverlayFadeSettings>().FromInstance(_overlayFadeSettings).AsSingle();
+            Container.Bind<PickupSettings>().FromInstance(_pickupSettings).AsSingle();
         }
     }
 }
