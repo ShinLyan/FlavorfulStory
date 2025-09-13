@@ -1,6 +1,8 @@
-﻿using FlavorfulStory.Actions;
+﻿using System;
+using FlavorfulStory.Actions;
 using FlavorfulStory.InteractionSystem;
 using FlavorfulStory.Player;
+using FlavorfulStory.Saving;
 using FlavorfulStory.TimeManagement;
 using FlavorfulStory.TooltipSystem.ActionTooltips;
 using FlavorfulStory.Windows;
@@ -11,8 +13,9 @@ using DateTime = FlavorfulStory.TimeManagement.DateTime;
 
 namespace FlavorfulStory.Shop
 {
-    /// <summary> Компонент для управления состоянием магазина. </summary>
-    public class ShopLock : MonoBehaviour, IInteractable
+    /// <summary> Компонент для управления состоянием магазина. </summary> 
+    [RequireComponent(typeof(SaveableEntity))]
+    public class ShopLock : MonoBehaviour, IInteractable, ISaveable
     {
         /// <summary> Шина сигналов для коммуникации между системами. </summary>
         private SignalBus _signalBus;
@@ -148,6 +151,33 @@ namespace FlavorfulStory.Shop
         /// <summary> Завершить взаимодействие с магазином. </summary>
         /// <param name="player"> Контроллер игрока. </param>
         public void EndInteraction(PlayerController player) => player.SetBusyState(false);
+
+        #endregion
+
+        #region ISaveable
+
+        [Serializable]
+        private struct ShopSaveData
+        {
+            public bool IsOpen { get; }
+            public bool ClosedByPlayer { get; }
+
+            public ShopSaveData(bool isOpen, bool closedByPlayer)
+            {
+                IsOpen = isOpen;
+                ClosedByPlayer = closedByPlayer;
+            }
+        }
+
+        public object CaptureState() => new ShopSaveData(IsOpen, _closedByPlayer);
+
+        public void RestoreState(object state)
+        {
+            var saveData = (ShopSaveData)state;
+
+            IsOpen = saveData.IsOpen;
+            _closedByPlayer = saveData.ClosedByPlayer;
+        }
 
         #endregion
     }

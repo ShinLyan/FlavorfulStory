@@ -11,7 +11,7 @@ PrefabInstance:
     - target: {fileID: 3832487737651394562, guid: 138f89b76f0ea694f8c49f92363f2743,
         type: 3}
       propertyPath: m_Name
-      value: Props_MiniEasel Variant
+      value: ShopLock
       objectReference: {fileID: 0}
     - target: {fileID: 4495836965126546104, guid: 138f89b76f0ea694f8c49f92363f2743,
         type: 3}
@@ -70,6 +70,10 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 3832487737651394562, guid: 138f89b76f0ea694f8c49f92363f2743,
         type: 3}
       insertIndex: -1
+      addedObject: {fileID: 3150389027726001507}
+    - targetCorrespondingSourceObject: {fileID: 3832487737651394562, guid: 138f89b76f0ea694f8c49f92363f2743,
+        type: 3}
+      insertIndex: -1
       addedObject: {fileID: 6182600771679380802}
   m_SourcePrefab: {fileID: 100100000, guid: 138f89b76f0ea694f8c49f92363f2743, type: 3}
 --- !u!1 &579464000905712514 stripped
@@ -78,6 +82,19 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 4405945654142888832}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &3150389027726001507
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 579464000905712514}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3deb9cfb883439a4d9da32368c0a55b4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _uniqueIdentifier: 
 --- !u!114 &6182600771679380802
 MonoBehaviour:
   m_ObjectHideFlags: 0
