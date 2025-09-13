@@ -1,8 +1,8 @@
-﻿using FlavorfulStory.Infrastructure.Factories;
+﻿using UnityEngine;
+using Zenject;
+using FlavorfulStory.Infrastructure.Factories;
 using FlavorfulStory.InventorySystem;
 using FlavorfulStory.Saving;
-using UnityEngine;
-using Zenject;
 
 namespace FlavorfulStory.PickupSystem
 {
@@ -19,11 +19,19 @@ namespace FlavorfulStory.PickupSystem
 
         /// <summary> Фабрика для создания экземпляров предметов, доступных для подбора. </summary>
         private IPrefabFactory<Pickup> _pickupFactory;
+        
+        /// <summary> Настройки пикапа. </summary>
+        private PickupSettings _pickupSettings;
 
         /// <summary> Фабрика для создания экземпляров предметов, доступных для подбора. </summary>
         /// <param name="pickupFactory"> Фабрика для создания экземпляров предметов, доступных для подбора. </param>
+        /// <param name="pickupSettings"> Настройки пикапов. </param>
         [Inject]
-        private void Construct(IPrefabFactory<Pickup> pickupFactory) => _pickupFactory = pickupFactory;
+        private void Construct(IPrefabFactory<Pickup> pickupFactory, PickupSettings pickupSettings)
+        {
+            _pickupFactory = pickupFactory;
+            _pickupSettings = pickupSettings;
+        }
 
         /// <summary> Создает предмет при загрузке сцены. </summary>
         private void Start()
@@ -36,7 +44,7 @@ namespace FlavorfulStory.PickupSystem
         {
             var instance = _pickupFactory.Create(_itemStack.Item.PickupPrefab, transform.position,
                 Quaternion.identity, transform);
-            instance.Setup(_itemStack, 0f);
+            instance.Setup(_itemStack);
             _isPickedUp = true;
         }
 
@@ -48,7 +56,7 @@ namespace FlavorfulStory.PickupSystem
 
         /// <summary> Восстанавливает состояние объекта при загрузке. </summary>
         /// <param name="state"> Сохраненное состояние объекта. </param>
-        public void RestoreState(object state) => _isPickedUp = (bool)state;
+        public void RestoreState(object state) => _isPickedUp = (bool) state;
 
         #endregion
     }

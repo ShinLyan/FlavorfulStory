@@ -1,6 +1,7 @@
-﻿using FlavorfulStory.InventorySystem;
-using UnityEngine;
+﻿using UnityEngine;
 using Zenject;
+using FlavorfulStory.InventorySystem;
+using FlavorfulStory.Player;
 
 namespace FlavorfulStory.PickupSystem
 {
@@ -11,7 +12,7 @@ namespace FlavorfulStory.PickupSystem
     {
         /// <summary> Радиус подбора предмета. </summary>
         [Tooltip("Радиус подбора предмета."), SerializeField, Range(0f, 5f)]
-        private float _pickupRadius = 1f;
+        private float _pickupRadius;
 
         /// <summary> Стак предметов для подбора. </summary>
         [Tooltip("Стак предметов для подбора."), SerializeField]
@@ -26,25 +27,50 @@ namespace FlavorfulStory.PickupSystem
         /// <summary> Провайдер инвентарей. </summary>
         private IInventoryProvider _inventoryProvider;
 
+        /// <summary> Провайдер позиции игрока. </summary>
+        private IPlayerPositionProvider _playerPositionProvider;
+
+        /// <summary> Настройки пикапов. </summary>
+        private PickupSettings _pickupSettings;
+        
+        /// <summary> Магнит. </summary>
+        private PickupMagnet _magnet;
+        
         /// <summary> Флаг, указывающий, можно ли подбирать предмет. </summary>
         private bool _canBePickedUp;
 
         /// <summary> Возвращает true, если предмет можно подобрать и в инвентаре есть место. </summary>
-        private bool CanBePickedUp => _canBePickedUp && _inventoryProvider.GetPlayerInventory().HasSpaceFor(Item);
+        public bool CanBePickedUp => _canBePickedUp && _inventoryProvider.GetPlayerInventory().HasSpaceFor(Item);
 
         /// <summary> Внедрение зависимостей Zenject. </summary>
         /// <param name="inventoryProvider"> Провайдер инвентарей. </param>
+        /// <param name="playerPositionProvider"> Провайдер позиции игрока. </param>
+        /// <param name="pickupSettings"> Настройки пикапа. </param>
         [Inject]
-        private void Construct(IInventoryProvider inventoryProvider) => _inventoryProvider = inventoryProvider;
+        private void Construct(
+            IInventoryProvider inventoryProvider, 
+            IPlayerPositionProvider playerPositionProvider, 
+            PickupSettings pickupSettings)
+        {
+            _inventoryProvider = inventoryProvider;
+            _pickupSettings = pickupSettings;
+            _magnet = new PickupMagnet(
+                this,
+                transform,
+                GetComponent<Rigidbody>(),
+                GetComponentsInChildren<Collider>(true),
+                playerPositionProvider,
+                inventoryProvider,
+                _pickupSettings);
+        }
 
         /// <summary> Устанавливает предмет, количество и задержку перед возможностью подбора. </summary>
         /// <param name="itemStack"> Предмет и его количество, которые можно подобрать. </param>
-        /// <param name="pickupDelay"> Задержка в секундах до возможности подбора. </param>
-        public void Setup(ItemStack itemStack, float pickupDelay = 1f)
+        public void Setup(ItemStack itemStack)
         {
             _itemStack = itemStack;
             _canBePickedUp = false;
-            Invoke(nameof(ActivatePickup), pickupDelay);
+            Invoke(nameof(ActivatePickup), _pickupSettings.PickupActivationDelay);
         }
 
         /// <summary> Пытается подобрать предмет и удалить его из мира. </summary>
@@ -56,7 +82,14 @@ namespace FlavorfulStory.PickupSystem
         }
 
         /// <summary> Делает предмет доступным для подбора. </summary>
-        private void ActivatePickup() => _canBePickedUp = true;
+        private void ActivatePickup()
+        {
+            _canBePickedUp = true;
+            _magnet?.ScheduleMagnet();
+        } 
+
+        /// <summary> Отписка магнита от инвентаря игрока при уничтожении. </summary>
+        private void OnDestroy() => _magnet?.Dispose();
 
 #if UNITY_EDITOR
 
@@ -80,11 +113,11 @@ namespace FlavorfulStory.PickupSystem
         private void IgnorePlayerOnChildColliders()
         {
             int playerLayer = 1 << LayerMask.NameToLayer("Player");
-            foreach (var collider in GetComponentsInChildren<Collider>(true))
+            foreach (var col in GetComponentsInChildren<Collider>(true))
             {
-                if (collider.gameObject == gameObject) continue;
+                if (col.gameObject == gameObject) continue;
 
-                collider.excludeLayers = playerLayer;
+                col.excludeLayers = playerLayer;
             }
         }
 

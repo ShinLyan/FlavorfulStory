@@ -14,12 +14,12 @@ namespace FlavorfulStory.GridSystem
         /// <summary> Слой, на который можно размещать объекты. </summary>
         private static readonly int PlacementLayerMask = LayerMask.GetMask("Placement");
 
-        /// <summary> Размер клетки в гриде. </summary>
-        private const float CellSize = 1f;
-
         /// <summary> Половина размера клетки. </summary>
         public static readonly Vector3 CellHalfExtents = new(0.5f, 0.5f, 0.5f);
 
+        /// <summary> Размер клетки в гриде. </summary>
+        public const float CellSize = 1f;
+        
         /// <summary> Конструктор, принимающий ссылку на компонент Grid. </summary>
         /// <param name="grid"> Сетка, в которой происходит размещение объектов. </param>
         public GridPositionProvider(Grid grid) => _grid = grid;
