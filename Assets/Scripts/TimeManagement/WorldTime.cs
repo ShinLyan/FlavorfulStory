@@ -149,11 +149,11 @@ namespace FlavorfulStory.TimeManagement
                     break;
 
                 case ShopOpenHour:
-                    _signalBus.Fire(new ShopStateChangedSignal(true));
+                    _signalBus.Fire(new ShopStateChangedSignal(true, false));
                     break;
 
                 case ShopCloseHour:
-                    _signalBus.Fire(new ShopStateChangedSignal(false));
+                    _signalBus.Fire(new ShopStateChangedSignal(false, false));
                     break;
             }
         }

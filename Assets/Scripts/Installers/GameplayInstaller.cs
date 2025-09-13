@@ -116,6 +116,7 @@ namespace FlavorfulStory.Installers
             Container.DeclareSignal<ExhaustedSleepSignal>();
 
             Container.DeclareSignal<ShopStateChangedSignal>();
+            Container.DeclareSignal<UnableToChangeShopStateSignal>();
         }
 
         /// <summary> Установить зависимости, связанные с ремонтом построек. </summary>
@@ -188,6 +189,7 @@ namespace FlavorfulStory.Installers
             Container.BindInterfacesTo<SignalNotifier<DismantleDeniedSignal>>().AsSingle();
             Container.BindInterfacesTo<SignalNotifier<SaveCompletedSignal>>().AsSingle();
             Container.BindInterfacesTo<SignalNotifier<ExhaustedSleepSignal>>().AsSingle();
+            Container.BindInterfacesTo<SignalNotifier<UnableToChangeShopStateSignal>>().AsSingle();
 
             Container.Bind<NotificationAnchorLocator>().FromComponentInHierarchy().AsSingle();
             Container.BindInterfacesAndSelfTo<NotificationService>().AsSingle();

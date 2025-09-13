@@ -188,6 +188,8 @@ namespace FlavorfulStory.AI.NonInteractableNpc
         private void UnsubscribeSequences()
         {
             ((SequenceState)_nameToCharacterStates[NpcStateName.BuyItemSequence]).OnSequenceEnded -=
+                GoToDespawnPoint;
+            ((SequenceState)_nameToCharacterStates[NpcStateName.BuyItemSequence]).OnSequenceEnded -=
                 HandleAfterPurchaseTransition;
             ((SequenceState)_nameToCharacterStates[NpcStateName.FurnitureSequence]).OnSequenceEnded -=
                 HandleAfterFurnitureSequence;
