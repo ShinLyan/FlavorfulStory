@@ -19,6 +19,9 @@
         SaveCompleted,
 
         /// <summary> Уведомление об истощении и переходе ко сну. </summary>
-        ExhaustedSleep
+        ExhaustedSleep,
+
+        /// <summary> Уведомление о невозможности изменить состояние магазина. </summary>
+        UnableToChangeShopState
     }
 }

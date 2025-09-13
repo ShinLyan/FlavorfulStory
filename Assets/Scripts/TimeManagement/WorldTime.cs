@@ -2,6 +2,7 @@ using System;
 using FlavorfulStory.EditorTools.Attributes;
 using FlavorfulStory.Saving;
 using FlavorfulStory.SceneManagement;
+using FlavorfulStory.Shop;
 using UnityEngine;
 using Zenject;
 
@@ -119,16 +120,42 @@ namespace FlavorfulStory.TimeManagement
         /// <summary> Обработчик, вызываемый на каждый тик времени. </summary>
         private void HandleTimeTick(DateTime time)
         {
-            const int DayEndHour = 2;
-            const int MidnightHour = 0;
-
             int previousHour = (int)_previousTime.Hour;
             int currentHour = (int)time.Hour;
 
-            if (previousHour != DayEndHour && currentHour == DayEndHour) BeginNewDay(10);
+            HandleHourTransition(previousHour, currentHour);
+        }
 
-            if (previousHour != MidnightHour && currentHour == MidnightHour)
-                _signalBus.Fire(new MidnightStartedSignal());
+        /// <summary> Обрабатывает переход между игровыми часами. </summary>
+        /// <param name="previousHour"> Предыдущий час. </param>
+        /// <param name="currentHour"> Текущий час. </param>
+        private void HandleHourTransition(int previousHour, int currentHour)
+        {
+            const int DayEndHour = 2;
+            const int MidnightHour = 0;
+            const int ShopOpenHour = 8;
+            const int ShopCloseHour = 20;
+
+            if (previousHour == currentHour) return;
+
+            switch (currentHour)
+            {
+                case DayEndHour:
+                    BeginNewDay(10);
+                    break;
+
+                case MidnightHour:
+                    _signalBus.Fire(new MidnightStartedSignal());
+                    break;
+
+                case ShopOpenHour:
+                    _signalBus.Fire(new ShopStateChangedSignal(true, false));
+                    break;
+
+                case ShopCloseHour:
+                    _signalBus.Fire(new ShopStateChangedSignal(false, false));
+                    break;
+            }
         }
 
         /// <summary> Расчёт множителя скорости. </summary>

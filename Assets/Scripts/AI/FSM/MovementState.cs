@@ -1,5 +1,6 @@
 using FlavorfulStory.AI.BaseNpc;
 using FlavorfulStory.TimeManagement;
+using UnityEngine;
 
 namespace FlavorfulStory.AI.FSM
 {
@@ -36,7 +37,7 @@ namespace FlavorfulStory.AI.FSM
             if (Context.TryGet(FsmContextType.DestinationPoint, out NpcDestinationPoint destinationPoint))
             {
                 _destinationPoint = destinationPoint;
-                _movementController.MoveToPoint(destinationPoint);
+                _movementController.MoveToPoint(_destinationPoint);
                 _animationController.TriggerAnimation(AnimationType.Locomotion);
             }
 

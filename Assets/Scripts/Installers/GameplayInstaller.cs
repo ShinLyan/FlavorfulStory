@@ -57,22 +57,20 @@ namespace FlavorfulStory.Installers
         [SerializeField] private ItemTooltipView _itemTooltipPrefab;
 
         /// <summary> Префаб отображения ячейки инвентаря. </summary>
-        [Header("Inventory")]
-        [SerializeField] private InventorySlotView _inventorySlotViewPrefab;
+        [Header("Inventory")] [SerializeField] private InventorySlotView _inventorySlotViewPrefab;
 
         /// <summary> Родительский контейнер для выбрасываемых предметов. </summary>
         [SerializeField] private Transform _itemDropContainer;
 
         /// <summary> Индикатор клетки на гриде. </summary>
-        [Header("Placement System")]
-        [SerializeField] private GameObject _gridIndicator;
+        [Header("Placement System")] [SerializeField]
+        private GameObject _gridIndicator;
 
         /// <summary> Родительский контейнер для размещаемых объектов. </summary>
         [SerializeField] private Transform _placeableContainer;
 
         /// <summary> Сопоставления типов инструментов с их префабами для визуализации в руке игрока. </summary>
-        [Header("Tools")]
-        [SerializeField] private ToolPrefabMapping[] _toolMappings;
+        [Header("Tools")] [SerializeField] private ToolPrefabMapping[] _toolMappings;
 
         /// <summary> Слои, по которым производится удар с помощью инструмента. </summary>
         [SerializeField] private LayerMask _hitableLayers;
@@ -125,6 +123,9 @@ namespace FlavorfulStory.Installers
 
             Container.DeclareSignal<SaveCompletedSignal>();
             Container.DeclareSignal<ExhaustedSleepSignal>();
+
+            Container.DeclareSignal<ShopStateChangedSignal>();
+            Container.DeclareSignal<UnableToChangeShopStateSignal>();
         }
 
         /// <summary> Установить зависимости, связанные с ремонтом построек. </summary>
@@ -197,6 +198,7 @@ namespace FlavorfulStory.Installers
             Container.BindInterfacesTo<SignalNotifier<DismantleDeniedSignal>>().AsSingle();
             Container.BindInterfacesTo<SignalNotifier<SaveCompletedSignal>>().AsSingle();
             Container.BindInterfacesTo<SignalNotifier<ExhaustedSleepSignal>>().AsSingle();
+            Container.BindInterfacesTo<SignalNotifier<UnableToChangeShopStateSignal>>().AsSingle();
 
             Container.Bind<NotificationAnchorLocator>().FromComponentInHierarchy().AsSingle();
             Container.BindInterfacesAndSelfTo<NotificationService>().AsSingle();
@@ -283,6 +285,8 @@ namespace FlavorfulStory.Installers
 
             Container.Bind<IPrefabFactory<NonInteractableNpc>>()
                 .To<Infrastructure.Factories.PrefabFactory<NonInteractableNpc>>().AsSingle();
+
+            Container.BindInterfacesAndSelfTo<ShopLock>().FromComponentsInHierarchy().AsSingle();
         }
     }
 }

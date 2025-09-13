@@ -3,6 +3,7 @@ using FlavorfulStory.AI.BaseNpc;
 using FlavorfulStory.AI.FSM;
 using FlavorfulStory.Economy;
 using FlavorfulStory.SceneManagement;
+using FlavorfulStory.Shop;
 using UnityEngine;
 using Zenject;
 
@@ -18,6 +19,12 @@ namespace FlavorfulStory.AI.NonInteractableNpc
         /// <summary> Сервис для транзакций. </summary>
         private TransactionService _transactionService;
 
+        /// <summary> Замок магазина. </summary>
+        private ShopLock _shopLock;
+
+        /// <summary> Сигнальная шина. </summary>
+        private SignalBus _signalBus;
+
         /// <summary> Стейт-контроллер для неинтерктивного НПС. </summary>
         private NonInteractableNpcStateController _stateController;
 
@@ -30,11 +37,16 @@ namespace FlavorfulStory.AI.NonInteractableNpc
         /// <summary> Внедряет зависимости Zenject. </summary>
         /// <param name="locationManager"> Менеджер локаций. </param>
         /// <param name="transactionService"> Сервис транзакций. </param>
+        /// <param name="signalBus"> Сигнальная шина. </param>
+        /// <param name="shopLock"> Замок магазина. </param>
         [Inject]
-        private void Construct(LocationManager locationManager, TransactionService transactionService)
+        private void Construct(LocationManager locationManager, TransactionService transactionService,
+            SignalBus signalBus, ShopLock shopLock)
         {
             _locationManager = locationManager;
             _transactionService = transactionService;
+            _signalBus = signalBus;
+            _shopLock = shopLock;
         }
 
         /// <summary> Выполняет инициализацию компонентов NPC. </summary>
@@ -43,7 +55,8 @@ namespace FlavorfulStory.AI.NonInteractableNpc
             base.Awake();
 
             _stateController = new NonInteractableNpcStateController(MovementController, _locationManager,
-                AnimationController, _transactionService, transform, GetComponent<NpcPurchaseIndicator>());
+                AnimationController, _transactionService, transform, GetComponent<NpcPurchaseIndicator>(),
+                _shopLock, _signalBus);
         }
 
         /// <summary> Устанавливает цель для перемещения NPC с автоматическим запуском
@@ -55,7 +68,16 @@ namespace FlavorfulStory.AI.NonInteractableNpc
             context.Set(FsmContextType.DestinationPoint, npcDestination);
 
             _stateController.ForceSetState(NpcStateName.Movement, context);
-            MovementController.OnDestinationReached += () => _stateController.StartRandomSequence();
+            MovementController.OnDestinationReached += OnReached;
+        }
+
+        /// <summary> Действие при достижении точки. </summary>
+        private void OnReached()
+        {
+            if (_shopLock.IsOpen)
+                _stateController.StartRandomSequence();
+            else
+                _stateController.GoToDespawnPoint();
         }
 
         /// <summary> Устанавливает точку исчезновения для неинтерактивного NPC. </summary>

@@ -22,6 +22,9 @@
         GetMoney,
 
         /// <summary> Открыть сундук / прилавок. </summary>
-        Open
+        Open,
+
+        /// <summary> Закрыть. </summary>
+        Close
     }
 }
