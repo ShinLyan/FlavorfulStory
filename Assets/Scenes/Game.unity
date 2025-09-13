@@ -290,12 +290,6 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 395860145}
   m_PrefabAsset: {fileID: 0}
---- !u!198 &570972561 stripped
-ParticleSystem:
-  m_CorrespondingSourceObject: {fileID: 2188401316080140410, guid: a9114609ac4097e459c8c7e1f3d67d2b,
-    type: 3}
-  m_PrefabInstance: {fileID: 895288242}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &629537258
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1192,12 +1186,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a9114609ac4097e459c8c7e1f3d67d2b, type: 3}
---- !u!1 &918152623 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 6369924165669710491, guid: a9114609ac4097e459c8c7e1f3d67d2b,
-    type: 3}
-  m_PrefabInstance: {fileID: 895288242}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &950797354
 GameObject:
   m_ObjectHideFlags: 0
@@ -1496,84 +1484,6 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1514013231}
   m_PrefabAsset: {fileID: 0}
---- !u!1001 &1547552011
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 4847369762703888537, guid: c5c5cf5a342838d4d8519aec83ee8006,
-        type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4847369762703888537, guid: c5c5cf5a342838d4d8519aec83ee8006,
-        type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4847369762703888537, guid: c5c5cf5a342838d4d8519aec83ee8006,
-        type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4847369762703888537, guid: c5c5cf5a342838d4d8519aec83ee8006,
-        type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4847369762703888537, guid: c5c5cf5a342838d4d8519aec83ee8006,
-        type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4847369762703888537, guid: c5c5cf5a342838d4d8519aec83ee8006,
-        type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4847369762703888537, guid: c5c5cf5a342838d4d8519aec83ee8006,
-        type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4847369762703888537, guid: c5c5cf5a342838d4d8519aec83ee8006,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4847369762703888537, guid: c5c5cf5a342838d4d8519aec83ee8006,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4847369762703888537, guid: c5c5cf5a342838d4d8519aec83ee8006,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7484373122585158868, guid: c5c5cf5a342838d4d8519aec83ee8006,
-        type: 3}
-      propertyPath: m_Name
-      value: WeatherGenerator
-      objectReference: {fileID: 0}
-    - target: {fileID: 7572364593481823560, guid: c5c5cf5a342838d4d8519aec83ee8006,
-        type: 3}
-      propertyPath: _particleParent
-      value: 
-      objectReference: {fileID: 918152623}
-    - target: {fileID: 7572364593481823560, guid: c5c5cf5a342838d4d8519aec83ee8006,
-        type: 3}
-      propertyPath: _weatherSettings.Array.data[1].<ParticleObject>k__BackingField
-      value: 
-      objectReference: {fileID: 570972561}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: c5c5cf5a342838d4d8519aec83ee8006, type: 3}
 --- !u!1001 &2057708486
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1827,7 +1737,6 @@ SceneRoots:
   - {fileID: 8195510124016254902}
   - {fileID: 5243182215877109707}
   - {fileID: 950797356}
-  - {fileID: 1547552011}
   - {fileID: 2121134258}
   - {fileID: 2057708486}
   - {fileID: 1326435316}
